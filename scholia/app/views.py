@@ -20,6 +20,11 @@ def redirect_orcid(orcid_):
     return redirect("../author/{q}".format(q=q), code=302)
 
 
+@app.route('/organization/<q_>')
+def show_organization(q_):
+    return render_template('organization.html', q=q_)
+
+
 @app.route('/author/<q_>')
 def show_author(q_):
     q = "Q20980928"
