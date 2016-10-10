@@ -1,7 +1,7 @@
 """Views for app."""
 
 
-from flask import redirect, render_template
+from flask import redirect, render_template, url_for
 
 from . import app
 from ..query import orcid_to_qs
@@ -17,7 +17,7 @@ def redirect_orcid(orcid_):
     qs = orcid_to_qs(orcid_)
     if len(qs) > 0:
         q = qs[0]
-    return redirect("../author/{q}".format(q=q), code=302)
+    return redirect(url_for('show_author', q_=q), code=302)
 
 
 @app.route('/organization/<q_>')
