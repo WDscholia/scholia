@@ -62,7 +62,7 @@ def orcid_to_qs(orcid):
     """
     query = 'select ?author where {{ ?author wdt:P496 "{orcid}" }}'.format(
         orcid=escape_string(orcid))
-    
+
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
@@ -70,7 +70,7 @@ def orcid_to_qs(orcid):
 
     return [item['author']['value'][31:]
             for item in data['results']['bindings']]
-    
+
 
 def main():
     """Handle command-line interface."""
