@@ -1,18 +1,24 @@
-<html>
-  <head>
-    <title>Scholia</title>
-  </head>
+{% extends "base.html" %}
 
-  <body>
-    <h1>Scholia</h1>
+{% block page_content %}
 
-    <h2>Examples</h2>
-    <ul>
-      <li><a href="author/Q18618629">Q18618629</a> (Denny Vrandečić)
-      <li><a href="orcid/0000-0001-7542-0286">orcid/0000-0001-7542-0286</a>
-      <li><a href="organization/Q1269766">organization/Q1269766</a>
-      <li><a href="venue/Q1981225">venue/Q1981225</a> (NeuroImage)
-    </ul>
-  </body>
-</html>
+Scholarly profile pages constructed from queries to
+<a href="https://query.wikidata.org/">Wikidata Query Service</a>.
+
+<h2>Examples</h2>
+<hr>
+
+<ul>
+  <li><a href="author/Q18618629">Denny Vrandečić</a>
+  <li><a href="orcid/0000-0001-7542-0286">ORCID 0000-0001-7542-0286</a>
+  <li><a href="organization/Q1269766">Technical University of Denmark</a>
+  <li><a href="venue/Q1981225">NeuroImage</a>
+</ul>
+
+<hr>
+
+<a href="https://github.com/fnielsen/scholia">GitHub repository</a>
+
+{% endblock %}
+
   
