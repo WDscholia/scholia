@@ -14,12 +14,12 @@
 
     <h2>Author images</h2>
 
-    <iframe style="width:96vw; height:50vh;" scrolling="yes" frameborder="0" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0Aselect%20%28sample%28%3Fimage%29%20as%20%3Fanimage%29%20%3FauthorLabel%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3AQ1981225%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%3Fauthor%20wdt%3AP18%20%3Fimage%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%20group%20by%20%3Fauthor%20%3FauthorLabel%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2050"></iframe>
+    <iframe style="width:96vw; height:50vh;" scrolling="yes" frameborder="0" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0Aselect%20%28sample%28%3Fimage%29%20as%20%3Fanimage%29%20%3FauthorLabel%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%3Fauthor%20wdt%3AP18%20%3Fimage%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%20group%20by%20%3Fauthor%20%3FauthorLabel%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2050"></iframe>
     
 
     <h2>Author gender distribution</h2>
 
-    <iframe style="width:96vw; height:20vh;" scrolling="yes" frameborder="0" src="https://query.wikidata.org/embed.html#select%20%28count%28%3Fauthor%29%20as%20%3Fcount%29%20%3FgenderLabel%20%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3AQ1981225%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%3Fauthor%20wdt%3AP21%20%3Fgender%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Fgender%20%3FgenderLabel"></iframe>
+    <iframe style="width:96vw; height:20vh;" scrolling="yes" frameborder="0" src="https://query.wikidata.org/embed.html#select%20%28count%28%3Fauthor%29%20as%20%3Fcount%29%20%3FgenderLabel%20%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%3Fauthor%20wdt%3AP21%20%3Fgender%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Fgender%20%3FgenderLabel"></iframe>
     
   </body>
 </html>
