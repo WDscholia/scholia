@@ -1,19 +1,8 @@
-<html>
+{% extends "author_base.html" %}
 
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta http-equiv="Content-language" content="en">
+{% block content %}
 
-    <title>Scholia</title>
-
-  </head>
-
-  <body>
-    <h1>Scholia</h1>
-
-    Scholarly profile page constructed from queries to
-    <a href="https://query.wikidata.org/">Wikidata Query Service</a>.
-    
+   
     <h2>Education</h2>
 
     <iframe style="width:96vw; height:50vh;" frameborder="0" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20%3Feducation%20%3Feducation_label%20%3Feducation_beginning%20%3Feducation_ending%20%3Feducation_degree_label%20WHERE%20%7B%0A%20%20wd%3A{{ q }}%20p%3AP69%20%3Feducation_statement%20.%0A%20%20%3Feducation_statement%20ps%3AP69%20%3Feducation%20.%0A%20%20%3Feducation%20rdfs%3Alabel%20%3Feducation_label%20.%20filter%20%28lang%28%3Feducation_label%29%20%3D%20%27en%27%29%0A%20%20optional%20%7B%20%3Feducation_statement%20pq%3AP580%20%3Feducation_beginning%20.%20%7D%0A%20%20optional%20%7B%20%3Feducation_statement%20pq%3AP582%20%3Feducation_ending%20.%20%7D%0A%20%20optional%20%7B%20%3Feducation_statement%20pq%3AP512%20%3Feducation_degree%20.%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Feducation_degree%20rdfs%3Alabel%20%3Feducation_degree_label%20.%20filter%20%28lang%28%3Feducation_degree_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22.%20%7D%20%20%0A%7D%20"></iframe>
@@ -65,6 +54,4 @@
 
     <iframe style="width:80vw; height:50vh;" scrolling="yes" frameborder="0" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20%3Fciting_author%20%3Fciting_author_label%20%28count%28%3Fciting_work%29%20as%20%3Fcount%29%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%0A%20%20minus%20%7B%20%3Fciting_work%20wdt%3AP50%20wd%3A{{ q }}%20%7D%0A%20%20%3Fciting_work%20wdt%3AP50%20%3Fciting_author%20.%0A%20%20%3Fciting_author%20rdfs%3Alabel%20%3Fciting_author_label%20.%20filter%20%28lang%28%3Fciting_author_label%29%20%3D%20%27en%27%29%0A%7D%20group%20by%20%3Fciting_author%20%3Fciting_author_label%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2020"></iframe>
 
-
-  </body>
-</html>
+{% endblock %}
