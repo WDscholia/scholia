@@ -4,14 +4,13 @@
 from flask import redirect, render_template, url_for
 
 from . import app
-from ..query import orcid_to_qs
+from ..query import orcid_to_qs, twitter_to_qs
 from ..utils import sanitize_q
 
 
 @app.route("/")
 def index():
     return render_template('index.html')
-
 
 
 @app.route('/author/<q_>')
@@ -44,6 +43,14 @@ def show_organization_empty():
     return render_template('organization_empty.html')
 
 
+@app.route('/twitter/<twitter_>')
+def redirect_twitter(twitter_):
+    qs = twitter_to_qs(twitter_)
+    if len(qs) > 0:
+        q = qs[0]
+    return redirect(url_for('show_author', q_=q), code=302)
+
+
 @app.route('/venue/<q_>')
 def show_venue(q_):
     q = sanitize_q(q_)
@@ -53,4 +60,3 @@ def show_venue(q_):
 @app.route('/venue/')
 def show_venue_empty():
     return render_template('venue_empty.html')
-
