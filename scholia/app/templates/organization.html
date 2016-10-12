@@ -3,6 +3,8 @@
 {% block content %}
     <h2>Employee</h2>
 
+    (past and present)<br/>
+    
     <iframe style="width:96vw; height:50vh;" scrolling="yes" frameborder="0" src="https://query.wikidata.org/embed.html#select%20%3Fresearcher%20%3FresearcherLabel%20%3Fbirthdate%20where%20%7B%0A%20%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%0A%20%20optional%20%7B%20%3Fresearcher%20wdt%3AP569%20%3Fbirthdate%20.%20%7D%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cjp%2Cda%22%20.%20%7D%20%0A%7D%20order%20by%20desc%28%3Fbirthdate%29"></iframe>
     
     <h2>Awards</h2>
