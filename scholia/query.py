@@ -1,7 +1,8 @@
-"""query
+"""query.
 
 Usage:
   scholia.query orcid-to-q <orcid>
+  scholia.query twitter-to-q <twitter>
 
 Examples:
   $ python -m scholia.query orcid-to-q 0000-0001-6128-3356
@@ -72,6 +73,37 @@ def orcid_to_qs(orcid):
             for item in data['results']['bindings']]
 
 
+def twitter_to_qs(twitter):
+    """Convert Twitter account name to Wikidata ID.
+
+    Parameters
+    ----------
+    twitter : str
+        Twitter account identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> twitter_to_qs('utafrith') == ['Q8219']
+    True
+
+    """
+    query = 'select ?author where {{ ?author wdt:P2002 "{twitter}" }}'.format(
+        twitter=escape_string(twitter))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    return [item['author']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def main():
     """Handle command-line interface."""
     from docopt import docopt
@@ -80,6 +112,10 @@ def main():
 
     if arguments['orcid-to-q']:
         qs = orcid_to_qs(arguments['<orcid>'])
+        if len(qs) > 0:
+            print(qs[0])
+    elif arguments['twitter-to-q']:
+        qs = twitter_to_qs(arguments['<twitter>'])
         if len(qs) > 0:
             print(qs[0])
 
