@@ -1,4 +1,4 @@
-"""query
+"""query.
 
 Usage:
   scholia orcid-to-q <orcid>
@@ -16,7 +16,7 @@ from .query import orcid_to_qs
 
 
 arguments = docopt(__doc__)
-    
+
 if arguments['orcid-to-q']:
     qs = orcid_to_qs(arguments['<orcid>'])
     if len(qs) > 0:
