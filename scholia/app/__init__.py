@@ -1,3 +1,5 @@
+"""app."""
+
 
 from __future__ import absolute_import, division, print_function
 
@@ -8,7 +10,3 @@ app = Flask(__name__)
 Bootstrap(app)
 
 from . import views
-
-
-
-
