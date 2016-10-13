@@ -1,6 +1,9 @@
 {% extends "venue_base.html" %}
 
 {% block content %}
+<h1 id="h1">Venue</h1>
+
+
     <h2>Recently published works</h2>
     
     <iframe style="width:96vw; height:50vh;" scrolling="yes" frameborder="0" src="https://query.wikidata.org/embed.html#select%20%3Fwork%20%3Fpublication_date%20%3FworkLabel%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20optional%20%7B%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%0Aorder%20by%20desc%28%3Fpublication_date%29%0Alimit%2050"></iframe>
