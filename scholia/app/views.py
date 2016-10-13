@@ -43,6 +43,17 @@ def show_organization_empty():
     return render_template('organization_empty.html')
 
 
+@app.route('/topic/<q_>')
+def show_topic(q_):
+    q = sanitize_q(q_)
+    return render_template('topic.html', q=q)
+
+
+@app.route('/topic/')
+def show_topic_empty():
+    return render_template('topic_empty.html')
+
+
 @app.route('/twitter/<twitter_>')
 def redirect_twitter(twitter_):
     qs = twitter_to_qs(twitter_)
