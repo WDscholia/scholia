@@ -3,28 +3,25 @@
 {% block title %}Scholia{% endblock %}
 
 {% block scripts %}
-<script src="{{url_for('.static', filename='wikidata-sdk.min.js')}}"></script>
 {{super()}}
 
-<script>
-var url = wdk.getEntities('Q535')
-request(url, function(err, response){
-  if (err) { dealWithError(err) }
-  var entity = response.entities.Q535
-  simplifiedClaims = wdk.simplifyClaims(entity.claims)
-})
+<script type="text/javascript">
+var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids={{ q }}&format=json&callback=?'
+$.getJSON(url, function (data) {
+  $("#h1").text(data.entities.{{ q }}.labels.en.value + ' ({{ q }})');
+});
 </script>
-
 {% endblock %}
 
 {% block navbar %}
 <div class="navbar navbar-static-top">
   <ul class="nav nav-pills">
-  <li role="presentation" class="active"><a href="#">Scholia</a></li>
-  <li role="presentation"><a href="author/">Author</a></li>
-  <li role="presentation"><a href="organization/">Organization</a></li>
-  <li role="presentation"><a href="venue/">Venue</a></li>
-</ul>
+    <li role="presentation" class="active"><a href="#">Scholia</a></li>
+    <li role="presentation"><a href="author/">Author</a></li>
+    <li role="presentation"><a href="organization/">Organization</a></li>
+    <li role="presentation"><a href="venue/">Venue</a></li>
+    <li role="presentation"><a href="topic/">Topic</a></li>
+  </ul>
 </div>
 {% endblock %}
 
