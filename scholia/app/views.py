@@ -71,3 +71,9 @@ def show_venue(q_):
 @app.route('/venue/')
 def show_venue_empty():
     return render_template('venue_empty.html')
+
+
+@app.route('/static/<path:filename>')
+def serve_bootstrap_custom(filename):
+    # https://github.com/mbr/flask-bootstrap/issues/88
+    return app.send_static_file('bootstrap_custom/' + filename)
