@@ -1,5 +1,12 @@
 {% extends "bootstrap/base.html" %}
 
+{% block head %}
+{{super()}}
+
+<link rel="stylesheet" type="text/css" href="/static/css/scholia.css">
+
+{% endblock %}
+
 {% block title %}Scholia{% endblock %}
 
 {% block scripts %}
@@ -8,8 +15,17 @@
 <script type="text/javascript">
 var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids={{ q }}&format=json&callback=?'
 $.getJSON(url, function (data) {
-  $("#h1").text(data.entities.{{ q }}.labels.en.value + ' ({{ q }})');
+  $("#h1").text(data.entities.{{ q }}.labels.en.value).append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
+
+  var title = data.entities.{{ q }}.sitelinks.enwiki.title;
+  var wikipediaUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&explaintext=1&callback=?&format=json&titles=' + title;
+  $.getJSON(wikipediaUrl, function (data) {
+    var pages = data.query.pages
+    $("#intro").text(pages[Object.keys(pages)[0]].extract + " ... (from the English Wikipedia)");
+  });
+
 });
+
 </script>
 {% endblock %}
 
