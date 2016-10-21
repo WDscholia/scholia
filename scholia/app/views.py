@@ -73,6 +73,17 @@ def show_venue_empty():
     return render_template('venue_empty.html')
 
 
+@app.route('/work/<q_>')
+def show_work(q_):
+    q = sanitize_q(q_)
+    return render_template('work.html', q=q)
+
+
+@app.route('/work/')
+def show_work_empty():
+    return render_template('work_empty.html')
+
+
 @app.route('/static/<path:filename>')
 def serve_bootstrap_custom(filename):
     # https://github.com/mbr/flask-bootstrap/issues/88
