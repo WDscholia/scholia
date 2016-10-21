@@ -1,7 +1,7 @@
 {% extends "topic_base.html" %}
 
 
-{% block content %}
+{% block page_content %}
 
 <h1 id=h1>Topic</h1>
 
@@ -10,13 +10,16 @@
 
 <h2>Recently published works within the topic</h2>
 
-<iframe style="width:96vw; height:70vh;" scrolling="yes" frameborder="0" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20%28group_concat%28%3Ftopic_label%3B%20separator%3D%22%20%2F%2F%20%22%29%20as%20%3Ftopics%29%20%28min%28%3Fdates%29%20as%20%3Fdate%29%20%3Fwork%20%3FworkLabel%20WHERE%20%7B%0A%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%20%23%20filter%20%28%3Ftopic%20%21%3D%20wd%3A{{ q }}%29%0A%20%20optional%20%7B%20%3Fwork%20wdt%3AP577%20%3Fdates%20.%20%7D%0A%20%20%3Ftopic%20rdfs%3Alabel%20%3Ftopic_label%20.%20filter%20%28lang%28%3Ftopic_label%29%20%3D%20%27en%27%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fwork%20%3FworkLabel%0Aorder%20by%20desc%28%3Fdate%29"></iframe>
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20%28group_concat%28%3Ftopic_label%3B%20separator%3D%22%20%2F%2F%20%22%29%20as%20%3Ftopics%29%20%28min%28%3Fdates%29%20as%20%3Fdate%29%20%3Fwork%20%3FworkLabel%20WHERE%20%7B%0A%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%20%23%20filter%20%28%3Ftopic%20%21%3D%20wd%3A{{ q }}%29%0A%20%20optional%20%7B%20%3Fwork%20wdt%3AP577%20%3Fdates%20.%20%7D%0A%20%20%3Ftopic%20rdfs%3Alabel%20%3Ftopic_label%20.%20filter%20%28lang%28%3Ftopic_label%29%20%3D%20%27en%27%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fwork%20%3FworkLabel%0Aorder%20by%20desc%28%3Fdate%29"></iframe>
+</div>
 
 
 <h2>Authors publishing about the topic</h2>
 
-<iframe style="width:96vw; height:50vh;" scrolling="yes" frameborder="0" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Fauthor%20%3FauthorLabel%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP921%2Fwdt%3AP257%2a%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fauthor%20%3FauthorLabel%0Aorder%20by%20desc%28%3Fcount%29%0A"></iframe>
-
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Fauthor%20%3FauthorLabel%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP921%2Fwdt%3AP257%2a%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fauthor%20%3FauthorLabel%0Aorder%20by%20desc%28%3Fcount%29%0A"></iframe>
+</div>
 
 {% endblock %}
     
