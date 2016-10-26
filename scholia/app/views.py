@@ -73,6 +73,17 @@ def show_venue_empty():
     return render_template('venue_empty.html')
 
 
+@app.route('/publisher/<q_>')
+def show_publisher(q_):
+    q = sanitize_q(q_)
+    return render_template('publisher.html', q=q)
+
+
+@app.route('/publisher/')
+def show_publisher_empty():
+    return render_template('publisher_empty.html')
+
+
 @app.route('/work/<q_>')
 def show_work(q_):
     q = sanitize_q(q_)
