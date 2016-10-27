@@ -6,7 +6,7 @@
 <div id="intro"></div>
 
 
-<h2>Journals</h2>
+<h2>Journals and other collections</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%3Fjournal%20%3FjournalLabel%20%3FBFI%20%28count%28%3Fwork%29%20as%20%3Fnumber_of_papers%29%20where%20%7B%0A%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP1433%20%3Fjournal%20.%0A%20%20optional%20%7B%20%3Fjournal%20wdt%3AP1240%20%3FBFI%20.%20%7D%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cfr%2Cjp%2Cde%2Cnl%22%20.%20%7D%20%0A%7D%20group%20by%20%3Fjournal%20%3FjournalLabel%20%3FBFI%0Aorder%20by%20desc%28%3Fnumber_of_papers%29%0A"></iframe>
