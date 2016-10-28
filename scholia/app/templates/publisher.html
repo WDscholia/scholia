@@ -9,11 +9,11 @@
 <h2>Journals and other collections</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%3Fjournal%20%3FjournalLabel%20%3FBFI%20%28count%28%3Fwork%29%20as%20%3Fnumber_of_papers%29%20where%20%7B%0A%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP1433%20%3Fjournal%20.%0A%20%20optional%20%7B%20%3Fjournal%20wdt%3AP1240%20%3FBFI%20.%20%7D%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cfr%2Cjp%2Cde%2Cnl%22%20.%20%7D%20%0A%7D%20group%20by%20%3Fjournal%20%3FjournalLabel%20%3FBFI%0Aorder%20by%20desc%28%3Fnumber_of_papers%29%0A"></iframe>
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%3Fjournal%20%3FjournalLabel%20%28group_concat%28%3Fthemes_labels%3B%20separator%3D%22%2C%20%22%29%20as%20%3Ftheme%29%20%28max%28%3Fbfi%29%20as%20%3FBFI%29%20%28sample%28%3Fcount%29%20as%20%3Fnumber_of_papers%29%20where%20%7B%0A%20%20%7B%0A%09select%20%3Fjournal%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%09%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%09%20%20%3Fwork%20wdt%3AP1433%20%3Fjournal%20.%0A%20%20%20%20%7D%0A%20%20%20%20group%20by%20%3Fjournal%20%0A%20%20%7D%0A%20%20optional%20%7B%0A%20%20%20%20%3Fjournal%20wdt%3AP921%20%3Fthemes%20.%0A%20%20%20%20%3Fthemes%20rdfs%3Alabel%20%3Fthemes_labels%20.%0A%20%20%20%20filter%20%28lang%28%3Fthemes_labels%29%20%3D%20%27en%27%29%0A%20%20%7D%0A%20%20optional%20%7B%20%3Fjournal%20wdt%3AP1240%20%3Fbfi%20.%20%7D%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cfr%2Cjp%2Cde%2Cnl%22%20.%20%7D%20%0A%7D%20%0Agroup%20by%20%3Fjournal%20%3FjournalLabel%0Aorder%20by%20desc%28%3Fnumber_of_papers%29%0A"></iframe>
 </div>
 
 
-<h2>Editors</h2>
+<h2>Associated editors</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0Aselect%20distinct%20%3Fimage%20%3Feditor%20%3FeditorLabel%20where%20%7B%0A%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%3Fjournal%20wdt%3AP98%20%3Feditor%20.%0A%20%20%3Feditor%20wdt%3AP18%20%3Fimage%20.%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cfr%2Cjp%2Cde%2Cnl%22%20.%20%7D%20%0A%7D"></iframe>
