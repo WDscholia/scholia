@@ -52,7 +52,7 @@ $('#searchterm').keyup(function( e ) {
     function(data) {
       $("#searchresult").empty();
       $.each(data.search, function(i, item) {
-        $("#searchresult").append("<div><a href='/" + item.title + "'>" + item.label + "</a> - " + item.description + "</div>");
+        $("#searchresult").append("<div><a href='" + item.title + "'>" + item.label + "</a> - " + item.description + "</div>");
     });
   });
 });
