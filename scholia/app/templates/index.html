@@ -42,7 +42,7 @@ Scholarly profile pages constructed from queries to
 <script type="text/javascript">
 $('#searchterm').keyup(function( e ) {
   var q = $('#searchterm').val();
-  $.getJSON("http://www.wikidata.org/w/api.php?callback=?", {
+  $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
       search: q,
       action: "wbsearchentities",
       language: "en",
