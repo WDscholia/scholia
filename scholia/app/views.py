@@ -4,7 +4,7 @@
 from flask import redirect, render_template, url_for
 
 from . import app
-from ..query import orcid_to_qs, twitter_to_qs
+from ..query import orcid_to_qs, q_to_class, twitter_to_qs
 from ..utils import sanitize_q
 
 
@@ -13,9 +13,17 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/author/<q_>')
+@app.route("/Q<int:q_>")
+def redirect_q(q_):
+    q = 'Q' + str(q_)
+    class_ = q_to_class(q)
+    method = 'show_' + class_
+    return redirect(url_for(method, q_=q_), code=302)
+
+
+@app.route('/author/Q<int:q_>')
 def show_author(q_):
-    q = sanitize_q(q_)
+    q = 'Q' + str(q_)
     return render_template('author.html', q=q)
 
 
@@ -32,9 +40,9 @@ def redirect_orcid(orcid_):
     return redirect(url_for('show_author', q_=q), code=302)
 
 
-@app.route('/organization/<q_>')
+@app.route('/organization/Q<int:q_>')
 def show_organization(q_):
-    q = sanitize_q(q_)
+    q = 'Q' + str(q_)
     return render_template('organization.html', q=q)
 
 
@@ -43,9 +51,9 @@ def show_organization_empty():
     return render_template('organization_empty.html')
 
 
-@app.route('/topic/<q_>')
+@app.route('/topic/Q<int:q_>')
 def show_topic(q_):
-    q = sanitize_q(q_)
+    q = 'Q' + str(q_)
     return render_template('topic.html', q=q)
 
 
@@ -62,9 +70,9 @@ def redirect_twitter(twitter_):
     return redirect(url_for('show_author', q_=q), code=302)
 
 
-@app.route('/venue/<q_>')
+@app.route('/venue/Q<int:q_>')
 def show_venue(q_):
-    q = sanitize_q(q_)
+    q = 'Q' + str(q_)
     return render_template('venue.html', q=q)
 
 
@@ -73,9 +81,9 @@ def show_venue_empty():
     return render_template('venue_empty.html')
 
 
-@app.route('/series/<q_>')
+@app.route('/series/Q<int:q_>')
 def show_series(q_):
-    q = sanitize_q(q_)
+    q = 'Q' + str(q_)
     return render_template('series.html', q=q)
 
 
@@ -84,9 +92,9 @@ def show_series_empty():
     return render_template('series_empty.html')
 
 
-@app.route('/publisher/<q_>')
+@app.route('/publisher/Q<int:q_>')
 def show_publisher(q_):
-    q = sanitize_q(q_)
+    q = 'Q' + str(q_)
     return render_template('publisher.html', q=q)
 
 
@@ -95,9 +103,9 @@ def show_publisher_empty():
     return render_template('publisher_empty.html')
 
 
-@app.route('/work/<q_>')
+@app.route('/work/Q<int:q_>')
 def show_work(q_):
-    q = sanitize_q(q_)
+    q = 'Q' + str(q_)
     return render_template('work.html', q=q)
 
 
