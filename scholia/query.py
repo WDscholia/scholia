@@ -99,6 +99,8 @@ def q_to_class(q):
     # Hard-coded matching match
     if ('Q5' in classes):  # human
         class_ = 'author'
+    elif ('Q2217301' in classes):  # serial (publication series)
+        class_ = 'series'
     elif ('Q5633421' in classes):  # scientific journal
         class_ = 'venue'
     elif ('Q2085381' in classes):  # publisher
