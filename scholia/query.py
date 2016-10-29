@@ -2,6 +2,7 @@
 
 Usage:
   scholia.query orcid-to-q <orcid>
+  scholia.query q-to-class <q>
   scholia.query twitter-to-q <twitter>
 
 Examples:
@@ -12,7 +13,6 @@ Examples:
 
 
 from __future__ import absolute_import, division, print_function
-
 
 import requests
 
@@ -73,6 +73,46 @@ def orcid_to_qs(orcid):
             for item in data['results']['bindings']]
 
 
+def q_to_class(q):
+    """Return Scholia class of Wikidata item.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    class_ : 'author', 'venue', 'organization', ...
+        Scholia class represented as a string.
+
+    """
+    query = 'select ?class where {{ wd:{q} wdt:P31 ?class }}'.format(
+        q=escape_string(q))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+    classes = [item['class']['value'][31:] for item in data['results']['bindings']] 
+
+    # Hard-coded matching match
+    if ('Q5' in classes):  # human
+        class_ = 'author'
+    elif ('Q5633421' in classes):  # scientific journal
+        class_ = 'venue'
+    elif ('Q2085381' in classes):  # publisher
+        class_ = 'publisher'
+    elif ('Q13442814' in classes):  # scientific journal
+        class_ = 'work'
+    elif ('Q3918' in classes):  # university
+        class_ = 'organization'
+    else:
+        class_ = 'topic'
+
+    return class_
+
+
 def twitter_to_qs(twitter):
     """Convert Twitter account name to Wikidata ID.
 
@@ -114,6 +154,9 @@ def main():
         qs = orcid_to_qs(arguments['<orcid>'])
         if len(qs) > 0:
             print(qs[0])
+    elif arguments['q-to-class']:
+        class_ = q_to_class(arguments['<q>'])
+        print(class_)
     elif arguments['twitter-to-q']:
         qs = twitter_to_qs(arguments['<twitter>'])
         if len(qs) > 0:
