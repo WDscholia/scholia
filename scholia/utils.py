@@ -1,4 +1,4 @@
-"""utils"""
+"""utils."""
 
 
 from re import findall
@@ -9,13 +9,13 @@ def sanitize_q(q):
 
     Parameters
     ----------
-    q : str
+    q : str or int
         Wikidata identifier as string.
 
     Returns
     -------
     sanitized_q : str
-        Sanitized Wikidata identifier.
+        Sanitized Wikidata identifier, empty if not a Wikidata identifier.
 
     Examples
     --------
@@ -25,10 +25,17 @@ def sanitize_q(q):
     'Q5'
     >>> sanitize_q('Wikidata')
     ''
+    >>> sanitize_q(5)
+    'Q5'
+    >>> sanitize_q('5')
+    'Q5'
 
     """
-    qs = findall('Q\d+', q)
-    if qs:
-        return qs[0]
+    if type(q) == int:
+        if q > 0:
+            return 'Q' + str(q)
     else:
-        return ''
+        qs = findall('\d+', q)
+        if qs:
+            return 'Q' + qs[0]
+    return ''
