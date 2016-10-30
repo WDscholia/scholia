@@ -13,7 +13,9 @@
 {{super()}}
 
 <script type="text/javascript">
-    var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids={{ q }}&format=json&callback=?'
+    var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+              '{{ q }}' + 
+              '&format=json&callback=?'
 
     $.getJSON(url, function (data) {
 	$("#h1")
@@ -21,7 +23,11 @@
 	    .append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 
 	var title = data.entities.{{ q }}.sitelinks.enwiki.title;
-	var wikipediaUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&explaintext=1&callback=?&format=json&titles=' + title;
+	var wikipediaUrl = 'https://en.wikipedia.org/w/api.php?' +
+            'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+            'explaintext=1&callback=?&format=json&titles=' +
+            encodeURIComponent(title);
+        console.log(wikipediaUrl);
 	$.getJSON(wikipediaUrl, function(data) {
 	    var pages = data.query.pages;
 	    var text = pages[Object.keys(pages)[0]].extract + " ... (from the English Wikipedia)";
