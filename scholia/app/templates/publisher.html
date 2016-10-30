@@ -28,5 +28,13 @@
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%3Fwork%20%3FworkLabel%20%3Fjournal%20%3FjournalLabel%20%28count%28%3Fciting_work%29%20as%20%3Fnumber_of_citations%29%20where%20%7B%0A%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP1433%20%3Fjournal%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cfr%2Cjp%2Cde%2Cnl%22%20.%20%7D%20%0A%7D%20group%20by%20%3Fwork%20%3FworkLabel%20%3Fjournal%20%3FjournalLabel%0Aorder%20by%20desc%28%3Fnumber_of_citations%29%0Alimit%20100"></iframe>
 </div>
 
+<h3><a name="As function of number of published works">As function of number of published works</a></h3>
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AScatterChart%0Aselect%20%28sample%28%3Fwork_count%29%20as%20%3Fnumber_of_published_works%29%20%28sample%28%3Fcitation_count%29%20as%20%3Fnumber_of_citations%29%20%28max%28%3Fbfi%29%20as%20%3FBFI%29%20%3Fjournal%20%3FjournalLabel%20where%20%7B%0A%20%20%7B%0A%09select%20%3Fjournal%20%28count%28%3Fwork%29%20as%20%3Fwork_count%29%20where%20%7B%0A%20%20%09%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%09%20%20%3Fwork%20wdt%3AP1433%20%3Fjournal%20.%0A%20%20%20%20%7D%0A%20%20%20%20group%20by%20%3Fjournal%20%0A%20%20%7D%0A%20%20%7B%0A%09select%20%3Fjournal%20%28count%28%3Fciting_work%29%20as%20%3Fcitation_count%29%20where%20%7B%0A%20%20%09%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%09%20%20%3Fwork%20wdt%3AP1433%20%3Fjournal%20.%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%0A%20%20%20%20%7D%0A%20%20%20%20group%20by%20%3Fjournal%20%0A%20%20%7D%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cfr%2Cjp%2Cde%2Cnl%22%20.%20%7D%20%0A%7D%20%0Agroup%20by%20%3Fjournal%20%3FjournalLabel%0Aorder%20by%20desc%28%3Fnumber_of_papers%29%0A"></iframe>
+</div>
+
+
+
 {% endblock %}
     
