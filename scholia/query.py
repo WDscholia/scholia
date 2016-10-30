@@ -94,7 +94,8 @@ def q_to_class(q):
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
-    classes = [item['class']['value'][31:] for item in data['results']['bindings']] 
+    classes = [item['class']['value'][31:]
+               for item in data['results']['bindings']]
 
     # Hard-coded matching match
     if ('Q5' in classes):  # human
@@ -103,11 +104,14 @@ def q_to_class(q):
         class_ = 'series'
     elif ('Q5633421' in classes):  # scientific journal
         class_ = 'venue'
-    elif ('Q2085381' in classes):  # publisher
+    elif ('Q2085381' in classes  # publisher
+          or 'Q479716' in classes):  # university publisher
         class_ = 'publisher'
     elif ('Q13442814' in classes):  # scientific journal
         class_ = 'work'
-    elif ('Q3918' in classes):  # university
+    elif ('Q3918' in classes  # university
+          or 'Q2467461' in classes  # university department
+          or 'Q7315155' in classes):  # research center
         class_ = 'organization'
     else:
         class_ = 'topic'
@@ -134,7 +138,9 @@ def twitter_to_qs(twitter):
     True
 
     """
-    query = 'select ?author where {{ ?author wdt:P2002 "{twitter}" }}'.format(
+    # This query only matches on exact match
+    query = """select ?item 
+               where {{ ?item wdt:P2002 "{twitter}" }}""".format(
         twitter=escape_string(twitter))
 
     url = 'https://query.wikidata.org/sparql'
@@ -142,7 +148,7 @@ def twitter_to_qs(twitter):
     response = requests.get(url, params=params)
     data = response.json()
 
-    return [item['author']['value'][31:]
+    return [item['item']['value'][31:]
             for item in data['results']['bindings']]
 
 
