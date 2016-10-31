@@ -302,6 +302,19 @@ def show_work_empty():
     return render_template('work_empty.html')
 
 
+@app.route('/about')
+def show_about():
+    """Return rendered about page.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page for about page.
+
+    """
+    return render_template('about.html')
+
+
 @app.route('/static/<path:filename>')
 def serve_bootstrap_custom(filename):
     """Return static file.
