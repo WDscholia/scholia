@@ -28,6 +28,13 @@
 </div>
 
 
+<h3 id="Number of publications per year">Number of publications per year</h3>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0A%23%20Inspired%20from%20%0Aselect%20%3Fyear%20%28count%28%3Fwork%29%20as%20%3Fnumber_of_publications%29%20%3Frole%20where%20%7B%0A%20%20%7B%0A%20%20%20%20select%20%3Fwork%20%28min%28%3Fyears%29%20as%20%3Fyear%29%20%28count%28%3Fauthor_statement%29%20as%20%3Fnumber_of_authors%29%20where%20%7B%0A%20%20%20%20%20%20%3Fwork%20p%3AP50%20%3Fauthor_statement%20.%20%0A%20%20%20%20%20%20%3Fauthor_statement%20ps%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fcoauthors%20.%20%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdates%20.%0A%20%20%20%20%20%20bind%28str%28year%28%3Fdates%29%29%20as%20%3Fyears%29%20.%0A%20%20%20%20%7D%20%20group%20by%20%3Fwork%0A%20%20%7D%0A%20%20bind%28if%28%3Fnumber_of_authors%20%3D%201%2C%20%27solo%27%2C%20%27multiple%27%29%20as%20%3Frole%29%0A%7D%0Agroup%20by%20%3Fyear%20%3Frole%0Aorder%20by%20%3Fyear"></iframe>
+</div>
+
+
 <h2>Venue statistics</h2>
 
 <div class="container">
@@ -77,12 +84,15 @@
 
 <br/><br/>
 
+<!-- 
+
 (this plot may not render correctly)<br/>
 
 <div class="embed-responsive embed-responsive-4by3">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ADimensions%0Aselect%20%3Fcount%20%3Ftheme_label%20%3Fwork_label%20%20%20WHERE%20%7B%0A%20%20%7B%20%0A%20%20%20%20select%20%3Ftheme%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%09%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%20%20%7D%0A%20%20%20%20group%20by%20%3Ftheme%0A%20%20%20%20order%20by%20desc%28%3Fcount%29%0A%20%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%3Ftheme%20rdfs%3Alabel%20%3Ftheme_label%20.%20filter%20%28lang%28%3Ftheme_label%29%20%3D%20%27en%27%29%0A%20%20%3Fwork%20rdfs%3Alabel%20%3Fwork_label%20.%20filter%20%28lang%28%3Fwork_label%29%20%3D%20%27en%27%29%0A%7D%20"></iframe>
 </div>
-    
+
+-->    
 
 <h2>Locations</h2>
 
