@@ -7,7 +7,7 @@
 <div id="intro"></div>
 
 
-<h2>Employees and affiliated</h2>
+<h2 id="Employees and affiliated">Employees and affiliated</h2>
 
 (past and present)<br/>
 
@@ -16,10 +16,19 @@
 </div>
 
 
-<h2>Awards</h2>
+<h2 id="Awards">Awards</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%3Faward%20%3FawardLabel%20%28count%28%3Fresearcher%29%20as%20%3Fcount%29%20%28group_concat%28%3Fresearcher_label%3B%20separator%3D%22%2C%20%22%29%20as%20%3Frecipients%29%20where%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22%20.%0A%20%20%7B%20%0A%20%20%20%20select%20distinct%20%3Fresearcher%20where%20%7B%0A%20%20%20%20%20%20%7B%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%7D%20%0A%20%20%7D%0A%20%20%3Fresearcher%20wdt%3AP166%20%3Faward%20.%0A%20%20%3Fresearcher%20rdfs%3Alabel%20%3Fresearcher_label%20.%20filter%20%28lang%28%3Fresearcher_label%29%20%3D%20%27en%27%29%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cjp%2Cda%2Csv%22%20.%20%7D%20%0A%7D%20group%20by%20%3Faward%20%3FawardLabel%20%0Aorder%20by%20desc%28%3Fcount%29"></iframe>
 </div>
+
+
+<h2 id="Researcher gender distribution">Researcher gender distribution</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%28count%28%3Fresearcher%29%20as%20%3Fnumber_of_researchers%29%20%3FgenderLabel%20where%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22%20.%0A%20%20%7B%20%0A%20%20%20%20select%20distinct%20%3Fresearcher%20where%20%7B%0A%20%20%20%20%20%20%7B%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%7D%20%0A%20%20%7D%0A%20%20%3Fresearcher%20wdt%3AP21%20%3Fgender%20.%20%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cjp%2Cda%2Csv%22%20.%20%7D%20%0A%7D%20group%20by%20%3Fgender%20%3FgenderLabel%0Aorder%20by%20desc%28%3Fnumber_of_researchers%29"></iframe>
+</div>
+
+
 
 {% endblock %}
