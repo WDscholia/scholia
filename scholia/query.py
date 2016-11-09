@@ -76,6 +76,11 @@ def orcid_to_qs(orcid):
 def q_to_class(q):
     """Return Scholia class of Wikidata item.
 
+    The 'class', i.e., which kind of instance, the item is.
+
+    The Wikidata Query Service will be queried for P31 value. The value
+    is compared against a set of hardcoded matches.
+
     Parameters
     ----------
     q : str
@@ -100,14 +105,16 @@ def q_to_class(q):
     # Hard-coded matching match
     if ('Q5' in classes):  # human
         class_ = 'author'
-    elif ('Q2217301' in classes):  # serial (publication series)
+    elif ('Q2217301' in classes  # serial (publication series)
+          or 'Q27785883' in classes):  # conference proceedings series
         class_ = 'series'
-    elif ('Q5633421' in classes):  # scientific journal
+    elif ('Q5633421' in classes   # scientific journal
+          or 'Q1143604' in classes):  # proceedings
         class_ = 'venue'
     elif ('Q2085381' in classes  # publisher
           or 'Q479716' in classes):  # university publisher
         class_ = 'publisher'
-    elif ('Q13442814' in classes):  # scientific journal
+    elif ('Q13442814' in classes):  # scientific article
         class_ = 'work'
     elif ('Q3918' in classes  # university
           or 'Q2467461' in classes  # university department
