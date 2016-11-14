@@ -13,11 +13,22 @@
 </div>
 
 
-<h2>Author images</h2>
+<h2 id="Authors">Authors</h3>
+
+<h3 id="Author images">Author images</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0Aselect%20%28sample%28%3Fimage%29%20as%20%3Fanimage%29%20%3FauthorLabel%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%3Fauthor%20wdt%3AP18%20%3Fimage%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%20group%20by%20%3Fauthor%20%3FauthorLabel%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2050"></iframe>
 </div>
+
+
+<h3 id="Prolific authors">Prolific authors</h3>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#SELECT%20%3Fauthor%20%3Fauthor_label%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20%3B%0A%20%20%20%20%20%20%20%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fauthor%20rdfs%3Alabel%20%3Fauthor_label%20.%20filter%20%28lang%28%3Fauthor_label%29%20%3D%20%27en%27%29%0A%7D%20group%20by%20%3Fauthor%20%3Fauthor_label%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2030"></iframe>
+</div>
+
+
 
 
 <h2>Citations</h2>
