@@ -111,6 +111,9 @@ def q_to_class(q):
     elif ('Q5633421' in classes   # scientific journal
           or 'Q1143604' in classes):  # proceedings
         class_ = 'venue'
+    elif ('Q157031' in classes  # foundation
+          or 'Q10498148' in classes):  # research council
+        class_ = 'sponsor'
     elif ('Q2085381' in classes  # publisher
           or 'Q479716' in classes):  # university publisher
         class_ = 'publisher'
