@@ -271,6 +271,38 @@ def show_publisher_empty():
     return render_template('publisher_empty.html')
 
 
+@app.route('/sponsor/' + q_pattern)
+def show_sponsor(q):
+    """Return rendered HTML page for specific sponsor.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page for specific sponsor.
+
+    """
+    return render_template('sponsor.html', q=q)
+
+
+@app.route('/sponsor/')
+def show_sponsor_empty():
+    """Return rendered index page for sponsor.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page for sponsor index page.
+
+    """
+    return render_template('sponsor_empty.html')
+
+
+
 @app.route('/work/' + q_pattern)
 def show_work(q):
     """Return rendered HTML page for specific work.
