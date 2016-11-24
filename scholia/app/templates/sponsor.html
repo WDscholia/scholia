@@ -19,5 +19,12 @@
 </div>
 
 
+<h2 id="Co-sponsors">Co-sponsors</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23%20Co-founders%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Fsponsor%20%3FsponsorLabel%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP859%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP859%20%3Fsponsor%20.%0A%20%20filter%20%28wd%3A{{ q }}%20%21%3D%20%3Fsponsor%29%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cde%2Cfr%2Ces%2Cjp%2Cit%2Cda%2Csv%2Czh%22%20%7D%0A%7D%0Agroup%20by%20%3Fsponsor%20%3FsponsorLabel%0Aorder%20by%20desc%28%3Fcount%29%0A"></iframe>
+</div>
+
+
 {% endblock %}
     
