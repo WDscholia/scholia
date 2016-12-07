@@ -30,5 +30,13 @@
 </div>
 
 
+<h2 id="Venues publishing works about the topic">Venues publishing works about the topic</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Fvenue%20%3FvenueLabel%20where%20%7B%0A%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%3Fwork%20wdt%3AP1433%20%3Fvenue%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fvenue%20%3FvenueLabel%0Aorder%20by%20desc%28%3Fcount%29%0A">
+  </iframe>
+</div>
+
+
 {% endblock %}
     
