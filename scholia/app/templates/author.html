@@ -120,6 +120,13 @@
 </div>
 
 
+<h3 id="Citations by year">Citations by year</h3>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%20%3Fyear%20%28count%28distinct%20%3Fciting_work%29%20as%20%3Fcount%29%20%3Fkind%20%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20bind%28if%20%28exists%20%7B%20%3Fciting_work%20wdt%3AP50%20wd%3A{{ q }}%20%7D%2C%20%22self-citations%22%2C%20%22citations%20from%20others%22%29%20as%20%3Fkind%29%0A%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20BIND%28str%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%0A%7D%20group%20by%20%3Fyear%20%3Fkind%0Aorder%20by%20desc%28%3Fyear%29%20%20%20%20"></iframe>
+</div>
+
+
 <h3>Citing authors</h3>
 
 (excluding self citations)<br/>
