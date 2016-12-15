@@ -149,7 +149,7 @@ def twitter_to_qs(twitter):
 
     """
     # This query only matches on exact match
-    query = """select ?item 
+    query = """select ?item
                where {{ ?item wdt:P2002 "{twitter}" }}""".format(
         twitter=escape_string(twitter))
 
