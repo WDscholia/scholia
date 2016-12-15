@@ -302,7 +302,6 @@ def show_sponsor_empty():
     return render_template('sponsor_empty.html')
 
 
-
 @app.route('/work/' + q_pattern)
 def show_work(q):
     """Return rendered HTML page for specific work.
