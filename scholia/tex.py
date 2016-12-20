@@ -38,7 +38,7 @@ from .api import (entity_to_authors, entity_to_month, entity_to_title,
 
 
 def extract_qs_from_aux_string(string):
-    """Extract qs from string.
+    r"""Extract qs from string.
 
     Paramaters
     ----------
@@ -50,10 +50,24 @@ def extract_qs_from_aux_string(string):
     qs : list of str
         List of strings.
 
+    Examples
+    --------
+    >>> string = "\citation{Q28042913}"
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913']
+
+    >>> string = "\citation{Q28042913,Q27615040}"
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913', 'Q27615040']
+
+    >>> string = "\citation{Q28042913,Q27615040,Q27615040}"
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913', 'Q27615040', 'Q27615040']
+
     """
-    matches = re.findall(r'^\\citation{(Q\d+?)(:?,(Q\d+?))*}', string,
+    matches = re.findall(r'^\\citation{(Q\d+?(?:,Q\d+?)*)}', string,
                          flags=re.MULTILINE | re.UNICODE)
-    qs = [q for qs in matches for q in qs if q]
+    qs = [q for submatches in matches for q in submatches.split(',')]
     return qs
 
 
