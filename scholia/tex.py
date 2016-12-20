@@ -3,6 +3,7 @@ r"""tex.
 Usage:
   scholia.tex extract-qs-from-aux <file>
   scholia.tex write-bbl-from-aux <file>
+  scholia.tex write-bib-from-aux <file>
 
 Description:
   Work with latex and bibtex.
@@ -32,7 +33,8 @@ from os.path import splitext
 
 import re
 
-from .api import entity_to_authors, entity_to_title, wb_get_entities
+from .api import (entity_to_authors, entity_to_month, entity_to_title,
+                  entity_to_year, wb_get_entities)
 
 
 def extract_qs_from_aux_string(string):
@@ -93,6 +95,29 @@ def main():
         with open(aux_filename, 'a') as f:
             for n, q in enumerate(qs, 1):
                 f.write('\\bibcite{%s}{%d}\n' % (q, n))
+
+    elif arguments['write-bib-from-aux']:
+        aux_filename = arguments['<file>']
+        base_filename, _ = splitext(aux_filename)
+        bib_filename = base_filename + '.bib'
+
+        string = open(aux_filename).read()
+        qs = extract_qs_from_aux_string(string)
+        entities = wb_get_entities(qs)
+
+        bib = ""
+        for q in qs:
+            entity = entities[q]
+            bib += "@Article{%s,\n" % q
+            bib += "  author = {%s},\n" % \
+                   u" and ".join(entity_to_authors(entity))
+            bib += "  title =  {%s},\n" % entity_to_title(entity)
+            bib += "  year =   {%s},\n" % entity_to_year(entity)
+            bib += "  month =  {%s},\n" % entity_to_month(entity)
+            bib += '}\n\n'
+
+        with open(bib_filename, 'w') as f:
+            f.write(bib.encode('utf-8'))
 
 
 if __name__ == '__main__':
