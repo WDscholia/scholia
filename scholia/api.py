@@ -37,6 +37,9 @@ def wb_get_entities(qs):
         Dictionary of dictionaries.
 
     """
+    if not qs:
+        return {}
+
     if len(qs) > 50:
         raise NotImplementedError("Cannot handle over 50 qs yet")
 
@@ -44,14 +47,19 @@ def wb_get_entities(qs):
     params = {
         'action': 'wbgetentities',
         'ids': ids,
-        'format': 'json'
+        'format': 'json',
     }
-    response_data = requests.get('https://www.wikidata.org/w/api.php',
-                                 params=params).json()
+    headers = {
+        'User-Agent': 'Scholia',
+    }
+    response_data = requests.get(
+        'https://www.wikidata.org/w/api.php',
+        headers=headers, params=params).json()
     if 'entities' in response_data:
         return response_data['entities']
     else:
-        return {}
+        # Make informative error
+        raise Exception('API error')
 
 
 def entity_to_authors(entity):
