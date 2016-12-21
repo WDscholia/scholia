@@ -110,6 +110,67 @@ def entity_to_authors(entity):
     return [author for _, author in authors]
 
 
+def entity_to_doi(entity):
+    """Extract DOI of publication from entity.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata item
+
+    Returns
+    -------
+    doi : str
+        DOI as string. An empty string is returned if the field is not set.
+
+    Examples
+    --------
+    >>> entities = wb_get_entities(['Q24239902'])
+    >>> doi = entity_to_doi(entities['Q24239902'])
+    >>> doi == '10.1038/438900a'
+    True
+
+    """
+    for statement in entity['claims'].get('P356', []):
+        pages = statement['mainsnak']['datavalue']['value']
+        return pages
+    else:
+        return ''
+
+
+def entity_to_journal_title(entity):
+    """Extract journal of publication from entity.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata item
+
+    Returns
+    -------
+    journal : str
+        Journal as string. An empty string is returned if the field is not set.
+
+    Examples
+    --------
+    >>> entities = wb_get_entities(['Q24239902'])
+    >>> journal = entity_to_journal_title(entities['Q24239902'])
+    >>> journal == 'Nature'
+    True
+
+    """
+    for statement in entity['claims'].get('P1433', []):
+        journal_item = statement['mainsnak']['datavalue']['value']['id']
+        journal_entities = wb_get_entities([journal_item])
+        claims = journal_entities[journal_item]['claims']
+        for journal_statement in claims.get('P1476', []):
+            value = journal_statement['mainsnak']['datavalue']['value']
+            if value['language'] == 'en':
+                return value['text']
+
+    return ''
+
+
 def entity_to_label(entity):
     """Extract label from entity.
 
@@ -157,6 +218,34 @@ def entity_to_month(entity, language='en'):
             raise ValueError('language "{}" not support'.format(language))
 
 
+def entity_to_pages(entity):
+    """Extract pages of publication from entity.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata item
+
+    Returns
+    -------
+    pages : str
+        Pages as string. An empty string is returned if the field is not set.
+
+    Examples
+    --------
+    >>> entities = wb_get_entities(['Q24239902'])
+    >>> pages = entity_to_pages(entities['Q24239902'])
+    >>> pages == '900-901'
+    True
+
+    """
+    for statement in entity['claims'].get('P304', []):
+        pages = statement['mainsnak']['datavalue']['value']
+        return pages
+    else:
+        return ''
+
+
 def entity_to_title(entity):
     """Extract title from entity.
 
@@ -174,6 +263,34 @@ def entity_to_title(entity):
     for statement in entity['claims']['P1476']:
         title = statement['mainsnak']['datavalue']['value']['text']
         return title
+
+
+def entity_to_volume(entity):
+    """Extract volume of publication from entity.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata item
+
+    Returns
+    -------
+    volume : str
+        Volume as string. An empty string is returned if the field is not set.
+
+    Examples
+    --------
+    >>> entities = wb_get_entities(['Q21172284'])
+    >>> volume = entity_to_volume(entities['Q21172284'])
+    >>> volume == '12'
+    True
+
+    """
+    for statement in entity['claims'].get('P478', []):
+        volume = statement['mainsnak']['datavalue']['value']
+        return volume
+    else:
+        return ''
 
 
 def entity_to_year(entity):
