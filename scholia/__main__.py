@@ -10,14 +10,20 @@ Examples:
 """
 
 
-from docopt import docopt
-
 from .query import orcid_to_qs
 
 
-arguments = docopt(__doc__)
+def main():
+    """Handle command-line interface."""
+    from docopt import docopt
 
-if arguments['orcid-to-q']:
-    qs = orcid_to_qs(arguments['<orcid>'])
-    if len(qs) > 0:
-        print(qs[0])
+    arguments = docopt(__doc__)
+
+    if arguments['orcid-to-q']:
+        qs = orcid_to_qs(arguments['<orcid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+
+if __name__ == '__main__':
+    main()
