@@ -33,8 +33,10 @@ from os.path import splitext
 
 import re
 
-from .api import (entity_to_authors, entity_to_month, entity_to_title,
-                  entity_to_year, wb_get_entities)
+from .api import (
+    entity_to_authors, entity_to_doi, entity_to_journal_title, entity_to_month,
+    entity_to_pages, entity_to_title, entity_to_volume, entity_to_year,
+    wb_get_entities)
 
 
 def extract_qs_from_aux_string(string):
@@ -78,6 +80,38 @@ def extract_qs_from_aux_string(string):
                 qs.append(q)
 
     return qs
+
+
+def entity_to_bibtex_entry(entity):
+    """Convert Wikidata entity to bibtex-formatted entry.
+
+    Parameters
+    ----------
+    entity : dict
+        Wikidata entity as hierarchical structure.
+    q : str
+        Wikidata identifier
+
+    Returns
+    -------
+    entry : str
+        Bibtex entry.
+
+    """
+    entry = "@Article{%s,\n" % entity['id']
+    entry += "  author =   {%s},\n" % \
+             u" and ".join(entity_to_authors(entity))
+    entry += "  title =    {%s},\n" % entity_to_title(entity)
+    entry += "  journal =  {%s},\n" % entity_to_journal_title(entity)
+    entry += "  year =     {%s},\n" % entity_to_year(entity)
+    entry += "  volume =   {%s},\n" % entity_to_volume(entity)
+    entry += "  number =   {},\n"
+    entry += "  month =    {%s},\n" % entity_to_month(entity)
+    entry += "  pages =    {%s},\n" % entity_to_pages(entity)
+    entry += "  DOI =      {%s},\n" % entity_to_doi(entity)
+    entry += "  wikidata = {%s}\n" % entity['id']
+    entry += '}\n'
+    return entry
 
 
 def main():
@@ -131,13 +165,8 @@ def main():
         bib = ""
         for q in qs:
             entity = entities[q]
-            bib += "@Article{%s,\n" % q
-            bib += "  author = {%s},\n" % \
-                   u" and ".join(entity_to_authors(entity))
-            bib += "  title =  {%s},\n" % entity_to_title(entity)
-            bib += "  year =   {%s},\n" % entity_to_year(entity)
-            bib += "  month =  {%s},\n" % entity_to_month(entity)
-            bib += '}\n\n'
+            bib += entity_to_bibtex_entry(entity)
+            bib += '\n'
 
         with open(bib_filename, 'w') as f:
             f.write(bib.encode('utf-8'))
