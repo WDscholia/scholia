@@ -39,6 +39,83 @@ from .api import (
     wb_get_entities)
 
 
+STRING_TO_TEX = {
+    '<': r'\textless{}',
+    '>': r'\textgreater{}',
+    '~': r'\~{}',
+    '{': r'\{',
+    '}': r'\}',
+    '_': r'\_',
+    '\\': r'\textbackslash{}',
+    '#': r'\#',
+    '&': r'\&',
+    '^': r'\^{}',
+    '%': r'\%',
+    '$': r'\$',
+}
+
+STRING_TO_TEX_URL = {
+    '<': r'\textless{}',
+    '>': r'\textgreater{}',
+    '~': r'\~{}',
+    '{': r'\{',
+    '}': r'\}',
+    '\\': r'\textbackslash{}',
+    '#': r'\#',
+    '&': r'\&',
+    '^': r'\^{}',
+    '%': r'\%',
+    '$': r'\$',
+}
+
+STRING_TO_TEX_PATTERN = re.compile(
+    u'|'.join(re.escape(key) for key in STRING_TO_TEX),
+    flags=re.UNICODE)
+
+STRING_TO_TEX_URL_PATTERN = re.compile(
+    u'|'.join(re.escape(key) for key in STRING_TO_TEX_URL),
+    flags=re.UNICODE)
+
+
+def escape_to_tex(string, escape_type='normal'):
+    """Escape a text to the a tex/latex safe.
+
+
+    Parameters
+    ----------
+    string : str
+        Unicode string to be excaped.
+
+    Returns
+    -------
+    escaped_string : str
+        Escaped unicode string.
+
+    Examples
+    --------
+    >>> escape_to_tex("^^") == r'\\^{}\\^{}'
+    True
+
+    >>> escape_to_tex('10.1007/978-3-319-18111-0_26', 'url')
+    10.1007/978-3-319-18111-0_26
+
+    References
+    ----------
+    - https://en.wikibooks.org/wiki/LaTeX/Special_Characters
+    - http://stackoverflow.com/questions/16259923/
+
+    """
+    if escape_type == 'normal':
+        unescaped_string = STRING_TO_TEX_PATTERN.sub(
+            lambda match: STRING_TO_TEX[match.group()], string)
+    elif escape_type == 'url':
+        unescaped_string = STRING_TO_TEX_URL_PATTERN.sub(
+            lambda match: STRING_TO_TEX_URL[match.group()], string)
+    else:
+        raise ValueError('Wrong value for parameter "url": {}'.format(type))
+    return unescaped_string
+    
+
 def extract_qs_from_aux_string(string):
     r"""Extract qs from string.
 
@@ -100,16 +177,17 @@ def entity_to_bibtex_entry(entity):
     """
     entry = "@Article{%s,\n" % entity['id']
     entry += "  author =   {%s},\n" % \
-             u" and ".join(entity_to_authors(entity))
-    entry += "  title =    {%s},\n" % entity_to_title(entity)
-    entry += "  journal =  {%s},\n" % entity_to_journal_title(entity)
-    entry += "  year =     {%s},\n" % entity_to_year(entity)
-    entry += "  volume =   {%s},\n" % entity_to_volume(entity)
+             escape_to_tex(u" and ".join(entity_to_authors(entity)))
+    entry += "  title =    {{%s}},\n" % escape_to_tex(entity_to_title(entity))
+    entry += "  journal =  {%s},\n" % (
+        escape_to_tex(entity_to_journal_title(entity)))
+    entry += "  year =     {%s},\n" % escape_to_tex(entity_to_year(entity))
+    entry += "  volume =   {%s},\n" % escape_to_tex(entity_to_volume(entity))
     entry += "  number =   {},\n"
-    entry += "  month =    {%s},\n" % entity_to_month(entity)
-    entry += "  pages =    {%s},\n" % entity_to_pages(entity)
-    entry += "  DOI =      {%s},\n" % entity_to_doi(entity)
-    entry += "  wikidata = {%s}\n" % entity['id']
+    entry += "  month =    {%s},\n" % escape_to_tex(entity_to_month(entity))
+    entry += "  pages =    {%s},\n" % escape_to_tex(entity_to_pages(entity))
+    entry += "  DOI =      {%s},\n" % escape_to_tex(entity_to_doi(entity), 'url')
+    entry += "  wikidata = {%s}\n" % escape_to_tex(entity['id'])
     entry += '}\n'
     return entry
 
