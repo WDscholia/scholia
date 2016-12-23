@@ -78,7 +78,7 @@ def entity_to_authors(entity):
     """
     def statement_to_order(statement):
         LARGE = 10000000
-        if 'P1545' in statement['qualifiers']:
+        if 'P1545' in statement.get('qualifiers', []):
             for qualifier in statement['qualifiers']['P1545']:
                 # The data value is a string type
                 # TODO: handle exceptions?
