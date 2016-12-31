@@ -34,7 +34,8 @@ from os.path import splitext
 import re
 
 from .api import (
-    entity_to_authors, entity_to_doi, entity_to_journal_title, entity_to_month,
+    entity_to_authors, entity_to_classes, entity_to_doi,
+    entity_to_journal_title, entity_to_month,
     entity_to_pages, entity_to_title, entity_to_volume, entity_to_year,
     wb_get_entities)
 
@@ -55,12 +56,8 @@ STRING_TO_TEX = {
 }
 
 STRING_TO_TEX_URL = {
-    '<': r'\textless{}',
-    '>': r'\textgreater{}',
-    '~': r'\~{}',
     '{': r'\{',
     '}': r'\}',
-    '\\': r'\textbackslash{}',
     '#': r'\#',
     '&': r'\&',
     '^': r'\^{}',
@@ -78,8 +75,7 @@ STRING_TO_TEX_URL_PATTERN = re.compile(
 
 
 def escape_to_tex(string, escape_type='normal'):
-    """Escape a text to the a tex/latex safe.
-
+    r"""Escape a text to the a tex/latex safe.
 
     Parameters
     ----------
@@ -93,11 +89,11 @@ def escape_to_tex(string, escape_type='normal'):
 
     Examples
     --------
-    >>> escape_to_tex("^^") == r'\\^{}\\^{}'
+    >>> escape_to_tex("^^") == r'\^{}\^{}'
     True
 
     >>> escape_to_tex('10.1007/978-3-319-18111-0_26', 'url')
-    10.1007/978-3-319-18111-0_26
+    '10.1007/978-3-319-18111-0_26'
 
     References
     ----------
@@ -114,7 +110,42 @@ def escape_to_tex(string, escape_type='normal'):
     else:
         raise ValueError('Wrong value for parameter "url": {}'.format(type))
     return unescaped_string
-    
+
+
+def guess_bibtex_entry_type(entity):
+    """Guess Bibtex entry type.
+
+    Parameters
+    ----------
+    entity : dict
+        Wikidata item.
+
+    Returns
+    -------
+    entry_type : str
+        Entry type as a string: 'Article', 'InProceedings', etc.
+
+    """
+    classes = entity_to_classes(entity)
+    if "Q13442814" in classes:
+        # TODO
+        # Scientific article: Article, InProceedings, Misc, ...
+        entry_type = 'Article'
+
+    elif 'Q1143604' in classes:
+        entry_type = 'Proceedings'
+
+    elif 'Q26995865' in classes:
+        entry_type = 'PhdThesis'
+
+    elif 'Q571' in classes:
+        entry_type = 'Book'
+
+    else:
+        pass
+
+    return entry_type
+
 
 def extract_qs_from_aux_string(string):
     r"""Extract qs from string.
@@ -186,7 +217,8 @@ def entity_to_bibtex_entry(entity):
     entry += "  number =   {},\n"
     entry += "  month =    {%s},\n" % escape_to_tex(entity_to_month(entity))
     entry += "  pages =    {%s},\n" % escape_to_tex(entity_to_pages(entity))
-    entry += "  DOI =      {%s},\n" % escape_to_tex(entity_to_doi(entity), 'url')
+    entry += "  DOI =      {%s},\n" % escape_to_tex(entity_to_doi(entity),
+                                                    'url')
     entry += "  wikidata = {%s}\n" % escape_to_tex(entity['id'])
     entry += '}\n'
     return entry
