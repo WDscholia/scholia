@@ -1,12 +1,18 @@
 """api.
 
 Usage:
-  scholia.api get <q>...
+  scholia.api get <qs>...
   scholia.api q-to-classes <q>
+
+Description:
+  Interface to the Wikidata API and its bibliographic data.
 
 Examples:
   $ python -m scholia.api get Q26857876 Q21172284 | wc
       2    1289   16174
+
+  $ python -m scholia.api q-to-classes Q28133147
+  Q13442814
 
 """
 
@@ -348,19 +354,18 @@ def main():
     arguments = docopt(__doc__)
 
     if arguments['get']:
-        qs = arguments['<q>']
+        qs = arguments['<qs>']
         entities = wb_get_entities(qs)
         for q in qs:
             print(entities[q])
 
     elif arguments['q-to-classes']:
-        qs = arguments['<q>']
-        entities = wb_get_entities(qs)
-        for q in qs:
-            classes = entity_to_classes(entities[q])
-            for class_ in classes:
-                print(class_)
-            
+        q = arguments['<q>']
+        entities = wb_get_entities([q])
+        classes = entity_to_classes(entities[q])
+        for class_ in classes:
+            print(class_)
+
 
 if __name__ == '__main__':
     main()
