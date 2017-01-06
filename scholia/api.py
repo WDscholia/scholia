@@ -3,6 +3,8 @@
 Usage:
   scholia.api get <qs>...
   scholia.api q-to-classes <q>
+  scholia.api q-to-name <q>
+
 
 Description:
   Interface to the Wikidata API and its bibliographic data.
@@ -237,7 +239,7 @@ def entity_to_month(entity, language='en'):
 
     Returns
     -------
-    month : str
+    month : str or None
         Month as string.
 
     """
@@ -250,6 +252,38 @@ def entity_to_month(entity, language='en'):
             return MONTH_NUMBER_TO_MONTH['en'][int(month)]
         else:
             raise ValueError('language "{}" not support'.format(language))
+    return None
+
+
+def entity_to_name(entity):
+    """Extract the name of the item.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata item representing a person.
+
+    Returns
+    -------
+    name : str or None
+        Name of person.
+
+    Examples
+    --------
+    >>> entities = wb_get_entities(['Q8219'])
+    >>> name = entity_to_name(entities.values()[0])
+    >>> name == 'Uta Frith'
+    True
+
+    """
+    if 'labels' in entity:
+        labels = entity['labels']
+        if 'en' in labels:
+            return labels['en']['value']
+        else:
+            for label in labels.values():
+                return label['value']
+    return None
 
 
 def entity_to_pages(entity):
@@ -365,6 +399,11 @@ def main():
         classes = entity_to_classes(entities[q])
         for class_ in classes:
             print(class_)
+
+    elif arguments['q-to-name']:
+        q = arguments['<q>']
+        entities = wb_get_entities([q])
+        print(entity_to_name(entities[q]))
 
 
 if __name__ == '__main__':
