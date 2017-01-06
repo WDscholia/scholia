@@ -5,6 +5,7 @@ from flask import redirect, render_template, url_for
 from werkzeug.routing import BaseConverter
 
 from . import app
+from ..api import entity_to_name, wb_get_entities
 from ..query import orcid_to_qs, q_to_class, twitter_to_qs
 
 
@@ -72,7 +73,14 @@ def show_author(q):
         Rendered HTML.
 
     """
-    return render_template('author.html', q=q)
+    entities = wb_get_entities([q])
+    name = entity_to_name(entities[q])
+    if name:
+        first_initial, last_name = name[0], name.split()[-1]
+    else:
+        first_initial, last_name = '', ''
+    return render_template('author.html', q=q, first_initial=first_initial,
+                           last_name=last_name)
 
 
 @app.route('/author/')
