@@ -110,6 +110,25 @@ def entity_to_authors(entity):
     return [author for _, author in authors]
 
 
+def entity_to_classes(entity):
+    """Extract 'instance_of' classes.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata item
+
+    Returns
+    -------
+    classes : list of str
+        List of strings.
+    """
+    classes = []
+    for statement in entity['claims'].get('P31', []):
+        classes.append(statement['mainsnak']['datavalue']['value'])
+    return classes
+
+
 def entity_to_doi(entity):
     """Extract DOI of publication from entity.
 
