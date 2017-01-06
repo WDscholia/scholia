@@ -2,6 +2,7 @@
 
 Usage:
   scholia.api get <q>...
+  scholia.api q-to-classes <q>
 
 Examples:
   $ python -m scholia.api get Q26857876 Q21172284 | wc
@@ -122,10 +123,18 @@ def entity_to_classes(entity):
     -------
     classes : list of str
         List of strings.
+
+    Examples
+    --------
+    >>> entities = wb_get_entities(['Q28133147'])
+    >>> classes = entity_to_classes(entities.values()[0])
+    >>> 'Q13442814' in classes
+    True
+
     """
     classes = []
     for statement in entity['claims'].get('P31', []):
-        classes.append(statement['mainsnak']['datavalue']['value'])
+        classes.append(statement['mainsnak']['datavalue']['value']['id'])
     return classes
 
 
@@ -344,6 +353,14 @@ def main():
         for q in qs:
             print(entities[q])
 
+    elif arguments['q-to-classes']:
+        qs = arguments['<q>']
+        entities = wb_get_entities(qs)
+        for q in qs:
+            classes = entity_to_classes(entities[q])
+            for class_ in classes:
+                print(class_)
+            
 
 if __name__ == '__main__':
     main()
