@@ -42,6 +42,37 @@ def escape_string(string):
     return string.replace('\\', '\\\\').replace('"', r'\"')
 
 
+def doi_to_qs(doi):
+    """Convert DOI to Wikidata ID.
+
+    Parameters
+    ----------
+    doi : str
+        DOI identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> doi_to_qs('10.1186/s13321-016-0161-3') == ['Q26899110']
+    True
+
+    """
+    query = 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
+        doi=escape_string(doi))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def orcid_to_qs(orcid):
     """Convert orcid to Wikidata ID.
 
