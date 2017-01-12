@@ -38,6 +38,7 @@ from .api import (
     entity_to_journal_title, entity_to_month,
     entity_to_pages, entity_to_title, entity_to_volume, entity_to_year,
     wb_get_entities)
+from .query import doi_to_qs
 
 
 STRING_TO_TEX = {
@@ -81,6 +82,8 @@ def escape_to_tex(string, escape_type='normal'):
     ----------
     string : str
         Unicode string to be excaped.
+    escape_type : normal or url, default normal
+        Type of escaping.
 
     Returns
     -------
@@ -147,6 +150,36 @@ def guess_bibtex_entry_type(entity):
     return entry_type
 
 
+def extract_dois_from_aux_string(string):
+    r"""Extract DOIs from string.
+
+    Paramaters
+    ----------
+    string : str
+        Extract Wikidata identifiers from citations.
+
+    Returns
+    -------
+    dois : list of str
+        List of strings.
+
+    Examples
+    --------
+    >>> string = "\citation{10.1186/s13321-016-0161-3}"
+    >>> extract_dois_from_aux_string(string)
+    ['10.1186/s13321-016-0161-3']
+
+    """
+    matches = re.findall(r'^\\citation{(.+?)}', string,
+                         flags=re.MULTILINE | re.UNICODE)
+    dois = []
+    for submatches in matches:
+        for doi in submatches.split(','):
+            if re.match('10\.\d{4}/.+', doi):
+                dois.append(doi)
+    return dois
+
+
 def extract_qs_from_aux_string(string):
     r"""Extract qs from string.
 
@@ -190,15 +223,15 @@ def extract_qs_from_aux_string(string):
     return qs
 
 
-def entity_to_bibtex_entry(entity):
+def entity_to_bibtex_entry(entity, key=None):
     """Convert Wikidata entity to bibtex-formatted entry.
 
     Parameters
     ----------
     entity : dict
         Wikidata entity as hierarchical structure.
-    q : str
-        Wikidata identifier
+    key : str
+        Bibtex key
 
     Returns
     -------
@@ -206,7 +239,10 @@ def entity_to_bibtex_entry(entity):
         Bibtex entry.
 
     """
-    entry = "@Article{%s,\n" % entity['id']
+    if key is None:
+        entry = "@Article{%s,\n" % entity['id']
+    else:
+        entry = "@Article{%s,\n" % escape_to_tex(key)
     entry += "  author =   {%s},\n" % \
              escape_to_tex(u" and ".join(entity_to_authors(entity)))
     entry += "  title =    {{%s}},\n" % escape_to_tex(entity_to_title(entity))
@@ -269,13 +305,27 @@ def main():
         bib_filename = base_filename + '.bib'
 
         string = open(aux_filename).read()
-        qs = extract_qs_from_aux_string(string)
+        qs = list(set(extract_qs_from_aux_string(string)))
+        keys = qs[:]
+        dois = list(set(extract_dois_from_aux_string(string)))
+        for doi in dois:
+            qs_doi = doi_to_qs(doi)
+            if len(qs_doi) == 0:
+                print('Could not find Wikidata item for {doi}'.format(doi))
+                continue
+            if len(qs_doi) > 1:
+                print(('Multiple Wikidata items for {doi}: {qs}.'
+                       'Using first.').format(doi, qs_doi))
+            q = qs_doi[0]
+            qs.append(q)
+            keys.append(doi)
+
         entities = wb_get_entities(qs)
 
         bib = ""
-        for q in qs:
+        for q, key in zip(qs, keys):
             entity = entities[q]
-            bib += entity_to_bibtex_entry(entity)
+            bib += entity_to_bibtex_entry(entity, key=key)
             bib += '\n'
 
         with open(bib_filename, 'w') as f:
