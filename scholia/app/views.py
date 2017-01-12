@@ -6,7 +6,7 @@ from werkzeug.routing import BaseConverter
 
 from . import app
 from ..api import entity_to_name, wb_get_entities
-from ..query import orcid_to_qs, q_to_class, twitter_to_qs
+from ..query import doi_to_qs, orcid_to_qs, q_to_class, twitter_to_qs
 
 
 class RegexConverter(BaseConverter):
@@ -94,6 +94,22 @@ def show_author_empty():
 
     """
     return render_template('author_empty.html')
+
+
+@app.route('/doi/<path:doi>')
+def redirect_doi(doi):
+    """Detect and redirect for DOI.
+
+    Parameters
+    ----------
+    doi : str
+        DOI identifier.
+
+    """
+    qs = doi_to_qs(doi)
+    if len(qs) > 0:
+        q = qs[0]
+    return redirect(url_for('show_work', q=q), code=302)
 
 
 @app.route('/orcid/<orcid>')
