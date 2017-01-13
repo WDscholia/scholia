@@ -30,6 +30,39 @@ MONTH_NUMBER_TO_MONTH = {
 }
 
 
+def select_value_by_language_preferences(
+        choices, preferences=('en', 'de', 'fr')):
+    """Select value based on language preference.
+
+    Parameters
+    ----------
+    choices : dict
+        Dictionary with language as keys and strings as values.
+    preferences : list or tuple
+        Iterator
+
+    Returns
+    -------
+    value : str
+        Selected string. Returns an empty string if there is no choices.
+
+    Examples
+    --------
+    >>> choices = {'da': 'Bog', 'en': 'Book', 'de': 'Buch'}
+    >>> select_value_by_language_preference(choices)
+    'Book'
+
+    """
+    if not choices:
+        return ''
+    for preference in preferences:
+        if preference in choices:
+            return choices[preference]
+    else:
+        # Select a random one
+        return next(choices.itervalues())
+        
+
 def wb_get_entities(qs):
     """Get entities from Wikidata.
 
@@ -199,11 +232,12 @@ def entity_to_journal_title(entity):
         journal_item = statement['mainsnak']['datavalue']['value']['id']
         journal_entities = wb_get_entities([journal_item])
         claims = journal_entities[journal_item]['claims']
+        titles = {}
         for journal_statement in claims.get('P1476', []):
             value = journal_statement['mainsnak']['datavalue']['value']
-            if value['language'] == 'en':
-                return value['text']
-
+            titles[value['language']] = value['text']
+        return select_value_by_language_preferences(titles)
+            
     return ''
 
 
