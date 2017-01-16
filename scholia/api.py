@@ -49,7 +49,7 @@ def select_value_by_language_preferences(
     Examples
     --------
     >>> choices = {'da': 'Bog', 'en': 'Book', 'de': 'Buch'}
-    >>> select_value_by_language_preference(choices)
+    >>> select_value_by_language_preferences(choices)
     'Book'
 
     """
@@ -61,7 +61,7 @@ def select_value_by_language_preferences(
     else:
         # Select a random one
         return next(choices.itervalues())
-        
+
 
 def wb_get_entities(qs):
     """Get entities from Wikidata.
@@ -237,7 +237,7 @@ def entity_to_journal_title(entity):
             value = journal_statement['mainsnak']['datavalue']['value']
             titles[value['language']] = value['text']
         return select_value_by_language_preferences(titles)
-            
+
     return ''
 
 
