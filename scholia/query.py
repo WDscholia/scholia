@@ -152,7 +152,10 @@ def q_to_class(q):
         class_ = 'work'
     elif ('Q3918' in classes  # university
           or 'Q2467461' in classes  # university department
-          or 'Q7315155' in classes):  # research center
+          or 'Q7315155' in classes  # research center
+          or 'Q902104' in classes  # private university
+          or 'Q15936437' in classes  # research university
+          or 'Q23002054' in classes):  # "private not-for-profit educational"
         class_ = 'organization'
     else:
         class_ = 'topic'
