@@ -35,6 +35,7 @@ import re
 
 from .api import (
     entity_to_authors, entity_to_classes, entity_to_doi,
+    entity_to_full_text_url,
     entity_to_journal_title, entity_to_month,
     entity_to_pages, entity_to_title, entity_to_volume, entity_to_year,
     wb_get_entities)
@@ -253,8 +254,10 @@ def entity_to_bibtex_entry(entity, key=None):
     entry += "  number =   {},\n"
     entry += "  month =    {%s},\n" % escape_to_tex(entity_to_month(entity))
     entry += "  pages =    {%s},\n" % escape_to_tex(entity_to_pages(entity))
-    entry += "  DOI =      {%s},\n" % escape_to_tex(entity_to_doi(entity),
-                                                    'url')
+    entry += "  DOI =      {%s},\n" % escape_to_tex(
+        entity_to_doi(entity), 'url')
+    entry += "  URL =      {%s},\n" % escape_to_tex(
+        entity_to_full_text_url(entity), 'url')
     entry += "  wikidata = {%s}\n" % escape_to_tex(entity['id'])
     entry += '}\n'
     return entry
