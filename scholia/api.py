@@ -201,8 +201,37 @@ def entity_to_doi(entity):
 
     """
     for statement in entity['claims'].get('P356', []):
-        pages = statement['mainsnak']['datavalue']['value']
-        return pages
+        doi = statement['mainsnak']['datavalue']['value']
+        return doi
+    else:
+        return ''
+
+
+def entity_to_full_text_url(entity):
+    """Extract full text URL of publication from entity.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata item
+
+    Returns
+    -------
+    url : str
+        URL as string. An empty string is returned if the field is not set.
+
+    Examples
+    --------
+    >>> entities = wb_get_entities(['Q28374293'])
+    >>> url = entity_to_full_text_url(entities['Q28374293'])
+    >>> url == ('http://papers.nips.cc/paper/'
+    ...         '5872-efficient-and-robust-automated-machine-learning.pdf')
+    True
+
+    """
+    for statement in entity['claims'].get('P953', []):
+        url = statement['mainsnak']['datavalue']['value']
+        return url
     else:
         return ''
 
