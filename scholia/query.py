@@ -150,12 +150,17 @@ def q_to_class(q):
         class_ = 'publisher'
     elif ('Q13442814' in classes):  # scientific article
         class_ = 'work'
-    elif ('Q3918' in classes  # university
-          or 'Q2467461' in classes  # university department
-          or 'Q7315155' in classes  # research center
-          or 'Q902104' in classes  # private university
-          or 'Q15936437' in classes  # research university
-          or 'Q23002054' in classes):  # "private not-for-profit educational"
+    elif set(classes).intersection([
+            'Q3918',  # university
+            'Q31855',  # research institute
+            'Q875538',  # public university
+            'Q2467461',  # university department
+            'Q3354859',  # collegiate university
+            'Q902104',  # private university
+            'Q7315155',  # research center
+            'Q15936437',  # research university
+            'Q23002054',  # "private not-for-profit educational"
+            ]):
         class_ = 'organization'
     else:
         class_ = 'topic'
