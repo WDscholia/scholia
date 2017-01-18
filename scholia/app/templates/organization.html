@@ -44,11 +44,21 @@ has been set.
 </div>
 
 
-<h2 id="Recent citations">Recent citations</h2>
+<h2 id="Citations">Citations</h2>
+
+<h3 id="Recent citations">Recent citations</h3>
 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20distinct%20%3Fciting_work%20%3Fciting_workLabel%20%3Fpublication_date%20%3Fwork%20%3FworkLabel%20WHERE%20%7B%0A%20%20%7B%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20%3Fresearcher%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%3Fciting_work%20wdt%3AP577%20%3Fpublication_date%20.%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Aorder%20by%20desc%28%3Fpublication_date%29"></iframe>
 </div>
+
+
+<h3>Most cited papers with affiliated first author</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%28count%28distinct%20%3Fciting_work%29%20as%20%3Fcount%29%20%3Fwork%20%3FworkLabel%20WHERE%20%7B%0A%20%20%7B%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%3Fwork%20p%3AP50%20%3Fresearcher_statement%20.%0A%20%20%3Fresearcher_statement%20ps%3AP50%20%3Fresearcher%20.%0A%20%20%3Fresearcher_statement%20pq%3AP1545%20%221%22%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%3Fciting_work%20wdt%3AP577%20%3Fpublication_date%20.%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%2Cda%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fwork%20%3FworkLabel%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2020"></iframe>
+</div>
+
 
 
 <h2 id="Awards">Awards</h2>
