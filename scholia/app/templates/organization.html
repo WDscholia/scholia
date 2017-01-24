@@ -60,6 +60,12 @@ has been set.
 </div>
 
 
+<h3>Co-author-normalized citations per year</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0Aselect%20%3Fyear%20%28sum%28%3Fcitations_per_author_%29%20as%20%3Fcitations_per_author%29%20%3Fresearcher_label%20where%20%7B%0A%20%7B%0A%20%20%20%20select%20%3Fresearcher_label%20%3Fwork%20%3Fyear%20%28count%28distinct%20%3Fciting_work%29%20%2F%20count%28distinct%20%3Fresearcher_of_paper%29%20as%20%3Fcitations_per_author_%29%20where%20%7B%0A%20%20%20%20%20%20%7B%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%5B%20wdt%3AP361%2a%20wd%3A{{ q }}%20%5D%20.%20%20%7D%0A%20%20%20%20%20%20%3Fwork%20%28wdt%3AP50%7Cwdt%3AP2093%29%20%3Fresearcher_of_paper%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fresearcher%20.%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdate%20.%20%0A%20%20%20%20%20%20bind%28str%28year%28%3Fdate%29%29%20as%20%3Fyear%29%20%0A%20%20%20%20%20%20%3Fresearcher%20rdfs%3Alabel%20%3Fresearcher_label%20.%20filter%28lang%28%3Fresearcher_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%7D%20%0A%20%20%20%20group%20by%20%3Fwork%20%3Fresearcher_label%20%3Fyear%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fyear%20%3Fresearcher_label%20%0Aorder%20by%20%3Fyear%0A"></iframe>
+</div>
+
 
 <h2 id="Awards">Awards</h2>
 
