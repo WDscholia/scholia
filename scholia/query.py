@@ -4,6 +4,7 @@ Usage:
   scholia.query orcid-to-q <orcid>
   scholia.query q-to-class <q>
   scholia.query twitter-to-q <twitter>
+  scholia.query arxiv-to-q <arxiv>
 
 Examples:
   $ python -m scholia.query orcid-to-q 0000-0001-6128-3356
@@ -40,6 +41,37 @@ def escape_string(string):
 
     """
     return string.replace('\\', '\\\\').replace('"', r'\"')
+
+
+def arxiv_to_qs(arxiv):
+    """Convert arxiv ID to Wikidata ID.
+
+    Parameters
+    ----------
+    arxiv : str
+        ArXiv identifier.
+
+    Returns
+    -------
+    qs : list of str
+        List of string with Wikidata IDs.
+
+    Examples
+    --------
+    >>> arxiv_to_qs('1507.04180') == ['Q27036443']
+    True
+
+    """
+    query = 'select ?work where {{ ?work wdt:P818 "{arxiv}" }}'.format(
+        arxiv=escape_string(arxiv))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
 
 
 def doi_to_qs(doi):
@@ -207,13 +239,20 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['orcid-to-q']:
+    if arguments['arxiv-to-q']:
+        qs = arxiv_to_qs(arguments['<arxiv>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['orcid-to-q']:
         qs = orcid_to_qs(arguments['<orcid>'])
         if len(qs) > 0:
             print(qs[0])
+
     elif arguments['q-to-class']:
         class_ = q_to_class(arguments['<q>'])
         print(class_)
+
     elif arguments['twitter-to-q']:
         qs = twitter_to_qs(arguments['<twitter>'])
         if len(qs) > 0:
