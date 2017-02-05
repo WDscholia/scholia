@@ -72,25 +72,20 @@
 
 Missing co-authors? <a href="https://query.wikidata.org/#select%20%3Fauthorname%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%20%3Fwork%20wdt%3AP50%20wd%3A{{ q | urlencode }}%20.%20%3Fwork%20wdt%3AP2093%20%3Fauthorname%20.%20%7D%20group%20by%20%3Fauthorname%20order%20by%20desc%28%3Fcount%29">Search for not yet created co-authors on Wikidata</a> or add them with Magnus Manske's <a href="https://tools.wmflabs.org/sourcemd/new_resolve_authors.php">Resolve author</a> tool.
 
-<h2>Themes</h2>
 
-<div class="container">
-  <div class="row">
-    <div class="col-xs-6">
-      <div class="embed-responsive embed-responsive-4by3">
-	<iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0Aselect%20%3Ftheme%20%3FthemeLabel%20%3Fimage%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%20%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20optional%20%7B%20%3Ftheme%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en,fr,de,ru,es,zh,jp%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Ftheme%20%3FthemeLabel%20%3Fimage%0Aorder%20by%20desc%28%3Fcount%29%20%0A"></iframe>
-      </div>
-    </div>
-    
-    <div class="col-xs-6">
-      <div class="embed-responsive embed-responsive-4by3">
-	<iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%20distinct%20%3Fimage%20WHERE%20%7B%0A%20%20%7B%20wd%3A{{ q }}%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20wd%3A{{ q }}%20%3Fproperty%20%3Fitem%20.%20%0A%20%20%20%20%3Fitem%20wdt%3AP18%20%3Fimage%0A%20%20%20%20filter%20%28%3Fitem%20%21%3D%20wd%3AQ5%29%0A%20%20%7D%0A%7D%20"></iframe>
-      </div>
-    </div>
-  </div>
+<h2>Topics</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Ftheme%20%3FthemeLabel%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Ftheme%20%3FthemeLabel%0Aorder%20by%20desc%28%3Fcount%29%20%0A"></iframe>
 </div>
 
-<br/><br/>
+
+<h2>Associated images</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%20distinct%20%3Fimage%20WHERE%20%7B%0A%20%20%7B%20wd%3A{{ q }}%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20wd%3A{{ q }}%20%3Fproperty%20%3Fitem%20.%0A%20%20%20%20%3Fitem%20wdt%3AP18%20%3Fimage%20.%20%0A%20%20%20%20filter%20%28%3Fitem%20%21%3D%20wd%3AQ5%29%0A%20%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%7B%20%3Fwork%20wdt%3AP921%20%5B%20wdt%3AP18%20%3Fimage%20%5D%20.%20%7D%20UNION%20%7B%20%3Fcoauthor%20wdt%3AP50%20%3Fwork%20.%20%3Fcoauthor%20wdt%3AP18%20%3Fimage%20%7D%0A%20%20%7D%0A%7D%20"></iframe>
+</div>
+
 
 <!-- 
 
