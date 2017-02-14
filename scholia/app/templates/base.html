@@ -18,11 +18,27 @@
               '&format=json&callback=?'
 
     $.getJSON(url, function (data) {
+        var item = data.entities.{{ q }}; 
 	$("#h1")
-	    .text(data.entities.{{ q }}.labels.en.value)
+	    .text(item.labels.en.value)
 	    .append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 
-	var title = data.entities.{{ q }}.sitelinks.enwiki.title;
+        // var dateString = item.claims.P577[0].mainsnak.datavalue.value.time;
+        // $( '#details' ).append( dateString.substring(1, 5) );
+
+        try {
+          var doi = item.claims.P356[0].mainsnak.datavalue.value;
+          $( '#details' ).append( 'DOI: <a href="https://dx.doi.org/' + doi + '">' + doi + '</a>. ');
+        }
+        catch(e) {}
+
+        try {
+          var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
+          $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
+        }
+        catch(e) {}
+
+	var title = item.sitelinks.enwiki.title;
 	var wikipediaUrl = 'https://en.wikipedia.org/w/api.php?' +
             'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
             'explaintext=1&callback=?&format=json&titles=' +
