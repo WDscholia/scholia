@@ -65,6 +65,7 @@ STRING_TO_TEX_URL = {
     '^': r'\^{}',
     '%': r'\%',
     '$': r'\$',
+    '_': r'\_',
 }
 
 STRING_TO_TEX_PATTERN = re.compile(
@@ -106,14 +107,15 @@ def escape_to_tex(string, escape_type='normal'):
 
     """
     if escape_type == 'normal':
-        unescaped_string = STRING_TO_TEX_PATTERN.sub(
+        escaped_string = STRING_TO_TEX_PATTERN.sub(
             lambda match: STRING_TO_TEX[match.group()], string)
     elif escape_type == 'url':
-        unescaped_string = STRING_TO_TEX_URL_PATTERN.sub(
+        escaped_string = STRING_TO_TEX_URL_PATTERN.sub(
             lambda match: STRING_TO_TEX_URL[match.group()], string)
     else:
-        raise ValueError('Wrong value for parameter "url": {}'.format(type))
-    return unescaped_string
+        raise ValueError('Wrong value for parameter "escape_type": {}'.format(
+            escape_type))
+    return escaped_string
 
 
 def guess_bibtex_entry_type(entity):
