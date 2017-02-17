@@ -98,7 +98,7 @@ def escape_to_tex(string, escape_type='normal'):
     True
 
     >>> escape_to_tex('10.1007/978-3-319-18111-0_26', 'url')
-    '10.1007/978-3-319-18111-0_26'
+    '10.1007/978-3-319-18111-0\\_26'
 
     References
     ----------
