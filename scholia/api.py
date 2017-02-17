@@ -24,6 +24,7 @@ from __future__ import print_function
 import requests
 
 
+# Must be indexed from zero
 MONTH_NUMBER_TO_MONTH = {
     'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July',
            'August', 'September', 'October', 'November', 'December']
@@ -196,7 +197,7 @@ def entity_to_doi(entity):
     --------
     >>> entities = wb_get_entities(['Q24239902'])
     >>> doi = entity_to_doi(entities['Q24239902'])
-    >>> doi == '10.1038/438900a'
+    >>> doi == '10.1038/438900A'
     True
 
     """
@@ -312,7 +313,7 @@ def entity_to_month(entity, language='en'):
         if language is None:
             return month
         elif language == 'en':
-            return MONTH_NUMBER_TO_MONTH['en'][int(month)]
+            return MONTH_NUMBER_TO_MONTH['en'][int(month) - 1]
         else:
             raise ValueError('language "{}" not support'.format(language))
     return None
