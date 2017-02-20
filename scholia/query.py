@@ -11,6 +11,9 @@ Examples:
   $ python -m scholia.query orcid-to-q 0000-0001-6128-3356
   Q20980928
 
+  $ python -m scholia.query github-to-q vrandezo
+  Q18618629
+
 """
 
 
@@ -233,6 +236,7 @@ def twitter_to_qs(twitter):
     return [item['item']['value'][31:]
             for item in data['results']['bindings']]
 
+
 def github_to_qs(github):
     """Convert GitHub account name to Wikidata ID.
 
@@ -274,6 +278,11 @@ def main():
 
     if arguments['arxiv-to-q']:
         qs = arxiv_to_qs(arguments['<arxiv>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['github-to-q']:
+        qs = github_to_qs(arguments['<github>'])
         if len(qs) > 0:
             print(qs[0])
 
