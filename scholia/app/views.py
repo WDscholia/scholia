@@ -6,7 +6,8 @@ from werkzeug.routing import BaseConverter
 
 from . import app
 from ..api import entity_to_name, wb_get_entities
-from ..query import doi_to_qs, orcid_to_qs, q_to_class, twitter_to_qs
+from ..query import (doi_to_qs, github_to_qs, orcid_to_qs, q_to_class,
+                     twitter_to_qs)
 
 
 class RegexConverter(BaseConverter):
@@ -110,6 +111,22 @@ def redirect_doi(doi):
     if len(qs) > 0:
         q = qs[0]
     return redirect(url_for('show_work', q=q), code=302)
+
+
+@app.route('/github/<github>')
+def redirect_github(github):
+    """Detect and redirect for Github user.
+
+    Parameters
+    ----------
+    doi : str
+        Github user identifier.
+
+    """
+    qs = github_to_qs(github)
+    if len(qs) > 0:
+        q = qs[0]
+    return redirect(url_for('show_author', q=q), code=302)
 
 
 @app.route('/orcid/<orcid>')
