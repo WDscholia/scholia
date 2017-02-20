@@ -4,6 +4,7 @@ Usage:
   scholia.query orcid-to-q <orcid>
   scholia.query q-to-class <q>
   scholia.query twitter-to-q <twitter>
+  scholia.query github-to-q <github>
   scholia.query arxiv-to-q <arxiv>
 
 Examples:
@@ -223,6 +224,38 @@ def twitter_to_qs(twitter):
     query = """select ?item
                where {{ ?item wdt:P2002 "{twitter}" }}""".format(
         twitter=escape_string(twitter))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    return [item['item']['value'][31:]
+            for item in data['results']['bindings']]
+
+def github_to_qs(github):
+    """Convert GitHub account name to Wikidata ID.
+
+    Parameters
+    ----------
+    github : str
+        github account identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> github_to_qs('vrandezo') == ['Q18618629']
+    True
+
+    """
+    # This query only matches on exact match
+    query = """select ?item
+               where {{ ?item wdt:P2037 "{github}" }}""".format(
+        github=escape_string(github))
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
