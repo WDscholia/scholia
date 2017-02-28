@@ -28,8 +28,17 @@ from lxml import etree
 import requests
 
 
+USER_AGENT = 'scholiabot 1.0'
+
+
 def get_metadata(arxiv):
     """Get metadata about an arxiv publication from website.
+
+    This function queries arXiv. It must not be used to crawl arXiv.
+    It does not look at robots.txt.
+
+    This function currently uses 'abs' HTML pages and not the arXiv API or
+    https://arxiv.org/help/oa/index which is the approved way.
 
     Parameters
     ----------
@@ -44,15 +53,17 @@ def get_metadata(arxiv):
     References
     ----------
     - https://arxiv.org
+    - https://arxiv.org/help/robots
 
     """
     arxiv = arxiv.strip()
     url = 'https://arxiv.org/abs/' + arxiv
-    response = requests.get(url)
+    headers = {'User-agent': USER_AGENT}
+    response = requests.get(url, headers=headers)
     tree = etree.HTML(response.content)
 
-    datetime_as_string = tree.xpath(
-        '//div[@class="submission-history"]/text()')[-2][5:30]
+    submissions = tree.xpath('//div[@class="submission-history"]/text()')
+    datetime_as_string = submissions[-2][5:30]
     isodatetime = parse_datetime(datetime_as_string).isoformat()
     metadata = {
         'arxiv': arxiv,
