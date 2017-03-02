@@ -56,6 +56,14 @@
 </div>
 
 
+<h3 id="Citation distribution">Citation distribution</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0Aselect%20%3Fnumber_of_citations%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fwork%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fnumber_of_citations%29%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}.%20%20%20%0A%20%20%20%20%20%20optional%20%7B%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Fwork%20%0A%20%20%7D%0A%7D%20%0Agroup%20by%20%3Fnumber_of_citations%0Aorder%20by%20desc%28%3Fnumber_of_citations%29%0A"></iframe>
+</div>
+
+
+
 <h3 id="Cited venues">Cited venues</h3>
 
 <div class="embed-responsive embed-responsive-4by3">
