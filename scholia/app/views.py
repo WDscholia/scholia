@@ -103,10 +103,7 @@ def show_arxiv(arxiv):
 def show_arxiv_to_quickstatements():
     """Return HTML rendering for arxiv.
 
-    Parameters
-    ----------
-    query : str
-        For instance, a 
+    Will look after the 'arxiv' parameter.
 
     Returns
     -------
@@ -120,7 +117,7 @@ def show_arxiv_to_quickstatements():
         return render_template('arxiv_to_quickstatements.html')
 
     current_app.logger.debug("query: {}".format(query))
-    
+
     arxiv = string_to_arxiv(query)
     if not arxiv:
         # Could not identify an arxiv identifier
@@ -133,7 +130,7 @@ def show_arxiv_to_quickstatements():
         return render_template('arxiv_to_quickstatements.html',
                                arxiv=arxiv, q=q)
 
-    try: 
+    try:
         metadata = get_arxiv_metadata(arxiv)
     except:
         return render_template('arxiv_to_quickstatements.html',
