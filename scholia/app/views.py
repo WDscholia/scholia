@@ -1,12 +1,15 @@
 """Views for app."""
 
 
-from flask import Blueprint, redirect, render_template, url_for
+from flask import (Blueprint, current_app, redirect, render_template, request,
+                   url_for)
 from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, wb_get_entities
-from ..query import (doi_to_qs, github_to_qs, orcid_to_qs, q_to_class,
-                     twitter_to_qs)
+from ..arxiv import metadata_to_quickstatements, string_to_arxiv
+from ..arxiv import get_metadata as get_arxiv_metadata
+from ..query import (arxiv_to_qs, doi_to_qs, github_to_qs, orcid_to_qs,
+                     q_to_class, twitter_to_qs)
 
 
 class RegexConverter(BaseConverter):
@@ -72,6 +75,73 @@ def redirect_q(q):
     class_ = q_to_class(q)
     method = 'app.show_' + class_
     return redirect(url_for(method, q=q), code=302)
+
+
+@main.route('/arxiv/<arxiv>')
+def show_arxiv(arxiv):
+    """Return HTML rendering for arxiv.
+
+    Parameters
+    ----------
+    arxiv : str
+        Arxiv identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    qs = arxiv_to_qs(arxiv)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_work', q=q), code=302)
+    return render_template('404.html')
+
+
+@main.route('/arxiv-to-quickstatements')
+def show_arxiv_to_quickstatements():
+    """Return HTML rendering for arxiv.
+
+    Parameters
+    ----------
+    query : str
+        For instance, a 
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    query = request.args.get('arxiv')
+
+    if not query:
+        return render_template('arxiv_to_quickstatements.html')
+
+    current_app.logger.debug("query: {}".format(query))
+    
+    arxiv = string_to_arxiv(query)
+    if not arxiv:
+        # Could not identify an arxiv identifier
+        return render_template('arxiv_to_quickstatements.html')
+
+    qs = arxiv_to_qs(arxiv)
+    if len(qs) > 0:
+        # The arxiv is already in Wikidata
+        q = qs[0]
+        return render_template('arxiv_to_quickstatements.html',
+                               arxiv=arxiv, q=q)
+
+    try: 
+        metadata = get_arxiv_metadata(arxiv)
+    except:
+        return render_template('arxiv_to_quickstatements.html',
+                               arxiv=arxiv)
+
+    quickstatements = metadata_to_quickstatements(metadata)
+    return render_template('arxiv_to_quickstatements.html',
+                           arxiv=arxiv, quickstatements=quickstatements)
 
 
 @main.route('/author/' + q_pattern)
