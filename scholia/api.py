@@ -169,7 +169,7 @@ def entity_to_classes(entity):
     Examples
     --------
     >>> entities = wb_get_entities(['Q28133147'])
-    >>> classes = entity_to_classes(entities.values()[0])
+    >>> classes = entity_to_classes(list(entities.values())[0])
     >>> 'Q13442814' in classes
     True
 
@@ -335,7 +335,7 @@ def entity_to_name(entity):
     Examples
     --------
     >>> entities = wb_get_entities(['Q8219'])
-    >>> name = entity_to_name(entities.values()[0])
+    >>> name = entity_to_name(list(entities.values())[0])
     >>> name == 'Uta Frith'
     True
 
