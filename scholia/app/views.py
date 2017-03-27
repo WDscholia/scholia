@@ -1,10 +1,9 @@
 """Views for app."""
 
 
-from flask import redirect, render_template, url_for
+from flask import Blueprint, redirect, render_template, url_for
 from werkzeug.routing import BaseConverter
 
-from . import app
 from ..api import entity_to_name, wb_get_entities
 from ..query import (doi_to_qs, github_to_qs, orcid_to_qs, q_to_class,
                      twitter_to_qs)
@@ -25,13 +24,29 @@ class RegexConverter(BaseConverter):
         self.regex = items[0]
 
 
-app.url_map.converters['regex'] = RegexConverter
+def add_app_url_map_converter(self, func, name=None):
+    """Register a custom URL map converters, available application wide.
+
+    References
+    ----------
+    https://coderwall.com/p/gnafxa/adding-custom-url-map-converters-to-flask-blueprint-objects
+
+    """
+    def register_converter(state):
+        state.app.url_map.converters[name or func.__name__] = func
+
+    self.record_once(register_converter)
+
+
+Blueprint.add_app_url_map_converter = add_app_url_map_converter
+main = Blueprint('app', __name__)
+main.add_app_url_map_converter(RegexConverter, 'regex')
 
 # Wikidata item identifier matcher
 q_pattern = '<regex("Q[1-9]\d*"):q>'
 
 
-@app.route("/")
+@main.route("/")
 def index():
     """Return rendered index page.
 
@@ -44,7 +59,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/" + q_pattern)
+@main.route("/" + q_pattern)
 def redirect_q(q):
     """Detect and redirect to Scholia class page.
 
@@ -59,7 +74,7 @@ def redirect_q(q):
     return redirect(url_for(method, q=q), code=302)
 
 
-@app.route('/author/' + q_pattern)
+@main.route('/author/' + q_pattern)
 def show_author(q):
     """Return HTML rendering for specific author.
 
@@ -84,7 +99,7 @@ def show_author(q):
                            last_name=last_name)
 
 
-@app.route('/author/')
+@main.route('/author/')
 def show_author_empty():
     """Return author index page.
 
@@ -97,7 +112,7 @@ def show_author_empty():
     return render_template('author_empty.html')
 
 
-@app.route('/doi/<path:doi>')
+@main.route('/doi/<path:doi>')
 def redirect_doi(doi):
     """Detect and redirect for DOI.
 
@@ -113,7 +128,7 @@ def redirect_doi(doi):
     return redirect(url_for('show_work', q=q), code=302)
 
 
-@app.route('/github/<github>')
+@main.route('/github/<github>')
 def redirect_github(github):
     """Detect and redirect for Github user.
 
@@ -129,7 +144,7 @@ def redirect_github(github):
     return redirect(url_for('show_author', q=q), code=302)
 
 
-@app.route('/orcid/<orcid>')
+@main.route('/orcid/<orcid>')
 def redirect_orcid(orcid):
     """Detect and redirect for ORCID.
 
@@ -145,7 +160,7 @@ def redirect_orcid(orcid):
     return redirect(url_for('show_author', q=q), code=302)
 
 
-@app.route('/organization/' + q_pattern)
+@main.route('/organization/' + q_pattern)
 def show_organization(q):
     """Return rendered HTML page for specific organization.
 
@@ -163,7 +178,7 @@ def show_organization(q):
     return render_template('organization.html', q=q)
 
 
-@app.route('/organization/')
+@main.route('/organization/')
 def show_organization_empty():
     """Return rendered HTML index page for organization.
 
@@ -176,7 +191,7 @@ def show_organization_empty():
     return render_template('organization_empty.html')
 
 
-@app.route('/topic/' + q_pattern)
+@main.route('/topic/' + q_pattern)
 def show_topic(q):
     """Return html render page for specific topic.
 
@@ -194,7 +209,7 @@ def show_topic(q):
     return render_template('topic.html', q=q)
 
 
-@app.route('/topic/')
+@main.route('/topic/')
 def show_topic_empty():
     """Return rendered HTML index page for topic.
 
@@ -207,7 +222,7 @@ def show_topic_empty():
     return render_template('topic_empty.html')
 
 
-@app.route('/twitter/<twitter>')
+@main.route('/twitter/<twitter>')
 def redirect_twitter(twitter):
     """Detect and redirect based on Twitter account.
 
@@ -224,7 +239,7 @@ def redirect_twitter(twitter):
     return redirect(url_for('redirect_q', q=q), code=302)
 
 
-@app.route('/venue/' + q_pattern)
+@main.route('/venue/' + q_pattern)
 def show_venue(q):
     """Return rendered HTML page for specific venue.
 
@@ -242,7 +257,7 @@ def show_venue(q):
     return render_template('venue.html', q=q)
 
 
-@app.route('/venue/')
+@main.route('/venue/')
 def show_venue_empty():
     """Return rendered HTML index page for venue.
 
@@ -255,7 +270,7 @@ def show_venue_empty():
     return render_template('venue_empty.html')
 
 
-@app.route('/series/' + q_pattern)
+@main.route('/series/' + q_pattern)
 def show_series(q):
     """Return rendered HTML for specific series.
 
@@ -273,7 +288,7 @@ def show_series(q):
     return render_template('series.html', q=q)
 
 
-@app.route('/series/')
+@main.route('/series/')
 def show_series_empty():
     """Return rendered HTML index page for series.
 
@@ -286,7 +301,7 @@ def show_series_empty():
     return render_template('series_empty.html')
 
 
-@app.route('/publisher/' + q_pattern)
+@main.route('/publisher/' + q_pattern)
 def show_publisher(q):
     """Return rendered HTML page for specific publisher.
 
@@ -299,7 +314,7 @@ def show_publisher(q):
     return render_template('publisher.html', q=q)
 
 
-@app.route('/publisher/')
+@main.route('/publisher/')
 def show_publisher_empty():
     """Return rendered HTML index page for publisher.
 
@@ -312,7 +327,7 @@ def show_publisher_empty():
     return render_template('publisher_empty.html')
 
 
-@app.route('/sponsor/' + q_pattern)
+@main.route('/sponsor/' + q_pattern)
 def show_sponsor(q):
     """Return rendered HTML page for specific sponsor.
 
@@ -330,7 +345,7 @@ def show_sponsor(q):
     return render_template('sponsor.html', q=q)
 
 
-@app.route('/sponsor/')
+@main.route('/sponsor/')
 def show_sponsor_empty():
     """Return rendered index page for sponsor.
 
@@ -343,7 +358,7 @@ def show_sponsor_empty():
     return render_template('sponsor_empty.html')
 
 
-@app.route('/work/' + q_pattern)
+@main.route('/work/' + q_pattern)
 def show_work(q):
     """Return rendered HTML page for specific work.
 
@@ -361,7 +376,7 @@ def show_work(q):
     return render_template('work.html', q=q)
 
 
-@app.route('/work/')
+@main.route('/work/')
 def show_work_empty():
     """Return rendered index page for work.
 
@@ -374,7 +389,7 @@ def show_work_empty():
     return render_template('work_empty.html')
 
 
-@app.route('/about')
+@main.route('/about')
 def show_about():
     """Return rendered about page.
 
@@ -385,17 +400,3 @@ def show_about():
 
     """
     return render_template('about.html')
-
-
-@app.route('/static/<path:filename>')
-def serve_bootstrap_custom(filename):
-    """Return static file.
-
-    Parameter
-    ---------
-    filename : str
-        Filename for static content.
-
-    """
-    # https://github.com/mbr/flask-bootstrap/issues/88
-    return app.send_static_file('bootstrap_custom/' + filename)
