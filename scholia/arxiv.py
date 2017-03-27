@@ -115,6 +115,34 @@ def metadata_to_quickstatements(metadata):
     return qs
 
 
+def string_to_arxiv(string):
+    """Extract arxiv id from string.
+
+    Parameters
+    ----------
+    string : str
+        String with arxiv ID.
+
+    Returns
+    -------
+    arxiv : str or None
+        String with arxiv ID.
+
+    Examples
+    --------
+    >>> string = "http://arxiv.org/abs/1103.2903"
+    >>> arxiv = string_to_arxiv(string)
+    >>> arxiv == '1103.2903'
+    True
+
+    """
+    PATTERN = re.compile(r'\d+\.\d+', flags=re.DOTALL | re.UNICODE)
+    arxivs = PATTERN.findall(string)
+    if len(arxivs) > 0:
+        return arxivs[0]
+    return None
+
+
 def main():
     """Handle command-line interface."""
     from docopt import docopt
