@@ -70,7 +70,7 @@ def redirect_q(q):
 
     """
     class_ = q_to_class(q)
-    method = 'show_' + class_
+    method = 'app.show_' + class_
     return redirect(url_for(method, q=q), code=302)
 
 
@@ -125,7 +125,7 @@ def redirect_doi(doi):
     qs = doi_to_qs(doi)
     if len(qs) > 0:
         q = qs[0]
-    return redirect(url_for('show_work', q=q), code=302)
+    return redirect(url_for('app.show_work', q=q), code=302)
 
 
 @main.route('/github/<github>')
@@ -141,7 +141,7 @@ def redirect_github(github):
     qs = github_to_qs(github)
     if len(qs) > 0:
         q = qs[0]
-    return redirect(url_for('show_author', q=q), code=302)
+    return redirect(url_for('app.show_author', q=q), code=302)
 
 
 @main.route('/orcid/<orcid>')
@@ -157,7 +157,7 @@ def redirect_orcid(orcid):
     qs = orcid_to_qs(orcid)
     if len(qs) > 0:
         q = qs[0]
-    return redirect(url_for('show_author', q=q), code=302)
+    return redirect(url_for('app.show_author', q=q), code=302)
 
 
 @main.route('/organization/' + q_pattern)
@@ -236,7 +236,7 @@ def redirect_twitter(twitter):
     q = ''
     if len(qs) > 0:
         q = qs[0]
-    return redirect(url_for('redirect_q', q=q), code=302)
+    return redirect(url_for('app.redirect_q', q=q), code=302)
 
 
 @main.route('/venue/' + q_pattern)
