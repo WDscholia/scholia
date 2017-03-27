@@ -1,0 +1,42 @@
+{% extends "work_base.html" %}
+
+{% block page_content %}
+
+
+<h2>Search</h2>
+
+<form action="" id="form" method="GET" class="form-horizontal">
+  <div class="input-group">
+    {% if arxiv %}
+    <input type="text" class="form-control" placeholder="arXiv id" value="{{ arxiv | urlencode }}" id="searchterm" name="arxiv"/>
+    {% else %}
+    <input type="text" class="form-control" placeholder="arXiv id" id="searchterm" name="arxiv"/>
+    {% endif %}
+    <span class="input-group-btn">
+      <button class="btn btn-search" type="submit">
+        <i class="glyphicon glyphicon-search"></i>
+      </button>
+    </span>
+  </div>
+</form>
+    
+
+
+<h2>Result</h2>
+
+{% if q %}
+
+<div id="searchresult">Already entered as <a href="../work/{{ q }}">work/{{ q }}</div>
+
+{% endif %}
+
+{% if quickstatements %}
+
+<div id="quickstatements"><pre>{{ quickstatements }} </pre></div>
+
+<a href="https://tools.wmflabs.org/wikidata-todo/quick_statements.php?list={{ quickstatements | urlencode }}">Forward to Magnus Manske's quickstatements</a>
+
+{% endif %}
+
+
+{% endblock %}
