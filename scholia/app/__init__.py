@@ -7,13 +7,26 @@ from flask import Flask
 from flask_bootstrap import Bootstrap, StaticCDN
 
 
-app = Flask(__name__)
-Bootstrap(app)
+def create_app():
+    """Create webapp.
 
-# Serve assets from wmflabs for privacy reasons
-app.extensions['bootstrap']['cdns']['jquery'] = StaticCDN()
-app.extensions['bootstrap']['cdns']['bootstrap'] = StaticCDN(
-    static_endpoint='serve_bootstrap_custom')
+    Factory for webapp.
 
+    Returns
+    -------
+    app : flask.app.Flask
+        Flask app object.
 
-from . import views
+    """
+    app = Flask(__name__)
+
+    Bootstrap(app)
+
+    # Serve assets from wmflabs for privacy reasons
+    app.extensions['bootstrap']['cdns']['jquery'] = StaticCDN()
+    app.extensions['bootstrap']['cdns']['bootstrap'] = StaticCDN()
+
+    from .views import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+
+    return app
