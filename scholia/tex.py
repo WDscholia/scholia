@@ -168,9 +168,9 @@ def extract_dois_from_aux_string(string):
 
     Examples
     --------
-    >>> string = "\citation{10.1186/s13321-016-0161-3}"
+    >>> string = "\citation{10.1186/S13321-016-0161-3}"
     >>> extract_dois_from_aux_string(string)
-    ['10.1186/s13321-016-0161-3']
+    ['10.1186/S13321-016-0161-3']
 
     """
     matches = re.findall(r'^\\citation{(.+?)}', string,
