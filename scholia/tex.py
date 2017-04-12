@@ -33,6 +33,8 @@ from os.path import splitext
 
 import re
 
+from six import u
+
 from .api import (
     entity_to_authors, entity_to_classes, entity_to_doi,
     entity_to_full_text_url,
@@ -43,6 +45,7 @@ from .query import doi_to_qs
 
 
 STRING_TO_TEX = {
+    u('\xc5'): r'{\AA}',
     '<': r'\textless{}',
     '>': r'\textgreater{}',
     '~': r'\~{}',
@@ -226,6 +229,29 @@ def extract_qs_from_aux_string(string):
     return qs
 
 
+def authors_to_bibtex_authors(authors):
+    """Convert a Wikidata entity to an author in BibTeX.
+
+    Parameters
+    ----------
+    entity : dict
+        Wikidata entity as hierarchical structure.
+
+    Returns
+    -------
+    entry : str
+        Bibtex entry.
+
+    """
+    bibtex_authors = []
+    for n, (author, humanness) in enumerate(authors):
+        if humanness:
+            bibtex_authors.append(escape_to_tex(author))
+        else:
+            bibtex_authors.append('{' + escape_to_tex(author) + '}')
+    return bibtex_authors
+
+
 def entity_to_bibtex_entry(entity, key=None):
     """Convert Wikidata entity to bibtex-formatted entry.
 
@@ -246,8 +272,9 @@ def entity_to_bibtex_entry(entity, key=None):
         entry = "@Article{%s,\n" % entity['id']
     else:
         entry = "@Article{%s,\n" % escape_to_tex(key)
-    entry += "  author =   {%s},\n" % \
-             escape_to_tex(u" and ".join(entity_to_authors(entity)))
+    authors = authors_to_bibtex_authors(
+        entity_to_authors(entity, return_humanness=True))
+    entry += "  author =   {%s},\n" % u" and ".join(authors)
     entry += "  title =    {{%s}},\n" % escape_to_tex(entity_to_title(entity))
     entry += "  journal =  {%s},\n" % (
         escape_to_tex(entity_to_journal_title(entity)))
