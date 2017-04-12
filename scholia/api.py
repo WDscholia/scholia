@@ -31,6 +31,24 @@ MONTH_NUMBER_TO_MONTH = {
 }
 
 
+def is_human(entity):
+    """Return true if entity is a human.
+
+    Parameters
+    ----------
+    entity : dict
+        Structure with Wikidata entity.
+
+    Returns
+    -------
+    result : bool
+        Result of comparison.
+
+    """
+    classes = entity_to_classes(entity)
+    return 'Q5' in classes
+
+
 def select_value_by_language_preferences(
         choices, preferences=('en', 'de', 'fr')):
     """Select value based on language preference.
@@ -105,7 +123,7 @@ def wb_get_entities(qs):
         raise Exception('API error')
 
 
-def entity_to_authors(entity):
+def entity_to_authors(entity, return_humanness=False):
     """Extract authors from entity.
 
     Parameters
@@ -142,15 +160,21 @@ def entity_to_authors(entity):
     if 'P2093' in claims:
         for statement in claims['P2093']:
             value = statement['mainsnak']['datavalue']['value']
-            authornames.append((statement_to_order(statement), value))
+            authornames.append((statement_to_order(statement), value, True))
 
-    authors = [(order, entity_to_label(entities[q]))
-               for order, q in zip(orders, qs)]
+    authors = []
+    for order, q in zip(orders, qs):
+        label = entity_to_label(entities[q])
+        authors.append((order, label, is_human(entities[q])))
+
     authors.extend(authornames)
 
     authors.sort()
 
-    return [author for _, author in authors]
+    if return_humanness:
+        return [(author, humanness) for _, author, humanness in authors]
+    else:
+        return [author for _, author, _ in authors]
 
 
 def entity_to_classes(entity):
