@@ -1,0 +1,9 @@
+@InProceedings{NielsenF2017Scholia,
+  author = 	 {Finn {\AA}rup Nielsen and Daniel Mietchen and Egon
+                  Willighagen},  
+  title = 	 {Scholia and scientometrics with Wikidata},
+  booktitle =    {Scientometrics 2017},
+  year = 	 {2017},
+  arxiv =        {1703.04222},
+  wikidata =     {Q28942417},
+}
