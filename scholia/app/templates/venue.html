@@ -32,9 +32,8 @@
 <h3 id="Prolific authors">Prolific authors</h3>
 
 <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#SELECT%20%3Fauthor%20%3Fauthor_label%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20%3B%0A%20%20%20%20%20%20%20%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fauthor%20rdfs%3Alabel%20%3Fauthor_label%20.%20filter%20%28lang%28%3Fauthor_label%29%20%3D%20%27en%27%29%0A%7D%20group%20by%20%3Fauthor%20%3Fauthor_label%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2030"></iframe>
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23%20Prolific%20authors%20for%20a%20specific%20journal%0ASELECT%20%3Fcount%20%3Fauthor%20%3FauthorLabel%20%3Forcid%0AWITH%20%7B%0A%20%20%23%20Count%20the%20number%20of%20works%20author%20by%20the%20author%20publishing%20in%20the%20journal%0A%20%20SELECT%20%3Fauthor%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20%3B%0A%20%20%20%20%20%20%20%20%20%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%20%0A%20%20%20%20%20%20%20%20%20%20%0A%20%20%23%20Include%20optional%20ORCID%20iD%0A%20%20OPTIONAL%20%7B%20%3Fauthor%20wdt%3AP496%20%3Forcid%20.%20%7D%0A%20%20%0A%20%20%23%20Label%20the%20results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%20%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0ALIMIT%2050"></iframe>
 </div>
-
 
 
 
