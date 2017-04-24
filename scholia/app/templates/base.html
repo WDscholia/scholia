@@ -3,6 +3,7 @@
 {% block head %}
 {{super()}}
 
+<link rel="stylesheet" type="text/css" href="/static/jquery.dataTables.min.css">
 <link rel="stylesheet" type="text/css" href="/static/css/scholia.css">
 
 {% endblock %}
@@ -12,71 +13,75 @@
 {% block scripts %}
 {{super()}}
 
-<script type="text/javascript">
-    var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-              '{{ q }}' + 
-              '&format=json&callback=?'
+<script type="text/javascript" src="/static/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/static/scholia.js">
 
-    $.getJSON(url, function (data) {
-        var item = data.entities.{{ q }}; 
-	$("#h1")
-	    .text(item.labels.en.value)
-	    .append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
+ 
+ <script type="text/javascript">
+ var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+           '{{ q }}' + 
+           '&format=json&callback=?'
 
-        // var dateString = item.claims.P577[0].mainsnak.datavalue.value.time;
-        // $( '#details' ).append( dateString.substring(1, 5) );
+	   $.getJSON(url, function (data) {
+               var item = data.entities.{{ q }}; 
+	       $("#h1")
+		   .text(item.labels.en.value)
+		   .append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 
-        try {
-          var doi = item.claims.P356[0].mainsnak.datavalue.value;
-          $( '#details' ).append( 'DOI: <a href="https://dx.doi.org/' + doi + '">' + doi + '</a>. ');
-        }
-        catch(e) {}
+               // var dateString = item.claims.P577[0].mainsnak.datavalue.value.time;
+               // $( '#details' ).append( dateString.substring(1, 5) );
 
-        try {
-          var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
-          $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
-        }
-        catch(e) {}
+               try {
+		   var doi = item.claims.P356[0].mainsnak.datavalue.value;
+		   $( '#details' ).append( 'DOI: <a href="https://dx.doi.org/' + doi + '">' + doi + '</a>. ');
+               }
+               catch(e) {}
 
-	var title = item.sitelinks.enwiki.title;
-	var wikipediaUrl = 'https://en.wikipedia.org/w/api.php?' +
-            'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
-            'explaintext=1&callback=?&format=json&titles=' +
-            encodeURIComponent(title);
-        console.log(wikipediaUrl);
-	$.getJSON(wikipediaUrl, function(data) {
-	    var pages = data.query.pages;
-	    var text = pages[Object.keys(pages)[0]].extract + " ... (from the English Wikipedia)";
-	    $("#intro").text(text);
-	}).fail(function(d, textStatus, error) {
-		console.error("getJSON failed, status: " + textStatus + ", error: "+error)
-	});
-    });
+               try {
+		   var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
+		   $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
+               }
+               catch(e) {}
+
+	       var title = item.sitelinks.enwiki.title;
+	       var wikipediaUrl = 'https://en.wikipedia.org/w/api.php?' +
+				  'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+				  'explaintext=1&callback=?&format=json&titles=' +
+				  encodeURIComponent(title);
+               console.log(wikipediaUrl);
+	       $.getJSON(wikipediaUrl, function(data) {
+		   var pages = data.query.pages;
+		   var text = pages[Object.keys(pages)[0]].extract + " ... (from the English Wikipedia)";
+		   $("#intro").text(text);
+	       }).fail(function(d, textStatus, error) {
+		   console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+	       });
+	   });
 </script>
 {% endblock %}
 
 {% block navbar %}
 <div class="navbar navbar-static-top">
-  <ul class="nav nav-pills">
-    <li role="presentation" class="active"><a href="./">Scholia</a></li>
-    <li role="presentation"><a href="author/">Author</a></li>
-    <li role="presentation"><a href="work/">Work</a></li>
-    <li role="presentation"><a href="organization/">Organization</a></li>
-    <li role="presentation"><a href="venue/">Venue</a></li>
-    <li role="presentation"><a href="series/">Series</a></li>
-    <li role="presentation"><a href="publisher/">Publisher</a></li>
-    <li role="presentation"><a href="sponsor/">Sponsor</a></li>
-    <li role="presentation"><a href="topic/">Topic</a></li>
-    <li role="presentation"><a href="about">About</a></li>
-  </ul>
+    <ul class="nav nav-pills">
+	<li role="presentation" class="active"><a href="./">Scholia</a></li>
+	<li role="presentation"><a href="author/">Author</a></li>
+	<li role="presentation"><a href="work/">Work</a></li>
+	<li role="presentation"><a href="organization/">Organization</a></li>
+	<li role="presentation"><a href="venue/">Venue</a></li>
+	<li role="presentation"><a href="series/">Series</a></li>
+	<li role="presentation"><a href="publisher/">Publisher</a></li>
+	<li role="presentation"><a href="sponsor/">Sponsor</a></li>
+	<li role="presentation"><a href="topic/">Topic</a></li>
+	<li role="presentation"><a href="about">About</a></li>
+    </ul>
 </div>
 {% endblock %}
 
 {% block content %}
-  <div class="container">
+<div class="container">
     {% block page_content %}{% endblock %}
-  </div>
-  <div class="container">
+</div>
+<div class="container">
     <hr>
     Data from <a href="https://www.wikidata.org">Wikidata</a> and
     <a href="https://en.wikipedia.org">English Wikipedia</a>
