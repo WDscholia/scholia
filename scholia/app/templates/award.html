@@ -1,0 +1,33 @@
+{% extends "award_base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Award</h1>
+
+<div id="intro"></div>
+
+     
+<h2 id="List of recipients">List of recipients</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#SELECT%20%3Fyear%20%3Frecipient%20%3FrecipientLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%3Frecipient%20%3Fyear%20WHERE%20%7B%0A%20%20%20%20%3Frecipient%20p%3AP166%20%3Faward_statement%20.%20%0A%20%20%20%20%3Faward_statement%20ps%3AP166%20wd%3A{{ q }}%20.%0A%20%20%20%20OPTIONAL%20%7B%0A%20%20%20%20%20%20%3Faward_statement%20pq%3AP585%20%3Ftime%20.%0A%20%20%20%20%20%20BIND%28YEAR%28%3Ftime%29%20AS%20%3Fyear%29%0A%20%20%20%20%7D%20%20%20%20%20%20%20%20%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%20%20%0A%7D%0AORDER%20BY%20DESC%28%3Fyear%29"></iframe>
+</div>
+
+
+<h2 id="Co-awards">Co-awards</h2>
+
+Awards with co-recipients 
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#SELECT%20%3Fnumber_of_corecipients%20%3Faward%20%3FawardLabel%0AWITH%20%7B%0A%20%20SELECT%20%3Faward%20%28COUNT%28%3Frecipient%29%20AS%20%3Fnumber_of_corecipients%29%20WHERE%20%7B%0A%20%20%20%20%3Frecipient%20wdt%3AP166%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Frecipient%20wdt%3AP166%20%3Faward%20.%0A%20%20%20%20FILTER%20%28%3Faward%20%21%3D%20wd%3A{{ q }}%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Faward%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%20%20%0A%7D%0AORDER%20BY%20DESC%28%3Fnumber_of_corecipients%29"></iframe>
+</div>
+
+
+{% endblock %}
