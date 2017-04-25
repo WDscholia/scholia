@@ -179,6 +179,37 @@ def show_author_empty():
     return render_template('author_empty.html')
 
 
+@main.route('/award/' + q_pattern)
+def show_award(q):
+    """Return HTML rendering for specific award.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('award.html', q=q)
+
+
+@main.route('/award/')
+def show_award_empty():
+    """Return award index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for author view.
+
+    """
+    return render_template('award_empty.html')
+
+
 @main.route('/doi/<path:doi>')
 def redirect_doi(doi):
     """Detect and redirect for DOI.
