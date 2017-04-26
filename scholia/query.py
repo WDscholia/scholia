@@ -172,20 +172,36 @@ def q_to_class(q):
     # Hard-coded matching match
     if ('Q5' in classes):  # human
         class_ = 'author'
-    elif ('Q2217301' in classes  # serial (publication series)
-          or 'Q27785883' in classes):  # conference proceedings series
+    elif ('Q2217301' in classes or  # serial (publication series)
+          'Q27785883' in classes):  # conference proceedings series
         class_ = 'series'
-    elif ('Q5633421' in classes   # scientific journal
-          or 'Q1143604' in classes):  # proceedings
+    elif ('Q5633421' in classes or  # scientific journal
+          'Q1143604' in classes):  # proceedings
         class_ = 'venue'
-    elif ('Q157031' in classes  # foundation
-          or 'Q10498148' in classes):  # research council
+    elif ('Q157031' in classes or  # foundation
+          'Q10498148' in classes):  # research council
         class_ = 'sponsor'
-    elif ('Q2085381' in classes  # publisher
-          or 'Q479716' in classes):  # university publisher
+    elif ('Q2085381' in classes or  # publisher
+          'Q479716' in classes):  # university publisher
         class_ = 'publisher'
     elif ('Q13442814' in classes):  # scientific article
         class_ = 'work'
+    elif set(classes).intersection([
+            'Q7191',  # Nobel prize
+            'Q193622',  # order
+            'Q230788',  # grant
+            'Q378427',  # litarary award
+            'Q618779',  # award
+            'Q1364556',  # music award
+            'Q1407225',  # television award
+            'Q1709894',  # journalism award
+            'Q1792571',  # art prize
+            'Q1829324',  # architecture award
+            'Q4220917',  # film award
+            'Q11448906',  # science prize
+            'Q15383322',  # culture award
+    ]):
+        class_ = 'award'
     elif set(classes).intersection([
             'Q3918',  # university
             'Q31855',  # research institute
