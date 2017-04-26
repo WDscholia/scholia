@@ -30,4 +30,11 @@ Awards with co-recipients
 </div>
 
 
+<h2 id="Locations of recipients">Locations of recipients</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20DISTINCT%20%3Frecipient%20%3FrecipientLabel%20%3Fimage%20%3Fitem%20%3FitemLabel%20%3Fgeo%20%3Flayer%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Frecipient%20%3Fimage%20%3Fitem%20%3Fgeo%20%28%3Fproperty_item_label%20AS%20%3Flayer%29%20WHERE%20%7B%0A%20%20%20%20%3Frecipient%20wdt%3AP166%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Frecipient%20%3Fproperty%20%3Fitem%20.%20%0A%20%20%20%20%3Fitem%20wdt%3AP625%20%3Fgeo%20.%0A%20%20%20%20%3Fproperty_item%20wikibase%3AdirectClaim%20%3Fproperty%20.%0A%20%20%20%20%3Fproperty_item%20rdfs%3Alabel%20%3Fproperty_item_label%20.%20FILTER%20%28LANG%28%3Fproperty_item_label%29%20%3D%20%27en%27%29%0A%20%20%20%20OPTIONAL%20%7B%20%3Fitem%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%20%0A%7D"></iframe>
+</div>
+
+
 {% endblock %}
