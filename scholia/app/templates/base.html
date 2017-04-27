@@ -56,7 +56,7 @@
 				  'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
 				  'explaintext=1&callback=?&format=json&titles=' +
 				  encodeURIComponent(title);
-               console.log(wikipediaUrl);
+
 	       $.getJSON(wikipediaUrl, function(data) {
 		   var pages = data.query.pages;
 		   var text = pages[Object.keys(pages)[0]].extract + " ... (from the English Wikipedia)";
