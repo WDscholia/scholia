@@ -96,9 +96,12 @@ def doi_to_qs(doi):
     >>> doi_to_qs('10.1186/S13321-016-0161-3') == ['Q26899110']
     True
 
+    >>> doi_to_qs('10.1016/j.stem.2016.02.016') == ['Q23008981']
+    True
+
     """
     query = 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
-        doi=escape_string(doi))
+        doi=escape_string(doi.upper()))
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
