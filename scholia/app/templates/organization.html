@@ -1,5 +1,92 @@
 {% extends "organization_base.html" %}
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ employeesAndAffiliatedSparql = `
+SELECT (SAMPLE(?number_of_works_) AS ?number_of_works) ?researcher ?researcherLabel (MAX(?birthdates) AS ?birthdate)
+WHERE {
+  hint:Query hint:optimizer "None" .
+  {
+    SELECT (COUNT(?work) AS ?number_of_works_) ?researcher WHERE {
+      { 
+        SELECT DISTINCT ?researcher WHERE {
+          { ?researcher wdt:P108 wd:{{ q }} . }
+          UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} . }
+        } 
+      }
+      OPTIONAL { ?work wdt:P50 ?researcher . }
+    } 
+    GROUP BY ?researcher
+  }  
+  OPTIONAL {
+    ?researcher wdt:P569 ?birthdatetimes .
+    BIND(xsd:date(?birthdatetimes) AS ?birthdates)
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
+}
+GROUP BY ?researcher ?researcherLabel
+ORDER BY DESC(?number_of_works)
+ `;
+
+ recentPublicationsSparql = `
+ #defaultView:Table
+SELECT ?publication_date ?work ?workLabel ?researchers
+WITH {
+  SELECT 
+    (min(?publication_dates) AS ?publication_date) ?work 
+    (GROUP_CONCAT(?researcher_label; separator=', ') AS ?researchers)
+  WHERE {                                                         
+    { ?researcher wdt:P108 wd:{{ q }} . }
+    UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} .  }
+    ?work wdt:P50 ?researcher .
+    ?researcher rdfs:label ?researcher_label . filter (lang(?researcher_label) = 'en')
+    OPTIONAL {
+      ?work wdt:P577 ?publication_datetimes .
+      BIND(xsd:date(?publication_datetimes) AS ?publication_dates)
+    }
+  }
+  GROUP BY ?work
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,nl,ru,zh". }
+}
+ORDER BY DESC(?publication_date)
+ `;
+
+ recentCitationsSparql = `
+ #defaultView:Table
+ SELECT DISTINCT ?publication_date ?citing_work ?citing_workLabel ?work ?workLabel
+ WHERE {
+     { ?researcher wdt:P108 wd:{{ q }} . }
+     UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} .  }
+     ?work wdt:P50 ?researcher .
+      ?citing_work wdt:P2860 ?work .
+   ?citing_work wdt:P577 ?publication_datetime .
+   BIND(xsd:date(?publication_datetime) AS ?publication_date)
+   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,nl,ru,sv,zh". }
+ }
+ ORDER BY DESC(?publication_date)
+`;
+
+
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(employeesAndAffiliatedSparql, "#employees-and-affiliated");
+     sparqlToDataTable(recentPublicationsSparql, "#recent-publications");
+     sparqlToDataTable(recentCitationsSparql, "#recent-citations");
+ });
+</script>
+
+
+{% endblock %}
+
+
+
+
 {% block page_content %}
 
 <h1 id="h1">Organization</h1>
@@ -11,24 +98,20 @@
 
 (past and present)<br/>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%28sample%28%3Fnumber_of_works_%29%20as%20%3Fnumber_of_works%29%20%3Fresearcher%20%3FresearcherLabel%20%28max%28%3Fbirthdates%29%20as%20%3Fbirthdate%29%20where%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22%20.%0A%20%20%7B%0A%20%20%20%20select%20%28count%28%3Fwork%29%20as%20%3Fnumber_of_works_%29%20%3Fresearcher%20where%20%7B%0A%20%20%20%20%20%20%7B%20%0A%20%20%20%20%20%20%20%20select%20distinct%20%3Fresearcher%20where%20%7B%0A%20%20%20%20%20%20%20%20%20%20%7B%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20%20%20%7D%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20optional%20%7B%20%3Fwork%20wdt%3AP50%20%3Fresearcher%20.%20%7D%0A%20%20%20%20%7D%20%0A%20%20%20%20group%20by%20%3Fresearcher%0A%20%20%7D%20%20%0A%20%20optional%20%7B%20%3Fresearcher%20wdt%3AP569%20%3Fbirthdates%20.%20%7D%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cjp%2Cda%2Csv%22%20.%20%7D%20%0A%7D%20group%20by%20%3Fresearcher%20%3FresearcherLabel%0Aorder%20by%20desc%28%3Fnumber_of_works%29"></iframe>
-</div>
+<table class="table table-hover" id="employees-and-affiliated"></table>
 
 
 <h2 id="Co-author graph">Co-author graph</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Frgb%20%3Fauthor2%20%3Fauthor2Label%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fauthor1%20%3Fauthor2%20%3Frgb%20WHERE%20%7B%0A%20%20%20%20%7B%20%3Fauthor1%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%20union%20%7B%20%3Fauthor1%20wdt%3AP1416%20%5B%20wdt%3AP361%2a%20wd%3A{{ q }}%20%5D%20.%20%20%7D%0A%20%20%20%20%7B%20%3Fauthor2%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%20union%20%7B%20%3Fauthor2%20wdt%3AP1416%20%5B%20wdt%3AP361%2a%20wd%3A{{ q }}%20%5D%20.%20%20%7D%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor2%20.%0A%20%20%20%20VALUES%20%3Fpublication_type%20%7B%20wd%3AQ13442814%20wd%3AQ571%20wd%3AQ26973022%7D%20%20%23%20journal%20and%20conference%20articles%2C%20books%2C%20not%20%28yet%3F%29%20software%0A%20%20%20%20%3Fwork%20wdt%3AP31%20%3Fpublication_type%20.%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%0A%20%20%20%20%3Fauthor1%20wdt%3AP21%20%3Fgender1%20.%20%0A%20%20%20%20BIND%20%28%20IF%28%3Fgender1%20%3D%20wd%3AQ6581097%2C%20%223182BD%22%2C%20%22E6550D%22%29%20AS%20%3Frgb%29%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Csv%2Cru%2Czh%22.%0A%20%20%7D%0A%7D%0A"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Frgb%20%3Fauthor2%20%3Fauthor2Label%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fauthor1%20%3Fauthor2%20%3Frgb%20WHERE%20%7B%0A%20%20%20%20%7B%20%3Fauthor1%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%20union%20%7B%20%3Fauthor1%20wdt%3AP1416%20%5B%20wdt%3AP361%2a%20wd%3A{{ q }}%20%5D%20.%20%20%7D%0A%20%20%20%20%7B%20%3Fauthor2%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%20union%20%7B%20%3Fauthor2%20wdt%3AP1416%20%5B%20wdt%3AP361%2a%20wd%3A{{ q }}%20%5D%20.%20%20%7D%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor2%20.%0A%20%20%20%20VALUES%20%3Fpublication_type%20%7B%20wd%3AQ13442814%20wd%3AQ571%20wd%3AQ26973022%7D%20%20%23%20journal%20and%20conference%20articles%2C%20books%2C%20not%20%28yet%3F%29%20software%0A%20%20%20%20%3Fwork%20wdt%3AP31%20%3Fpublication_type%20.%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%0A%20%20%20%20%3Fauthor1%20wdt%3AP21%20%3Fgender1%20.%20%0A%20%20%20%20BIND%20%28%20IF%28%3Fgender1%20%3D%20wd%3AQ6581097%2C%20%223182BD%22%2C%20%22E6550D%22%29%20AS%20%3Frgb%29%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Csv%2Cru%2Czh%22.%0A%20%20%7D%0A%7D%0A"></iframe>
 </div>
 
 
 
 <h2 id="Recent publications">Recent publications</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20%28min%28%3Fpublication_dates%29%20as%20%3Fpublication_date%29%20%3Fwork%20%3FworkLabel%20%28group_concat%28%3Fresearcher_label%3B%20separator%3D%27%2C%20%27%29%20as%20%3Fresearchers%29%20WHERE%20%7B%0A%20%20%7B%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20%3Fresearcher%20.%0A%20%20%3Fresearcher%20rdfs%3Alabel%20%3Fresearcher_label%20.%20filter%20%28lang%28%3Fresearcher_label%29%20%3D%20%27en%27%29%0A%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_dates%20.%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fwork%20%3FworkLabel%20%0Aorder%20by%20desc%28%3Fpublication_date%29"></iframe>
-</div>
+<table class="table table-hover" id="recent-publications"></table>
 
 
 <h2 id="Page production">Page production</h2>
@@ -48,9 +131,7 @@ has been set.
 
 <h3 id="Recent citations">Recent citations</h3>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20distinct%20%3Fciting_work%20%3Fciting_workLabel%20%3Fpublication_date%20%3Fwork%20%3FworkLabel%20WHERE%20%7B%0A%20%20%7B%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20%3Fresearcher%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%3Fciting_work%20wdt%3AP577%20%3Fpublication_date%20.%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Aorder%20by%20desc%28%3Fpublication_date%29"></iframe>
-</div>
+<table class="table table-hover" id="recent-citations"></table>
 
 
 <h3>Most cited papers with affiliated first author</h2>
