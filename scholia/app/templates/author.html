@@ -15,7 +15,7 @@
  ?venue ?venueLabel
  (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
  WHERE {
-  ?work wdt:P50 wd:Q8219 .
+  ?work wdt:P50 wd:{{ q }} .
       ?work wdt:P50 ?author .
       ?author rdfs:label ?author_label . FILTER (LANG(?author_label) = 'en')
      OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
@@ -30,9 +30,27 @@
  GROUP BY ?work ?workLabel ?venue ?venueLabel
  ORDER BY DESC(?date)    
  `
+
+ venueStatisticsSparql = `
+SELECT ?count ?venue ?venueLabel
+WITH {
+  SELECT (COUNT(?work) as ?count) ?venue WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P1433 ?venue .
+  }
+  GROUP BY ?venue
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp". }  
+} 
+ORDER BY DESC(?count)
+ `
+
  
  $(document).ready(function() {
      sparqlToDataTable(listOfPublicationsSparql, "#list-of-publications");
+     sparqlToDataTable(venueStatisticsSparql, "#venue-statistics");
  });
 
 
@@ -88,7 +106,7 @@
 <div class="container">
     <div class="rows">
 	<div class="col-xs-6">
-	    <table class="table" id="venue-statistics"></table>
+	    <table class="table table-hover" id="venue-statistics"></table>
 	</div>
     
 	<div class="col-xs-6">
