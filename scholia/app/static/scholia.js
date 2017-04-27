@@ -24,6 +24,11 @@ function convertDataTableData(data, columns) {
 		    '">' + data[i][key + 'Label'] + '</a>';
 	    } else if (key.substr(-5) == 'Label') {
 		// pass
+	    } else if (key == 'orcid') {
+		// Add link to ORCID website
+		convertedRow[key] = '<a href="https://orcid.org/' +
+		    data[i][key] + '">' + 
+		    data[i][key] + '</a>';
 	    } else {
 		convertedRow[key] = data[i][key];
 	    }
