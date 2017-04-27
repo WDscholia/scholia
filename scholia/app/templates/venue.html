@@ -1,5 +1,105 @@
 {% extends "venue_base.html" %}
 
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ recentlyPublishedWorksSparql = `
+# Recent works published in venue
+SELECT ?publication_date ?work ?workLabel where {
+  ?work wdt:P1433 wd:{{ q }} .
+  OPTIONAL {
+    ?work wdt:P577 ?publication_datetime . 
+    BIND(xsd:date(?publication_datetime) AS ?publication_date)
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?publication_date)
+LIMIT 200
+`
+
+ topicsSparql = `
+#defaultView:Table
+# Count of topics in published work in specified venue
+SELECT ?count ?topic ?topicLabel 
+WITH {
+  SELECT (COUNT(?work) as ?count) ?topic WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P921 ?topic .
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+`
+
+ prolificAuthorsSparql = `
+# Prolific authors for a specific journal
+SELECT ?count ?author ?authorLabel ?orcid
+WITH {
+  # Count the number of works author by the author publishing in the journal
+  SELECT ?author (COUNT(?work) AS ?count) WHERE {
+    ?work wdt:P50 ?author ;
+          wdt:P1433 wd:{{ q }} .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result 
+          
+  # Include optional ORCID iD
+  OPTIONAL { ?author wdt:P496 ?orcid . }
+  
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+LIMIT 50
+ `
+
+ citedVenuesSparql = `
+ # Cited venues from specific journal
+ SELECT ?count ?cited_journal ?cited_journalLabel
+ WITH {
+     SELECT (COUNT(?cited_work) AS ?count) ?cited_journal WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+	?work wdt:P2860 ?cited_work .
+	?cited_work wdt:P1433 ?cited_journal . 
+					OPTIONAL {
+      ?work wdt:P577 ?publication_datetime .
+				     BIND(xsd:date(?publication_datetime) AS ?publication_date)
+					}
+     }
+     GROUP BY ?cited_journal
+ } AS %result
+ WHERE {
+     INCLUDE %result
+     SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da" . } 
+ }
+ ORDER BY DESC(?count)
+ LIMIT 200
+ `
+
+
+ 
+
+ $(document).ready(function() {
+     sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
+     sparqlToDataTable(topicsSparql, "#topics");
+     sparqlToDataTable(prolificAuthorsSparql, "#prolific-authors");
+     sparqlToDataTable(citedVenuesSparql, "#cited-venues");
+ });
+</script>
+
+
+{% endblock %}
+
+
+
 {% block page_content %}
 <h1 id="h1">Venue</h1>
 
@@ -8,16 +108,13 @@
 
 <h2>Recently published works</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%3Fwork%20%3Fpublication_date%20%3FworkLabel%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20optional%20%7B%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%0Aorder%20by%20desc%28%3Fpublication_date%29%0Alimit%2050"></iframe>
-</div>
+<table class="table table-hover" id="recently-published-works"></table>
 
 
 <h2 id="Topics">Topics</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%3Ftopic%20%3FtopicLabel%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Ftopic%20%3FtopicLabel%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%20100"></iframe>
-</div>
+<table class="table table-hover" id="topics"></table>
+
 
 
 <h2 id="Authors">Authors</h3>
@@ -25,16 +122,13 @@
 <h3 id="Author images">Author images</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0Aselect%20%28sample%28%3Fimage%29%20as%20%3Fanimage%29%20%3Fauthor%20%3FauthorLabel%20%3Fcount%20where%20%7B%0A%20%20%7B%0A%20%20%20%20select%20%3Fauthor%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%7D%20group%20by%20%3Fauthor%0A%20%20%7D%0A%20%20%3Fauthor%20wdt%3AP18%20%3Fimage%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Cfr%2Czh%2Cjp%2Ces%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Fauthor%20%3FauthorLabel%20%3Fcount%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2050"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0Aselect%20%28sample%28%3Fimage%29%20as%20%3Fanimage%29%20%3Fauthor%20%3FauthorLabel%20%3Fcount%20where%20%7B%0A%20%20%7B%0A%20%20%20%20select%20%3Fauthor%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%7D%20group%20by%20%3Fauthor%0A%20%20%7D%0A%20%20%3Fauthor%20wdt%3AP18%20%3Fimage%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Cfr%2Czh%2Cjp%2Ces%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Fauthor%20%3FauthorLabel%20%3Fcount%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2050"></iframe>
 </div>
 
 
 <h3 id="Prolific authors">Prolific authors</h3>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23%20Prolific%20authors%20for%20a%20specific%20journal%0ASELECT%20%3Fcount%20%3Fauthor%20%3FauthorLabel%20%3Forcid%0AWITH%20%7B%0A%20%20%23%20Count%20the%20number%20of%20works%20author%20by%20the%20author%20publishing%20in%20the%20journal%0A%20%20SELECT%20%3Fauthor%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20%3B%0A%20%20%20%20%20%20%20%20%20%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%20%0A%20%20%20%20%20%20%20%20%20%20%0A%20%20%23%20Include%20optional%20ORCID%20iD%0A%20%20OPTIONAL%20%7B%20%3Fauthor%20wdt%3AP496%20%3Forcid%20.%20%7D%0A%20%20%0A%20%20%23%20Label%20the%20results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%20%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0ALIMIT%2050"></iframe>
-</div>
-
+<table class="table table-hover" id="prolific-authors"></table>
 
 
 <h2 id="Citations">Citations</h2>
@@ -58,16 +152,14 @@
 <h3 id="Citation distribution">Citation distribution</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0Aselect%20%3Fnumber_of_citations%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fwork%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fnumber_of_citations%29%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}.%20%20%20%0A%20%20%20%20%20%20optional%20%7B%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Fwork%20%0A%20%20%7D%0A%7D%20%0Agroup%20by%20%3Fnumber_of_citations%0Aorder%20by%20desc%28%3Fnumber_of_citations%29%0A"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0Aselect%20%3Fnumber_of_citations%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fwork%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fnumber_of_citations%29%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}.%20%20%20%0A%20%20%20%20%20%20optional%20%7B%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Fwork%20%0A%20%20%7D%0A%7D%20%0Agroup%20by%20%3Fnumber_of_citations%0Aorder%20by%20desc%28%3Fnumber_of_citations%29%0A"></iframe>
 </div>
 
 
 
 <h3 id="Cited venues">Cited venues</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%3Fcited_journal%20%28count%28%3Fcited_work%29%20as%20%3Fcount%29%20%3Fcited_journalLabel%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP2860%20%3Fcited_work%20.%0A%20%20%3Fcited_work%20wdt%3AP1433%20%3Fcited_journal%20.%20%0A%20%20optional%20%7B%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Fcited_journal%20%3Fcited_journalLabel%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2050"></iframe>
-</div>
+<table class="table table-hover" id="cited-venues"></table>
 
 
 <h3 id="Venues cited from">Venues cited from</h3>
