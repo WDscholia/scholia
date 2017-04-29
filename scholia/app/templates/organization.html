@@ -36,7 +36,7 @@ SELECT ?publication_date ?work ?workLabel ?researchers
 WITH {
   SELECT 
     (min(?publication_dates) AS ?publication_date) ?work 
-    (GROUP_CONCAT(?researcher_label; separator=', ') AS ?researchers)
+    (GROUP_CONCAT(DISTINCT ?researcher_label; separator=', ') AS ?researchers)
   WHERE {                                                         
     { ?researcher wdt:P108 wd:{{ q }} . }
     UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} .  }
