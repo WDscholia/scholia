@@ -187,7 +187,10 @@ def q_to_class(q):
     elif ('Q2085381' in classes or  # publisher
           'Q479716' in classes):  # university publisher
         class_ = 'publisher'
-    elif ('Q13442814' in classes):  # scientific article
+    elif set(classes).intersection([
+            'Q3331189',  # edition
+            'Q13442814',  # scientific article
+    ]):
         class_ = 'work'
     elif set(classes).intersection([
             'Q7191',  # Nobel prize
