@@ -1,5 +1,65 @@
 {% extends "work_base.html" %}
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ citationsToTheWorkSparql = `
+#defaultView:Table
+# List of works that is cited by the specified work
+SELECT ?citations ?publication_date ?citing_work ?citing_workLabel 
+WITH {
+  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work 
+  WHERE {
+    ?citing_work wdt:P2860 wd:{{ q }} .
+    OPTIONAL {
+      ?citing_work wdt:P577 ?datetime .
+      BIND(xsd:date(?datetime) AS ?date)
+    }
+    OPTIONAL { ?citing_citing_work wdt:P2860 ?citing_work }
+  }
+  GROUP BY ?citing_work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . } 
+} 
+ORDER BY DESC(?citations) DESC(?date) 
+ `;
+
+
+
+ citedWorksSparql = `
+#defaultView:Table
+# List of works that is cited by the specified work
+SELECT ?citations ?publication_date ?cited_work ?cited_workLabel 
+WITH {
+  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_cited_work) AS ?citations) ?cited_work 
+  WHERE {
+    wd:{{ q }} wdt:P2860 ?cited_work . 
+    OPTIONAL {
+      ?cited_work wdt:P577 ?datetime .
+      BIND(xsd:date(?datetime) AS ?date)
+    }
+    OPTIONAL { ?citing_cited_work wdt:P2860 ?cited_work }
+  }
+  GROUP BY ?cited_work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . } 
+} 
+ORDER BY DESC(?citations) DESC(?date) 
+ `;
+ 
+ $(document).ready(function() {
+     sparqlToDataTable(citationsToTheWorkSparql, "#citations-to-the-work");
+     sparqlToDataTable(citedWorksSparql, "#cited-works");
+ });
+</script>
+
+{% endblock %}
+
 
 {% block page_content %}
 <h1 id="h1">Work</h1>
@@ -12,18 +72,16 @@
 <h2>Citations</h2>
 
 
-<h3>Recent citations to the work</h3>
+<h3>Citations to the work</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20%28min%28%3Fdate%29%20as%20%3Fpublication_date%29%20%28count%28%3Fciting_citing_work%29%20as%20%3Fcitations%29%20%3Fciting_work%20%3Fciting_work_label%20WHERE%20%7B%0A%20%20%3Fciting_work%20wdt%3AP2860%20wd%3A{{ q }}%20.%20%0A%20%20optional%20%7B%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%20%7D%0A%20%20optional%20%7B%20%20%3Fciting_citing_work%20wdt%3AP2860%20%3Fciting_work%20%7D%0A%20%20%3Fciting_work%20rdfs%3Alabel%20%3Fciting_work_label%20.%20filter%20%28lang%28%3Fciting_work_label%29%20%3D%20%27en%27%29%0A%7D%0Agroup%20by%20%3Fciting_work%20%3Fciting_work_label%0Aorder%20by%20desc%28%3Fpublication_date%29%20desc%28%3Fcitations%29"></iframe>
-</div>
+Recent citations to the work
+
+<table class="table table-hover" id="citations-to-the-work"></table>
 
 
 <h3>Cited works</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20%28min%28%3Fdate%29%20as%20%3Fpublication_date%29%20%28count%28%3Fciting_cited_work%29%20as%20%3Fcitations%29%20%3Fcited_work%20%3Fcited_work_label%20WHERE%20%7B%0A%20%20wd%3A{{ q }}%20wdt%3AP2860%20%3Fcited_work%20.%20%0A%20%20optional%20%7B%20%3Fcited_work%20wdt%3AP577%20%3Fdate%20.%20%7D%0A%20%20optional%20%7B%20%3Fciting_cited_work%20wdt%3AP2860%20%3Fcited_work%20%7D%0A%20%20%3Fcited_work%20rdfs%3Alabel%20%3Fcited_work_label%20.%20filter%20%28lang%28%3Fcited_work_label%29%20%3D%20%27en%27%29%0A%7D%0Agroup%20by%20%3Fcited_work%20%3Fcited_work_label%0Aorder%20by%20desc%28%3Fcitations%29%20desc%28%3Fdate%29%20"></iframe>
-</div>
+<table class="table table-hover" id="cited-works"></table>
 
 
 <h3>Citation graph</h3>
