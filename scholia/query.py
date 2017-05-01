@@ -212,9 +212,10 @@ def q_to_class(q):
             'Q3918',  # university
             'Q31855',  # research institute
             'Q875538',  # public university
+            'Q902104',  # private university
             'Q2467461',  # university department
             'Q3354859',  # collegiate university
-            'Q902104',  # private university
+            'Q4358176',  # council
             'Q7315155',  # research center
             'Q15936437',  # research university
             'Q23002054',  # "private not-for-profit educational"

@@ -12,7 +12,7 @@ WHERE {
     SELECT (COUNT(?work) AS ?number_of_works_) ?researcher WHERE {
       { 
         SELECT DISTINCT ?researcher WHERE {
-          { ?researcher wdt:P108 wd:{{ q }} . }
+          { ?researcher wdt:P108|wdt:P463 wd:{{ q }} . }
           UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} . }
         } 
       }
@@ -38,7 +38,7 @@ WITH {
     (min(?publication_dates) AS ?publication_date) ?work 
     (GROUP_CONCAT(DISTINCT ?researcher_label; separator=', ') AS ?researchers)
   WHERE {                                                         
-    { ?researcher wdt:P108 wd:{{ q }} . }
+    { ?researcher wdt:P108|wdt:P463 wd:{{ q }} . }
     UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} .  }
     ?work wdt:P50 ?researcher .
     ?researcher rdfs:label ?researcher_label . filter (lang(?researcher_label) = 'en')
@@ -72,12 +72,29 @@ ORDER BY DESC(?publication_date)
 `;
 
 
+ genderDistributionSparql = `
+ SELECT ?count ?gender ?genderLabel 
+WITH {
+  SELECT (COUNT(DISTINCT ?researcher) AS ?count) ?gender WHERE {
+    { ?researcher wdt:P108|wdt:P463 wd:{{ q }} . }
+    UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} . }
+    ?researcher wdt:P21 ?gender . 
+  } 
+  GROUP BY ?gender
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,ep,fr,jp,nl,no,ru,sv,zh" . } 
+} 
+ ORDER BY DESC(?count)
+ `
 
 
  $(document).ready(function() {
      sparqlToDataTable(employeesAndAffiliatedSparql, "#employees-and-affiliated");
      sparqlToDataTable(recentPublicationsSparql, "#recent-publications");
      sparqlToDataTable(recentCitationsSparql, "#recent-citations");
+     sparqlToDataTable(genderDistributionSparql, "#gender-distribution");
  });
 </script>
 
@@ -96,7 +113,7 @@ ORDER BY DESC(?publication_date)
 
 <h2 id="Employees and affiliated">Employees and affiliated</h2>
 
-(past and present)<br/>
+Past and present employees, affiliated, and members<br/>
 
 <table class="table table-hover" id="employees-and-affiliated"></table>
 
@@ -155,12 +172,11 @@ has been set.
 </div>
 
 
-<h2 id="Researcher gender distribution">Researcher gender distribution</h2>
+<h2 id="Gender distribution">Gender distribution</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%28count%28%3Fresearcher%29%20as%20%3Fnumber_of_researchers%29%20%3FgenderLabel%20where%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22%20.%0A%20%20%7B%20%0A%20%20%20%20select%20distinct%20%3Fresearcher%20where%20%7B%0A%20%20%20%20%20%20%7B%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%7D%20%0A%20%20%7D%0A%20%20%3Fresearcher%20wdt%3AP21%20%3Fgender%20.%20%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cjp%2Cda%2Csv%22%20.%20%7D%20%0A%7D%20group%20by%20%3Fgender%20%3FgenderLabel%0Aorder%20by%20desc%28%3Fnumber_of_researchers%29"></iframe>
-</div>
+Count of the number of researchers wrt. gender.
 
+<table class="table table-hover" id="gender-distribution"></table>
 
 
 {% endblock %}

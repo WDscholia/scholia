@@ -2,7 +2,7 @@
 
 
 from flask import (Blueprint, current_app, redirect, render_template, request,
-                   url_for)
+                   Response, url_for)
 from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, wb_get_entities
@@ -423,6 +423,21 @@ def show_publisher_empty():
 
     """
     return render_template('publisher_empty.html')
+
+
+@main.route('/robots.txt')
+def show_robots_txt():
+    """Return robots.txt file.
+
+    Returns
+    -------
+    response : flask.Response
+        Rendered HTML for publisher index page.
+
+    """
+    ROBOTS_TXT = ('User-agent: *\n'
+                  'Disallow: /scholia/\n')
+    return Response(ROBOTS_TXT, mimetype="text/plain")
 
 
 @main.route('/sponsor/' + q_pattern)
