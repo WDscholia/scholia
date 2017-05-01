@@ -12,7 +12,7 @@ WHERE {
     SELECT (COUNT(?work) AS ?number_of_works_) ?researcher WHERE {
       { 
         SELECT DISTINCT ?researcher WHERE {
-          { ?researcher wdt:P108 wd:{{ q }} . }
+          { ?researcher wdt:P108|wdt:P463 wd:{{ q }} . }
           UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} . }
         } 
       }
@@ -38,7 +38,7 @@ WITH {
     (min(?publication_dates) AS ?publication_date) ?work 
     (GROUP_CONCAT(?researcher_label; separator=', ') AS ?researchers)
   WHERE {                                                         
-    { ?researcher wdt:P108 wd:{{ q }} . }
+    { ?researcher wdt:P108|wdt:P463 wd:{{ q }} . }
     UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} .  }
     ?work wdt:P50 ?researcher .
     ?researcher rdfs:label ?researcher_label . filter (lang(?researcher_label) = 'en')
@@ -96,7 +96,7 @@ ORDER BY DESC(?publication_date)
 
 <h2 id="Employees and affiliated">Employees and affiliated</h2>
 
-(past and present)<br/>
+Past and present employees, affiliated, and members<br/>
 
 <table class="table table-hover" id="employees-and-affiliated"></table>
 
