@@ -5,22 +5,26 @@
 
 <script type="text/javascript">
  cofunctionalProteinsSparql = `
-SELECT ?count ?protein ?proteinLabel ?functions
+SELECT ?count ?protein ?proteinLabel ?species ?speciesLabel ?functions
 WITH {
-  SELECT ?protein (COUNT(?function) AS ?count) (GROUP_CONCAT(?function_label; separator=" // ") AS ?functions) WHERE {
+  SELECT ?protein (COUNT(?function) AS ?count)
+         (GROUP_CONCAT(?function_label; separator=" // ") AS ?functions)
+  WHERE {
     BIND(wd:{{ q }} AS ?query_protein)
     ?query_protein wdt:P680 ?function .
-    ?protein wdt:P680 ?function . 
     FILTER (?query_protein != ?protein)
+    ?protein wdt:P680 ?function . 
     ?function rdfs:label ?function_label FILTER(lang(?function_label) = "en")
   }
   GROUP BY ?protein
 } AS %result 
 WHERE {
   INCLUDE %result
+  OPTIONAL { ?protein wdt:P703 ?species . }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,he,jp,it,nl,no,ru,sv,zh". }
 }
 ORDER BY DESC(?count)
+LIMIT 500
  `
 
  $(document).ready(function() {
