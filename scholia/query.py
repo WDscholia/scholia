@@ -188,6 +188,10 @@ def q_to_class(q):
           'Q479716' in classes):  # university publisher
         class_ = 'publisher'
     elif set(classes).intersection([
+            'Q8054',  # protein
+    ]):
+        class_ = 'protein'
+    elif set(classes).intersection([
             'Q3331189',  # edition
             'Q13442814',  # scientific article
     ]):
@@ -221,6 +225,12 @@ def q_to_class(q):
             'Q23002054',  # "private not-for-profit educational"
             ]):
         class_ = 'organization'
+    elif set(classes).intersection([
+            'Q12136',  # disease
+            'Q389735',  # cardiovascular system disease
+            'Q18965518',  # artery disease
+            ]):
+        class_ = 'disease'
     else:
         class_ = 'topic'
 
