@@ -47,10 +47,28 @@ WHERE {
 ORDER BY DESC(?count)
  `
 
+ topicsSparql = `
+#defaultView:Table
+SELECT ?count ?theme ?themeLabel 
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?theme WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P921 ?theme .
+  }
+  GROUP BY ?theme
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count) 
+`
+
  
  $(document).ready(function() {
      sparqlToDataTable(listOfPublicationsSparql, "#list-of-publications");
      sparqlToDataTable(venueStatisticsSparql, "#venue-statistics");
+     sparqlToDataTable(topicsSparql, "#topics");
  });
 
 
@@ -131,9 +149,7 @@ Missing co-authors? <a href="https://query.wikidata.org/#select%20%3Fauthorname%
 
 <h2>Topics</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Ftheme%20%3FthemeLabel%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Ftheme%20%3FthemeLabel%0Aorder%20by%20desc%28%3Fcount%29%20%0A"></iframe>
-</div>
+<table class="table table-hover" id="topics"></table>
 
 
 <h2>Associated images</h2>
