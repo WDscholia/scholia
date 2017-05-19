@@ -4,7 +4,7 @@
 {{super()}}
 
 <script type="text/javascript">
- geneticallyAassociatedDiseaseSparql = `
+ geneticallyAssociatedDiseaseSparql = `
 SELECT ?count ?disease ?diseaseLabel ?genes
 WITH {
   SELECT ?disease (COUNT(?gene) AS ?count) (GROUP_CONCAT(?gene_label; separator=" // ") AS ?genes) WHERE {
@@ -25,7 +25,7 @@ ORDER BY DESC(?count)
 
  
  $(document).ready(function() {
-     sparqlToDataTable(geneticallyAassociatedDiseaseSparql,
+     sparqlToDataTable(geneticallyAssociatedDiseaseSparql,
 		       "#genetically-associated-diseases");
  });
 </script>
