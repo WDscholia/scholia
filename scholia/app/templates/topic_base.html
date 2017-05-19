@@ -12,9 +12,20 @@
 	<li role="presentation"><a href="../publisher/">Publisher</a></li>
 	<li role="presentation"><a href="../sponsor/">Sponsor</a></li>
 	<li role="presentation"><a href="../award/">Award</a></li>
-	<li role="presentation" class="active"><a href="./">Topic</a></li>
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-primary dropdown-toggle" 
+type="button" data-toggle="dropdown">Topic
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		    <li role="presentation" class="active"><a href="./">General</a></li>
+		    <li role="presentation"><a href="../disease/">Disease</a></li>
+		    <li role="presentation"><a href="../protein/">Protein</a></li>
+		</ul>
+	    </div>
+	</li>
+
 	<li role="presentation"><a href="../about">About</a></li>
     </ul>
 </div>
 {% endblock %}
-
