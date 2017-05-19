@@ -210,6 +210,37 @@ def show_award_empty():
     return render_template('award_empty.html')
 
 
+@main.route('/disease/' + q_pattern)
+def show_disease(q):
+    """Return HTML rendering for specific disease.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('disease.html', q=q)
+
+
+@main.route('/disease/')
+def show_disease_empty():
+    """Return disease index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for author view.
+
+    """
+    return render_template('disease_empty.html')
+
+
 @main.route('/doi/<path:doi>')
 def redirect_doi(doi):
     """Detect and redirect for DOI.
@@ -287,6 +318,37 @@ def show_organization_empty():
 
     """
     return render_template('organization_empty.html')
+
+
+@main.route('/protein/' + q_pattern)
+def show_protein(q):
+    """Return HTML rendering for specific protein.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('protein.html', q=q)
+
+
+@main.route('/protein/')
+def show_protein_empty():
+    """Return protein index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for author view.
+
+    """
+    return render_template('protein_empty.html')
 
 
 @main.route('/topic/' + q_pattern)
