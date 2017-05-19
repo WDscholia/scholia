@@ -64,11 +64,51 @@ WHERE {
 ORDER BY DESC(?count) 
 `
 
+ mostCitedWorksSparql = `
+#defaultView:Table
+# Author's most cited works
+SELECT ?count ?work ?workLabel 
+WITH {
+  SELECT (count(?citing_work) as ?count) ?work WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    ?citing_work wdt:P2860 ?work . 
+  }
+  GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,jp". }        
+}  
+ORDER BY DESC(?count)
+LIMIT 500
+`
+
+ citingAuthorsSparql = `
+#defaultView:Table
+SELECT ?count ?citing_author ?citing_authorLabel
+WITH {
+  SELECT (COUNT(?citing_work) AS ?count) ?citing_author WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    ?citing_work wdt:P2860 ?work . 
+    MINUS { ?citing_work wdt:P50 wd:{{ q }} }
+    ?citing_work wdt:P50 ?citing_author .
+  }
+  GROUP BY ?citing_author 
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+} 
+ORDER BY DESC(?count)
+LIMIT 500
+`
  
  $(document).ready(function() {
      sparqlToDataTable(listOfPublicationsSparql, "#list-of-publications");
      sparqlToDataTable(venueStatisticsSparql, "#venue-statistics");
      sparqlToDataTable(topicsSparql, "#topics");
+     sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
+     sparqlToDataTable(citingAuthorsSparql, "#citing-authors");
  });
 
 
@@ -197,10 +237,10 @@ Missing co-authors? <a href="https://query.wikidata.org/#select%20%3Fauthorname%
 <h2>Citation statistics</h2>
 
 <h3>Most cited work</h3>
-    
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20%3Fwork%20%3Fwork_label%20%28count%28%3Fciting_work%29%20as%20%3Fcount%29%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%0A%20%20%3Fwork%20rdfs%3Alabel%20%3Fwork_label%20.%20filter%20%28lang%28%3Fwork_label%29%20%3D%20%27en%27%29%0A%7D%20group%20by%20%3Fwork%20%3Fwork_label%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2020"></iframe>
-</div>
+
+Works of the author ordered according to number of citations received.
+
+<table class="table table-hover" id="most-cited-works"></table>
 
 
 <h3 id="Citations by year">Citations by year</h3>
@@ -212,11 +252,9 @@ Missing co-authors? <a href="https://query.wikidata.org/#select%20%3Fauthorname%
 
 <h3>Citing authors</h3>
 
-(excluding self citations)<br/>
+Authors that cite the author (excluding self citations).
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0ASELECT%20%3Fciting_author%20%3Fciting_author_label%20%28count%28%3Fciting_work%29%20as%20%3Fcount%29%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%0A%20%20minus%20%7B%20%3Fciting_work%20wdt%3AP50%20wd%3A{{ q }}%20%7D%0A%20%20%3Fciting_work%20wdt%3AP50%20%3Fciting_author%20.%0A%20%20%3Fciting_author%20rdfs%3Alabel%20%3Fciting_author_label%20.%20filter%20%28lang%28%3Fciting_author_label%29%20%3D%20%27en%27%29%0A%7D%20group%20by%20%3Fciting_author%20%3Fciting_author_label%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2020"></iframe>
-</div>
+<table class="table table-hover" id="citing-authors"></table>
 
 
 {% endblock %}
