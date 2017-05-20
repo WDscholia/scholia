@@ -309,10 +309,10 @@ def github_to_qs(github):
 def random_author():
     """Return random author.
 
-    Sample a scientific author randomly from Wikidata. 
+    Sample a scientific author randomly from Wikidata.
 
     The SPARQL query is somewhat inefficient returning all
-    authors. 
+    authors.
 
     Returns
     -------
