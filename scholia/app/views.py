@@ -10,6 +10,8 @@ from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, doi_to_qs, github_to_qs, orcid_to_qs,
                      q_to_class, twitter_to_qs)
+from ..utils import sanitize_q
+from ..wikipedia import q_to_bibliography_templates
 
 
 class RegexConverter(BaseConverter):
@@ -91,6 +93,10 @@ def show_arxiv(arxiv):
     html : str
         Rendered HTML.
 
+    See also
+    --------
+    show_arxiv_to_quickstatements.
+
     """
     qs = arxiv_to_qs(arxiv)
     if len(qs) > 0:
@@ -109,6 +115,10 @@ def show_arxiv_to_quickstatements():
     -------
     html : str
         Rendered HTML.
+
+    See also
+    --------
+    show_arxiv.
 
     """
     query = request.args.get('arxiv')
@@ -349,6 +359,40 @@ def show_protein_empty():
 
     """
     return render_template('protein_empty.html')
+
+
+@main.route('/q-to-bibliography-templates')
+def show_q_to_bibliography_templates():
+    """Return HTML page for wiki templates bibliographies.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    See also
+    --------
+
+
+    """
+    q_ = request.args.get('q')
+
+    if not q_:
+        return render_template('q_to_bibliography_templates.html')
+
+    current_app.logger.debug("q: {}".format(q_))
+
+    q = sanitize_q(q_)
+    if not q:
+        # Could not identify a wikidata identifier
+        return render_template('q_to_bibliography_templates.html')
+
+    wikitext = q_to_bibliography_templates(q)
+
+    return render_template('q_to_bibliography_templates.html',
+                           q=q,
+                           wikitext=wikitext)
+
 
 
 @main.route('/topic/' + q_pattern)
