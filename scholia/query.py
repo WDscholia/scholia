@@ -3,6 +3,7 @@
 Usage:
   scholia.query orcid-to-q <orcid>
   scholia.query q-to-class <q>
+  scholia.query random-author
   scholia.query twitter-to-q <twitter>
   scholia.query github-to-q <github>
   scholia.query arxiv-to-q <arxiv>
@@ -18,6 +19,8 @@ Examples:
 
 
 from __future__ import absolute_import, division, print_function
+
+from random import choice
 
 import requests
 
@@ -303,6 +306,32 @@ def github_to_qs(github):
             for item in data['results']['bindings']]
 
 
+def random_author():
+    """Return random author.
+
+    Sample a scientific author randomly from Wikidata. 
+
+    The SPARQL query is somewhat inefficient returning all
+    authors. 
+
+    Returns
+    -------
+    q : str
+        Wikidata identifier.
+
+    """
+    query = """SELECT DISTINCT ?author WHERE {
+       ?work wdt:P31 wd:Q13442814 ; wdt:P50 ?author . }"""
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+    authors = [author['author']['value'][31:]
+               for author in data['results']['bindings']]
+    author = choice(authors)
+    return author
+
+
 def main():
     """Handle command-line interface."""
     from docopt import docopt
@@ -327,6 +356,10 @@ def main():
     elif arguments['q-to-class']:
         class_ = q_to_class(arguments['<q>'])
         print(class_)
+
+    elif arguments['random-author']:
+        q = random_author()
+        print(q)
 
     elif arguments['twitter-to-q']:
         qs = twitter_to_qs(arguments['<twitter>'])
