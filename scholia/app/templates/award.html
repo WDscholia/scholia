@@ -40,8 +40,32 @@
  ORDER BY DESC(?number_of_corecipients)
  `
 
+ recentPublicationsByRecipientsSparql = `
+SELECT ?publication_date ?work ?workLabel ?recipient ?recipientLabel 
+WITH {
+  SELECT
+    (MAX(?publication_datetimes) AS ?publication_datetime)
+    ?work ?recipient
+  WHERE {
+    ?recipient wdt:P166 wd:{{ q }} . 
+    ?work wdt:P50 ?recipient .
+    OPTIONAL { ?work wdt:P577 ?publication_datetimes . }
+  }
+  GROUP BY ?work ?recipient
+} AS %result
+WHERE {
+  INCLUDE %result 
+  BIND(xsd:date(?publication_datetime) AS ?publication_date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+}
+ORDER BY DESC(?publication_date)
+LIMIT 500
+`
+
  $(document).ready(function() {
      sparqlToDataTable(listOfRecipientsSparql, "#list-of-recipients");
+     sparqlToDataTable(recentPublicationsByRecipientsSparql,
+		       "#recent-publications-by-recipients");
      sparqlToDataTable(coAwardsSparql, "#co-awards");
  });
 </script>
@@ -70,6 +94,10 @@
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0A%23defaultView%3ABubbleChart%0A%23%20Count%20the%20number%20of%20time%20works%20by%20award%20recipients%20have%20set%20a%20main%20topic%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%3Ftopic%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%20%20%3Frecipient%20wdt%3AP166%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Frecipient%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%20%20%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29"></iframe>
 </div>
 
+
+<h2 id="Recent publications by recipient">Recent publications by recipient</h2>
+
+<table class="table table-hover" id="recent-publications-by-recipients"></table>
 
 
 <h2 id="Co-awards">Co-awards</h2>
