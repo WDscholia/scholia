@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+
+<h2>Search</h2>
+
+<form action="" id="form" method="GET" class="form-horizontal">
+  <div class="input-group">
+    {% if q %}
+    <input type="text" class="form-control" placeholder="Wikidata item" value="{{ q | urlencode }}" id="searchterm" name="q"/>
+    {% else %}
+    <input type="text" class="form-control" placeholder="Wikidata item" id="searchterm" name="q"/>
+    {% endif %}
+    <span class="input-group-btn">
+      <button class="btn btn-search" type="submit">
+        <i class="glyphicon glyphicon-search"></i>
+      </button>
+    </span>
+  </div>
+</form>
+    
+
+<h2>Result</h2>
+
+{% if q %}
+
+<p>
+    <div id="scholia-link">View item in Scholia: <a href="{{ q }}">{{ q }}</a></div>
+</p>
+
+{% endif %}
+
+{% if wikitext %}
+
+<div id="wikitext"><pre>{{ wikitext }}</pre></div>
+
+{% endif %}
+
+
+{% endblock %}
