@@ -10,6 +10,9 @@ Options:
   -o --output=<file>  Output filename, default output to stdout
   --verbose           Verbose messages.
 
+Examples:
+  $ python -m scholia.wikipedia q-to-bibliography-templates --debug Q20980928
+
 """
 
 
@@ -28,7 +31,8 @@ from six import b, u
 
 
 BIBLIOGRAPHY_SPARQL_QUERY = """
-select ?work ?title ?venueLabel ?date ?volume ?issue ?pages ?doi ?url where {{
+select ?work ?title ?venueLabel ?date ?volume ?issue ?pages
+       ?license ?doi ?url where {{
   ?work wdt:P50 wd:{q} .
   ?work wdt:P1476 ?title .
   optional {{ ?work wdt:P1433 ?venue . }}
@@ -36,6 +40,9 @@ select ?work ?title ?venueLabel ?date ?volume ?issue ?pages ?doi ?url where {{
   optional {{ ?work wdt:P478 ?volume . }}
   optional {{ ?work wdt:P433 ?issue . }}
   optional {{ ?work wdt:P304 ?pages . }}
+  optional {{ ?work wdt:P275 ?license_ .
+              ?license_ rdfs:label ?license .
+              filter(lang(?license) = 'en') }}
   optional {{ ?work wdt:P356 ?doi . }}
   optional {{ ?work wdt:P953 ?url . }}
   service wikibase:label {{
@@ -103,6 +110,7 @@ def q_to_bibliography_templates(q):
             issue=_value(item, 'issue'),
             date=_value(item, 'date').split('T')[0],
             pages=_value(item, 'pages'),
+            license=_value(item, 'license'),
             doi=_value(item, 'doi'),
             url=_value(item, 'url'),
         )
