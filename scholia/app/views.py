@@ -394,7 +394,6 @@ def show_q_to_bibliography_templates():
                            wikitext=wikitext)
 
 
-
 @main.route('/topic/' + q_pattern)
 def show_topic(q):
     """Return html render page for specific topic.
