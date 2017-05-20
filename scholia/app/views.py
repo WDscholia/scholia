@@ -9,7 +9,7 @@ from ..api import entity_to_name, wb_get_entities
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, doi_to_qs, github_to_qs, orcid_to_qs,
-                     q_to_class, twitter_to_qs)
+                     q_to_class, random_author, twitter_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -187,6 +187,20 @@ def show_author_empty():
 
     """
     return render_template('author_empty.html')
+
+
+@main.route('/author/random')
+def show_author_random():
+    """Redirect to random author.
+
+    Returns
+    -------
+    reponse : werkzeug.wrappers.Response
+        Redirect
+
+    """
+    q = random_author()
+    return redirect(url_for('app.show_author', q=q), code=302)
 
 
 @main.route('/award/' + q_pattern)
