@@ -92,7 +92,9 @@ def q_to_bibliography_templates(q):
     data = response.json()
 
     wikitext = ('<!-- Generated with scholia.wikipedia '
-                'q-to-bibliography-templates {q} -->').format(q=q)
+                'q-to-bibliography-templates {q}\n').format(q=q)
+    wikitext += ('     or http://tools.wmflabs.org/scholia/'
+                 'q-to-bibliography-templates?q={q} -->\n').format(q=q)
     for item in data['results']['bindings']:
         wikitext += CITE_JOURNAL_TEMPLATE.format(
             title=_value(item, 'title'),
