@@ -1,5 +1,6 @@
 """Views for app."""
 
+import re
 
 from flask import (Blueprint, current_app, redirect, render_template, request,
                    Response, url_for)
@@ -49,7 +50,10 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 
 # Wikidata item identifier matcher
 q_pattern = '<regex("Q[1-9]\d*"):q>'
+Q_PATTERN = re.compile(r'Q[1-9]\d*')
 
+# Wikidata item identifiers matcher
+qs_pattern = '<regex("Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)+"):qs>'
 
 @main.route("/")
 def index():
@@ -342,6 +346,26 @@ def show_organization_empty():
 
     """
     return render_template('organization_empty.html')
+
+
+@main.route('/organizations/' + qs_pattern)
+def show_organizations(qs):
+    """Return HTML rendering for specific organizations.
+
+    Parameters
+    ----------
+    qs : str
+        Wikidata item identifiers.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    qs = Q_PATTERN.findall(qs)
+    entities = wb_get_entities(qs)
+    return render_template('organizations.html', qs=qs)
 
 
 @main.route('/protein/' + q_pattern)
