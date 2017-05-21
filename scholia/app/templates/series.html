@@ -10,7 +10,7 @@ SELECT ?publication_date ?number_of_papers ?collection ?collectionLabel
 WITH {
   SELECT (COUNT(?work) AS ?number_of_papers) (MIN(?datetimes) AS ?publication_datetime) ?collection
   WHERE {
-    ?collection wdt:P179 wd:Q27230297 .
+    ?collection wdt:P179 wd:{{ q }} .
     ?work wdt:P1433 ?collection .
     OPTIONAL { ?collection wdt:P577 ?datetimes . }
   }
@@ -29,7 +29,7 @@ ORDER BY DESC(?publication_date) DESC(?number_of_papers)
  WITH {
      SELECT (MIN(?datetimes) AS ?publication_datetime) (COUNT(?citing_work) AS ?number_of_citations) ?work
      WHERE {
-    ?collection wdt:P179 wd:Q27230297 .
+    ?collection wdt:P179 wd:{{ q }} .
 	?work wdt:P1433 ?collection .
 				OPTIONAL { ?work wdt:P577 ?datetimes . }
 	 OPTIONAL { ?citing_work wdt:P2860 ?work . }
