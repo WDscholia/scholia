@@ -26,8 +26,8 @@
 <script type="text/javascript" src="/scholia/static/scholia.js"></script>
 
 
- 
- <script type="text/javascript">
+
+<script type="text/javascript">
  var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
            '{{ q }}' + 
            '&format=json&callback=?'
@@ -82,7 +82,29 @@
 	<li role="presentation"><a href="publisher/">Publisher</a></li>
 	<li role="presentation"><a href="sponsor/">Sponsor</a></li>
 	<li role="presentation"><a href="award/">Award</a></li>
-	<li role="presentation"><a href="topic/">Topic</a></li>
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-link dropdown-toggle" 
+type="button" data-toggle="dropdown">Topic
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		    <li role="presentation"><a href="../topic/">General</a></li>
+		    <li role="presentation"><a href="../disease/">Disease</a></li>
+		    <li role="presentation"><a href="../protein/">Protein</a></li>
+		</ul>
+	    </div>
+	</li>
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-link dropdown-toggle" 
+type="button" data-toggle="dropdown">Tools
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		    <li role="presentation"><a href="../arxiv-to-quickstatements">Arxiv to Quickstatements</a></li>
+		    <li role="presentation"><a href="../q-to-bibliography-templates">Q to Bibliography templates</a></li>
+		</ul>
+	    </div>
+	</li>
 	<li role="presentation"><a href="about">About</a></li>
     </ul>
 </div>
