@@ -1,0 +1,48 @@
+{% extends "organization_base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ coAuthorsSparql = `
+SELECT DISTINCT ?author1 ?author1Label ?author2 ?author2Label ?work ?workLabel WHERE {
+  VALUES ?organization1 { 
+    {% for q in qs %} wd:{{ q }} {% endfor %}
+  }
+  VALUES ?organization2 {
+    {% for q in qs %} wd:{{ q }} {% endfor %}
+  } 
+  ?author1 ?v1 ?organization1 . 
+  ?author2 ?v2 ?organization2 . 
+  ?work wdt:P50 ?author1, ?author2 .  
+  FILTER (STR(?author1) < STR(?author2) && ?organization1 != ?organization2)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY ?author1Label
+LIMIT 500
+ `;
+
+ $(document).ready(function() {
+     sparqlToDataTable(coAuthorsSparql, "#co-authors");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1 id="h1">Organizations</h1>
+
+<div id="intro"></div>
+
+
+<h2 id="Co-authors">Co-authors</h2>
+
+<p>Past and present employees, affiliated, and members shared between organizations</p>
+
+<table class="table table-hover" id="co-authors"></table>
+
+
+{% endblock %}
