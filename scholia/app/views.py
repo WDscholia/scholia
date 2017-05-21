@@ -55,6 +55,7 @@ Q_PATTERN = re.compile(r'Q[1-9]\d*')
 # Wikidata item identifiers matcher
 qs_pattern = '<regex("Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)+"):qs>'
 
+
 @main.route("/")
 def index():
     """Return rendered index page.
@@ -205,6 +206,25 @@ def show_author_random():
     """
     q = random_author()
     return redirect(url_for('app.show_author', q=q), code=302)
+
+
+@main.route('/authors/' + qs_pattern)
+def show_authors(qs):
+    """Return HTML rendering for specific authors.
+
+    Parameters
+    ----------
+    qs : str
+        Wikidata item identifiers.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    qs = Q_PATTERN.findall(qs)
+    return render_template('authors.html', qs=qs)
 
 
 @main.route('/award/' + q_pattern)
@@ -364,7 +384,6 @@ def show_organizations(qs):
 
     """
     qs = Q_PATTERN.findall(qs)
-    entities = wb_get_entities(qs)
     return render_template('organizations.html', qs=qs)
 
 
