@@ -1,9 +1,51 @@
-{% extends "base.html" %}
+{% extends "tools_base.html" %}
+
+{% block navbar %}
+<div class="navbar navbar-static-top">
+    <ul class="nav nav-pills">
+	<li role="presentation"><a href="..">Scholia</a></li>
+	<li role="presentation"><a href="../author/">Author</a></li>
+	<li role="presentation"><a href="../work/">Work</a></li>
+	<li role="presentation"><a href="../organization/">Organization</a></li>
+	<li role="presentation"><a href="../venue/">Venue</a></li>
+	<li role="presentation"><a href="../series/">Series</a></li>
+	<li role="presentation"><a href="../publisher/">Publisher</a></li>
+	<li role="presentation"><a href="../sponsor/">Sponsor</a></li>
+	<li role="presentation"><a href="../award/">Award</a></li>
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-link dropdown-toggle" 
+type="button" data-toggle="dropdown">Topic
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		    <li role="presentation"><a href="../topic/">General</a></li>
+		    <li role="presentation"><a href="../disease/">Disease</a></li>
+		    <li role="presentation"><a href="../protein/">Protein</a></li>
+		</ul>
+	    </div>
+	</li>
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-primary dropdown-toggle" 
+type="button" data-toggle="dropdown">Tools
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		    <li role="presentation" class="active"><a href="./arxiv-to-quickstatements">Arxiv to Quickstatements</a></li>
+		    <li role="presentation"><a href="../q-to-bibliography-templates">Q to Bibliography templates</a></li>
+		</ul>
+	    </div>
+	</li>
+
+	<li role="presentation"><a href="../about">About</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+
 
 {% block page_content %}
 
-
-<h2>Search</h2>
+<h2>Input</h2>
 
 <form action="" id="form" method="GET" class="form-horizontal">
   <div class="input-group">
@@ -20,6 +62,11 @@
   </div>
 </form>
     
+<p>Copy and paste an ID from the <a href="https://arxiv.org">arXiv</a> preprint repository.
+Bare IDs (such as "1703.06103") and URLs (such as "https://arxiv.org/abs/1703.06103") both work.
+</p>
+<p>The input ID will be queried in Wikidata and Quickstatements will not be generated if the input 
+ID is found in Wikidata. However, note that new items may not be immediately found because of cacheing.
 
 
 <h2>Result</h2>
