@@ -46,7 +46,7 @@ Getting started
 
    .. code:: shell
 
-       pip runserver.py
+       python runserver.py
 
 Testing
 -------
