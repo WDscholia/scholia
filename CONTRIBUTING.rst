@@ -47,3 +47,13 @@ Getting started
    .. code:: shell
 
        pip runserver.py
+
+Testing
+-------
+
+Rudimentary testing and code style checking are implemented via `tox`.
+Before committing please run the following code in the main directory:
+
+   .. code:: shell
+   
+       tox
