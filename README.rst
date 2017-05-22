@@ -21,12 +21,16 @@ The information displayed on the page is only what is available in Wikidata.
 Script
 ------
 
-It is possible to use the scholia package as a script:
+It is possible to use methods of the scholia package as a script:
 ::
     $ python -m scholia.query twitter-to-q fnielsen
     Q20980928
 
 
+Contributing
+------------
+
+See file CONTRIBUTING.rst for technical details how to improve Scholia.
 
 .. _Wikidata: https://www.wikidata.org
 .. _Wikimedia Foundation: https://wikimediafoundation.org
