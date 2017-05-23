@@ -530,6 +530,25 @@ def show_venue_empty():
     return render_template('venue_empty.html')
 
 
+@main.route('/venues/' + qs_pattern)
+def show_venues(qs):
+    """Return rendered HTML page for specific venues.
+
+    Parameters
+    ----------
+    qs : str
+        Wikidata item identifiers.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page.
+
+    """
+    qs = Q_PATTERN.findall(qs)
+    return render_template('venues.html', qs=qs)
+
+
 @main.route('/series/' + q_pattern)
 def show_series(q):
     """Return rendered HTML for specific series.
