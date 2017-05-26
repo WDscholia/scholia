@@ -84,14 +84,24 @@ LIMIT 50
  LIMIT 200
  `
 
-
- 
+ mostCitedWorksSparql = `
+  # Most cited works published in venue
+  SELECT (COUNT(?citing_work) AS ?count) ?work ?workLabel  WHERE {
+    ?work wdt:P1433 wd:Q6294930.
+    ?citing_work wdt:P2860 ?work.
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+  }
+  GROUP BY ?work ?workLabel
+  ORDER BY DESC(?count)
+  LIMIT 20
+  `
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(prolificAuthorsSparql, "#prolific-authors");
      sparqlToDataTable(citedVenuesSparql, "#cited-venues");
+     sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
  });
 </script>
 
@@ -136,10 +146,7 @@ LIMIT 50
 <h3 id="Most cited articles"
     title="Most cited articles published in the venue, where the citations may come from any venue">Most cited articles</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#SELECT%20%3Fwork%20%3Fwork_label%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork.%0A%20%20%3Fwork%20rdfs%3Alabel%20%3Fwork_label.%0A%20%20FILTER%28%28LANG%28%3Fwork_label%29%29%20%3D%20%22en%22%29%0A%7D%0AGROUP%20BY%20%3Fwork%20%3Fwork_label%0AORDER%20BY%20DESC%28%3Fcount%29%0ALIMIT%2020"></iframe>
-</div>
-
+<table class="table table-hover" id="most-cited-works"></table>
 
 <h3 id="Most cited authors"
     title="Most cited authors based on articles published in the venue and where citations may come from any venue">Most cited authors</h3>
