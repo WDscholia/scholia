@@ -16,9 +16,21 @@
   LIMIT 500
 `
 
+ relatedChemicalsSparql = `
+  SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WHERE {
+    wd:{{ q }} wdt:P235 ?queryKey .
+    ?mol wdt:P235 ?InChIKey .
+    OPTIONAL { ?mol wdt:P231 ?CAS }
+    OPTIONAL { ?mol wdt:P661 ?ChemSpider }
+    OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
+    FILTER (regex(str(?InChIKey), concat("^", substr($queryKey,1,14), "-")))
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  }
+`
+
  $(document).ready(function() {
-     sparqlToDataTable(identifiersSparql,
-		       "#identifiers");
+   sparqlToDataTable(identifiersSparql, "#identifiers");
+   sparqlToDataTable(relatedChemicalsSparql, "#related");
  });
 </script>
 
@@ -34,6 +46,10 @@
 <h2 id="Identifiers">Identifiers</h2>
 
 <table class="table table-hover" id="identifiers"></table>
+
+<h2 id="Related">Related Compounds</h2>
+
+<table class="table table-hover" id="related"></table>
 
 {% endblock %}
     
