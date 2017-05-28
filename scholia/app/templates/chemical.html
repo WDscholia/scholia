@@ -7,7 +7,7 @@
 
  identifiersSparql = `
   SELECT ?IDpred ?IDpredLabel ?id WHERE {
-    wd:Q47512 ?IDdir ?id .
+    wd:{{ q }} ?IDdir ?id .
     ?IDpred wikibase:directClaim ?IDdir ;
             wdt:P31 wd:Q19833835 .
     SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
