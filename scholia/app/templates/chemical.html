@@ -1,0 +1,39 @@
+{% extends "chemical_base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ identifiersSparql = `
+  SELECT ?IDpred ?IDpredLabel ?id WHERE {
+    wd:Q47512 ?IDdir ?id .
+    ?IDpred wikibase:directClaim ?IDdir ;
+            wdt:P31 wd:Q19833835 .
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
+  }
+  ORDER BY ASC(?IDpredLabel)
+  LIMIT 500
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(identifiersSparql,
+		       "#identifiers");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Chemical</h1>
+
+<div id="intro"></div>
+
+<h2 id="Identifiers">Identifiers</h2>
+
+<table class="table table-hover" id="identifiers"></table>
+
+{% endblock %}
+    
