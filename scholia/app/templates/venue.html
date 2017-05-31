@@ -39,7 +39,7 @@ ORDER BY DESC(?count)
 
  prolificAuthorsSparql = `
 # Prolific authors for a specific journal
-SELECT ?count ?author ?authorLabel ?ORCID
+SELECT ?count ?author ?authorLabel ?orcid
 WITH {
   # Count the number of works author by the author publishing in the journal
   SELECT ?author (COUNT(?work) AS ?count) WHERE {
@@ -52,7 +52,7 @@ WHERE {
   INCLUDE %result 
           
   # Include optional ORCID iD
-  OPTIONAL { ?author wdt:P496 ?ORCID . }
+  OPTIONAL { ?author wdt:P496 ?orcid . }
   
   # Label the results
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh" . } 
@@ -111,7 +111,7 @@ LIMIT 50
 
  mostCitedAuthorsSparql = `
   # Most cited authors published in venue
-SELECT ?count ?author ?authorLabel ?ORCID
+SELECT ?count ?author ?authorLabel ?orcid
 WITH {
   # Count the number of works author by the author publishing in the journal
   SELECT ?author (COUNT(?work) AS ?count) WHERE {
@@ -125,7 +125,7 @@ WHERE {
   INCLUDE %result 
           
   # Include optional ORCID iD
-  OPTIONAL { ?author wdt:P496 ?ORCID . }
+  OPTIONAL { ?author wdt:P496 ?orcid . }
   
   # Label the results
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh" . } 
