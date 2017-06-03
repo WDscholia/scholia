@@ -85,28 +85,39 @@ LIMIT 50
  `
 
  citingVenuesSparql = `
- # Venues citing articles from this specific journal
- SELECT (COUNT(?citing_work) as ?count) ?citing_journal ?citing_journalLabel WHERE {
+#defaultView:Table
+# Venues citing articles from this specific journal
+SELECT ?count ?citing_journal ?citing_journalLabel 
+WITH {
+  SELECT (COUNT(?citing_work) as ?count) ?citing_journal WHERE {
     ?work wdt:P1433 wd:Q6294930 .
     ?citing_work wdt:P2860 ?work .
     ?citing_work wdt:P1433 ?citing_journal .
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
   }
-  GROUP BY ?citing_journal ?citing_journalLabel
-  ORDER BY desc(?count)
-  LIMIT 50
+  GROUP BY ?citing_journal
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
   `
 
  mostCitedWorksSparql = `
-  # Most cited works published in venue
-  SELECT (COUNT(?citing_work) AS ?count) ?work ?workLabel  WHERE {
+#defaultView:Table
+# Most cited works published in venue
+SELECT ?count ?work ?workLabel
+WITH {
+  SELECT (COUNT(?citing_work) AS ?count) ?work WHERE {
     ?work wdt:P1433 wd:Q6294930.
     ?citing_work wdt:P2860 ?work.
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
-  }
-  GROUP BY ?work ?workLabel
-  ORDER BY DESC(?count)
-  LIMIT 20
+  } GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
   `
 
  mostCitedAuthorsSparql = `
