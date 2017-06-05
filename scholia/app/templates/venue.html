@@ -90,7 +90,7 @@ LIMIT 50
 SELECT ?count ?citing_journal ?citing_journalLabel 
 WITH {
   SELECT (COUNT(?citing_work) as ?count) ?citing_journal WHERE {
-    ?work wdt:P1433 wd:Q6294930 .
+    ?work wdt:P1433 wd:{{ q }} .
     ?citing_work wdt:P2860 ?work .
     ?citing_work wdt:P1433 ?citing_journal .
   }
@@ -109,7 +109,7 @@ ORDER BY DESC(?count)
 SELECT ?count ?work ?workLabel
 WITH {
   SELECT (COUNT(?citing_work) AS ?count) ?work WHERE {
-    ?work wdt:P1433 wd:Q6294930.
+    ?work wdt:P1433 wd:{{ q }} .
     ?citing_work wdt:P2860 ?work.
   } GROUP BY ?work
 } AS %result
@@ -126,7 +126,7 @@ SELECT ?count ?author ?authorLabel ?orcid
 WITH {
   # Count the number of works author by the author publishing in the journal
   SELECT ?author (COUNT(?work) AS ?count) WHERE {
-    ?work wdt:P1433 wd:Q6294930 .
+    ?work wdt:P1433 wd:{{ q }} .
     ?citing_work wdt:P2860 ?work .
     ?work wdt:P50 ?author .
   }
