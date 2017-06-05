@@ -84,14 +84,75 @@ LIMIT 50
  LIMIT 200
  `
 
+ citingVenuesSparql = `
+#defaultView:Table
+# Venues citing articles from this specific journal
+SELECT ?count ?citing_journal ?citing_journalLabel 
+WITH {
+  SELECT (COUNT(?citing_work) as ?count) ?citing_journal WHERE {
+    ?work wdt:P1433 wd:Q6294930 .
+    ?citing_work wdt:P2860 ?work .
+    ?citing_work wdt:P1433 ?citing_journal .
+  }
+  GROUP BY ?citing_journal
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+  `
 
- 
+ mostCitedWorksSparql = `
+#defaultView:Table
+# Most cited works published in venue
+SELECT ?count ?work ?workLabel
+WITH {
+  SELECT (COUNT(?citing_work) AS ?count) ?work WHERE {
+    ?work wdt:P1433 wd:Q6294930.
+    ?citing_work wdt:P2860 ?work.
+  } GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+  `
+
+ mostCitedAuthorsSparql = `
+  # Most cited authors published in venue
+SELECT ?count ?author ?authorLabel ?orcid
+WITH {
+  # Count the number of works author by the author publishing in the journal
+  SELECT ?author (COUNT(?work) AS ?count) WHERE {
+    ?work wdt:P1433 wd:Q6294930 .
+    ?citing_work wdt:P2860 ?work .
+    ?work wdt:P50 ?author .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result 
+          
+  # Include optional ORCID iD
+  OPTIONAL { ?author wdt:P496 ?orcid . }
+  
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+LIMIT 50
+  `
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(prolificAuthorsSparql, "#prolific-authors");
      sparqlToDataTable(citedVenuesSparql, "#cited-venues");
+     sparqlToDataTable(citingVenuesSparql, "#citing-venues");
+     sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
+     sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
  });
 </script>
 
@@ -136,18 +197,12 @@ LIMIT 50
 <h3 id="Most cited articles"
     title="Most cited articles published in the venue, where the citations may come from any venue">Most cited articles</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#SELECT%20%3Fwork%20%3Fwork_label%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork.%0A%20%20%3Fwork%20rdfs%3Alabel%20%3Fwork_label.%0A%20%20FILTER%28%28LANG%28%3Fwork_label%29%29%20%3D%20%22en%22%29%0A%7D%0AGROUP%20BY%20%3Fwork%20%3Fwork_label%0AORDER%20BY%20DESC%28%3Fcount%29%0ALIMIT%2020"></iframe>
-</div>
-
+<table class="table table-hover" id="most-cited-works"></table>
 
 <h3 id="Most cited authors"
     title="Most cited authors based on articles published in the venue and where citations may come from any venue">Most cited authors</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#SELECT%20%3Fauthor%20%3Fauthor_label%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%20%0A%20%20%3Fauthor%20rdfs%3Alabel%20%3Fauthor_label%20.%20FILTER%28%28LANG%28%3Fauthor_label%29%29%20%3D%20%22en%22%29%0A%7D%0AGROUP%20BY%20%3Fauthor%20%3Fauthor_label%0AORDER%20BY%20DESC%28%3Fcount%29%0ALIMIT%2020"></iframe>
-</div>
-
+<table class="table table-hover" id="most-cited-authors"></table>
 
 <h3 id="Citation distribution">Citation distribution</h2>
 
@@ -164,9 +219,7 @@ LIMIT 50
 
 <h3 id="Venues cited from">Venues cited from</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%3Fciting_journal%20%28count%28%3Fciting_work%29%20as%20%3Fcount%29%20%3Fciting_journalLabel%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%3Fciting_work%20wdt%3AP1433%20%3Fciting_journal%20.%20%0A%20%20optional%20%7B%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Fciting_journal%20%3Fciting_journalLabel%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2050"></iframe>
-</div>
+<table class="table table-hover" id="citing-venues"></table>
 
 
 <h2>Author gender distribution</h2>
