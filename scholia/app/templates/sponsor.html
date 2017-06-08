@@ -5,23 +5,25 @@
 
 <script type="text/javascript">
   recentlyPublishedSponsoredWorkSparql = `
-  SELECT ?publication_date ?number_of_citations ?work ?workLabel
+SELECT ?publication_date ?number_of_citations ?work ?workLabel ?quote
 WITH {
-  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_work) as ?number_of_citations) ?work WHERE {
-    ?work wdt:P859 wd:{{ q }} .
+  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_work) as ?number_of_citations) ?work (SAMPLE(?quote_) AS ?quote) WHERE {
+    ?work p:P859 ?sponsor_statement .
+    ?sponsor_statement ps:P859 wd:{{ q }} .
+    OPTIONAL { ?sponsor_statement prov:wasDerivedFrom/pr:P1683 ?quote_ . }
     ?work wdt:P577 ?datetime .
     BIND(xsd:date(?datetime) AS ?date)
     OPTIONAL { ?citing_work wdt:P2860 ?work }
   } 
-  GROUP BY ?work
+  GROUP BY ?work ?r_
 } AS %result
 WHERE {
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" }
 } 
-  ORDER BY DESC(?publication_date) DESC(?number_of_citations)
-  LIMIT 1000
- `
+ORDER BY DESC(?publication_date) DESC(?number_of_citations)
+LIMIT 1000
+`
 
   authorsOnSponsoredWorkSparql = `
   SELECT ?publication_count ?author ?authorLabel
