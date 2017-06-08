@@ -15,7 +15,7 @@ WITH {
     BIND(xsd:date(?datetime) AS ?date)
     OPTIONAL { ?citing_work wdt:P2860 ?work }
   } 
-  GROUP BY ?work ?r_
+  GROUP BY ?work
 } AS %result
 WHERE {
   INCLUDE %result
