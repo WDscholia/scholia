@@ -5,13 +5,14 @@
 {{super()}}
 
 <script type="text/javascript">
- inSeriesSparql = `
-SELECT ?publication_date ?number_of_papers ?collection ?collectionLabel
+  inSeriesSparql = `
+SELECT ?publication_date ?number_of_papers ?short_name ?collection ?collectionLabel
 WITH {
-  SELECT (COUNT(?work) AS ?number_of_papers) (MIN(?datetimes) AS ?publication_datetime) ?collection
+  SELECT (COUNT(?work) AS ?number_of_papers) (MIN(?datetimes) AS ?publication_datetime) (SAMPLE(?short_name_) AS ?short_name) ?collection
   WHERE {
     ?collection wdt:P179 wd:{{ q }} .
     ?work wdt:P1433 ?collection .
+    OPTIONAL { ?collection wdt:P1813 ?short_name_ . }
     OPTIONAL { ?collection wdt:P577 ?datetimes . }
   }
   GROUP BY ?collection
