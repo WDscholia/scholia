@@ -29,11 +29,91 @@ WHERE {
 }
 ORDER BY DESC(?date)
 `
+ authorsSparql = `
+#defaultView:Table
+SELECT ?count ?author ?authorLabel
+WITH {
+  SELECT (count(?work) as ?count) ?author WHERE {
+    { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P361+ wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
+    ?work wdt:P50 ?author .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+  `
 
- 
+  topicsSparql = `
+#defaultView:Table
+SELECT ?count ?topic ?topicLabel
+WITH {
+  SELECT (count(?work) as ?count) ?topic WHERE {
+    { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P361+ wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
+    ?work wdt:P921 ?topic .
+    filter (wd:{{ q }} != ?topic)
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+  `
+
+  venuesSparql = `
+#defaultView:Table
+SELECT ?count ?venue ?venueLabel
+WITH {
+  SELECT (count(?work) as ?count) ?venue WHERE {
+    { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P361+ wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
+    ?work wdt:P1433 ?venue .
+  }
+  GROUP BY ?venue
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+  `
+
+  topCitedSparql = `
+#defaultView:Table
+SELECT ?count ?cited_work ?cited_workLabel
+WITH {
+  SELECT (count(?work) as ?count) ?cited_work WHERE {
+    { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P361+ wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
+    ?work wdt:P2860 ?cited_work .
+  }
+  GROUP BY ?cited_work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+  `
+
+
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql,
 		       "#recently-published-works");
+     sparqlToDataTable(authorsSparql, "#authors");
+     sparqlToDataTable(topicsSparql, "#topics");
+     sparqlToDataTable(venuesSparql, "#venues");
+     sparqlToDataTable(topCitedSparql, "#topCited");
  });
 </script>
 
@@ -65,10 +145,7 @@ ORDER BY DESC(?date)
 
 <h3 id="Authors publishing about the topic">Authors publishing about the topic</h3>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Fauthor%20%3FauthorLabel%20where%20%7B%0A%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fauthor%20%3FauthorLabel%0Aorder%20by%20desc%28%3Fcount%29%0A"></iframe>
-</div>
-
+<table class="table table-hover" id="authors"></table>
 
 <h3 id="Co-author graph">Co-author graph</h3>
 
@@ -81,10 +158,7 @@ ORDER BY DESC(?date)
 
 <h3 id="Co-occurring topics">Co-occurring topics</h3>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Ftopic%20%3FtopicLabel%20where%20%7B%0A%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20filter%20%28wd%3A{{ q }}%20%21%3D%20%3Ftopic%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Ftopic%20%3FtopicLabel%0Aorder%20by%20desc%28%3Fcount%29%0A"></iframe>
-</div>
-
+<table class="table table-hover" id="topics"></table>
 
 <h3 id="Co-occurring topics graph">Co-occurring topics graph</h3>
 
@@ -97,18 +171,13 @@ ORDER BY DESC(?date)
 
 <h2 id="Venues publishing works about the topic">Venues publishing works about the topic</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Fvenue%20%3FvenueLabel%20where%20%7B%0A%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%3Fwork%20wdt%3AP1433%20%3Fvenue%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fvenue%20%3FvenueLabel%0Aorder%20by%20desc%28%3Fcount%29%0A"></iframe>
-</div>
-
+<table class="table table-hover" id="venues"></table>
 
 <h2 id="Citations">Citations</h2>
 
 <h3 id="Most cited works from works on the topic">Most cited works from works on the topic</h3>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATable%0Aselect%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20%3Fcited_work%20%3Fcited_workLabel%20where%20%7B%0A%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%3Fwork%20wdt%3AP2860%20%3Fcited_work%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%20%7D%0A%7D%0Agroup%20by%20%3Fcited_work%20%3Fcited_workLabel%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2030%0A"></iframe>
-</div>
+<table class="table table-hover" id="topCited"></table>
 
 
 {% endblock %}
