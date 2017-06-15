@@ -31,7 +31,7 @@ ORDER BY DESC(?date)
 `
  authorsSparql = `
 #defaultView:Table
-SELECT ?count ?author ?authorLabel ?orcid
+SELECT ?count ?author ?authorLabel (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ?authorLabel)) AS ?orcid) 
 WITH {
   SELECT (count(?work) as ?count) ?author WHERE {
     { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
@@ -45,8 +45,7 @@ WHERE {
   INCLUDE %result
           
   # Include optional ORCID iD
-  OPTIONAL { ?author wdt:P496 ?orcid . }
-
+  OPTIONAL { ?author wdt:P496 ?orcid_ . }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?count)
