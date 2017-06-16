@@ -29,6 +29,11 @@ function convertDataTableData(data, columns) {
 		convertedRow[key] = '<a href="https://orcid.org/' +
 		    data[i][key] + '">' + 
 		    data[i][key] + '</a>';
+	    } else if (key == 'doi') {
+		// Add link to Crossref
+		convertedRow[key] = '<a href="https://doi.org/' +
+		    encodeURIComponent(data[i][key]) + '">' +
+		    $("<div>").text(data[i][key]).html() + '</a>';
 	    } else {
 		convertedRow[key] = data[i][key];
 	    }
