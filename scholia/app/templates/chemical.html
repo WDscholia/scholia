@@ -31,7 +31,7 @@
 SELECT ?propEntity ?propEntityLabel ?value ?units ?unitsLabel ?source ?sourceLabel ?doi
 WITH {
   SELECT DISTINCT ?propEntity ?value ?units ?source ?doi WHERE {
-    wd:Q47512 ?propp ?statement .
+    wd:{{ q }} ?propp ?statement .
     ?statement a wikibase:BestRank ;
       ?proppsv [
         wikibase:quantityAmount ?value ;
