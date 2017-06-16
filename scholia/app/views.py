@@ -482,6 +482,37 @@ def show_topic_empty():
     return render_template('topic_empty.html')
 
 
+@main.route('/chemical/' + q_pattern)
+def show_chemical(q):
+    """Return html render page for specific chemical.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('chemical.html', q=q)
+
+
+@main.route('/chemical/')
+def show_chemical_empty():
+    """Return rendered HTML index page for chemical.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for chemical.
+
+    """
+    return render_template('chemical_empty.html')
+
+
 @main.route('/twitter/<twitter>')
 def redirect_twitter(twitter):
     """Detect and redirect based on Twitter account.

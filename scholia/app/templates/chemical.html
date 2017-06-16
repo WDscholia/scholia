@@ -1,0 +1,86 @@
+{% extends "chemical_base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ identifiersSparql = `
+  SELECT ?IDpred ?IDpredLabel ?id WHERE {
+    wd:{{ q }} ?IDdir ?id .
+    ?IDpred wikibase:directClaim ?IDdir ;
+            wdt:P31 wd:Q19833835 .
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
+  }
+  ORDER BY ASC(?IDpredLabel)
+  LIMIT 500
+`
+
+ relatedChemicalsSparql = `
+  SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WHERE {
+    wd:{{ q }} wdt:P235 ?queryKey .
+    ?mol wdt:P235 ?InChIKey .
+    OPTIONAL { ?mol wdt:P231 ?CAS }
+    OPTIONAL { ?mol wdt:P661 ?ChemSpider }
+    OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
+    FILTER (regex(str(?InChIKey), concat("^", substr($queryKey,1,14), "-")))
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  }
+`
+ propertiesSparql = `
+SELECT ?propEntity ?propEntityLabel ?value ?units ?unitsLabel ?source ?sourceLabel ?doi
+WITH {
+  SELECT DISTINCT ?propEntity ?value ?units ?source ?doi WHERE {
+    wd:{{ q }} ?propp ?statement .
+    ?statement a wikibase:BestRank ;
+      ?proppsv [
+        wikibase:quantityAmount ?value ;
+        wikibase:quantityUnit ?units
+      ] .
+    OPTIONAL {
+      ?statement prov:wasDerivedFrom/pr:P248 ?source .
+      OPTIONAL { ?source wdt:P356 ?doi . }
+    }
+    ?property wikibase:claim ?propp ;
+            wikibase:statementValue ?proppsv ;
+            wdt:P1629 ?propEntity ;
+            wdt:P31 wd:Q21077852 .
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
+} 
+ORDER BY ASC(?IDpredLabel)
+`
+
+ $(document).ready(function() {
+   sparqlToDataTable(identifiersSparql, "#identifiers");
+   sparqlToDataTable(relatedChemicalsSparql, "#related");
+   sparqlToDataTable(propertiesSparql, "#properties");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Chemical</h1>
+
+<div id="intro"></div>
+
+<h2 id="Identifiers">Identifiers</h2>
+
+<table class="table table-hover" id="identifiers"></table>
+
+<h2 id="Related">Related Compounds</h2>
+
+<table class="table table-hover" id="related"></table>
+
+<h2 id="Related">Physchem Properties</h2>
+
+<table class="table table-hover" id="properties"></table>
+
+{% endblock %}
+    
