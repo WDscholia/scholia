@@ -11,7 +11,6 @@ WITH {
   SELECT DISTINCT ?work WHERE {
     ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
   }
-  LIMIT 500
 } AS %works
 WITH {
   SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics) WHERE {
@@ -28,6 +27,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }
 ORDER BY DESC(?date)
+LIMIT 500
 `
  authorsSparql = `
 #defaultView:Table
