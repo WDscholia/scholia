@@ -1,12 +1,13 @@
 """query.
 
 Usage:
+  scholia.query arxiv-to-q <arxiv>
+  scholia.query github-to-q <github>
+  scholia.query inchikey-to-q <inchikey>
   scholia.query orcid-to-q <orcid>
   scholia.query q-to-class <q>
   scholia.query random-author
   scholia.query twitter-to-q <twitter>
-  scholia.query github-to-q <github>
-  scholia.query arxiv-to-q <arxiv>
 
 Examples:
   $ python -m scholia.query orcid-to-q 0000-0001-6128-3356
@@ -309,6 +310,39 @@ def github_to_qs(github):
             for item in data['results']['bindings']]
 
 
+def inchikey_to_qs(inchikey):
+    """Convert InChIKey to Wikidata ID.
+
+    Parameters
+    ----------
+    inchikey : str
+        inchikey identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> inchikey_to_qs('UHOVQNZJYSORNB-UHFFFAOYSA-N') == ['Q2270']
+    True
+
+    """
+    # This query only matches on exact match
+    query = """select ?item
+               where {{ ?item wdt:P235 "{inchikey}" }}""".format(
+        inchikey=escape_string(inchikey))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    return [item['item']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def random_author():
     """Return random author.
 
@@ -348,6 +382,11 @@ def main():
 
     elif arguments['github-to-q']:
         qs = github_to_qs(arguments['<github>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['inchikey-to-q']:
+        qs = inchikey_to_qs(arguments['<inchikey>'])
         if len(qs) > 0:
             print(qs[0])
 
