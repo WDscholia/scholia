@@ -9,7 +9,8 @@ from werkzeug.routing import BaseConverter
 from ..api import entity_to_name, wb_get_entities
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
-from ..query import (arxiv_to_qs, doi_to_qs, github_to_qs, orcid_to_qs,
+from ..query import (arxiv_to_qs, doi_to_qs, github_to_qs, inchikey_to_qs,
+                     orcid_to_qs,
                      q_to_class, random_author, twitter_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
@@ -302,7 +303,8 @@ def redirect_doi(doi):
     qs = doi_to_qs(doi)
     if len(qs) > 0:
         q = qs[0]
-    return redirect(url_for('app.show_work', q=q), code=302)
+        return redirect(url_for('app.show_work', q=q), code=302)
+    return render_template('404.html')
 
 
 @main.route('/github/<github>')
@@ -318,7 +320,25 @@ def redirect_github(github):
     qs = github_to_qs(github)
     if len(qs) > 0:
         q = qs[0]
-    return redirect(url_for('app.show_author', q=q), code=302)
+        return redirect(url_for('app.show_author', q=q), code=302)
+    return render_template('404.html')
+
+
+@main.route('/inchikey/<inchikey>')
+def redirect_inchikey(inchikey):
+    """Detect and redirect for InChIkey user.
+
+    Parameters
+    ----------
+    doi : str
+        InChIkey user identifier.
+
+    """
+    qs = inchikey_to_qs(inchikey)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_chemical', q=q), code=302)
+    return render_template('404.html')
 
 
 @main.route('/orcid/<orcid>')
@@ -334,7 +354,8 @@ def redirect_orcid(orcid):
     qs = orcid_to_qs(orcid)
     if len(qs) > 0:
         q = qs[0]
-    return redirect(url_for('app.show_author', q=q), code=302)
+        return redirect(url_for('app.show_author', q=q), code=302)
+    return render_template('404.html')
 
 
 @main.route('/organization/' + q_pattern)
@@ -527,7 +548,8 @@ def redirect_twitter(twitter):
     q = ''
     if len(qs) > 0:
         q = qs[0]
-    return redirect(url_for('app.redirect_q', q=q), code=302)
+        return redirect(url_for('app.redirect_q', q=q), code=302)
+    return render_template('404.html')
 
 
 @main.route('/venue/' + q_pattern)
