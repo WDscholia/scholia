@@ -53,6 +53,9 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 q_pattern = '<regex("Q[1-9]\d*"):q>'
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 
+p_pattern = '<regex("P[1-9]\d*"):p>'
+P_PATTERN = re.compile(r'P[1-9]\d*')
+
 # Wikidata item identifiers matcher
 qs_pattern = '<regex("Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)+"):qs>'
 
@@ -83,6 +86,19 @@ def redirect_q(q):
     class_ = q_to_class(q)
     method = 'app.show_' + class_
     return redirect(url_for(method, q=q), code=302)
+
+
+@main.route("/" + p_pattern)
+def show_p(p):
+    """Detect and redirect to Scholia class page.
+
+    Parameters
+    ----------
+    p : str
+        Wikidata property identifier
+
+    """
+    return render_template('property.html', p=p)
 
 
 @main.route('/arxiv/<arxiv>')
