@@ -145,15 +145,54 @@ ORDER BY DESC(?count)
 LIMIT 50
   `
 
- $(document).ready(function() {
-     sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
-     sparqlToDataTable(topicsSparql, "#topics");
-     sparqlToDataTable(prolificAuthorsSparql, "#prolific-authors");
-     sparqlToDataTable(citedVenuesSparql, "#cited-venues");
-     sparqlToDataTable(citingVenuesSparql, "#citing-venues");
-     sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
-     sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
- });
+
+ genderDistributionSparql = `
+SELECT ?count ?gender ?genderLabel 
+WITH {
+  SELECT (COUNT(DISTINCT ?author) AS ?count) ?gender WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P50 ?author .
+    ?author wdt:P21 ?gender .
+  } 
+  GROUP BY ?gender
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,ep,fr,jp,nl,no,ru,sv,zh" . } 
+} 
+ ORDER BY DESC(?count)
+ `
+
+ authorshipsGenderDistributionSparql = `
+SELECT ?count ?gender ?genderLabel 
+WITH {
+  SELECT (COUNT(?author) AS ?count) ?gender WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P50 ?author .
+    ?author wdt:P21 ?gender .
+  } 
+  GROUP BY ?gender
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,ep,fr,jp,nl,no,ru,sv,zh" . } 
+} 
+ ORDER BY DESC(?count)
+ `
+
+
+  $(document).ready(function() {
+      sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
+      sparqlToDataTable(topicsSparql, "#topics");
+      sparqlToDataTable(prolificAuthorsSparql, "#prolific-authors");
+      sparqlToDataTable(citedVenuesSparql, "#cited-venues");
+      sparqlToDataTable(citingVenuesSparql, "#citing-venues");
+      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
+      sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
+      sparqlToDataTable(genderDistributionSparql, "#gender-distribution");
+      sparqlToDataTable(authorshipsGenderDistributionSparql,
+			"#authorships-gender-distribution");
+  });
 </script>
 
 
@@ -222,11 +261,19 @@ LIMIT 50
 <table class="table table-hover" id="citing-venues"></table>
 
 
-<h2>Author gender distribution</h2>
+<h2>Gender distribution</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%28count%28%3Fauthor%29%20as%20%3Fcount%29%20%3FgenderLabel%20%20where%20%7B%0A%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%3Fauthor%20wdt%3AP21%20%3Fgender%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Fgender%20%3FgenderLabel"></iframe>
-</div>
+
+<h3>Authors</h3>
+
+Distint authors.
+
+<table class="table table-hover" id="gender-distribution"></table>
+
+<h3>Authorships</h3>
+
+<table class="table table-hover" id="authorships-gender-distribution"></table>
+
 
 {% endblock %}
     
