@@ -25,8 +25,28 @@ group by ?journal ?journalLabel
 order by desc(?number_of_papers)
 `
 
+ mostCitedSparql = `
+# Count the number of citations for each journal published by a specified publisher
+SELECT ?work ?workLabel ?journal ?journalLabel ?number_of_citations
+WITH {
+  SELECT ?work ?journal (COUNT(?citing_work) AS ?number_of_citations) WHERE {
+    ?journal wdt:P123 wd:{{ q }} .
+    ?work wdt:P1433 ?journal .
+    ?citing_work wdt:P2860 ?work
+  }
+  GROUP BY ?work ?journal
+} AS %result
+WHERE {
+  INCLUDE %result
+  # Label the result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,es,da,sv,no,zh,ru,jp" . } 
+}
+ORDER BY DESC(?number_of_citations)
+`
+
  $(document).ready(function() {
      sparqlToDataTable(journalSparql, "#journals");
+     sparqlToDataTable(mostCitedSparql, "#mostCited");
  });
 </script>
 
@@ -55,9 +75,7 @@ order by desc(?number_of_papers)
 
 <h3>Most cited papers</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23%20Count%20the%20number%20of%20citations%20for%20each%20journal%20published%20by%20a%20specified%20publisher%0ASELECT%20%3Fwork%20%3FworkLabel%20%3Fjournal%20%3FjournalLabel%20%3Fnumber_of_citations%0AWITH%20%7B%0A%20%20SELECT%20%3Fwork%20%3Fjournal%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fnumber_of_citations%29%20WHERE%20%7B%0A%20%20%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20%3Fjournal%20.%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fwork%20%3Fjournal%0A%20%20ORDER%20BY%20DESC%28%3Fnumber_of_citations%29%0A%20%20LIMIT%20100%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20%23%20Label%20the%20result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Ces%2Cda%2Csv%2Cno%2Czh%2Cru%2Cjp%22%20.%20%7D%20%0A%20%20INCLUDE%20%25result%0A%7D%0AORDER%20BY%20DESC%28%3Fnumber_of_citations%29"></iframe>
-</div>
+<table class="table table-hover" id="mostCited"></table>
 
 <h3 id="As function of number of published works">As function of number of published works</h3>
 
