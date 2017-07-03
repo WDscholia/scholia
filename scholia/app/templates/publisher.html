@@ -1,6 +1,39 @@
 {% extends "publisher_base.html" %}
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ journalSparql = `
+select ?journal ?journalLabel (group_concat(?themes_labels; separator=", ") as ?theme) (max(?bfi) as ?BFI) (sample(?count) as ?number_of_papers) where {
+  {
+	select ?journal (count(?work) as ?count) where {
+  	  ?journal wdt:P123 wd:{{ q }} .
+  	  ?work wdt:P1433 ?journal .
+    }
+    group by ?journal 
+  }
+  optional {
+    ?journal wdt:P921 ?themes .
+    ?themes rdfs:label ?themes_labels .
+    filter (lang(?themes_labels) = 'en')
+  }
+  optional { ?journal wdt:P1240 ?bfi . }
+  service wikibase:label { bd:serviceParam wikibase:language "en,da,fr,jp,de,nl" . } 
+} 
+group by ?journal ?journalLabel
+order by desc(?number_of_papers)
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(journalSparql, "#journals");
+ });
+</script>
+
+{% endblock %}
+
 {% block page_content %}
+
 <h1 id="h1">Publisher</h1>
 
 <div id="intro"></div>
@@ -8,9 +41,7 @@
 
 <h2>Journals and other collections</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#select%20%3Fjournal%20%3FjournalLabel%20%28group_concat%28%3Fthemes_labels%3B%20separator%3D%22%2C%20%22%29%20as%20%3Ftheme%29%20%28max%28%3Fbfi%29%20as%20%3FBFI%29%20%28sample%28%3Fcount%29%20as%20%3Fnumber_of_papers%29%20where%20%7B%0A%20%20%7B%0A%09select%20%3Fjournal%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%09%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%09%20%20%3Fwork%20wdt%3AP1433%20%3Fjournal%20.%0A%20%20%20%20%7D%0A%20%20%20%20group%20by%20%3Fjournal%20%0A%20%20%7D%0A%20%20optional%20%7B%0A%20%20%20%20%3Fjournal%20wdt%3AP921%20%3Fthemes%20.%0A%20%20%20%20%3Fthemes%20rdfs%3Alabel%20%3Fthemes_labels%20.%0A%20%20%20%20filter%20%28lang%28%3Fthemes_labels%29%20%3D%20%27en%27%29%0A%20%20%7D%0A%20%20optional%20%7B%20%3Fjournal%20wdt%3AP1240%20%3Fbfi%20.%20%7D%0A%20%20service%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cfr%2Cjp%2Cde%2Cnl%22%20.%20%7D%20%0A%7D%20%0Agroup%20by%20%3Fjournal%20%3FjournalLabel%0Aorder%20by%20desc%28%3Fnumber_of_papers%29%0A"></iframe>
-</div>
+<table class="table table-hover" id="journals"></table>
 
 
 <h2>Associated editors</h2>
