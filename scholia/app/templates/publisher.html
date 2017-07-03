@@ -4,9 +4,14 @@
 {{super()}}
 
 <script type="text/javascript">
- journalSparql = `
-select ?journal ?journalLabel (group_concat(?themes_labels; separator=", ") as ?theme) (max(?bfi) as ?BFI) (sample(?count) as ?number_of_papers) where {
-  {
+    journalSparql = `
+  SELECT
+    (sample(?count) as ?number_of_papers)
+    (max(?bfi) as ?BFI)
+    ?journal ?journalLabel
+    (group_concat(?themes_labels; separator=", ") as ?theme)
+  WHERE {
+    {
 	select ?journal (count(?work) as ?count) where {
   	  ?journal wdt:P123 wd:{{ q }} .
   	  ?work wdt:P1433 ?journal .
@@ -23,11 +28,13 @@ select ?journal ?journalLabel (group_concat(?themes_labels; separator=", ") as ?
 } 
 group by ?journal ?journalLabel
 order by desc(?number_of_papers)
-`
+  `
 
- mostCitedSparql = `
+  mostCitedSparql = `
 # Count the number of citations for each journal published by a specified publisher
-SELECT ?work ?workLabel ?journal ?journalLabel ?number_of_citations
+SELECT
+  ?number_of_citations
+  ?work ?workLabel ?journal ?journalLabel 
 WITH {
   SELECT ?work ?journal (COUNT(?citing_work) AS ?number_of_citations) WHERE {
     ?journal wdt:P123 wd:{{ q }} .
