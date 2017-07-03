@@ -5,7 +5,7 @@
 
 <script type="text/javascript">
  employeesAndAffiliatedSparql = `
-SELECT (SAMPLE(?number_of_works_) AS ?number_of_works) ?researcher ?researcherLabel (MAX(?birthdates) AS ?birthdate)
+SELECT (SAMPLE(?number_of_works_) AS ?number_of_works) ?researcher ?researcherLabel (MAX(?birthdates) AS ?birthdate) ?orcid
 WHERE {
   hint:Query hint:optimizer "None" .
   {
@@ -24,9 +24,10 @@ WHERE {
     ?researcher wdt:P569 ?birthdatetimes .
     BIND(xsd:date(?birthdatetimes) AS ?birthdates)
   }
+  OPTIONAL { ?researcher wdt:P496 ?orcid . }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
 }
-GROUP BY ?researcher ?researcherLabel
+GROUP BY ?researcher ?researcherLabel ?orcid
 ORDER BY DESC(?number_of_works)
  `;
 
