@@ -51,10 +51,33 @@ WHERE {
 } 
 ORDER BY DESC(?citations) DESC(?date) 
  `;
- 
+
+  statementsSparql = `
+#defaultView:Table
+# Statements referencing this article
+SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel 
+WITH {
+  SELECT distinct ?item ?property ?value
+  WHERE {
+    ?item ?p ?statement .
+    ?property wikibase:claim ?p . 
+    ?statement ?a ?value .
+    ?item ?b ?value . 
+    ?statement prov:wasDerivedFrom/
+         <http://www.wikidata.org/prop/reference/P248> wd:{{ q }} .
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . } 
+} 
+ORDER BY DESC(?itemLabel)
+`;
+
  $(document).ready(function() {
      sparqlToDataTable(citationsToTheWorkSparql, "#citations-to-the-work");
      sparqlToDataTable(citedWorksSparql, "#cited-works");
+     sparqlToDataTable(statementsSparql, "#statements");
  });
 </script>
 
@@ -103,10 +126,7 @@ Partial citation graph
 
 <h2>Supports the following statement(s)</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#SELECT%20distinct%20%3Fitem%20%3FitemLabel%20%3Fproperty%20%3FpropertyLabel%20%3Fvalue%20%3FvalueLabel%20%0AWHERE%0A%7B%0A%20%20%3Fitem%20%3Fp%20%3Fstatement%20.%0A%20%20%3Fproperty%20wikibase%3Aclaim%20%3Fp%20.%20%0A%20%20%3Fstatement%20%3Fa%20%3Fvalue%20.%0A%20%20%3Fitem%20%3Fb%20%3Fvalue%20.%20%0A%20%20%3Fstatement%20prov%3AwasDerivedFrom%2F%0A%20%20%20%20%20%20%20%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Freference%2FP248%3E%20wd%3A{{ q }}%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Csde%2Cfr%2Cda%2Csv%2Cjp%22%20%7D%0A%7D%20order%20by%20%3FitemLabel"></iframe>
-</div>
-
+<table class="table table-hover" id="statements"></table>
   
 {% endblock %}
     
