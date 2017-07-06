@@ -22,6 +22,6 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 2.7',
         ],
-    test_requires=['pytest', 'flake8'],
+    tests_require=['pytest', 'flake8'],
     version=versioneer.get_version(),
 )
