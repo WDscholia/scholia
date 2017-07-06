@@ -55,6 +55,12 @@ def get_metadata(arxiv):
     - https://arxiv.org
     - https://arxiv.org/help/robots
 
+    Examples
+    --------
+    >>> metadata = get_metadata('1503.00759')
+    >>> metadata['doi'] = '10.1109/JPROC.2015.2483592'
+    True
+
     """
     arxiv = arxiv.strip()
     url = 'https://arxiv.org/abs/' + arxiv
@@ -65,13 +71,30 @@ def get_metadata(arxiv):
     submissions = tree.xpath('//div[@class="submission-history"]/text()')
     datetime_as_string = submissions[-2][5:30]
     isodatetime = parse_datetime(datetime_as_string).isoformat()
+
+    subjects = tree.xpath(
+        '//td[@class="tablecell subjects"]/span/text()'
+        '|'
+        '//td[@class="tablecell subjects"]/text()')
+    arxiv_classifications = [
+        re.search('\(.*\)', subject).group()[1:-1]
+        for subject in subjects
+    ]
+
     metadata = {
         'arxiv': arxiv,
         'authornames': tree.xpath('//div[@class="authors"]/a/text()'),
         'full_text_url': 'https://arxiv.org/pdf/' + arxiv + '.pdf',
         'publication_date': isodatetime,
         'title': re.sub('\s+', ' ', tree.xpath('//h1/text()')[-1].strip()),
+        'arxiv_classifications': arxiv_classifications,
     }
+
+    # Optional DOI
+    doi = tree.xpath('//td[@class="tablecell doi"]/a/text()')
+    if doi:
+        metadata['doi'] = doi[0]
+
     return metadata
 
 
