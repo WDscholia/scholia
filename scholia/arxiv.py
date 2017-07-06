@@ -58,7 +58,7 @@ def get_metadata(arxiv):
     Examples
     --------
     >>> metadata = get_metadata('1503.00759')
-    >>> metadata['doi'] = '10.1109/JPROC.2015.2483592'
+    >>> metadata['doi'] == '10.1109/JPROC.2015.2483592'
     True
 
     """
@@ -132,6 +132,17 @@ def metadata_to_quickstatements(metadata):
         metadata['publication_date'][:10])
     qs += u'LAST\tP953\t"{}"\n'.format(
         metadata['full_text_url'].replace('"', '\"'))
+
+    # Optional DOI
+    if 'doi' in metadata:
+        qs += u'LAST\tP356\t"{}"\n'.format(
+            metadata['doi'].replace('"', '\"'))
+
+    # arXiv classifications such as "cs.LG"
+    for classification in metadata['arxiv_classifications']:
+        qs += u'LAST\tP820\t"{}"\n'.format(
+            classification.replace('"', '\"'))
+
     for n, authorname in enumerate(metadata['authornames'], start=1):
         qs += u'LAST\tP2093\t"{}"\tP1545\t"{}"\n'.format(
             authorname.replace('"', '\"'), n)
