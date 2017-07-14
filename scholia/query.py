@@ -238,6 +238,14 @@ def q_to_class(q):
             'Q18965518',  # artery disease
             ]):
         class_ = 'disease'
+    elif set(classes).intersection([
+            'Q11173',  # chemical compound
+            'Q36496',  # ion
+            'Q79529',  # chemical substance
+            'Q407595',  # metabolite
+            'Q2393187',  # molecular entity
+            ]):
+        class_ = 'chemical'
     else:
         class_ = 'topic'
 
