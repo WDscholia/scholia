@@ -649,6 +649,37 @@ def show_series_empty():
     return render_template('series_empty.html')
 
 
+@main.route('/pathway/' + q_pattern)
+def show_pathway(q):
+    """Return html render page for specific pathway.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('pathway.html', q=q)
+
+
+@main.route('/pathway/')
+def show_pathway_empty():
+    """Return rendered HTML index page for pathway.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for pathway.
+
+    """
+    return render_template('pathway_empty.html')
+
+
 @main.route('/publisher/' + q_pattern)
 def show_publisher(q):
     """Return rendered HTML page for specific publisher.

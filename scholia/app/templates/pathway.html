@@ -1,0 +1,43 @@
+{% extends "pathway_base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ participantsSparql = `
+SELECT ?part ?partLabel ?type
+WITH {
+  SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
+  WHERE {
+    wd:{{ q }} wdt:P31 wd:Q4915012 ;
+             wdt:P527 ?part .
+    OPTIONAL { ?part wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
+  } GROUP BY ?part
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY ASC(?partLabel)
+`
+
+ $(document).ready(function() {
+   sparqlToDataTable(participantsSparql, "#participants");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Chemical</h1>
+
+<div id="intro"></div>
+
+<h2 id="Participants">Participants</h2>
+
+<table class="table table-hover" id="participants"></table>
+
+{% endblock %}
+
