@@ -246,6 +246,10 @@ def q_to_class(q):
             'Q2393187',  # molecular entity
             ]):
         class_ = 'chemical'
+    elif set(classes).intersection([
+            'Q4915012',  # biological pathway
+            ]):
+        class_ = 'pathway'
     else:
         class_ = 'topic'
 
