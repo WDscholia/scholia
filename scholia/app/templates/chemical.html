@@ -69,11 +69,43 @@ WHERE {
 } 
 ORDER BY ASC(?propEntityLabel)
 `
+  recentArticlesSparql = `
+SELECT ?date ?work ?workLabel ?type ?topics
+WITH {
+  SELECT DISTINCT ?work WHERE {
+    {
+      ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+    } UNION {
+      wd:{{ q }} ?propp ?statement .
+      ?statement a wikibase:BestRank ;
+                 prov:wasDerivedFrom/pr:P248 ?work .
+    }
+  }
+} AS %works
+WITH {
+  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics) WHERE {
+    INCLUDE %works
+    ?work wdt:P921 ?topic . 
+    OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
+    OPTIONAL { ?work wdt:P577 ?dates . }
+    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
+  }
+  GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  BIND(xsd:date(?datetime) AS ?date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?date)
+LIMIT 500
+`
 
  $(document).ready(function() {
    sparqlToDataTable(identifiersSparql, "#identifiers");
    sparqlToDataTable(relatedChemicalsSparql, "#related");
    sparqlToDataTable(propertiesSparql, "#properties");
+   sparqlToDataTable(recentArticlesSparql, "#recentArticles");
  });
 </script>
 
@@ -94,9 +126,19 @@ ORDER BY ASC(?propEntityLabel)
 
 <table class="table table-hover" id="related"></table>
 
-<h2 id="Related">Physchem Properties</h2>
+<h2 id="PhysChem">Physchem Properties</h2>
 
 <table class="table table-hover" id="properties"></table>
+
+<h2 id="Recently published works on the chemical">Recently published works on the chemical</h2>
+
+<table class="table table-hover" id="recentArticles"></table>
+
+<h2 id="Publications per year">Publications per year</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item"  src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0A%23%20Inspired%20from%20LEGOLAS%20-%20http%3A%2F%2Fabel.lis.illinois.edu%2Flegolas%2F%0A%23%20Shubhanshu%20Mishra%2C%20Vetle%20Torvik%0Aselect%20%3Fyear%20%28count%28%3Fwork%29%20as%20%3Fnumber_of_publications%29%20where%20%7B%0A%20%20%7B%0A%20%20%20%20select%20%28str%28%3Fyear_%29%20as%20%3Fyear%29%20%280%20as%20%3Fpages%29%20where%20%7B%0A%20%20%20%20%20%20%23%20default%20values%20%3D%200%0A%20%20%20%20%20%20%3Fyear_item%20wdt%3AP31%20wd%3AQ577%20.%20%0A%20%20%20%20%20%20%3Fyear_item%20wdt%3AP585%20%3Fdate%20.%0A%20%20%20%20%20%20bind%28year%28%3Fdate%29%20as%20%3Fyear_%29%0A%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20select%20%28min%28%3Fyear_%29%20as%20%3Fearliest_year%29%20where%20%7B%0A%20%20%20%20%20%20%20%20%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20wd%3A{{ q }}%20%3Fpropp%20%3Fstatement%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fstatement%20a%20wikibase%3ABestRank%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20prov%3AwasDerivedFrom%2Fpr%3AP248%20%3Fwork%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%20%0A%20%20%20%20%20%20%20%20%20%20bind%28year%28%3Fpublication_date%29%20as%20%3Fyear_%29%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20bind%28year%28now%28%29%29%20as%20%3Fnext_year%29%0A%20%20%20%20%20%20filter%20%28%3Fyear_%20%3E%3D%20%3Fearliest_year%20%26%26%20%3Fyear_%20%3C%3D%20%3Fnext_year%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20union%20%7B%0A%20%20%20%20select%20%3Fwork%20%28min%28%3Fyears%29%20as%20%3Fyear%29%20where%20%7B%0A%20%20%20%20%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20union%20%7B%20wd%3A{{ q }}%20%3Fpropp%20%3Fstatement%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fstatement%20a%20wikibase%3ABestRank%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20prov%3AwasDerivedFrom%2Fpr%3AP248%20%3Fwork%20.%20%7D%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdates%20.%0A%20%20%20%20%20%20bind%28str%28year%28%3Fdates%29%29%20as%20%3Fyears%29%20.%0A%20%20%20%20%7D%0A%20%20%20%20group%20by%20%3Fwork%20%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fyear%20%0Aorder%20by%20%3Fyear" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
+</div>
 
 {% endblock %}
     
