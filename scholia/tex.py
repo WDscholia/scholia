@@ -46,6 +46,7 @@ from .query import doi_to_qs
 
 STRING_TO_TEX = {
     u('\xc5'): r'{\AA}',
+    u('\xc1'): r"{\'A}",
     '<': r'\textless{}',
     '>': r'\textgreater{}',
     '~': r'\~{}',
