@@ -9,8 +9,8 @@ from werkzeug.routing import BaseConverter
 from ..api import entity_to_name, wb_get_entities
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
-from ..query import (arxiv_to_qs, doi_to_qs, github_to_qs, inchikey_to_qs,
-                     orcid_to_qs,
+from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
+                     inchikey_to_qs, orcid_to_qs,
                      q_to_class, random_author, twitter_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
@@ -273,6 +273,23 @@ def show_award_empty():
 
     """
     return render_template('award_empty.html')
+
+
+@main.route('/cas/<cas>')
+def redirect_cas(cas):
+    """Detect and redirect for CAS registry numbers.
+
+    Parameters
+    ----------
+    cas : str
+        CAS registry number.
+
+    """
+    qs = cas_to_qs(cas)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_chemical', q=q), code=302)
+    return render_template('404.html')
 
 
 @main.route('/disease/' + q_pattern)

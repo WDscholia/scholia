@@ -2,6 +2,7 @@
 
 Usage:
   scholia.query arxiv-to-q <arxiv>
+  scholia.query cas-to-q <cas>
   scholia.query github-to-q <github>
   scholia.query inchikey-to-q <inchikey>
   scholia.query orcid-to-q <orcid>
@@ -351,6 +352,39 @@ def inchikey_to_qs(inchikey):
             for item in data['results']['bindings']]
 
 
+def cas_to_qs(cas):
+    """Convert a CAS registry number to Wikidata ID.
+
+    Parameters
+    ----------
+    cas : str
+        CAS registry number
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> cas_to_qs('50-00-0') == ['Q161210']
+    True
+
+    """
+    # This query only matches on exact match
+    query = """select ?item
+               where {{ ?item wdt:P231 "{cas}" }}""".format(
+        cas=cas)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    return [item['item']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def random_author():
     """Return random author.
 
@@ -385,6 +419,11 @@ def main():
 
     if arguments['arxiv-to-q']:
         qs = arxiv_to_qs(arguments['<arxiv>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['cas-to-q']:
+        qs = cas_to_qs(arguments['<cas>'])
         if len(qs) > 0:
             print(qs[0])
 
