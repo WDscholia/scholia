@@ -118,9 +118,15 @@ def wb_get_entities(qs):
         headers=headers, params=params).json()
     if 'entities' in response_data:
         return response_data['entities']
-    else:
-        # Make informative error
-        raise Exception('API error')
+
+    # TODO: Make informative/better error handling
+    if 'error' in response_data:
+        message = response_data['error'].get('info', '')
+        message += ", id=" + response_data['error'].get('id', '')
+        raise Exception(message)
+
+    # Last resort
+    raise Exception('API error')
 
 
 def entity_to_authors(entity, return_humanness=False):
