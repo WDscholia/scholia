@@ -32,9 +32,10 @@ from six import b, u
 
 BIBLIOGRAPHY_SPARQL_QUERY = """
 select ?work ?title ?venueLabel ?date ?volume ?issue ?pages
-       ?license ?doi ?url where {{
+       ?license ?doi ?url ?type where {{
   ?work wdt:P50 wd:{q} .
   ?work wdt:P1476 ?title .
+  optional {{ ?work wdt:P31 ?type . }}
   optional {{ ?work wdt:P1433 ?venue . }}
   optional {{ ?work wdt:P577 ?date . }}
   optional {{ ?work wdt:P478 ?volume . }}
@@ -60,6 +61,15 @@ CITE_JOURNAL_TEMPLATE = u("""
   | issue = {issue}
   | pages = {pages}
   | doi = {doi}
+  | url = {url}
+}}}}""")
+
+
+CITE_NEWS_TEMPLATE = u("""
+* {{{{Cite news
+  | title = {title}
+  | work = {work}
+  | date = {date}
   | url = {url}
 }}}}""")
 
@@ -103,17 +113,27 @@ def q_to_bibliography_templates(q):
     wikitext += ('     or http://tools.wmflabs.org/scholia/'
                  'q-to-bibliography-templates?q={q} -->\n').format(q=q)
     for item in data['results']['bindings']:
-        wikitext += CITE_JOURNAL_TEMPLATE.format(
-            title=_value(item, 'title'),
-            journal=_value(item, 'venueLabel'),
-            volume=_value(item, 'volume'),
-            issue=_value(item, 'issue'),
-            date=_value(item, 'date').split('T')[0],
-            pages=_value(item, 'pages'),
-            license=_value(item, 'license'),
-            doi=_value(item, 'doi'),
-            url=_value(item, 'url'),
-        )
+        if (_value(item, 'type').endswith('Q5707594') or
+                _value(item, 'type').endswith('Q17928402')):
+            # news article or blog post
+            wikitext += CITE_NEWS_TEMPLATE.format(
+                title=_value(item, 'title'),
+                work=_value(item, 'venueLabel'),
+                date=_value(item, 'date').split('T')[0],
+                url=_value(item, 'url'),
+            )
+        else:
+            wikitext += CITE_JOURNAL_TEMPLATE.format(
+                title=_value(item, 'title'),
+                journal=_value(item, 'venueLabel'),
+                volume=_value(item, 'volume'),
+                issue=_value(item, 'issue'),
+                date=_value(item, 'date').split('T')[0],
+                pages=_value(item, 'pages'),
+                license=_value(item, 'license'),
+                doi=_value(item, 'doi'),
+                url=_value(item, 'url'),
+            )
 
     return wikitext
 
