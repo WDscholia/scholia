@@ -53,9 +53,32 @@ ORDER BY DESC(?date)
 LIMIT 500
 `
 
+  citingArticlesSparql = `
+#defaultView:Table
+SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
+WITH {
+  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work
+  WHERE {
+    ?citing_work wdt:P2860 wd:{{ q }} .
+    OPTIONAL {
+      ?citing_work wdt:P577 ?datetime .
+      BIND(xsd:date(?datetime) AS ?date)
+    }
+    OPTIONAL { ?citing_citing_work wdt:P2860 ?citing_work }
+  }
+  GROUP BY ?citing_work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . }
+}
+ORDER BY DESC(?citations) DESC(?date)
+`
+
  $(document).ready(function() {
    sparqlToDataTable(participantsSparql, "#participants");
    sparqlToDataTable(recentArticlesSparql, "#recentArticles");
+   sparqlToDataTable(citingArticlesSparql, "#citingArticles");
  });
 </script>
 
@@ -75,6 +98,12 @@ LIMIT 500
 <h2 id="Published works related to the pathway">Published works related to the pathway</h2>
 
 <table class="table table-hover" id="recentArticles"></table>
+
+
+<h2 id="Works citing this pathway">Works citing this pathway</h2>
+
+<table class="table table-hover" id="citingArticles"></table>
+
 
 <h2 id="Publications per year">Publications per year</h2>
 
