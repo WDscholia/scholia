@@ -42,6 +42,8 @@ WITH {
     ?citing_work wdt:P2860 ?work
   }
   GROUP BY ?work ?journal
+  ORDER BY DESC(?number_of_citations)
+  LIMIT 500  
 } AS %result
 WHERE {
   INCLUDE %result
