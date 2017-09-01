@@ -5,10 +5,32 @@
 {{super()}}
 
 <script type="text/javascript">
- 
- // $(document).ready(function() {
- //     sparqlToDataTable(listOfPublicationsSparql, "#list-of-publications");
- // });
+
+  listOfVenuesSparql = `
+SELECT ?venue ?venueLabel ?publisher ?publisherLabel ?number_of_works ?number_of_citations
+WITH {
+  SELECT ?venue (COUNT(DISTINCT ?work) AS ?number_of_works) (COUNT(?citing_work) AS ?number_of_citations)
+  WHERE {
+    VALUES ?venue {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
+    OPTIONAL {
+      ?work wdt:P1433 ?venue .
+      OPTIONAL { ?citing_work wdt:P2860 ?work }
+    }
+  } 
+  GROUP BY ?venue
+} AS %result
+WHERE {
+  INCLUDE %result
+  OPTIONAL { ?venue wdt:P123 ?publisher }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY ?venueLabel
+`
+
+
+$(document).ready(function() {
+    sparqlToDataTable(listOfVenuesSparql, "#list-of-venues");
+});
 
 
 </script>
@@ -21,6 +43,10 @@
 <h1 id="h1">Venues</h1>
 
 <div id="intro"></div>
+
+
+<table class="table table-hover" id="list-of-venues"></table>
+
 
 
 <h2 id="Published works per year">Published works per year</h2>
