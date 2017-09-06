@@ -505,6 +505,37 @@ def show_q_to_bibliography_templates():
                            wikitext=wikitext)
 
 
+@main.route('/software/' + q_pattern)
+def show_software(q):
+    """Return HTML rendering for specific software.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('software.html', q=q)
+
+
+@main.route('/software/')
+def show_software_empty():
+    """Return software index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for author view.
+
+    """
+    return render_template('software_empty.html')
+
+
 @main.route('/topic/' + q_pattern)
 def show_topic(q):
     """Return html render page for specific topic.
