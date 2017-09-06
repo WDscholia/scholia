@@ -251,6 +251,14 @@ def q_to_class(q):
             'Q4915012',  # biological pathway
             ]):
         class_ = 'pathway'
+    elif set(classes).intersection([
+            'Q7397',  # software
+            'Q1639024',  # mathematical software
+            'Q21127166',  # Java software library
+            'Q21129801',  # natural language processing toolkit
+            'Q24529812',  # statistical package
+            ]):
+        class_ = 'software'
     else:
         class_ = 'topic'
 

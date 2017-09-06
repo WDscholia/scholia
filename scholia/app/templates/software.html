@@ -1,0 +1,70 @@
+{% extends "software_base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ recentWorkUsingTheSoftwareSparql = `
+SELECT ?publication_date ?work ?workLabel
+WITH{
+  SELECT ?publication_date ?work WHERE {
+	  ?work wdt:P2283/(wdt:P279*) wd:{{ q }} .
+    ?work wdt:P577 ?publication_datetime .
+    BIND(xsd:date(?publication_datetime) AS ?publication_date)
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
+}
+ORDER BY DESC(?publication_date)      
+`
+
+  coUsedSparql = `
+SELECT ?count ?coused ?cousedLabel 
+WITH{
+  SELECT ?coused (COUNT(?work) as ?count) WHERE {
+	  ?work wdt:P2283/(wdt:P279*) wd:{{ q }} .
+    ?work wdt:P2283 ?coused .
+	  FILTER (?coused != wd:{{ q }})
+  }
+  GROUP BY ?coused
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
+}
+ORDER BY DESC(?count)  
+
+    `
+
+ 
+ $(document).ready(function() {
+     sparqlToDataTable(recentWorkUsingTheSoftwareSparql,
+		       "#recent-work-using-the-software");
+     sparqlToDataTable(coUsedSparql,
+		       "#co-used");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Software</h1>
+
+<div id="intro"></div>
+
+<h2 id="Recent work using the software">Recent work using the software</h2>
+
+<table class="table table-hover" id="recent-work-using-the-software"></table>
+
+
+<h2 id="Co-used">Co-used</h2>
+
+<table class="table table-hover" id="co-used"></table>
+
+
+{% endblock %}
+    

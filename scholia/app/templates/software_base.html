@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+
 {% block navbar %}
 <div class="navbar navbar-static-top">
     <ul class="nav nav-pills">
@@ -18,26 +19,18 @@
 			type="button" data-toggle="dropdown">Topic
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
-		    <li role="presentation" class="active"><a href="./">General</a></li>
-		    <li role="presentation"><a href="../disease/">Disease</a></li>
+		    <li role="presentation"><a href="../topic/">General</a></li>
+		    <li role="presentation"><a href="../">Disease</a></li>
 		    <li role="presentation"><a href="../protein/">Protein</a></li>
 		    <li role="presentation"><a href="../chemical/">Chemical</a></li>
-		    <li role="presentation"><a href="../software/">Software</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Tools
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="../arxiv-to-quickstatements">Arxiv to Quickstatements</a></li>
-		    <li role="presentation"><a href="../q-to-bibliography-templates">Q to Bibliography templates</a></li>
+		    <li role="presentation" class="active"><a href="./">Software</a></li>
 		</ul>
 	    </div>
 	</li>
 	<li role="presentation"><a href="../about">About</a></li>
     </ul>
 </div>
+
+
 {% endblock %}
+
