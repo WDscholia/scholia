@@ -5,10 +5,24 @@
 {{super()}}
 
 <script type="text/javascript">
+ listOfAuthorsSparql = `
+SELECT ?author ?authorLabel ?authorDescription ?example_work ?example_workLabel
+WITH {
+  SELECT ?author (SAMPLE(?work) AS ?example_work) WHERE {
+    VALUES ?author { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    OPTIONAL { ?work wdt:P50 ?author }
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,nl,no,ru,sv,zh". }
+}
+`
  
- // $(document).ready(function() {
- //     sparqlToDataTable(listOfPublicationsSparql, "#list-of-publications");
- // });
+ $(document).ready(function() {
+     sparqlToDataTable(listOfAuthorsSparql, "#list-of-authors");
+ });
 
 
 </script>
@@ -16,11 +30,15 @@
 {% endblock %}
 
 
+
 {% block page_content %}
 
 <h1 id="h1">Authors</h1>
 
 <div id="intro"></div>
+
+
+<table class="table table-hover" id="list-of-authors"></table>
 
 
 <h2>Number of citations per publication year</h2>
