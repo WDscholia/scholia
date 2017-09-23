@@ -6,6 +6,7 @@ Usage:
   scholia.query github-to-q <github>
   scholia.query inchikey-to-q <inchikey>
   scholia.query orcid-to-q <orcid>
+  scholia.query viaf-to-q <viaf>
   scholia.query q-to-class <q>
   scholia.query random-author
   scholia.query twitter-to-q <twitter>
@@ -138,6 +139,36 @@ def orcid_to_qs(orcid):
     """
     query = 'select ?author where {{ ?author wdt:P496 "{orcid}" }}'.format(
         orcid=escape_string(orcid))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    return [item['author']['value'][31:]
+            for item in data['results']['bindings']]
+
+def viaf_to_qs(viaf):
+    """Convert VIAF identifier to Wikidata ID.
+
+    Parameters
+    ----------
+    viaf : str
+        VIAF identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> viaf_to_qs('59976288') == ['Q3259614']
+    True
+
+    """
+    query = 'select ?author where {{ ?author wdt:P214 "{viaf}" }}'.format(
+        viaf=escape_string(viaf))
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
@@ -451,6 +482,11 @@ def main():
 
     elif arguments['orcid-to-q']:
         qs = orcid_to_qs(arguments['<orcid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['viaf-to-q']:
+        qs = viaf_to_qs(arguments['<viaf>'])
         if len(qs) > 0:
             print(qs[0])
 
