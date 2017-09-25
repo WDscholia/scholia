@@ -110,6 +110,29 @@ WHERE {
 ORDER BY DESC(?count)
   `
 
+mostCitedAuthorsSparql = `
+SELECT ?number_of_citations ?author ?authorLabel 
+WITH {
+  SELECT DISTINCT ?work WHERE {
+	  ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+  }
+} AS %works
+WITH {
+  SELECT (COUNT(?work) AS ?number_of_citations) ?author WHERE {
+    INCLUDE %works
+    ?cited_work wdt:P50 ?author . 
+    ?work wdt:P2860 ?cited_work .
+  } 
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+} 
+ORDER BY DESC(?number_of_citations)
+LIMIT 200
+`
+
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql,
@@ -118,6 +141,7 @@ ORDER BY DESC(?count)
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(venuesSparql, "#venues");
      sparqlToDataTable(topCitedSparql, "#topCited");
+     sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
  });
 </script>
 
@@ -183,6 +207,9 @@ ORDER BY DESC(?count)
 
 <table class="table table-hover" id="topCited"></table>
 
+<h3 id="Most cited author from works on the topic">Most cited authors from works on the topic</h3>
+
+<table class="table table-hover" id="most-cited-authors"></table>
 
 {% endblock %}
     
