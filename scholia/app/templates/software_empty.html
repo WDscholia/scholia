@@ -1,5 +1,45 @@
 {% extends "software_base.html" %}
 
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    mostUsedSoftwareSparql = `
+SELECT ?count ?software ?softwareLabel ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?software
+    (SAMPLE(?described_by) AS ?described_by_example)
+    (SAMPLE(?work) AS ?example_use)
+  WHERE {
+    ?work wdt:P2283 ?software . 
+    ?software wdt:P31/wdt:P279* wd:Q7397 . 
+    # Restricting to work takes too long time :(    
+    # ?work wdt:P31/wdt:P279* wd:Q386724 .
+    OPTIONAL { ?software wdt:P1343 ?described_by . }
+  }
+  GROUP BY ?software
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+LIMIT 500    
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(mostUsedSoftwareSparql, "#most-used-software");
+ });
+</script>
+
+{% endblock %}
+
+
+
 {% block page_content %}
 
 <h1>Software</h1>
@@ -13,6 +53,14 @@
   <li><a href="Q32998961">Stanford CoreNLP</a></li>
   <li><a href="Q1204300">STATA</a></li>
 </ul>
+
+
+<h2>Overview</h2>
+
+<h3 id="most used software">Most used software</h3>
+
+<table class="table table-hover" id="most-used-software"></table>
+
 
 {% endblock %}
 
