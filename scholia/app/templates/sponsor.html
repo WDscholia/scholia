@@ -42,22 +42,23 @@ ORDER BY DESC(?count)
   `
 
   coSponsorsSparql = `
-  # Co-founders
-SELECT ?count ?sponsor ?sponsorLabel
+# Co-founders including an example funded work
+SELECT ?count ?sponsor ?sponsorLabel ?example_work ?example_workLabel
 WITH {
-  SELECT (COUNT(?work) AS ?count) ?sponsor WHERE {
-    ?work wdt:P859 wd:{{ q }} .
+  SELECT (COUNT(?work) AS ?count) ?sponsor (SAMPLE(?work) AS ?example_work) WHERE {
+	  ?work wdt:P859 wd:{{ q }} .
     ?work wdt:P859 ?sponsor .
-    FILTER (wd:{{ q }} != ?sponsor)
+    FILTER (wd:Q390551 != ?sponsor)
   }
   GROUP BY ?sponsor
 } AS %result
 WHERE {
+  # Label the result
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,fr,es,jp,it,nl,no,ru,sv,zh" }
 }
 ORDER BY DESC(?count)
-  `
+`
  
  $(document).ready(function() {
   sparqlToDataTable(recentlyPublishedSponsoredWorkSparql,
