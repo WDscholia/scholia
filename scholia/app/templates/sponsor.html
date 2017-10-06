@@ -48,7 +48,7 @@ WITH {
   SELECT (COUNT(?work) AS ?count) ?sponsor (SAMPLE(?work) AS ?example_work) WHERE {
 	  ?work wdt:P859 wd:{{ q }} .
     ?work wdt:P859 ?sponsor .
-    FILTER (wd:Q390551 != ?sponsor)
+    FILTER (wd:{{ q }} != ?sponsor)
   }
   GROUP BY ?sponsor
 } AS %result
