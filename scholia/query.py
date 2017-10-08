@@ -231,6 +231,10 @@ def q_to_class(q):
     ]):
         class_ = 'protein'
     elif set(classes).intersection([
+            'Q7187',  # gene
+    ]):
+        class_ = 'gene'
+    elif set(classes).intersection([
             'Q3331189',  # edition
             'Q13442814',  # scientific article
     ]):
