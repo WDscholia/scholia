@@ -148,6 +148,7 @@ def orcid_to_qs(orcid):
     return [item['author']['value'][31:]
             for item in data['results']['bindings']]
 
+
 def viaf_to_qs(viaf):
     """Convert VIAF identifier to Wikidata ID.
 
