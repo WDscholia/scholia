@@ -5,13 +5,15 @@
 
 <script type="text/javascript">
 
- transcriptsSparql = `
-SELECT ?transcriptID
+  transcriptsSparql = `
+SELECT ?transcriptID ?reference ?referenceLabel
 WITH {
-  SELECT ?transcriptID
+  SELECT ?transcriptID ?reference
   WHERE {
-    wd:{{ q }} wdt:P31 wd:Q7187;
-         wdt:P704 ?transcriptID
+      wd:{{ q }} wdt:P31 wd:Q7187;
+                 p:P704 ?transcriptid_statement .
+    ?transcriptid_statement ps:P704 ?transcriptID ;
+                            prov:wasDerivedFrom/pr:P248 ?reference .
   }
 } AS %result 
 WHERE {
