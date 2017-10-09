@@ -66,14 +66,19 @@ ORDER BY DESC(?citations) DESC(?date)
 # Statements referencing this article
 SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel 
 WITH {
+  SELECT ?statement WHERE { 
+	  ?statement prov:wasDerivedFrom/pr:P248 wd:{{ q }} .
+  }
+  LIMIT 2000
+} AS %statements 
+WITH {
   SELECT distinct ?item ?property ?value
   WHERE {
+    INCLUDE %statements
     ?item ?p ?statement .
     ?property wikibase:claim ?p . 
     ?statement ?a ?value .
     ?item ?b ?value . 
-    ?statement prov:wasDerivedFrom/
-         <http://www.wikidata.org/prop/reference/P248> wd:{{ q }} .
   }
 } AS %result
 WHERE {
@@ -141,6 +146,9 @@ Partial citation graph
 
 
 <h2>Supports the following statement(s)</h2>
+
+Statements in Wikidata supported by references to this work.
+Only a maximum of around 2000 statements are shown.
 
 <table class="table table-hover" id="statements"></table>
   
