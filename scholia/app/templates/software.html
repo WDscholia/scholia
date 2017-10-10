@@ -26,22 +26,24 @@ ORDER BY DESC(?publication_date)
 `
 
   coUsedSparql = `
-SELECT ?count ?coused ?cousedLabel 
+SELECT ?count ?coused ?cousedLabel ?example_work ?example_workLabel
 WITH{
-  SELECT ?coused (COUNT(?work) as ?count) WHERE {
-	  ?work wdt:P2283/(wdt:P279*) wd:{{ q }} .
+  # Find works that are using a specific software,
+  # and find other software used in the found works
+  SELECT ?coused (COUNT(?work) as ?count) (SAMPLE(?work) AS ?example_work) WHERE {
+    ?work wdt:P2283/(wdt:P279*) wd:{{ q }} .
     ?work wdt:P2283 ?coused .
-	  FILTER (?coused != wd:{{ q }})
+    FILTER (?coused != wd:{{ q }})
   }
   GROUP BY ?coused
 } AS %result
 WHERE {
+  # Label the result
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
 }
 ORDER BY DESC(?count)  
-
-    `
+  `
 
  
  $(document).ready(function() {
