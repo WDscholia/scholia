@@ -9,7 +9,7 @@
 SELECT ?count ?software ?softwareLabel ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
 WITH {
   SELECT
-    (COUNT(?work) AS ?count)
+    (COUNT(DISTINCT ?work) AS ?count)
     ?software
     (SAMPLE(?described_by) AS ?described_by_example)
     (SAMPLE(?work) AS ?example_use)
