@@ -11,8 +11,10 @@ WITH {
     ?work p:P859 ?sponsor_statement .
     ?sponsor_statement ps:P859 wd:{{ q }} .
     OPTIONAL { ?sponsor_statement prov:wasDerivedFrom/pr:P1683 ?quote_ . }
-    ?work wdt:P577 ?datetime .
-    BIND(xsd:date(?datetime) AS ?date)
+    OPTIONAL {
+      ?work wdt:P577 ?datetime .
+      BIND(xsd:date(?datetime) AS ?date)
+    }
     OPTIONAL { ?citing_work wdt:P2860 ?work }
   } 
   GROUP BY ?work
