@@ -879,6 +879,25 @@ def show_work_empty():
     return render_template('work_empty.html')
 
 
+@main.route('/works/' + qs_pattern)
+def show_works(qs):
+    """Return HTML rendering for specific authors.
+
+    Parameters
+    ----------
+    qs : str
+        Wikidata item identifiers separated by commas
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    qs = Q_PATTERN.findall(qs)
+    return render_template('works.html', qs=qs)
+
+
 @main.route('/about')
 def show_about():
     """Return rendered about page.
