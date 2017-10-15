@@ -7,6 +7,7 @@ from flask import (Blueprint, current_app, redirect, render_template, request,
 from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, wb_get_entities
+from ..rss import wb_get_author_latest_articles
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
@@ -196,6 +197,22 @@ def show_author(q):
         first_initial, last_name = '', ''
     return render_template('author.html', q=q, first_initial=first_initial,
                            last_name=last_name)
+
+
+@main.route('/author/rss/latest/' + q_pattern)
+def show_author_rss(q):
+    """Return author index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for author view.
+
+    """
+    responseBody = wb_get_author_latest_articles(q)
+    r = Response(response=responseBody, status=200, mimetype="application/rss+xml")
+    r.headers["Content-Type"] = "text/xml; charset=utf-8"
+    return r
 
 
 @main.route('/author/' + q_pattern + '/missing')
