@@ -199,7 +199,7 @@ def show_author(q):
                            last_name=last_name)
 
 
-@main.route('/author/rss/latest/' + q_pattern)
+@main.route('/author/' + q_pattern + '/latest/rss')
 def show_author_rss(q):
     """Return author index page.
 
