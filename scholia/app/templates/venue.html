@@ -95,6 +95,8 @@ WITH {
     ?citing_work wdt:P1433 ?citing_journal .
   }
   GROUP BY ?citing_journal
+  ORDER BY DESC(?count)
+  LIMIT 1000
 } AS %result
 WHERE {
   INCLUDE %result
@@ -111,7 +113,11 @@ WITH {
   SELECT (COUNT(?citing_work) AS ?count) ?work WHERE {
     ?work wdt:P1433 wd:{{ q }} .
     ?citing_work wdt:P2860 ?work.
-  } GROUP BY ?work
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?count)
+  LIMIT 1000  
+
 } AS %result
 WHERE {
   INCLUDE %result
