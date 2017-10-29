@@ -1,0 +1,56 @@
+{% extends "author_base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ missingCoauthorItemsSparql = `
+SELECT
+  ?count
+  ?coauthor
+
+  # Build URL to Magnus Manske's resolver tool
+  (CONCAT('https://tools.wmflabs.org/sourcemd/new_resolve_authors.php?doit=Look+for+author&name=', STR(?coauthor)) AS ?resolver_url)
+WITH {
+  SELECT (COUNT(?work) as ?count) ?coauthor WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P2093 ?coauthor .
+  }
+  GROUP BY ?coauthor
+} AS %result
+WHERE {
+  INCLUDE %result
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+`
+ 
+ $(document).ready(function() {
+     sparqlToDataTable(missingCoauthorItemsSparql, "#missing-coauthor-items");
+ });
+
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Author</h1>
+
+Missing information with respect to the author.
+
+
+<h2>Missing coauthor items</h2>
+
+The coauthors below are only represented as strings in Wikidata and not linked to
+Wikidata items.
+Follow the link to use Magnus Manske's resolver tool to try to resolve the authors.
+
+<table class="table table-hover" id="missing-coauthor-items"></table>
+
+
+{% endblock %}
