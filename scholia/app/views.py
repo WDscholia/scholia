@@ -198,6 +198,24 @@ def show_author(q):
                            last_name=last_name)
 
 
+@main.route('/author/' + q_pattern + '/missing')
+def show_author_missing(q):
+    """Return HTML rendering for missing information about specific author.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('author_missing.html', q=q)
+
+
 @main.route('/author/')
 def show_author_empty():
     """Return author index page.
