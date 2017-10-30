@@ -1,0 +1,58 @@
+{% extends "venue_base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ missingAuthorItemSparql = `
+SELECT
+  # Number of works with the author
+  ?count
+
+  # The author as a string, - rather than as an item
+  ?author
+
+  # Build URL to Magnus Manske's resolver tool
+  (CONCAT(
+      'https://tools.wmflabs.org/sourcemd/new_resolve_authors.php?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?author)) AS ?resolver_url)
+WITH {
+  SELECT (COUNT(?work) as ?count) ?author WHERE {
+	  ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P2093 ?author .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+}
+ORDER BY DESC(?count)
+`
+
+
+  $(document).ready(function() {
+      sparqlToDataTable(missingAuthorItemSparql, "#missing-author-item");
+  });
+</script>
+
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Venue</h1>
+
+<h2>Missing author item</h2>
+
+If there is any authors listed below,
+it means that author names are not resolved for some works published in the venue
+and linked to Wikidata items.
+Follow the link to Magnus Manske's resolver tool to resolve the names.
+
+<table class="table table-hover" id="missing-author-item"></table>
+
+
+{% endblock %}
+    
