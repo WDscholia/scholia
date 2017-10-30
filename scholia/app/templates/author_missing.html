@@ -7,11 +7,16 @@
 <script type="text/javascript">
  missingCoauthorItemsSparql = `
 SELECT
+  # Number of works with the coauthor
   ?count
+
+  # The coauthor as a string, - rather than as an item
   ?coauthor
 
   # Build URL to Magnus Manske's resolver tool
-  (CONCAT('https://tools.wmflabs.org/sourcemd/new_resolve_authors.php?doit=Look+for+author&name=', STR(?coauthor)) AS ?resolver_url)
+  (CONCAT(
+      'https://tools.wmflabs.org/sourcemd/new_resolve_authors.php?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?coauthor)) AS ?resolver_url)
 WITH {
   SELECT (COUNT(?work) as ?count) ?coauthor WHERE {
     ?work wdt:P50 wd:{{ q }} .
