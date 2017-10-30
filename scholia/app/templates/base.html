@@ -24,7 +24,7 @@
 <script type="text/javascript">
  var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
            '{{ q }}' + 
-           '&format=json&callback=?'
+           '&format=json&callback=?';
 
 	   $.getJSON(url, function (data) {
                var item = data.entities.{{ q }}; 
