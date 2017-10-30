@@ -1,0 +1,80 @@
+{% extends "work_base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ listOfWorksSparql = `
+SELECT ?work ?workLabel ?example_author ?example_authorLabel
+WITH {
+  SELECT ?work (SAMPLE(?author) AS ?example_author) WHERE {
+    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    OPTIONAL { ?work wdt:P50 ?author }
+  }
+  GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,nl,no,ru,sv,zh". }
+}
+`
+
+  otherWorksCitingAllTheWorksSparql = `
+SELECT ?date ?work ?workLabel
+WITH {
+  SELECT (MIN(?dates) AS ?date) ?work 
+  WHERE {
+    {% for q in qs %} ?work wdt:P2860 wd:{{ q }} . {% endfor %}
+    OPTIONAL {
+      ?work wdt:P577 ?datetimes .
+      BIND(xsd:date(?datetimes) AS ?dates)
+    }
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?date)
+  LIMIT 1000
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?date)
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(listOfWorksSparql, "#list-of-works");
+     sparqlToDataTable(otherWorksCitingAllTheWorksSparql,
+		       "#other-works-citing-all-the-works");
+ });
+
+
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1 id="h1">Works</h1>
+
+<div id="intro"></div>
+
+
+<table class="table table-hover" id="list-of-works"></table>
+
+
+<h2>Other works citings all the works</h2>
+
+<table class="table table-hover" id="other-works-citing-all-the-works"></table>
+
+
+<h2 id="Citations">Citations</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%3Fyear%20%3Fnumber_of_citations%20%3Fwork%20%3FworkLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fnumber_of_citations%29%20%3Fwork%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Fwork%20%7B%20%20wd%3A{% for q in qs %} wd:{{ q }} {% endfor %}%20%20%7D%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%0A%20%20%20%20%23%20Year%20of%20citation%20%0A%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear%20%3Fwork%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0A"></iframe>
+</div>
+
+
+{% endblock %}

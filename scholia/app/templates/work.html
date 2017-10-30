@@ -20,16 +20,25 @@ SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
 WITH {
   SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work 
   WHERE {
-    ?citing_work wdt:P2860 wd:{{ q }} .
+    # Find works that cite the queried work
+	  ?citing_work wdt:P2860 wd:{{ q }} .
+
     OPTIONAL {
       ?citing_work wdt:P577 ?datetime .
+      
+      # Simplify the datetime to one with day, month and year only
       BIND(xsd:date(?datetime) AS ?date)
     }
     OPTIONAL { ?citing_citing_work wdt:P2860 ?citing_work }
   }
   GROUP BY ?citing_work
+  
+  # Limit the number of results to avoid downloading too much data
+  ORDER BY DESC(?citations) DESC(?date) 
+  LIMIT 1000
 } AS %result
 WHERE {
+  # Label the result
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . } 
 } 
@@ -66,14 +75,19 @@ ORDER BY DESC(?citations) DESC(?date)
 # Statements referencing this article
 SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel 
 WITH {
+  SELECT ?statement WHERE { 
+	  ?statement prov:wasDerivedFrom/pr:P248 wd:{{ q }} .
+  }
+  LIMIT 2000
+} AS %statements 
+WITH {
   SELECT distinct ?item ?property ?value
   WHERE {
+    INCLUDE %statements
     ?item ?p ?statement .
     ?property wikibase:claim ?p . 
     ?statement ?a ?value .
     ?item ?b ?value . 
-    ?statement prov:wasDerivedFrom/
-         <http://www.wikidata.org/prop/reference/P248> wd:{{ q }} .
   }
 } AS %result
 WHERE {
@@ -135,12 +149,15 @@ Partial citation graph
 <h3>Citations per year</h3>
 
 <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%20%3Fyear%20%28COUNT%28DISTINCT%20%3Fciting_work%29%20AS%20%3Fcount%29%20%3Fkind%20%20WHERE%20%7B%0A%20%20BIND%28wd%3A{{ q }}%20AS%20%3Fwork%29%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%23%20BIND%28IF%28EXISTS%20%7B%20%3Fciting_work%20wdt%3AP50%20wd%3AQ20980928%20%7D%2C%20%22self-citations%22%2C%20%22citations%20from%20others%22%29%20AS%20%3Fkind%29%0A%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%0A%7D%0AGROUP%20BY%20%3Fyear%20%3Fkind%0AORDER%20BY%20DESC%28%3Fyear%29%20%20%20%20"></iframe>
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%20%3Fyear%20%28COUNT%28DISTINCT%20%3Fciting_work%29%20AS%20%3Fcount%29%20%3Fkind%20%20WHERE%20%7B%0A%20%20BIND%28wd%3A{{ q }}%20AS%20%3Fwork%29%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%0A%20%20%23%20Detect%20self-citations%0A%20%20OPTIONAL%20%7B%0A%20%20%20%20%23%20This%20is%20optional%20because%20of%20short%20author%20name%3A%20We%20do%20not%20detect%20self-citations%20P2093%2C%20-%20only%20P50.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fwork_author%20.%0A%20%20%20%20BIND%28IF%28EXISTS%20%7B%20%3Fciting_work%20wdt%3AP50%20%3Fwork_author%20%7D%2C%20%22detected%20self-citations%22%2C%20%22citations%20from%20others%20or%20non-detected%20self-citations%22%29%20AS%20%3Fkind%29%0A%20%20%7D%0A%0A%20%20%23%20Year%20of%20citation%0A%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%0A%7D%0AGROUP%20BY%20%3Fyear%20%3Fkind%0AORDER%20BY%20DESC%28%3Fyear%29%20%0A%20%20%20%20%0A"></iframe>
 </div>
 
 
 
 <h2>Supports the following statement(s)</h2>
+
+Statements in Wikidata supported by references to this work.
+Only a maximum of around 2000 statements are shown.
 
 <table class="table table-hover" id="statements"></table>
   

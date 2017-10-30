@@ -148,6 +148,7 @@ def orcid_to_qs(orcid):
     return [item['author']['value'][31:]
             for item in data['results']['bindings']]
 
+
 def viaf_to_qs(viaf):
     """Convert VIAF identifier to Wikidata ID.
 
@@ -230,6 +231,10 @@ def q_to_class(q):
             'Q8054',  # protein
     ]):
         class_ = 'protein'
+    elif set(classes).intersection([
+            'Q7187',  # gene
+    ]):
+        class_ = 'gene'
     elif set(classes).intersection([
             'Q3331189',  # edition
             'Q13442814',  # scientific article

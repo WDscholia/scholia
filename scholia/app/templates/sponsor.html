@@ -11,8 +11,10 @@ WITH {
     ?work p:P859 ?sponsor_statement .
     ?sponsor_statement ps:P859 wd:{{ q }} .
     OPTIONAL { ?sponsor_statement prov:wasDerivedFrom/pr:P1683 ?quote_ . }
-    ?work wdt:P577 ?datetime .
-    BIND(xsd:date(?datetime) AS ?date)
+    OPTIONAL {
+      ?work wdt:P577 ?datetime .
+      BIND(xsd:date(?datetime) AS ?date)
+    }
     OPTIONAL { ?citing_work wdt:P2860 ?work }
   } 
   GROUP BY ?work
@@ -26,9 +28,10 @@ LIMIT 1000
 `
 
   authorsOnSponsoredWorkSparql = `
-  SELECT ?publication_count ?author ?authorLabel
+SELECT ?publication_count ?author ?authorLabel ?example_work ?example_workLabel
 WITH {
-  SELECT ?author (count(?work) as ?publication_count) WHERE {
+  SELECT ?author (count(?work) as ?publication_count) (SAMPLE(?work) AS ?example_work)
+  WHERE {
     ?work wdt:P859 wd:{{ q }} .
     ?work wdt:P50 ?author .
   }
@@ -38,26 +41,27 @@ WHERE {
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" }
 } 
-ORDER BY DESC(?count)
+ORDER BY DESC(?publication_count)
   `
 
   coSponsorsSparql = `
-  # Co-founders
-SELECT ?count ?sponsor ?sponsorLabel
+# Co-founders including an example funded work
+SELECT ?count ?sponsor ?sponsorLabel ?example_work ?example_workLabel
 WITH {
-  SELECT (COUNT(?work) AS ?count) ?sponsor WHERE {
-    ?work wdt:P859 wd:{{ q }} .
+  SELECT (COUNT(?work) AS ?count) ?sponsor (SAMPLE(?work) AS ?example_work) WHERE {
+	  ?work wdt:P859 wd:{{ q }} .
     ?work wdt:P859 ?sponsor .
     FILTER (wd:{{ q }} != ?sponsor)
   }
   GROUP BY ?sponsor
 } AS %result
 WHERE {
+  # Label the result
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,fr,es,jp,it,nl,no,ru,sv,zh" }
 }
 ORDER BY DESC(?count)
-  `
+`
  
  $(document).ready(function() {
   sparqlToDataTable(recentlyPublishedSponsoredWorkSparql,
@@ -86,6 +90,13 @@ ORDER BY DESC(?count)
 <table class="table table-hover" id="authors-on-sponsored-work"></table>
 
 
+<h2 id="Topics of sponsored work">Topics of sponsored work</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP859%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%20%0A%20%20GROUP%20BY%20%3Ftopic%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%20200%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20%7D%0A%7D%20%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+</div>
+
+    
 
 <h2 id="Co-sponsors">Co-sponsors</h2>
 

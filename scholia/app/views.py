@@ -507,6 +507,37 @@ def show_protein_empty():
     return render_template('protein_empty.html')
 
 
+@main.route('/gene/' + q_pattern)
+def show_gene(q):
+    """Return HTML rendering for specific gene.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('gene.html', q=q)
+
+
+@main.route('/gene/')
+def show_gene_empty():
+    """Return gene index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for gene view.
+
+    """
+    return render_template('gene_empty.html')
+
+
 @main.route('/q-to-bibliography-templates')
 def show_q_to_bibliography_templates():
     """Return HTML page for wiki templates bibliographies.
@@ -864,6 +895,25 @@ def show_work_empty():
 
     """
     return render_template('work_empty.html')
+
+
+@main.route('/works/' + qs_pattern)
+def show_works(qs):
+    """Return HTML rendering for specific authors.
+
+    Parameters
+    ----------
+    qs : str
+        Wikidata item identifiers separated by commas
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    qs = Q_PATTERN.findall(qs)
+    return render_template('works.html', qs=qs)
 
 
 @main.route('/about')

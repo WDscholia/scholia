@@ -53,9 +53,10 @@ ORDER BY DESC(?count)
 
  topicsSparql = `
 #defaultView:Table
-SELECT ?count ?theme ?themeLabel 
+SELECT ?count ?theme ?themeLabel ?example_work ?example_workLabel
 WITH {
-  SELECT (COUNT(?work) AS ?count) ?theme WHERE {
+  SELECT (COUNT(?work) AS ?count) ?theme (SAMPLE(?work) AS ?example_work)
+  WHERE {
     ?work wdt:P50 wd:{{ q }} .
     ?work wdt:P921 ?theme .
   }
@@ -183,13 +184,27 @@ Missing co-authors? <a href="https://query.wikidata.org/#select%20%3Fauthorname%
 
 <h2>Topics</h2>
 
+
+<h3>Topic scores</h3>
+
+Topics based on a weighting between fields of work,
+topics of authored works and topics of citing works.  
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fscore%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28SUM%28%3Fscore_%29%20AS%20%3Fscore%29%0A%20%20%20%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP101%20%3Ftopic%20.%0A%20%20%20%20%20%20BIND%2820%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%283%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%281%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25results%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cjp%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fscore%29%0ALIMIT%20200"></iframe>
+</div>
+
+
+
+<h3>Topics of authored works</h3>
+
 <table class="table table-hover" id="topics"></table>
 
 
 <h2>Associated images</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%20distinct%20%3Fimage%20WHERE%20%7B%0A%20%20%7B%20wd%3A{{ q }}%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20wd%3A{{ q }}%20%3Fproperty%20%3Fitem%20.%0A%20%20%20%20%3Fitem%20wdt%3AP18%20%3Fimage%20.%20%0A%20%20%20%20filter%20%28%3Fitem%20%21%3D%20wd%3AQ5%29%0A%20%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%7B%20%3Fwork%20wdt%3AP921%20%5B%20wdt%3AP18%20%3Fimage%20%5D%20.%20%7D%20UNION%20%7B%20%3Fcoauthor%20wdt%3AP50%20%3Fwork%20.%20%3Fcoauthor%20wdt%3AP18%20%3Fimage%20%7D%0A%20%20%7D%0A%7D%20"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%20DISTINCT%20%3Fimage%20WHERE%20%7B%0A%20%20%7B%20wd%3A{{ q }}%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20%23%20Excluded%20%22different%20from%22%20property%20and%20take%20all%20other%20properties%0A%20%20%20%20wd%3A{{ q }}%20%21wdt%3AP1889%20%3Fitem%20.%0A%0A%20%20%20%20%3Fitem%20wdt%3AP18%20%3Fimage%20.%20%0A%20%20%20%20%0A%20%20%20%20%23%20All%20people%20are%20humans%20%0A%20%20%20%20FILTER%20%28%3Fitem%20%21%3D%20wd%3AQ5%29%0A%20%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%7B%20%3Fwork%20wdt%3AP921%20%5B%20wdt%3AP18%20%3Fimage%20%5D%20.%20%7D%20UNION%20%7B%20%3Fcoauthor%20wdt%3AP50%20%3Fwork%20.%20%3Fcoauthor%20wdt%3AP18%20%3Fimage%20%7D%0A%20%20%7D%0A%7D%20"></iframe></iframe>
 </div>
 
 

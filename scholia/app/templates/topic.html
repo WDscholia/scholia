@@ -53,18 +53,22 @@ ORDER BY DESC(?count)
 
  topicsSparql = `
 #defaultView:Table
-SELECT ?count ?topic ?topicLabel
+SELECT ?count ?topic ?topicLabel ?example_work ?example_workLabel
 WITH {
-  SELECT (count(?work) as ?count) ?topic WHERE {
-    { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
-    union { ?work wdt:P921/wdt:P361+ wd:{{ q }} . }
-    union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
+  SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
+    # Find works for the specific queried topic
+	  ?work wdt:P921/( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) wd:{{ q }} .
+    
+    # Find co-occuring topics
     ?work wdt:P921 ?topic .
-    filter (wd:{{ q }} != ?topic)
+    
+    # Avoid listing the queried topic
+      FILTER (wd:{{ q }} != ?topic)
   }
   GROUP BY ?topic
 } AS %result
 WHERE {
+  # Label the results
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
@@ -110,6 +114,33 @@ WHERE {
 ORDER BY DESC(?count)
   `
 
+  mostCitedAuthorsSparql = `
+SELECT ?number_of_citations ?author ?authorLabel ?cited_work_example ?cited_work_exampleLabel
+WITH {
+  # Find works about the topic
+  SELECT DISTINCT ?work WHERE {
+	  ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+  }
+} AS %works
+WITH {
+  # Find cited works
+  SELECT (COUNT(?work) AS ?number_of_citations) ?author (SAMPLE(?cited_work) AS ?cited_work_example)
+  WHERE {
+    INCLUDE %works
+    ?cited_work wdt:P50 ?author . 
+    ?work wdt:P2860 ?cited_work .
+  } 
+  GROUP BY ?author
+} AS %result
+WHERE {
+  # Label the results
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+} 
+ORDER BY DESC(?number_of_citations)
+LIMIT 200
+`
+
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql,
@@ -118,6 +149,7 @@ ORDER BY DESC(?count)
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(venuesSparql, "#venues");
      sparqlToDataTable(topCitedSparql, "#topCited");
+     sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
  });
 </script>
 
@@ -183,6 +215,9 @@ ORDER BY DESC(?count)
 
 <table class="table table-hover" id="topCited"></table>
 
+<h3 id="Most cited author from works on the topic">Most cited authors from works on the topic</h3>
+
+<table class="table table-hover" id="most-cited-authors"></table>
 
 {% endblock %}
     

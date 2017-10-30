@@ -1,0 +1,123 @@
+{% extends "gene_base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+  transcriptsSparql = `
+SELECT ?transcriptID ?reference ?referenceLabel
+WITH {
+  SELECT ?transcriptID ?reference
+  WHERE {
+      wd:{{ q }} wdt:P31 wd:Q7187;
+                 p:P704 ?transcriptid_statement .
+    ?transcriptid_statement ps:P704 ?transcriptID ;
+                            prov:wasDerivedFrom/pr:P248 ?reference .
+  }
+} AS %result 
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+ proteinsSparql = `
+SELECT ?protein ?proteinLabel
+WITH {
+  SELECT ?protein
+  WHERE {
+    wd:{{ q }} wdt:P31 wd:Q7187;
+         wdt:P688 ?protein .
+  }
+} AS %result 
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+ orthologsSparql = `
+SELECT ?ortholog ?orthologLabel ?taxon ?taxonLabel
+WITH {
+  SELECT ?ortholog ?taxon
+  WHERE {
+    wd:{{ q }} wdt:P31 wd:Q7187;
+         wdt:P684 ?ortholog .
+    ?ortholog wdt:P703 ?taxon .
+  }
+} AS %result 
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+ variantsSparql = `
+SELECT ?variant ?variantLabel ?types
+WITH {
+  SELECT ?variant ?type
+  WHERE {
+    ?variant wdt:P3433 wd:{{ q }}
+  }
+} AS %variants
+WITH {
+  SELECT ?variant (GROUP_CONCAT(?type_label; separator=" // ") AS ?types) WHERE {
+    INCLUDE %variants
+    OPTIONAL {
+      ?variant wdt:P279 ?variantType . 
+      ?variantType rdfs:label ?type_label .  FILTER (lang(?type_label) = 'en')
+    }
+  }
+  GROUP BY ?variant
+} AS %result 
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(transcriptsSparql, "#transcripts");
+     sparqlToDataTable(proteinsSparql, "#proteins");
+     sparqlToDataTable(orthologsSparql, "#orthologs");
+     sparqlToDataTable(variantsSparql, "#variants");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Gene</h1>
+
+<div id="intro"></div>
+
+<h2 id="Transcripts">Transcripts</h2>
+
+Transcripts encoded by this gene.
+
+<table class="table table-hover" id="transcripts"></table>
+
+<h2 id="Proteins">Proteins</h2>
+
+Proteins encoded by this gene.
+
+<table class="table table-hover" id="proteins"></table>
+
+<h2 id="Orthologs">Orthologs</h2>
+
+Orthologs encoded by this gene.
+
+<table class="table table-hover" id="orthologs"></table>
+
+<h2 id="Variants">Variants</h2>
+
+Variants encoded by this gene.
+
+<table class="table table-hover" id="variants"></table>
+
+
+{% endblock %}
+    
