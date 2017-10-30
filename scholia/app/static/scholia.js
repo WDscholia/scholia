@@ -27,8 +27,8 @@ function convertDataTableData(data, columns) {
 	    } else if (key.substr(-3) == 'url') {
 		// Convert URL to a link
 		convertedRow[key] = '<a href="' +
-		    data[i][key] + '">' + 
-		    data[i][key] + '</a>';
+		    encodeURIComponent(data[i][key]) + '">' + 
+		    $("<div>").text(data[i][key]).html() + '</a>';
 	    } else if (key == 'orcid') {
 		// Add link to ORCID website
 		convertedRow[key] = '<a href="https://orcid.org/' +
