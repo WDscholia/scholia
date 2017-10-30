@@ -33,9 +33,6 @@
       }
       $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 
-      // var dateString = item.claims.P577[0].mainsnak.datavalue.value.time;
-      // $( '#details' ).append( dateString.substring(1, 5) );
-      
       try {
 	  var doi = item.claims.P356[0].mainsnak.datavalue.value;
 	  $( '#details' ).append( 'DOI: <a href="https://dx.doi.org/' + doi + '">' + doi + '</a>. ');
