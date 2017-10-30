@@ -259,6 +259,7 @@ def q_to_class(q):
     elif set(classes).intersection([
             'Q3918',  # university
             'Q31855',  # research institute
+            'Q38723',  # higher education institution
             'Q875538',  # public university
             'Q902104',  # private university
             'Q2467461',  # university department
