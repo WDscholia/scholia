@@ -700,6 +700,24 @@ def show_venue(q):
     return render_template('venue.html', q=q)
 
 
+@main.route('/venue/' + q_pattern + '/missing')
+def show_venue_missing(q):
+    """Return HTML rendering for missing information about specific venue.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('venue_missing.html', q=q)
+
+
 @main.route('/venue/')
 def show_venue_empty():
     """Return rendered HTML index page for venue.
