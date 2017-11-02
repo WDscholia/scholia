@@ -16,12 +16,31 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,nl,no,ru,sv,zh". }
 }
 `
- 
+
+  listOfCommonAuthoredWorksSparql = `
+SELECT ?coauthor_count ?work ?workLabel ?authors
+WITH {
+  SELECT (COUNT(?author) AS ?coauthor_count) ?work (GROUP_CONCAT(?author_label; separator=" // ") AS ?authors) WHERE {
+    VALUES ?author { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    ?work wdt:P50 ?author .
+    OPTIONAL { ?author rdfs:label ?author_label . FILTER(LANG(?author_label) = 'en') }
+  }
+  GROUP BY ?work
+  HAVING(?coauthor_count > 1)
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?coauthor_count)
+`
+
  $(document).ready(function() {
      sparqlToDataTable(listOfAuthorsSparql, "#list-of-authors");
+     sparqlToDataTable(listOfCommonAuthoredWorksSparql, "#list-of-common-authored-works");
  });
 
 
@@ -39,6 +58,11 @@ WHERE {
 
 
 <table class="table table-hover" id="list-of-authors"></table>
+
+
+<h2>List of common authored works</h2>
+
+<table class="table table-hover" id="list-of-common-authored-works"></table>
 
 
 <h2>Number of citations per publication year</h2>
