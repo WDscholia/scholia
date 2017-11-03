@@ -364,7 +364,7 @@ def redirect_github(github):
 
     Parameters
     ----------
-    doi : str
+    github : str
         Github user identifier.
 
     """
@@ -381,7 +381,7 @@ def redirect_inchikey(inchikey):
 
     Parameters
     ----------
-    doi : str
+    inchikey : str
         InChIkey user identifier.
 
     """
