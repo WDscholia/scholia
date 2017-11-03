@@ -3,6 +3,7 @@
 Usage:
   scholia.query arxiv-to-q <arxiv>
   scholia.query cas-to-q <cas>
+  scholia.query doi-to-q <doi>
   scholia.query github-to-q <github>
   scholia.query inchikey-to-q <inchikey>
   scholia.query orcid-to-q <orcid>
@@ -17,6 +18,9 @@ Examples:
 
   $ python -m scholia.query github-to-q vrandezo
   Q18618629
+
+  $ python -m scholia.query doi-to-q 10.475/123_4
+  Q41533080
 
 """
 
@@ -86,6 +90,11 @@ def arxiv_to_qs(arxiv):
 
 def doi_to_qs(doi):
     """Convert DOI to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the DOI.
+
+    The DOI string is converted to uppercase before any
+    query is made. Uppercase DOIs are default in Wikidata.
 
     Parameters
     ----------
@@ -473,6 +482,11 @@ def main():
 
     elif arguments['cas-to-q']:
         qs = cas_to_qs(arguments['<cas>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['doi-to-q']:
+        qs = doi_to_qs(arguments['<doi>'])
         if len(qs) > 0:
             print(qs[0])
 
