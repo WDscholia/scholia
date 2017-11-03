@@ -152,6 +152,12 @@ def metadata_to_quickstatements(metadata):
 def string_to_arxiv(string):
     """Extract arxiv id from string.
 
+    The arXiv identifier part of `string` will be extracted, where the
+    identifier pattern should be in the format of a series of digits
+    followed by a period followed by a series of digits. Other formats
+    will not be matched. If multiple identifier patterns are in the input
+    string then only the first is returned.
+
     Parameters
     ----------
     string : str
@@ -161,16 +167,6 @@ def string_to_arxiv(string):
     -------
     arxiv : str or None
         String with arxiv ID.
-
-    Description
-    -----------
-    The arXiv identifier part of a string will be extracted, where the
-    identifier pattern should be in the format of a series of digits
-    followed by a period followed by a series of digits. Other formats
-    will not be matched.
-
-    If multiple identifier patterns are in the input string then only
-    the first is returned.
 
     Examples
     --------
