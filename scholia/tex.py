@@ -160,7 +160,7 @@ def guess_bibtex_entry_type(entity):
 def extract_dois_from_aux_string(string):
     r"""Extract DOIs from string.
 
-    Paramaters
+    Parameters
     ----------
     string : str
         Extract Wikidata identifiers from citations.
@@ -190,7 +190,7 @@ def extract_dois_from_aux_string(string):
 def extract_qs_from_aux_string(string):
     r"""Extract qs from string.
 
-    Paramaters
+    Parameters
     ----------
     string : str
         Extract Wikidata identifiers from citations.
