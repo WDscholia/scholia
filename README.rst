@@ -36,3 +36,6 @@ See file CONTRIBUTING.rst for technical details how to improve Scholia.
 .. _Wikimedia Foundation: https://wikimediafoundation.org
 .. _Wikimedia Tool Labs: https://tools.wmflabs.org/
 
+Reference
+---------
+- Finn Årup Nielsen, Daniel Mietchen, Egon Willighagen, "Scholia and scientometrics with Wikidata", Joint Proceedings of the 1st International Workshop on Scientometrics and 1st International Workshop on Enabling Decentralised Scholarly Communication, 2017. http://ceur-ws.org/Vol-1878/article-03.pdf
