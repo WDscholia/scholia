@@ -1,7 +1,7 @@
 """Test scholia query module."""
 
 
-from scholia.query import q_to_class
+from scholia.query import doi_to_qs, q_to_class
 
 
 def test_q_to_class_publisher():
@@ -20,3 +20,13 @@ def test_q_to_class_venue():
 
     # Proceedings
     assert 'venue' == q_to_class('Q27611219')
+
+
+def test_doi_to_qs():
+    """Test for DOI search on Wikidata.
+
+    This test requires Internet access to Wikidata Query Service.
+
+    """
+    dois = doi_to_qs('10.475/123_4')
+    assert dois == ['Q41533080']
