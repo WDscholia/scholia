@@ -235,7 +235,7 @@ def authors_to_bibtex_authors(authors):
 
     Parameters
     ----------
-    entity : dict
+    authors : dict
         Wikidata entity as hierarchical structure.
 
     Returns
