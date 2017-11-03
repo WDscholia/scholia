@@ -136,11 +136,18 @@ def entity_to_authors(entity, return_humanness=False):
     ----------
     entity : dict
         Dictionary with Wikidata item
+    return_humanness : bool
+        Toogle whether return argument should contain be a list of strings or a
+        list of tuples with both name and an indication of whether the author
+        is a human. Some authors are organizations and formatting of authors
+        may need to distinguish between humans and organizations.
 
     Returns
     -------
-    authors : list of str
-        Title as string.
+    authors : list of str or list of two-tuple
+        List with each element representing an author. Each element may either
+        be a string with the author name or a tuple with the author name and
+        a boolean indicating humanness of the author.
 
     """
     def statement_to_order(statement):
