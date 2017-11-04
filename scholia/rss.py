@@ -49,7 +49,7 @@ WITH {{
   SELECT
     (MIN(?dates) AS ?date) ?work
   WHERE {{
-    ?work wdt:P50 wd:{q} .
+    ?work wdt:P1433 wd:{q} .
     ?work wdt:P577 ?datetimes .
     BIND(xsd:date(?datetimes) AS ?dates)
   }}
@@ -69,7 +69,7 @@ WITH {{
   SELECT
     (MIN(?dates) AS ?date) ?work
   WHERE {{
-    ?work wdt:P50 wd:{q} .
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{q} .
     ?work wdt:P577 ?datetimes .
     BIND(xsd:date(?datetimes) AS ?dates)
   }}
