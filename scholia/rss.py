@@ -75,7 +75,7 @@ def wb_get_author_latest_articles(q):
     rssBody += ' <title>Scholia - Latest Articles by ' + q + '</title>\n'
     rssBody += ' <description>The author''s most recent articles</description>\n'
     rssBody += ' <link>https://tools.wmflabs.org/scholia/</link>\n'
-    rssBody += ' <atom:link href="https://tools.wmflabs.org/scholia/author/rss/latest/' + q + '" rel="self" type="application/rss+xml" />\n'
+    rssBody += ' <atom:link href="https://tools.wmflabs.org/scholia/author/' + q + '/latest/rss" rel="self" type="application/rss+xml" />\n'
 
     query = SPARQL_QUERY.format(q=q)
     url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
@@ -113,7 +113,7 @@ def wb_get_venue_latest_articles(q):
     rssBody += ' <title>Scholia - Latest Articles in ' + q + '</title>\n'
     rssBody += ' <description>The venue''s most recent articles</description>\n'
     rssBody += ' <link>https://tools.wmflabs.org/scholia/</link>\n'
-    rssBody += ' <atom:link href="https://tools.wmflabs.org/scholia/venue/' + q + 'latest/rss/" rel="self" type="application/rss+xml" />\n'
+    rssBody += ' <atom:link href="https://tools.wmflabs.org/scholia/venue/' + q + '/latest/rss" rel="self" type="application/rss+xml" />\n'
 
     query = VENUE_SPARQL_QUERY.format(q=q)
     url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
