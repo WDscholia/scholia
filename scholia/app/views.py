@@ -7,7 +7,8 @@ from flask import (Blueprint, current_app, redirect, render_template, request,
 from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, wb_get_entities
-from ..rss import wb_get_author_latest_articles
+from ..rss import (wb_get_author_latest_articles, wb_get_venue_latest_articles,
+                   wb_get_topic_latest_articles)
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
