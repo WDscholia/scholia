@@ -637,6 +637,27 @@ def show_topic(q):
     return render_template('topic.html', q=q)
 
 
+@main.route('/topic/' + q_pattern + '/latest/rss')
+def show_topic_rss(q):
+    """Return a RSS feed for specific topic.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        RSS feed.
+
+    """
+    responseBody = wb_get_topic_latest_articles(q)
+    r = Response(response=responseBody, status=200, mimetype="application/rss+xml")
+    r.headers["Content-Type"] = "text/xml; charset=utf-8"
+    return r
+
+
 @main.route('/topic/')
 def show_topic_empty():
     """Return rendered HTML index page for topic.
