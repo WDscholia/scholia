@@ -735,6 +735,27 @@ def show_venue_missing(q):
     return render_template('venue_missing.html', q=q)
 
 
+@main.route('/venue/' + q_pattern + '/latest/rss')
+def show_venue_rss(q):
+    """Return a RSS feed for specific venue.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        RSS feed.
+
+    """
+    responseBody = wb_get_venue_latest_articles(q)
+    r = Response(response=responseBody, status=200, mimetype="application/rss+xml")
+    r.headers["Content-Type"] = "text/xml; charset=utf-8"
+    return r
+
+
 @main.route('/venue/')
 def show_venue_empty():
     """Return rendered HTML index page for venue.
