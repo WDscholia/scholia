@@ -5,34 +5,33 @@
 
 <script type="text/javascript">
 
- variantsSparql = `
-SELECT ?variant ?variantLabel ?types
-WITH {
-  SELECT ?variant ?type
-  WHERE {
-    ?variant wdt:P3433 wd:{{ q }}
+ infoSparql = `
+SELECT ?parent ?parentLabel (GROUP_CONCAT(DISTINCT ?rank_label_; separator=", ") AS ?rankList) WHERE {
+  wd:{{ q }} wdt:P171+ ?parent .
+  ?parent wdt:P105 ?rank .
+  OPTIONAL {
+    ?rank rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
   }
-} AS %variants
-WITH {
-  SELECT ?variant (GROUP_CONCAT(?type_label; separator=" // ") AS ?types) WHERE {
-    INCLUDE %variants
-    OPTIONAL {
-      ?variant wdt:P279 ?variantType . 
-      ?variantType rdfs:label ?type_label .  FILTER (lang(?type_label) = 'en')
-    }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?parent ?parentLabel
+`
+
+ genomeSparql = `
+SELECT ?gene ?geneLabel ?chromosome ?chromosomeLabel WITH {
+  SELECT ?gene ?chromosome WHERE {
+    ?gene wdt:P31 wd:Q7187 ;
+          wdt:P703 wd:{{ q }} ;
+          wdt:P1057 ?chromosome .
   }
-  GROUP BY ?variant
-} AS %result 
-WHERE {
-  INCLUDE %result
+} AS %results {
+  INCLUDE %results
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
 
  $(document).ready(function() {
-     sparqlToDataTable(transcriptsSparql, "#parents");
-     sparqlToDataTable(transcriptsSparql, "#children");
-     sparqlToDataTable(transcriptsSparql, "#genome");
+     sparqlToDataTable(infoSparql, "#parents");
+     sparqlToDataTable(genomeSparql, "#genome");
  });
 </script>
 
@@ -41,17 +40,13 @@ WHERE {
 
 
 {% block page_content %}
-<h1 id="h1">Gene</h1>
+<h1 id="h1">Taxon</h1>
 
 <div id="intro"></div>
 
 <h2 id="Parent Taxons">Parent Taxons</h2>
 
 <table class="table table-hover" id="parents"></table>
-
-<h2 id="Child Taxons">Child Taxons</h2>
-
-<table class="table table-hover" id="children"></table>
 
 <h2 id="Genome">Genome</h2>
 
