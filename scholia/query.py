@@ -332,7 +332,7 @@ def q_to_class(q):
             ]):
         class_ = 'pathway'
     elif set(classes).intersection([
-            'XXX',  # biological pathway
+            'Q16521',  # taxon
             ]):
         class_ = 'taxon'
     elif set(classes).intersection([
