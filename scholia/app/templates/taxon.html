@@ -29,9 +29,22 @@ SELECT ?gene ?geneLabel ?chromosome ?chromosomeLabel WITH {
 }
 `
 
+ metabolomeSparql = `
+SELECT ?metabolite ?metaboliteLabel WITH {
+  SELECT ?metabolite WHERE {
+    ?metabolite wdt:P31|wdt:P279/wdt:P31 wd:Q11173 ;
+          wdt:P703 wd:{{ q }} .
+  }
+} AS %results {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
  $(document).ready(function() {
      sparqlToDataTable(infoSparql, "#parents");
      sparqlToDataTable(genomeSparql, "#genome");
+     sparqlToDataTable(metabolomeSparql, "#metabolome");
  });
 </script>
 
@@ -48,10 +61,15 @@ SELECT ?gene ?geneLabel ?chromosome ?chromosomeLabel WITH {
 
 <table class="table table-hover" id="parents"></table>
 
+
 <h2 id="Genome">Genome</h2>
 
 <table class="table table-hover" id="genome"></table>
 
+
+<h2 id="Metabolome">Metabolome</h2>
+
+<table class="table table-hover" id="metabolome"></table>
 
 
 {% endblock %}
