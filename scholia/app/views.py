@@ -200,7 +200,7 @@ def show_author(q):
                            last_name=last_name)
 
 
-@main.route('/author/' + q_pattern + '/latest/rss')
+@main.route('/author/' + q_pattern + '/latest-articles/rss')
 def show_author_rss(q):
     """Return author index page.
 
@@ -638,7 +638,7 @@ def show_topic(q):
     return render_template('topic.html', q=q)
 
 
-@main.route('/topic/' + q_pattern + '/latest/rss')
+@main.route('/topic/' + q_pattern + '/latest-articles/rss')
 def show_topic_rss(q):
     """Return a RSS feed for specific topic.
 
@@ -757,7 +757,7 @@ def show_venue_missing(q):
     return render_template('venue_missing.html', q=q)
 
 
-@main.route('/venue/' + q_pattern + '/latest/rss')
+@main.route('/venue/' + q_pattern + '/latest-articles/rss')
 def show_venue_rss(q):
     """Return a RSS feed for specific venue.
 
