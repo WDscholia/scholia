@@ -37,6 +37,8 @@ Getting started
 
 On Debian 8/9 you need to install the packages python3, python3-pip, and python3-flask and use pip3:
 
+   .. code:: shell
+
        $ apt-get install python3 python3-pip and python3-flask
        $ pip3 install -r requirements.txt
 
