@@ -271,6 +271,7 @@ def q_to_class(q):
             'Q38723',  # higher education institution
             'Q875538',  # public university
             'Q902104',  # private university
+            'Q1371037',  # technical university
             'Q2467461',  # university department
             'Q3354859',  # collegiate university
             'Q4358176',  # council
