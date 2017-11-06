@@ -35,6 +35,11 @@ Getting started
        $ pip install -r requirements.txt   # either global
        $ pip install -r requirements.txt   # or locally
 
+On Debian 8/9 you need to install the packages python3, python3-pip, and python3-flask and use pip3:
+
+       $ apt-get install python3 python3-pip and python3-flask
+       $ pip3 install -r requirements.txt
+
 3. Run Scholia functionality as script, e.g.:
 
    .. code:: shell
