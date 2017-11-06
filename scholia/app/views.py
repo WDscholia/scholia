@@ -7,6 +7,8 @@ from flask import (Blueprint, current_app, redirect, render_template, request,
 from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, wb_get_entities
+from ..rss import (wb_get_author_latest_articles, wb_get_venue_latest_articles,
+                   wb_get_topic_latest_articles)
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
@@ -196,6 +198,22 @@ def show_author(q):
         first_initial, last_name = '', ''
     return render_template('author.html', q=q, first_initial=first_initial,
                            last_name=last_name)
+
+
+@main.route('/author/' + q_pattern + '/latest-articles/rss')
+def show_author_rss(q):
+    """Return author index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for author view.
+
+    """
+    responseBody = wb_get_author_latest_articles(q)
+    r = Response(response=responseBody, status=200, mimetype="application/rss+xml")
+    r.headers["Content-Type"] = "text/xml; charset=utf-8"
+    return r
 
 
 @main.route('/author/' + q_pattern + '/missing')
@@ -620,6 +638,27 @@ def show_topic(q):
     return render_template('topic.html', q=q)
 
 
+@main.route('/topic/' + q_pattern + '/latest-articles/rss')
+def show_topic_rss(q):
+    """Return a RSS feed for specific topic.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        RSS feed.
+
+    """
+    responseBody = wb_get_topic_latest_articles(q)
+    r = Response(response=responseBody, status=200, mimetype="application/rss+xml")
+    r.headers["Content-Type"] = "text/xml; charset=utf-8"
+    return r
+
+
 @main.route('/topic/')
 def show_topic_empty():
     """Return rendered HTML index page for topic.
@@ -716,6 +755,27 @@ def show_venue_missing(q):
 
     """
     return render_template('venue_missing.html', q=q)
+
+
+@main.route('/venue/' + q_pattern + '/latest-articles/rss')
+def show_venue_rss(q):
+    """Return a RSS feed for specific venue.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        RSS feed.
+
+    """
+    responseBody = wb_get_venue_latest_articles(q)
+    r = Response(response=responseBody, status=200, mimetype="application/rss+xml")
+    r.headers["Content-Type"] = "text/xml; charset=utf-8"
+    return r
 
 
 @main.route('/venue/')
