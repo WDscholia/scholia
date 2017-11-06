@@ -35,7 +35,7 @@ Getting started
        $ pip install -r requirements.txt   # either global
        $ pip install -r requirements.txt   # or locally
 
-On Debian 8/9 you need to install the packages python3, python3-pip, and python3-flask and use pip3:
+   On Debian 8/9 you need to install the packages python3, python3-pip, and python3-flask and use pip3:
 
    .. code:: shell
 
@@ -61,6 +61,7 @@ Testing
 Rudimentary testing and code style checking are implemented via `tox`.
 Before committing please run the following code in the main directory:
 
-   .. code:: shell
-   
-       tox
+.. code:: shell
+
+    tox
+
