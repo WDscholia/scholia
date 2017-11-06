@@ -4,6 +4,13 @@
 from scholia.query import doi_to_qs, q_to_class
 
 
+
+def test_q_to_class_organization():
+    """Test for organization in class detection."""
+    # Technical university
+    assert 'organization' == q_to_class('Q1269766')
+
+
 def test_q_to_class_publisher():
     """Test for publisher in class detection."""
     # University publisher
