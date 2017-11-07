@@ -679,6 +679,25 @@ def show_topic_empty():
     return render_template('topic_empty.html')
 
 
+@main.route('/topics/' + qs_pattern)
+def show_topics(qs):
+    """Return HTML rendering for specific topics.
+
+    Parameters
+    ----------
+    qs : str
+        Wikidata item identifiers.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    qs = Q_PATTERN.findall(qs)
+    return render_template('topics.html', qs=qs)
+
+
 @main.route('/chemical/' + q_pattern)
 def show_chemical(q):
     """Return html render page for specific chemical.
