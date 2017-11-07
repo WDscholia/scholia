@@ -16,36 +16,73 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
 }
 `
 
-  otherWorksCitingAllTheWorksSparql = `
-SELECT ?date ?work ?workLabel
+  authorsSparql = `
+SELECT
+  ?count
+  ?author ?authorLabel
+  ?example_work ?example_workLabel
 WITH {
-  SELECT (MIN(?dates) AS ?date) ?work 
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?author
+    (SAMPLE(?work) AS ?example_work)
   WHERE {
-    {% for q in qs %} ?work wdt:P2860 wd:{{ q }} . {% endfor %}
-    OPTIONAL {
-      ?work wdt:P577 ?datetimes .
-      BIND(xsd:date(?datetimes) AS ?dates)
-    }
+    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    ?work wdt:P50 ?author .
   }
-  GROUP BY ?work
-  ORDER BY DESC(?date)
-  LIMIT 1000
+  GROUP BY ?author
+  ORDER BY ?count  
+  LIMIT 200
 } AS %results
 WHERE {
   INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,nl,no,ru,sv,zh". }
-}
-ORDER BY DESC(?date)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
+  }
+ORDER BY DESC(?count)
+`
+
+
+  citingWorksSparql = `
+SELECT
+  ?count
+  (MIN(?dates) AS ?date)
+  ?citing_work ?citing_workLabel
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?citing_work 
+  WHERE {
+    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    ?citing_work wdt:P2860 ?work .
+  }
+  GROUP BY ?citing_work
+  ORDER BY ?count  
+  LIMIT 200
+} AS %results
+WHERE {
+  INCLUDE %results
+  OPTIONAL {
+    ?citing_work wdt:P577 ?datetimes .
+    BIND(xsd:date(?datetimes) AS ?dates)
+  }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
+  }
+GROUP BY ?count ?citing_work ?citing_workLabel
+ORDER BY DESC(?count) DESC(?date)
 `
 
  $(document).ready(function() {
      sparqlToDataTable(listOfWorksSparql, "#list-of-works");
-     sparqlToDataTable(otherWorksCitingAllTheWorksSparql,
-		       "#other-works-citing-all-the-works");
+     sparqlToDataTable(authorsSparql, "#authors");
+     sparqlToDataTable(citingWorksSparql,
+		       "#citing-works");
  });
 
 
@@ -65,12 +102,26 @@ ORDER BY DESC(?date)
 <table class="table table-hover" id="list-of-works"></table>
 
 
-<h2>Other works citings all the works</h2>
+<h2>Authors</h2>
 
-<table class="table table-hover" id="other-works-citing-all-the-works"></table>
+<table class="table table-hover" id="authors"></table>
+
+
+<h2>Topics</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%0A%20%20%3Fcount%0A%20%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%0A%20%20%20%20%3Ftopic%20%0A%20%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Fwork%20%7B%20%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%20%7D%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%20%20ORDER%20BY%20%3Fcount%20%20%0A%20%20LIMIT%20200%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%20%20%7D%0AORDER%20BY%20DESC%28%3Fcount%29"></iframe>
+</div>
 
 
 <h2 id="Citations">Citations</h2>
+
+<h3>Citing works</h3>
+
+<table class="table table-hover" id="citing-works"></table>
+
+
+<h3>Citations per year</h3>
 
 <div class="embed-responsive embed-responsive-4by3">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%3Fyear%20%3Fnumber_of_citations%20%3Fwork%20%3FworkLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fnumber_of_citations%29%20%3Fwork%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Fwork%20%7B%20%20wd%3A{% for q in qs %} wd:{{ q }} {% endfor %}%20%20%7D%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%0A%20%20%20%20%23%20Year%20of%20citation%20%0A%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear%20%3Fwork%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0A"></iframe>
