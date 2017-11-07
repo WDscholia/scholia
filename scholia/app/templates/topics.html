@@ -1,0 +1,84 @@
+{% extends "topic_base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    listOfTopicsSparql = `
+SELECT ?topic ?topicLabel ?example_work ?example_workLabel
+WITH {
+  SELECT ?topic (SAMPLE(?work) AS ?example_work) WHERE {
+    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    OPTIONAL { ?work wdt:P921 ?topic }
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,nl,no,ru,sv,zh". }
+}
+  `;
+
+  listOfWorksSparql = `
+SELECT
+  ?count 
+  (MIN(?publication_date_) AS ?publication_date)
+  ?work ?workLabel
+  ?topics
+WITH {
+  SELECT (COUNT(?topic) AS ?count) ?work
+    (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics)
+  WHERE {
+    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    
+    # A broad query including "(wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )" seems to take
+    # long time and time out.
+    ?work wdt:P921 ?topic  .
+    ?topic rdfs:label ?topic_label .
+    FILTER(LANG(?topic_label) = 'en')
+  }
+  GROUP BY ?work ?topics
+  HAVING(?count > 1)
+  ORDER BY DESC(?count)
+  LIMIT 200
+} AS %results
+WHERE {
+  INCLUDE %results
+  OPTIONAL {
+    ?work wdt:P577 ?publication_datetime .
+    BIND(xsd:date(?publication_datetime) AS ?publication_date_)
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+GROUP BY ?count ?work ?workLabel ?topics
+ORDER BY DESC(?count) DESC(?publication_date)
+  `;
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(listOfTopicsSparql, "#list-of-topics");
+     sparqlToDataTable(listOfWorksSparql, "#list-of-works");
+ });
+
+
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1 id="h1">Topics</h1>
+
+<div id="intro"></div>
+
+<table class="table table-hover" id="list-of-topics"></table>
+
+<h2>List of works</h2>
+
+<table class="table table-hover" id="list-of-works"></table>
+
+
+{% endblock %}
