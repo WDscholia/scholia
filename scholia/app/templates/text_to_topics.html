@@ -1,0 +1,65 @@
+{% extends "tools_base.html" %}
+
+{% block navbar %}
+<div class="navbar navbar-static-top">
+    <ul class="nav nav-pills">
+	<li role="presentation"><a href="./">Scholia</a></li>
+	<li role="presentation"><a href="./author/">Author</a></li>
+	<li role="presentation"><a href="./work/">Work</a></li>
+	<li role="presentation"><a href="./organization/">Organization</a></li>
+	<li role="presentation"><a href="./venue/">Venue</a></li>
+	<li role="presentation"><a href="./series/">Series</a></li>
+	<li role="presentation"><a href="./publisher/">Publisher</a></li>
+	<li role="presentation"><a href="./sponsor/">Sponsor</a></li>
+	<li role="presentation"><a href="./award/">Award</a></li>
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-link dropdown-toggle" 
+			type="button" data-toggle="dropdown">Topic
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		    <li role="presentation"><a href="./topic/">General</a></li>
+		    <li role="presentation"><a href="./disease/">Disease</a></li>
+		    <li role="presentation"><a href="./protein/">Protein</a></li>
+		</ul>
+	    </div>
+	</li>
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-primary dropdown-toggle" 
+			type="button" data-toggle="dropdown">Tools
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		    <li role="presentation"><a href="./arxiv-to-quickstatements">Arxiv to Quickstatements</a></li>
+		    <li role="presentation"><a href="./q-to-bibliography-templates">Q to Bibliography templates</a></li>
+		    <li role="presentation" class="active"><a href="{{ url_for('app.show_text_to_topics') }}">Text to topics</a></li>
+		</ul>
+	    </div>
+	</li>
+
+	<li role="presentation"><a href="./about">About</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h2>Text</h2>
+
+Copy and paste an abstract to the text area and press submit to extract Wikidata labels
+and query.
+
+<form action="" id="form" method="POST" class="form-horizontal">
+  <div class="form-group">
+    <textarea rows=10 class="form-control" style="min-width: 100%" id="text" name="text">
+    </textarea>
+  </div>
+  <div class="form-group">
+    <button class="btn btn-primary" type="submit">Submit</button>
+  </div>
+</form>
+    
+
+{% endblock %}
