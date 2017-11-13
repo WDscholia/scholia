@@ -14,6 +14,7 @@ from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
                      inchikey_to_qs, orcid_to_qs, viaf_to_qs,
                      q_to_class, random_author, twitter_to_qs)
+from ..text import text_to_topic_qs
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -624,6 +625,36 @@ def show_software_empty():
 
     """
     return render_template('software_empty.html')
+
+
+@main.route('/text-to-topics', methods=['POST', 'GET'])
+def show_text_to_topics():
+    """Return HTML page for text-to-topics query.
+
+    Return HTML page with form for text-to-topics query or if the text field is
+    set, extract Wikidata identifiers based on label matching and redirect to
+    the topics page.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    if request.method == 'GET':
+        text = request.args.get('text')
+    elif request.method == 'POST':
+        text = request.form.get('text')
+    else:
+        assert False
+
+    if not text:
+        return render_template('text_to_topics.html')
+
+    qs_list = text_to_topic_qs(text)
+    qs = ",".join(set(qs_list))
+
+    return redirect(url_for('app.show_topics', qs=qs), code=302)
 
 
 @main.route('/topic/' + q_pattern)
