@@ -36,7 +36,7 @@ WITH {
     ?work wdt:P50 ?author .
   }
   GROUP BY ?author
-  ORDER BY ?count  
+  ORDER BY DESC(?count)
   LIMIT 200
 } AS %results
 WHERE {
@@ -62,7 +62,7 @@ WITH {
     ?citing_work wdt:P2860 ?work .
   }
   GROUP BY ?citing_work
-  ORDER BY ?count  
+  ORDER BY DESC(?count)
   LIMIT 200
 } AS %results
 WHERE {
