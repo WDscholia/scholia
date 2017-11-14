@@ -56,9 +56,40 @@ ORDER BY DESC(?count) DESC(?publication_date)
   `;
 
 
+  authorsSparql = `
+SELECT
+  ?score
+  ?author ?authorLabel
+  ?example_work ?example_workLabel
+WITH {
+  SELECT (COUNT(?topic) AS ?score) ?author (SAMPLE(?work_) AS ?example_work)
+    WHERE {
+    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    
+    # A broad query including "(wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )" seems to take
+    # long time and time out.
+    ?work wdt:P921 ?topic  .
+    ?work wdt:P2860 ?cited_work .
+    { ?cited_work wdt:P50 ?author . BIND(?cited_work AS ?work_) }
+    UNION
+    { ?work wdt:P50 ?author . BIND(?work AS ?work_) }
+  }
+  GROUP BY ?author
+  ORDER BY DESC(?score)
+  LIMIT 200
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+`
+
+
  $(document).ready(function() {
      sparqlToDataTable(listOfTopicsSparql, "#list-of-topics");
      sparqlToDataTable(listOfWorksSparql, "#list-of-works");
+     sparqlToDataTable(authorsSparql, "#authors");
  });
 
 
@@ -79,6 +110,12 @@ ORDER BY DESC(?count) DESC(?publication_date)
 <h2>List of works</h2>
 
 <table class="table table-hover" id="list-of-works"></table>
+
+
+<h2>Authors</h2>
+
+<table class="table table-hover" id="authors"></table>
+
 
 
 {% endblock %}
