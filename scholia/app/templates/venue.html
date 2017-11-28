@@ -228,7 +228,7 @@ WHERE {
 <h3 id="Author images">Author images</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0Aselect%20%28sample%28%3Fimage%29%20as%20%3Fanimage%29%20%3Fauthor%20%3FauthorLabel%20%3Fcount%20where%20%7B%0A%20%20%7B%0A%20%20%20%20select%20%3Fauthor%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%7D%20group%20by%20%3Fauthor%0A%20%20%7D%0A%20%20%3Fauthor%20wdt%3AP18%20%3Fimage%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Cfr%2Czh%2Cjp%2Ces%22%20.%20%7D%20%0A%7D%0Agroup%20by%20%3Fauthor%20%3FauthorLabel%20%3Fcount%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2050"></iframe>
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%20%28SAMPLE%28%3Fimage_%29%20AS%20%3Fimage%29%20%3Fauthor%20%3FauthorLabel%20%3Fcount%0AWITH%20%7B%0A%20%20SELECT%20%3Fauthor%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%3B%0A%20%20%20%20%20%20%20%20%20%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25authors%0AWHERE%20%7B%0A%20%20INCLUDE%20%25authors%0A%20%20%3Fauthor%20wdt%3AP18%20%3Fimage_%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl.no%2Cru%2Csv%2Czh%22%20.%20%7D%20%0A%7D%0AGROUP%20BY%20%3Fauthor%20%3FauthorLabel%20%3Fcount%0AORDER%20BY%20DESC%28%3Fcount%29%0ALIMIT%2050%20%20"></iframe>
 </div>
 
 
