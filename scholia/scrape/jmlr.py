@@ -1,8 +1,8 @@
 """Scraper for Journal of Machine Learning Research.
 
 Usage:
-  scholia.scrape.jlmr scrape
-  scholia.scrape.jlmr load-and-print <file>
+  scholia.scrape.jmlr scrape
+  scholia.scrape.jmlr load-and-print <file>
 
 """
 
@@ -21,6 +21,7 @@ class Jmrl(object):
     """Scraper for Journal of Machine Learning Research."""
 
     def __init__(self):
+        """Setup entries."""
         self.entries = []
 
     def load(self, filename):
@@ -35,6 +36,19 @@ class Jmrl(object):
         self.entries = json.load(open(filename))
 
     def scrape_paper_from_url(self, url):
+        """Scrape JMLR paper based on URL.
+
+        Parameters
+        ----------
+        url : str
+            URL to JMLR paper.
+
+        Returns
+        -------
+        entry : dict
+            Scraped paper represented as a dict.
+
+        """
         entry = {'homepage': url}
         entry['volume'] = url.split('/')[4][1:]
         response = requests.get(url)
@@ -54,6 +68,14 @@ class Jmrl(object):
         return entry
 
     def scrape_papers(self):
+        """Scrape and return papers.
+
+        Returns
+        -------
+        entries : list of dict
+            Papers represented in a list of dictionaries.
+
+        """
         entries = []
         for volume in range(1, 2):
             url = 'http://jmlr.org/papers/v{}'.format(volume)
@@ -70,6 +92,7 @@ class Jmrl(object):
 
 
 def main():
+    """Handle command-line interface."""
     jmlr = Jmrl()
 
     arguments = docopt(__doc__)
