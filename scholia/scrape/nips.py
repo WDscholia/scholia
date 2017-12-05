@@ -38,7 +38,7 @@ YEAR_TO_Q = {
 
 
 def escape_string(string):
-    """Escape string.
+    r"""Escape string.
 
     Parameters
     ----------
@@ -54,9 +54,10 @@ def escape_string(string):
     --------
     >>> string = 'String with " in it'
     >>> escape_string(string)
+    'String with \\" in it'
 
     """
-    return string.replace(r'\\', r'\\\\').replace('"', r'\"')
+    return string.replace('\\', '\\\\').replace('"', '\\"')
 
 
 def paper_to_q(paper):
