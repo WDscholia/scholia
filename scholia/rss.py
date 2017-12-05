@@ -1,4 +1,4 @@
-"""rss
+"""rss.
 
 Usage:
   scholia.rss author-latest-works <q>
