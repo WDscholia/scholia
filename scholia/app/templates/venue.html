@@ -78,38 +78,55 @@ ORDER BY DESC(?count)
 LIMIT 50
  `
 
- citedVenuesSparql = `
- # Cited venues from specific journal
- SELECT ?count ?cited_journal ?cited_journalLabel
- WITH {
-     SELECT (COUNT(?cited_work) AS ?count) ?cited_journal WHERE {
+  citedVenuesSparql = `
+# Cited venues from specific journal
+SELECT
+  ?count
+  ?short_name
+  ?cited_journal ?cited_journalLabel
+WITH {
+  SELECT
+    (COUNT(?cited_work) AS ?count)
+    ?cited_journal
+    (SAMPLE(?short_name_) AS ?short_name)
+  WHERE {
     ?work wdt:P1433 wd:{{ q }} .
-	?work wdt:P2860 ?cited_work .
-	?cited_work wdt:P1433 ?cited_journal . 
-					OPTIONAL {
+    ?work wdt:P2860 ?cited_work .
+    ?cited_work wdt:P1433 ?cited_journal . 
+    OPTIONAL {
       ?work wdt:P577 ?publication_datetime .
-				     BIND(xsd:date(?publication_datetime) AS ?publication_date)
-					}
-     }
-     GROUP BY ?cited_journal
- } AS %result
- WHERE {
-     INCLUDE %result
-     SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da" . } 
- }
- ORDER BY DESC(?count)
- LIMIT 200
- `
+      BIND(xsd:date(?publication_datetime) AS ?publication_date)
+    }
+    OPTIONAL { ?cited_journal wdt:P1813 ?short_name_ . }
+  }
+  GROUP BY ?cited_journal
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+LIMIT 200
+`
 
  citingVenuesSparql = `
 #defaultView:Table
 # Venues citing articles from this specific journal
-SELECT ?count ?citing_journal ?citing_journalLabel 
+SELECT
+  ?count
+  ?short_name
+  ?citing_journal ?citing_journalLabel 
 WITH {
-  SELECT (COUNT(?citing_work) as ?count) ?citing_journal WHERE {
+  SELECT
+    (COUNT(?citing_work) as ?count)
+    ?citing_journal
+    (SAMPLE(?short_name_) AS ?short_name)
+  WHERE {
     ?work wdt:P1433 wd:{{ q }} .
     ?citing_work wdt:P2860 ?work .
     ?citing_work wdt:P1433 ?citing_journal .
+    OPTIONAL { ?citing_journal wdt:P1813 ?short_name_ . }
   }
   GROUP BY ?citing_journal
   ORDER BY DESC(?count)
@@ -117,7 +134,8 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?count)
   `
@@ -125,33 +143,52 @@ ORDER BY DESC(?count)
  mostCitedWorksSparql = `
 #defaultView:Table
 # Most cited works published in venue
-SELECT ?count ?work ?workLabel
+SELECT
+  ?count
+  ?work ?workLabel
+  ?example_citing_work ?example_citing_workLabel
 WITH {
-  SELECT (COUNT(?citing_work) AS ?count) ?work WHERE {
+  # Count citations
+  SELECT
+    (COUNT(?citing_work) AS ?count)
+    ?work
+    (SAMPLE(?citing_work) AS ?example_citing_work)
+  WHERE {
     ?work wdt:P1433 wd:{{ q }} .
     ?citing_work wdt:P2860 ?work.
   }
   GROUP BY ?work
   ORDER BY DESC(?count)
   LIMIT 1000  
-
 } AS %result
 WHERE {
+  # Label results
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?count)
   `
 
  mostCitedAuthorsSparql = `
-  # Most cited authors published in venue
-SELECT ?count ?author ?authorLabel ?orcid
+# Most cited authors published in venue
+SELECT
+  ?count
+  ?author ?authorLabel
+  ?orcid
+  ?example_cited_work ?example_cited_workLabel
+  ?example_citing_work ?example_citing_workLabel
 WITH {
-  # Count the number of works author by the author publishing in the journal
-  SELECT ?author (COUNT(?work) AS ?count) WHERE {
-    ?work wdt:P1433 wd:{{ q }} .
-    ?citing_work wdt:P2860 ?work .
-    ?work wdt:P50 ?author .
+  # Count the number of citations
+  SELECT
+    ?author
+    (COUNT(?cited_work) AS ?count)
+    (SAMPLE(?cited_work) AS ?example_cited_work)
+    (SAMPLE(?citing_work) AS ?example_citing_work)
+  WHERE {
+    ?cited_work wdt:P1433 wd:{{ q }} .
+    ?citing_work wdt:P2860 ?cited_work .
+    ?cited_work wdt:P50 ?author .
   }
   GROUP BY ?author
 } AS %result
@@ -165,7 +202,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?count)
-LIMIT 50
+LIMIT 100
   `
 
 
