@@ -7,24 +7,37 @@
 <script type="text/javascript">
  recentlyPublishedWorksSparql = `
 # Recent works published in venue
-SELECT ?publication_date ?work ?workLabel where {
+SELECT
+  (MIN(?publication_date_) AS ?publication_date)
+  ?work ?workLabel
+  (GROUP_CONCAT(?author_label; separator=" // ") AS ?authors)
+WHERE {
   ?work wdt:P1433 wd:{{ q }} .
   OPTIONAL {
     ?work wdt:P577 ?publication_datetime . 
-    BIND(xsd:date(?publication_datetime) AS ?publication_date)
+    BIND(xsd:date(?publication_datetime) AS ?publication_date_)
+  }
+  OPTIONAL {
+    ?work wdt:P50/rdfs:label ?author_label .
+    FILTER (LANG(?author_label) = 'en')
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
+GROUP BY ?work ?workLabel
 ORDER BY DESC(?publication_date)
-LIMIT 200
+LIMIT 1000
 `
 
  topicsSparql = `
 #defaultView:Table
 # Count of topics in published work in specified venue
-SELECT ?count ?topic ?topicLabel 
+SELECT ?count ?topic ?topicLabel ?example_work ?example_workLabel
 WITH {
-  SELECT (COUNT(?work) as ?count) ?topic WHERE {
+  SELECT 
+    (COUNT(?work) as ?count)
+    ?topic
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
     ?work wdt:P1433 wd:{{ q }} .
     ?work wdt:P921 ?topic .
   }
@@ -39,10 +52,14 @@ ORDER BY DESC(?count)
 
  prolificAuthorsSparql = `
 # Prolific authors for a specific journal
-SELECT ?count ?author ?authorLabel ?orcid
+SELECT ?count ?author ?authorLabel ?orcid ?example_work ?example_workLabel
 WITH {
   # Count the number of works author by the author publishing in the journal
-  SELECT ?author (COUNT(?work) AS ?count) WHERE {
+  SELECT
+    ?author
+    (COUNT(?work) AS ?count)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
     ?work wdt:P50 ?author ;
           wdt:P1433 wd:{{ q }} .
   }
@@ -187,18 +204,18 @@ WHERE {
  `
 
 
-  $(document).ready(function() {
-      sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
-      sparqlToDataTable(topicsSparql, "#topics");
-      sparqlToDataTable(prolificAuthorsSparql, "#prolific-authors");
-      sparqlToDataTable(citedVenuesSparql, "#cited-venues");
-      sparqlToDataTable(citingVenuesSparql, "#citing-venues");
-      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
-      sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
-      sparqlToDataTable(genderDistributionSparql, "#gender-distribution");
-      sparqlToDataTable(authorshipsGenderDistributionSparql,
-			"#authorships-gender-distribution");
-  });
+ $(document).ready(function() {
+     sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
+     sparqlToDataTable(topicsSparql, "#topics");
+     sparqlToDataTable(prolificAuthorsSparql, "#prolific-authors");
+     sparqlToDataTable(citedVenuesSparql, "#cited-venues");
+     sparqlToDataTable(citingVenuesSparql, "#citing-venues");
+     sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
+     sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
+     sparqlToDataTable(genderDistributionSparql, "#gender-distribution");
+     sparqlToDataTable(authorshipsGenderDistributionSparql,
+		       "#authorships-gender-distribution");
+ });
 </script>
 
 
