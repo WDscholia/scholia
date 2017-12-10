@@ -6,6 +6,7 @@ Usage:
   scholia.query doi-to-q <doi>
   scholia.query github-to-q <github>
   scholia.query inchikey-to-q <inchikey>
+  scholia.query issn-to-q <issn>
   scholia.query orcid-to-q <orcid>
   scholia.query viaf-to-q <viaf>
   scholia.query q-to-class <q>
@@ -124,6 +125,37 @@ def doi_to_qs(doi):
     data = response.json()
 
     return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def issn_to_qs(issn):
+    """Convert ISSN to Wikidata ID.
+
+    Parameters
+    ----------
+    ISSN : str
+        ORCID identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> issn_to_qs('1533-7928') == ['Q1660383']
+    True
+
+    """
+    query = 'select ?author where {{ ?author wdt:P236 "{issn}" }}'.format(
+        issn=escape_string(issn))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    return [item['author']['value'][31:]
             for item in data['results']['bindings']]
 
 
@@ -498,6 +530,11 @@ def main():
 
     elif arguments['inchikey-to-q']:
         qs = inchikey_to_qs(arguments['<inchikey>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['issn-to-q']:
+        qs = issn_to_qs(arguments['<issn>'])
         if len(qs) > 0:
             print(qs[0])
 
