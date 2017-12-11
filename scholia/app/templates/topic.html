@@ -79,6 +79,45 @@ WHERE {
 ORDER BY DESC(?count)
   `
 
+  authorScoreSparql = `
+SELECT ?score ?author ?authorLabel ?example_work ?example_workLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?author
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    { 
+      ?author wdt:P101/wdt:P279* wd:{{ q }} .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?author ?work WHERE {
+        ?work wdt:P50 ?author ;
+              wdt:P921/wdt:P279* wd:{{ q }} . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?author ?work WHERE {
+        ?work wdt:P50 ?author .
+        ?citing_work wdt:P2860 ?work .
+        ?citing_work wdt:P921/wdt:P279* wd:{{ q }} . 
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+`
+
+
  venuesSparql = `
 #defaultView:Table
 SELECT ?count ?short_name ?venue ?venueLabel
@@ -151,6 +190,7 @@ LIMIT 200
 		       "#recently-published-works");
      sparqlToDataTable(authorsSparql, "#authors");
      sparqlToDataTable(topicsSparql, "#topics");
+     sparqlToDataTable(authorScoreSparql, "#author-score");
      sparqlToDataTable(venuesSparql, "#venues");
      sparqlToDataTable(topCitedSparql, "#topCited");
      sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
@@ -208,6 +248,18 @@ LIMIT 200
 </div>
 
 
+<h2 id="Author score">Author score</h2>
+
+Authors scored according to field of work, publications within the topic
+and citing works within the topic.
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fscore%20%3Fauthor%20%3FauthorLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28SUM%28%3Fscore_%29%20AS%20%3Fscore%29%0A%20%20%20%20%3Fauthor%0A%20%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20%3Fauthor%20wdt%3AP101%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20BIND%2820%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%283%20AS%20%3Fscore_%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP921%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%281%20AS%20%3Fscore_%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fcited_work%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fcited_work%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP921%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25results%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cjp%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fscore%29%0ALIMIT%20200"></iframe>
+</div>
+
+<table class="table table-hover" id="author-score"></table>
+
+    
 
 <h2 id="Venues and series publishing works about the topic">Venues and series publishing works about the topic</h2>
 
