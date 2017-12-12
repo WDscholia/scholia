@@ -133,8 +133,8 @@ def issn_to_qs(issn):
 
     Parameters
     ----------
-    ISSN : str
-        ORCID identifier
+    issn : str
+        ISSN identifier as a string.
 
     Returns
     -------
