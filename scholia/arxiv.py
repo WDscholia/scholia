@@ -34,11 +34,8 @@ USER_AGENT = 'scholiabot 1.0'
 def get_metadata(arxiv):
     """Get metadata about an arxiv publication from website.
 
-    This function queries arXiv. It must not be used to crawl arXiv.
-    It does not look at robots.txt.
-
-    This function currently uses 'abs' HTML pages and not the arXiv API or
-    https://arxiv.org/help/oa/index which is the approved way.
+    Scrapes the arXiv webpage corresponding to the paper with the `arxiv`
+    identifier and return the metadata for the paper in a dictionary.
 
     Parameters
     ----------
@@ -49,6 +46,14 @@ def get_metadata(arxiv):
     -------
     metadata : dict
         Dictionary with metadata.
+
+    Notes
+    -----
+    This function queries arXiv. It must not be used to crawl arXiv.
+    It does not look at robots.txt.
+
+    This function currently uses 'abs' HTML pages and not the arXiv API or
+    https://arxiv.org/help/oa/index which is the approved way.
 
     References
     ----------
@@ -77,8 +82,9 @@ def get_metadata(arxiv):
         '|'
         '//td[@class="tablecell subjects"]/text()')
     arxiv_classifications = [
-        re.search('\(.*\)', subject).group()[1:-1]
+        match
         for subject in subjects
+        for match in re.findall('\((.*?)\)', subject)
     ]
 
     metadata = {
