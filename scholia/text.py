@@ -63,7 +63,7 @@ class TextToTopicQText():
         self.mapper = self.get_mapper()
 
         tokens = self.mapper.keys()
-        tokens.sort(key=len, reverse=True)
+        tokens = sorted(tokens, key=len, reverse=True)
         tokens = [re.escape(token) for token in tokens if len(token) > 3]
 
         regex = '(?:' + "|".join(tokens) + ')'
