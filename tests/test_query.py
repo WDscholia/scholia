@@ -4,7 +4,6 @@
 from scholia.query import doi_to_qs, q_to_class
 
 
-
 def test_q_to_class_organization():
     """Test for organization in class detection."""
     # Technical university
