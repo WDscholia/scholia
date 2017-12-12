@@ -98,7 +98,7 @@ def paper_to_q(paper):
     ...                       'embeddings-for-efficient-word-'
     ...                       'representations.pdf')}
     >>> paper_to_q(paper)
-    Q39502823
+    'Q39502551'
 
     """
     title = escape_string(paper['title'])
@@ -114,7 +114,7 @@ def paper_to_q(paper):
         # Not found
         return None
 
-    return data[0]['paper']['value'][31:]
+    return str(data[0]['paper']['value'][31:])
 
 
 def paper_url_to_q(url):
@@ -136,9 +136,9 @@ def paper_url_to_q(url):
     Examples
     --------
     >>> url = ('https://papers.nips.cc/paper/7078-hash-embeddings-for-'
-               'efficient-word-representations')
+    ...        'efficient-word-representations')
     >>> paper_url_to_q(url)
-    Q39502823
+    'Q39502551'
 
     """
     paper = scrape_paper_from_url(url)
