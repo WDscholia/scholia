@@ -59,7 +59,7 @@ class TextToTopicQText():
     """
 
     def __init__(self):
-        """Setup attributes."""
+        """Set up attributes."""
         self.mapper = self.get_mapper()
 
         tokens = self.mapper.keys()

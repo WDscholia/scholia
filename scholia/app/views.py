@@ -29,7 +29,7 @@ class RegexConverter(BaseConverter):
     """
 
     def __init__(self, url_map, *items):
-        """Setup regular expression matcher."""
+        """Set up regular expression matcher."""
         super(RegexConverter, self).__init__(url_map)
         self.regex = items[0]
 
@@ -118,7 +118,7 @@ def show_arxiv(arxiv):
     html : str
         Rendered HTML.
 
-    See also
+    See Also
     --------
     show_arxiv_to_quickstatements.
 
@@ -141,7 +141,7 @@ def show_arxiv_to_quickstatements():
     html : str
         Rendered HTML.
 
-    See also
+    See Also
     --------
     show_arxiv.
 
@@ -588,10 +588,6 @@ def show_q_to_bibliography_templates():
     -------
     html : str
         Rendered HTML.
-
-    See also
-    --------
-
 
     """
     q_ = request.args.get('q')

@@ -21,7 +21,7 @@ class Jmrl(object):
     """Scraper for Journal of Machine Learning Research."""
 
     def __init__(self):
-        """Setup entries."""
+        """Set up entries."""
         self.entries = []
 
     def load(self, filename):
