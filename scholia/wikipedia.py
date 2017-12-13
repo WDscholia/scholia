@@ -10,7 +10,8 @@ Options:
   -o --output=<file>  Output filename, default output to stdout
   --verbose           Verbose messages.
 
-Examples:
+Examples
+--------
   $ python -m scholia.wikipedia q-to-bibliography-templates --debug Q20980928
 
 """

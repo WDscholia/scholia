@@ -13,7 +13,8 @@ Usage:
   scholia.query random-author
   scholia.query twitter-to-q <twitter>
 
-Examples:
+Examples
+--------
   $ python -m scholia.query orcid-to-q 0000-0001-6128-3356
   Q20980928
 

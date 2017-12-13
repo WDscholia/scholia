@@ -7,7 +7,8 @@ Usage:
 Options:
   -o --output=file  Output filename, default output to stdout
 
-References:
+References
+----------
   https://arxiv.org
 
 """

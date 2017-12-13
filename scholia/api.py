@@ -5,11 +5,11 @@ Usage:
   scholia.api q-to-classes <q>
   scholia.api q-to-name <q>
 
-
 Description:
   Interface to the Wikidata API and its bibliographic data.
 
-Examples:
+Examples
+--------
   $ python -m scholia.api get Q26857876 Q21172284 | wc
       2    1289   16174
 

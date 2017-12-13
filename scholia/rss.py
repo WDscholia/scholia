@@ -8,7 +8,8 @@ Usage:
 Description:
   Functions related to feed.
 
-Examples:
+Examples
+--------
   $ python -m scholia.rss author-latest-works Q27061849
   ...
 
@@ -17,7 +18,8 @@ Examples:
 
   $ python -m scholia.rss topic-latest-works Q130983
 
-References:
+References
+----------
   https://validator.w3.org/feed/docs/rss2.html
 
 """

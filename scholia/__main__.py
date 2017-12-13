@@ -7,11 +7,13 @@ Usage:
 Options:
   -o --output=file  Output filename, default output to stdout
 
-Examples:
+Examples
+--------
   $ python -m scholia orcid-to-q 0000-0001-6128-3356
   Q20980928
 
-References:
+References
+----------
   https://tools.wmflabs.org/wikidata-todo/quick_statements.php
 
 """
