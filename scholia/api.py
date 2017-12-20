@@ -344,7 +344,7 @@ def entity_to_month(entity, language='en'):
         Month as string.
 
     """
-    for statement in entity['claims']['P577']:
+    for statement in entity['claims'].get('P577', []):
         date = statement['mainsnak']['datavalue']['value']['time']
         month = date[6:8]
         if language is None:
@@ -425,13 +425,14 @@ def entity_to_title(entity):
 
     Returns
     -------
-    title : str
-        Title as string.
+    title : str or None
+        Title as string. If the title is not set then None is returned.
 
     """
-    for statement in entity['claims']['P1476']:
+    for statement in entity['claims'].get('P1476', []):
         title = statement['mainsnak']['datavalue']['value']['text']
         return title
+    return None
 
 
 def entity_to_volume(entity):
@@ -472,14 +473,15 @@ def entity_to_year(entity):
 
     Returns
     -------
-    year : str
+    year : str or None
         Year as string.
 
     """
-    for statement in entity['claims']['P577']:
+    for statement in entity['claims'].get('P577', []):
         date = statement['mainsnak']['datavalue']['value']['time']
         year = date[1:5]
         return year
+    return None
 
 
 def main():
