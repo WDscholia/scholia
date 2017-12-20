@@ -31,9 +31,46 @@ WHERE {
 }
 ORDER BY DESC(?count)
 `
- 
+
+  missingCitingAuthorItemsSparql = `
+SELECT
+  # Number of works with the coauthor
+  ?count
+
+  # The citing author as a string, - rather than as an item
+  ?citing_author
+
+  # Build URL to Magnus Manske's resolver tool
+  (CONCAT(
+      'https://tools.wmflabs.org/sourcemd/new_resolve_authors.php?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?citing_author)) AS ?resolver_url)
+
+  ?example_citing_work ?example_citing_workLabel
+WITH {
+  SELECT
+    (COUNT(?work) as ?count)
+    ?citing_author
+    (SAMPLE(?citing_work) AS ?example_citing_work) 
+  WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    ?citing_work wdt:P2860 ?work .
+    ?citing_work wdt:P2093 ?citing_author .
+  }
+  GROUP BY ?citing_author
+} AS %result
+WHERE {
+  INCLUDE %result
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+LIMIT 1000
+`
+
+
  $(document).ready(function() {
      sparqlToDataTable(missingCoauthorItemsSparql, "#missing-coauthor-items");
+     sparqlToDataTable(missingCitingAuthorItemsSparql, "#missing-citing-author-items");
  });
 
 
@@ -56,6 +93,16 @@ Wikidata items.
 Follow the link to use Magnus Manske's resolver tool to try to resolve the authors.
 
 <table class="table table-hover" id="missing-coauthor-items"></table>
+
+
+<h2>Missing citing author items</h2>
+
+The citing authors below are only represented as strings in Wikidata and not linked to
+Wikidata items.
+Follow the link to use Magnus Manske's resolver tool to try to resolve the authors.
+
+<table class="table table-hover" id="missing-citing-author-items"></table>
+
 
 
 {% endblock %}
