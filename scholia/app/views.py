@@ -60,7 +60,7 @@ p_pattern = '<regex("P[1-9]\d*"):p>'
 P_PATTERN = re.compile(r'P[1-9]\d*')
 
 # Wikidata item identifiers matcher
-qs_pattern = '<regex("Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)+"):qs>'
+qs_pattern = '<regex("Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
 
 
 @main.route("/")
