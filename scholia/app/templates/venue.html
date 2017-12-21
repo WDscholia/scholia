@@ -291,6 +291,15 @@ WHERE {
 <table class="table table-hover" id="prolific-authors"></table>
 
 
+<!-- h3 id="Co-author graph">Co-author graph</h2>
+
+This will make a very big graph for, e.g., PLOS ONE.
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Fimage1%20%3Fauthor2%20%3Fauthor2Label%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fauthor1%20%28SAMPLE%28%3Fimage1_%29%20AS%20%3Fimage1%29%20%3Fauthor2%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%3B%0A%20%20%20%20%20%20%20%20%20%20wdt%3AP50%20%3Fauthor1%2C%20%3Fauthor2%20.%0A%20%20%20%20OPTIONAL%20%7B%20%3Fauthor1%20wdt%3AP18%20%3Fimage1_%20.%20%7D%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor1%20%3Fauthor2%0A%7D%20AS%20%25authors%0AWHERE%20%7B%0A%20%20INCLUDE%20%25authors%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl.no%2Cru%2Csv%2Czh%22%20.%20%7D%20%0A%7D%0A"></iframe>
+</div -->
+
+
 <h2 id="Citations">Citations</h2>
 
 <h3 id="Most cited articles"
