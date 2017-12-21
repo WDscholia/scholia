@@ -86,7 +86,7 @@ def escape_to_tex(string, escape_type='normal'):
 
     Parameters
     ----------
-    string : str
+    string : str or None
         Unicode string to be excaped.
     escape_type : normal or url, default normal
         Type of escaping.
@@ -94,7 +94,8 @@ def escape_to_tex(string, escape_type='normal'):
     Returns
     -------
     escaped_string : str
-        Escaped unicode string.
+        Escaped unicode string. If the input is None then an empty string is
+        returned.
 
     Examples
     --------
@@ -110,6 +111,8 @@ def escape_to_tex(string, escape_type='normal'):
     - http://stackoverflow.com/questions/16259923/
 
     """
+    if string is None:
+        return ''
     if escape_type == 'normal':
         escaped_string = STRING_TO_TEX_PATTERN.sub(
             lambda match: STRING_TO_TEX[match.group()], string)
