@@ -55,7 +55,12 @@ YEAR_TO_Q = {
     "2012": "Q32962684",
     "2011": "Q43904402",
     "2010": "Q43904497",
+    "2009": "Q28698531",
+    "2004": "Q27789295",
+    "2000": "Q33040753",
+    "1999": "Q41661180",
     "1992": "Q47012467",
+    "1987": "Q47032920",
 }
 
 
@@ -261,6 +266,10 @@ def scrape_paper_from_url(url):
     before NIPS 2009 has the publication year set to the year after the
     conference.
 
+    If the abstract is not listed on the papers.nips.cc HTML page then there
+    `abstract` field is not available in the returned `paper` variable. Some
+    of the earliest conferences does not list the abstract.
+
     """
     url_paper_base = URL_BASE + "/paper/"
     if url[:len(url_paper_base)] != url_paper_base:
@@ -280,7 +289,9 @@ def scrape_paper_from_url(url):
     full_text_url = tree.xpath("//a[text()='[PDF]']")[0].attrib['href']
     entry['full_text_url'] = 'https://papers.nips.cc' + full_text_url
 
-    entry['abstract'] = tree.xpath("//p[@class='abstract']")[0].text
+    abstract = tree.xpath("//p[@class='abstract']")[0].text
+    if abstract != "Abstract Missing":
+        entry['abstract'] = abstract
 
     book_element = tree.xpath("//p[contains(text(), 'Part of:')]")[0]
     book_url = URL_BASE + book_element.xpath('a')[0].attrib['href']
