@@ -7,6 +7,12 @@ Usage:
   scholia.scrape.nips paper-url-to-q <url>
   scholia.scrape.nips paper-url-to-quickstatements <url>
 
+Notes
+-----
+For `scrape-paper-urls-from-proceedings-url` the proceedings URL should be one
+listed at https://papers.nips.cc/. It will return a JSON with a list of URLs
+for the individual papers.
+
 """
 
 from six import print_, u
