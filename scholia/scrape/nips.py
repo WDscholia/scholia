@@ -9,6 +9,13 @@ Usage:
 
 Notes
 -----
+NIPS papers are available from https://papers.nips.cc.
+
+Papers may be published the year after the conference. Newer conferences seems
+to publish the same year while older conferences published the year after,
+e.g., NIPS 2008 is published in 2009, while NIPS 2009 is published in the same
+year, i.e., 2009.
+
 For `scrape-paper-urls-from-proceedings-url` the proceedings URL should be one
 listed at https://papers.nips.cc/. It will return a JSON with a list of URLs
 for the individual papers.
@@ -38,6 +45,7 @@ URL_BASE = "https://papers.nips.cc"
 
 WDQS_URL = 'https://query.wikidata.org/sparql'
 
+# Year should be the nominal year, - not the year of publication
 YEAR_TO_Q = {
     "2017": "Q39502823",
     "2016": "Q30715037",
@@ -47,6 +55,7 @@ YEAR_TO_Q = {
     "2012": "Q32962684",
     "2011": "Q43904402",
     "2010": "Q43904497",
+    "1992": "Q47012467",
 }
 
 
@@ -241,6 +250,17 @@ def scrape_paper_from_url(url):
     paper : dict
         Dictionary with paper.
 
+    Notes
+    -----
+    The information is scraped from the individual HTML pages on the website
+    https://papers.nips.cc.
+
+    The returned `paper` dict contains url, title, authors as list,
+    full_text_url, abstract, year and published_in_q. The year is corrected
+    from the nominal to the actual publication year, such that papers published
+    before NIPS 2009 has the publication year set to the year after the
+    conference.
+
     """
     url_paper_base = URL_BASE + "/paper/"
     if url[:len(url_paper_base)] != url_paper_base:
@@ -265,10 +285,13 @@ def scrape_paper_from_url(url):
     book_element = tree.xpath("//p[contains(text(), 'Part of:')]")[0]
     book_url = URL_BASE + book_element.xpath('a')[0].attrib['href']
 
-    year = book_url[-4:]
-    entry['year'] = year
+    nominal_year = book_url[-4:]
+    year = int(nominal_year)
+    if year < 2009:
+        year += 1
+    entry['year'] = str(year)
 
-    entry['published_in_q'] = YEAR_TO_Q.get(year, None)
+    entry['published_in_q'] = YEAR_TO_Q.get(nominal_year, None)
 
     return entry
 
