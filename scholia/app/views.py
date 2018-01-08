@@ -580,6 +580,37 @@ def show_gene_empty():
     return render_template('gene_empty.html')
 
 
+@main.route('/taxon/' + q_pattern)
+def show_taxon(q):
+    """Return HTML rendering for specific taxon.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('taxon.html', q=q)
+
+
+@main.route('/taxon/')
+def show_taxon_empty():
+    """Return taxon index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for taxon view.
+
+    """
+    return render_template('taxon_empty.html')
+
+
 @main.route('/q-to-bibliography-templates')
 def show_q_to_bibliography_templates():
     """Return HTML page for wiki templates bibliographies.

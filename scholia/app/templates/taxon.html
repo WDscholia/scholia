@@ -1,0 +1,76 @@
+{% extends "taxon_base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ infoSparql = `
+SELECT ?parent ?parentLabel (GROUP_CONCAT(DISTINCT ?rank_label_; separator=", ") AS ?rankList) WHERE {
+  wd:{{ q }} wdt:P171+ ?parent .
+  ?parent wdt:P105 ?rank .
+  OPTIONAL {
+    ?rank rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?parent ?parentLabel
+`
+
+ genomeSparql = `
+SELECT ?gene ?geneLabel ?chromosome ?chromosomeLabel WITH {
+  SELECT ?gene ?chromosome WHERE {
+    ?gene wdt:P31 wd:Q7187 ;
+          wdt:P703 wd:{{ q }} ;
+          wdt:P1057 ?chromosome .
+  }
+} AS %results {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+ metabolomeSparql = `
+SELECT ?metabolite ?metaboliteLabel WITH {
+  SELECT ?metabolite WHERE {
+    ?metabolite wdt:P31|wdt:P279/wdt:P31 wd:Q11173 ;
+          wdt:P703 wd:{{ q }} .
+  }
+} AS %results {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(infoSparql, "#parents");
+     sparqlToDataTable(genomeSparql, "#genome");
+     sparqlToDataTable(metabolomeSparql, "#metabolome");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Taxon</h1>
+
+<div id="intro"></div>
+
+<h2 id="Parent Taxons">Parent Taxons</h2>
+
+<table class="table table-hover" id="parents"></table>
+
+
+<h2 id="Genome">Genome</h2>
+
+<table class="table table-hover" id="genome"></table>
+
+
+<h2 id="Metabolome">Metabolome</h2>
+
+<table class="table table-hover" id="metabolome"></table>
+
+
+{% endblock %}
+    
