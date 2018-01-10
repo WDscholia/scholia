@@ -2,13 +2,19 @@
 
 Usage:
   scholia.scrape.jmlr scrape
-  scholia.scrape.jmlr load-and-print <file>
+  scholia.scrape.jmlr scrape-paper-from-url <url>
+  scholia.scrape.jmlr paper-url-to-quickstatements <url>
+
+Examples
+--------
+$ URL=http://www.jmlr.org/papers/v12/pedregosa11a.html
+$ python -m scholia.scrape.jmlr scrape-paper-from-url $URL
 
 """
 
-import json
+from __future__ import print_function, unicode_literals
 
-from re import findall, sub, UNICODE
+import json
 
 from docopt import docopt
 
@@ -16,8 +22,10 @@ from lxml import etree
 
 import requests
 
+from ..model import Work
 
-class Jmrl(object):
+
+class Jmlr(object):
     """Scraper for Journal of Machine Learning Research."""
 
     def __init__(self):
@@ -46,26 +54,48 @@ class Jmrl(object):
         Returns
         -------
         entry : dict
-            Scraped paper represented as a dict.
+            Scraped paper represented as a dict where the field representes,
+            e.g., year, title, etc.
+
+        Examples
+        --------
+        >>> jmlr = Jmlr()
+        >>> url = "http://www.jmlr.org/papers/v12/pedregosa11a.html"
+        >>> work = jmlr.scrape_paper_from_url(url)
+        >>> 'year' in work
+        True
+        >>> '2011' == work['year']
+        True
 
         """
-        entry = {'homepage': url}
-        entry['volume'] = url.split('/')[4][1:]
+        paper = {'homepage': url}
+        paper['volume'] = url.split('/')[4][1:]
+
         response = requests.get(url)
         tree = etree.HTML(response.content)
-        content_element = tree.xpath("//div[@id='content']")[0]
-        texts = [text for text in content_element.itertext()]
-        entry['title'] = texts[1]
-        entry['authors'] = texts[3]
-        volume, month_string, pages, year = findall(
-            '; \n(\d+)\((.{3})\):(\d+-\d+), (\d{4})', texts[4])[0]
-        entry['pages'] = pages
-        entry['year'] = year
-        entry['month_string'] = month_string
-        abstract = texts[7].strip()
-        abstract = sub('\s+', ' ', abstract, flags=UNICODE)
-        entry['abstract'] = abstract
-        return entry
+
+        def _get_content(name):
+            match = "//meta[@name='citation_{}']".format(name)
+            return tree.xpath(match)[0].attrib['content']
+
+        paper['title'] = _get_content('title')
+        paper['year'] = _get_content('publication_date')
+        paper['published_in_q'] = "Q1660383"
+        paper['issn'] = _get_content('issn')[5:]
+        paper['month_string'] = _get_content('issue')
+        paper['pages'] = (_get_content('firstpage') + "-" +
+                          _get_content('lastpage'))
+        paper['full_text_url'] = _get_content('pdf_url')
+        paper['language_q'] = "Q1860"  # English
+
+        authors = []
+        match = "//meta[@name='citation_author']"
+        for element in tree.xpath(match):
+            name_parts = element.attrib['content'].split(', ')
+            authors.append(name_parts[1] + " " + name_parts[0])
+        paper['authors'] = authors
+
+        return Work(paper)
 
     def scrape_papers(self):
         """Scrape and return papers.
@@ -93,12 +123,22 @@ class Jmrl(object):
 
 def main():
     """Handle command-line interface."""
-    jmlr = Jmrl()
+    jmlr = Jmlr()
 
     arguments = docopt(__doc__)
 
     if arguments['scrape']:
         print(json.dumps(jmlr.scrape_papers()))
+
+    elif arguments['scrape-paper-from-url']:
+        url = arguments['<url>']
+        work = jmlr.scrape_paper_from_url(url)
+        print(json.dumps(work))
+
+    elif arguments['paper-url-to-quickstatements']:
+        url = arguments['<url>']
+        work = jmlr.scrape_paper_from_url(url)
+        print(work.to_quickstatements())
 
 
 if __name__ == '__main__':
