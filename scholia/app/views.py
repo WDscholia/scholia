@@ -167,7 +167,7 @@ def show_arxiv_to_quickstatements():
 
     try:
         metadata = get_arxiv_metadata(arxiv)
-    except:
+    except Exception:
         return render_template('arxiv_to_quickstatements.html',
                                arxiv=arxiv)
 
