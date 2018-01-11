@@ -23,6 +23,8 @@ Description:
 
 import re
 
+from simplejson import JSONDecodeError
+
 import requests
 
 
@@ -30,14 +32,13 @@ TOPIC_LABELS_SPARQL = """
 SELECT ?topic ?topic_label
 WITH {
   SELECT DISTINCT ?topic WHERE {
-    ?work wdt:P31 wd:Q13442814 .
-    ?work wdt:P921 ?topic .
+    [] wdt:P31 wd:Q13442814 ; wdt:P921 ?topic .
   }
 } AS %topics
 WHERE {
   INCLUDE %topics
   ?topic rdfs:label | skos:altLabel ?topic_label_ .
-  FILTER(LANG(?topic_label) = 'en')
+  FILTER(LANG(?topic_label_) = 'en')
   BIND(LCASE(?topic_label_) AS ?topic_label)
 }
 """
@@ -86,15 +87,28 @@ class TextToTopicQText():
 
         Notes
         -----
-        This function queries the Wikidata Query SERVICE with a static
-        SPARQL query. It well take some time to complete, perhaps 20 seconds
+        This method queries the Wikidata Query SERVICE with a static
+        SPARQL query. It well take some time to complete, perhaps 30 seconds
         or more.
+
+        In some cases a timeout may occur in the middle of a response,
+        making the JSON return invalid. The method will try second time.
+        If this also fails, then the method will raise an exception.
 
         """
         response = requests.get(
             'https://query.wikidata.org/sparql',
             params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'})
-        response_data = response.json()
+
+        try:
+            response_data = response.json()
+        except JSONDecodeError:
+            # In some cases a timeout may occur in the middle of a response,
+            # making the JSON returned invalid.
+            response = requests.get(
+                'https://query.wikidata.org/sparql',
+                params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'})
+
         data = response_data['results']['bindings']
 
         mapper = {}
