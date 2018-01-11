@@ -5,4 +5,5 @@ Flask-Bootstrap
 flask-mwoauth>=0.1.14
 lxml
 requests
+simplejson
 werkzeug>=0.9
