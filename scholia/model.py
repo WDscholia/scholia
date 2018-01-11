@@ -55,7 +55,9 @@ class Work(dict):
         >>> work = Work(
         ...     {'authors': ['Niels Bohr'],
         ...      'title': 'On the Constitution of Atoms and Molecules'})
-        >>> work.to_quickstatements()
+        >>> qs = work.to_quickstatements()
+        >>> qs.find('CREATE') != -1
+        True
 
         """
         qs = u("CREATE\n")
