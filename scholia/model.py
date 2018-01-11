@@ -1,4 +1,4 @@
-"""model"""
+"""model."""
 
 from six import u
 
@@ -98,6 +98,7 @@ class Work(dict):
 
 
 def main():
+    """Handle command-line interface."""
     pass
 
 
