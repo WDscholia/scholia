@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ futureEventsSparql = `
+SELECT DISTINCT ?time ?short_name ?event ?eventLabel ?location ?locationLabel
+WHERE {
+  { ?event wdt:P31 / wdt:P279* wd:Q2020153 . }
+  UNION 
+  { ?event wdt:P31 / wdt:P279* wd:Q46855 . }
+  UNION 
+  { ?event wdt:P31 / wdt:P279* wd:Q40444998 . }
+  
+  ?event wdt:P580 | wdt:P585 ?time .
+  FILTER (?time > NOW())
+  
+  OPTIONAL { ?event wdt:P276 ?location }
+  
+  OPTIONAL { ?event wdt:P1813 ?short_name }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY ?time
+`
+
+ pastEventsSparql = `
+SELECT DISTINCT ?time ?short_name ?event ?eventLabel ?location ?locationLabel
+WHERE {
+  { ?event wdt:P31 / wdt:P279* wd:Q2020153 . }
+  UNION 
+  { ?event wdt:P31 / wdt:P279* wd:Q46855 . }
+  UNION 
+  { ?event wdt:P31 / wdt:P279* wd:Q40444998 . }
+  
+  ?event wdt:P580 | wdt:P585 ?time .
+  FILTER (?time < NOW())
+  
+  OPTIONAL { ?event wdt:P276 ?location }
+  
+  OPTIONAL { ?event wdt:P1813 ?short_name }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?time)
+`
+
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(futureEventsSparql, "#future-events");
+     sparqlToDataTable(pastEventsSparql, "#past-events");
+ });
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1>Events</h1>
+
+<h2 id="Future events">Future events</h2>
+
+<table class="table table-hover" id="future-events"></table>
+
+
+<h2 id="Future events">Past events</h2>
+
+<table class="table table-hover" id="past-events"></table>
+
+
+
+
+{% endblock %}
+
+  
