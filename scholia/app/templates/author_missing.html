@@ -68,9 +68,28 @@ LIMIT 1000
 `
 
 
+  missingTopicSparql = `
+SELECT
+  ?work ?workLabel (?work AS ?wikidata_url)
+WHERE {
+  # Works by author
+  ?work wdt:P50 wd:Q41158133 .
+  
+  # Works with no topic(s)
+  FILTER NOT EXISTS { ?work wdt:P591 ?topic . }
+
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+`
+
+
+
  $(document).ready(function() {
      sparqlToDataTable(missingCoauthorItemsSparql, "#missing-coauthor-items");
      sparqlToDataTable(missingCitingAuthorItemsSparql, "#missing-citing-author-items");
+     sparqlToDataTable(missingTopicSparql, "#missing-topic");
  });
 
 
@@ -102,6 +121,11 @@ Wikidata items.
 Follow the link to use Magnus Manske's resolver tool to try to resolve the authors.
 
 <table class="table table-hover" id="missing-citing-author-items"></table>
+
+
+<h2>Authored works with missing topics</h2>
+
+<table class="table table-hover" id="missing-topic"></table>
 
 
 
