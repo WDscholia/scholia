@@ -383,6 +383,19 @@ def redirect_doi(doi):
     return render_template('404.html')
 
 
+@main.route('/event/')
+def show_event_empty():
+    """Return event index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for event view.
+
+    """
+    return render_template('event_empty.html')
+
+
 @main.route('/github/<github>')
 def redirect_github(github):
     """Detect and redirect for Github user.
