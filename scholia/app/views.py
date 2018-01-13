@@ -773,8 +773,8 @@ def show_chemical_empty():
     return render_template('chemical_empty.html')
 
 
-@main.route('/chemclass/' + q_pattern)
-def show_chemclass(q):
+@main.route('/chemical_class/' + q_pattern)
+def show_chemical_class(q):
     """Return html render page for a specific class of chemicals.
 
     Parameters
@@ -788,11 +788,11 @@ def show_chemclass(q):
         Rendered HTML.
 
     """
-    return render_template('chemclass.html', q=q)
+    return render_template('chemical_class.html', q=q)
 
 
-@main.route('/chemclass/')
-def show_chemclass_empty():
+@main.route('/chemical_class/')
+def show_chemical_class_empty():
     """Return rendered HTML index page for a specific class of chemicals.
 
     Returns
@@ -801,7 +801,7 @@ def show_chemclass_empty():
         Rendered HTML index page for a specific class of chemicals.
 
     """
-    return render_template('chemclass_empty.html')
+    return render_template('chemical_class_empty.html')
 
 
 @main.route('/twitter/<twitter>')

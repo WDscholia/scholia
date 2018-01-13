@@ -354,7 +354,7 @@ def q_to_class(q):
                 'Q11173',  # chemical compound
                 'Q79529',  # chemical substance
                 ]):
-            class_ = 'chemclass'
+            class_ = 'chemical_class'
         else:
             class_ = 'topic'
 
