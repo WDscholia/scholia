@@ -63,10 +63,6 @@ P_PATTERN = re.compile(r'P[1-9]\d*')
 qs_pattern = '<regex("Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
 
 
-# RSS icon
-rss_icon = 'data:image/png;base64,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'
-
-
 @main.route("/")
 def index():
     """Return rendered index page.
@@ -202,7 +198,7 @@ def show_author(q):
     else:
         first_initial, last_name = '', ''
     return render_template('author.html', q=q, first_initial=first_initial,
-                           last_name=last_name, rss_icon=rss_icon)
+                           last_name=last_name)
 
 
 @main.route('/author/' + q_pattern + '/latest-works/rss')
@@ -689,7 +685,7 @@ def show_topic(q):
         Rendered HTML.
 
     """
-    return render_template('topic.html', q=q, rss_icon=rss_icon)
+    return render_template('topic.html', q=q)
 
 
 @main.route('/topic/' + q_pattern + '/latest-works/rss')
@@ -810,7 +806,7 @@ def show_venue(q):
         Rendered HTML page.
 
     """
-    return render_template('venue.html', q=q, rss_icon=rss_icon)
+    return render_template('venue.html', q=q)
 
 
 @main.route('/venue/' + q_pattern + '/missing')
