@@ -73,6 +73,15 @@ ORDER BY DESC(?number_of_citations)
 <table class="table table-hover" id="journals"></table>
 
 
+<h2>Recently established scientific journals</h2>
+
+At most 50 journals are displayed.
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20%3Fdatetime%20%3Fvenue%20%3FvenueLabel%20WHERE%20%7B%0A%20%20%23%20Publisher%0A%20%20%3Fvenue%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%0A%20%20%23%20Scientific%20journal%0A%20%20%3Fvenue%20wdt%3AP31%20wd%3AQ5633421%20.%0A%20%20%0A%20%20%23%20When%20the%20journal%20was%20started%20%0A%20%20%3Fvenue%20wdt%3AP571%20%3Fdatetime.%0A%20%20%0A%20%20%23%20Label%20the%20journal%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fdatetime%29%0ALIMIT%2050"></iframe>
+</div>
+
+
 <h2>Associated editors</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
