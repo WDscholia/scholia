@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ personsSparql = `
+SELECT ?number_of_publications ?person ?personLabel ?personDescription ?roles ?example_work ?example_workLabel
+WITH {
+  SELECT
+    (GROUP_CONCAT(?role; separator=", ") AS ?roles) ?person
+  WHERE {
+    {
+      # speaker
+      wd:{{ q }} wdt:P823 ?person .
+      # BIND(wd:Q9379869 AS ?role)
+      BIND("speaker" AS ?role)
+    }
+    UNION
+    {
+      # organizer
+      wd:{{ q }} wdt:P664 ?person .
+      #BIND(wd:Q2029941 AS ?role)
+      BIND("organizer" AS ?role)
+    }
+    UNION
+    {
+      # participant
+      ?person wdt:P1344 wd:{{ q }} .
+      BIND("participant" AS ?role)
+    }
+  }
+  GROUP BY ?person
+} AS %persons  
+WITH {
+  SELECT
+    (COUNT(?work) AS ?number_of_publications)
+    ?roles
+    ?person (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    INCLUDE %persons .
+    OPTIONAL { ?work wdt:P50 ?person . }
+  }
+  GROUP BY ?roles ?person
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?number_of_publications)
+`
+
+ 
+ $(document).ready(function() {
+     sparqlToDataTable(personsSparql, "#persons");
+ });
+
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Event</h1>
+
+<div id="intro"></div>
+
+
+<h2>Persons</h2>
+
+<table class="table table-hover" id="persons"></table>
+
+
+{% endblock %}
