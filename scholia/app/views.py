@@ -383,6 +383,24 @@ def redirect_doi(doi):
     return render_template('404.html')
 
 
+@main.route('/event/' + q_pattern)
+def show_event(q):
+    """Return HTML rendering for specific event.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier representing an event
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('event.html', q=q)
+
+
 @main.route('/event/')
 def show_event_empty():
     """Return event index page.
