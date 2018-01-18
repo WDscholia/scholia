@@ -73,10 +73,10 @@ SELECT
   ?work ?workLabel (?work AS ?wikidata_url)
 WHERE {
   # Works by author
-  ?work wdt:P50 wd:Q41158133 .
+  ?work wdt:P50 wd:{{ q }} .
   
   # Works with no topic(s)
-  FILTER NOT EXISTS { ?work wdt:P591 ?topic . }
+  FILTER NOT EXISTS { ?work wdt:P921 ?topic . }
 
   # Label the results
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
@@ -107,8 +107,8 @@ Missing information with respect to the author.
 
 <h2>Missing coauthor items</h2>
 
-The coauthors below are only represented as strings in Wikidata and not linked to
-Wikidata items.
+The coauthors listed below may only be represented as strings in Wikidata
+with no link to Wikidata items.
 Follow the link to use Magnus Manske's resolver tool to try to resolve the authors.
 
 <table class="table table-hover" id="missing-coauthor-items"></table>
