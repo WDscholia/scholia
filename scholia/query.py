@@ -344,7 +344,23 @@ def q_to_class(q):
             ]):
         class_ = 'software'
     else:
-        class_ = 'topic'
+        query = 'select ?class where {{ wd:{q} wdt:P279+ ?class }}'.format(
+        q=escape_string(q))
+
+        url = 'https://query.wikidata.org/sparql'
+        params = {'query': query, 'format': 'json'}
+        response = requests.get(url, params=params)
+        data = response.json()
+        parents = [item['class']['value'][31:]
+                for item in data['results']['bindings']]
+        
+        if set(parents).intersection([
+                'Q11173',  # chemical compound
+                'Q79529',  # chemical substance
+                ]):
+            class_ = 'chemical_class'
+        else:
+            class_ = 'topic'
 
     return class_
 
