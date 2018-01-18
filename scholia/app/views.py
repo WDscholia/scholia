@@ -835,7 +835,7 @@ def show_chemical_empty():
     return render_template('chemical_empty.html')
 
 
-@main.route('/chemical_class/' + q_pattern)
+@main.route('/chemical-class/' + q_pattern)
 def show_chemical_class(q):
     """Return html render page for a specific class of chemicals.
 
@@ -853,7 +853,7 @@ def show_chemical_class(q):
     return render_template('chemical_class.html', q=q)
 
 
-@main.route('/chemical_class/')
+@main.route('/chemical-class/')
 def show_chemical_class_empty():
     """Return rendered HTML index page for a specific class of chemicals.
 
