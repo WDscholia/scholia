@@ -16,7 +16,7 @@ from __future__ import print_function, unicode_literals
 
 import json
 
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 
 from docopt import docopt
 
@@ -119,7 +119,7 @@ class Jmlr(object):
         # http://www.jmlr.org/papers/v8/garcia-pedrajas07a.html
         try:
             paper['issn'] = _get_content('issn')[5:]
-        except:
+        except IndexError:
             pass
 
         paper['month_string'] = _get_content('issue')
