@@ -16,6 +16,8 @@ from __future__ import print_function, unicode_literals
 
 import json
 
+from urlparse import urlparse
+
 from docopt import docopt
 
 from lxml import etree
@@ -49,13 +51,17 @@ class Jmlr(object):
         Parameters
         ----------
         url : str
-            URL to JMLR paper.
+            URL to JMLR paper of either the HTML or the PDF.
 
         Returns
         -------
         entry : dict
             Scraped paper represented as a dict where the field representes,
             e.g., year, title, etc.
+
+        Notes
+        -----
+        Extracts various bibliographic fields. ISSN is not always present.
 
         Examples
         --------
@@ -68,6 +74,31 @@ class Jmlr(object):
         True
 
         """
+        parsed_url = urlparse(url)
+        if parsed_url.netloc != 'www.jmlr.org':
+            message = (
+                "URL should contain the 'www.jmlr.org' host: {}"
+            ).format(url)
+            raise ValueError(message)
+
+        url_directories = urlparse(url).path.split('/')
+
+        if url.endswith('.html'):
+            if len(url_directories) != 4:
+                message = "Could not interpret URL: {}".format(url)
+                raise ValueError(message)
+        elif url.endswith('.pdf'):
+            if len(url_directories) != 5:
+                message = "Could not interpret URL: {}".format(url)
+                raise ValueError(message)
+            volume = url_directories[2][6:]
+            paper_id = url_directories[3]
+            url = 'http://www.jmlr.org/papers/v{}/{}.html'.format(
+                volume, paper_id)
+        else:
+            message = "URL should end with html or pdf: {}".format(url)
+            raise ValueError(message)
+
         paper = {'homepage': url}
         paper['volume'] = url.split('/')[4][1:]
 
@@ -81,7 +112,16 @@ class Jmlr(object):
         paper['title'] = _get_content('title')
         paper['year'] = _get_content('publication_date')
         paper['published_in_q'] = "Q1660383"
-        paper['issn'] = _get_content('issn')[5:]
+
+        # ISSN information may apparently be missing for some articles.
+        # For instance http://www.jmlr.org/papers/v18/16-365.html
+        # For other it is present, e.g.,
+        # http://www.jmlr.org/papers/v8/garcia-pedrajas07a.html
+        try:
+            paper['issn'] = _get_content('issn')[5:]
+        except:
+            pass
+
         paper['month_string'] = _get_content('issue')
         paper['pages'] = (_get_content('firstpage') + "-" +
                           _get_content('lastpage'))
@@ -91,8 +131,12 @@ class Jmlr(object):
         authors = []
         match = "//meta[@name='citation_author']"
         for element in tree.xpath(match):
-            name_parts = element.attrib['content'].split(', ')
-            authors.append(name_parts[1] + " " + name_parts[0])
+            author = element.attrib['content']
+            if "," in author:
+                name_parts = author.split(', ')
+                authors.append(name_parts[1] + " " + name_parts[0])
+            else:
+                authors.append(author)
         paper['authors'] = authors
 
         return Work(paper)
