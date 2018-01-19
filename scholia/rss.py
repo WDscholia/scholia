@@ -33,9 +33,11 @@ from dateutil.parser import parse as parse_datetime
 
 from email.utils import formatdate
 
-import time
+from calendar import timegm
 
 from xml.sax.saxutils import escape
+
+from re import sub
 
 from six import u
 
@@ -158,9 +160,27 @@ def entities_to_works_rss(entities):
         qid = _value(entity, 'work')[31:]
         url = 'https://tools.wmflabs.org/scholia/work/' + qid
         item_date = parse_datetime(_value(entity, 'date'))
+
+        # Dirty hack to get around the problem with dates before 1900
+        old_year = item_date.year
+        if old_year < 1900:
+            datetime_string = _value(entity, 'date')
+            index = datetime_string.index('-')
+            datetime_string = "1900" + datetime_string[index:]
+            item_date = parse_datetime(datetime_string)
+
         date_tuple = item_date.timetuple()
-        timestamp = time.mktime(date_tuple)
+
+        # We should use UTC time here, - not mktime that is local
+        timestamp = timegm(date_tuple)
+
         publication_date = formatdate(timestamp)
+
+        # Continuing dirty hack with setting to old year
+        if old_year < 1900:
+            publication_date = sub('1900', str(old_year),
+                                   publication_date)
+
         description = _value(entity, 'description')
         rss += WORK_ITEM_RSS.format(
             title=escape(_value(entity, 'workLabel')),
@@ -187,6 +207,16 @@ def wb_get_author_latest_works(q):
     rss : str
         Feed in XML.
 
+    Notes
+    -----
+    The Wikidata Query Service may have problems for dates before 0.
+    The SPARQL will fail in such instances [1]_. This function will then
+    return an empty list.
+
+    References
+    ----------
+    .. [1] https://stackoverflow.com/questions/47562736
+
     """
     if not q:
         return ''
@@ -208,9 +238,13 @@ def wb_get_author_latest_works(q):
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
-    data = response.json()
 
-    rss_body += entities_to_works_rss(data['results']['bindings'])
+    if response.ok:
+        data = response.json()
+        rss_body += entities_to_works_rss(data['results']['bindings'])
+    else:
+        # If there are dates before BC then the SPARQL will fails
+        pass
 
     rss_body += '  </channel>\n'
     rss_body += '</rss>'
