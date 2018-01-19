@@ -336,13 +336,22 @@ def q_to_class(q):
             ]):
         class_ = 'taxon'
     elif set(classes).intersection([
+            'Q46855',  # hackathon
+            'Q625994',  # conference
+            'Q2020153',  # scientific conference
+            'Q40444998',  # akademic workshop
+            ]):
+        class_ = 'event'
+    elif set(classes).intersection([
             'Q7397',  # software
+            'Q1172284',  # dataset
             'Q1639024',  # mathematical software
             'Q21127166',  # Java software library
             'Q21129801',  # natural language processing toolkit
+            'Q22811662',  # image database
             'Q24529812',  # statistical package
             ]):
-        class_ = 'software'
+        class_ = 'use'
     else:
         query = 'select ?class where {{ wd:{q} wdt:P279+ ?class }}'.format(
             q=escape_string(q))

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    mostUsedSparql = `
+SELECT ?count ?use ?useLabel ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
+WITH {
+  SELECT
+    (COUNT(DISTINCT ?work) AS ?count)
+    ?use
+    (SAMPLE(?described_by) AS ?described_by_example)
+    (SAMPLE(?work) AS ?example_use)
+  WHERE {
+    ?work wdt:P2283 | wdt:P4510 ?use . 
+    ?use wdt:P31/wdt:P279* wd:Q7397 . 
+    # Restricting to work takes too long time :(    
+    # ?work wdt:P31/wdt:P279* wd:Q386724 .
+    OPTIONAL { ?use wdt:P1343 ?described_by . }
+  }
+  GROUP BY ?use
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+LIMIT 500    
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(mostUsedSparql, "#most-used");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1>Use</h1>
+
+
+<h2>Examples</h2>
+
+Software:
+<ul>
+  <li><a href="Q5140318">CodonCode Aligner</a></li>
+  <li><a href="Q1635410">NLTK</a></li>
+  <li><a href="Q32998961">Stanford CoreNLP</a></li>
+  <li><a href="Q1204300">STATA</a></li>
+  <li><a href="Q41566485">SPM</a> (statistical parametric mapping)</li>
+</ul>
+
+Datasets:
+<ul>
+  <li><a href="Q17069496">MNIST</a></li>
+  <li><a href="Q24901201">ImageNet</a>
+</ul>      
+
+
+<h2>Overview</h2>
+
+<h3 id="most used software">Most used</h3>
+
+<table class="table table-hover" id="most-used"></table>
+
+
+{% endblock %}
+
+  

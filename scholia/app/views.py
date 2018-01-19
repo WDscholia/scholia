@@ -1108,6 +1108,37 @@ def show_sponsor_empty():
     return render_template('sponsor_empty.html')
 
 
+@main.route('/use/' + q_pattern)
+def show_use(q):
+    """Return HTML rendering for specific use.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('use.html', q=q)
+
+
+@main.route('/use/')
+def show_use_empty():
+    """Return use index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for author view.
+
+    """
+    return render_template('use_empty.html')
+
+
 @main.route('/work/' + q_pattern)
 def show_work(q):
     """Return rendered HTML page for specific work.

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ recentWorkUsingTheUsedSparql = `
+SELECT ?publication_date ?work ?workLabel ?quote
+WITH{
+  SELECT
+    (MIN(?publication_date_) AS ?publication_date) ?work (SAMPLE(?quote_) AS ?quote)
+  WHERE {
+    ?work p:P2283 | p:P4510 ?use_statement .
+    ?use_statement (ps:P2283 | ps:P4510) / (wdt:P279*) wd:{{ q }} .
+    OPTIONAL { ?use_statement prov:wasDerivedFrom/pr:P1683 ?quote_ . }
+    ?work wdt:P577 ?publication_datetime .
+    BIND(xsd:date(?publication_datetime) AS ?publication_date_)
+  }
+  GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
+}
+ORDER BY DESC(?publication_date)
+`
+
+  coUsedSparql = `
+SELECT
+  ?count
+  ?coused ?cousedLabel ?cousedDescription
+  ?example_work ?example_workLabel
+WITH {
+  # Find works that are using a specific software,
+  # and find other software used in the found works
+  SELECT ?coused (COUNT(?work) as ?count) (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    ?work (wdt:P2283 | wdt:P4510) / (wdt:P279*) wd:{{ q }} .
+    ?work wdt:P2283 | wdt:P4510 ?coused .
+    FILTER (?coused != wd:{{ q }})
+  }
+  GROUP BY ?coused
+} AS %result
+WHERE {
+  # Label the result
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
+}
+ORDER BY DESC(?count)  
+  `
+
+ 
+ $(document).ready(function() {
+     sparqlToDataTable(recentWorkUsingTheUsedSparql,
+		       "#recent-work-using-the-used");
+     sparqlToDataTable(coUsedSparql, "#co-used");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Use</h1>
+
+<div id="intro"></div>
+
+<h2 id="Recent work using the software">Recent work using the used</h2>
+
+<table class="table table-hover" id="recent-work-using-the-used"></table>
+
+
+<h2 id="Co-used">Co-used</h2>
+
+<table class="table table-hover" id="co-used"></table>
+
+
+<h2 id="Topics of works using the software">Topics of works using the used</h2>
+
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20%28wdt%3AP2283%20%7C%20wdt%3AP4510%29%20%2F%20wdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+</div>
+
+<h2 id="Authors of works using the software">Authors of works using the used</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fauthor%20%3FauthorLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20%28wdt%3AP2283%20%7C%20wdt%3AP4510%29%20%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+</div>
+
+
+{% endblock %}
+    
