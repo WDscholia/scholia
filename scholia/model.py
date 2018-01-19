@@ -85,7 +85,9 @@ class Work(dict):
             qs += 'LAST\tP407\t{}\n'.format(self['language_q'])
 
         # Homepage
-        if 'url' in self:
+        if 'homepage' in self:
+            qs += 'LAST\tP856\t"{}"\n'.format(self['homepage'])
+        elif 'url' in self:
             qs += 'LAST\tP856\t"{}"\n'.format(self['url'])
 
         # Fulltext URL
