@@ -27,7 +27,7 @@ WITH {
     UNION
     {
       # participant
-      ?person wdt:P1344 wd:{{ q }} .
+      ?person wdt:P1344 | ^wdt:P710 wd:{{ q }} .
       BIND("participant" AS ?role)
     }
   }
