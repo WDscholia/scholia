@@ -51,9 +51,62 @@ WHERE {
 ORDER BY DESC(?number_of_publications)
 `
 
+  topicsSparql = `
+SELECT ?score ?topic ?topicLabel ?topicDescription
+WITH {
+  SELECT
+    DISTINCT ?person
+  WHERE {
+    {
+      # speaker
+      wd:{{ q }} wdt:P823 ?person .
+    }
+    UNION
+    {
+      # organizer
+      wd:{{ q }} wdt:P664 ?person .
+    }
+    UNION
+    {
+      # participant
+      ?person wdt:P1344 | ^wdt:P710 wd:{{ q }} .
+    }
+  }
+} AS %persons  
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score) ?topic
+  WHERE {
+    {
+      wd:{{ q }} wdt:P921 ?topic .
+      BIND(50 AS ?score_)
+    }
+    UNION
+    {
+      INCLUDE %persons
+      ?person ^wdt:P50 / wdt:P921 ?topic .
+      BIND(1 AS ?score_)
+    }
+    UNION
+    {
+      wd:{{ q }} ^wdt:P4745 / ^wdt:P1433 / wdt:P921 ?topic .
+      BIND(7 AS ?score_)
+    }
+      
+  }
+  GROUP BY ?topic
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+`
  
  $(document).ready(function() {
      sparqlToDataTable(personsSparql, "#persons");
+     sparqlToDataTable(topicsSparql, "#topics");
  });
 
 
@@ -80,6 +133,10 @@ ORDER BY DESC(?number_of_publications)
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20%3Ftime%20%3Fitem%20%3FitemLabel%20%3Fimage%0AWHERE%20%7B%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP580%20%7C%20wdt%3AP585%20%3Ftime%20.%0A%20%20%20%20OPTIONAL%20%7B%20wd%3A{{ q }}%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20%20%20BIND%28wd%3AQ24575110%20AS%20%3Fitem%29%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP582%20%3Ftime%20.%0A%20%20%20%20OPTIONAL%20%7B%20wd%3A{{ q }}%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20%20%20BIND%28wd%3AQ24575125%20AS%20%3Fitem%29%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%20wd%3A{{ q }}%20p%3AP793%20%5B%20ps%3AP793%20%3Fitem%20%3B%20pq%3AP585%20%3Ftime%20%5D%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0A%20%20%0A%20%20"></iframe>
 </div>
 
+
+<h2>Topic scores</h2>
+
+<table class="table table-hover" id="topics"></table>
 
 
 
