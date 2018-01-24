@@ -103,10 +103,56 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 `
- 
+
+  recentPublicationsSparql = `
+SELECT
+  ?publication_date
+  ?work ?workLabel
+  ?authors
+WITH {
+  SELECT
+    DISTINCT ?person
+  WHERE {
+    {
+      # speaker
+      wd:{{ q }} wdt:P823 ?person .
+    }
+    UNION
+    {
+      # organizer
+      wd:{{ q }} wdt:P664 ?person .
+    }
+    UNION
+    {
+      # participant
+      ?person wdt:P1344 | ^wdt:P710 wd:{{ q }} .
+    }
+  }
+} AS %persons  
+WITH {
+  SELECT
+    (MAX(?publication_datetime) AS ?publication_date)
+    ?work
+    (GROUP_CONCAT(?person_label; separator=" // ") AS ?authors)
+  WHERE {
+    INCLUDE %persons .
+    ?work wdt:P50 ?person ; wdt:P577 ?publication_datetime .
+    ?person rdfs:label ?person_label . FILTER(LANG(?person_label) = 'en')
+  }
+  GROUP BY ?work
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?publication_date)
+LIMIT 500
+`
+
  $(document).ready(function() {
      sparqlToDataTable(personsSparql, "#persons");
      sparqlToDataTable(topicsSparql, "#topics");
+     sparqlToDataTable(recentPublicationsSparql, "#recent-publications");
  });
 
 
@@ -137,6 +183,11 @@ LIMIT 200
 <h2>Topic scores</h2>
 
 <table class="table table-hover" id="topics"></table>
+
+
+<h2>Recent publications</h2>
+
+<table class="table table-hover" id="recent-publications"></table>
 
 
 
