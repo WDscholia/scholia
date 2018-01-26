@@ -3,7 +3,32 @@
 {% block scripts %}
 {{super()}}
 
-<script type="text/javascript">
+  <script type="text/javascript">
+ listOfOrganizationsSparql = `
+SELECT
+  ?organization ?organizationLabel ?organizationDescription
+  ?location ?locationLabel
+  ?country ?countryLabel
+WITH {
+  SELECT
+    ?organization
+    (SAMPLE(?location_) AS ?location)
+    (SAMPLE(?country_) AS ?country)
+  WHERE {
+    VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    OPTIONAL { ?organization wdt:P131 | wdt:P159 ?location_ }
+    OPTIONAL { ?organization wdt:P17 ?country_ }
+  }
+  GROUP BY ?organization
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,nl,no,ru,sv,zh". }
+}
+`
+
+
+
  coAuthorshipsSparql = `
 SELECT DISTINCT ?author1 ?author1Label ?author2 ?author2Label ?work ?workLabel WHERE {
   VALUES ?organization1 { 
@@ -23,6 +48,7 @@ LIMIT 500
  `;
 
  $(document).ready(function() {
+     sparqlToDataTable(listOfOrganizationsSparql, "#list-of-organizations");
      sparqlToDataTable(coAuthorshipsSparql, "#co-authorships");
  });
 </script>
@@ -36,6 +62,8 @@ LIMIT 500
 <h1 id="h1">Organizations</h1>
 
 <div id="intro"></div>
+
+<table class="table table-hover" id="list-of-organizations"></table>
 
 
 <h2 id="Co-authorships">Co-authorships</h2>
