@@ -27,8 +27,6 @@ WHERE {
 }
 `
 
-
-
  coAuthorshipsSparql = `
 SELECT DISTINCT ?author1 ?author1Label ?author2 ?author2Label ?work ?workLabel WHERE {
   VALUES ?organization1 { 
@@ -47,9 +45,53 @@ ORDER BY ?author1Label
 LIMIT 500
  `;
 
+  topicTreeMapSparql = `
+#defaultView:TreeMap
+SELECT
+  ?number_of_works
+  ?topic ?topicLabel
+  ?organization ?organizationLabel  
+WITH {
+  # Bind organizations to variable
+  SELECT ?organization WHERE {
+    VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+  }
+} AS %organizations
+WITH {
+  # Find works associated with the organizations
+  SELECT
+    # Should not count authors twice
+    DISTINCT ?work ?organization
+  WHERE {
+    INCLUDE %organizations
+    ?work wdt:P50 / (wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*)) ?organization . 
+  }
+} AS %works
+WITH {
+  # Count the number of works per topic per organization
+  SELECT
+    (COUNT(?work) AS ?number_of_works) ?topic ?organization
+  WHERE {
+    INCLUDE %works
+    ?work wdt:P921 ?topic .
+  } 
+  GROUP BY ?topic ?organization
+} AS %work_numbers
+WHERE {
+  # Join the work and citation counts
+  INCLUDE %work_numbers
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?number_of_works)
+LIMIT 100
+`
+
+
+
  $(document).ready(function() {
      sparqlToDataTable(listOfOrganizationsSparql, "#list-of-organizations");
      sparqlToDataTable(coAuthorshipsSparql, "#co-authorships");
+     sparqlToDataTable(topicTreeMapSparql, "#topic-tree-map");
  });
 </script>
 
@@ -83,7 +125,30 @@ LIMIT 500
 <h2 id="Citations per year">Citations per year</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%3Fyear_of_citation%20%28COUNT%28%3Fwork%29%20AS%20%3Fnumber_of_citations%29%20%3Forganization%20%3ForganizationLabel%20%20%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fyear_of_citation%20%3Fciting_work%20%3Fwork%20%3Forganization%20WHERE%20%7B%0A%20%20%20%20%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20%20%20%20%20VALUES%20%3Forganization%20%7B%20%20{% for q in qs %} wd:{{ q }} {% endfor %}%7D%0A%20%20%20%20%20%20%3Fauthor%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20%28wdt%3AP1416%2Fwdt%3AP361%2a%29%20%3Forganization%20.%20%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fpublication_date%20.%0A%20%20%20%20%20%20BIND%28STR%28YEAR%28%3Fpublication_date%29%29%20AS%20%3Fyear_of_citation%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fciting_work%20%3Fwork%20%3Fyear_of_citation%20%3Forganization%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AGROUP%20BY%20%3Fyear_of_citation%20%3Forganization%20%3ForganizationLabel%0AORDER%20BY%20%3Fyear_of_citation%0A%20"></iframe></div>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%0A%20%20%3Fyear_of_citation%0A%20%20%3Fnumber_of_citations%0A%20%20%3Forganization%20%3ForganizationLabel%20%20%0AWITH%20%7B%0A%20%20%23%20Bind%20organizations%20to%20variable%0A%20%20SELECT%20%3Forganization%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Forganization%20%7B%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%7D%0A%20%20%7D%0A%7D%20AS%20%25organizations%0AWITH%20%7B%0A%20%20%23%20Find%20works%20author%20by%20the%20organization%0A%20%20SELECT%0A%20%20%20%20DISTINCT%20%3Fwork%20%3Forganization%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25organizations%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%2F%20%28wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20%28wdt%3AP1416%2Fwdt%3AP361%2a%29%29%20%3Forganization%20.%20%0A%20%20%7D%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20%23%20Count%20citations%20per%20year%20per%20organization%0A%20%20SELECT%0A%20%20%20%20%3Fyear_of_citation%0A%20%20%20%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fnumber_of_citations%29%0A%20%20%20%20%3Forganization%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%0A%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fpublication_date%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fpublication_date%29%29%20AS%20%3Fyear_of_citation%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear_of_citation%20%3Forganization%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20%23%20Since%201990%0A%20%20%23%20FILTER%20%28%3Fyear_of_citation%20%3E%3D%20%221990%22%29%0A%20%20%0A%20%20%23%20Label%20the%20results%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20%3Fyear_of_citation%0A%20"></iframe></div>
+
+
+<h2 id="Citations to work ratio">Citations to works ratio</h2>
+
+The ratio between the number of citations received and the works authored
+per organization per year.
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%0A%20%20%28%3Fyear_of_citation%20AS%20%3Fyear%29%0A%20%20%28%3Fnumber_of_citations%2F%3Fnumber_of_works%20AS%20%3Fcitations_to_works_ratio%29%0A%20%20%3Fnumber_of_works%0A%20%20%3Fnumber_of_citations%0A%20%20%3Forganization%20%3ForganizationLabel%20%20%0AWITH%20%7B%0A%20%20%23%20Bind%20organizations%20to%20variable%0A%20%20SELECT%20%3Forganization%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Forganization%20%7B%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%7D%0A%20%20%7D%0A%7D%20AS%20%25organizations%0AWITH%20%7B%0A%20%20%23%20Find%20works%20associated%20with%20the%20organizations%0A%20%20SELECT%0A%20%20%20%20%23%20Should%20not%20count%20authors%20twice%0A%20%20%20%20DISTINCT%20%3Fwork%20%3Forganization%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25organizations%0A%20%20%20%20%3Fauthor%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20%28wdt%3AP1416%2Fwdt%3AP361%2a%29%20%3Forganization%20.%20%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%7D%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20%23%20Count%20the%20number%20of%20works%20published%20per%20year%20per%20organization%0A%20%20SELECT%0A%20%20%20%20%3Fyear_of_cited%20%28COUNT%28%3Fwork%29%20AS%20%3Fnumber_of_works%29%20%3Forganization%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fcited_publication_date%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fcited_publication_date%29%29%20AS%20%3Fyear_of_cited%29%0A%20%20%7D%20%0A%20%20GROUP%20BY%20%3Fyear_of_cited%20%3Forganization%0A%7D%20AS%20%25work_numbers%0AWITH%20%7B%0A%20%20%23%20Count%20the%20number%20of%20citations%20received%20per%20year%20per%20organization%0A%20%20SELECT%20%0A%20%20%20%20%3Fyear_of_citation%20%28COUNT%28%3Fwork%29%20AS%20%3Fnumber_of_citations%29%20%3Forganization%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%20%0A%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fciting_publication_date%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fciting_publication_date%29%29%20AS%20%3Fyear_of_citation%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear_of_citation%20%3Forganization%0A%7D%20AS%20%25citation_numbers%0AWHERE%20%7B%0A%20%20%23%20Join%20the%20work%20and%20citation%20counts%0A%20%20INCLUDE%20%25citation_numbers%0A%20%20INCLUDE%20%25work_numbers%0A%20%20FILTER%20%28%3Fyear_of_citation%20%3D%20%3Fyear_of_cited%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20%3Fyear_of_citation%0A%20"></iframe></div>
+
+
+<h2 id="Topics">Topics</h2>
+
+Tree map of most common topics in works authored by people associated with the
+organizations. 
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATreeMap%0ASELECT%0A%20%20%3Fnumber_of_works%0A%20%20%3Ftopic%20%3FtopicLabel%0A%20%20%3Forganization%20%3ForganizationLabel%20%20%0AWITH%20%7B%0A%20%20%23%20Bind%20organizations%20to%20variable%0A%20%20SELECT%20%3Forganization%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Forganization%20%7B%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%7D%0A%20%20%7D%0A%7D%20AS%20%25organizations%0AWITH%20%7B%0A%20%20%23%20Find%20works%20associated%20with%20the%20organizations%0A%20%20SELECT%0A%20%20%20%20%23%20Should%20not%20count%20authors%20twice%0A%20%20%20%20DISTINCT%20%3Fwork%20%3Forganization%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25organizations%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%2F%20%28wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20%28wdt%3AP1416%2Fwdt%3AP361%2a%29%29%20%3Forganization%20.%20%0A%20%20%7D%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20%23%20Count%20the%20number%20of%20works%20per%20topic%20per%20organization%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28%3Fwork%29%20AS%20%3Fnumber_of_works%29%20%3Ftopic%20%3Forganization%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%20%0A%20%20GROUP%20BY%20%3Ftopic%20%3Forganization%0A%7D%20AS%20%25work_numbers%0AWHERE%20%7B%0A%20%20%23%20Join%20the%20work%20and%20citation%20counts%0A%20%20INCLUDE%20%25work_numbers%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fnumber_of_works%29%0ALIMIT%20100%0A%20"></iframe>
+</div>
+
+
+
+<table class="table table-hover" id="topic-tree-map"></table>
 
 
 
