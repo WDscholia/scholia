@@ -314,6 +314,11 @@ def q_to_class(q):
             ]):
         class_ = 'organization'
     elif set(classes).intersection([
+            'Q1656682',  # event
+            'Q27968055',  # recurrent event edition (event in a series)
+            ]):
+        class_ = 'event'
+    elif set(classes).intersection([
             'Q12136',  # disease
             'Q389735',  # cardiovascular system disease
             'Q18965518',  # artery disease
