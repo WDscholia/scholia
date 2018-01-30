@@ -46,7 +46,6 @@ LIMIT 500
  `;
 
   topicTreeMapSparql = `
-#defaultView:TreeMap
 SELECT
   ?number_of_works
   ?topic ?topicLabel
@@ -78,7 +77,7 @@ WITH {
   GROUP BY ?topic ?organization
 } AS %work_numbers
 WHERE {
-  # Join the work and citation counts
+  # Label the items returned
   INCLUDE %work_numbers
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
 }
