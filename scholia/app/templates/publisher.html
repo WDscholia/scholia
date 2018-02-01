@@ -30,6 +30,32 @@ group by ?journal ?journalLabel
 order by desc(?number_of_papers)
   `
 
+  listOfEditorsSparql = `
+SELECT
+  ?number_of_editorships
+  ?editor ?editorLabel 
+  ?example_venue ?example_venueLabel
+WITH {
+  SELECT
+    (COUNT(?venue_) AS ?number_of_editorships)
+    ?editor
+    (SAMPLE(?venue_) AS ?example_venue)
+    # (GROUP_CONCAT(?journal_label; separator=" // ") AS ?venues)
+  WHERE {
+    # Find editors for a work published by publisher
+    ?venue_ wdt:P123 wd:{{ q }} .
+    ?venue_ wdt:P98 ?editor .
+    # ?venue_ rdfs:label ?venue_label . FILTER(LANG(?venue_label) = 'en')
+  } 
+  GROUP BY ?editor
+} AS %result
+WHERE {
+  # Label the result
+  INCLUDE %result 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,fr,jp,nl,sv,ru,zh" . } 
+}
+  `
+
   mostCitedSparql = `
 # Count the number of citations for each journal published by a specified publisher
 SELECT
@@ -55,6 +81,7 @@ ORDER BY DESC(?number_of_citations)
 
  $(document).ready(function() {
      sparqlToDataTable(journalSparql, "#journals");
+     sparqlToDataTable(listOfEditorsSparql, "#list-of-editors");
      sparqlToDataTable(mostCitedSparql, "#mostCited");
  });
 </script>
@@ -82,11 +109,18 @@ At most 50 journals are displayed.
 </div>
 
 
-<h2>Associated editors</h2>
+<h2>Editors</h2>
+
+Editors association with the publisher, e.g., by being editor of a journal or a
+proceeding published by the publisher.
+
+<table class="table table-hover" id="list-of-editors"></table>
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%20%3Fimage%20%3Feditor%20%3FeditorLabel%20%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fimage%20%3Feditor%20WHERE%20%7B%0A%20%20%20%20%23%20Find%20editors%20for%20journals%20published%20by%20publisher%0A%20%20%20%20%3Fjournal%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fjournal%20wdt%3AP98%20%3Feditor%20.%0A%20%20%20%20%0A%20%20%20%20%23%20Optional%20image%2C%20if%20not%20available%20just%20a%20white%20background%0A%20%20%20%20OPTIONAL%20%7B%20%3Feditor%20wdt%3AP18%20%3Fimage_%20.%20%7D%0A%20%20%20%20BIND%28COALESCE%28%3Fimage_%2C%20%3Chttp%3A%2F%2Fcommons.wikimedia.org%2Fwiki%2FSpecial%3AFilePath%2FWhite180x1px.jpg%3E%29%20AS%20%3Fimage%29%0A%20%20%7D%20%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Cfr%2Cjp%2Cnl%2Csv%2Cru%2Czh%22%20.%20%7D%20%0A%7D%0AORDER%20BY%20%3FeditorLabel%20%20%20"></iframe>
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%0A%20%20%3Fimage%0A%20%20%3Feditor%20%3FeditorLabel%20%0A%20%20%3Fvenues%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%0A%20%20%20%20%28SAMPLE%28%3Fimage_%29%20AS%20%3Fimage%29%0A%20%20%20%20%3Feditor%20%0A%20%20%20%20%28GROUP_CONCAT%28%3Fvenue_label%3B%20separator%3D%22%20%2F%2F%20%22%29%20AS%20%3Fvenues%29%0A%20%20WHERE%20%7B%0A%20%20%20%20%23%20Find%20editors%20for%20journals%20published%20by%20publisher%0A%20%20%20%20%3Fvenue_%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fvenue_%20wdt%3AP98%20%3Feditor%20.%0A%20%20%20%20%3Feditor%20wdt%3AP18%20%3Fimage_%20.%0A%20%20%20%20OPTIONAL%20%7B%0A%20%20%20%20%20%20%3Fvenue_%20rdfs%3Alabel%20%3Fvenue_label%20.%20FILTER%28LANG%28%3Fvenue_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Feditor%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Cfr%2Cjp%2Cnl%2Csv%2Cru%2Czh%22%20.%20%7D%20%0A%7D%0A"></iframe>
 </div>
+
+
 
 
 <h2>Citations</h2>
