@@ -105,7 +105,7 @@ class TextToTopicQText():
         except JSONDecodeError:
             # In some cases a timeout may occur in the middle of a response,
             # making the JSON returned invalid.
-            response = requests.get(
+            response_data = requests.get(
                 'https://query.wikidata.org/sparql',
                 params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'})
 
