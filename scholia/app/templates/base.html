@@ -35,7 +35,7 @@
 
       try {
 	  var doi = item.claims.P356[0].mainsnak.datavalue.value;
-	  $( '#details' ).append( 'DOI: <a href="https://dx.doi.org/' + doi + '">' + doi + '</a>. ');
+	  $( '#details' ).append( 'DOI: <a href="https://doi.org/' + doi + '">' + doi + '</a>. ');
                }
       catch(e) {}
       
