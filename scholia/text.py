@@ -61,8 +61,9 @@ class TextToTopicQText():
 
     def __init__(self):
         """Set up attributes."""
+        self.headers = {'User-Agent': 'Scholia'}
         self.mapper = self.get_mapper()
-
+        
         tokens = self.mapper.keys()
         tokens = sorted(tokens, key=len, reverse=True)
         tokens = [re.escape(token) for token in tokens if len(token) > 3]
@@ -98,17 +99,20 @@ class TextToTopicQText():
         """
         response = requests.get(
             'https://query.wikidata.org/sparql',
-            params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'})
+            params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'},
+            headers=self.headers)
 
         try:
             response_data = response.json()
         except JSONDecodeError:
             # In some cases a timeout may occur in the middle of a response,
             # making the JSON returned invalid.
-            response_data = requests.get(
+            response = requests.get(
                 'https://query.wikidata.org/sparql',
-                params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'})
-
+                params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'},
+                headers=self.headers)
+            response_data = response.json()
+            
         data = response_data['results']['bindings']
 
         mapper = {}
