@@ -54,6 +54,8 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 
 # Wikidata item identifier matcher
 q_pattern = '<regex("Q[1-9]\d*"):q>'
+q1_pattern = '<regex("Q[1-9]\d*"):q1>'
+q2_pattern = '<regex("Q[1-9]\d*"):q2>'
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 
 p_pattern = '<regex("P[1-9]\d*"):p>'
@@ -494,6 +496,57 @@ def redirect_issn(issn):
         q = qs[0]
         return redirect(url_for('app.show_venue', q=q), code=302)
     return render_template('404.html')
+
+
+@main.route('/location/')
+def show_location_empty():
+    """Return location index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for location view.
+
+    """
+    return render_template('location_empty.html')
+
+
+@main.route('/location/' + q_pattern)
+def show_location(q):
+    """Return HTML rendering for specific location.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific location.
+
+    """
+    return render_template('location.html', q=q)
+
+
+@main.route('/location/' + q1_pattern + '/topic/' + q2_pattern)
+def show_location_topic(q1, q2):
+    """Return HTML rendering for specific location and topic
+
+    Parameters
+    ----------
+    q1 : str
+        Wikidata item identifier for location.
+    q2 : str
+        Wikidata item identifier for topic
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific location and topic.
+
+    """
+    return render_template('location_topic.html', q1=q1, q2=q2, q=q1)
 
 
 @main.route('/orcid/<orcid>')

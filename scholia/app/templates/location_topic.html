@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    nearbyResearchersSparql = `
+SELECT
+  ?score
+  ?author ?authorLabel
+  ?example_work ?example_workLabel
+WITH {
+  # Universities, research centers, etc.
+  SELECT ?university WHERE {
+    VALUES ?university { wd:Q3918 wd:Q1371037 wd:Q7315155 wd:Q31855 }
+  }
+} AS %universities
+WITH {
+  # Academic institutions on all levels
+  SELECT DISTINCT ?organization ?other_geo WHERE {
+    INCLUDE %universities
+    ?organization wdt:P361* / wdt:P31 / wdt:P279* ?university .
+    ?organization wdt:P625 ?other_geo .
+  }
+} AS %organizations
+WITH {
+  # Compute distance for authors
+  SELECT
+    (MAX(?inverse_distance_) AS ?inverse_distance)
+    ?author
+  WHERE {
+    INCLUDE %organizations
+    wd:{{ q1 }} wdt:P625 ?geo .
+    BIND(1 / geof:distance(?other_geo, ?geo) AS ?inverse_distance_)
+    ?author wdt:P108 | wdt:P1416 ?organization .  
+    FILTER(?inverse_distance_ > 0.01)
+  }
+  GROUP BY ?author
+} AS %authors_with_distance
+WITH {
+  SELECT
+    ?author
+    (SUM(?topic_score) * MAX(?inverse_distance) AS ?score)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    INCLUDE %authors_with_distance
+    {
+      ?work wdt:P50 ?author .
+      ?work wdt:P921 / wdt:P279* wd:{{ q2 }} . BIND(3 AS ?topic_score)
+    }
+    UNION
+    { ?author wdt:P101 wd:{{ q2 }} . BIND(20 AS ?topic_score) }
+  }
+  GROUP BY ?author
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score) 
+`;
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(nearbyResearchersSparql, "#nearby-researchers");
+ });
+</script>
+
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1 id="h1">Location-topic</h1>
+
+<div id="intro"></div>
+
+
+<h2 id="Nearby researchers">Nearby researchers</h2>
+
+(links does not work)
+
+<table class="table table-hover" id="nearby-researchers"></table>
+
+
+{% endblock %}
