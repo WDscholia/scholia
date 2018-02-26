@@ -29,8 +29,45 @@ ORDER BY DESC(?number_of_authors) DESC(?number_of_works)
  `;
 
 
+  authorsSparql = `
+SELECT
+  ?number_of_citing_works
+  ?author ?authorLabel
+  ?organization ?organizationLabel
+  ?example_work ?example_workLabel
+WITH {
+  SELECT DISTINCT ?author WHERE {
+    ?author wdt:P27 | wdt:P1416/wdt:P17 | wdt:P108/wdt:P17 wd:{{ q }} .
+  }
+} AS %authors
+WITH {
+  SELECT
+    ?author 
+    (COUNT(DISTINCT ?citing_work) AS ?number_of_citing_works)
+    (SAMPLE(?organization_) AS ?organization)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    INCLUDE %authors
+    ?work wdt:P50 ?author .
+    ?citing_work wdt:P2860 ?work .
+    OPTIONAL {
+      ?author wdt:P1416 | wdt:P108 ?organization_ .
+      ?organization_ wdt:P17 wd:{{ q }}
+    }
+  }
+  GROUP BY ?author 
+} AS %results
+WHERE {
+  INCLUDE %results
+  service wikibase:label { bd:serviceParam wikibase:language "en" . } 
+}
+ORDER BY DESC(?number_of_citations) 
+`
+
+
  $(document).ready(function() {
      sparqlToDataTable(organizationsSparql, "#organizations");
+     sparqlToDataTable(authorsSparql, "#authors");
  });
 </script>
 
@@ -47,7 +84,7 @@ ORDER BY DESC(?number_of_authors) DESC(?number_of_works)
 <div id="intro"></div>
 
 
-<h2 id="Employees and affiliated">Organizations</h2>
+<h2 id="Organization">Organizations</h2>
 
 <table class="table table-hover" id="organizations"></table>
 
@@ -57,6 +94,11 @@ ORDER BY DESC(?number_of_authors) DESC(?number_of_works)
 <div class="embed-responsive embed-responsive-4by3">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATree%0ASELECT%0A%20%20%3Forganization%20%3ForganizationLabel%0A%20%20%3Fsuborganization%20%3FsuborganizationLabel%0A%20%20%3Fsubsuborganization%20%3FsubsuborganizationLabel%0AWITH%20%7B%0A%20%20SELECT%20%3Ftype%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Ftype%20%7B%20wd%3AQ3918%20wd%3AQ1371037%20%7D%0A%20%20%7D%0A%7D%20AS%20%25types%0AWHERE%20%7B%0A%20%20INCLUDE%20%25types%0A%20%20%3Forganization%20wdt%3AP17%20wd%3A{{ q }}%20.%0A%20%20%3Forganization%20wdt%3AP31%20%3Ftype%20.%0A%20%20OPTIONAL%20%7B%0A%20%20%20%20%3Fsuborganization%20wdt%3AP361%20%3Forganization%20.%0A%20%20%20%20OPTIONAL%20%7B%20%3Fsubsuborganization%20wdt%3AP361%20%3Fsuborganization%20%7D%0A%20%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22.%20%7D%0A%7D"></iframe>
 </div>
+
+
+<h2 id="Authors">Authors</h2>
+
+<table class="table table-hover" id="authors"></table>
 
 
 <h2 id="Co-organizations">Co-organizations</h2>
