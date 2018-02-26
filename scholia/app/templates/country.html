@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    organizationsSparql = `
+SELECT
+  ?number_of_authors
+  ?number_of_works
+  ?organization ?organizationLabel
+WITH {  
+  SELECT
+    ?organization
+    (COUNT(DISTINCT ?author) AS ?number_of_authors)
+    (COUNT(DISTINCT ?work) AS ?number_of_works)
+  WHERE {
+    ?organization wdt:P17 wd:{{ q }} .
+    ?author wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?organization .
+    ?work wdt:P50 ?author .
+  }
+  GROUP BY ?organization 
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?number_of_authors) DESC(?number_of_works)
+ `;
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(organizationsSparql, "#organizations");
+ });
+</script>
+
+
+{% endblock %}
+
+
+
+
+{% block page_content %}
+
+<h1 id="h1">Country</h1>
+
+<div id="intro"></div>
+
+
+<h2 id="Employees and affiliated">Organizations</h2>
+
+<table class="table table-hover" id="organizations"></table>
+
+
+<h2 id="Organizational tree">Organizational tree</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATree%0ASELECT%0A%20%20%3Forganization%20%3ForganizationLabel%0A%20%20%3Fsuborganization%20%3FsuborganizationLabel%0A%20%20%3Fsubsuborganization%20%3FsubsuborganizationLabel%0AWITH%20%7B%0A%20%20SELECT%20%3Ftype%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Ftype%20%7B%20wd%3AQ3918%20wd%3AQ1371037%20%7D%0A%20%20%7D%0A%7D%20AS%20%25types%0AWHERE%20%7B%0A%20%20INCLUDE%20%25types%0A%20%20%3Forganization%20wdt%3AP17%20wd%3A{{ q }}%20.%0A%20%20%3Forganization%20wdt%3AP31%20%3Ftype%20.%0A%20%20OPTIONAL%20%7B%0A%20%20%20%20%3Fsuborganization%20wdt%3AP361%20%3Forganization%20.%0A%20%20%20%20OPTIONAL%20%7B%20%3Fsubsuborganization%20wdt%3AP361%20%3Fsuborganization%20%7D%0A%20%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22.%20%7D%0A%7D"></iframe>
+</div>
+
+
+<h2 id="Co-organizations">Co-organizations</h2>
+
+International organizations with co-authors.
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Fcoorganization%20%3FcoorganizationLabel%20%3Fgeocoordinates%20%3Fexample_coauthor%20%3Fexample_coauthorLabel%20%3Fexample_work%20%3Fexample_workLabel%0AWITH%20%7B%20%20%0A%20%20SELECT%0A%20%20%20%20%3Fcoorganization%0A%20%20%20%20%28SAMPLE%28%3Fgeocoordinates_%29%20AS%20%3Fgeocoordinates%29%0A%20%20%20%20%28SAMPLE%28%3Fcoauthor%29%20AS%20%3Fexample_coauthor%29%0A%20%20%20%20%28SAMPLE%28%3Fwork%29%20AS%20%3Fexample_work%29%0A%20%20WHERE%20%7B%0A%20%20%20%20%3Forganization%20wdt%3AP17%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fauthor%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20wdt%3AP1416%2Fwdt%3AP361%2a%20%3Forganization%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%2C%20%3Fcoauthor%20.%0A%20%20%20%20%3Fcoauthor%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20wdt%3AP1416%2Fwdt%3AP361%2a%20%3Fcoorganization%20.%0A%20%20%20%20FILTER%20NOT%20EXISTS%20%7B%20%3Fcoorganization%20wdt%3AP17%20wd%3A{{ q }}%20%7D%0A%20%20%20%20%3Fcoorganization%20wdt%3AP625%20%3Fgeocoordinates_%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fcoorganization%20%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D"></iframe>"></iframe>
+</div>
+
+
+
+{% endblock %}

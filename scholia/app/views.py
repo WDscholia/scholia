@@ -335,6 +335,37 @@ def redirect_cas(cas):
     return render_template('404.html')
 
 
+@main.route('/country/')
+def show_country_empty():
+    """Return country index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for country view.
+
+    """
+    return render_template('country_empty.html')
+
+
+@main.route('/country/' + q_pattern)
+def show_country(q):
+    """Return HTML rendering for specific country.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific country.
+
+    """
+    return render_template('country.html', q=q)
+
+
 @main.route('/disease/' + q_pattern)
 def show_disease(q):
     """Return HTML rendering for specific disease.
