@@ -1,0 +1,56 @@
+q,aspect,description
+Q5,author,human
+Q571,work,book
+Q3918,organization,university
+Q7187,gene,gene
+Q7191,award,Nobel prize
+Q7397,software,software
+Q8054,protein,protein
+Q11173,chemical,chemical compound
+Q12136,disease,disease
+Q31855,organization,research institute
+Q36496,chemical,ion
+Q38723,organization,higher education institution
+Q79529,chemical,chemical substance
+Q157031,sponsor,foundation
+Q277759,series,book series
+Q1143604,venue,proceedings
+Q2217301,series,serial (publication series)
+Q5633421,venue,scientific journal
+Q27785883,series,conference proceedings series
+Q10498148,sponsor,research council
+Q2085381,publisher,publisher
+Q479716,publisher,university publisher
+Q3331189,work,edition
+Q13442814,work,scientific article
+Q193622,award,order
+Q230788,award,grant
+Q378427,award,litarary award
+Q407595,chemical,metabolite
+Q618779,award,award
+Q875538,organization,public university
+Q902104,organization,private university
+Q1364556,award,music award
+Q1407225,award,television award
+Q1709894,award,journalism award
+Q1792571,award,art prize
+Q1829324,award,architecture award
+Q4220917,award,film award
+Q11448906,award,science prize
+Q15383322,award,culture award
+Q1371037,organization,technical university
+Q2467461,organization,university department
+Q3354859,organization,collegiate university
+Q4358176,organization,council
+Q7315155,organization,research center
+Q15936437,organization,research university
+Q23002054,organization,private not-for-profit educational
+Q389735,disease,cardiovascular system disease
+Q18965518,disease,artery disease
+Q2393187,chemical,molecular entity
+Q4915012,pathway,biological pathway
+Q1639024,software,mathematical software
+Q21127166,software,Java software library
+Q21129801,software,natural language processing toolkit
+Q24529812,softwarwe,statistical package
+
