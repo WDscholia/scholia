@@ -531,7 +531,7 @@ def show_location(q):
 
 @main.route('/location/' + q1_pattern + '/topic/' + q2_pattern)
 def show_location_topic(q1, q2):
-    """Return HTML rendering for specific location and topic
+    """Return HTML rendering for specific location and topic.
 
     Parameters
     ----------
