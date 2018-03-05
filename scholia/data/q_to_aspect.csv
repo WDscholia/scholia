@@ -1,14 +1,64 @@
 q,aspect,description
-Q15974764,organization,association of universities and higher education institutions in France
-Q38723,organization,higher education institution
-Q2385804,organization,educational institution
 Q5,author,human
-Q157031,sponsor,foundation
 Q515,location,city
+Q571,work,book
+Q3918,organization,university
 Q3957,location,town
+Q6256,country,country
+Q7187,gene,gene
+Q7191,award,Nobel prize
+Q7397,software,software
+Q8054,protein,protein
+Q11173,chemical,chemical compound
+Q12136,disease,disease
+Q31855,organization,research institute
+Q36496,chemical,ion
+Q38723,organization,higher education institution
+Q49848,work,document
+Q79529,chemical,chemical substance
+Q157031,sponsor,foundation
+Q193622,award,order
+Q230788,award,grant
+Q277759,series,book series
+Q378427,award,litarary award
+Q389735,disease,cardiovascular system disease
+Q407595,chemical,metabolite
+Q479716,publisher,university publisher
+Q618779,award,award
+Q875538,organization,public university
+Q902104,organization,private university
+Q1143604,venue,proceedings
+Q1364556,award,music award
+Q1371037,organization,technical university
+Q1407225,award,television award
 Q1549591,location,big city
 Q1637706,location,city with millions of inhabitants
-Q6256,country,country
-Q8054,protein,protein
-Q7187,gene,gene
-Q49848,work,document
+Q1639024,software,mathematical software
+Q1709894,award,journalism award
+Q1792571,award,art prize
+Q1829324,award,architecture award
+Q1980247,work,chapter
+Q2085381,publisher,publisher
+Q2217301,series,serial (publication series)
+Q2385804,organization,educational institution
+Q2393187,chemical,molecular entity
+Q2467461,organization,university department
+Q3331189,work,edition
+Q3354859,organization,collegiate university
+Q4220917,award,film award
+Q4358176,organization,council
+Q4915012,pathway,biological pathway
+Q5633421,venue,scientific journal
+Q7315155,organization,research center
+Q10498148,sponsor,research council
+Q11448906,award,science prize
+Q13442814,work,scientific article
+Q15383322,award,culture award
+Q15936437,organization,research university
+Q15974764,organization,association of universities and higher education institutions in France
+Q18965518,disease,artery disease
+Q21127166,software,Java software library
+Q21129801,software,natural language processing toolkit
+Q23002054,organization,private not-for-profit educational
+Q24529812,software,statistical package
+Q27785883,series,conference proceedings series
