@@ -63,7 +63,7 @@ class TextToTopicQText():
         """Set up attributes."""
         self.headers = {'User-Agent': 'Scholia'}
         self.mapper = self.get_mapper()
-        
+
         tokens = self.mapper.keys()
         tokens = sorted(tokens, key=len, reverse=True)
         tokens = [re.escape(token) for token in tokens if len(token) > 3]
@@ -112,7 +112,7 @@ class TextToTopicQText():
                 params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'},
                 headers=self.headers)
             response_data = response.json()
-            
+
         data = response_data['results']['bindings']
 
         mapper = {}
