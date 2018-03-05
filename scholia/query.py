@@ -33,6 +33,8 @@ from random import choice
 
 import requests
 
+from simplejson import JSONDecodeError
+
 
 def escape_string(string):
     r"""Escape string to be used in SPARQL query.
@@ -225,10 +227,8 @@ def viaf_to_qs(viaf):
 def q_to_class(q):
     """Return Scholia class of Wikidata item.
 
-    The 'class', i.e., which kind of instance, the item is.
-
-    The Wikidata Query Service will be queried for P31 value. The value
-    is compared against a set of hardcoded matches.
+    The 'class', i.e., which kind of instance, the item is by querying
+    the Wikidata Query Service.
 
     Parameters
     ----------
@@ -240,6 +240,11 @@ def q_to_class(q):
     class_ : 'author', 'venue', 'organization', ...
         Scholia class represented as a string.
 
+    Notes
+    -----
+    The Wikidata Query Service will be queried for P31 value. The value
+    is compared against a set of hardcoded matches.
+
     """
     query = 'select ?class where {{ wd:{q} wdt:P31 ?class }}'.format(
         q=escape_string(q))
@@ -247,9 +252,15 @@ def q_to_class(q):
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
-    data = response.json()
-    classes = [item['class']['value'][31:]
-               for item in data['results']['bindings']]
+    try:
+        data = response.json()
+    except JSONDecodeError:
+        # If the Wikidata MediaWiki API does not return a proper
+        # response, then fallback on nothing.
+        classes = []
+    else:
+        classes = [item['class']['value'][31:]
+                   for item in data['results']['bindings']]
 
     # Hard-coded matching match
     if ('Q5' in classes):  # human
