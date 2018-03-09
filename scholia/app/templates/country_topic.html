@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    authorsSparql = `
+SELECT
+  ?number_of_works
+  ?author ?authorLabel
+  ?example_work ?example_workLabel
+WITH {
+  SELECT DISTINCT ?author WHERE {
+    ?author ( wdt:P108 | wdt:P1416 ) / wdt:P17 wd:{{ q1 }} .
+  }
+} AS %authors
+WITH {  
+  SELECT
+    ?author 
+    (COUNT(?work) AS ?number_of_works)
+    (SAMPLE(?work) AS ?example_work) 
+  WHERE {
+    INCLUDE %authors
+    ?work wdt:P50 ?author .       
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q2 }} .
+  }
+  GROUP BY ?author
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+} 
+ORDER BY DESC(?number_of_works) 
+`;
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(authorsSparql, "#authors");
+ });
+</script>
+
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1 id="h1">Country-topic</h1>
+
+<div id="intro"></div>
+
+
+<h2 id="Authors">Authors of the country within the topics</h2>
+
+(links do not work)
+
+<table class="table table-hover" id="authors"></table>
+
+
+<h2 id="Co-author graph">Co-author graph</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%0A%20%20%3Fauthor1%20%3Fauthor1Label%0A%20%20%3Fauthor2%20%3Fauthor2Label%0AWITH%20%7B%0A%20%20SELECT%20%3Forganization%20WHERE%20%7B%0A%20%20%20%20%3Forganization%20wdt%3AP17%20wd%3A{{ q1 }}%20.%0A%20%20%7D%0A%7D%20AS%20%25organizations%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fauthor1%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25organizations%0A%20%20%20%20%3Fauthor1%20%28%20wdt%3AP108%20%7C%20wdt%3AP1416%20%29%20%3Forganization%20.%0A%20%20%7D%0A%7D%20AS%20%25authors1%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fauthor2%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25organizations%0A%20%20%20%20%3Fauthor2%20%28%20wdt%3AP108%20%7C%20wdt%3AP1416%20%29%20%3Forganization%20.%0A%20%20%7D%0A%7D%20AS%20%25authors2%0AWITH%20%7B%20%20%0A%20%20SELECT%0A%20%20%20%20%3Fauthor1%0A%20%20%20%20%3Fwork%0A%20%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%7C%20%28wdt%3AP31%2a%20%2F%20wdt%3AP279%2a%29%20%29%20wd%3A{{ q2 }}%20.%0A%20%20%20%20INCLUDE%20%25authors1%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20.%20%20%0A%20%20%7D%0A%7D%20AS%20%25author_works%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20DISTINCT%20%3Fauthor1%20%3Fauthor2%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25author_works%0A%20%20%20%20INCLUDE%20%25authors2%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor2%20.%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%0A%20%20%7D%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0A"></iframe>
+
+
+{% endblock %}

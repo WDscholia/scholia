@@ -368,6 +368,26 @@ def show_country(q):
     return render_template('country.html', q=q)
 
 
+@main.route('/country/' + q1_pattern + '/topic/' + q2_pattern)
+def show_country_topic(q1, q2):
+    """Return HTML rendering for specific country and topic.
+
+    Parameters
+    ----------
+    q1 : str
+        Wikidata item identifier for country.
+    q2 : str
+        Wikidata item identifier for topic
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific country and topic.
+
+    """
+    return render_template('country_topic.html', q1=q1, q2=q2, q=q1)
+
+
 @main.route('/disease/' + q_pattern)
 def show_disease(q):
     """Return HTML rendering for specific disease.
