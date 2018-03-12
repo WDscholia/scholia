@@ -56,9 +56,11 @@ YEAR_TO_Q = {
     "2011": "Q43904402",
     "2010": "Q43904497",
     "2009": "Q28698531",
+    "2005": "Q50412869",  # NIPS 2005
     "2004": "Q27789295",
     "2000": "Q33040753",
     "1999": "Q41661180",
+    "1997": "Q50413005",  # NIPS 1997
     "1992": "Q47012467",
     "1987": "Q47032920",
 }
@@ -215,7 +217,8 @@ def paper_to_quickstatements(paper):
     qs += 'LAST\tP953\t"{}"\n'.format(paper['full_text_url'])
 
     # Published in
-    qs += 'LAST\tP1433\t{}\n'.format(paper['published_in_q'])
+    if paper['published_in_q']:
+        qs += 'LAST\tP1433\t{}\n'.format(paper['published_in_q'])
 
     return qs
 
