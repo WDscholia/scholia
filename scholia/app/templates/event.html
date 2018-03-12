@@ -149,10 +149,78 @@ ORDER BY DESC(?publication_date)
 LIMIT 500
 `
 
+  relatedEventsSparql = `
+SELECT
+  ?score
+  ?time_score
+  ?location_score
+  ?event ?eventLabel
+WITH {
+  SELECT ?event_type WHERE {
+    VALUES ?event_type { wd:Q2020153 wd:Q46855 wd:Q40444998 }
+  }
+} AS %event_types
+WITH {
+  SELECT ?event WHERE {
+    INCLUDE %event_types
+    ?event wdt:P31 / wdt:P279* ?event_type .
+  }
+} AS %events
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    (MAX(?time_score_) AS ?time_score)
+    (MAX(?location_score_) AS ?location_score)
+    ?event
+  WHERE {
+    INCLUDE %events 
+          
+    { 
+      # Around the same time
+      wd:{{ q }} wdt:P580 | wdt:P585 ?time0 .
+      ?event wdt:P580 | wdt:P585 ?time .
+      BIND((365.25 * YEAR(?time0) + 30.5 * MONTH(?time0) + DAY(?time0)) AS ?day0)
+      BIND((365.25 * YEAR(?time) + 30.5 * MONTH(?time) + DAY(?time)) AS ?day)
+      
+      # TODO: multiple days cause double counting
+      BIND(20 / (1 + ABS(?day - ?day0)) AS ?time_score_)
+    }
+    # UNION
+    {
+      SELECT ?event (MAX(?inverse_distance) AS ?location_score_) WHERE {
+        INCLUDE %events 
+                
+        # geocoordinate of the query event
+        wd:{{ q }} wdt:P276? / wdt:P625 ?geo0 .
+        
+        # geocoordinate of other events
+        ?event wdt:P276? / wdt:P625 ?geo .
+        
+        # inverse distance
+        BIND((200 / (1 + geof:distance(?geo, ?geo0))) AS ?inverse_distance)
+      }
+      GROUP BY ?event
+    }  
+  
+    BIND((?time_score_ * ?location_score_) AS ?score_)
+  }
+  GROUP BY ?event
+  
+} AS %results
+WHERE {
+  INCLUDE %results
+  FILTER (?event != wd:{{ q }})
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?score)
+`
+
+
  $(document).ready(function() {
      sparqlToDataTable(personsSparql, "#persons");
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(recentPublicationsSparql, "#recent-publications");
+     sparqlToDataTable(relatedEventsSparql, "#related-events");
  });
 
 
@@ -187,7 +255,17 @@ LIMIT 500
 
 <h2>Recent publications</h2>
 
+Recent publications by organizers, speakers or participants of the event.
+
 <table class="table table-hover" id="recent-publications"></table>
+
+
+<h2>Related events</h2>
+
+Related events in terms of time and location.
+
+<table class="table table-hover" id="related-events"></table>
+
 
 
 
