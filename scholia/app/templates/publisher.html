@@ -4,33 +4,37 @@
 {{super()}}
 
 <script type="text/javascript">
-    journalSparql = `
-  SELECT
-    (sample(?count) as ?number_of_papers)
-    (max(?bfi) as ?BFI)
-    ?journal ?journalLabel
-    (group_concat(?themes_labels; separator=", ") as ?theme)
+ journalSparql = `
+SELECT
+  (SAMPLE(?number_of_works_) AS ?number_of_works)
+  (MAX(?bfi) AS ?BFI)
+  ?journal ?journalLabel
+  (GROUP_CONCAT(?themes_labels; separator=", ") as ?theme)
+WITH {
+  SELECT 
+    ?journal
+    (COUNT(?work) AS ?number_of_works_)
   WHERE {
-    {
-	select ?journal (count(?work) as ?count) where {
-  	  ?journal wdt:P123 wd:{{ q }} .
-  	  ?work wdt:P1433 ?journal .
-    }
-    group by ?journal 
+    ?journal wdt:P123 wd:{{ q }} .
+    OPTIONAL { ?work wdt:P1433 ?journal . }
   }
-  optional {
+  GROUP BY ?journal 
+} AS %journals
+WHERE {
+  INCLUDE %journals
+  OPTIONAL {
     ?journal wdt:P921 ?themes .
     ?themes rdfs:label ?themes_labels .
-    filter (lang(?themes_labels) = 'en')
+    FILTER (LANG(?themes_labels) = 'en')
   }
-  optional { ?journal wdt:P1240 ?bfi . }
-  service wikibase:label { bd:serviceParam wikibase:language "en,da,fr,jp,de,nl" . } 
+  OPTIONAL { ?journal wdt:P1240 ?bfi . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,nl,ru,sv,zh" . } 
 } 
-group by ?journal ?journalLabel
-order by desc(?number_of_papers)
+GROUP BY ?journal ?journalLabel
+ORDER BY DESC(?number_of_works_)
   `
 
-  listOfEditorsSparql = `
+ listOfEditorsSparql = `
 SELECT
   ?number_of_editorships
   ?editor ?editorLabel 
@@ -56,7 +60,7 @@ WHERE {
 }
   `
 
-  mostCitedSparql = `
+ mostCitedSparql = `
 # Count the number of citations for each journal published by a specified publisher
 SELECT
   ?number_of_citations
@@ -100,12 +104,12 @@ ORDER BY DESC(?number_of_citations)
 <table class="table table-hover" id="journals"></table>
 
 
-<h2>Recently established scientific journals</h2>
+<h2>Recently established journals</h2>
 
 At most 50 journals are displayed.
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20%3Fdatetime%20%3Fvenue%20%3FvenueLabel%20WHERE%20%7B%0A%20%20%23%20Publisher%0A%20%20%3Fvenue%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%0A%20%20%23%20Scientific%20journal%0A%20%20%3Fvenue%20wdt%3AP31%20wd%3AQ5633421%20.%0A%20%20%0A%20%20%23%20When%20the%20journal%20was%20started%20%0A%20%20%3Fvenue%20wdt%3AP571%20%3Fdatetime.%0A%20%20%0A%20%20%23%20Label%20the%20journal%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fdatetime%29%0ALIMIT%2050"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20%3Fdatetime%20%3Fvenue%20%3FvenueLabel%20WHERE%20%7B%0A%20%20%23%20Publisher%0A%20%20%3Fvenue%20wdt%3AP123%20wd%3A{{ q }}%20.%0A%20%20%0A%20%20%23%20Periodic%20literature%0A%20%20%3Fvenue%20wdt%3AP31%20%2F%20wdt%3AP279%2a%20wd%3AQ1002697%20.%0A%20%20%0A%20%20%23%20When%20the%20journal%20was%20started%20%0A%20%20%3Fvenue%20wdt%3AP571%20%3Fdatetime.%0A%20%20%0A%20%20%23%20Label%20the%20journal%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fdatetime%29%0ALIMIT%2050"</iframe>
 </div>
 
 
