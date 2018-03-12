@@ -249,6 +249,7 @@ def scrape_paper_from_url(url):
     ----------
     url : str
         URL to NIPS paper. Should start with https://papers.nips.cc/paper/
+        The URL may either be to the HTML page or the PDF.
 
     Returns
     -------
@@ -275,6 +276,9 @@ def scrape_paper_from_url(url):
     if url[:len(url_paper_base)] != url_paper_base:
         raise ValueError("url should start with " + url_paper_base)
 
+    if url.endswith('.pdf'):
+        url = url[:-4] + '.html'
+    
     entry = {'url': url}
 
     response = requests.get(url)
