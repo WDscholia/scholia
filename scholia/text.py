@@ -111,7 +111,13 @@ class TextToTopicQText():
                 'https://query.wikidata.org/sparql',
                 params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'},
                 headers=self.headers)
-            response_data = response.json()
+            try:
+                response_data = response.json()
+            except JSONDecodeError:
+                # TODO: We may end here due to timeout or (perhaps?) invalid
+                # JSON in the cache. It is unclear what we can do to escape
+                # this problem other than wait. Here is made an empty response.
+                response_data = {'results': {'bindings': []}}
 
         data = response_data['results']['bindings']
 
