@@ -17,7 +17,7 @@ WITH {
 WITH {  
   SELECT
     ?author 
-    (COUNT(?work) AS ?number_of_works)
+    (COUNT(DISTINCT ?work) AS ?number_of_works)
     (SAMPLE(?work) AS ?example_work) 
   WHERE {
     INCLUDE %authors
