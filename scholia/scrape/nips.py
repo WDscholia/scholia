@@ -278,7 +278,7 @@ def scrape_paper_from_url(url):
 
     if url.endswith('.pdf'):
         url = url[:-4] + '.html'
-    
+
     entry = {'url': url}
 
     response = requests.get(url)
