@@ -80,10 +80,30 @@ type="button" data-toggle="dropdown">Work
 		</ul>
 	    </div>
 	</li>
-	<li role="presentation"><a href="{{ url_for('app.show_organization_empty') }}">Organization</a></li>
-	<!-- li role="presentation"><a href="{{ url_for('app.show_location_empty') }}">Location</a></li -->
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-link dropdown-toggle" 
+type="button" data-toggle="dropdown">Organization
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		  <li role="presentation"><a href="{{ url_for('app.show_organization_empty') }}">Organization</a></li>
+		  <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
+		  <li role="presentation"><a href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a></li>
+		</ul>
+	    </div>
+	</li>
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-link dropdown-toggle" 
+type="button" data-toggle="dropdown">Location
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		  <li role="presentation"><a href="{{ url_for('app.show_location_empty') }}">Location</a></li>
+		  <li role="presentation"><a href="{{ url_for('app.show_country_empty') }}">Country</a></li>
+		</ul>
+	    </div>
+	</li>
 	<li role="presentation"><a href="{{ url_for('app.show_event_empty') }}">Event</a></li>
-	<li role="presentation"><a href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a></li>
 	<li role="presentation"><a href="{{ url_for('app.show_award_empty') }}">Award</a></li>
 	<li role="presentation">
 	    <div class="dropdown">
