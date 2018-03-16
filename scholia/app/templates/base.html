@@ -54,8 +54,9 @@
       
       $.getJSON(wikipediaApiUrl, function(data) {
 	  var pages = data.query.pages;
-	  var text = pages[Object.keys(pages)[0]].extract + " ... (from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
-	  $("#intro").text(text);
+	  var text = pages[Object.keys(pages)[0]].extract + " ... "
+	  var html = "(from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
+	  $("#intro").text(text).append(html);
       }).fail(function(d, textStatus, error) {
 	  console.error("getJSON failed, status: " + textStatus + ", error: "+error)
       });
