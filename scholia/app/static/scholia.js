@@ -87,7 +87,8 @@ function sparqlToDataTable(sparql, element) {
 	    data: convertedData.data,
 	    columns: columns,
 	    lengthMenu: [[10, 25, 100, -1], [10, 25, 100, "All"]],
-	    ordering: false,
+	    ordering: true,
+	    order: [], 
 	    paging: (convertedData.data.length > 10),
 	});
 
