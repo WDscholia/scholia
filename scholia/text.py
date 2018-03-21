@@ -32,7 +32,12 @@ TOPIC_LABELS_SPARQL = """
 SELECT ?topic ?topic_label
 WITH {
   SELECT DISTINCT ?topic WHERE {
-    [] wdt:P31 wd:Q13442814 ; wdt:P921 ?topic .
+    []
+
+    # Disabled because of performance
+    # wdt:P31 wd:Q13442814 ;
+
+    wdt:P921 ?topic .
   }
 } AS %topics
 WHERE {
