@@ -35,14 +35,12 @@
 
       try {
           var orcid = item.claims.P496[0].mainsnak.datavalue.value;
-          $( '#details' ).append( '<a href="https://orcid.org/"><img alt="' +
+          $( '#details' ).append( '<div><!-- a href="https://orcid.org/"><!-- img alt="' +
 	      'ORCID logo" src="https://orcid.org/sites/default/files/images/orcid_16x16.png"' +
-	      'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
-	       orcid + '">https://orcid.org/' + orcid + '</a>')
-               }
-      catch(e) {
-          console.error("ORCID error: " + e)
+	      'width="16" height="16" hspace="4" /></a --> <a href="https://orcid.org/' +
+	       orcid + '">ORCID: ' + orcid + '</a></div>')
       }
+      catch(e) {}
 
       try {
 	  var doi = item.claims.P356[0].mainsnak.datavalue.value;
