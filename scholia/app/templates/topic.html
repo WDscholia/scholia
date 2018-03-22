@@ -242,10 +242,18 @@ LIMIT 200
 
 <h3 id="Co-occurring topics graph">Co-occurring topics graph</h3>
 
+Only a maximum of the 400 most often occuring links are shown.
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0Aselect%20distinct%20%3Ftopic1%20%3Ftopic1Label%20%3Ftopic2%20%3Ftopic2Label%20where%20%7B%0A%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftopic1%2C%20%3Ftopic2%20.%20%0A%20%20filter%20%28wd%3A{{ q }}%20%21%3D%20%3Ftopic1%20%26%26%20wd%3A{{ q }}%20%21%3D%20%3Ftopic2%20%26%26%20%3Ftopic1%20%21%3D%20%3Ftopic2%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0A%0A"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%0A%20%20%3Ftopic1%20%3Ftopic1Label%20%3Ftopic2%20%3Ftopic2Label%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic1%20%3Ftopic2%0A%20%20WHERE%20%7B%0A%20%20%20%20%23%20Find%20works%20that%20are%20marked%20with%20main%20subject%20of%20the%20topic.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28%20wdt%3AP31%2a%2Fwdt%3AP279%2a%20%7C%20wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%29%20wd%3A{{ q }}%20.%0A%20%20%20%20%0A%20%20%20%20%23%20Identify%20co-occuring%20topics.%20%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic1%2C%20%3Ftopic2%20.%20%0A%0A%20%20%20%20%23%20Exclude%20the%20topic%20it%20self%0A%20%20%20%20FILTER%20%28wd%3A{{ q }}%20%21%3D%20%3Ftopic1%20%26%26%20wd%3A{{ q }}%20%21%3D%20%3Ftopic2%20%26%26%20%3Ftopic1%20%21%3D%20%3Ftopic2%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic1%20%3Ftopic2%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%0A%20%20%23%20There%20a%20performance%20problems%20in%20the%20browser%3A%20We%20cannot%20show%20large%20graphs%2C%0A%20%20%23%20so%20we%20put%20a%20limit%20on%20the%20number%20of%20links%20displayed.%0A%20%20LIMIT%20400%0A%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20%0A%20%20%23%20Label%20the%20results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%0A%20%20%7D%0A%7D%0A%0A"></iframe>
 </div>
+
+<h3 id="Co-occurring topics map">Co-occurring topics map</h3>
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%0A%20%20%3Flocation%20%3FlocationLabel%0A%20%20%3Fgeo%0A%20%20%3Fexample_work%20%3Fexample_workLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%3Flocation%20%3Fgeo%0A%20%20%20%20%28SAMPLE%28%3Fwork%29%20AS%20%3Fexample_work%29%0A%20%20WHERE%20%7B%0A%20%20%20%20%23%20Find%20works%20that%20are%20marked%20with%20main%20subject%20of%20the%20topic.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28%20wdt%3AP31%2a%2Fwdt%3AP279%2a%20%7C%20wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%29%20wd%3A{{ q }}%20.%0A%20%20%20%20%0A%20%20%20%20%23%20Identify%20co-occuring%20topic%20that%20is%20geo-locatable.%20%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Flocation%20.%0A%20%20%20%20%3Flocation%20wdt%3AP625%20%3Fgeo%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Flocation%20%3Fgeo%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20%0A%20%20%23%20Label%20the%20results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%0A%20%20%7D%0A%7D%0A"></iframe>
+</div>
+
 
 
 <h2 id="Author score">Author score</h2>
