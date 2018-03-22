@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    missingAuthorItemsSparql = `
+SELECT
+  # Number of works with the author
+  ?count
+
+  # Author as a string
+  ?author
+
+  # Link to Magnus Manske's resolver tool
+  (CONCAT(
+      'https://tools.wmflabs.org/sourcemd/new_resolve_authors.php?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?author)) AS ?resolver_url)
+WITH {
+  SELECT DISTINCT ?work WHERE {
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q50826007 .
+  }
+} AS %works
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?author
+  WHERE {
+    INCLUDE %works
+    ?work wdt:P2093 ?author .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+
+  # Label the result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+LIMIT 500
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(missingAuthorItemsSparql, "#missing-author-items");
+ });
+
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Topic </h1>
+
+Missing information with respect to the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}">{{ q }}</a>.
+
+
+<h2>Missing author items</h2>
+
+The authors listed below may only be represented as strings in Wikidata
+with no link to Wikidata items.
+Follow the link to use Magnus Manske's resolver tool to try to resolve
+the authors.
+
+<table class="table table-hover" id="missing-author-items"></table>
+
+
+{% endblock %}
