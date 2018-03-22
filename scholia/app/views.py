@@ -908,6 +908,24 @@ def show_topics(qs):
     return render_template('topics.html', qs=qs)
 
 
+@main.route('/topic/' + q_pattern + '/missing')
+def show_topic_missing(q):
+    """Return rendered HTML for missing page for topic.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifiers.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for topic.
+
+    """
+    return render_template('topic_missing.html', q=q)
+
+
 @main.route('/chemical/' + q_pattern)
 def show_chemical(q):
     """Return html render page for specific chemical.
