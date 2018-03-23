@@ -30,6 +30,12 @@ WITH {
       ?person wdt:P1344 | ^wdt:P710 wd:{{ q }} .
       BIND("participant" AS ?role)
     }
+    UNION
+    {
+      # editor
+      ?person ^wdt:P98 / wdt:P4745 wd:Q48026033 .
+      BIND("editor of proceedings" AS ?role)
+    }
   }
   GROUP BY ?person
 } AS %people  
