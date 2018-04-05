@@ -229,8 +229,10 @@ LIMIT 200
 
 <h3 id="Co-author graph">Co-author graph</h3>
 
+The 25 most prolific authors and their co-authors.
+
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0Aselect%20%3Fauthor1%20%3Fauthor1Label%20%3Fauthor2%20%3Fauthor2Label%20where%20%7B%0A%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20.%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor2%20.%0A%20%20filter%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0A"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Fauthor2%20%3Fauthor2Label%0AWITH%20%7B%0A%20%20%23%20Find%20works%20with%20the%20topic%0A%20%20SELECT%20%3Fwork%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28wdt%3AP31%2a%20%2F%20wdt%3AP279%2a%20%7C%20wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%29%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20%23%20Limit%20the%20number%20of%20authors%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fauthor1%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor1%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%2025%0A%7D%20AS%20%25authors%0AWHERE%20%7B%0A%20%20INCLUDE%20%25works%0A%20%20INCLUDE%20%25authors%0A%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20%2C%20%3Fauthor2%20.%0A%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0A"></iframe>
 </div>
 
 
