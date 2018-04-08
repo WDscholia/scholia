@@ -2,6 +2,7 @@
 
 Usage:
   scholia.text text-to-topic-qs <text>
+  scholia.text text-to-topic-q-text-setup
 
 Options:
   -h | --help  Help
@@ -20,6 +21,15 @@ Description:
   https://tools.wmflabs.org/scholia/topics/<qs>
 
 """
+
+from __future__ import print_function
+
+import errno
+
+from os import makedirs
+from os.path import exists, expanduser, join
+
+from six.moves import cPickle as pickle
 
 import re
 
@@ -51,6 +61,11 @@ WHERE {
 
 Q_PATTERN = re.compile('Q\d+', flags=re.UNICODE | re.DOTALL)
 
+SCHOLIA_DATA_DIRECTORY = join(expanduser('~'), '.scholia')
+
+TEXT_TO_TOPIC_Q_TEXT_FILENAME = join(
+    SCHOLIA_DATA_DIRECTORY, 'text_to_topic_q_text.pck')
+
 
 class TextToTopicQText():
     """Converter of text to Wikidata Q identifier data.
@@ -58,7 +73,7 @@ class TextToTopicQText():
     Attributes
     ----------
     mapper : dict
-        Dictionary between labels and associated Wikidata Q identifiers
+        Dictionary between labels and associated Wikidata Q identifiers.
     pattern : re.SRE_Pattern
         Regular expression pattern for matching Wikidata labels.
 
@@ -67,6 +82,12 @@ class TextToTopicQText():
     def __init__(self):
         """Set up attributes."""
         self.headers = {'User-Agent': 'Scholia'}
+
+        directory = SCHOLIA_DATA_DIRECTORY
+        if not exists(directory):
+            makedirs(directory)
+        self.filename = TEXT_TO_TOPIC_Q_TEXT_FILENAME
+
         self.mapper = self.get_mapper()
 
         tokens = self.mapper.keys()
@@ -93,7 +114,7 @@ class TextToTopicQText():
 
         Notes
         -----
-        This method queries the Wikidata Query SERVICE with a static
+        This method queries the Wikidata Query Service with a static
         SPARQL query. It well take some time to complete, perhaps 30 seconds
         or more.
 
@@ -137,6 +158,13 @@ class TextToTopicQText():
         """Convert match object to mapped value."""
         return self.mapper[match_object.group(0)]
 
+    def save(self, filename=None):
+        """Save object."""
+        if not filename:
+            filename = self.filename
+
+        pickle.dump(self, open(filename, 'w'))
+
     def text_to_topic_q_text(self, text):
         """Convert text to q-text.
 
@@ -170,13 +198,23 @@ class TextToTopicQText():
         """
         return Q_PATTERN.findall(self.text_to_topic_q_text(text))
 
-    __call__ = text_to_topic_q_text
 
+def load_text_to_topic_q_text():
+    """Load an object that is already set up.
 
-text_to_topic_q_text = TextToTopicQText()
+    Load the TextToTopicQText object from a pickle file and if it is not
+    available set it up from the object.
 
-text_to_topic_qs = TextToTopicQText()
-text_to_topic_qs.__call__ = text_to_topic_qs.text_to_topic_qs
+    Returns
+    -------
+    text_to_topic_q_text : TextToTopicQText
+        Text-to-topic-q-text object that is set up and ready to use.
+
+    """
+    try:
+        return pickle.load(open(TEXT_TO_TOPIC_Q_TEXT_FILENAME))
+    except IOError:
+        return TextToTopicQText()
 
 
 def main():
@@ -186,8 +224,19 @@ def main():
     arguments = docopt(__doc__)
 
     if arguments['text-to-topic-qs']:
-        qs = text_to_topic_qs(arguments['<text>'])
+        text_to_topic_q_text = load_text_to_topic_q_text()
+        qs = text_to_topic_q_text.text_to_topic_qs(arguments['<text>'])
         print(",".join(qs))
+
+    elif arguments['text-to-topic-q-text-setup']:
+        text_to_topic_q_text = TextToTopicQText()
+
+        # http://stefaanlippens.net/python-pickling-and-dealing-
+        # with-attributeerror-module-object-has-no-attribute-thing.html
+        TextToTopicQText.__module__ = 'scholia.text'
+
+        text_to_topic_q_text.save()
+        print('{} saved'.format(TEXT_TO_TOPIC_Q_TEXT_FILENAME))
 
 
 if __name__ == '__main__':

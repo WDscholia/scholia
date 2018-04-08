@@ -9,3 +9,7 @@ caption {
     caption-side: bottom;
     text-align: left;
 }
+
+dd {
+    margin: 0 0 1em 2em ;
+}

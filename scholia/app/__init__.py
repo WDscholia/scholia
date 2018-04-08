@@ -6,6 +6,8 @@ from __future__ import absolute_import, division, print_function
 from flask import Flask
 from flask_bootstrap import Bootstrap, StaticCDN
 
+from ..text import TextToTopicQText, load_text_to_topic_q_text
+
 
 def create_app():
     """Create webapp.
@@ -28,5 +30,7 @@ def create_app():
 
     from .views import main as main_blueprint
     app.register_blueprint(main_blueprint)
+
+    app.text_to_topic_q_text = load_text_to_topic_q_text()
 
     return app

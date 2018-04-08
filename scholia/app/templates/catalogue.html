@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ itemsInCatalogueSparql = `
+SELECT
+  ?number
+  ?code
+  ?item ?itemLabel ?itemDescription
+WHERE {
+  # Find catalogue items
+  ?item p:P972 ?catalogue_statement .
+  ?catalogue_statement ps:P972 wd:{{ q }} .
+
+  # Optionally the catalogue code or the serial order
+  OPTIONAL { ?catalogue_statement pq:P528 | pq:P1545 ?code }
+
+  # For numerical sorting the catalogue code should be converted to an integer
+  BIND(xsd:integer(?code) AS ?number)
+
+  # Label the result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY ?number ?code
+LIMIT 1000
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(itemsInCatalogueSparql, "#items-in-catalogue");
+ });
+</script>
+
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Catalogue</h1>
+
+<div id="intro"></div>
+
+
+<h2>Items in catalogue</h2>
+
+<table class="table table-hover" id="items-in-catalogue"></table>
+
+
+<h2>Images</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%0A%20%20%3Fimage%0A%20%20%3Fitem%20%3FitemLabel%0AWHERE%20%7B%0A%20%20%3Fitem%20wdt%3AP972%20wd%3A{{ q }}%20%3B%0A%20%20%20%20%20%20%20%20wdt%3AP18%20%3Fimage%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0A"></iframe>
+</div>
+
+
+{% endblock %}
+    

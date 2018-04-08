@@ -14,7 +14,6 @@ from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
                      q_to_class, random_author, twitter_to_qs)
-from ..text import text_to_topic_qs
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -335,6 +334,37 @@ def redirect_cas(cas):
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
     return render_template('404.html')
+
+
+@main.route('/catalogue/' + q_pattern)
+def show_catalogue(q):
+    """Return rendered HTML page for specific catalogue.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page.
+
+    """
+    return render_template('catalogue.html', q=q)
+
+
+@main.route('/catalogue/')
+def show_catalogue_empty():
+    """Return rendered HTML index page for catalogue.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for catalogue.
+
+    """
+    return render_template('catalogue_empty.html')
 
 
 @main.route('/country/')
@@ -830,7 +860,7 @@ def show_text_to_topics():
     if not text:
         return render_template('text_to_topics.html')
 
-    qs_list = text_to_topic_qs(text)
+    qs_list = current_app.text_to_topic_q_text.text_to_topic_qs(text)
     qs = ",".join(set(qs_list))
 
     return redirect(url_for('app.show_topics', qs=qs), code=302)
