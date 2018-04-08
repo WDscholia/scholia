@@ -24,8 +24,6 @@ Description:
 
 from __future__ import print_function
 
-import errno
-
 from os import makedirs
 from os.path import exists, expanduser, join
 
