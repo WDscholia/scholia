@@ -38,6 +38,15 @@ Scholarly profile pages constructed from queries to
 
 <div id="searchresult"></div>
 
+<hr>
+
+<h2>Statistics</h2>
+
+<table class="table table-hover" id="statistics"></table>
+
+
+
+
 {% endblock %}
 
   
@@ -62,5 +71,42 @@ $('#searchterm').keyup(function( e ) {
     });
   });
 });
+
+
+ statisticsSparql = `
+SELECT ?count ?description
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] ?p [] . }
+} AS %triples
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P698 []. }
+} AS %pmids
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P356 []. }
+} AS %dois
+WHERE {
+  {
+    INCLUDE %triples
+    BIND("Triples" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %pmids
+    BIND("Items with PMID" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %dois
+    BIND("Items with DOI" AS ?description)
+  }
+}
+ORDER BY DESC(?count)
+ `
+
+ $(document).ready(function() {
+     sparqlToDataTable(statisticsSparql, "#statistics");
+ });
+
 </script>
+
 {% endblock %}
