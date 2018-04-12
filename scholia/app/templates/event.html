@@ -110,6 +110,30 @@ ORDER BY DESC(?score)
 LIMIT 200
 `
 
+  proceedingsPublicationsSparql = `
+SELECT
+  ?work ?workLabel
+  ?authors
+  ?topics
+WITH {
+  SELECT 
+    ?work
+    (GROUP_CONCAT(DISTINCT ?author; separator=" // ") AS ?authors)
+    (GROUP_CONCAT(DISTINCT ?topic; separator=" // ") AS ?topics)
+  WHERE {
+    ?work wdt:P1433 / wdt:P4745 wd:{{ q }} .
+    OPTIONAL { ?work wdt:P50 / rdfs:label ?author . FILTER(LANG(?author) = "en") }
+    OPTIONAL { ?work wdt:P921 / rdfs:label ?topic . FILTER(LANG(?topic) = "en") }
+  }
+  GROUP BY ?work
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
+`
+
   recentPublicationsSparql = `
 SELECT
   ?publication_date
@@ -225,6 +249,7 @@ ORDER BY DESC(?score)
  $(document).ready(function() {
      sparqlToDataTable(peopleSparql, "#people");
      sparqlToDataTable(topicsSparql, "#topics");
+     sparqlToDataTable(proceedingsPublicationsSparql, "#proceedings-publications");
      sparqlToDataTable(recentPublicationsSparql, "#recent-publications");
      sparqlToDataTable(relatedEventsSparql, "#related-events");
  });
@@ -259,11 +284,19 @@ ORDER BY DESC(?score)
 <table class="table table-hover" id="topics"></table>
 
 
-<h2>Recent publications</h2>
+<h2>Works</h2>
+
+<h3>Recent publications</h3>
 
 Recent publications by organizers, speakers or participants of the event.
 
 <table class="table table-hover" id="recent-publications"></table>
+
+<h3>Proceedings publications</h3>
+
+Works published in the proceedings related to the event.
+
+<table class="table table-hover" id="proceedings-publications"></table>
 
 
 <h2>Related events</h2>
