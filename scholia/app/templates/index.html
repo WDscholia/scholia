@@ -79,25 +79,65 @@ WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] ?p [] . }
 } AS %triples
 WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P698 []. }
-} AS %pmids
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P50 []. }
+} AS %authors
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P356 []. }
 } AS %dois
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P496 []. }
+} AS %orcids
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P698 []. }
+} AS %pmids
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P932 []. }
+} AS %pmcids
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2093 []. }
+} AS %authorstrings
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2860 [] . }
+} AS %cites
 WHERE {
   {
     INCLUDE %triples
-    BIND("Triples" AS ?description)
+    BIND("Total number of triples" AS ?description)
   }
   UNION
   {
     INCLUDE %pmids
-    BIND("Items with PMID" AS ?description)
+    BIND("Items with a PubMed ID" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %pmcids
+    BIND("Items with a PubMed Central ID" AS ?description)
   }
   UNION
   {
     INCLUDE %dois
-    BIND("Items with DOI" AS ?description)
+    BIND("Items with a DOI" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %cites
+    BIND("Citations" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %authors
+    BIND("Links from items about works to items about their authors" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %authorstrings
+    BIND("Author name strings on items about works" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %orcids
+    BIND("Items about authors with an ORCID profile that has public content" AS ?description)
   }
 }
 ORDER BY DESC(?count)
