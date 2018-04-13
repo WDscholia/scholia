@@ -27,7 +27,7 @@ WITH {
   SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work 
   WHERE {
     # Find works that cite the queried work
-	  ?citing_work wdt:P2860 wd:{{ q }} .
+    ?citing_work wdt:P2860 wd:{{ q }} .
 
     OPTIONAL {
       ?citing_work wdt:P577 ?datetime .
@@ -48,7 +48,7 @@ WHERE {
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . } 
 } 
-ORDER BY DESC(?citations) DESC(?date) 
+ORDER BY DESC(?citations) DESC(?publication_date) 
  `;
 
 
