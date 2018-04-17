@@ -9,7 +9,7 @@
 SELECT ?number_of_publications ?person ?personLabel ?personDescription ?roles ?example_work ?example_workLabel
 WITH {
   SELECT
-    (GROUP_CONCAT(?role; separator=", ") AS ?roles) ?person
+    (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles) ?person
   WHERE {
     {
       # speaker
@@ -35,6 +35,12 @@ WITH {
       # editor
       ?person ^wdt:P98 / wdt:P4745 wd:{{ q }} .
       BIND("editor of proceedings" AS ?role)
+    }
+    UNION
+    {
+      # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 wd:{{ q }} .
+      BIND("author" AS ?role)
     }
   }
   GROUP BY ?person
@@ -77,6 +83,11 @@ WITH {
       # participant
       ?person wdt:P1344 | ^wdt:P710 wd:{{ q }} .
     }
+    UNION
+    {
+      # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 wd:{{ q }} .
+    }
   }
 } AS %people  
 WITH {
@@ -98,7 +109,6 @@ WITH {
       wd:{{ q }} ^wdt:P4745 / ^wdt:P1433 / wdt:P921 ?topic .
       BIND(7 AS ?score_)
     }
-      
   }
   GROUP BY ?topic
 } AS %results
@@ -156,6 +166,11 @@ WITH {
     {
       # participant
       ?person wdt:P1344 | ^wdt:P710 wd:{{ q }} .
+    }
+    UNION
+    {
+      # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 wd:{{ q }} .
     }
   }
 } AS %people  
