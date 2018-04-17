@@ -36,6 +36,11 @@ import requests
 from simplejson import JSONDecodeError
 
 
+USER_AGENT = 'Scholia'
+
+HEADERS = {'User-Agent': USER_AGENT}
+
+
 def escape_string(string):
     r"""Escape string to be used in SPARQL query.
 
@@ -85,7 +90,7 @@ def arxiv_to_qs(arxiv):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['work']['value'][31:]
@@ -124,7 +129,7 @@ def doi_to_qs(doi):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['work']['value'][31:]
@@ -155,7 +160,7 @@ def issn_to_qs(issn):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['author']['value'][31:]
@@ -186,7 +191,7 @@ def orcid_to_qs(orcid):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['author']['value'][31:]
@@ -217,7 +222,7 @@ def viaf_to_qs(viaf):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['author']['value'][31:]
@@ -251,7 +256,7 @@ def q_to_class(q):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     try:
         data = response.json()
     except JSONDecodeError:
@@ -375,7 +380,7 @@ def q_to_class(q):
 
         url = 'https://query.wikidata.org/sparql'
         params = {'query': query, 'format': 'json'}
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, headers=HEADERS)
         data = response.json()
         parents = [item['class']['value'][31:]
                    for item in data['results']['bindings']]
@@ -417,7 +422,7 @@ def twitter_to_qs(twitter):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -450,7 +455,7 @@ def github_to_qs(github):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -483,7 +488,7 @@ def inchikey_to_qs(inchikey):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -516,7 +521,7 @@ def cas_to_qs(cas):
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -541,7 +546,7 @@ def random_author():
        ?work wdt:P31 wd:Q13442814 ; wdt:P50 ?author . }"""
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
     authors = [author['author']['value'][31:]
                for author in data['results']['bindings']]
