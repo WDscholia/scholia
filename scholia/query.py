@@ -246,7 +246,7 @@ def q_to_class(q):
     is compared against a set of hardcoded matches.
 
     """
-    query = 'select ?class where {{ wd:{q} wdt:P31 ?class }}'.format(
+    query = 'select ?class where {{ wd:{q} p:P31/ps:P31 ?class }}'.format(
         q=escape_string(q))
 
     url = 'https://query.wikidata.org/sparql'
