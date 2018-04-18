@@ -27,7 +27,11 @@
     '&format=json&callback=?';
 
   $.getJSON(url, function (data) {
-      var item = data.entities.{{ q }};
+      if ("{{ q }}" == "") {
+	  return;
+      }
+	  
+      var item = data.entities["{{ q }}"];
       if ('en' in item.labels) {
 	  $("#h1").text(item.labels.en.value);
       }
