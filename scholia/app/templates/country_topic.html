@@ -35,7 +35,13 @@ ORDER BY DESC(?number_of_works)
 
 
  $(document).ready(function() {
-     sparqlToDataTable(authorsSparql, "#authors");
+     sparqlToDataTable(authorsSparql, "#authors",
+		       {'linkPrefixes': {
+			   "author": "../../../author/",
+			   "example_work": "../../../work/",
+		       }
+		       }
+		      );
  });
 </script>
 
@@ -52,8 +58,6 @@ ORDER BY DESC(?number_of_works)
 
 
 <h2 id="Authors">Authors of the country within the topics</h2>
-
-(links do not work)
 
 <table class="table table-hover" id="authors"></table>
 

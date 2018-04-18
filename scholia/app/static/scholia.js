@@ -4,8 +4,11 @@ function capitalizeFirstLetter(string) {
 }
 
 
-function convertDataTableData(data, columns) {
+function convertDataTableData(data, columns, options) {
     // Handle 'Label' columns.
+
+    var linkPrefixes = (options && options.linkPrefixes) || {};
+    
     var convertedData = [];
     var convertedColumns = [];
     for (var i = 0 ; i < columns.length ; i++) {
@@ -20,7 +23,9 @@ function convertDataTableData(data, columns) {
 	var convertedRow = {};
 	for (var key in data[i]) {
 	    if (key + 'Label' in data[i]) {
-		convertedRow[key] = '<a href="../' + data[i][key].substr(31) +
+		convertedRow[key] = '<a href="' +
+		    (linkPrefixes[key] || "../") + 
+		    data[i][key].substr(31) +
 		    '">' + data[i][key + 'Label'] + '</a>';
 	    } else if (key.substr(-5) == 'Label') {
 		// pass
@@ -65,14 +70,14 @@ function sparqlDataToSimpleData(response) {
 }
 
 
-function sparqlToDataTable(sparql, element) {
+function sparqlToDataTable(sparql, element, options) {
     var url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=" + 
 	encodeURIComponent(sparql) + '&format=json';
 
     $.getJSON(url, function(response) {
 	var simpleData = sparqlDataToSimpleData(response);
 
-	convertedData = convertDataTableData(simpleData.data, simpleData.columns)
+	convertedData = convertDataTableData(simpleData.data, simpleData.columns, options);
 	columns = [];
 	for ( i = 0 ; i < convertedData.columns.length ; i++ ) {
 	    var column = {

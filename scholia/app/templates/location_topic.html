@@ -62,7 +62,11 @@ ORDER BY DESC(?score)
 
 
  $(document).ready(function() {
-     sparqlToDataTable(nearbyResearchersSparql, "#nearby-researchers");
+     sparqlToDataTable(
+	 nearbyResearchersSparql, "#nearby-researchers",
+	 {'linkPrefixes': {"author": "../../../author/",
+			   "example_work": "../../../work/"} }
+     );
  });
 </script>
 
@@ -79,8 +83,6 @@ ORDER BY DESC(?score)
 
 
 <h2 id="Nearby researchers">Nearby researchers</h2>
-
-(links do not work)
 
 <table class="table table-hover" id="nearby-researchers"></table>
 
