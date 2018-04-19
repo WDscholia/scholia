@@ -15,6 +15,49 @@ Chemical substances.
     <li><a href="../cas/50-00-0">50-00-0</a> (CAS number for formaldehyde)</li>
 </ul>
 
+
+<h2>Statistics</h2>
+
+<table class="table table-hover" id="statistics"></table>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ statisticsSparql = `
+
+SELECT ?count ?description
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P231 []. }
+} AS %cas
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P235 []. }
+} AS %inchikeys
+WHERE {
+  {
+    INCLUDE %cas
+    BIND("Total number of CAS registry numbers" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %inchikeys
+    BIND("Total number of InChIKeys" AS ?description)
+  }
+}
+ORDER BY DESC(?count)
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(statisticsSparql, "#statistics");
+ });
+
+</script>
+
 {% endblock %}
 
   
