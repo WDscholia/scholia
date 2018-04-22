@@ -497,6 +497,37 @@ def show_event_empty():
     return render_template('event_empty.html')
 
 
+@main.route('/event-series/' + q_pattern)
+def show_event_series(q):
+    """Return HTML rendering for specific event series.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier representing an event series
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('event_series.html', q=q)
+
+
+@main.route('/event-series/')
+def show_event_series_empty():
+    """Return event series index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for event series view.
+
+    """
+    return render_template('event_series_empty.html')
+
+
 @main.route('/github/<github>')
 def redirect_github(github):
     """Detect and redirect for Github user.

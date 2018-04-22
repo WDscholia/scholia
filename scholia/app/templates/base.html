@@ -23,57 +23,57 @@
 
 <script type="text/javascript">
  var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-    '{{ q }}' + 
-    '&format=json&callback=?';
+	   '{{ q }}' + 
+	   '&format=json&callback=?';
 
-  $.getJSON(url, function (data) {
-      if ("{{ q }}" == "") {
-	  return;
-      }
-	  
-      var item = data.entities["{{ q }}"];
-      if ('en' in item.labels) {
-	  $("#h1").text(item.labels.en.value);
-      }
-      $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
+ $.getJSON(url, function (data) {
+     if ("{{ q }}" == "") {
+	 return;
+     }
+     
+     var item = data.entities["{{ q }}"];
+     if ('en' in item.labels) {
+	 $("#h1").text(item.labels.en.value);
+     }
+     $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 
-      try {
-          var orcid = item.claims.P496[0].mainsnak.datavalue.value;
-          $( '#details' ).append( '<div><a href="https://orcid.org/"><img alt="' +
-	      'ORCID logo" src="{{ url_for('static', filename='images/orcid_16x16.gif') }}"' +
-	      'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
-	       orcid + '">https://orcid.org/' + orcid + '</a></div>')
-      }
-      catch(e) {}
+     try {
+         var orcid = item.claims.P496[0].mainsnak.datavalue.value;
+         $( '#details' ).append( '<div><a href="https://orcid.org/"><img alt="' +
+				 'ORCID logo" src="{{ url_for('static', filename='images/orcid_16x16.gif') }}"' +
+				 'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
+				 orcid + '">https://orcid.org/' + orcid + '</a></div>')
+     }
+     catch(e) {}
 
-      try {
-	  var doi = item.claims.P356[0].mainsnak.datavalue.value;
-	  $( '#details' ).append( 'DOI: <a href="https://doi.org/' + doi + '">' + doi + '</a>. ');
-               }
-      catch(e) {}
-      
-      try {
-	  var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
-	  $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
-               }
-      catch(e) {}
-      
-      var title = item.sitelinks.enwiki.title;
-      var wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?' +
-	  'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
-	  'explaintext=1&callback=?&format=json&titles=' +
-	  encodeURIComponent(title);
-      var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
-      
-      $.getJSON(wikipediaApiUrl, function(data) {
-	  var pages = data.query.pages;
-	  var text = pages[Object.keys(pages)[0]].extract + " ... "
-	  var html = "(from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
-	  $("#intro").text(text).append(html);
-      }).fail(function(d, textStatus, error) {
-	  console.error("getJSON failed, status: " + textStatus + ", error: "+error)
-      });
-  });
+     try {
+	 var doi = item.claims.P356[0].mainsnak.datavalue.value;
+	 $( '#details' ).append( 'DOI: <a href="https://doi.org/' + doi + '">' + doi + '</a>. ');
+     }
+     catch(e) {}
+     
+     try {
+	 var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
+	 $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
+     }
+     catch(e) {}
+     
+     var title = item.sitelinks.enwiki.title;
+     var wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?' +
+			   'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+			   'explaintext=1&callback=?&format=json&titles=' +
+			   encodeURIComponent(title);
+     var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
+     
+     $.getJSON(wikipediaApiUrl, function(data) {
+	 var pages = data.query.pages;
+	 var text = pages[Object.keys(pages)[0]].extract + " ... "
+	 var html = "(from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
+	 $("#intro").text(text).append(html);
+     }).fail(function(d, textStatus, error) {
+	 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+     });
+ });
 </script>
 {% endblock %}
 
@@ -85,46 +85,56 @@
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Work
+			type="button" data-toggle="dropdown">Work
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
-		  <li role="presentation"><a href="{{ url_for('app.show_work_empty') }}">Work</a></li>
-		  <li role="presentation"><a href="{{ url_for('app.show_venue_empty') }}">Venue</a></li>
-		  <li role="presentation"><a href="{{ url_for('app.show_series_empty') }}">Series</a></li>
-                  <li role="presentation"><a href="{{ url_for('app.show_catalogue_empty') }}">Catalogue</a></li>
-		  <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_work_empty') }}">Work</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_venue_empty') }}">Venue</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_series_empty') }}">Series</a></li>
+                    <li role="presentation"><a href="{{ url_for('app.show_catalogue_empty') }}">Catalogue</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
 		</ul>
 	    </div>
 	</li>
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Organization
+			type="button" data-toggle="dropdown">Organization
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
-		  <li role="presentation"><a href="{{ url_for('app.show_organization_empty') }}">Organization</a></li>
-		  <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
-		  <li role="presentation"><a href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_organization_empty') }}">Organization</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a></li>
 		</ul>
 	    </div>
 	</li>
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Location
+			type="button" data-toggle="dropdown">Location
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
-		  <li role="presentation"><a href="{{ url_for('app.show_location_empty') }}">Location</a></li>
-		  <li role="presentation"><a href="{{ url_for('app.show_country_empty') }}">Country</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_location_empty') }}">Location</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_country_empty') }}">Country</a></li>
 		</ul>
 	    </div>
 	</li>
-	<li role="presentation"><a href="{{ url_for('app.show_event_empty') }}">Event</a></li>
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-link dropdown-toggle" 
+			type="button" data-toggle="dropdown">Event
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		    <li role="presentation"><a href="{{ url_for('app.show_event_empty') }}">Event</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_event_series_empty') }}">Event series</a></li>
+		</ul>
+	    </div>
+	</li>
 	<li role="presentation"><a href="{{ url_for('app.show_award_empty') }}">Award</a></li>
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Topic
+			type="button" data-toggle="dropdown">Topic
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_topic_empty') }}">General</a></li>
@@ -142,7 +152,7 @@ type="button" data-toggle="dropdown">Topic
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Tools
+			type="button" data-toggle="dropdown">Tools
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_arxiv_to_quickstatements') }}">Arxiv to Quickstatements</a></li>

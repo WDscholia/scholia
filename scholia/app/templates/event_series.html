@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ listOfEventsSparql = `
+SELECT 
+  ?year
+  ?short_name
+  ?event ?eventLabel
+WHERE {
+  ?event wdt:P179 wd:{{ q }} .
+  OPTIONAL {
+    ?event wdt:P585 | wdt:P580 ?datetime .
+    BIND(YEAR(?datetime) AS ?year)
+  }
+  OPTIONAL {
+    ?event wdt:P1813 ?short_name
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?year)
+`
+
+ topicsSparql = `
+SELECT ?score ?topic ?topicLabel ?topicDescription
+WITH {
+  SELECT
+    DISTINCT ?person
+  WHERE {
+    ?event wdt:P179 wd:{{ q }} .
+    {
+      # speaker
+      ?event wdt:P823 ?person .
+    }
+    UNION
+    {
+      # organizer
+      ?event wdt:P664 ?person .
+    }
+    UNION
+    {
+      # participant
+      ?person wdt:P1344 | ^wdt:P710 ?event .
+    }
+    UNION
+    {
+      # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event .
+    }
+  }
+} AS %people  
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score) ?topic
+  WHERE {
+    ?event wdt:P179 wd:{{ q }} .
+    {
+      ?event wdt:P921 ?topic .
+      BIND(50 AS ?score_)
+    }
+    UNION
+    {
+      INCLUDE %people
+      ?person ^wdt:P50 / wdt:P921 ?topic .
+      BIND(1 AS ?score_)
+    }
+    UNION
+    {
+      ?event ^wdt:P4745 / ^wdt:P1433 / wdt:P921 ?topic .
+      BIND(7 AS ?score_)
+    }
+  }
+  GROUP BY ?topic
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+`
+
+
+ recentPublicationsSparql = `
+SELECT
+  ?publication_date
+  ?work ?workLabel
+  ?authors
+WITH {
+  SELECT
+    DISTINCT ?person
+  WHERE {
+    ?event wdt:P179 wd:{{ q }} .
+    {
+      # speaker
+      ?event wdt:P823 ?person .
+    }
+    UNION
+    {
+      # organizer
+      ?event wdt:P664 ?person .
+    }
+    UNION
+    {
+      # participant
+      ?person wdt:P1344 | ^wdt:P710 ?event .
+    }
+    UNION
+    {
+      # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event .
+    }
+  }
+} AS %people  
+WITH {
+  SELECT
+    (MAX(?publication_datetime) AS ?publication_date)
+    ?work
+    (GROUP_CONCAT(?person_label; separator=" // ") AS ?authors)
+  WHERE {
+    INCLUDE %people .
+    ?work wdt:P50 ?person ; wdt:P577 ?publication_datetime .
+    ?person rdfs:label ?person_label . FILTER(LANG(?person_label) = 'en')
+  }
+  GROUP BY ?work
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?publication_date)
+LIMIT 500
+`
+
+ proceedingsPublicationsSparql = `
+SELECT
+  ?work ?workLabel
+  ?authors
+  ?topics
+WITH {
+  SELECT 
+    ?work
+    (GROUP_CONCAT(DISTINCT ?author; separator=" // ") AS ?authors)
+    (GROUP_CONCAT(DISTINCT ?topic; separator=" // ") AS ?topics)
+  WHERE {
+    ?work wdt:P1433 / wdt:P4745 / wdt:P179 wd:{{ q }} .
+    OPTIONAL { ?work wdt:P50 / rdfs:label ?author . FILTER(LANG(?author) = "en") }
+    OPTIONAL { ?work wdt:P921 / rdfs:label ?topic . FILTER(LANG(?topic) = "en") }
+  }
+  GROUP BY ?work
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(listOfEventsSparql, "#list-of-events", {
+	 'linkPrefixes': {
+	     "event": "../event/",
+	 }
+     });
+     sparqlToDataTable(topicsSparql, "#topics", {
+	 "linkPrefixes": {
+	     "topic": "../topic/",
+	 }
+     });
+     sparqlToDataTable(proceedingsPublicationsSparql, "#proceedings-publications", {
+	 "linkPrefixes": {
+	     "work": "../work/",
+	 }
+     });
+     sparqlToDataTable(recentPublicationsSparql, "#recent-publications", {
+	 "linkPrefixes": {
+	     "work": "../work/",
+	 }
+     });
+ });
+
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Event</h1>
+
+<div id="intro"></div>
+
+
+<h2>List of events</h2>
+
+<table class="table table-hover" id="list-of-events"></table>
+
+
+<h2>Timeline</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20%3Ftime%20%3Fendtime%20%3Fevent%20%3FeventLabel%20%3Fimage%0AWHERE%20%7B%0A%20%20%3Fevent%20wdt%3AP179%20wd%3A{{ q }}%20.%0A%20%20%7B%0A%20%20%20%20%3Fevent%20wdt%3AP580%20%7C%20wdt%3AP585%20%3Ftime%20.%0A%20%20%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20%20%20%3Fevent%20wdt%3AP582%20%3Fendtime%20.%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%20%3Fevent%20p%3AP793%20%5B%20ps%3AP793%20%3Fitem%20%3B%20pq%3AP585%20%3Ftime%20%5D%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0A%20%20%0A%20%20"></iframe>
+</div>
+
+
+<h2>Topic scores</h2>
+
+<table class="table table-hover" id="topics"></table>
+
+
+<h2>Works</h2>
+
+<h3>Recent publications</h3>
+
+Recent publications by organizers, speakers or participants of the events in the series.
+
+<table class="table table-hover" id="recent-publications"></table>
+
+<h3>Proceedings publications</h3>
+
+Works published in the proceedings related to the events in the series.
+
+<table class="table table-hover" id="proceedings-publications"></table>
+
+
+{% endblock %}
