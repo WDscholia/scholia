@@ -745,6 +745,36 @@ def show_protein_empty():
     return render_template('protein_empty.html')
 
 
+@main.route('/project/' + q_pattern)
+def show_project(q):
+    """Return HTML rendering for specific project.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('project.html', q=q)
+
+@main.route('/project/')
+def show_project_empty():
+    """Return project index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for project view.
+
+    """
+    return render_template('project_empty.html')
+
+
 @main.route('/gene/' + q_pattern)
 def show_gene(q):
     """Return HTML rendering for specific gene.

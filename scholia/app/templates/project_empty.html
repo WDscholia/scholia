@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<h1>Project</h1>
+
+Funded project.
+
+<h2>Examples</h2>
+
+<ul>
+    <li><a href="Q27990087">eNanoMapper</a></li>
+</ul>
+
+
+<h2>Statistics</h2>
+
+<table class="table table-hover" id="statistics"></table>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ statisticsSparql = `
+
+SELECT ?count ?description
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3400 []. }
+} AS %cordis
+WHERE {
+  {
+    INCLUDE %cordis
+    BIND("Total number of projects with a CORDIS number" AS ?description)
+  }
+}
+ORDER BY DESC(?count)
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(statisticsSparql, "#statistics");
+ });
+
+</script>
+
+{% endblock %}
+
+  
