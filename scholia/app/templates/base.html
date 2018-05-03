@@ -22,58 +22,89 @@
 
 
 <script type="text/javascript">
- var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-	   '{{ q }}' + 
-	   '&format=json&callback=?';
+    if ("{{ q }}" != "") {
 
- $.getJSON(url, function (data) {
-     if ("{{ q }}" == "") {
-	 return;
-     }
-     
-     var item = data.entities["{{ q }}"];
-     if ('en' in item.labels) {
-	 $("#h1").text(item.labels.en.value);
-     }
-     $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
+    var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+    '{{ q }}' + 
+    '&format=json&callback=?';
+    
+    $.getJSON(url, function (data) {
+    var item = data.entities["{{ q }}"];
+    if ('en' in item.labels) {
+    $("#h1").text(item.labels.en.value);
+    }
+    $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
+    
+    try {
+    var orcid = item.claims.P496[0].mainsnak.datavalue.value;
+    $( '#details' ).append( '<div><a href="https://orcid.org/"><img alt="' +
+									 'ORCID logo" src="{{ url_for('static', filename='images/orcid_16x16.gif') }}"' +
+								    'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
+														       orcid + '">https://orcid.org/' + orcid + '</a></div>')
+    }
+    catch(e) {}
+    
+    try {
+    var doi = item.claims.P356[0].mainsnak.datavalue.value;
+    $( '#details' ).append( 'DOI: <a href="https://doi.org/' + doi + '">' + doi + '</a>. ');
+    }
+    catch(e) {}
+    
+    try {
+    var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
+    $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
+    }
+    catch(e) {}
+    
+    var title = item.sitelinks.enwiki.title;
+    var wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?' +
+    'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+    'explaintext=1&callback=?&format=json&titles=' +
+    encodeURIComponent(title);
+    var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
+    
+    $.getJSON(wikipediaApiUrl, function(data) {
+    var pages = data.query.pages;
+    var text = pages[Object.keys(pages)[0]].extract + " ... "
+    var html = "(from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
+    $("#intro").text(text).append(html);
+    }).fail(function(d, textStatus, error) {
+    console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+    });
+    });
 
-     try {
-         var orcid = item.claims.P496[0].mainsnak.datavalue.value;
-         $( '#details' ).append( '<div><a href="https://orcid.org/"><img alt="' +
-				 'ORCID logo" src="{{ url_for('static', filename='images/orcid_16x16.gif') }}"' +
-				 'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
-				 orcid + '">https://orcid.org/' + orcid + '</a></div>')
-     }
-     catch(e) {}
+    var endpointUrl = 'https://query.wikidata.org/sparql';
+    var query = `
+    SELECT DISTINCT ?aspect 
+    WHERE {
+    { [] wdt:P50 wd:{{ q }} . BIND("author" AS ?aspect) }
+    UNION 
+    { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
+    UNION 
+    { [] wdt:P921 wd:{{ q }} . BIND("topic" AS ?aspect) }
+    UNION
+    { [] wdt:P859 wd:{{ q }} . BIND("sponsor" AS ?aspect) }
+    UNION
+    { [] wdt:P108 | wdt:P1416 wd:{{ q }} . BIND("organization" AS ?aspect) }
+    UNION
+    { [] wdt:P4510 wd:{{ q }} . BIND("use" AS ?aspect) } 
+    }
+    `;
+    settings = {
+      headers: { Accept: 'application/sparql-results+json' },
+      data: { query: query }
+    };
+    
+    $.ajax( endpointUrl, settings ).then( function ( data ) {
+      console.log( data );
+      data.results.bindings.forEach(function(entry) {
+	     var aspect = entry.aspect.value;
+	     $( '#aspect-chooser' ).append( '<a href="../' + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
+	     console.log( "Chooser: " + aspect );
+      });
+     } );
 
-     try {
-	 var doi = item.claims.P356[0].mainsnak.datavalue.value;
-	 $( '#details' ).append( 'DOI: <a href="https://doi.org/' + doi + '">' + doi + '</a>. ');
-     }
-     catch(e) {}
-     
-     try {
-	 var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
-	 $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
-     }
-     catch(e) {}
-     
-     var title = item.sitelinks.enwiki.title;
-     var wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?' +
-			   'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
-			   'explaintext=1&callback=?&format=json&titles=' +
-			   encodeURIComponent(title);
-     var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
-     
-     $.getJSON(wikipediaApiUrl, function(data) {
-	 var pages = data.query.pages;
-	 var text = pages[Object.keys(pages)[0]].extract + " ... "
-	 var html = "(from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
-	 $("#intro").text(text).append(html);
-     }).fail(function(d, textStatus, error) {
-	 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
-     });
- });
+ }
 </script>
 {% endblock %}
 
@@ -167,6 +198,9 @@
 {% endblock %}
 
 {% block content %}
+<div class="container">
+    <span id="aspect-chooser"></span>
+</div>
 <div class="container">
     {% block page_content %}{% endblock %}
 </div>
