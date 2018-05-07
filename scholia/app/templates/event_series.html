@@ -213,6 +213,13 @@ WHERE {
 </div>
 
 
+<h2>Map</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Fevent%20%3FeventLabel%20%3Fgeo%20%3Fimage%20WHERE%20%7B%0A%20%20%3Fevent%20wdt%3AP179%20wd%3A{{ q }}%20.%0A%20%20%3Fevent%20wdt%3AP276%3F%20%2F%20wdt%3AP625%20%3Fgeo%20.%0A%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D"></iframe>
+</div>
+
+
 <h2>Topic scores</h2>
 
 <table class="table table-hover" id="topics"></table>
