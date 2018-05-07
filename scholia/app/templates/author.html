@@ -39,7 +39,7 @@ ORDER BY DESC(?date)
 SELECT ?count ?short_name ?venue ?venueLabel ?topics
 WITH {
   SELECT
-    (COUNT(?work) as ?count)
+    (COUNT(DISTINCT ?work) as ?count)
     ?venue
     (GROUP_CONCAT(DISTINCT ?topic; separator=" // ") AS ?topics)
   WHERE {
