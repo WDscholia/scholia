@@ -82,14 +82,23 @@ WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P50 []. }
 } AS %authors
 WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P225 []. }
+} AS %taxa
+WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P356 []. }
 } AS %dois
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P496 []. }
 } AS %orcids
 WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P625 []. }
+} AS %geoloc
+WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P698 []. }
 } AS %pmids
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P921 []. }
+} AS %topics
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P932 []. }
 } AS %pmcids
@@ -139,9 +148,24 @@ WHERE {
     INCLUDE %orcids
     BIND("Items about authors with an ORCID profile that has public content" AS ?description)
   }
+  UNION
+  {
+    INCLUDE %taxa
+    BIND("Items with a taxon name" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %geoloc
+    BIND("Items with a geolocation" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %topics
+    BIND("Links from items about works to items about their main subjects" AS ?description)
+  }
 }
 ORDER BY DESC(?count)
- `
+`
 
  $(document).ready(function() {
      sparqlToDataTable(statisticsSparql, "#statistics");
