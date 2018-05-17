@@ -130,7 +130,7 @@
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Work
+			type="button" data-toggle="dropdown">Work
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_work_empty') }}">Work</a></li>
@@ -144,7 +144,7 @@ type="button" data-toggle="dropdown">Work
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Organization
+			type="button" data-toggle="dropdown">Organization
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_organization_empty') }}">Organization</a></li>
@@ -156,7 +156,7 @@ type="button" data-toggle="dropdown">Organization
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Location
+			type="button" data-toggle="dropdown">Location
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_location_empty') }}">Location</a></li>
@@ -167,7 +167,7 @@ type="button" data-toggle="dropdown">Location
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Event
+			type="button" data-toggle="dropdown">Event
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_event_empty') }}">Event</a></li>
@@ -179,7 +179,7 @@ type="button" data-toggle="dropdown">Event
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Topic
+			type="button" data-toggle="dropdown">Topic
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_topic_empty') }}">General</a></li>
@@ -197,7 +197,7 @@ type="button" data-toggle="dropdown">Topic
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
-type="button" data-toggle="dropdown">Tools
+			type="button" data-toggle="dropdown">Tools
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_arxiv_to_quickstatements') }}">Arxiv to Quickstatements</a></li>
@@ -206,7 +206,18 @@ type="button" data-toggle="dropdown">Tools
 		</ul>
 	    </div>
 	</li>
-	<li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a></li>
+
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-link dropdown-toggle" 
+			type="button" data-toggle="dropdown">Help
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+		    <li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_faq') }}">FAQ</a></li>
+		</ul>
+	    </div>
+	</li>
     </ul>
 </div>
 {% endblock %}

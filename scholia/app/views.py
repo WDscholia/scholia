@@ -528,6 +528,19 @@ def show_event_series_empty():
     return render_template('event_series_empty.html')
 
 
+@main.route('/faq')
+def show_faq():
+    """Return rendered FAQ page.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page for FAQ page.
+
+    """
+    return render_template('faq.html')
+
+
 @main.route('/github/<github>')
 def redirect_github(github):
     """Detect and redirect for Github user.
