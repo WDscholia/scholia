@@ -264,7 +264,7 @@ ORDER BY DESC(?count)
 `
 
  $(document).ready(function() {
-     sparqlToDataTable(statisticsSparql, "#statistics");
+     sparqlToDataTable(statisticsSparql, "#statistics", { pageLength: 50 });
  });
 
 </script>
