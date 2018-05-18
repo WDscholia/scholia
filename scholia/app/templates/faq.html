@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<h1 id="h1">Frequently asked questions</h1>
+
+
+<dl>
+    <dt>How can I add information to Scholia?</dt>
+    <dd>
+	Scholia's information comes from <a href="https://www.wikidata.org/wiki/">Wikidata</a>
+	and the English Wikipedia,
+	so you should add data there. 
+	Use the
+	<a href="https://www.wikidata.org/wiki/Special:Search">search page in Wikidata</a> to examine if the data item you want to add is already in Wikidata. 
+	If not add a new data item with the
+	<a href="https://www.wikidata.org/wiki/Special:NewItem">new item page</a> on the Wikidata site.
+	<br/><br/>
+	There are a number of tools to ease editing Wikidata.
+	If you want to include a scientific document in Wikidata and it has a DOI, PMID or PMCID identifier
+	then you can use Magnus Manske <a href="https://tools.wmflabs.org/sourcemd/">sourcemd tool</a>
+	(you need a Wikidata account and authorize Manske's tool to edit in Wikidata).
+	If you want to update some information about an author and the author has a ORCID profile, 
+	Magnus Manske's <a href="https://tools.wmflabs.org/sourcemd/orcidator.php">ORCIDator</a>
+	will in many can help. 
+    </dd>
+
+    <dt>How do I report a problem</dt>
+    <dd>
+	Technical problems and similar are curated at
+	<a href="https://github.com/fnielsen/scholia/issues">Scholia's GitHub issue list</a>. 
+	Use the search field to see if your problem is already listed or press 
+	"New issue" to make a new issue (you need to have an account on GitHub).
+	<br/><br/>
+	Content-related problems, e.g., wrong data, may be addressed by
+	editing the underlying data in <a href="https://www.wikidata.org/wiki/">Wikidata</a>. 
+    </dd>
+
+    <dt>Where can I read more about Scholia</dt>
+    <dd>
+	The <a href="https://www.wikidata.org/wiki/Wikidata:Scholia">Wikidata:Scholia</a> page on Wikidata presents
+	Scholia briefly. 
+	
+	<a href="http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/7010/pdf/imm7010.pdf"><em>Scholia, Scientometrics and Wikidata</em></a> is our canonical scientific article about Scholia. 
+	It is based on the shorter article <a href="http://ceur-ws.org/Vol-1878/article-03.pdf"><em>Scholia and scientometrics with Wikidata</em></a>.
+	The article <a href="https://zenodo.org/record/1202256/files/geospatial-data-scholia.pdf"><em>Geospatial data and Scholia</em></a> focuses on the geospatial aspects
+	of Scholia.
+
+    </dd>
+
+    <dt>How do I cite Scholia</dt>
+    <dd>
+	We suggest citing
+        <a href="https://www.wikidata.org/wiki/Q41799194"><em>Scholia, Scientometrics and Wikidata</em></a>,
+	in LaTeX \cite{Q41799194}.
+    </dd>
+
+    <!-- dt>How can I contribute to Scholia</dt>
+    <dd>
+	
+    </dd -->
+
+    <!-- dt>Privacy</dt>
+	 <dd>
+	 
+	 </dd -->
+
+
+</dl>
+
+
+{% endblock %}
+    
