@@ -96,7 +96,7 @@ function sparqlToDataTable(sparql, element, options) {
 	    lengthMenu: [[10, 25, 100, -1], [10, 25, 100, "All"]],
 	    ordering: true,
 	    order: [], 
-	    paging: (convertedData.data.length > 10),
+	    paging: (convertedData.data.length > pageLength),
 	});
 
 	$(element).append(
