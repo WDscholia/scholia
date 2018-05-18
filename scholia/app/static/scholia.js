@@ -88,6 +88,8 @@ function sparqlToDataTable(sparql, element, options) {
 	    columns.push(column)
 	}
 
+	var pageLength = options.pageLength || 10;
+
 	table = $(element).DataTable({ 
 	    data: convertedData.data,
 	    columns: columns,
