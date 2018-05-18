@@ -74,16 +74,38 @@ $('#searchterm').keyup(function( e ) {
 
 
  statisticsSparql = `
+
 SELECT ?count ?description
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] ?p [] . }
 } AS %triples
 WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { ?property a wikibase:Property.  }
+} AS %properties
+WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P50 []. }
 } AS %authors
 WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P69 [] . }
+} AS %almamater
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P108 [] . }
+} AS %employer
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P166 [] . }
+} AS %award_received
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P212 [] . }
+} AS %isbn13
+WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P225 []. }
 } AS %taxa
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P234 []. }
+} AS %inchi
+WITH {
+  SELECT (COUNT(DISTINCT ?serials) AS ?count) WHERE { ?serials wdt:P236 [] . }
+} AS %issn
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P356 []. }
 } AS %dois
@@ -94,8 +116,23 @@ WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P625 []. }
 } AS %geoloc
 WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P638 [] . }
+} AS %pdb
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P686 [] . }
+} AS %gene
+WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P698 []. }
 } AS %pmids
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P699 [] . }
+} AS %disease
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P859 [] . }
+} AS %sponsor
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P818 [] . }
+} AS %arxivID
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P921 []. }
 } AS %topics
@@ -103,8 +140,14 @@ WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P932 []. }
 } AS %pmcids
 WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P1416 [] . }
+} AS %affiliation
+WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2093 []. }
 } AS %authorstrings
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2427 [] . }
+} AS %GRID
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2860 [] . }
 } AS %cites
@@ -112,6 +155,11 @@ WHERE {
   {
     INCLUDE %triples
     BIND("Total number of triples" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %properties
+    BIND("Total number of properties" AS ?description)
   }
   UNION
   {
@@ -126,7 +174,7 @@ WHERE {
   UNION
   {
     INCLUDE %dois
-    BIND("Items with a DOI" AS ?description)
+    BIND("Items with a Digital Object Identifier (DOI)" AS ?description)
   }
   UNION
   {
@@ -162,6 +210,71 @@ WHERE {
   {
     INCLUDE %topics
     BIND("Links from items about works to items about their main subjects" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %inchi
+    BIND("Items with an International Chemical Identifier (InChI)" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %isbn13
+    BIND("Items with a 13-digit International Standard Book Number (ISBN 13)" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %award_received
+    BIND("Links from items about people or others to an award they have received" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %affiliation
+    BIND("Links from items about people to items about groups they are affiliated with" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %employer
+    BIND("Links from items about people to items about their employer" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %almamater
+    BIND("Links from items about people to items about the educational establishments they attended" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %issn
+    BIND("Items with an International Standard Serial Number (ISSN)" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %arxivID
+    BIND("Items with an arxivID" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %GRID
+    BIND("Items about institutions with an identifier from the Global Research Identifier Database (GRID ID)" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %sponsor
+    BIND("Links from items about anything to items about corresponding sponsors" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %disease
+    BIND("Items indexed in the Disease Ontology" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %gene
+    BIND("Items indexed in the Gene Ontology" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %pdb
+    BIND("Protein structures indexed in the Protein Data Bank" AS ?description)
   }
 }
 ORDER BY DESC(?count)
