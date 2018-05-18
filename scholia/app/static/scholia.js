@@ -88,7 +88,12 @@ function sparqlToDataTable(sparql, element, options) {
 	    columns.push(column)
 	}
 
-	var pageLength = options.pageLength || 10;
+	if (typeof options.paging === "undefined") {
+	    var paging = true;
+	}
+	else {
+	    var paging = options.paging;
+	}
 
 	table = $(element).DataTable({ 
 	    data: convertedData.data,
@@ -96,7 +101,7 @@ function sparqlToDataTable(sparql, element, options) {
 	    lengthMenu: [[10, 25, 100, -1], [10, 25, 100, "All"]],
 	    ordering: true,
 	    order: [], 
-	    paging: (convertedData.data.length > 10),
+	    paging: paging,
 	});
 
 	$(element).append(
