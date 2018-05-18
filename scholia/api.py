@@ -4,6 +4,10 @@ Usage:
   scholia.api get <qs>...
   scholia.api q-to-classes <q>
   scholia.api q-to-name <q>
+  scholia.api search [options] <query>
+
+Options:
+  --limit=<limit>  Number of search results to return [default: 10]
 
 Description:
   Interface to the Wikidata API and its bibliographic data.
@@ -23,6 +27,12 @@ from __future__ import print_function
 
 import requests
 
+from six import u
+
+
+HEADERS = {
+    'User-Agent': 'Scholia',
+}
 
 # Must be indexed from zero
 MONTH_NUMBER_TO_MONTH = {
@@ -484,6 +494,42 @@ def entity_to_year(entity):
     return None
 
 
+def search(query, limit=10):
+    """Search Wikidata.
+
+    Parameters
+    ----------
+    query : str
+        Query string.
+    limit : int, optional
+        Number of maximum search results to return.
+
+    Returns
+    -------
+    result : list of dicts
+
+    """
+    response = requests.get(
+        "https://www.wikidata.org/w/api.php",
+        params={
+            'action': 'query',
+            'list': 'search',
+            'srlimit': limit,
+            'srsearch': query,
+            'srwhat': 'text',
+            'format': 'json',
+        },
+        headers=HEADERS)
+    response_data = response.json()
+    print(response_data)
+    items = response_data['query']['search']
+    results = [
+        {'q': item['title'],
+         'description': item['snippet']}
+        for item in items]
+    return results
+
+
 def main():
     """Handle command-line arguments."""
     from docopt import docopt
@@ -507,6 +553,13 @@ def main():
         q = arguments['<q>']
         entities = wb_get_entities([q])
         print(entity_to_name(entities[q]))
+
+    elif arguments['search']:
+        query = arguments['<query>']
+        limit = int(arguments['--limit'])
+        results = search(query, limit=limit)
+        for item in results:
+            print(u("{q} {description}").format(**item).encode('utf-8'))
 
 
 if __name__ == '__main__':
