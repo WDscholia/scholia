@@ -509,6 +509,7 @@ def search(query, limit=10):
     result : list of dicts
 
     """
+    # Query the Wikidata API
     response = requests.get(
         "https://www.wikidata.org/w/api.php",
         params={
@@ -520,13 +521,15 @@ def search(query, limit=10):
             'format': 'json',
         },
         headers=HEADERS)
+
+    # Convert the response
     response_data = response.json()
-    print(response_data)
     items = response_data['query']['search']
     results = [
         {'q': item['title'],
          'description': item['snippet']}
         for item in items]
+
     return results
 
 
