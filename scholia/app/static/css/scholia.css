@@ -13,3 +13,25 @@ caption {
 dd {
     margin: 0 0 1em 2em ;
 }
+
+h2 {
+    margin-top: 0.7em;
+}
+
+.dropdown-menu li {
+    margin: 0.5em;
+}
+
+.dropdown-menu {
+    box-shadow: 2px 2px;
+}
+
+.nav li {
+    margin-right: 1em;
+}
+
+.nav button {
+    margin-top: -0.4em;
+    margin-left: -1em; 
+    margin-right: -0.5em; 
+

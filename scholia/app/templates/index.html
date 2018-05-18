@@ -2,50 +2,146 @@
 
 {% block page_content %}
 
-Scholarly profile pages constructed from queries to
-<a href="https://query.wikidata.org/">Wikidata Query Service</a>.
+<div class="container">
+    <h2>Search</h2>
+    
+    <div class="input-group">
+	<input type="text" class="form-control"
+	       placeholder="Search for a scientist, paper, organization, venue, event, topic, etc." id="searchterm"/>
+	<!-- span class="input-group-btn">
+	    <button class="btn btn-primary" type="submit">Search</button>
+	</span -->
+    </div>
 
-<hr>
+    <div id="searchresult"></div>
 
-<h2>Examples</h2>
-
-<ul>
-  <li><a href="twitter/utafrith">Twitter: @utafrith (Uta Frith)</a></li>
-  <li><a href="author/Q18618629">Denny Vrandečić</a></li>
-  <li><a href="orcid/0000-0001-7542-0286">ORCID 0000-0001-7542-0286 (Egon Willighagen)</a></li>
-  <li><a href="twitter/mitpress">Twitter: @mitpress</a></li>
-  <li><a href="organization/Q1269766">Technical University of Denmark</a></li>
-  <li><a href="venue/Q1981225">NeuroImage</a></li>
-  <li><a href="publisher/Q233358">Public Library of Science</a></li>
-  <li><a href="github/vedina">Github @vedina (Nina Jeliazkova)</a></li>
-  <li><a href="doi/10.1186/S13321-016-0161-3">DOI 10.1186/S13321-016-0161-3</a></li>
-  <li><a href="organizations/Q1269766,Q193196">Compare Technical University of Denmark and UCL</a></li>
-  <li><a href="viaf/59976288">VIAF 59976288 (Ben Feringa)</a></li>
-</ul>
-
-<hr>
-
-<h2>Search</h2>
-
-<div class="input-group">
-  <input type="text" class="form-control" placeholder="search" id="searchterm"/>
-  <span class="input-group-btn">
-    <button class="btn btn-default" type="submit">
-      <i class="glyphicon glyphicon-search"></i>
-    </button>
-  </span>
 </div>
 
-<div id="searchresult"></div>
-
-<hr>
-
-<h2>Statistics</h2>
-
-<table class="table table-hover" id="statistics"></table>
 
 
 
+
+<div class="container">
+
+    <h2>Examples</h2>
+
+    <div class="card-deck mb-3">
+	<div class="card mb-4 box-shadow">
+	    
+            <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Single items</h4>
+            </div>
+            <div class="card-body">
+		<dl>
+		    <dt><a href="author/Q18618629">Denny Vrandečić</a></dt>
+		    <dd>
+			View the researcher profile for the Semantic Web researcher Denny Vrandečić.
+			It shows his papers, co-authors, etc.
+		    </dd>
+		    
+		    <dt><a href="organization/Q1269766">Technical University of Denmark</a></dt>
+		    <dd>
+			View the profile for an organization: People associated with the organization, 
+			their publication, the co-author pattern, etc.
+		    </dd>
+		    
+		    <dt>
+			<a href="venue/Q1981225">NeuroImage</a>
+		    </dt>
+		    <dd>
+			View information about a venue, e.g., a scientific journal or scientific conference.
+			Here the <em>NeuroImage</em> journal, its recently published paper, 
+			authors, topics, citation pattern, etc.
+		    </dd>
+		    
+		    <dt>
+			<a href="publisher/Q233358">Public Library of Science</a>
+		    </dt>
+		    <dd>
+			View information about a publisher, here
+			<em>Public Library of Science</em> with, e.g., its journals it publishes.
+		    </dd>
+		</dl>
+            </div>
+
+	</div>
+	    
+        <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Multiple items</h4>
+	    </div>
+	    <div class="card-body">
+		<p>Scholia can show multiple items together.</p>
+		
+		<dl>
+		    <dt>
+			<a href="organizations/Q1269766,Q193196">Technical University of Denmark and UCL</a>
+		    </dt>
+		    <dd>
+			Compare two or more organization. Here a comparison between two universities with
+			collaborating researchers, number of publications and citations.
+		    </dd>
+		</dl>
+
+		<dt>
+		    <a href="authors/Q80,Q6135847,Q30085536">Tim Berners-Lee, James Hendler and Ruben Verborgh</a></dt>
+		<dd>
+		    Compare three Semantic Web researchers. 
+		</dd>
+
+
+
+	    </div>
+        </div>
+	
+        <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Redirecting</h4>
+	    </div>
+	    <div class="card-body">
+		<p>If you know the identifier then Scholia can make a lookup based on the identifier:</p>
+		
+		<dl>
+		    <dt><a href="twitter/utafrith">twitter/utafrith</a></dt>
+		    <dd>Lookup @utafrith Twitter username. This will identify
+			the London-based researcher Uta Frith and redirect to her Scholia page.</dd>
+		  
+		    <dt><a href="twitter/mitpress">twitter/mitpress</a></dt>
+		    <dd>Redirect also works for organizations, here MIT Press</dd>
+
+		    <dt><a href="orcid/0000-0001-7542-0286">orcid/0000-0001-7542-0286</a></dt>
+		    <dd>Lookup 0000-0001-7542-0286 that is identifying Egon Willighagen.</dd>
+
+		    <dt><a href="github/vedina">github/vedina</a></dt>
+		    <dd>
+			Redirect via GitHub username, here @vedina to Nina Jeliazkova.
+		    </dd>
+
+		    <dt><a href="doi/10.1186/S13321-016-0161-3">doi/10.1186/S13321-016-0161-3</a></dt>
+		    <dd>Redirect via DOI.</dd>
+		    
+		    <dt><a href="viaf/59976288">viaf/59976288</a></dt>
+		    <dd>Redirect via VIAF identifier, here to Ben Feringa</a></li>
+
+
+		</dl>
+
+	    </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container">
+
+    <h2>Statistics</h2>
+
+    Scholia uses Wikidata for all its data. How much data do we search over?
+
+    <table class="table table-hover" id="statistics"></table>
+    
+</div>    
 
 {% endblock %}
 
