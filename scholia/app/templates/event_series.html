@@ -165,27 +165,27 @@ WHERE {
 
 
  $(document).ready(function() {
-     sparqlToDataTable(listOfEventsSparql, "#list-of-events", {
-	 'linkPrefixes': {
+     sparqlToDataTable(listOfEventsSparql, "#list-of-events",
+	 linkPrefixes={
 	     "event": "../event/",
 	     "proceedings": "../venue/",
 	 }
-     });
-     sparqlToDataTable(topicsSparql, "#topics", {
-	 "linkPrefixes": {
+     );
+     sparqlToDataTable(topicsSparql, "#topics", 
+	 linkPrefixes={
 	     "topic": "../topic/",
 	 }
-     });
-     sparqlToDataTable(proceedingsPublicationsSparql, "#proceedings-publications", {
-	 "linkPrefixes": {
+     );
+     sparqlToDataTable(proceedingsPublicationsSparql, "#proceedings-publications", 
+	 linkPrefixes={
 	     "work": "../work/",
 	 }
-     });
-     sparqlToDataTable(recentPublicationsSparql, "#recent-publications", {
-	 "linkPrefixes": {
+     );
+     sparqlToDataTable(recentPublicationsSparql, "#recent-publications", 
+	 linkPrefixes={
 	     "work": "../work/",
 	 }
-     });
+     );
  });
 
 

@@ -36,12 +36,11 @@ ORDER BY DESC(?number_of_works)
 
  $(document).ready(function() {
      sparqlToDataTable(authorsSparql, "#authors",
-		       {'linkPrefixes': {
+		       linkPrefixes={
 			   "author": "../../../author/",
 			   "example_work": "../../../work/",
 		       }
-		       }
-		      );
+     );
  });
 </script>
 

@@ -4,10 +4,10 @@ function capitalizeFirstLetter(string) {
 }
 
 
-function convertDataTableData(data, columns, options) {
+function convertDataTableData(data, columns, linkPrefixes={}) {
     // Handle 'Label' columns.
 
-    var linkPrefixes = (options && options.linkPrefixes) || {};
+    // var linkPrefixes = (options && options.linkPrefixes) || {};
     
     var convertedData = [];
     var convertedColumns = [];
@@ -70,14 +70,14 @@ function sparqlDataToSimpleData(response) {
 }
 
 
-function sparqlToDataTable(sparql, element, options) {
+function sparqlToDataTable(sparql, element, linkPrefixes={}, paging=true) {
     var url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=" + 
 	encodeURIComponent(sparql) + '&format=json';
 
     $.getJSON(url, function(response) {
 	var simpleData = sparqlDataToSimpleData(response);
 
-	convertedData = convertDataTableData(simpleData.data, simpleData.columns, options);
+	convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes=linkPrefixes);
 	columns = [];
 	for ( i = 0 ; i < convertedData.columns.length ; i++ ) {
 	    var column = {
@@ -86,13 +86,6 @@ function sparqlToDataTable(sparql, element, options) {
 		defaultContent: "",
 	    }
 	    columns.push(column)
-	}
-
-	if (typeof options.paging === "undefined") {
-	    var paging = true;
-	}
-	else {
-	    var paging = options.paging;
 	}
 
 	table = $(element).DataTable({ 

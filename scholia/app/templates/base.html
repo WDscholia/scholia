@@ -57,21 +57,50 @@
 	 }
 	 catch(e) {}
 	 
-	 var title = item.sitelinks.enwiki.title;
-	 var wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?' +
-			       'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
-			       'explaintext=1&callback=?&format=json&titles=' +
-			       encodeURIComponent(title);
-	 var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
+	 if ('enwiki' in item.sitelinks) {
+	     var title = item.sitelinks.enwiki.title;
+	     var wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?' +
+				   'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+				   'explaintext=1&callback=?&format=json&titles=' +
+				   encodeURIComponent(title);
+	     var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
+	     
+	     $.getJSON(wikipediaApiUrl, function(data) {
+		 var pages = data.query.pages;
+		 var text = pages[Object.keys(pages)[0]].extract + " ... "
+		 var html = "(from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
+		 $("#intro").text(text).append(html);
+	     }).fail(function(d, textStatus, error) {
+		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+	     });
+	 }
+
 	 
-	 $.getJSON(wikipediaApiUrl, function(data) {
-	     var pages = data.query.pages;
-	     var text = pages[Object.keys(pages)[0]].extract + " ... "
-	     var html = "(from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
-	     $("#intro").text(text).append(html);
-	 }).fail(function(d, textStatus, error) {
-	     console.error("getJSON failed, status: " + textStatus + ", error: "+error)
-	 });
+	 /* English Wikiversity */
+	 if ('enwikiversity' in item.sitelinks) {
+	     var enwikiversityTitle = item.sitelinks.enwikiversity.title;
+	     var wikiversityApiUrl = 'https://en.wikiversity.org/w/api.php?' +
+				     'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+				     'explaintext=1&callback=?&format=json&titles=' +
+				     encodeURIComponent(enwikiversityTitle);
+	     var wikiversityUrl = 'https://en.wikiversity.org/wiki/' + encodeURIComponent(enwikiversityTitle)
+
+	     $.getJSON(wikiversityApiUrl, function(data) {
+		 var pages = data.query.pages;
+		 var text = pages[Object.keys(pages)[0]].extract; 
+		 if (text) {
+		     var html = "... (from the <a href=\"" + wikiversityUrl + "\">English Wikiversity</a>)";
+		 }
+		 else {
+		     var html = "Read on the <a href=\"" + wikiversityUrl + "\">English Wikiversity</a>";
+		 }
+		 $("#wikiversity-extract").text(text).append(html);
+	     }).fail(function(d, textStatus, error) {
+		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+	     });
+	 }
+
+
      });
 
      var endpointUrl = 'https://query.wikidata.org/sparql';
@@ -115,7 +144,6 @@
 	 data.results.bindings.forEach(function(entry) {
 	     var aspect = entry.aspect.value;
 	     $( '#aspect-chooser' ).append( '<a href="../' + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
-	     console.log( "Chooser: " + aspect );
 	 });
      } );
 
