@@ -6,7 +6,7 @@ from flask import (Blueprint, current_app, redirect, render_template, request,
                    Response, url_for)
 from werkzeug.routing import BaseConverter
 
-from ..api import entity_to_name, wb_get_entities
+from ..api import entity_to_name, search, wb_get_entities
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works)
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
@@ -752,10 +752,29 @@ def show_protein_empty():
     Returns
     -------
     html : str
-        Rendered index page for author view.
+        Rendered index page for protein view.
 
     """
     return render_template('protein_empty.html')
+
+
+@main.route('/search')
+def show_search():
+    """Return search page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for search view.
+
+    """
+    query = request.args.get('q', '')
+    if query:
+        search_results = search(query)
+    else:
+        search_results = []
+    return render_template('search.html',
+                           query=query, search_results=search_results)
 
 
 @main.route('/gene/' + q_pattern)

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<h1>Search</h1>
+
+<form>
+    <div class="input-group">
+	<input type="text" class="form-control"name="q" id="searchterm" value="{{ query }}"
+	       placeholder="Search after scientist, paper, topic, etc." 
+/>
+	<span class="input-group-btn">
+	    <button class="btn btn-primary" type="submit">
+		Search
+	    </button>
+	</span>
+    </div>
+</form>
+
+<div id="searchresult">
+    <ol>
+{% for search_result in search_results %}
+	<li><a href="../{{ search_result['q'] }}">{{ search_result['q'] }}</a> &mdash; {{ search_result['description'] }}
+{% endfor %}
+    </ol>
+</div>
+
+
+
+{% endblock %}
+
+  
