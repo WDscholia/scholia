@@ -255,6 +255,38 @@ def entity_to_doi(entity):
         return ''
 
 
+def chemical_to_smiles(entity):
+    """Extract SMILES of a chemical.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata item
+
+    Returns
+    -------
+    doi : str
+        DOI as string. An empty string is returned if the field is not set.
+
+    Examples
+    --------
+    >>> entities = wb_get_entities(['Q48791494'])
+    >>> smiles = chemical_to_smiles(entities['Q48791494'])
+    >>> smiles == 'CC(C)[C@H]1CC[C@@]2(CO2)[C@@H]3[C@@H]1C=C(COC3=O)C(=O)O'
+    True
+
+    """
+    for statement in entity['claims'].get('P2017', []):
+        smiles = statement['mainsnak']['datavalue']['value']
+        return smiles
+    else:
+        for statement in entity['claims'].get('P233', []):
+            smiles = statement['mainsnak']['datavalue']['value']
+            return smiles
+        else:
+            return ''
+
+
 def entity_to_full_text_url(entity):
     """Extract full text URL of publication from entity.
 

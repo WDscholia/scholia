@@ -6,7 +6,7 @@ from flask import (Blueprint, current_app, redirect, render_template, request,
                    Response, url_for)
 from werkzeug.routing import BaseConverter
 
-from ..api import entity_to_name, wb_get_entities
+from ..api import entity_to_name, wb_get_entities, chemical_to_smiles
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works)
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
@@ -1015,7 +1015,9 @@ def show_chemical(q):
         Rendered HTML.
 
     """
-    return render_template('chemical.html', q=q)
+    entities = wb_get_entities([q])
+    smiles = chemical_to_smiles(entities[q])
+    return render_template('chemical.html', q=q, smiles=smiles)
 
 
 @main.route('/chemical/')
