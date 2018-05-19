@@ -6,19 +6,59 @@
 
 Chemical substances.
 
-<h2>Examples</h2>
 
-<ul>
-    <li><a href="../inchikey/QTBSBXVTEAMEQO-UHFFFAOYSA-N">QTBSBXVTEAMEQO-UHFFFAOYSA-N</a> (InChIKey for acetic acid)</li>
-    <li><a href="Q2270">benzene</a></li>
-    <li><a href="Q159683">citric acid</a></li>
-    <li><a href="../cas/50-00-0">50-00-0</a> (CAS number for formaldehyde)</li>
-</ul>
+<div class="container">
 
+    <h2>Examples</h2>
 
-<h2>Statistics</h2>
+    <div class="card-deck mb-3">
+	<div class="card mb-4 box-shadow">
 
-<table class="table table-hover" id="statistics"></table>
+            <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Single items</h4>
+            </div>
+            <div class="card-body">
+		<dl>
+		    <dt><a href="Q2270">benzene</a></dt>
+		    <dd>
+			View information about the chemical benzene.
+		    </dd>
+
+		    <dt><a href="Q159683">citric acid</a></dt>
+		    <dd>
+			View information about the chemical citric acid.
+		    </dd>
+		</dl>
+            </div>
+
+	</div>
+
+     <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+	    </div>
+	    <div class="card-body">
+		<p>If you know the identifier then Scholia can make a lookup based on the identifier:</p>
+
+		<dl>
+		    <dt><a href="../cas/50-00-0">cas/50-00-0</a></dt>
+		    <dd>Lookup CAS 50-00-0. This will identify formaldehyde
+			and redirect to its Scholia page.</dd>
+
+		    <dt><a href="../inchikey/QTBSBXVTEAMEQO-UHFFFAOYSA-N">inchikey/QTBSBXVTEAMEQO-UHFFFAOYSA-N</a></dt>
+		    <dd>Redirect also works for InChIKeys, here for acetic acid.</dd>
+		</dl>
+	    </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+  <h2>Statistics</h2>
+
+  <table class="table table-hover" id="statistics"></table>
+
+</div>
 
 {% endblock %}
 
