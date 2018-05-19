@@ -57,6 +57,8 @@
 	 }
 	 catch(e) {}
 	 
+
+	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {
 	     var title = item.sitelinks.enwiki.title;
 	     var wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?' +
@@ -100,7 +102,6 @@
 	     });
 	 }
 
-
      });
 
      var endpointUrl = 'https://query.wikidata.org/sparql';
@@ -140,15 +141,56 @@
      };
      
      $.ajax( endpointUrl, settings ).then( function ( data ) {
-	 console.log( data );
 	 data.results.bindings.forEach(function(entry) {
 	     var aspect = entry.aspect.value;
 	     $( '#aspect-chooser' ).append( '<a href="../' + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
 	 });
      } );
 
+
+     /* Wembedder */
+     var wembedderUrl = "https://tools.wmflabs.org/wembedder/api/most-similar/{{ q }}";
+     $.ajax({
+	 url: wembedderUrl,
+	 success: function (data) {
+	     $( '#wembedder' ).append('<hr> Related: ');
+
+	     // Make list with results
+	     data.most_similar.forEach(function(entry, idx, array) {
+		 var listed_q = entry.item;
+		 var language = 'en';
+
+		 if (idx !== 0) {
+		     $( '#wembedder' ).append( ' &middot; ');
+		 }
+
+		 var html = '<a href="../' + listed_q + '"><span id="wembedder-result-' + listed_q + '">' + listed_q + '</span></a> '
+		 $( '#wembedder' ).append( html );
+
+		 // Convert Q identifier to labels
+                 $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
+                     action: "wbgetentities",
+                     ids: listed_q,
+                     language: language,
+                     uselang: language,
+                     format: "json",
+                     strictlanguage: true,
+                 }, function (data) {
+                     if (listed_q in data.entities) {
+                         label = entityToLabel(data.entities[listed_q],
+                                               language=language);
+                         $('#wembedder-result-' + listed_q).empty();
+                         $('#wembedder-result-' + listed_q).text(label);
+                     }
+		 });
+	     });
+	     $( '#wembedder' ).append( '<hr>' );
+	 }
+     });
  }
+
 </script>
+
 {% endblock %}
 
 {% block navbar %}

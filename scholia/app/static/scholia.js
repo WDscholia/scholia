@@ -54,6 +54,25 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 }
 
 
+function entityToLabel(entity, language='en') {
+    if (language in entity['labels']) {
+        return entity['labels'][language].value;
+    }
+
+    // Fallback
+    languages = ['en', 'da', 'de', 'es', 'fr', 'jp',
+                 'nl', 'no', 'ru', 'sv', 'zh'];
+    for (lang in languages) {
+        if (lang in entity['labels']) {
+            return entity['labels'][lang].value;
+        }
+    }
+
+    // Last resort
+    return entity['id']
+}
+
+
 function sparqlDataToSimpleData(response) {
     // Convert long JSON data from from SPARQL endpoint to short form
     let data = response.results.bindings;
