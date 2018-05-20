@@ -15,6 +15,8 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 	column = columns[i];
 	if (column.substr(-5) == 'Label') {
 	    // pass
+	} else if (column.substr(-3) == 'Url') {
+	    // pass
 	} else {
 	    convertedColumns.push(column);
 	}
@@ -29,6 +31,15 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 		    '">' + data[i][key + 'Label'] + '</a>';
 	    } else if (key.substr(-5) == 'Label') {
 		// pass
+		
+	    } else if (key + 'Url' in data[i]) {
+		convertedRow[key] = '<a href="' +
+		    data[i][key + 'Url'] +
+		    '">' + data[i][key] + '</a>';
+		console.log(convertedRow[key]);
+	    } else if (key.substr(-3) == 'Url') {
+		// pass
+
 	    } else if (key.substr(-3) == 'url') {
 		// Convert URL to a link
 		convertedRow[key] = "<a href='" +

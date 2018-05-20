@@ -6,14 +6,18 @@
 <script type="text/javascript">
 
  identifiersSparql = `
-  SELECT ?IDpred ?IDpredLabel ?id WHERE {
-    wd:{{ q }} ?IDdir ?id .
-    ?IDpred wikibase:directClaim ?IDdir ;
-            wdt:P31 wd:Q19833835 .
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
+SELECT ?IDpred ?IDpredLabel ?id ?idUrl WHERE {  
+  wd:{{ q }} ?IDdir ?id .
+  ?IDpred wikibase:directClaim ?IDdir ;
+          wdt:P31 wd:Q19833835 .
+  OPTIONAL { 
+    ?IDpred wdt:P1630 ?formatterurl .
   }
-  ORDER BY ASC(?IDpredLabel)
-  LIMIT 500
+  BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrl).
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
+}
+ORDER BY ASC(?IDpredLabel)
+LIMIT 500
 `
 
  relatedChemicalsSparql = `
@@ -69,7 +73,7 @@ WHERE {
 } 
 ORDER BY ASC(?propEntityLabel)
 `
-  recentArticlesSparql = `
+ recentArticlesSparql = `
 SELECT ?date ?work ?workLabel ?type ?topics
 WITH {
   SELECT DISTINCT ?work WHERE {
@@ -102,10 +106,10 @@ LIMIT 500
 `
 
  $(document).ready(function() {
-   sparqlToDataTable(identifiersSparql, "#identifiers");
-   sparqlToDataTable(relatedChemicalsSparql, "#related");
-   sparqlToDataTable(propertiesSparql, "#properties");
-   sparqlToDataTable(recentArticlesSparql, "#recentArticles");
+     sparqlToDataTable(identifiersSparql, "#identifiers");
+     sparqlToDataTable(relatedChemicalsSparql, "#related");
+     sparqlToDataTable(propertiesSparql, "#properties");
+     sparqlToDataTable(recentArticlesSparql, "#recentArticles");
  });
 </script>
 
