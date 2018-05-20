@@ -13,7 +13,9 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
     var convertedColumns = [];
     for (var i = 0 ; i < columns.length ; i++) {
 	column = columns[i];
-	if (column.substr(-5) == 'Label') {
+	if (column.substr(-11) == 'Description') {
+	    convertedColumns.push('description');
+	} else if (column.substr(-5) == 'Label') {
 	    // pass
 	} else if (column.substr(-3) == 'Url') {
 	    // pass
@@ -24,7 +26,10 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
     for (var i = 0 ; i < data.length ; i++) {
 	var convertedRow = {};
 	for (var key in data[i]) {
-	    if (key + 'Label' in data[i]) {
+	    if (key.substr(-11) == 'Description') {
+		convertedRow['description'] = data[i][key];
+
+	    } else if (key + 'Label' in data[i]) {
 		convertedRow[key] = '<a href="' +
 		    (linkPrefixes[key] || "../") + 
 		    data[i][key].substr(31) +
@@ -45,11 +50,13 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 		convertedRow[key] = "<a href='" +
 		    data[i][key] + "'>" + 
 		    $("<div>").text(data[i][key]).html() + '</a>';
+
 	    } else if (key == 'orcid') {
 		// Add link to ORCID website
 		convertedRow[key] = '<a href="https://orcid.org/' +
 		    data[i][key] + '">' + 
 		    data[i][key] + '</a>';
+
 	    } else if (key == 'doi') {
 		// Add link to Crossref
 		convertedRow[key] = '<a href="https://doi.org/' +

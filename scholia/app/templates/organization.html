@@ -5,30 +5,31 @@
 
 <script type="text/javascript">
  employeesAndAffiliatedSparql = `
-SELECT (SAMPLE(?number_of_works_) AS ?number_of_works) ?researcher ?researcherLabel (MAX(?birthdates) AS ?birthdate) ?orcid
+SELECT
+  (SAMPLE(?number_of_works_) AS ?works)
+  ?researcher ?researcherLabel ?researcherDescription
+  (SAMPLE(?orcid_) AS ?orcid)
+WITH {
+  SELECT DISTINCT ?researcher WHERE {
+    ?researcher wdt:P108 | wdt:P463 | wdt:P1416 / wdt:P361* wd:{{ q }} . 
+  } 
+} AS %researchers
+WITH {
+  SELECT
+    (COUNT(?work) AS ?number_of_works_) ?researcher
+  WHERE {
+    INCLUDE %researchers
+    OPTIONAL { ?work wdt:P50 ?researcher . }
+  } 
+  GROUP BY ?researcher
+} AS %researchers_and_number_of_works
 WHERE {
-  hint:Query hint:optimizer "None" .
-  {
-    SELECT (COUNT(?work) AS ?number_of_works_) ?researcher WHERE {
-      { 
-        SELECT DISTINCT ?researcher WHERE {
-          { ?researcher wdt:P108|wdt:P463 wd:{{ q }} . }
-          UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} . }
-        } 
-      }
-      OPTIONAL { ?work wdt:P50 ?researcher . }
-    } 
-    GROUP BY ?researcher
-  }  
-  OPTIONAL {
-    ?researcher wdt:P569 ?birthdatetimes .
-    BIND(xsd:date(?birthdatetimes) AS ?birthdates)
-  }
-  OPTIONAL { ?researcher wdt:P496 ?orcid . }
+  INCLUDE %researchers_and_number_of_works
+  OPTIONAL { ?researcher wdt:P496 ?orcid_ . }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
 }
-GROUP BY ?researcher ?researcherLabel ?orcid
-ORDER BY DESC(?number_of_works)
+GROUP BY ?researcher ?researcherLabel ?researcherDescription 
+ORDER BY DESC(?works)
  `;
 
  recentPublicationsSparql = `
