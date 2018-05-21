@@ -11,7 +11,7 @@ SELECT
   (SAMPLE(?orcid_) AS ?orcid)
 WITH {
   SELECT DISTINCT ?researcher WHERE {
-    ?researcher wdt:P108 | wdt:P463 | wdt:P1416 / wdt:P361* wd:{{ q }} . 
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
   } 
 } AS %researchers
 WITH {
@@ -40,8 +40,7 @@ WITH {
     (min(?publication_dates) AS ?publication_date) ?work 
     (GROUP_CONCAT(DISTINCT ?researcher_label; separator=', ') AS ?researchers)
   WHERE {                                                         
-    { ?researcher wdt:P108|wdt:P463 wd:{{ q }} . }
-    UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} .  }
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
     ?work wdt:P50 ?researcher .
     ?researcher rdfs:label ?researcher_label . filter (lang(?researcher_label) = 'en')
     OPTIONAL {
@@ -60,15 +59,14 @@ ORDER BY DESC(?publication_date)
 
  recentCitationsSparql = `
  #defaultView:Table
- SELECT DISTINCT ?publication_date ?citing_work ?citing_workLabel ?work ?workLabel
- WHERE {
-     { ?researcher wdt:P108 wd:{{ q }} . }
-     UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} .  }
-     ?work wdt:P50 ?researcher .
-      ?citing_work wdt:P2860 ?work .
-   ?citing_work wdt:P577 ?publication_datetime .
-   BIND(xsd:date(?publication_datetime) AS ?publication_date)
-   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,nl,ru,sv,zh". }
+SELECT DISTINCT ?publication_date ?citing_work ?citing_workLabel ?work ?workLabel
+WHERE {
+  ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
+  ?work wdt:P50 ?researcher .
+  ?citing_work wdt:P2860 ?work .
+  ?citing_work wdt:P577 ?publication_datetime .
+  BIND(xsd:date(?publication_datetime) AS ?publication_date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,nl,ru,sv,zh". }
  }
  ORDER BY DESC(?publication_date)
 `;
@@ -80,8 +78,7 @@ WITH {
     hint:Query hint:optimizer "None" .
     { 
       SELECT DISTINCT ?researcher WHERE {
-        { ?researcher wdt:P108 wd:{{ q }} . }
-        UNION { ?researcher wdt:P1416 / wdt:P361* wd:{{ q }} .  }
+        ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
       } 
     }
     ?researcher wdt:P166 ?award .
@@ -101,8 +98,7 @@ ORDER BY DESC(?count)
  SELECT ?count ?gender ?genderLabel 
 WITH {
   SELECT (COUNT(DISTINCT ?researcher) AS ?count) ?gender WHERE {
-    { ?researcher wdt:P108|wdt:P463 wd:{{ q }} . }
-    UNION { ?researcher wdt:P1416/wdt:P361* wd:{{ q }} . }
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
     ?researcher wdt:P21 ?gender . 
   } 
   GROUP BY ?gender
