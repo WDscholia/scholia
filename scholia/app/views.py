@@ -6,7 +6,7 @@ from flask import (Blueprint, current_app, redirect, render_template, request,
                    Response, url_for)
 from werkzeug.routing import BaseConverter
 
-from ..api import entity_to_name, search, wb_get_entities
+from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works)
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
@@ -920,8 +920,11 @@ def show_text_to_topics():
     else:
         assert False
 
+    if not current_app.text_to_topic_q_text_enabled:
+        return render_template('text_to_topics.html', enabled=False)
+
     if not text:
-        return render_template('text_to_topics.html')
+        return render_template('text_to_topics.html', enabled=True)
 
     qs_list = current_app.text_to_topic_q_text.text_to_topic_qs(text)
     qs = ",".join(set(qs_list))
@@ -1034,7 +1037,13 @@ def show_chemical(q):
         Rendered HTML.
 
     """
-    return render_template('chemical.html', q=q)
+    entities = wb_get_entities([q])
+    smiles = entity_to_smiles(entities[q])
+    return render_template(
+        'chemical.html',
+        q=q,
+        smiles=smiles,
+        third_parties_enabled=current_app.third_parties_enabled)
 
 
 @main.route('/chemical/')

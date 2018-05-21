@@ -41,6 +41,38 @@ MONTH_NUMBER_TO_MONTH = {
 }
 
 
+def entity_to_smiles(entity):
+    """Extract SMILES of a chemical.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata item
+
+    Returns
+    -------
+    smiles : str
+        SMILES as string.
+
+    Examples
+    --------
+    >>> entities = wb_get_entities(['Q48791494'])
+    >>> smiles = entity_to_smiles(entities['Q48791494'])
+    >>> smiles == 'CC(C)[C@H]1CC[C@@]2(CO2)[C@@H]3[C@@H]1C=C(COC3=O)C(=O)O'
+    True
+
+    """
+    for statement in entity['claims'].get('P2017', []):
+        smiles = statement['mainsnak']['datavalue']['value']
+        return smiles
+    else:
+        for statement in entity['claims'].get('P233', []):
+            smiles = statement['mainsnak']['datavalue']['value']
+            return smiles
+        else:
+            return ''
+
+
 def is_human(entity):
     """Return true if entity is a human.
 

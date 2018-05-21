@@ -120,7 +120,28 @@ LIMIT 500
 {% block page_content %}
 <h1 id="h1">Chemical</h1>
 
+{% if third_parties_enabled %}
+
+<div class="card-deck mb-3">
+    <div class="card mb-4 box-shadow">
+	<div class="card-body">
+	    <div id="intro"></div>
+	</div>
+    </div>
+
+    <div class="card mb-4 box-shadow">
+	<div class="card-body">
+	    <img src="http://www.simolecule.com/cdkdepict/depict/bow/svg?smi={{smiles}}&abbr=on&hdisp=bridgehead&showtitle=false&zoom=2&annotate=cip" />
+	</div>
+    </div>
+</div>
+
+{% else %}
+
 <div id="intro"></div>
+
+{% endif %}
+
 
 <h2 id="Identifiers">Identifiers</h2>
 
