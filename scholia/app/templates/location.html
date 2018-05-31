@@ -42,21 +42,29 @@ ORDER BY ?distance
   nearbyLocationsAsTopicsInWorksSparql = `
 SELECT ?distance ?work ?workLabel ?location ?locationLabel
 WITH {
-  SELECT ?work ?location ?geo ?distance WHERE {
+  SELECT DISTINCT ?work ?location ?geo ?distance WHERE {
     ?work wdt:P921 ?location . 
-    ?location wdt:P625 ?other_geo . 
+    ?location p:P625 ?other_geo_statement . 
+    
+    # Some locations have unknown geocoordinates indicated with novalue
+    # psv will remove them. 
+    ?other_geo_statement ps:P625 ?other_geo .
+    ?other_geo_statement psv:P625 [] .
+
+    # Remove articles from encyclopedia and dictionaries
+    # Filter is more expensive when applied here. 
+    MINUS { ?work wdt:P31 wd:Q17329259 }
+    MINUS { ?work wdt:P31 wd:Q4423781 }
+   
     wd:{{ q }} wdt:P625 ?geo .
     BIND(geof:distance(?other_geo, ?geo) AS ?distance)
   }
   ORDER BY ?distance
-  LIMIT 100
+  LIMIT 500
 } AS %results
 WHERE {
   INCLUDE %results
           
-  # Filter is expensive if earlier
-  FILTER NOT EXISTS { ?work wdt:P31 wd:Q17329259 }
-  
   # Label the result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,cs,da,de,es,jp,nl,no,ru,sv,zh". }
 }
