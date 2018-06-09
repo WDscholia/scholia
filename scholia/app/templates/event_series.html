@@ -12,7 +12,10 @@ SELECT
   ?event ?eventLabel
   ?proceedings ?proceedingsLabel
 WHERE {
-  ?event wdt:P179 wd:{{ q }} .
+  {
+    { ?event wdt:P179 wd:{{ q }} } UNION
+    { ?event wdt:P31 wd:{{ q }} }
+  }
   OPTIONAL {
     ?event wdt:P585 | wdt:P580 ?datetime .
     BIND(YEAR(?datetime) AS ?year)
@@ -34,7 +37,10 @@ WITH {
   SELECT
     DISTINCT ?person
   WHERE {
-    ?event wdt:P179 wd:{{ q }} .
+    {
+      { ?event wdt:P179 wd:{{ q }} } UNION
+      { ?event wdt:P31 wd:{{ q }} }
+    }
     {
       # speaker
       ?event wdt:P823 ?person .
@@ -60,7 +66,9 @@ WITH {
   SELECT
     (SUM(?score_) AS ?score) ?topic
   WHERE {
-    ?event wdt:P179 wd:{{ q }} .
+    {
+      { ?event wdt:P179 wd:{{ q }} } UNION { ?event wdt:P31 wd:{{ q }} }
+    }
     {
       ?event wdt:P921 ?topic .
       BIND(50 AS ?score_)
@@ -97,7 +105,9 @@ WITH {
   SELECT
     DISTINCT ?person
   WHERE {
-    ?event wdt:P179 wd:{{ q }} .
+    {
+      { ?event wdt:P179 wd:{{ q }} } UNION { ?event wdt:P31 wd:{{ q }} }
+    }
     {
       # speaker
       ?event wdt:P823 ?person .
