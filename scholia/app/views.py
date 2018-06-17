@@ -806,6 +806,8 @@ def show_search():
         search_results = []
     return render_template('search.html',
                            query=query, search_results=search_results)
+
+
 @main.route('/gene/' + q_pattern)
 def show_gene(q):
     """Return HTML rendering for specific gene.
