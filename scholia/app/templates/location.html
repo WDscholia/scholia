@@ -4,7 +4,7 @@
 {{super()}}
 
 <script type="text/javascript">
-    nearbyOrganizationsSparql = `
+ nearbyOrganizationsSparql = `
 SELECT
   ?distance
   ?organization ?organizationLabel
@@ -26,7 +26,7 @@ WITH {
   # Compute distance.
   SELECT ?organization ?distance WHERE {
     INCLUDE %organizations
-    wd:{{ q }} wdt:P625 ?geo .
+    wd:{{ q }} wdt:P159* / wdt:P625 ?geo .
     BIND(geof:distance(?other_geo, ?geo) AS ?distance)
     FILTER(?distance < 250)
   }
@@ -39,13 +39,13 @@ ORDER BY ?distance
  `;
 
 
-  nearbyLocationsAsTopicsInWorksSparql = `
+ nearbyLocationsAsTopicsInWorksSparql = `
 SELECT ?distance ?work ?workLabel ?location ?locationLabel
 WITH {
   SELECT ?work ?location ?geo ?distance WHERE {
     ?work wdt:P921 ?location . 
     ?location wdt:P625 ?other_geo . 
-    wd:{{ q }} wdt:P625 ?geo .
+    wd:{{ q }} wdt:P159* / wdt:P625 ?geo .
     BIND(geof:distance(?other_geo, ?geo) AS ?distance)
   }
   ORDER BY ?distance
