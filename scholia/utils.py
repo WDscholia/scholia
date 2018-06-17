@@ -52,7 +52,7 @@ def string_to_type(string):
     Returns
     -------
     result : str
-    
+
     Examples
     --------
     >>> string_to_type('1121-4545')
