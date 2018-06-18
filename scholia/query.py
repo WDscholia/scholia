@@ -40,6 +40,7 @@ import requests
 
 from simplejson import JSONDecodeError
 
+from six import u
 
 USER_AGENT = 'Scholia'
 
@@ -267,11 +268,21 @@ def search_article_titles(q, search_string=None):
     ----------
     q : str
         String with Wikidata Q item.
+    search_string : str, optional
+        String with query string. If it is not provided then the label of
+        q items is used as the query string.
 
     Returns
     -------
     results : list of dict
         List of dicts with query result.
+
+    Notes
+    -----
+    This function uses the Egon Willighagen trick with iterating
+    over batches of 500'000 thousand articles and performing a search
+    in the (scientific) article title for the query string via the `CONTAINS`
+    SPARQL function. Case is ignored.
 
     """
     if search_string is None:
@@ -302,13 +313,13 @@ def search_article_titles(q, search_string=None):
 
     batch_size = 500000
     loops = article_count // batch_size + 1
-    loops = 1
 
     results = []
     for loop in range(loops):
         offset = loop * batch_size
         query = query_template.format(
-            batch_size=batch_size, offset=offset, label=search_string, q=q)
+            batch_size=batch_size, offset=offset,
+            label=search_string.lower(), q=q)
 
         params = {'query': query, 'format': 'json'}
         response = requests.get(url, params=params, headers=HEADERS)
@@ -340,9 +351,9 @@ def search_article_titles_to_quickstatements(q, search_string=None):
 
     """
     articles = search_article_titles(q, search_string=search_string)
-    quickstatements = ''
+    quickstatements = u('')
     for article in articles:
-        quickstatements += ("{article_q}\twdt:P921\t{topic_q} /* {title} */\n"
+        quickstatements += u("{article_q}\twdt:P921\t{topic_q} /* {title} */\n"
                             ).format(
             article_q=article['q'], topic_q=q, title=article['title'])
     return quickstatements
