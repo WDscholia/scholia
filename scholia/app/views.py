@@ -13,7 +13,8 @@ from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
-                     q_to_class, random_author, twitter_to_qs)
+                     q_to_class, random_author, twitter_to_qs,
+                     cordis_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -333,6 +334,23 @@ def redirect_cas(cas):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
+    return render_template('404.html')
+
+
+@main.route('/cordis/<cordis>')
+def redirect_cordis(cordis):
+    """Detect and redirect for EU CORDIS project IDs.
+
+    Parameters
+    ----------
+    cordis : str
+        CORDIS identifier.
+
+    """
+    qs = cordis_to_qs(cordis)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_project', q=q), code=302)
     return render_template('404.html')
 
 
