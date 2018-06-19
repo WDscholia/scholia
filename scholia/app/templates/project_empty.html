@@ -23,6 +23,11 @@ Research projects.
 
 <table class="table table-hover" id="statistics"></table>
 
+<h3>Citations per budget</h3>
+
+<table class="table table-hover" id="citations-per-budget"></table>
+
+
 {% endblock %}
 
 
@@ -54,8 +59,39 @@ WHERE {
 ORDER BY DESC(?count)
 `
 
+ citationsPerBudgetSparql = `
+SELECT
+  ?cites_per_million
+  ?citations 
+  ?budget ?currency ?currencyLabel
+  ?project ?projectLabel
+WITH {
+  SELECT
+    (COUNT(?citing_work) / ?budget * 1000000 AS ?cites_per_million)
+    (COUNT(?citing_work) AS ?citations)
+    ?budget ?currency
+    ?project
+  WHERE {
+    ?project p:P2769 / psv:P2769 ?budget_value .
+    ?budget_value wikibase:quantityAmount ?budget .
+    ?budget_value wikibase:quantityUnit ?currency .
+    ?work wdt:P859 ?project .
+    ?citing_work wdt:P2860 ?work .
+  } 
+  GROUP BY ?project ?budget ?currency
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?cites_per_million)
+`
+
+
  $(document).ready(function() {
      sparqlToDataTable(statisticsSparql, "#statistics");
+     sparqlToDataTable(citationsPerBudgetSparql, "#citations-per-budget");
  });
 
 </script>
