@@ -3,6 +3,7 @@
 Usage:
   scholia.query arxiv-to-q <arxiv>
   scholia.query cas-to-q <cas>
+  scholia.query cordis-to-q <cordis>
   scholia.query count-scientific-articles
   scholia.query doi-to-q <doi>
   scholia.query github-to-q <github>
@@ -666,6 +667,39 @@ def inchikey_to_qs(inchikey):
             for item in data['results']['bindings']]
 
 
+def cordis_to_qs(cordis):
+    """Convert CORDIS project ID to Wikidata ID.
+
+    Parameters
+    ----------
+    cordis : str
+        CORDIS identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> cordis_to_qs('604134') == ['Q27990087']
+    True
+
+    """
+    # This query only matches on exact match
+    query = """select ?item
+               where {{ ?item wdt:P3400 "{cordis}" }}""".format(
+        cordis=escape_string(cordis))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['item']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def cas_to_qs(cas):
     """Convert a CAS registry number to Wikidata ID.
 
@@ -738,6 +772,11 @@ def main():
 
     elif arguments['cas-to-q']:
         qs = cas_to_qs(arguments['<cas>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['cordis-to-q']:
+        qs = cordis_to_qs(arguments['<cordis>'])
         if len(qs) > 0:
             print(qs[0])
 
