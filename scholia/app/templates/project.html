@@ -118,7 +118,7 @@ LIMIT 500
 <h2 id="Project Partners">Project Partners</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item"  src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Fpartner%20%3FpartnerLabel%20%3Flocation%0AWITH%20%7B%0A%20%20SELECT%20%3Fpartner%20%3Flocation%20WHERE%20%7B%0A%20%20%20%20wd%3A{{ q }}%20%28%5Ewdt%3AP1344%20%7C%20wdt%3AP710%29%2a%20%2F%20%28wdt%3AP527%20%7C%20wdt%3AP710%29%20%3Fpartner%20.%0A%20%20%20%20%3Fpartner%20wdt%3AP159%2a%20%2F%20wdt%3AP625%20%3Flocation%20.%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0A"></iframe>
+  <iframe class="embed-responsive-item"  src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Fpartner%20%3FpartnerLabel%20%3Flocation%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fpartner%20%3Flocation%20WHERE%20%7B%0A%20%20%20%20wd%3A{{ q }}%20%28%5Ewdt%3AP1344%20%7C%20wdt%3AP710%29%2a%20%2F%20%28wdt%3AP527%20%7C%20wdt%3AP710%20%7C%20wdt%3AP1416%29%20%3Fpartner%20.%0A%20%20%20%20%3Fpartner%20wdt%3AP159%2a%20%2F%20wdt%3AP625%20%3Flocation%20.%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0A"></iframe>
 </div>
 
 
