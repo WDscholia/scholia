@@ -12,10 +12,7 @@ SELECT
   ?event ?eventLabel
   ?proceedings ?proceedingsLabel
 WHERE {
-  {
-    { ?event wdt:P179 wd:{{ q }} } UNION
-    { ?event wdt:P31 wd:{{ q }} }
-  }
+  ?event wdt:P179 | wdt:P31 wd:{{ q }} .
   OPTIONAL {
     ?event wdt:P585 | wdt:P580 ?datetime .
     BIND(YEAR(?datetime) AS ?year)
@@ -37,10 +34,7 @@ WITH {
   SELECT
     DISTINCT ?person
   WHERE {
-    {
-      { ?event wdt:P179 wd:{{ q }} } UNION
-      { ?event wdt:P31 wd:{{ q }} }
-    }
+    ?event (wdt:P179 | wdt:P31) wd:{{ q }} .
     {
       # speaker
       ?event wdt:P823 ?person .
@@ -66,9 +60,12 @@ WITH {
   SELECT
     (SUM(?score_) AS ?score) ?topic
   WHERE {
-    {
-      { ?event wdt:P179 wd:{{ q }} } UNION { ?event wdt:P31 wd:{{ q }} }
-    }
+
+    # For some reason a path query does not work here.
+    { ?event wdt:P179 wd:{{ q }} . }
+    UNION
+    { ?event wdt:P31 wd:{{ q }} . }
+
     {
       ?event wdt:P921 ?topic .
       BIND(50 AS ?score_)
@@ -105,9 +102,8 @@ WITH {
   SELECT
     DISTINCT ?person
   WHERE {
-    {
-      { ?event wdt:P179 wd:{{ q }} } UNION { ?event wdt:P31 wd:{{ q }} }
-    }
+    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
+
     {
       # speaker
       ?event wdt:P823 ?person .
@@ -160,7 +156,7 @@ WITH {
     (GROUP_CONCAT(DISTINCT ?author; separator=" // ") AS ?authors)
     (GROUP_CONCAT(DISTINCT ?topic; separator=" // ") AS ?topics)
   WHERE {
-    ?work wdt:P1433 / wdt:P4745 / wdt:P179 wd:{{ q }} .
+    ?work wdt:P1433 / wdt:P4745 / (wdt:P179 | wdt:P31) wd:{{ q }} .
     OPTIONAL { ?work wdt:P50 / rdfs:label ?author . FILTER(LANG(?author) = "en") }
     OPTIONAL { ?work wdt:P921 / rdfs:label ?topic . FILTER(LANG(?topic) = "en") }
   }
@@ -219,14 +215,14 @@ WHERE {
 <h2>Timeline</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20%3Ftime%20%3Fendtime%20%3Fevent%20%3FeventLabel%20%3Fimage%0AWHERE%20%7B%0A%20%20%3Fevent%20wdt%3AP179%20wd%3A{{ q }}%20.%0A%20%20%7B%0A%20%20%20%20%3Fevent%20wdt%3AP580%20%7C%20wdt%3AP585%20%3Ftime%20.%0A%20%20%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20%20%20%3Fevent%20wdt%3AP582%20%3Fendtime%20.%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%20%3Fevent%20p%3AP793%20%5B%20ps%3AP793%20%3Fitem%20%3B%20pq%3AP585%20%3Ftime%20%5D%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0A%20%20%0A%20%20"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20%3Ftime%20%3Fendtime%20%3Fevent%20%3FeventLabel%20%3Fimage%0AWHERE%20%7B%0A%20%20%3Fevent%20wdt%3AP179%20%7C%20wdt%3AP31%20wd%3A{{ q }}%20.%0A%20%20%7B%0A%20%20%20%20%3Fevent%20wdt%3AP580%20%7C%20wdt%3AP585%20%3Ftime%20.%0A%20%20%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20%20%20%3Fevent%20wdt%3AP582%20%3Fendtime%20.%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%20%3Fevent%20p%3AP793%20%5B%20ps%3AP793%20%3Fitem%20%3B%20pq%3AP585%20%3Ftime%20%5D%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0A%20%20%0A%20%20"></iframe>
 </div>
 
 
 <h2>Map</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Fevent%20%3FeventLabel%20%3Fgeo%20%3Fimage%20WHERE%20%7B%0A%20%20%3Fevent%20wdt%3AP179%20wd%3A{{ q }}%20.%0A%20%20%3Fevent%20wdt%3AP276%3F%20%2F%20wdt%3AP625%20%3Fgeo%20.%0A%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Fevent%20%3FeventLabel%20%3Fgeo%20%3Fimage%20WHERE%20%7B%0A%20%20%3Fevent%20%28wdt%3AP179%20%7C%20wdt%3AP31%29%20wd%3A{{ q }}%20.%0A%20%20%3Fevent%20wdt%3AP276%3F%20%2F%20wdt%3AP625%20%3Fgeo%20.%0A%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D"></iframe>
 </div>
 
 
