@@ -64,6 +64,7 @@ SELECT
   ?cites_per_million
   ?citations 
   ?budget ?currency ?currencyLabel
+  ?short_name
   ?project ?projectLabel
 WITH {
   SELECT
@@ -82,6 +83,7 @@ WITH {
 } AS %results
 WHERE {
   INCLUDE %results
+  OPTIONAL { ?project wdt:P1813 ?short_name }
   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }
