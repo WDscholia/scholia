@@ -1,7 +1,7 @@
 """utils."""
 
 
-from re import findall
+from re import findall, search
 
 
 def sanitize_q(q):
@@ -39,3 +39,29 @@ def sanitize_q(q):
         if qs:
             return 'Q' + qs[0]
     return ''
+
+
+def string_to_type(string):
+    """Guess type of string.
+
+    Parameters
+    ----------
+    string : str
+        Query string.
+
+    Returns
+    -------
+    result : str
+
+    Examples
+    --------
+    >>> string_to_type('1121-4545')
+    'issn'
+
+    """
+    if search('\d{4}-\d{4}', string):
+        return 'issn'
+    elif search('10\.\d{4}', string):
+        return 'doi'
+    else:
+        return 'string'

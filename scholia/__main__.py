@@ -3,6 +3,7 @@
 Usage:
   scholia arxiv-to-quickstatements [options] <arxiv>
   scholia orcid-to-q <orcid>
+  scholia string-to-type <string>
 
 Options:
   -o --output=file  Output filename, default output to stdout
@@ -26,6 +27,7 @@ from os import write
 
 from . import arxiv
 from .query import orcid_to_qs
+from .utils import string_to_type
 
 
 def main():
@@ -53,6 +55,10 @@ def main():
         qs = orcid_to_qs(arguments['<orcid>'])
         if len(qs) > 0:
             print(qs[0])
+
+    elif arguments['string-to-type']:
+        type = string_to_type(arguments['<string>'])
+        print(type)
 
 
 if __name__ == '__main__':

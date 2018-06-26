@@ -3,11 +3,14 @@
 Usage:
   scholia.query arxiv-to-q <arxiv>
   scholia.query cas-to-q <cas>
+  scholia.query cordis-to-q <cordis>
+  scholia.query count-scientific-articles
   scholia.query doi-to-q <doi>
   scholia.query github-to-q <github>
   scholia.query inchikey-to-q <inchikey>
   scholia.query issn-to-q <issn>
   scholia.query orcid-to-q <orcid>
+  scholia.query q-to-label <q>
   scholia.query viaf-to-q <viaf>
   scholia.query q-to-class <q>
   scholia.query random-author
@@ -24,6 +27,9 @@ Examples
   $ python -m scholia.query doi-to-q 10.475/123_4
   Q41533080
 
+  $ python -m schoia.query q-to-label Q80
+  Tim Berners-Lee
+
 """
 
 
@@ -35,6 +41,7 @@ import requests
 
 from simplejson import JSONDecodeError
 
+from six import u
 
 USER_AGENT = 'Scholia'
 
@@ -95,6 +102,26 @@ def arxiv_to_qs(arxiv):
 
     return [item['work']['value'][31:]
             for item in data['results']['bindings']]
+
+
+def count_scientific_articles():
+    """Return count for the number of scientific articles.
+
+    Returns
+    -------
+    count : int
+        Number of scientific articles in Wikidata.
+
+    """
+    query = """
+        SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31 wd:Q13442814 }"""
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return int(data['results']['bindings'][0]['count']['value'])
 
 
 def doi_to_qs(doi):
@@ -196,6 +223,141 @@ def orcid_to_qs(orcid):
 
     return [item['author']['value'][31:]
             for item in data['results']['bindings']]
+
+
+def q_to_label(q, language='en'):
+    """Get label for Q item.
+
+    Parameters
+    ----------
+    q : str
+        String with Wikidata Q item.
+    language : str
+        String with language identifier
+
+    Returns
+    -------
+    label : str
+        String with label corresponding to Wikidata item.
+
+    Examples
+    --------
+    >>> q_to_label('Q80') == "Tim Berners-Lee"
+    True
+
+    """
+    query = """SELECT ?label WHERE {{ wd:{q} rdfs:label ?label .
+        FILTER (LANG(?label) = "{language}") }}""".format(
+        q=q, language=language)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    results = data['results']['bindings']
+    if len(results) == 1:
+        return results[0]['label']['value']
+    else:
+        return None
+
+
+def search_article_titles(q, search_string=None):
+    """Search articles with q item.
+
+    Parameters
+    ----------
+    q : str
+        String with Wikidata Q item.
+    search_string : str, optional
+        String with query string. If it is not provided then the label of
+        q items is used as the query string.
+
+    Returns
+    -------
+    results : list of dict
+        List of dicts with query result.
+
+    Notes
+    -----
+    This function uses the Egon Willighagen trick with iterating
+    over batches of 500'000 thousand articles and performing a search
+    in the (scientific) article title for the query string via the `CONTAINS`
+    SPARQL function. Case is ignored.
+
+    """
+    if search_string is None:
+        search_string = q_to_label(q)
+
+    query_template = """
+      SELECT
+        ?article ?title
+      WITH {{
+        SELECT ?article WHERE {{
+          ?article wdt:P31 wd:Q13442814
+        }}
+        LIMIT {batch_size}
+        OFFSET {offset}
+      }} AS %results
+      WHERE {{
+        INCLUDE %results
+        ?article wdt:P1476 ?title .
+        MINUS {{ ?article wdt:P921 / wdt:P279* wd:{q} }}
+        FILTER (CONTAINS(LCASE(?title), "{label}"))
+      }}"""
+
+    # Number of articles and a bit more to account for possible
+    # addition during query.
+    article_count = count_scientific_articles() + 1000
+
+    url = 'https://query.wikidata.org/sparql'
+
+    batch_size = 500000
+    loops = article_count // batch_size + 1
+
+    results = []
+    for loop in range(loops):
+        offset = loop * batch_size
+        query = query_template.format(
+            batch_size=batch_size, offset=offset,
+            label=search_string.lower(), q=q)
+
+        params = {'query': query, 'format': 'json'}
+        response = requests.get(url, params=params, headers=HEADERS)
+        data = response.json()
+        batch_results = [
+            {
+                'title': item['title']['value'],
+                'q': item['article']['value'][31:]
+            }
+            for item in data['results']['bindings']]
+        results.extend(batch_results)
+    return results
+
+
+def search_article_titles_to_quickstatements(q, search_string=None):
+    """Search article titles and return quickstatements.
+
+    Parameters
+    ----------
+    q : str
+        String with Wikidata Q identifier.
+    search_string : str, optional
+        Search string
+
+    Returns
+    -------
+    quickstatements : str
+       String with quickstatement formated commands.
+
+    """
+    articles = search_article_titles(q, search_string=search_string)
+    quickstatements = u('')
+    for article in articles:
+        quickstatements += u(
+            "{article_q}\twdt:P921\t{topic_q} /* {title} */\n").format(
+            article_q=article['q'], topic_q=q, title=article['title'])
+    return quickstatements
 
 
 def viaf_to_qs(viaf):
@@ -505,6 +667,39 @@ def inchikey_to_qs(inchikey):
             for item in data['results']['bindings']]
 
 
+def cordis_to_qs(cordis):
+    """Convert CORDIS project ID to Wikidata ID.
+
+    Parameters
+    ----------
+    cordis : str
+        CORDIS identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> cordis_to_qs('604134') == ['Q27990087']
+    True
+
+    """
+    # This query only matches on exact match
+    query = """select ?item
+               where {{ ?item wdt:P3400 "{cordis}" }}""".format(
+        cordis=escape_string(cordis))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['item']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def cas_to_qs(cas):
     """Convert a CAS registry number to Wikidata ID.
 
@@ -580,6 +775,15 @@ def main():
         if len(qs) > 0:
             print(qs[0])
 
+    elif arguments['cordis-to-q']:
+        qs = cordis_to_qs(arguments['<cordis>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['count-scientific-articles']:
+        count = count_scientific_articles()
+        print(count)
+
     elif arguments['doi-to-q']:
         qs = doi_to_qs(arguments['<doi>'])
         if len(qs) > 0:
@@ -613,6 +817,10 @@ def main():
     elif arguments['q-to-class']:
         class_ = q_to_class(arguments['<q>'])
         print(class_)
+
+    elif arguments['q-to-label']:
+        label = q_to_label(arguments['<q>'])
+        print(label)
 
     elif arguments['random-author']:
         q = random_author()
