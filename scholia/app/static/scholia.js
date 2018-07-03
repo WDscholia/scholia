@@ -107,7 +107,11 @@ function sparqlDataToSimpleData(response) {
 }
 
 
-function sparqlToDataTable(sparql, element, linkPrefixes={}, paging=true) {
+function sparqlToDataTable(sparql, element, options={}) {
+    // Options: linkPrefixes={}, paging=true
+    var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
+    var paging = (typeof options.paging === 'undefined') ? true : options.paging;
+    
     var url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=" + 
 	encodeURIComponent(sparql) + '&format=json';
 

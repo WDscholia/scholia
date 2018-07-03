@@ -63,9 +63,9 @@ ORDER BY DESC(?score)
 
  $(document).ready(function() {
      sparqlToDataTable(
-	 nearbyResearchersSparql, "#nearby-researchers",
-	 linkPrefixes={"author": "../../../author/",
-		       "example_work": "../../../work/"});
+	 nearbyResearchersSparql, "#nearby-researchers", {
+	     linkPrefixes:{"author": "../../../author/",
+			   "example_work": "../../../work/"} });
  });
 </script>
 
