@@ -49,7 +49,7 @@ WITH {
   WHERE {
     INCLUDE %authors
     ?work wdt:P50 ?author .
-    ?citing_work wdt:P2860 ?work .
+    OPTIONAL { ?citing_work wdt:P2860 ?work . }
     OPTIONAL {
       ?author wdt:P1416 | wdt:P108 ?organization_ .
       ?organization_ wdt:P17 wd:{{ q }}
