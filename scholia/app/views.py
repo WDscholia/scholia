@@ -385,6 +385,25 @@ def show_catalogue_empty():
     return render_template('catalogue_empty.html')
 
 
+@main.route('/countries/' + qs_pattern)
+def show_countries(qs):
+    """Return HTML rendering for specific countries.
+
+    Parameters
+    ----------
+    qs : str
+        Wikidata item identifiers.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for specific countries.
+
+    """
+    qs = Q_PATTERN.findall(qs)
+    return render_template('countries.html', qs=qs)
+
+
 @main.route('/country/')
 def show_country_empty():
     """Return country index page.
