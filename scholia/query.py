@@ -9,6 +9,7 @@ Usage:
   scholia.query github-to-q <github>
   scholia.query inchikey-to-q <inchikey>
   scholia.query issn-to-q <issn>
+  scholia.query mesh-to-q <meshid>
   scholia.query orcid-to-q <orcid>
   scholia.query q-to-label <q>
   scholia.query viaf-to-q <viaf>
@@ -222,6 +223,37 @@ def orcid_to_qs(orcid):
     data = response.json()
 
     return [item['author']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def mesh_to_qs(meshid):
+    """Convert MeSH ID to Wikidata ID.
+
+    Parameters
+    ----------
+    meshid : str
+        MeSH identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> mesh_to_qs('D028441') == ['Q33659470']
+    True
+
+    """
+    query = 'select ?cmp where {{ ?cmp wdt:P486 "{meshid}" }}'.format(
+        meshid=meshid)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['cmp']['value'][31:]
             for item in data['results']['bindings']]
 
 
@@ -801,6 +833,11 @@ def main():
 
     elif arguments['issn-to-q']:
         qs = issn_to_qs(arguments['<issn>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['mesh-to-q']:
+        qs = mesh_to_qs(arguments['<meshid>'])
         if len(qs) > 0:
             print(qs[0])
 
