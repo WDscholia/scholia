@@ -2,6 +2,7 @@
 
 {% block page_content %}
 
+<div class="container">
 <h1>Author</h1>
 
 Researcher with a published record.
@@ -11,32 +12,115 @@ Researcher with a published record.
 	<a href="random" class="btn btn-primary">Random author</a>
     </div>
 </p>
+</div>
 
-<h2>Examples</h2>
+<div class="container">
 
-<ul>
-    <li><a href="Q8219">Uta Frith</a></li>
-    <li><a href="Q97270">Thomas C. Südhof</a></li>
-    <li><a href="Q2399315">Leena Peltonen-Palotie</a></li>
-    <li><a href="Q3063122">Pardis Sabeti</a></li>
-    <li><a href="Q4693015">Agnes Binagwaho</a></li>
-    <li><a href="Q6152709">Jane Shelby Richardson</a></li>
-    <li><a href="Q13520818">Magnus Manske</a></li>
-    <li><a href="Q18921408">Alex Bateman</a></li>
-    <li><a href="Q20980928">Finn Årup Nielsen</a></li>
-    <li><a href="Q24244119">Didier Musso</a></li>
-</ul>
+    <h2>Examples</h2>
+
+    <div class="card-deck mb-3">
+	<div class="card mb-4 box-shadow">
+	    
+            <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Profiles</h4>
+            </div>
+            <div class="card-body">
+		<dl>
+		    <dt><a href="Q97270">Thomas C. Südhof</a></dt>
+		    <dd>
+			View information about Thomas C. Südhof.
+		    </dd>
+
+		    <dt><a href="Q2399315">Leena Peltonen-Palotie</a></dt>
+		    <dd>
+			View information about Leena Peltonen-Palotie.
+		    </dd>
+
+		    <dt><a href="Q3063122">Pardis Sabeti</a></dt>
+		    <dd>
+			View information about Pardis Sabeti.
+		    </dd>
+
+		    <dt><a href="Q4693015">Agnes Binagwaho</a></dt>
+		    <dd>
+			View information about Agnes Binagwaho.
+		    </dd>
+
+		    <dt><a href="Q6152709">Jane Shelby Richardson</a></dt>
+		    <dd>
+			View information about Jane Shelby Richardson.
+		    </dd>
+
+		    <dt><a href="Q18921408">Alex Bateman</a></dt>
+		    <dd>
+			View information about Alex Bateman.
+		    </dd>
+
+		    <dt><a href="Q24244119">Didier Musso</a></dt>
+		    <dd>
+			View information about Didier Musso.
+		    </dd>
+
+		</dl>
+            </div>
+
+	</div>
+
+        <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Comparisons</h4>
+	    </div>
+	    <div class="card-body">
+		<p>Scholia can show multiple authors together.</p>
+		
+		<dl>
+		    <dt><a href="../authors/Q20980928,Q24290415,Q24390693,Q26720269">Finn Årup Nielsen, Ole Winther, Sune Lehmann and Morten Mørup</a></dt>
+		    <dd>Compare researchers at Cognitive Systems, Technical University of Denmark.</dd>
+
+		    <dt><a href="../authors/Q26837548,Q5398061,Q7666528">Lars Juhl Jensen, Eske Willerslev, Søren Brunak</a></dt>
+		    <dd>Compare Copenhagen bioinformatics/genetics researchers.</dd>
+
+		    <dt><a href="../authors/Q37876,Q173746">Natalie Portman and Paul Erdős</a></dt>
+		    <dd></dd>
+
+		    <dt><a href="../authors/Q38084489,Q38085379,Q38084725,Q38084995">Anders Eklund, Anders Eklund, Anders Eklund, and Anders Eklund</a></dt>
+		    <dd>Where would we be without identifiers...</dd>
+		</dl>
 
 
-<h3>Multiple authors</h3>
 
-<ul>
-    <li><a href="../authors/Q20980928,Q24290415,Q24390693,Q26720269">Finn Årup Nielsen, Ole Winther, Sune Lehmann and Morten Mørup</a> (researchers at Cognitive Systems, Technical University of Denmark)</li> 
-    <li><a href="../authors/Q26837548,Q5398061,Q7666528">Lars Juhl Jensen, Eske Willerslev, Søren Brunak</a> (Copenhagen bioinformatics/genetics researchers)</li> 
-    <li><a href="../authors/Q37876,Q173746">Natalie Portman and Paul Erdős</a></li>
-    <li><a href="../authors/Q38084489,Q38085379,Q38084725,Q38084995">Anders Eklund, Anders Eklund, Anders Eklund and Anders Eklund</a> (Different Swedish researchers with the same name)</li>
-</ul>
+	    </div>
+        </div>
+	
+        <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Redirects</h4>
+	    </div>
+	    <div class="card-body">
+		<p>If you know the author by social account or identifier, you can look them up with:</p>
+		
+		<dl>
+		    <dt><a href="../twitter/utafrith">twitter/utafrith</a></dt>
+		    <dd>Look up by Twitter username @utafrith. This will identify
+			the London-based researcher Uta Frith and redirect to her Scholia page.</dd>
 
+		    <dt><a href="../orcid/0000-0001-5916-0947">orcid/0000-0001-5916-0947</a></dt>
+		    <dd>Lookup 0000-0001-5916-0947 that is identifying Magnus Manske.</dd>
+
+		    <dt><a href="../github/fnielsen">github/fnielsen</a></dt>
+		    <dd>
+			Redirect via GitHub username, here @fnielsen to Finn Årup Nielsen.
+		    </dd>
+
+		    <dt><a href="../viaf/59976288">viaf/59976288</a></dt>
+		    <dd>Redirect via VIAF identifier, here to Ben Feringa</a></li>
+
+		</dl>
+
+	    </div>
+        </div>
+    </div>
+</div>
 
 
 {% endblock %}
