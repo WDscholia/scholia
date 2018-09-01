@@ -6,10 +6,14 @@
 <script type="text/javascript">
 
  identifiersSparql = `
-  SELECT ?IDpred ?IDpredLabel ?id WHERE {
+  SELECT ?IDpred ?IDpredLabel ?id ?idUrl WHERE {
     wd:{{ q }} ?IDdir ?id .
     ?IDpred wikibase:directClaim ?IDdir ;
             wdt:P31 wd:Q19833835 .
+    OPTIONAL {
+      ?IDpred wdt:P1630 ?formatterurl .
+    }
+    BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrl).
     SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
   }
   ORDER BY ASC(?IDpredLabel)
@@ -17,7 +21,7 @@
 `
 
  relatedChemicalsSparql = `
-  SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WITH {
+  SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl WITH {
     SELECT DISTINCT ?mol WHERE {
       ?mol wdt:P31/wdt:P279* wd:{{ q }} .
     } LIMIT 500
@@ -25,9 +29,34 @@
   WHERE {
     INCLUDE %result
     OPTIONAL { ?mol wdt:P235 ?InChIKey }
-    OPTIONAL { ?mol wdt:P231 ?CAS }
-    OPTIONAL { ?mol wdt:P661 ?ChemSpider }
+    OPTIONAL {
+      VALUES ?CASIDdir { wdt:P231 }
+      ?mol ?CASIDdir ?CAS .
+      OPTIONAL {
+        ?CASIDpred wikibase:directClaim ?CASIDdir .
+        ?CASIDpred wdt:P1630 ?CASformatterurl .
+      }
+      BIND(IRI(REPLACE(?CASformatterurl, '\\\\$1', str(?CAS))) AS ?CASUrl).
+    }
+    OPTIONAL {
+      VALUES ?IDdir { wdt:P661 }
+      ?mol ?IDdir ?ChemSpider .
+      OPTIONAL {
+        ?IDpred wikibase:directClaim ?IDdir .
+        ?IDpred wdt:P1630 ?formatterurl .
+      }
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?ChemSpider))) AS ?ChemSpiderUrl).
+    }
     OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
+    OPTIONAL {
+      VALUES ?PCIDdir { wdt:P662 }
+      ?mol ?PCIDdir ?PubChem_CID .
+      OPTIONAL {
+        ?PCIDpred wikibase:directClaim ?PCIDdir .
+        ?PCIDpred wdt:P1630 ?PCformatterurl .
+      }
+      BIND(IRI(REPLACE(?PCformatterurl, '\\\\$1', str(?PubChem_CID))) AS ?PubChem_CIDUrl).
+    }
     SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
   }
 `
