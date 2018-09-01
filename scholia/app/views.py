@@ -14,7 +14,7 @@ from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
                      q_to_class, random_author, twitter_to_qs,
-                     cordis_to_qs)
+                     cordis_to_qs, mesh_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -678,6 +678,25 @@ def show_location_topic(q1, q2):
 
     """
     return render_template('location_topic.html', q1=q1, q2=q2, q=q1)
+
+
+@main.route('/mesh/<meshid>')
+def redirect_mesh(meshid):
+    """Detect and redirect for MeSH identifier.
+
+    Parameters
+    ----------
+    mesh : str
+        MeSH identifier.
+
+    """
+    qs = mesh_to_qs(meshid)
+    if len(qs) > 0:
+        q = qs[0]
+        class_ = q_to_class(q)
+        method = 'app.show_' + class_
+        return redirect(url_for(method, q=q), code=302)
+    return render_template('404.html')
 
 
 @main.route('/orcid/<orcid>')
