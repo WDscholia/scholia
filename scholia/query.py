@@ -556,7 +556,7 @@ def q_to_class(q):
     elif set(classes).intersection([
             'Q17339814',  # group of chemical substances
             ]):
-        class_ = 'chemical-class'
+        class_ = 'chemical_class'
     elif set(classes).intersection([
             'Q4915012',  # biological pathway
             ]):
