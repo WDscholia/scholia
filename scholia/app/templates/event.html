@@ -162,7 +162,7 @@ WITH {
   WHERE {
     {
       # speaker, organizer, program committe member 
-      wd:{{ q }} wdt:P823 | wdt:P5804 ?person .
+      wd:{{ q }} wdt:P823 | wdt:P664 | wdt:P5804 ?person .
     }
     UNION
     {
