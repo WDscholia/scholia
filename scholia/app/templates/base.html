@@ -153,7 +153,8 @@
      $.ajax({
 	 url: wembedderUrl,
 	 success: function (data) {
-	     $( '#wembedder' ).append('<hr> Related: ');
+	     var html = `<hr><span data-toogle="tooltip" title="Related items from Wembedder knowledge graph embedding.">Related:</span> `; 
+	     $( '#wembedder' ).append(html);
 
 	     // Make list with results
 	     data.most_similar.forEach(function(entry, idx, array) {
