@@ -5,18 +5,28 @@
 
 <script type="text/javascript">
 
- listOfAuthorsSparql = `
+  listOfAuthorsSparql = `
+# List of authors for a work
 SELECT
+  # Author order
+  ?order
+
   # Author item and label
   ?author ?authorLabel
 
   # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
   (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?authorLabel))) AS ?orcid)
 WHERE {
-  wd:{{ q }} wdt:P50 ?author .
+  wd:{{ q }} p:P50 ?author_statement .
+  ?author_statement ps:P50 ?author .
+  OPTIONAL {
+    ?author_statement pq:P1545 ?order_ .
+    BIND(xsd:integer(?order_) AS ?order)
+  }
   OPTIONAL { ?author wdt:P496 ?orcid_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
 }
+ORDER BY ?order
 `
  
  citationsToTheWorkSparql = `
