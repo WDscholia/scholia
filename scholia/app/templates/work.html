@@ -28,7 +28,28 @@ WHERE {
 }
 ORDER BY ?order
 `
- 
+
+  relatedWorksSparql = `
+#defaultView:Table
+# List of related works by co-citation analysis
+SELECT ?count ?work ?workLabel
+WITH {
+  SELECT ?work (COUNT(?work) AS ?count)
+  WHERE {
+    wd:{{ q }} (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?work .
+    FILTER (wd:{{ q }} != ?work)
+  }
+  GROUP BY ?work
+  LIMIT 500
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . } 
+} 
+ORDER BY DESC(?count) 
+`
+
+
  citationsToTheWorkSparql = `
 #defaultView:Table
 # List of works that is cited by the specified work
@@ -115,6 +136,7 @@ ORDER BY DESC(?itemLabel)
 
  $(document).ready(function() {
      sparqlToDataTable(listOfAuthorsSparql, "#list-of-authors");
+     sparqlToDataTable(relatedWorksSparql, "#related-works");
      sparqlToDataTable(citationsToTheWorkSparql, "#citations-to-the-work");
      sparqlToDataTable(citedWorksSparql, "#cited-works");
      sparqlToDataTable(statementsSparql, "#statements");
@@ -128,8 +150,6 @@ ORDER BY DESC(?itemLabel)
 <h1 id="h1">Work</h1>
 
 <div id="intro"></div>
-
-<div id="wembedder"></div>
 
 <div id="details"></div>
 
@@ -153,6 +173,17 @@ Topics based on a weighting between main subject of work, cited and citing works
 <div class="embed-responsive embed-responsive-4by3">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20DISTINCT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP577%20%3Fdatetime%20.%0A%20%20%20%20BIND%28%22%F0%9F%8C%9E%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP2507%20%2F%20wdt%3AP577%20%3Fdatetime%20.%0A%20%20%20%20BIND%28%22%E2%9D%97%20erratum%22%20AS%20%3Fdescription%29%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP5824%20%2F%20wdt%3AP577%20%3Fdatetime%20.%0A%20%20%20%20BIND%28%22%E2%9B%94%20retracted%22%20AS%20%3Fdescription%29%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20p%3AP793%20%3Fevent_statement%20.%0A%20%20%20%20%3Fevent_statement%20ps%3AP793%20%3Fevent_type%20.%0A%20%20%20%20%3Fevent_type%20rdfs%3Alabel%20%3Fdescription_%20.%0A%20%20%20%20%3Fevent_statement%20pq%3AP585%20%3Fdatetime%20.%0A%20%20%20%20FILTER%20%28LANG%28%3Fdescription_%29%20%3D%20%22en%22%29%0A%20%20%20%20%0A%20%20%20%20%23%20Warning%20icon%20for%20retraction%0A%20%20%20%20BIND%28%0A%20%20%20%20%20%20IF%28%0A%20%20%20%20%20%20%20%20%3Fevent_type%20%3D%20wd%3AQ45203135%2C%0A%20%20%20%20%20%20%20%20CONCAT%28%22%E2%9B%94%20%22%2C%20%3Fdescription_%29%2C%0A%20%20%20%20%20%20%20%20IF%28%0A%20%20%20%20%20%20%20%20%20%20%3Fevent_type%20%3D%20wd%3AQ56478588%2C%0A%20%20%20%20%20%20%20%20%20%20CONCAT%28%22%E2%9D%93%20%22%2C%20%3Fdescription_%29%2C%0A%20%20%20%20%20%20%20%20%20%20%3Fdescription_%0A%20%20%20%20%20%20%20%20%20%20%29%0A%20%20%20%20%20%20%20%20%29%20AS%20%3Fdescription%29%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP2860%20%2F%20wdt%3AP577%20%3Fdatetime%0A%20%20%20%20%20%20BIND%28%22%F0%9F%93%96%E2%9E%A1%EF%B8%8F%20cited%20work%20with%20earliest%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%20%20%7D%0A%20%20%20%20ORDER%20BY%20%3Fdatetime%0A%20%20%20%20LIMIT%201%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP2860%20%2F%20wdt%3AP577%20%3Fdatetime%0A%20%20%20%20%20%20BIND%28%22%F0%9F%93%96%E2%9E%A1%EF%B8%8F%20cited%20work%20with%20latest%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%20%20%7D%0A%20%20%20%20ORDER%20BY%20DESC%28%3Fdatetime%29%0A%20%20%20%20LIMIT%201%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%20%20%20%20wd%3A{{ q }}%20%5Ewdt%3AP2860%20%2F%20wdt%3AP577%20%3Fdatetime%0A%20%20%20%20%20%20BIND%28%22%F0%9F%93%96%E2%AC%85%EF%B8%8F%20citing%20work%20with%20earliest%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%20%20%7D%0A%20%20%20%20ORDER%20BY%20%3Fdatetime%0A%20%20%20%20LIMIT%201%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%20%20%20%20wd%3A{{ q }}%20%5Ewdt%3AP2860%20%2F%20wdt%3AP577%20%3Fdatetime%0A%20%20%20%20%20%20BIND%28%22%F0%9F%93%96%E2%AC%85%EF%B8%8F%20citing%20work%20with%20latest%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%20%20%7D%0A%20%20%20%20ORDER%20BY%20DESC%28%3Fdatetime%29%0A%20%20%20%20LIMIT%201%0A%20%20%7D%0A%7D"></iframe>
 </div>
+
+<h2>Related works</h2>
+
+<h3 data-toogle="tooltip" title="List of related works by co-citation analysis.">Related works from co-citation analysis</h3>
+
+<table class="table table-hover" id="related-works"></table>
+
+
+<h3 data-toogle="tooltop" title="Wembedder knowledge graph embedding related works">Related works from knowledge graph embedding</h3>
+
+<div id="wembedder"></div>
 
 
 <h2>Citations</h2>
