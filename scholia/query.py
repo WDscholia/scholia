@@ -470,8 +470,10 @@ def q_to_class(q):
             'Q27785883',  # conference proceedings series
     ]):
         class_ = 'series'
-    elif ('Q5633421' in classes or  # scientific journal
-          'Q1143604' in classes):  # proceedings
+    elif set(classes).intersection([
+            'Q5633421',  # scientific journal
+            'Q1143604',  # proceedings
+    ]):
         class_ = 'venue'
     elif ('Q157031' in classes or  # foundation
           'Q10498148' in classes):  # research council
@@ -493,6 +495,7 @@ def q_to_class(q):
     ]):
         class_ = 'gene'
     elif set(classes).intersection([
+            'Q191067',  # article
             'Q1980247',  # chapter
             'Q3331189',  # edition
             'Q13442814',  # scientific article
