@@ -11,13 +11,15 @@ SELECT
   ?recipient ?recipientLabel 
   ?example_work ?example_workLabel
 WITH {
-  SELECT ?recipient ?year (SAMPLE(?work) AS ?example_work) WHERE {
+  SELECT DISTINCT ?recipient ?year (SAMPLE(?work) AS ?example_work) WHERE {
     ?recipient p:P166 ?award_statement . 
     ?award_statement ps:P166 wd:{{ q }} .
     OPTIONAL {
-      ?award_statement pq:P585 ?time .
-	  BIND(YEAR(?time) AS ?year)
-	}
+      { ?award_statement pq:P585 ?time }
+      UNION
+      { ?award_statement pq:P580 ?time }
+      BIND(YEAR(?time) AS ?year)
+    }
     OPTIONAL { ?work wdt:P50 ?recipient . }
   }
   GROUP BY ?recipient ?year
