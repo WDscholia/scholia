@@ -155,7 +155,8 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?count)
-  `
+LIMIT 200
+`
 
   mostCitedAuthorsSparql = `
 SELECT ?number_of_citations ?author ?authorLabel ?cited_work_example ?cited_work_exampleLabel
