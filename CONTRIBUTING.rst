@@ -39,7 +39,7 @@ Getting started
 
    .. code:: shell
 
-       $ apt-get install python3 python3-pip and python3-flask
+       $ apt-get install python3 python3-pip python3-flask
        $ pip3 install -r requirements.txt
 
 3. Run Scholia functionality as script, e.g.:
