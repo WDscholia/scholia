@@ -65,3 +65,5 @@ Before committing please run the following code in the main directory:
 
     tox
 
+The style is checked with `flake8`. Also follow the commit message recommendations, 
+cf. `Writing good commit messages <https://github.com/erlang/otp/wiki/writing-good-commit-messages>`_.
