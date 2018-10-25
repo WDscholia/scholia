@@ -398,7 +398,8 @@ def wb_get_organization_latest_works(q):
                 q + '</title>\n'
     rss_body += "    <description>The organization's most " + \
                 "recent articles</description>\n"
-    rss_body += '    <link>https://tools.wmflabs.org/scholia/organization/</link>\n'
+    rss_body += ('    <link>https://tools.wmflabs.org/'
+                 'scholia/organization/</link>\n')
     rss_body += '    <atom:link ' + \
                 'href="https://tools.wmflabs.org/scholia/organization/' + \
                 q + '/latest-works/rss" rel="self" ' + \
