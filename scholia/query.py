@@ -16,6 +16,7 @@ Usage:
   scholia.query q-to-class <q>
   scholia.query random-author
   scholia.query twitter-to-q <twitter>
+  scholia.query website-to-q <url>
 
 Examples
 --------
@@ -772,6 +773,39 @@ def cas_to_qs(cas):
             for item in data['results']['bindings']]
 
 
+def website_to_qs(url):
+    """Convert URL for website to Wikidata ID.
+
+    Parameters
+    ----------
+    url : str
+        URL for official website.
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> url = ("https://papers.nips.cc/paper/"
+               "6498-online-and-differentially-private-tensor-decomposition")
+    >>> website_to_qs == ['']
+    True
+
+    """
+    query = 'SELECT ?work WHERE {{ ?work wdt:P856 <{url}> }}'.format(
+        url=url.strip())
+
+    url_ = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url_, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def random_author():
     """Return random author.
 
@@ -872,6 +906,10 @@ def main():
 
     elif arguments['twitter-to-q']:
         qs = twitter_to_qs(arguments['<twitter>'])
+        if len(qs) > 0:
+            print(qs[0])
+    elif arguments['website-to-q']:
+        qs = website_to_qs(arguments['<url>'])
         if len(qs) > 0:
             print(qs[0])
 
