@@ -763,6 +763,7 @@ def show_organization_empty():
     """
     return render_template('organization_empty.html')
 
+
 @main.route('/organization/' + q_pattern + '/latest-works/rss')
 def show_organization_rss(q):
     """Return a RSS feed for specific organization.
