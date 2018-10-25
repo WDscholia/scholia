@@ -2,10 +2,14 @@
 
 Usage:
   scholia.scrape.nips scrape-paper-from-url <url>
-  scholia.scrape.nips scrape-paper-urls-from-proceedings-url <url>
+  scholia.scrape.nips scrape-paper-urls-from-proceedings-url [options] <url>
   scholia.scrape.nips scrape-proceedings-from-url <url>
   scholia.scrape.nips paper-url-to-q <url>
   scholia.scrape.nips paper-url-to-quickstatements <url>
+
+Options:
+  -o --output=file  Output filename, default output to stdout
+  --oe=encoding     Output encoding [default: utf-8]
 
 Notes
 -----
@@ -22,9 +26,13 @@ for the individual papers.
 
 """
 
-from six import print_, u
+from six import b, print_, u
 
 import json
+
+import os
+
+import signal
 
 from lxml import etree
 
@@ -56,12 +64,27 @@ YEAR_TO_Q = {
     "2011": "Q43904402",
     "2010": "Q43904497",
     "2009": "Q28698531",
+    "2008": "Q57745355",
+    "2007": "Q57745520",
+    "2006": "Q57745572",
     "2005": "Q50412869",  # NIPS 2005
     "2004": "Q27789295",
+    "2003": "Q51687233",
+    "2002": "Q56231205",
+    "2001": "Q56739400",
     "2000": "Q33040753",
     "1999": "Q41661180",
+    "1998": "Q57745702",
     "1997": "Q50413005",  # NIPS 1997
+    "1996": "Q57745778",
+    "1995": "Q57745835",
+    "1994": "Q57745887",
+    "1993": "Q57745933",
     "1992": "Q47012467",
+    "1991": "Q57745985",
+    "1990": "Q57746010",
+    "1989": "Q57746049",
+    "1988": "Q57746081",
     "1987": "Q47032920",
 }
 
@@ -226,6 +249,10 @@ def paper_to_quickstatements(paper):
 def paper_url_to_quickstatements(url):
     """Return Quickstatements for paper URL.
 
+    For a given URL pointing to a NIPS paper, scrape the bibliographic
+    information from the NIPS website and return the corresponding
+    Quickstatements command for entry into Wikidata.
+
     Parameters
     ----------
     url : str
@@ -234,12 +261,22 @@ def paper_url_to_quickstatements(url):
     Returns
     -------
     qs : str
-        Paper formatted as Quickstatements.
+        String with paper formatted as Quickstatements.
+
+    Notes
+    -----
+    The function tests whether the paper is already entered into Wikidata
+    and return a comment line with the corresponding Wikidata identifier.
 
     """
+    # Check whether the paper is in Wikidata
+    q = paper_url_to_q(url)
+    if q:
+        return "# {q} is {url}".format(q=q, url=url)
+
     paper = scrape_paper_from_url(url)
-    qs = paper_to_quickstatements(paper)
-    return qs
+    quickstatements = paper_to_quickstatements(paper)
+    return quickstatements
 
 
 def scrape_paper_from_url(url):
@@ -378,6 +415,17 @@ def main():
 
     arguments = docopt(__doc__)
 
+    if arguments['--output']:
+        output_filename = arguments['--output']
+        output_file = os.open(output_filename, os.O_RDWR | os.O_CREAT)
+    else:
+        # stdout
+        output_file = 1
+    output_encoding = arguments['--oe']
+
+    # Ignore broken pipe errors
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
     if arguments['paper-url-to-q']:
         url = arguments['<url>']
         entry = paper_url_to_q(url)
@@ -395,8 +443,9 @@ def main():
 
     elif arguments['scrape-paper-urls-from-proceedings-url']:
         url = arguments['<url>']
-        entry = scrape_paper_urls_from_proceedings_url(url)
-        print_(json.dumps(entry))
+        entries = scrape_paper_urls_from_proceedings_url(url)
+        for entry in entries:
+            os.write(output_file, entry.encode(output_encoding) + b('\n'))
 
     elif arguments['scrape-proceedings-from-url']:
         url = arguments['<url>']
