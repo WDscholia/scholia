@@ -43,8 +43,8 @@ PAPER_TO_Q_QUERY = u("""
 SELECT ?paper WHERE {{
   OPTIONAL {{ ?label rdfs:label "{label}"@en . }}
   OPTIONAL {{ ?title wdt:P1476 "{title}"@en . }}
-  OPTIONAL {{ ?url wdt:P856 <{full_text_url}> . }}
-  OPTIONAL {{ ?full_text_url wdt:P953 <{url}> . }}
+  OPTIONAL {{ ?full_text_url wdt:P856 <{full_text_url}> . }}
+  OPTIONAL {{ ?url wdt:P953 <{url}> . }}
   BIND(COALESCE(?full_text_url, ?url, ?label, ?title) AS ?paper)
 }}
 """)
