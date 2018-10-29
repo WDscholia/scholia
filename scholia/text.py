@@ -5,7 +5,7 @@ Usage:
   scholia.text text-to-topic-q-text-setup
 
 Options:
-  -h | --help  Help
+  -h --help  Help
 
 Description:
   Handle text.
