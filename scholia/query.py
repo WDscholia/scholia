@@ -446,7 +446,7 @@ def q_to_class(q):
     is compared against a set of hardcoded matches.
 
     """
-    query = 'select ?class where {{ wd:{q} p:P31/ps:P31 ?class }}'.format(
+    query = 'SELECT ?class {{ wd:{q} wdt:P31 ?class }}'.format(
         q=escape_string(q))
 
     url = 'https://query.wikidata.org/sparql'
@@ -496,9 +496,12 @@ def q_to_class(q):
     ]):
         class_ = 'gene'
     elif set(classes).intersection([
+            'Q571',  # book
             'Q191067',  # article
             'Q1980247',  # chapter
             'Q3331189',  # edition
+            'Q10870555',  # report
+            'Q10885494',  # scientific conference paper
             'Q13442814',  # scientific article
     ]):
         class_ = 'work'
@@ -789,8 +792,9 @@ def website_to_qs(url):
     Examples
     --------
     >>> url = ("https://papers.nips.cc/paper/"
-               "6498-online-and-differentially-private-tensor-decomposition")
-    >>> website_to_qs == ['']
+    ...        "6498-online-and-differentially-private-tensor-decomposition")
+    >>> qs = website_to_qs(url)
+    >>> qs == ['Q46994097']
     True
 
     """
