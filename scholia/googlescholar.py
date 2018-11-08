@@ -73,7 +73,7 @@ def get_user_data(user):
     works = []
     for element in work_elements:
         items = list(element.itertext())
-        work = { 'title': items[0] }
+        work = {'title': items[0]}
 
         # If the title contains a '*' then this will result in an extra
         # field in the list.
