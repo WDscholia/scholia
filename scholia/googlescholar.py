@@ -22,18 +22,17 @@ import requests
 
 USER_URL = "https://scholar.google.dk/citations"
 
+USER_AGENT = 'Scholia'
+
+HEADERS = {'User-Agent': USER_AGENT}
+
 
 def get_user_data(user):
     """Return user data scrape from Google Scholar page.
 
-    Journals and proceedings title may not be written complete in Google
-    Scholar, so is not returned complete.
-
-    Also the author list may be abbreviated and missing authors indicated
-    with '...'.
-
-    Only the first 20 works in the list are returned, - corresponding to
-    the first page
+    Query Google Scholar with a specific Google Scholar user identifier and
+    get citations statistics and the first metadata about the first works
+    back.
 
     Parameters
     ----------
@@ -45,6 +44,18 @@ def get_user_data(user):
     data : dict
         User data.
 
+    Notes
+    -----
+    Journals and proceedings title may not be written completely in Google
+    Scholar, so is not returned completely.
+
+    Also the author list may be abbreviated and missing authors indicated
+    with '...'. Year and citations information might also be missing from
+    some of the works.
+
+    Only the first 20 works in the list are returned, - corresponding to
+    the first page. This function will not page through the results.
+
     Examples
     --------
     >>> data = get_user_data('EofVNskAAAAJ')
@@ -52,23 +63,29 @@ def get_user_data(user):
     True
 
     """
-    response = requests.get(USER_URL, params={'user': user})
+    response = requests.get(USER_URL, params={'user': user}, headers=HEADERS)
     tree = fromstring(response.content)
 
     citation_data = tree.xpath('//td[@class="gsc_rsb_std"]/text()')
 
     work_elements = tree.xpath('//td[@class="gsc_a_t"]')
+
     works = []
     for element in work_elements:
         items = list(element.itertext())
-        work = {
-            'title': items[0],
-            'authors': items[1].split(', '),
-        }
-        if len(items) >= 3:
-            work['citation'] = items[2]
-        if len(items) >= 4:
-            work['year'] = int(items[3][2:])
+        work = { 'title': items[0] }
+
+        # If the title contains a '*' then this will result in an extra
+        # field in the list.
+        offset = 0
+        if items[1] == '*':
+            offset = 1
+
+        work['authors'] = items[1 + offset].split(', ')
+        if len(items) >= 3 + offset:
+            work['citation'] = items[2 + offset]
+        if len(items) >= 4 + offset:
+            work['year'] = int(items[3 + offset][2:])
         works.append(work)
 
     data = {
