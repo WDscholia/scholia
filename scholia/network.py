@@ -30,9 +30,7 @@ WHERE {
 
 
 def write_pajek_from_sparql(filename, sparql):
-    """Write Pajek network file from SPARQL query.
-
-    """
+    """Write Pajek network file from SPARQL query."""
     column1 = 'item1'
     column2 = 'item2'
 

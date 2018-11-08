@@ -29,7 +29,7 @@ from lxml import etree
 import requests
 
 
-USER_AGENT = 'scholiabot 1.0'
+USER_AGENT = 'Scholia'
 
 
 def get_metadata(arxiv):
@@ -75,7 +75,7 @@ def get_metadata(arxiv):
     tree = etree.HTML(response.content)
 
     submissions = tree.xpath('//div[@class="submission-history"]/text()')
-    datetime_as_string = submissions[-2][5:30]
+    datetime_as_string = submissions[-1][5:30]
     isodatetime = parse_datetime(datetime_as_string).isoformat()
 
     subjects = tree.xpath(
@@ -92,13 +92,15 @@ def get_metadata(arxiv):
         'arxiv': arxiv,
         'authornames': tree.xpath('//div[@class="authors"]/a/text()'),
         'full_text_url': 'https://arxiv.org/pdf/' + arxiv + '.pdf',
-        'publication_date': isodatetime,
+        'publication_date': isodatetime[:10],
         'title': re.sub('\s+', ' ', tree.xpath('//h1/text()')[-1].strip()),
         'arxiv_classifications': arxiv_classifications,
     }
 
     # Optional DOI
     doi = tree.xpath('//td[@class="tablecell doi"]/a/text()')
+    if not doi:
+        doi = tree.xpath('//td[@class="tablecell msc_classes"]/a/text()')
     if doi:
         metadata['doi'] = doi[0]
 
