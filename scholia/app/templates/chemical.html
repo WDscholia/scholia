@@ -6,18 +6,21 @@
 <script type="text/javascript">
 
  identifiersSparql = `
-SELECT ?IDpred ?IDpredLabel ?id ?idUrl WHERE {  
-  wd:{{ q }} ?IDdir ?id .
-  ?IDpred wikibase:directClaim ?IDdir ;
-          wdt:P31 wd:Q19833835 .
-  OPTIONAL { 
-    ?IDpred wdt:P1630 ?formatterurl .
-  }
-  BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrl).
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
-}
+SELECT ?IDpred ?IDpredLabel ?id (SAMPLE(?idUrls) as ?idUrl) WITH {
+  SELECT ?IDpred ?id ?formatterurl WHERE {
+    wd:{{ q }} ?IDdir ?id .
+    ?IDpred wikibase:directClaim ?IDdir ;
+            wdt:P31 wd:Q19833835 .
+    OPTIONAL { 
+      ?IDpred wdt:P1630 ?formatterurl .
+    }
+  } LIMIT 500
+} AS %RESULTS {
+  INCLUDE %RESULTS
+  BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?IDpred ?IDpredLabel ?id
 ORDER BY ASC(?IDpredLabel)
-LIMIT 500
 `
 
  relatedChemicalsSparql = `

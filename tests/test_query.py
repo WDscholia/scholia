@@ -34,5 +34,5 @@ def test_doi_to_qs():
     This test requires Internet access to Wikidata Query Service.
 
     """
-    dois = doi_to_qs('10.475/123_4')
-    assert dois == ['Q41533080']
+    dois = doi_to_qs('10.1145/3184558.3191645')
+    assert dois == ['Q50347076']

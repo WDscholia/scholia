@@ -39,7 +39,7 @@ Getting started
 
    .. code:: shell
 
-       $ apt-get install python3 python3-pip and python3-flask
+       $ apt-get install python3 python3-pip python3-flask
        $ pip3 install -r requirements.txt
 
 3. Run Scholia functionality as script, e.g.:
@@ -65,3 +65,5 @@ Before committing please run the following code in the main directory:
 
     tox
 
+The style is checked with `flake8`. Also follow the commit message recommendations, 
+cf. `Writing good commit messages <https://github.com/erlang/otp/wiki/writing-good-commit-messages>`_.

@@ -37,21 +37,23 @@ ORDER BY DESC(?works)
 SELECT ?publication_date ?work ?workLabel ?researchers
 WITH {
   SELECT 
-    (min(?publication_dates) AS ?publication_date) ?work 
+    (MIN(?publication_datetimes) AS ?publication_datetime) ?work 
     (GROUP_CONCAT(DISTINCT ?researcher_label; separator=', ') AS ?researchers)
   WHERE {                                                         
     ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
     ?work wdt:P50 ?researcher .
-    ?researcher rdfs:label ?researcher_label . filter (lang(?researcher_label) = 'en')
+    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
     OPTIONAL {
       ?work wdt:P577 ?publication_datetimes .
-      BIND(xsd:date(?publication_datetimes) AS ?publication_dates)
     }
   }
   GROUP BY ?work
+  ORDER BY DESC(?publication_datetime)
+  LIMIT 200  
 } AS %results
 WHERE {
   INCLUDE %results
+  BIND(xsd:date(?publication_datetime) AS ?publication_date)
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,nl,ru,zh". }
 }
 ORDER BY DESC(?publication_date)
@@ -157,21 +159,21 @@ Past and present employees, affiliated, and members<br/>
 
 
 
-<h2 id="Recent publications">Recent publications</h2>
+<h2 id="Recent publications">Recent publications <a href="{{ url_for('app.show_organization_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
 <table class="table table-hover" id="recent-publications"></table>
 
 
 <h2 id="Page production">Page production</h2>
 
-Scientific article page production per year per author.
+Page production per year per author.
 The number of pages for a multiple-author paper is distributed among
 the authors.
 The statistics is only for papers where the "number of pages" property
 has been set.
 
 <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0Aselect%20%3Fyear%20%28sum%28%3Fpages_per_author%29%20as%20%3Fnumber_of_pages%29%20%3Fresearcher_label%20where%20%7B%0A%20%7B%0A%20%20%20%20select%20%3Fresearcher_label%20%3Fwork%20%3Fyear%20%28sample%28%3Fpages%29%20%2F%20count%28%3Fresearcher_of_paper%29%20as%20%3Fpages_per_author%29%20where%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B%20%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fwork%20%28wdt%3AP50%7Cwdt%3AP2093%29%20%3Fresearcher_of_paper%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP31%20wd%3AQ13442814%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fresearcher%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP1104%20%3Fpages%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdate%20.%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20bind%28str%28year%28%3Fdate%29%29%20as%20%3Fyear%29%20%0A%20%20%20%20%20%20%3Fresearcher%20rdfs%3Alabel%20%3Fresearcher_label%20.%20filter%28lang%28%3Fresearcher_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%7D%20%0A%20%20%20%20group%20by%20%3Fwork%20%3Fresearcher_label%20%3Fyear%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fyear%20%3Fresearcher_label%20%0Aorder%20by%20%3Fyear"></iframe>
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0A%23%20Pages%20per%20year%20bar%20chart%20of%20an%20organization%0ASELECT%0A%20%20%3Fyear%0A%20%20%28SUM%28%3Fpages_per_author%29%20AS%20%3Fnumber_of_pages%29%0A%20%20%3Fresearcher_label%0AWHERE%20%7B%0A%20%20%7B%0A%20%20%20%20SELECT%0A%20%20%20%20%20%20%3Fresearcher_label%20%3Fwork%20%3Fyear%0A%20%20%20%20%20%20%28SAMPLE%28%3Fpages%29%20%2F%20COUNT%28%3Fresearcher_of_paper%29%20AS%20%3Fpages_per_author%29%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20%23%20Find%20authors%20associated%20with%20organization%0A%20%20%20%20%20%20%3Fresearcher%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20%28wdt%3AP1416%20%2F%20wdt%3AP361%2a%29%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%0A%20%20%20%20%20%20%3Fwork%20%28wdt%3AP50%7Cwdt%3AP2093%29%20%3Fresearcher_of_paper%20.%0A%20%20%20%20%20%20%0A%20%20%20%20%20%20%23%20Disabled%20to%20only%20look%20on%20scholarly%20articles%0A%20%20%20%20%20%20%23%20%3Fwork%20wdt%3AP31%20wd%3AQ13442814%20.%0A%20%20%20%20%20%20%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fresearcher%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP1104%20%3Fpages%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdate%20.%20%0A%20%20%20%20%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%20%0A%20%20%20%20%20%20%3Fresearcher%20rdfs%3Alabel%20%3Fresearcher_label%20.%20FILTER%28LANG%28%3Fresearcher_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%7D%20%0A%20%20%20%20GROUP%20BY%20%3Fwork%20%3Fresearcher_label%20%3Fyear%0A%20%20%7D%0A%7D%0AGROUP%20BY%20%3Fyear%20%3Fresearcher_label%20%0AORDER%20BY%20%3Fyear"></iframe>
 </div>
 
 
@@ -185,14 +187,14 @@ has been set.
 <h3>Most cited papers with affiliated first author</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%28count%28distinct%20%3Fciting_work%29%20as%20%3Fcount%29%20%3Fwork%20%3FworkLabel%20WHERE%20%7B%0A%20%20%7B%3Fresearcher%20wdt%3AP108%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%20%20union%20%7B%20%3Fresearcher%20wdt%3AP1416%20%3Fsuborganization%20.%20%3Fsuborganization%20wdt%3AP361%20wd%3A{{ q }}%20.%20%20%7D%0A%20%20%3Fwork%20p%3AP50%20%3Fresearcher_statement%20.%0A%20%20%3Fresearcher_statement%20ps%3AP50%20%3Fresearcher%20.%0A%20%20%3Fresearcher_statement%20pq%3AP1545%20%221%22%20.%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%3Fciting_work%20wdt%3AP577%20%3Fpublication_date%20.%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%2Cda%22.%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fwork%20%3FworkLabel%0Aorder%20by%20desc%28%3Fcount%29%0Alimit%2020"></iframe>
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0A%23%20Bubble%20chart%20of%20most%20cited%20works%20of%20first%20author%20associated%0A%23%20with%20an%20organization%0ASELECT%0A%20%20%3Fcount%20%3Fwork%20%3FworkLabel%0AWITH%20%7B%0A%20%20%23%20Find%20researchers%20associated%20with%20the%20organization%20and%20count%0A%20%20%23%20the%20number%20of%20citations.%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fciting_work%29%20AS%20%3Fcount%29%0A%20%20%20%20%3Fwork%0A%20%20WHERE%20%7B%0A%20%20%20%20%3Fresearcher%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20%28wdt%3AP1416%20%2F%20wdt%3AP361%2a%29%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20p%3AP50%20%3Fresearcher_statement%20.%0A%20%20%20%20%3Fresearcher_statement%20ps%3AP50%20%3Fresearcher%20.%0A%20%20%20%20%3Fresearcher_statement%20pq%3AP1545%20%221%22%20.%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fwork%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%2020%0A%7D%20AS%20%25works%0AWHERE%20%7B%0A%20%20%23%20Label%20the%20works%0A%20%20INCLUDE%20%25works%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%0A%20%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29"></iframe>
 </div>
 
 
 <h3>Co-author-normalized citations per year</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%20%3Fyear%20%28SUM%28%3Fcitations_per_author_%29%20AS%20%3Fcitations_per_author%29%20%3FresearcherLabel%0AWITH%20%7B%0A%20%20%23%20Find%20researchers%20affiliated%20with%20the%20organization%0A%20%20SELECT%20DISTINCT%20%3Fresearcher%20WHERE%20%7B%0A%20%20%20%20%3Fresearcher%20wdt%3AP108%20%7C%20wdt%3AP1416%2Fwdt%3AP361%2a%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%7D%20AS%20%25researchers%20%0AWITH%20%7B%0A%20%20%23%20Find%20works%20of%20the%20researchers%20and%20count%20the%20number%20of%20citations%0A%20%20SELECT%0A%20%20%20%20%3Fresearcher%20%3Fwork%20%3Fyear%20%28COUNT%28DISTINCT%20%3Fciting_work%29%20%2F%20COUNT%28DISTINCT%20%3Fresearcher_of_paper%29%20AS%20%3Fcitations_per_author_%29%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25researchers%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%7C%20wdt%3AP2093%20%3Fresearcher_of_paper%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fresearcher%20.%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdate%20.%20%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%20%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fwork%20%3Fresearcher%20%3Fyear%0A%7D%20AS%20%25counts%0AWHERE%20%7B%0A%20%20%23%20Label%20the%20results%0A%20%20INCLUDE%20%25counts%20%20%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AGROUP%20BY%20%3Fyear%20%3Fresearcher%20%3FresearcherLabel%0AORDER%20BY%20%3Fyear%0A"></iframe>
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%20%3Fyear%20%28SUM%28%3Fcitations_per_author_%29%20AS%20%3Fcitations_per_author%29%20%3FresearcherLabel%0AWITH%20%7B%0A%20%20%23%20Find%20researchers%20affiliated%20with%20the%20organization%0A%20%20SELECT%20DISTINCT%20%3Fresearcher%20WHERE%20%7B%0A%20%20%20%20%3Fresearcher%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20wdt%3AP1416%2Fwdt%3AP361%2a%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%7D%20AS%20%25researchers%20%0AWITH%20%7B%0A%20%20%23%20Find%20works%20of%20the%20researchers%20and%20count%20the%20number%20of%20citations%0A%20%20SELECT%0A%20%20%20%20%3Fresearcher%20%3Fwork%20%3Fyear%20%28COUNT%28DISTINCT%20%3Fciting_work%29%20%2F%20COUNT%28DISTINCT%20%3Fresearcher_of_paper%29%20AS%20%3Fcitations_per_author_%29%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25researchers%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%7C%20wdt%3AP2093%20%3Fresearcher_of_paper%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fresearcher%20.%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdate%20.%20%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fwork%20%3Fresearcher%20%3Fyear%0A%7D%20AS%20%25counts%0AWHERE%20%7B%0A%20%20%23%20Label%20the%20results%0A%20%20INCLUDE%20%25counts%20%20%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AGROUP%20BY%20%3Fyear%20%3Fresearcher%20%3FresearcherLabel%0AORDER%20BY%20%3Fyear%0A"></iframe>
 </div>
 
 

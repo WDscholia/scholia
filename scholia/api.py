@@ -383,7 +383,8 @@ def entity_to_month(entity, language='en'):
     Returns
     -------
     month : str or None
-        Month as string.
+        Month as string. If month is not specified, i.e., the precision is year
+        then `None` is return.
 
     """
     for statement in entity['claims'].get('P577', []):
@@ -391,6 +392,8 @@ def entity_to_month(entity, language='en'):
         month = date[6:8]
         if language is None:
             return month
+        elif month == '00':
+            return None
         elif language == 'en':
             return MONTH_NUMBER_TO_MONTH['en'][int(month) - 1]
         else:

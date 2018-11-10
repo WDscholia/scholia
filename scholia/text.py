@@ -5,7 +5,7 @@ Usage:
   scholia.text text-to-topic-q-text-setup
 
 Options:
-  -h | --help  Help
+  -h --help  Help
 
 Description:
   Handle text.
@@ -210,7 +210,7 @@ def load_text_to_topic_q_text():
 
     """
     try:
-        return pickle.load(open(TEXT_TO_TOPIC_Q_TEXT_FILENAME))
+        return pickle.load(open(TEXT_TO_TOPIC_Q_TEXT_FILENAME, 'rb'))
     except IOError:
         return TextToTopicQText()
 

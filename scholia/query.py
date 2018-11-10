@@ -16,6 +16,7 @@ Usage:
   scholia.query q-to-class <q>
   scholia.query random-author
   scholia.query twitter-to-q <twitter>
+  scholia.query website-to-q <url>
 
 Examples
 --------
@@ -445,7 +446,7 @@ def q_to_class(q):
     is compared against a set of hardcoded matches.
 
     """
-    query = 'select ?class where {{ wd:{q} p:P31/ps:P31 ?class }}'.format(
+    query = 'SELECT ?class {{ wd:{q} wdt:P31 ?class }}'.format(
         q=escape_string(q))
 
     url = 'https://query.wikidata.org/sparql'
@@ -470,8 +471,10 @@ def q_to_class(q):
             'Q27785883',  # conference proceedings series
     ]):
         class_ = 'series'
-    elif ('Q5633421' in classes or  # scientific journal
-          'Q1143604' in classes):  # proceedings
+    elif set(classes).intersection([
+            'Q5633421',  # scientific journal
+            'Q1143604',  # proceedings
+    ]):
         class_ = 'venue'
     elif ('Q157031' in classes or  # foundation
           'Q10498148' in classes):  # research council
@@ -493,8 +496,12 @@ def q_to_class(q):
     ]):
         class_ = 'gene'
     elif set(classes).intersection([
+            'Q571',  # book
+            'Q191067',  # article
             'Q1980247',  # chapter
             'Q3331189',  # edition
+            'Q10870555',  # report
+            'Q10885494',  # scientific conference paper
             'Q13442814',  # scientific article
     ]):
         class_ = 'work'
@@ -769,6 +776,40 @@ def cas_to_qs(cas):
             for item in data['results']['bindings']]
 
 
+def website_to_qs(url):
+    """Convert URL for website to Wikidata ID.
+
+    Parameters
+    ----------
+    url : str
+        URL for official website.
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> url = ("https://papers.nips.cc/paper/"
+    ...        "6498-online-and-differentially-private-tensor-decomposition")
+    >>> qs = website_to_qs(url)
+    >>> qs == ['Q46994097']
+    True
+
+    """
+    query = 'SELECT ?work WHERE {{ ?work wdt:P856 <{url}> }}'.format(
+        url=url.strip())
+
+    url_ = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url_, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def random_author():
     """Return random author.
 
@@ -869,6 +910,10 @@ def main():
 
     elif arguments['twitter-to-q']:
         qs = twitter_to_qs(arguments['<twitter>'])
+        if len(qs) > 0:
+            print(qs[0])
+    elif arguments['website-to-q']:
+        qs = website_to_qs(arguments['<url>'])
         if len(qs) > 0:
             print(qs[0])
 

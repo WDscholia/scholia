@@ -36,14 +36,14 @@ ORDER BY DESC(?date)
 
  venueStatisticsSparql = `
 # Venue statistics for a specific author
-SELECT ?count ?short_name ?venue ?venueLabel ?topics
+SELECT ?count (SAMPLE(?short_name_) AS ?short_name) ?venue ?venueLabel ?topics
 WITH {
   SELECT
     (COUNT(DISTINCT ?work) as ?count)
     ?venue
     (GROUP_CONCAT(DISTINCT ?topic; separator=" // ") AS ?topics)
   WHERE {
-    ?work wdt:P50 wd:{{ q }} .
+	  ?work wdt:P50 wd:{{ q }} .
     ?work wdt:P1433 ?venue .
     OPTIONAL { ?venue wdt:P921 / rdfs:label ?topic . FILTER(LANG(?topic) = 'en') }
   }
@@ -51,9 +51,10 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  OPTIONAL { ?venue wdt:P1813 ?short_name . }
+  OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }  
 } 
+GROUP BY ?count ?venue ?venueLabel ?topics
 ORDER BY DESC(?count)
  `
 
@@ -82,7 +83,7 @@ SELECT ?count ?work ?workLabel
 WITH {
   SELECT (count(?citing_work) as ?count) ?work WHERE {
     ?work wdt:P50 wd:{{ q }} .
-    ?citing_work wdt:P2860 ?work . 
+    OPTIONAL { ?citing_work wdt:P2860 ?work . }
   }
   GROUP BY ?work
 } AS %result
@@ -183,16 +184,16 @@ LIMIT 500
 
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fvenue%20%3Fvenue_label%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20WHERE%20%7B%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP1433%20%3Fvenue%20.%0A%20%20%3Fvenue%20rdfs%3Alabel%20%3Flong_venue_label%20FILTER%28lang%28%3Flong_venue_label%29%20%3D%20%27en%27%29%0A%20%20OPTIONAL%20%7B%20%3Fvenue%20wdt%3AP1813%20%3Fshort_name%20.%20%7D%0A%20%20BIND%28COALESCE%28%3Fshort_name%2C%20%3Flong_venue_label%29%20AS%20%3Fvenue_label%29%0A%7D%0AGROUP%20BY%20%3Fvenue%20%3Fvenue_label%0AORDER%20BY%20DESC%28%3Fcount%29%20%20"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fvenue%20%28SAMPLE%28%3Fvenue_label_%29%20AS%20%3Fvenue_label%29%20%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20as%20%3Fcount%29%20%3Fvenue%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20%3Fvenue%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fvenue%0A%7D%20AS%20%25counts%0AWHERE%20%7B%0A%20%20INCLUDE%20%25counts%0A%20%20%3Fvenue%20rdfs%3Alabel%20%3Flong_venue_label%20FILTER%28LANG%28%3Flong_venue_label%29%20%3D%20%27en%27%29%0A%20%20OPTIONAL%20%7B%20%3Fvenue%20wdt%3AP1813%20%3Fshort_name%20.%20%7D%0A%20%20BIND%28COALESCE%28%3Fshort_name%2C%20%3Flong_venue_label%29%20AS%20%3Fvenue_label_%29%0A%7D%0AGROUP%20BY%20%3Fvenue%20%3Fcount%0AORDER%20BY%20DESC%28%3Fcount%29%20%20"></iframe>
 </div>
 
 <table class="table table-hover" id="venue-statistics"></table>
 
 
-<h2>Co-author graph</h2>
+<h2 data-toogle="tooltip" title="Co-author graph for the author (up to 1000 links)">Co-author graph</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Frgb%20%3Fauthor2%20%3Fauthor2Label%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fauthor1%20%3Fauthor2%20%3Frgb%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor2%20.%0A%20%20%20%20VALUES%20%3Fpublication_type%20%7B%20wd%3AQ13442814%20wd%3AQ571%20wd%3AQ26973022%7D%20%20%23%20journal%20and%20conference%20articles%2C%20books%2C%20not%20%28yet%3F%29%20software%0A%20%20%20%20%3Fwork%20wdt%3AP31%20%3Fpublication_type%20.%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%0A%20%20%20%20%3Fauthor1%20wdt%3AP21%20%3Fgender1%20.%20%0A%20%20%20%20BIND%28%20IF%28%3Fgender1%20%3D%20wd%3AQ6581097%2C%20%223182BD%22%2C%20%22E6550D%22%29%20AS%20%3Frgb%29%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20%23%20Label%20the%20results%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%20%7D%0A%7D%0A"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0A%23%20Egocentric%20co-author%20graph%20for%20an%20author%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Frgb%20%3Fauthor2%20%3Fauthor2Label%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fauthor1%20%3Fauthor2%20WHERE%20%7B%0A%20%20%20%20%23%20Find%20co-authors%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%2C%20%3Fauthor1%2C%20%3Fauthor2%20.%0A%0A%20%20%20%20%23%20Filtering%20%0A%20%20%20%20%23%20Only%20journal%20and%20conference%20articles%2C%20books%2C%20not%20%28yet%3F%29%20software%0A%20%20%20%20%23%20VALUES%20%3Fpublication_type%20%7B%20wd%3AQ13442814%20wd%3AQ571%20wd%3AQ26973022%7D%20%20%0A%20%20%20%20%23%20%3Fwork%20wdt%3AP31%20%3Fpublication_type%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor1%20%3Fauthor2%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%23%20Limit%20the%20size%20of%20the%20graph%2C%20to%20avoid%20overburdening%20the%20browser%0A%20%20LIMIT%201000%0A%7D%20AS%20%25authors%0AWITH%20%7B%0A%20%20SELECT%20%3Fauthor1%20%3Fauthor2%20%3Frgb%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25authors%0A%20%20%20%20%0A%20%20%20%20%23%20Exclude%20self-links%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%0A%20%20%20%20%0A%20%20%20%20%23%20Color%20according%20to%20gender%0A%20%20%20%20OPTIONAL%20%7B%0A%20%20%20%20%20%20%3Fauthor1%20wdt%3AP21%20%3Fgender1%20.%20%0A%20%20%20%20%20%20BIND%28%20IF%28%3Fgender1%20%3D%20wd%3AQ6581097%2C%20%223182BD%22%2C%20%22E6550D%22%29%20AS%20%3Frgb%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20%23%20Label%20the%20results%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%20%7D%0A%7D"></iframe>
 </div>
 
 Missing co-authors? <a href="https://query.wikidata.org/#select%20%3Fauthorname%20%28count%28%3Fwork%29%20as%20%3Fcount%29%20where%20%7B%20%3Fwork%20wdt%3AP50%20wd%3A{{ q | urlencode }}%20.%20%3Fwork%20wdt%3AP2093%20%3Fauthorname%20.%20%7D%20group%20by%20%3Fauthorname%20order%20by%20desc%28%3Fcount%29">Search for not yet created co-authors on Wikidata</a> or add them with Magnus Manske's <a href="https://tools.wmflabs.org/sourcemd/new_resolve_authors.php">Resolve author</a> tool.
@@ -231,7 +232,15 @@ topics of authored works and topics of citing works.
 </div>
 
 
-<h2>Education</h2>
+<h2>Timeline</h2>
+
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0A%23%20Timeline%20for%20an%20author%0ASELECT%20%3Flabel%20%3Fbeginning%20%3Fending%20%3Feducation_degree_label%0AWITH%20%7B%0A%20%20SELECT%20%3Fwork%20%28MIN%28%3Fpublication_date%29%20AS%20%3Fbeginning%29%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%20%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fwork%0A%7D%20AS%20%25works_with_publication_date%0AWITH%20%7B%0A%20%20%0A%20%20SELECT%20%3Fwork%20%3Fbeginning%20%28COUNT%28%3Fciting_article%29%20AS%20%3Fnumber_of_citations%29%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works_with_publication_date%0A%20%20%20%20OPTIONAL%20%7B%20%3Fciting_article%20wdt%3AP2860%20%3Fwork%20.%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fwork%20%3Fbeginning%20%0A%7D%20AS%20%25works%0AWHERE%20%7B%0A%20%20%23%20%7B%20Birth%20wd%3A{{ q }}%20wdt%3AP569%20%3Fbeginning%20.%20BIND%28%22Birth%22%20AS%20%3Flabel%29%20%7D%20UNION%0A%20%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20SELECT%20%3Fwork%20%3Fbeginning%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20ORDER%20BY%20DESC%28%3Fnumber_of_citations%29%0A%20%20%20%20%20%20LIMIT%201%20%20%20%20%20%20%20%20%0A%20%20%20%20%7D%0A%20%20%20%20BIND%28%22%F0%9F%93%96%20publication%20of%20most%20cited%20article%22%20AS%20%3Flabel%29%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20SELECT%20%3Fwork%20%3Fbeginning%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20ORDER%20BY%20%3Fbeginning%0A%20%20%20%20%20%20LIMIT%201%20%20%20%20%20%20%20%20%0A%20%20%20%20%7D%0A%20%20%20%20BIND%28%22%F0%9F%93%96%20first%20publication%22%20AS%20%3Flabel%29%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20SELECT%20%3Fwork%20%3Fbeginning%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20ORDER%20BY%20DESC%28%3Fbeginning%29%0A%20%20%20%20%20%20LIMIT%201%20%20%20%20%20%20%20%20%0A%20%20%20%20%7D%0A%20%20%20%20BIND%28%22%F0%9F%93%96%20latest%20publication%22%20AS%20%3Flabel%29%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20%23%20Education%0A%20%20%20%20wd%3A{{ q }}%20p%3AP69%20%3Feducation_statement%20.%0A%20%20%20%20%3Feducation_statement%20ps%3AP69%20%3Feducation%20.%0A%20%20%20%20%3Feducation%20rdfs%3Alabel%20%3Feducation_label%20.%20%0A%20%20%20%20FILTER%20%28lang%28%3Feducation_label%29%20%3D%20%27en%27%29%0A%20%20%20%20BIND%28CONCAT%28%22%F0%9F%A6%89%20%22%2C%20%3Feducation_label%29%20AS%20%3Flabel%29%0A%20%20%20%20OPTIONAL%20%7B%20%3Feducation_statement%20pq%3AP580%20%3Fbeginning%20.%20%7D%0A%20%20%20%20OPTIONAL%20%7B%20%3Feducation_statement%20pq%3AP582%20%3Fending%20.%20%7D%0A%20%20%20%20OPTIONAL%20%7B%0A%20%20%20%20%20%20%3Feducation_statement%20pq%3AP512%20%3Feducation_degree%20.%20%0A%20%20%20%20%20%20%3Feducation_degree%20rdfs%3Alabel%20%3Feducation_degree_label%20.%0A%20%20%20%20%20%20FILTER%20%28lang%28%3Feducation_degree_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20%23%20Affiliation%0A%20%20%20%20wd%3A{{ q }}%20p%3AP1416%20%7C%20p%3AP108%20%3Faffiliation_statement%20.%0A%20%20%20%20%3Faffiliation_statement%20ps%3AP1416%20%7C%20ps%3AP108%20%3Faffiliation%20.%0A%20%20%20%20%3Faffiliation%20rdfs%3Alabel%20%3Faffiliation_label%20.%0A%20%20%20%20FILTER%20%28lang%28%3Faffiliation_label%29%20%3D%20%27en%27%29%0A%20%20%20%20BIND%28CONCAT%28%22%F0%9F%8F%A0%20%22%2C%3Faffiliation_label%29%20AS%20%3Flabel%29%0A%20%20%20%20%23%20OPTIONAL%20%7B%20%3Faffiliation%20wdt%3AP18%20%3Fimage%20%7D%0A%20%20%20%20OPTIONAL%20%7B%20%3Faffiliation_statement%20pq%3AP580%20%3Fbeginning%20.%20%7D%0A%20%20%20%20OPTIONAL%20%7B%20%3Faffiliation_statement%20pq%3AP582%20%3Fending%20.%20%7D%0A%20%20%20%20OPTIONAL%20%7B%0A%20%20%20%20%20%20%3Faffiliation_statement%20pq%3AP512%20%3Faffiliation_degree%20.%20%0A%20%20%20%20%20%20%3Faffiliation_degree%20rdfs%3Alabel%20%3Faffiliation_degree_label%20.%0A%20%20%20%20%20%20FILTER%20%28lang%28%3Faffiliation_degree_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20p%3AP166%20%3Faward_statement%20.%20%0A%20%20%20%20%3Faward_statement%20ps%3AP166%20%3Faward%20.%0A%20%20%20%20%3Faward%20rdfs%3Alabel%20%3Faward_label%20.%0A%20%20%20%20FILTER%20%28lang%28%3Faward_label%29%20%3D%20%27en%27%29%0A%20%20%20%20BIND%28CONCAT%28%22%F0%9F%8F%86%20%22%2C%3Faward_label%29%20AS%20%3Flabel%29%0A%20%20%20%20%3Faward_statement%20pq%3AP585%20%3Fbeginning%20.%0A%20%20%7D%0A%0A%7D%20"></iframe>
+</div>
+
+
+<!-- h2>Education</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20%3Feducation%20%3Feducation_label%20%3Feducation_beginning%20%3Feducation_ending%20%3Feducation_degree_label%20WHERE%20%7B%0A%20%20wd%3A{{ q }}%20p%3AP69%20%3Feducation_statement%20.%0A%20%20%3Feducation_statement%20ps%3AP69%20%3Feducation%20.%0A%20%20%3Feducation%20rdfs%3Alabel%20%3Feducation_label%20.%20filter%20%28lang%28%3Feducation_label%29%20%3D%20%27en%27%29%0A%20%20optional%20%7B%20%3Feducation_statement%20pq%3AP580%20%3Feducation_beginning%20.%20%7D%0A%20%20optional%20%7B%20%3Feducation_statement%20pq%3AP582%20%3Feducation_ending%20.%20%7D%0A%20%20optional%20%7B%20%3Feducation_statement%20pq%3AP512%20%3Feducation_degree%20.%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Feducation_degree%20rdfs%3Alabel%20%3Feducation_degree_label%20.%20filter%20%28lang%28%3Feducation_degree_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en,fr,de,ru,es,zh,jp%22.%20%7D%20%20%0A%7D%20"></iframe>
@@ -242,7 +251,7 @@ topics of authored works and topics of citing works.
 
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0Aselect%20%3Fimage%20%3Faffiliation%20%3Faffiliation_label%20%3Faffiliation_beginning%20%3Faffiliation_ending%20%3Faffiliation_degree_label%20where%20%7B%0A%20%20%7B%20wd%3A{{ q }}%20p%3AP1416%20%3Faffiliation_statement%20.%20%7D%0A%20%20union%20%7B%20wd%3A{{ q }}%20p%3AP108%20%3Faffiliation_statement%20.%20%7D%20%20%23%20actually%20employer%0A%20%20%7B%20%3Faffiliation_statement%20ps%3AP1416%20%3Faffiliation%20.%20%7D%0A%20%20union%20%7B%20%3Faffiliation_statement%20ps%3AP108%20%3Faffiliation%20.%20%7D%0A%20%20%3Faffiliation%20rdfs%3Alabel%20%3Faffiliation_label%20.%20filter%20%28lang%28%3Faffiliation_label%29%20%3D%20%27en%27%29%0A%20%20optional%20%7B%20%3Faffiliation%20wdt%3AP18%20%3Fimage%20%7D%0A%20%20optional%20%7B%20%3Faffiliation_statement%20pq%3AP580%20%3Faffiliation_beginning%20.%20%7D%0A%20%20optional%20%7B%20%3Faffiliation_statement%20pq%3AP582%20%3Faffiliation_ending%20.%20%7D%0A%20%20optional%20%7B%20%3Faffiliation_statement%20pq%3AP512%20%3Faffiliation_degree%20.%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Faffiliation_degree%20rdfs%3Alabel%20%3Faffiliation_degree_label%20.%20filter%20%28lang%28%3Faffiliation_degree_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%20%7D%20%20%0A%7D"></iframe>
-</div>
+</div -->
 
 
 <h2 id="Academic tree">Academic tree</h2>
@@ -261,7 +270,7 @@ topics of authored works and topics of citing works.
 
 <h2>Citation statistics</h2>
 
-<h3>Most cited work</h3>
+<h3>Highly cited works</h3>
 
 Works of the author ordered according to number of citations received.
 

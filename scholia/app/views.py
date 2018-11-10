@@ -8,7 +8,7 @@ from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
-                   wb_get_topic_latest_works)
+                   wb_get_topic_latest_works, wb_get_organization_latest_works)
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
@@ -762,6 +762,28 @@ def show_organization_empty():
 
     """
     return render_template('organization_empty.html')
+
+
+@main.route('/organization/' + q_pattern + '/latest-works/rss')
+def show_organization_rss(q):
+    """Return a RSS feed for specific organization.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    rss : str
+        RSS feed.
+
+    """
+    response_body = wb_get_organization_latest_works(q)
+    response = Response(response=response_body,
+                        status=200, mimetype="application/rss+xml")
+    response.headers["Content-Type"] = "text/xml; charset=utf-8"
+    return response
 
 
 @main.route('/organizations/' + qs_pattern)
