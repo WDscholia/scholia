@@ -123,7 +123,7 @@ function sparqlToDataTable(sparql, element, options={}) {
 	for ( i = 0 ; i < convertedData.columns.length ; i++ ) {
 	    var column = {
 		data: convertedData.columns[i],
-		title: capitalizeFirstLetter(convertedData.columns[i]).replace("_", "&nbsp;"),
+		title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
 		defaultContent: "",
 	    }
 	    columns.push(column)
