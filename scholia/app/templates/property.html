@@ -14,15 +14,21 @@ LIMIT 500
  `;
 
  $(document).ready(function() {
-     sparqlToDataTable(useSparql, "#use");
+     sparqlToDataTable(useSparql, "#use", {
+	 linkPrefixes: {
+	     item: "",
+	     property_value: "",
+	 }
+	     
+     });
  });
 </script>
 
 {% endblock %}
 
-
-
 {% block page_content %}
+
+<h1>Property: {{ p }}</h1>
 
 <h2>Use</h2>
 
