@@ -111,14 +111,27 @@ WITH {
     ?citing_work wdt:P50 ?citing_author .
   }
   GROUP BY ?citing_author 
+  ORDER BY DESC(?count)
+  LIMIT 500
+} AS %counts
+WITH {
+  # An author might have multiple ORCID iDs
+  SELECT
+    ?count
+    ?citing_author
+    (SAMPLE(?orcids) AS ?orcid_)
+  WHERE {
+    INCLUDE %counts
+    OPTIONAL { ?citing_author wdt:P496 ?orcids }
+  }
+  GROUP BY ?count ?citing_author
 } AS %result
 WHERE {
   INCLUDE %result
-  OPTIONAL { ?citing_author wdt:P496 ?orcid_ }
+  
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 } 
 ORDER BY DESC(?count)
-LIMIT 500
 `
  
  $(document).ready(function() {
