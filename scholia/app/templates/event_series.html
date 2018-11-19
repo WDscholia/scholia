@@ -128,7 +128,7 @@ WITH {
 } AS %people  
 WITH {
   SELECT
-    (MAX(?publication_datetime) AS ?publication_date)
+    (xsd:date(MAX(?publication_datetime)) AS ?publication_date)
     ?work
     (GROUP_CONCAT(?person_label; separator=" // ") AS ?authors)
   WHERE {
