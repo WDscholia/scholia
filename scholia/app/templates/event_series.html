@@ -12,7 +12,7 @@ SELECT DISTINCT
   ?event ?eventLabel
   ?proceedings ?proceedingsLabel
 WHERE {
-  ?event wdt:P179 | wdt:P31 wd:Q56846035 .
+	?event wdt:P179 | wdt:P31 wd:{{ q }} .
   OPTIONAL {
     ?event wdt:P585 | wdt:P580 ?datetime .
     BIND(YEAR(?datetime) AS ?years)
