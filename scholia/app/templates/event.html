@@ -198,9 +198,9 @@ LIMIT 500
 
  relatedEventsSparql = `
 SELECT
-  ?score
-  ?time_score
-  ?location_score
+  (ROUND(1000 * ?score_) / 1000 AS ?score)
+  (ROUND(1000 * ?time_score_) / 1000 AS ?time_score)
+  (ROUND(1000 * ?location_score_) / 1000 AS ?location_score) 
   ?event ?eventLabel
 WITH {
   SELECT ?event_type WHERE {
@@ -215,9 +215,9 @@ WITH {
 } AS %events
 WITH {
   SELECT
-    (SUM(?score_) AS ?score)
-    (MAX(?time_score_) AS ?time_score)
-    (MAX(?location_score_) AS ?location_score)
+    (SUM(?scores) AS ?score_)
+    (MAX(?time_scores) AS ?time_score_)
+    (MAX(?location_scores) AS ?location_score_)
     ?event
   WHERE {
     INCLUDE %events 
@@ -230,11 +230,11 @@ WITH {
       BIND((365.25 * YEAR(?time) + 30.5 * MONTH(?time) + DAY(?time)) AS ?day)
       
       # TODO: multiple days cause double counting
-      BIND(20 / (1 + ABS(?day - ?day0)) AS ?time_score_)
+      BIND(20 / (1 + ABS(?day - ?day0)) AS ?time_scores)
     }
     # UNION
     {
-      SELECT ?event (MAX(?inverse_distance) AS ?location_score_) WHERE {
+      SELECT ?event (MAX(?inverse_distance) AS ?location_scores) WHERE {
         INCLUDE %events 
                 
         # geocoordinate of the query event
@@ -249,7 +249,7 @@ WITH {
       GROUP BY ?event
     }  
   
-    BIND((?time_score_ * ?location_score_) AS ?score_)
+    BIND((?time_scores * ?location_scores) AS ?scores)
   }
   GROUP BY ?event
   
