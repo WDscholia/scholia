@@ -52,8 +52,17 @@ ORDER BY DESC(?count)
  
  $(document).ready(function() {
      sparqlToDataTable(recentWorkUsingTheUsedSparql,
-		       "#recent-work-using-the-used");
-     sparqlToDataTable(coUsedSparql, "#co-used");
+		       "#recent-work-using-the-used", {
+			   linkPrefixes: {
+			       work: "../work/",
+			   }
+		       });
+     sparqlToDataTable(coUsedSparql, "#co-used", {
+	 linkPrefixes: {
+	     coused: "./",
+	     example_work: "../work/",
+	 }
+     });
  });
 </script>
 
