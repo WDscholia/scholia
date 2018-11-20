@@ -143,7 +143,10 @@
      $.ajax( endpointUrl, settings ).then( function ( data ) {
 	 data.results.bindings.forEach(function(entry) {
 	     var aspect = entry.aspect.value;
-	     $( '#aspect-chooser' ).append( '<a href="../' + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
+	     $( '#aspect-chooser' ).append(
+		 `<a role="button"
+		     class="btn btn-outline-dark btn-sm"
+                     href="../` + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
 	 });
      } );
 
