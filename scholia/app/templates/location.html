@@ -6,8 +6,8 @@
 <script type="text/javascript">
  nearbyOrganizationsSparql = `
 SELECT
-  ?distance
-  ?organization ?organizationLabel
+  (ROUND(1000 * ?distance_) / 1000 AS ?distance)
+  ?organization ?organizationLabel ?organizationDescription
 WITH {
   # Universities, research centers, etc.
   SELECT ?university WHERE {
@@ -24,11 +24,11 @@ WITH {
 } AS %organizations
 WITH {
   # Compute distance.
-  SELECT ?organization ?distance WHERE {
+  SELECT ?organization ?distance_ WHERE {
     INCLUDE %organizations
     wd:{{ q }} wdt:P159* / wdt:P625 ?geo .
-    BIND(geof:distance(?other_geo, ?geo) AS ?distance)
-    FILTER(?distance < 250)
+    BIND(geof:distance(?other_geo, ?geo) AS ?distance_)
+    FILTER(?distance_ < 250)
   }
 } AS %results
 WHERE {
@@ -40,9 +40,15 @@ ORDER BY ?distance
 
 
  nearbyLocationsAsTopicsInWorksSparql = `
-SELECT ?distance ?work ?workLabel ?location ?locationLabel
+SELECT
+  (ROUND(1000 * ?distance_) / 1000 AS ?distance)
+  ?work ?workLabel
+  ?location ?locationLabel
 WITH {
-  SELECT DISTINCT ?work ?location ?geo ?distance WHERE {
+  SELECT
+    ?work ?location
+    (min(?distances) AS ?distance_)
+  WHERE {
     ?work wdt:P921 ?location . 
 
     ?location p:P625 ?other_geo_statement . 
@@ -58,16 +64,17 @@ WITH {
     MINUS { ?work wdt:P31 wd:Q4423781 }
    
     wd:{{ q }} wdt:P159* / wdt:P625 ?geo .
-    BIND(geof:distance(?other_geo, ?geo) AS ?distance)
+    BIND(geof:distance(?other_geo, ?geo) AS ?distances)
   }
-  ORDER BY ?distance
+  GROUP BY ?work ?location
+  ORDER BY ?distance_
   LIMIT 500
 } AS %results
 WHERE {
   INCLUDE %results
           
   # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,cs,da,de,es,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,cs,da,de,es,jp,nl,no,ru,sv,zh". }
 }
 ORDER BY ?distance
 `
@@ -75,9 +82,19 @@ ORDER BY ?distance
 
 
  $(document).ready(function() {
-     sparqlToDataTable(nearbyOrganizationsSparql, "#nearby-organizations");
+     sparqlToDataTable(nearbyOrganizationsSparql, "#nearby-organizations", {
+	 linkPrefixes: {
+	     organization: '../organization/',
+	 }
+     });
      sparqlToDataTable(nearbyLocationsAsTopicsInWorksSparql,
-		       "#nearby-locations-as-topics-in-works");
+		       "#nearby-locations-as-topics-in-works", {
+			   linkPrefixes: {
+			       work: '../work/',
+			       location: '../topic/',
+			   }
+			   
+		       });
  });
 </script>
 
@@ -95,7 +112,8 @@ ORDER BY ?distance
 <div id="wembedder"></div>
 
 
-<h2 id="Nearby organizations">Nearby organizations</h2>
+<h2 title="Nearby academic organizations with distances in kilometers"
+    id="Nearby organizations">Nearby organizations</h2>
 
 <table class="table table-hover" id="nearby-organizations"></table>
 
