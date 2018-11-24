@@ -4,6 +4,7 @@ Usage:
   scholia.query arxiv-to-q <arxiv>
   scholia.query cas-to-q <cas>
   scholia.query cordis-to-q <cordis>
+  scholia.query count-authorships
   scholia.query count-scientific-articles
   scholia.query doi-to-q <doi>
   scholia.query github-to-q <github>
@@ -37,7 +38,7 @@ Examples
 
 from __future__ import absolute_import, division, print_function
 
-from random import choice
+from random import random
 
 import requests
 
@@ -75,6 +76,31 @@ def escape_string(string):
     return string.replace('\\', '\\\\').replace('"', r'\"')
 
 
+def query_to_bindings(query):
+    """Return response bindings from SPARQL query.
+
+    Query the Wikidata Query Service with the given query and return the
+    response data as binding.
+
+    Parameters
+    ----------
+    query : str
+        SPARQL query as string
+
+    Returns
+    -------
+    bindings : list
+        Data as list of dicts.
+
+    """
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return data['results']['bindings']
+
+
 def arxiv_to_qs(arxiv):
     """Convert arxiv ID to Wikidata ID.
 
@@ -104,6 +130,35 @@ def arxiv_to_qs(arxiv):
 
     return [item['work']['value'][31:]
             for item in data['results']['bindings']]
+
+
+def count_authorships():
+    """Count the number of authorships.
+
+    Query the Wikidata Query Service to determine the number of authorships as
+    the number of P50 relationships.
+
+    Returns
+    -------
+    count : int
+        Number of authorships.
+
+    Notes
+    -----
+    The count is determined from the SPARQL query
+
+    `SELECT (COUNT(*) AS ?count) { [] wdt:P50 [] }`
+
+    Examples
+    --------
+    >>> count_authorships() > 1000000  # More than a million authorships
+    True
+
+    """
+    query = "SELECT (COUNT(*) AS ?count) { [] wdt:P50 [] }"
+    bindings = query_to_bindings(query)
+    count = int(bindings[0]['count']['value'])
+    return count
 
 
 def count_scientific_articles():
@@ -815,27 +870,38 @@ def website_to_qs(url):
 def random_author():
     """Return random author.
 
-    Sample a scientific author randomly from Wikidata.
-
-    The SPARQL query is somewhat inefficient returning all
-    authors.
+    Sample a scientific author randomly from Wikidata by a call to the Wikidata
+    Query Service.
 
     Returns
     -------
     q : str
         Wikidata identifier.
 
+    Notes
+    -----
+    The SPARQL query is somewhat slow and takes several seconds. It sample
+    uniformly among authorships rather than authors. The SPARQL query is this:
+
+    `SELECT ?author {{ [] wdt:P50 ?author . }}`
+
+    The author returned is not necessarily a scholarly author.
+
+    Examples
+    --------
+    >>> q = random_author()
+    >>> q.startswith('Q')
+    True
+
     """
-    query = """SELECT DISTINCT ?author WHERE {
-       ?work wdt:P31 wd:Q13442814 ; wdt:P50 ?author . }"""
-    url = 'https://query.wikidata.org/sparql'
-    params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
-    data = response.json()
-    authors = [author['author']['value'][31:]
-               for author in data['results']['bindings']]
-    author = choice(authors)
-    return author
+    count = count_authorships()
+    offset = int(random() * count)
+
+    query = """SELECT ?author {{ [] wdt:P50 ?author . }}
+               OFFSET {} LIMIT 1""".format(offset)
+    bindings = query_to_bindings(query)
+    q = bindings[0]['author']['value'][31:]
+    return q
 
 
 def main():
@@ -861,6 +927,10 @@ def main():
 
     elif arguments['count-scientific-articles']:
         count = count_scientific_articles()
+        print(count)
+
+    elif arguments['count-authorships']:
+        count = count_authorships()
         print(count)
 
     elif arguments['doi-to-q']:
