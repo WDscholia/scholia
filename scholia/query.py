@@ -558,6 +558,7 @@ def q_to_class(q):
             'Q10870555',  # report
             'Q10885494',  # scientific conference paper
             'Q13442814',  # scientific article
+            'Q58632367',  # conference abstract
     ]):
         class_ = 'work'
     elif set(classes).intersection([
