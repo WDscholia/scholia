@@ -553,6 +553,7 @@ def q_to_class(q):
     elif set(classes).intersection([
             'Q571',  # book
             'Q191067',  # article
+            'Q253623',  # patent
             'Q1980247',  # chapter
             'Q3331189',  # edition
             'Q5707594',  # news article
