@@ -555,6 +555,7 @@ def q_to_class(q):
             'Q191067',  # article
             'Q1980247',  # chapter
             'Q3331189',  # edition
+            'Q5707594',  # news article
             'Q10870555',  # report
             'Q10885494',  # scientific conference paper
             'Q13442814',  # scientific article
