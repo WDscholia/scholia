@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ recentTrialsSparql = `
+SELECT ?start_date ?trial ?trialLabel WHERE {
+  {
+    SELECT * WHERE { 
+      ?trial wdt:P31 wd:Q30612 .
+      OPTIONAL {
+        ?trial wdt:P580 ?start_datetime .
+        BIND(xsd:date(?start_datetime) AS ?start_date) 
+      }
+    }
+    ORDER BY DESC(?start_datetime)
+    LIMIT 200
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?start_datetime)
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(recentTrialsSparql, "#recent-clinical-trials", {
+	 linkPrefixes: {
+	     trial: "./",
+	 }
+     });
+ });
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1>Clinical trials</h1>
+
+<h2 title="Recently initiated clinical trials"
+    id="Recent clinical trials">Recent clinical trials</h2>
+
+<table class="table table-hover" id="recent-clinical-trials"></table>
+
+
+
+{% endblock %}
+
+  

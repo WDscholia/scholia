@@ -385,6 +385,37 @@ def show_catalogue_empty():
     return render_template('catalogue_empty.html')
 
 
+@main.route('/clinical-trial/')
+def show_clinical_trial_empty():
+    """Return clinical trial index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for clinical trials.
+
+    """
+    return render_template('clinical_trial_empty.html')
+
+
+@main.route('/clinical-trial/' + q_pattern)
+def show_clinical_trial(q):
+    """Return HTML rendering for specific clinical trial.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier for clinical trial.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific clinical trial.
+
+    """
+    return render_template('clinical_trial.html', q=q)
+
+
 @main.route('/countries/' + qs_pattern)
 def show_countries(qs):
     """Return HTML rendering for specific countries.

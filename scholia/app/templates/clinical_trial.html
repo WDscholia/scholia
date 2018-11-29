@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ dataSparql = `
+SELECT ?description ?value ?valueUrl
+WHERE {
+  BIND(wd:{{ q }} AS ?trial)
+  {
+    BIND(1 AS ?order)
+    BIND("Title" AS ?description)
+    ?trial wdt:P1476 ?value .
+  }
+  UNION
+  {
+    BIND(20 AS ?order)
+    BIND("Sponsor" AS ?description)
+    ?trial wdt:P859 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../sponsor/", ?q) AS ?valueUrl)
+  }
+ 
+} 
+ORDER BY ?order
+`;
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(dataSparql, "#data");
+ });
+
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Clinical trial</h1>
+
+<div id="intro"></div>
+
+<h2>Data</h2>
+
+<table class="table table-hover" id="data"></table>
+
+
+{% endblock %}
