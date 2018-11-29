@@ -520,6 +520,8 @@ def q_to_class(q):
     # Hard-coded matching match
     if ('Q5' in classes):  # human
         class_ = 'author'
+    elif ('Q30612' in classes):  # clinical trial
+        class_ = 'clinical_trial'
     elif set(classes).intersection([
             'Q277759',  # book series
             'Q2217301',  # serial (publication series)
