@@ -71,6 +71,27 @@ SELECT
 ORDER BY DESC(?count)
 `;
 
+ statisticsSparql = `
+SELECT ?count ?description
+WHERE {
+  {
+    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31 wd:Q30612 . } }
+    BIND("Number of clinical trial" AS ?description)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3098 [] . } }
+    BIND("Links to ClinicalTrials.gov" AS ?description)
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6099 [] . } }
+    BIND("Number of clinical trial phases links" AS ?description)
+  } 
+}
+ORDER BY DESC(?count)
+`
+
 
  $(document).ready(function() {
      sparqlToDataTable(recentTrialsSparql, "#recent-clinical-trials", {
@@ -90,7 +111,9 @@ ORDER BY DESC(?count)
 	     example_trial: "./",
 	 }
      });
+     sparqlToDataTable(statisticsSparql, "#statistics")
  });
+ 
 </script>
 
 {% endblock %}
@@ -121,6 +144,11 @@ ORDER BY DESC(?count)
 <h2 title="Interventions in clinical trials sorted by number of trials">Inverventions</h2>
 
 <table class="table table-hover" id="interventions"></table>
+
+
+<h2 title="Statistics for clinical trials">Statistics</h2>
+
+<table class="table table-hover" id="statistics"></table>
 
 
 {% endblock %}
