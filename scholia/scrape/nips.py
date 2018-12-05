@@ -55,6 +55,7 @@ WDQS_URL = 'https://query.wikidata.org/sparql'
 
 # Year should be the nominal year, - not the year of publication
 YEAR_TO_Q = {
+    "2018": "Q56580288",
     "2017": "Q39502823",
     "2016": "Q30715037",
     "2015": "Q28374318",
