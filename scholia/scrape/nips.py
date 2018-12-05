@@ -24,6 +24,9 @@ For `scrape-paper-urls-from-proceedings-url` the proceedings URL should be one
 listed at https://papers.nips.cc/. It will return a JSON with a list of URLs
 for the individual papers.
 
+The generated quickstatements from `paper-url-to-quickstatements` can be
+submitted to https://tools.wmflabs.org/quickstatements/.
+
 """
 
 from six import b, print_, u
@@ -325,8 +328,13 @@ def scrape_paper_from_url(url):
     response = requests.get(url)
     tree = etree.HTML(response.content)
 
-    entry['title'] = tree.xpath("//h2[@class='subtitle']")[0].text
-
+    # In this field there might be markup. For instance,
+    # <h2 class="subtitle"><var>\ell_1</var>-regression with Heavy-tailed ...
+    # So this is not sufficient:
+    # entry['title'] = tree.xpath("//h2[@class='subtitle']")[0].text
+    title_element = tree.xpath("//h2[@class='subtitle']")[0]
+    entry['title'] = "".join(text for text in title_element.itertext())
+    
     authors_element = tree.xpath("//ul[@class='authors']")[0]
     entry['authors'] = [element.text
                         for element in authors_element.xpath('li/a')]
@@ -435,7 +443,7 @@ def main():
     elif arguments['paper-url-to-quickstatements']:
         url = arguments['<url>']
         qs = paper_url_to_quickstatements(url)
-        print_(qs)
+        os.write(output_file, qs.encode(output_encoding) + b('\n'))
 
     elif arguments['scrape-paper-from-url']:
         url = arguments['<url>']
