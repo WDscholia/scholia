@@ -229,7 +229,7 @@ def paper_to_quickstatements(paper):
         qs += u('LAST\tP2093\t"{}"\tP1545\t"{}"\n').format(author, n)
 
     # Published in
-    qs += 'LAST\t577\t+{}-01-01T00:00:00Z/9\n'.format(paper['year'])
+    qs += 'LAST\tP577\t+{}-01-01T00:00:00Z/9\n'.format(paper['year'])
 
     # Language
     qs += 'LAST\tP407\tQ1860\n'
