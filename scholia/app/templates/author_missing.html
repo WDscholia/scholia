@@ -13,9 +13,9 @@ SELECT
   # The coauthor as a string, - rather than as an item
   ?coauthor
 
-  # Build URL to Magnus Manske's resolver tool
+  # Build URL to the Author disambiguator tool
   (CONCAT(
-      'https://tools.wmflabs.org/sourcemd/new_resolve_authors.php?doit=Look+for+author&name=',
+      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
       ENCODE_FOR_URI(?coauthor)) AS ?resolver_url)
 WITH {
   SELECT (COUNT(?work) as ?count) ?coauthor WHERE {
@@ -40,9 +40,9 @@ SELECT
   # The citing author as a string, - rather than as an item
   ?citing_author
 
-  # Build URL to Magnus Manske's resolver tool
+  # Build URL to the Author disambiguator tool
   (CONCAT(
-      'https://tools.wmflabs.org/sourcemd/new_resolve_authors.php?doit=Look+for+author&name=',
+      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
       ENCODE_FOR_URI(?citing_author)) AS ?resolver_url)
 
   ?example_citing_work ?example_citing_workLabel
@@ -109,7 +109,8 @@ Missing information with respect to the author.
 
 The coauthors listed below may only be represented as strings in Wikidata
 with no link to Wikidata items.
-Follow the link to use Magnus Manske's resolver tool to try to resolve the authors.
+Follow the link to use the Author disambiguator tool to try to resolve
+the authors.
 
 <table class="table table-hover" id="missing-coauthor-items"></table>
 
@@ -118,7 +119,8 @@ Follow the link to use Magnus Manske's resolver tool to try to resolve the autho
 
 The citing authors below are only represented as strings in Wikidata and not linked to
 Wikidata items.
-Follow the link to use Magnus Manske's resolver tool to try to resolve the authors.
+Follow the link to use the Author disambiguator tool to try to resolve
+the authors.
 
 <table class="table table-hover" id="missing-citing-author-items"></table>
 

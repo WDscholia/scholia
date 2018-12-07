@@ -13,9 +13,9 @@ SELECT
   # Author as a string
   ?author
 
-  # Link to Magnus Manske's resolver tool
+  # Build URL to the Author disambiguator tool
   (CONCAT(
-      'https://tools.wmflabs.org/sourcemd/new_resolve_authors.php?doit=Look+for+author&name=',
+      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
       ENCODE_FOR_URI(?author)) AS ?resolver_url)
 WITH {
   SELECT DISTINCT ?work WHERE {
@@ -64,7 +64,7 @@ Missing information with respect to the topic <a href="{{ url_for('app.show_topi
 
 The authors listed below may only be represented as strings in Wikidata
 with no link to Wikidata items.
-Follow the link to use Magnus Manske's resolver tool to try to resolve
+Follow the link to use the Author disambiguator tool to try to resolve
 the authors.
 
 <table class="table table-hover" id="missing-author-items"></table>
