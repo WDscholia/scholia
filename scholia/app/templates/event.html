@@ -73,7 +73,7 @@ WHERE {
 ORDER BY DESC(?number_of_publications)
 `
 
-  topicsSparql = `
+ topicsSparql = `
 # Topics of works authored by people associated with an event
 SELECT ?score ?topic ?topicLabel ?topicDescription
 WITH {
@@ -196,7 +196,7 @@ ORDER BY DESC(?publication_date)
 LIMIT 500
 `
 
- relatedEventsSparql = `
+ relatedEventsTimeLocationSparql = `
 SELECT
   (ROUND(1000 * ?score_) / 1000 AS ?score)
   (ROUND(1000 * ?time_score_) / 1000 AS ?time_score)
@@ -257,10 +257,33 @@ WITH {
 WHERE {
   INCLUDE %results
   FILTER (?event != wd:{{ q }})
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,no,ru,sv,zh". }
 }
 ORDER BY DESC(?score)
 `
+
+ relatedEventsPeopleSparql = `
+SELECT
+  ?score ?event ?eventLabel ?eventDescription
+  ?example_person ?example_personLabel
+WHERE {
+  { 
+    SELECT
+      (COUNT(*) AS ?score) ?event
+      (SAMPLE(?person) AS ?example_person)
+    WHERE {
+      ?person ^wdt:P823 | ^wdt:P664 | ^wdt:P1344 | wdt:P710 | (^wdt:P98 / wdt:P4745) | (^wdt:P50 / wdt:P1433 / wdt:P4745 ) | ^wdt:P5804 wd:{{ q }} , ?event . 
+      FILTER (?event != wd:{{ q }})
+    }
+    GROUP BY ?event
+    ORDER BY DESC(?score)
+    LIMIT 200
+  } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+`
+
 
 
  $(document).ready(function() {
@@ -268,7 +291,8 @@ ORDER BY DESC(?score)
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(proceedingsPublicationsSparql, "#proceedings-publications");
      sparqlToDataTable(recentPublicationsSparql, "#recent-publications");
-     sparqlToDataTable(relatedEventsSparql, "#related-events");
+     sparqlToDataTable(relatedEventsTimeLocationSparql, "#related-events-time-location");
+     sparqlToDataTable(relatedEventsPeopleSparql, "#related-events-people");
  });
 
 
@@ -325,11 +349,17 @@ Works published in the proceedings related to the event.
 
 <h2>Related events</h2>
 
-Related events in terms of time and location.
+<h3>Related based on time and location</h3>
 
-<table class="table table-hover" id="related-events"></table>
+<table class="table table-hover" id="related-events-time-location"></table>
 
 
+<h3>Related based on people</h3>
+
+Related event based on overlap among participants, organizers, editors,
+authors and program committee members. 
+
+<table class="table table-hover" id="related-events-people"></table>
 
 
 {% endblock %}
