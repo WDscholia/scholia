@@ -23,7 +23,7 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
 
@@ -39,7 +39,7 @@ SELECT DISTINCT ?author1 ?author1Label ?author2 ?author2Label ?work ?workLabel W
   ?author2 ?v2 ?organization2 . 
   ?work wdt:P50 ?author1, ?author2 .  
   FILTER (STR(?author1) < STR(?author2) && ?organization1 != ?organization2)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY ?author1Label
 LIMIT 500
@@ -79,7 +79,7 @@ WITH {
 WHERE {
   # Label the items returned
   INCLUDE %work_numbers
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?number_of_works)
 LIMIT 100

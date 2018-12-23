@@ -31,7 +31,7 @@ ORDER BY ASC(?IDpredLabel)
     OPTIONAL { ?mol wdt:P661 ?ChemSpider }
     OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
     FILTER (regex(str(?InChIKey), concat("^", substr($queryKey,1,14), "-")))
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
   }
 `
  propertiesSparql = `
@@ -102,7 +102,7 @@ WITH {
 WHERE {
   INCLUDE %result
   BIND(xsd:date(?datetime) AS ?date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?date)
 LIMIT 500

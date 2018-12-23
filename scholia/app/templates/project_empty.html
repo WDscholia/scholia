@@ -149,8 +149,7 @@ WITH {
 WHERE {
   INCLUDE %results
   OPTIONAL { ?project wdt:P1813 ?short_name }
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?cites_per_million)
 `

@@ -16,8 +16,7 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
 
@@ -41,8 +40,7 @@ WITH {
 } AS %results
 WHERE {
   INCLUDE %results
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
   }
 ORDER BY DESC(?count)
 `
@@ -71,8 +69,7 @@ WHERE {
     ?citing_work wdt:P577 ?datetimes .
     BIND(xsd:date(?datetimes) AS ?dates)
   }
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
   }
 GROUP BY ?count ?citing_work ?citing_workLabel
 ORDER BY DESC(?count) DESC(?date)

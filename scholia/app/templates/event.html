@@ -257,7 +257,7 @@ WITH {
 WHERE {
   INCLUDE %results
   FILTER (?event != wd:{{ q }})
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?score)
 `
@@ -279,7 +279,7 @@ WHERE {
     ORDER BY DESC(?score)
     LIMIT 200
   } 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?score)
 `

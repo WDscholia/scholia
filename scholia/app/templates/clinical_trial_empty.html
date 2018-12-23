@@ -18,7 +18,7 @@ SELECT ?start_date ?trial ?trialLabel WHERE {
     ORDER BY DESC(?start_datetime)
     LIMIT 500
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?start_datetime)
 `
@@ -42,7 +42,7 @@ WHERE {
     ORDER BY DESC(?count)
     LIMIT 500
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)
 `
@@ -68,7 +68,7 @@ SELECT
     LIMIT 500
   }
   BIND(IF(EXISTS { ?intervention wdt:P31 wd:Q11173 }, ?intervention, "") AS ?as_chemical) 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)
 `;

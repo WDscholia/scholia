@@ -27,7 +27,7 @@ WITH {
 WHERE {
   INCLUDE %result
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)
 `
@@ -61,7 +61,7 @@ WITH {
 WHERE {
   INCLUDE %result
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)
 LIMIT 1000
@@ -79,7 +79,7 @@ WHERE {
   FILTER NOT EXISTS { ?work wdt:P921 ?topic . }
 
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)
 `

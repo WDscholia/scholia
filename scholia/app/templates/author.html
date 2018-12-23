@@ -28,7 +28,7 @@ WHERE {
   }
   OPTIONAL { ?work wdt:P1104 ?pages_ }
   OPTIONAL { ?work wdt:P1433 ?venue }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 GROUP BY ?work ?workLabel ?venue ?venueLabel
 ORDER BY DESC(?date)    
@@ -52,7 +52,7 @@ WITH {
 WHERE {
   INCLUDE %result
   OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 } 
 GROUP BY ?count ?venue ?venueLabel ?topics
 ORDER BY DESC(?count)
@@ -71,7 +71,7 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count) 
 `
@@ -89,7 +89,7 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,jp". }        
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }  
 ORDER BY DESC(?count)
 LIMIT 500
@@ -129,7 +129,7 @@ WITH {
 WHERE {
   INCLUDE %result
   
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 } 
 ORDER BY DESC(?count)
 `

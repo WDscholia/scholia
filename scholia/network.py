@@ -23,8 +23,7 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 """
 
