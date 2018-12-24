@@ -5,6 +5,7 @@ Usage:
   scholia.rss venue-latest-works <q>
   scholia.rss topic-latest-works <q>
   scholia.rss organization-latest-works <q>
+  scholia.rss sponsor-latest-works <q>
 
 Description:
   Functions related to feed.
@@ -21,6 +22,9 @@ Examples
   ...
 
   $ python -m scholia.rss organization-latest-works Q1137652
+  ...
+
+  $ python -m scholia.rss sponsor-latest-works Q1377836
 
 References
 ----------
@@ -168,6 +172,31 @@ WITH {{
 ORDER BY DESC(?date)
 """
 
+ORGANIZATION_SPARQL_QUERY = """
+SELECT ?work ?workLabel ?date (?author AS ?description)
+WITH {{
+  SELECT
+    (MIN(?dates) AS ?date)
+    ?work
+    (GROUP_CONCAT(DISTINCT ?author_label; separator=', ') AS ?author)
+  WHERE {{
+    ?work p:P859 ?sponsor_statement ;
+          wdt:P577 ?datetimes .
+    ?sponsor_statement ps:P859 wd:{q} .
+    BIND(xsd:date(?datetimes) AS ?dates)
+    OPTIONAL {{
+      ?work wdt:P50 / rdfs:label ?author_label .
+      FILTER(LANG(?author_label) = 'en')
+    }}
+  }}
+  GROUP BY ?work
+  LIMIT 10
+}} AS %result
+WHERE {{
+  INCLUDE %result
+  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }}
+}} ORDER BY DESC(?date)
+"""
 
 def _value(item, field):
     return item[field]['value'] if field in item else ''
@@ -419,6 +448,52 @@ def wb_get_organization_latest_works(q):
     return rss_body
 
 
+def wb_get_sponsor_latest_works(q):
+    """Return feed for latest work from a sponsor.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata identifer
+
+    Returns
+    -------
+    rss : str
+        RSS-formatted feed with latest work from a sponsor.
+
+    """
+    if not q:
+        return ''
+
+    rss_body = '<?xml version="1.0" encoding="UTF-8" ?>\n'
+    rss_body += '<rss version="2.0" ' + \
+                'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    rss_body += '  <channel>\n'
+    rss_body += '    <title>Scholia - Latest articles sponsored by ' + \
+                q + '</title>\n'
+    rss_body += "    <description>The sponsor's most " + \
+                "recent articles</description>\n"
+    rss_body += ('    <link>https://tools.wmflabs.org/'
+                 'scholia/sponsor/</link>\n')
+    rss_body += '    <atom:link ' + \
+                'href="https://tools.wmflabs.org/scholia/sponsor/' + \
+                q + '/latest-works/rss" rel="self" ' + \
+                'type="application/rss+xml" />\n'
+
+    query = ORGANIZATION_SPARQL_QUERY.format(q=q)
+    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    rss_body += entities_to_works_rss(data['results']['bindings'])
+
+    rss_body += '  </channel>\n'
+    rss_body += '</rss>'
+
+    return rss_body
+
+
 def main():
     """Handle command-line arguments."""
     from docopt import docopt
@@ -438,6 +513,9 @@ def main():
     elif arguments['organization-latest-works']:
         q = arguments['<q>']
         print(wb_get_organization_latest_works(q))
+    elif arguments['sponsor-latest-works']:
+        q = arguments['<q>']
+        print(wb_get_sponsor_latest_works(q))
     else:
         assert False
 
