@@ -132,6 +132,10 @@
     UNION
     { [] wdt:P1433 wd:{{ q }} . BIND("venue" AS ?aspect) } 
     UNION
+    { wd:{{ q }} wdt:P235 [] . BIND("chemical" AS ?aspect) }
+    UNION
+    { [] wdt:P279 | wdt:P31 wd:{{ q }} . BIND("chemical" AS ?aspect) }
+    UNION
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
     `;
