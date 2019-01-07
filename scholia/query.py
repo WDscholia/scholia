@@ -245,7 +245,8 @@ def pubmed_to_qs(pmid):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(pmid=pmid)
+    query = 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(
+        pmid=pmid)
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
