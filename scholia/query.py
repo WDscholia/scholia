@@ -593,6 +593,7 @@ def q_to_class(q):
             'Q571',  # book
             'Q191067',  # article
             'Q253623',  # patent
+            'Q580922',  # preprint
             'Q1980247',  # chapter
             'Q3331189',  # edition
             'Q5707594',  # news article
