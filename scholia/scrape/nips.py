@@ -334,7 +334,7 @@ def scrape_paper_from_url(url):
     # entry['title'] = tree.xpath("//h2[@class='subtitle']")[0].text
     title_element = tree.xpath("//h2[@class='subtitle']")[0]
     entry['title'] = "".join(text for text in title_element.itertext())
-    
+
     authors_element = tree.xpath("//ul[@class='authors']")[0]
     entry['authors'] = [element.text
                         for element in authors_element.xpath('li/a')]

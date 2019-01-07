@@ -12,11 +12,12 @@ Usage:
   scholia.query issn-to-q <issn>
   scholia.query mesh-to-q <meshid>
   scholia.query orcid-to-q <orcid>
+  scholia.query pubmed-to-q <pmid>
   scholia.query q-to-label <q>
-  scholia.query viaf-to-q <viaf>
   scholia.query q-to-class <q>
   scholia.query random-author
   scholia.query twitter-to-q <twitter>
+  scholia.query viaf-to-q <viaf>
   scholia.query website-to-q <url>
 
 Examples
@@ -210,6 +211,42 @@ def doi_to_qs(doi):
     """
     query = 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
         doi=escape_string(doi.upper()))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def pubmed_to_qs(pmid):
+    """Convert a PubMed identifier to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the PubMed identifier.
+
+    The PubMed identifier string is converted to uppercase before any
+    query is made.
+
+    Parameters
+    ----------
+    pmid : str
+        PubMed identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> pubmed_to_qs('29029422') == ['Q42371516']
+    True
+
+    """
+    query = 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(
+        pmid=pmid)
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
@@ -966,6 +1003,11 @@ def main():
 
     elif arguments['orcid-to-q']:
         qs = orcid_to_qs(arguments['<orcid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['pubmed-to-q']:
+        qs = pubmed_to_qs(arguments['<pmid>'])
         if len(qs) > 0:
             print(qs[0])
 
