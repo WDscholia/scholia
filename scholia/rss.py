@@ -194,9 +194,12 @@ WITH {{
 }} AS %result
 WHERE {{
   INCLUDE %result
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }}
+  SERVICE wikibase:label {{
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en".
+  }}
 }} ORDER BY DESC(?date)
 """
+
 
 def _value(item, field):
     return item[field]['value'] if field in item else ''
