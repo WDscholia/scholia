@@ -14,7 +14,7 @@ from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
                      q_to_class, random_author, twitter_to_qs,
-                     cordis_to_qs, mesh_to_qs)
+                     cordis_to_qs, mesh_to_qs, pubmed_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -744,6 +744,23 @@ def redirect_orcid(orcid):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_author', q=q), code=302)
+    return render_template('404.html')
+
+
+@main.route('/pubmed/<pmid>')
+def redirect_pubmed(pmid):
+    """Detect and redirect for PubMed identifiers.
+
+    Parameters
+    ----------
+    pmid : str
+        PubMed identifier.
+
+    """
+    qs = pubmed_to_qs(pmid)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_work', q=q), code=302)
     return render_template('404.html')
 
 
