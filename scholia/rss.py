@@ -190,6 +190,7 @@ WITH {{
     }}
   }}
   GROUP BY ?work
+  ORDER BY DESC(?date)
   LIMIT 10
 }} AS %result
 WHERE {{
