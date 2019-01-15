@@ -16,8 +16,18 @@ SELECT ?IDpred ?IDpredLabel ?id (SAMPLE(?idUrls) as ?idUrl) WITH {
     }
   } LIMIT 500
 } AS %RESULTS {
-  INCLUDE %RESULTS
-  BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
+  { SELECT * WHERE {
+      INCLUDE %RESULTS
+      FILTER (?IDpred = wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?id)))) AS ?idUrls).
+    }
+  } UNION {
+    SELECT * WHERE {
+      INCLUDE %RESULTS
+      FILTER (?IDpred != wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
+    }
+  }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 } GROUP BY ?IDpred ?IDpredLabel ?id
 ORDER BY ASC(?IDpredLabel)
