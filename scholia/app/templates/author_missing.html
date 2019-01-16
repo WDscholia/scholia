@@ -15,7 +15,7 @@ SELECT
 WHERE {
   {
     SELECT DISTINCT ?author_name {
-      wd:{{ q }} skos:altLabel ?author_name_ .
+      wd:{{ q }} skos:altLabel | rdfs:label ?author_name_ .
       
       # The SELECT-DISTINCT-BIND trick here is due to Stanislav Kralin
       # https://stackoverflow.com/questions/53933564
