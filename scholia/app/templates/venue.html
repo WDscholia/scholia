@@ -142,7 +142,7 @@ ORDER BY DESC(?count)
 
  mostCitedWorksSparql = `
 #defaultView:Table
-# Highly cited works published in venue
+# Most cited works published in venue
 SELECT
   ?count
   ?work ?workLabel
@@ -171,7 +171,7 @@ ORDER BY DESC(?count)
   `
 
  mostCitedAuthorsSparql = `
-# Highly cited authors published in venue
+# Most cited authors published in venue
 SELECT
   ?count
   ?author ?authorLabel
@@ -305,13 +305,13 @@ This will make a very big graph for, e.g., PLOS ONE.
 
 <h2 id="Citations">Citations</h2>
 
-<h3 id="Highly cited articles"
-    title="Highly cited articles published in the venue, where the citations may come from any venue">Highly cited articles</h3>
+<h3 id="Most cited articles"
+    title="Most cited articles published in the venue, where the citations may come from any venue">Most cited articles</h3>
 
 <table class="table table-hover" id="most-cited-works"></table>
 
-<h3 id="Highly cited authors"
-    title="Highly cited authors based on articles published in the venue and where citations may come from any venue">Highly cited authors</h3>
+<h3 id="Most cited authors"
+    title="Most cited authors based on articles published in the venue and where citations may come from any venue">Most cited authors</h3>
 
 <table class="table table-hover" id="most-cited-authors"></table>
 
