@@ -54,16 +54,16 @@ main = Blueprint('app', __name__)
 main.add_app_url_map_converter(RegexConverter, 'regex')
 
 # Wikidata item identifier matcher
-q_pattern = '<regex("Q[1-9]\d*"):q>'
-q1_pattern = '<regex("Q[1-9]\d*"):q1>'
-q2_pattern = '<regex("Q[1-9]\d*"):q2>'
+q_pattern = r'<regex(r"Q[1-9]\d*"):q>'
+q1_pattern = r'<regex(r"Q[1-9]\d*"):q1>'
+q2_pattern = r'<regex(r"Q[1-9]\d*"):q2>'
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 
-p_pattern = '<regex("P[1-9]\d*"):p>'
+p_pattern = r'<regex(r"P[1-9]\d*"):p>'
 P_PATTERN = re.compile(r'P[1-9]\d*')
 
 # Wikidata item identifiers matcher
-qs_pattern = '<regex("Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
+qs_pattern = r'<regex(r"Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
 
 
 @main.route("/")

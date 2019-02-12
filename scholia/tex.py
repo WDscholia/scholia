@@ -185,7 +185,7 @@ def extract_dois_from_aux_string(string):
     dois = []
     for submatches in matches:
         for doi in submatches.split(','):
-            if re.match('10\.\d{4}/.+', doi):
+            if re.match(r'10\.\d{4}/.+', doi):
                 dois.append(doi)
     return dois
 
@@ -227,7 +227,7 @@ def extract_qs_from_aux_string(string):
     qs = []
     for submatches in matches:
         for q in submatches.split(','):
-            if re.match('Q\d+', q):
+            if re.match(r'Q\d+', q):
                 qs.append(q)
 
     return qs
