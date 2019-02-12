@@ -85,7 +85,7 @@ def get_metadata(arxiv):
     arxiv_classifications = [
         match
         for subject in subjects
-        for match in re.findall('\((.*?)\)', subject)
+        for match in re.findall(r'\((.*?)\)', subject)
     ]
 
     metadata = {
@@ -93,7 +93,7 @@ def get_metadata(arxiv):
         'authornames': tree.xpath('//div[@class="authors"]/a/text()'),
         'full_text_url': 'https://arxiv.org/pdf/' + arxiv + '.pdf',
         'publication_date': isodatetime[:10],
-        'title': re.sub('\s+', ' ', tree.xpath('//h1/text()')[-1].strip()),
+        'title': re.sub(r'\s+', ' ', tree.xpath('//h1/text()')[-1].strip()),
         'arxiv_classifications': arxiv_classifications,
     }
 
