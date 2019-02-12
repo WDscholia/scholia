@@ -4,6 +4,29 @@
 from re import findall, search
 
 
+def escape_string(string):
+    r"""Escape string.
+
+    Parameters
+    ----------
+    string : str
+        String to be escaped
+
+    Returns
+    -------
+    escaped_string : str
+        Escaped string
+
+    Examples
+    --------
+    >>> string = 'String with " in it'
+    >>> escape_string(string)
+    'String with \\" in it'
+
+    """
+    return string.replace('\\', '\\\\').replace('"', '\\"')
+
+
 def sanitize_q(q):
     """Sanitize Wikidata identifier.
 
@@ -35,7 +58,7 @@ def sanitize_q(q):
         if q > 0:
             return 'Q' + str(q)
     else:
-        qs = findall('\d+', q)
+        qs = findall(r'\d+', q)
         if qs:
             return 'Q' + qs[0]
     return ''
@@ -59,9 +82,9 @@ def string_to_type(string):
     'issn'
 
     """
-    if search('\d{4}-\d{4}', string):
+    if search(r'\d{4}-\d{4}', string):
         return 'issn'
-    elif search('10\.\d{4}', string):
+    elif search(r'10\.\d{4}', string):
         return 'doi'
     else:
         return 'string'
