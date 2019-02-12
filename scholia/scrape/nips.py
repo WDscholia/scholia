@@ -41,6 +41,9 @@ from lxml import etree
 
 import requests
 
+from ..qs import paper_to_quickstatements
+from ..utils import escape_string
+
 
 PAPER_TO_Q_QUERY = u("""
 SELECT ?paper WHERE {{
@@ -91,29 +94,6 @@ YEAR_TO_Q = {
     "1988": "Q57746081",
     "1987": "Q47032920",
 }
-
-
-def escape_string(string):
-    r"""Escape string.
-
-    Parameters
-    ----------
-    string : str
-        String to be escaped
-
-    Returns
-    -------
-    escaped_string : str
-        Escaped string
-
-    Examples
-    --------
-    >>> string = 'String with " in it'
-    >>> escape_string(string)
-    'String with \\" in it'
-
-    """
-    return string.replace('\\', '\\\\').replace('"', '\\"')
 
 
 def paper_to_q(paper):
@@ -195,61 +175,6 @@ def paper_url_to_q(url):
     return q
 
 
-def paper_to_quickstatements(paper):
-    """Convert paper to Quickstatements.
-
-    Convert a NIPS paper represented as a dict in to Magnus Manske's
-    Quickstatement format for entry into Wikidata.
-
-    Parameters
-    ----------
-    paper : dict
-        Scraped paper represented as a dict.
-
-    Returns
-    -------
-    qs : str
-        Quickstatements as a string
-
-    References
-    ----------
-    https://tools.wmflabs.org/wikidata-todo/quick_statements.php
-
-    """
-    qs = u("CREATE\n")
-
-    title = escape_string(paper['title'])
-    qs += u('LAST\tLen\t"{}"\n').format(title)
-
-    # Instance of scientific article
-    qs += 'LAST\tP31\tQ13442814\n'
-
-    # Title
-    qs += u('LAST\tP1476\ten:"{}"\n').format(title)
-
-    # Authors
-    for n, author in enumerate(paper['authors'], start=1):
-        qs += u('LAST\tP2093\t"{}"\tP1545\t"{}"\n').format(author, n)
-
-    # Published in
-    qs += 'LAST\tP577\t+{}-01-01T00:00:00Z/9\n'.format(paper['year'])
-
-    # Language
-    qs += 'LAST\tP407\tQ1860\n'
-
-    # Homepage
-    qs += 'LAST\tP856\t"{}"\n'.format(paper['url'])
-
-    # Fulltext URL
-    qs += 'LAST\tP953\t"{}"\n'.format(paper['full_text_url'])
-
-    # Published in
-    if paper['published_in_q']:
-        qs += 'LAST\tP1433\t{}\n'.format(paper['published_in_q'])
-
-    return qs
-
-
 def paper_url_to_quickstatements(url):
     """Return Quickstatements for paper URL.
 
@@ -311,7 +236,7 @@ def scrape_paper_from_url(url):
     before NIPS 2009 has the publication year set to the year after the
     conference.
 
-    If the abstract is not listed on the papers.nips.cc HTML page then there
+    If the abstract is not listed on the papers.nips.cc HTML page then the
     `abstract` field is not available in the returned `paper` variable. Some
     of the earliest conferences does not list the abstract.
 
@@ -356,6 +281,9 @@ def scrape_paper_from_url(url):
     entry['year'] = str(year)
 
     entry['published_in_q'] = YEAR_TO_Q.get(nominal_year, None)
+
+    # All NIPS papers are in English
+    entry['language_q'] = "Q1860"
 
     return entry
 

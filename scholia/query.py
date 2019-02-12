@@ -51,6 +51,15 @@ USER_AGENT = 'Scholia'
 
 HEADERS = {'User-Agent': USER_AGENT}
 
+# Instead of of querying common ISO 639 codes, they are just listed here
+ISO639_TO_Q = {'en': 'Q1860'}
+
+
+class QueryResultError(Exception):
+    """Generic query error."""
+
+    pass
+
 
 def escape_string(string):
     r"""Escape string to be used in SPARQL query.
@@ -219,6 +228,56 @@ def doi_to_qs(doi):
 
     return [item['work']['value'][31:]
             for item in data['results']['bindings']]
+
+
+def iso639_to_q(language):
+    """Convert ISO639 to Q item.
+
+    Arguments
+    ---------
+    language : str
+        language represented as a ISO 639 format
+
+    Returns
+    -------
+    q : str or None
+        Language represented as a q identifier.
+
+    Examples
+    --------
+    >>> iso639_to_q('en') == 'Q1860'
+    True
+
+    >>> iso639_to_q('dan') == 'Q9035'
+    True
+
+    """
+    if language in ISO639_TO_Q:
+        return ISO639_TO_Q[language]
+
+    # Fallback on query
+    if len(language) == 2:
+        query = "SELECT * {{ ?language wdt:P218 '{}' }}".format(language)
+    elif len(language) == 3:
+        query = "SELECT * {{ ?language wdt:P219 '{}' }}".format(language)
+    else:
+        raise ValueError('ISO639 language code not recognized')
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+    qs = [item['language']['value'][31:]
+          for item in data['results']['bindings']]
+    if len(qs) == 1:
+        return qs[0]
+    elif len(qs) == 0:
+        return None
+    else:
+        # There shouldn't be multiple matching items, so it is not clear
+        # what we can do here.
+        raise QueryResultError("Multiple matching language found for "
+                               "ISO639 code")
 
 
 def pubmed_to_qs(pmid):

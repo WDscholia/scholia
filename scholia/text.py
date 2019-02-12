@@ -57,7 +57,7 @@ WHERE {
 """
 
 
-Q_PATTERN = re.compile('Q\d+', flags=re.UNICODE | re.DOTALL)
+Q_PATTERN = re.compile(r'Q\d+', flags=re.UNICODE | re.DOTALL)
 
 SCHOLIA_DATA_DIRECTORY = join(expanduser('~'), '.scholia')
 
