@@ -6,7 +6,7 @@ Source code an issue tracker
 
 Scholia development is hosted at https://github.com/fnielsen/scholia.
 
-Technolgy stack
+Technology stack
 ---------------
 
 Scholia is mainly based on
