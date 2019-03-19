@@ -720,7 +720,18 @@ def q_to_class(q):
             ]):
         class_ = 'chemical'
     elif set(classes).intersection([
-            'Q17339814',  # group of chemical substances
+            'Q15711994',  # family of isomeric compounds
+            'Q17339814',  # group or class of chemical substances
+            'Q47154513',  # structural class of chemical compounds
+            'Q55499636',  # pharmacological class of chemical compounds
+            'Q55640599',  # group of ions
+            'Q55662456',  # group of ortho, meta, para isomers
+            'Q55662548',  # pair of cis–trans isomers
+            'Q55662747',  # pair of enantiomers
+            'Q55663030',  # pair of enantiomeric ions
+            'Q56256086',  # group of chemical compounds
+            'Q56256173',  # class of chemical compounds with similar applications or functions
+            'Q59199015',  # group of stereoisomers
             ]):
         class_ = 'chemical_class'
     elif set(classes).intersection([
