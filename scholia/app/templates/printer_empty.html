@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<h1>Printer</h1>
+
+
+<div class="container">
+
+
+<h3>Printed works per printer</h3>
+
+<table class="table table-hover" id="printed-works-per-publisher"></table>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ printedWorksPerPublisherSparql = `
+SELECT
+  ?count
+  ?printer ?printerLabel ?printerDescription
+  ?example_work ?example_workLabel
+WHERE {
+  {
+    SELECT
+      (COUNT(?work) AS ?count)
+      ?printer
+      (SAMPLE(?work) AS ?example_work)
+    WHERE {
+      ?work wdt:P872 ?printer .
+    }
+    GROUP BY ?printer
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+LIMIT 1000
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(
+	 printedWorksPerPublisherSparql,
+	 "#printed-works-per-publisher",
+	 {
+	     linkPrefixes: {
+		 printer: './',
+		 example_work: '../work/',
+	     },
+	 });
+ });
+
+</script>
+
+{% endblock %}
+
+  

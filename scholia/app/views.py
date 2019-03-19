@@ -854,6 +854,37 @@ def show_organizations(qs):
     return render_template('organizations.html', qs=qs)
 
 
+@main.route('/printer/' + q_pattern)
+def show_printer(q):
+    """Return HTML rendering for specific printer.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('printer.html', q=q)
+
+
+@main.route('/printer/')
+def show_printer_empty():
+    """Return printer index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for printer view.
+
+    """
+    return render_template('printer_empty.html')
+
+
 @main.route('/protein/' + q_pattern)
 def show_protein(q):
     """Return HTML rendering for specific protein.
