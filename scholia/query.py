@@ -726,11 +726,12 @@ def q_to_class(q):
             'Q55499636',  # pharmacological class of chemical compounds
             'Q55640599',  # group of ions
             'Q55662456',  # group of ortho, meta, para isomers
-            'Q55662548',  # pair of cis–trans isomers
+            'Q55662548',  # pair of cis-trans isomers
             'Q55662747',  # pair of enantiomers
             'Q55663030',  # pair of enantiomeric ions
             'Q56256086',  # group of chemical compounds
-            'Q56256173',  # class of chemical compounds with similar applications or functions
+            'Q56256173',  # class of chemical compounds with similar
+                          # applications or functions
             'Q59199015',  # group of stereoisomers
             ]):
         class_ = 'chemical_class'
