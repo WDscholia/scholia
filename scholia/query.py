@@ -625,6 +625,7 @@ def q_to_class(q):
     ]):
         class_ = 'series'
     elif set(classes).intersection([
+            'Q737498',  # academic journal
             'Q5633421',  # scientific journal
             'Q1143604',  # proceedings
     ]):
