@@ -321,6 +321,24 @@ def show_award_empty():
     return render_template('award_empty.html')
 
 
+@main.route('/award/' + q_pattern + '/missing')
+def show_award_missing(q):
+    """Return HTML rendering for missing information about specific award.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('award_missing.html', q=q)
+
+
 @main.route('/cas/<cas>')
 def redirect_cas(cas):
     """Detect and redirect for CAS registry numbers.
