@@ -16,7 +16,7 @@ Scholia is mainly based on
 -  JavaScript with `jQuery <https://jquery.com/>`__ and
    `wikidata-sdk <https://github.com/maxlath/wikidata-sdk>`__
 -  SPARQL to query the `Wikidata Query
-   Service <http://query.wikidata,org/>`__
+   Service <http://query.wikidata.org/>`__
 
 Getting started
 ---------------
