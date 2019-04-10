@@ -18,12 +18,12 @@ SELECT
       ENCODE_FOR_URI(?author_name)) AS ?resolver_url)
 WITH {
   SELECT DISTINCT ?researcher_ WHERE {
-    ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:Q23048689 . 
+    ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
   } 
 } AS %researchers
 WITH {
   SELECT
-    (COUNT(?work) AS ?works)
+    (COUNT(DISTINCT ?work) AS ?works)
     ?author_name
     (SAMPLE(?researcher_) AS ?researcher)
   WHERE {
