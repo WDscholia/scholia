@@ -43,7 +43,13 @@ ORDER BY DESC(?works)
 `
 
  $(document).ready(function() {
-     sparqlToDataTable(missingAuthorResolvingSparql, "#missing-author-resolving");
+     sparqlToDataTable(
+	 missingAuthorResolvingSparql, "#missing-author-resolving",
+	 {
+	     linkPrefixes: {
+		 researcher: '../../author/',
+	     },
+	 });
  });
 
 
