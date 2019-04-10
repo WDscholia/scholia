@@ -853,6 +853,24 @@ def show_organization_rss(q):
     return response
 
 
+@main.route('/organization/' + q_pattern + '/missing')
+def show_organization_missing(q):
+    """Return HTML rendering for missing information about an organization.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier for an organization.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('organization_missing.html', q=q)
+
+
 @main.route('/organizations/' + qs_pattern)
 def show_organizations(qs):
     """Return HTML rendering for specific organizations.
