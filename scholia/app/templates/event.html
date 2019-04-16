@@ -269,10 +269,10 @@ SELECT
 WHERE {
   { 
     SELECT
-      (COUNT(*) AS ?score) ?event
+      (COUNT(DISTINCT ?person) AS ?score) ?event
       (SAMPLE(?person) AS ?example_person)
     WHERE {
-      ?person ^wdt:P823 | ^wdt:P664 | ^wdt:P1344 | wdt:P710 | (^wdt:P98 / wdt:P4745) | (^wdt:P50 / wdt:P1433 / wdt:P4745 ) | ^wdt:P5804 wd:{{ q }} , ?event . 
+      ?person ^wdt:P823 | ^wdt:P664 | wdt:P1344 | ^wdt:P710 | (^wdt:P98 / wdt:P4745) | (^wdt:P50 / wdt:P1433 / wdt:P4745 ) | ^wdt:P5804 wd:{{ q }} , ?event . 
       FILTER (?event != wd:{{ q }})
     }
     GROUP BY ?event
