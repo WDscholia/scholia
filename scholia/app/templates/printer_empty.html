@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<h1>Printer</h1>
+
+
+
+<h3>Printed works per printer</h3>
+
+<table class="table table-hover" id="printed-works-per-publisher"></table>
+
+
+<h2 id="Map of printers">Map of printers</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%7B%22layer%22%3A%20%22%3Fcounts%22%7D%0ASELECT%0A%20%20%3Fgeo%0A%20%20%3Fprinter%20%3FprinterLabel%20%3FprinterDescription%0A%20%20%3Fcounts%0A%20%20%3Fexample_work%20%3Fexample_workLabel%0AWHERE%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20%7B%0A%20%20%20%20SELECT%0A%20%20%20%20%20%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%0A%20%20%20%20%20%20%3Fprinter%0A%20%20%20%20%20%20%28SAMPLE%28%3Fwork%29%20AS%20%3Fexample_work%29%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP872%20%3Fprinter%20.%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Fprinter%0A%20%20%7D%0A%20%20BIND%28IF%28%3Fcount%20%3D%201%2C%20%221%22%2C%20IF%28%3Fcount%20%3C%3D%205%2C%20%222-5%22%2C%20IF%28%3Fcount%20%3C%3D%2010%2C%20%226-10%22%2C%20%2210%2B%22%29%29%29%20AS%20%3Fcounts%29%0A%20%20%3Fprinter%20wdt%3AP159%3F%20%2F%20wdt%3AP625%20%3Fgeo%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cfr%2Cit%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0ALIMIT%201000%0A"></iframe>
+</div>
+
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ printedWorksPerPublisherSparql = `
+SELECT
+  ?count
+  ?printer ?printerLabel ?printerDescription
+  ?example_work ?example_workLabel
+WHERE {
+  {
+    SELECT
+      (COUNT(?work) AS ?count)
+      ?printer
+      (SAMPLE(?work) AS ?example_work)
+    WHERE {
+      ?work wdt:P872 ?printer .
+    }
+    GROUP BY ?printer
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+LIMIT 1000
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(
+	 printedWorksPerPublisherSparql,
+	 "#printed-works-per-publisher",
+	 {
+	     linkPrefixes: {
+		 printer: './',
+		 example_work: '../work/',
+	     },
+	 });
+ });
+
+</script>
+
+{% endblock %}
+
+  

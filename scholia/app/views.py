@@ -8,13 +8,14 @@ from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
-                   wb_get_topic_latest_works, wb_get_organization_latest_works)
+                   wb_get_topic_latest_works, wb_get_organization_latest_works,
+                   wb_get_sponsor_latest_works)
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
                      q_to_class, random_author, twitter_to_qs,
-                     cordis_to_qs, mesh_to_qs)
+                     cordis_to_qs, mesh_to_qs, pubmed_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -53,16 +54,16 @@ main = Blueprint('app', __name__)
 main.add_app_url_map_converter(RegexConverter, 'regex')
 
 # Wikidata item identifier matcher
-q_pattern = '<regex("Q[1-9]\d*"):q>'
-q1_pattern = '<regex("Q[1-9]\d*"):q1>'
-q2_pattern = '<regex("Q[1-9]\d*"):q2>'
+q_pattern = r'<regex(r"Q[1-9]\d*"):q>'
+q1_pattern = r'<regex(r"Q[1-9]\d*"):q1>'
+q2_pattern = r'<regex(r"Q[1-9]\d*"):q2>'
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 
-p_pattern = '<regex("P[1-9]\d*"):p>'
+p_pattern = r'<regex(r"P[1-9]\d*"):p>'
 P_PATTERN = re.compile(r'P[1-9]\d*')
 
 # Wikidata item identifiers matcher
-qs_pattern = '<regex("Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
+qs_pattern = r'<regex(r"Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
 
 
 @main.route("/")
@@ -318,6 +319,24 @@ def show_award_empty():
 
     """
     return render_template('award_empty.html')
+
+
+@main.route('/award/' + q_pattern + '/missing')
+def show_award_missing(q):
+    """Return HTML rendering for missing information about specific award.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('award_missing.html', q=q)
 
 
 @main.route('/cas/<cas>')
@@ -747,6 +766,23 @@ def redirect_orcid(orcid):
     return render_template('404.html')
 
 
+@main.route('/pubmed/<pmid>')
+def redirect_pubmed(pmid):
+    """Detect and redirect for PubMed identifiers.
+
+    Parameters
+    ----------
+    pmid : str
+        PubMed identifier.
+
+    """
+    qs = pubmed_to_qs(pmid)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_work', q=q), code=302)
+    return render_template('404.html')
+
+
 @main.route('/viaf/<viaf>')
 def redirect_viaf(viaf):
     """Detect and redirect for VIAF identifiers.
@@ -817,6 +853,24 @@ def show_organization_rss(q):
     return response
 
 
+@main.route('/organization/' + q_pattern + '/missing')
+def show_organization_missing(q):
+    """Return HTML rendering for missing information about an organization.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier for an organization.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('organization_missing.html', q=q)
+
+
 @main.route('/organizations/' + qs_pattern)
 def show_organizations(qs):
     """Return HTML rendering for specific organizations.
@@ -834,6 +888,37 @@ def show_organizations(qs):
     """
     qs = Q_PATTERN.findall(qs)
     return render_template('organizations.html', qs=qs)
+
+
+@main.route('/printer/' + q_pattern)
+def show_printer(q):
+    """Return HTML rendering for specific printer.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('printer.html', q=q)
+
+
+@main.route('/printer/')
+def show_printer_empty():
+    """Return printer index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for printer view.
+
+    """
+    return render_template('printer_empty.html')
 
 
 @main.route('/protein/' + q_pattern)
@@ -1470,6 +1555,28 @@ def show_sponsor_empty():
 
     """
     return render_template('sponsor_empty.html')
+
+
+@main.route('/sponsor/' + q_pattern + '/latest-works/rss')
+def show_sponsor_rss(q):
+    """Return a RSS feed for specific sponsor.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    rss : str
+        RSS feed.
+
+    """
+    response_body = wb_get_sponsor_latest_works(q)
+    response = Response(response=response_body,
+                        status=200, mimetype="application/rss+xml")
+    response.headers["Content-Type"] = "text/xml; charset=utf-8"
+    return response
 
 
 @main.route('/use/' + q_pattern)

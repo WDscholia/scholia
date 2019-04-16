@@ -122,6 +122,8 @@
     UNION 
     { [] wdt:P123 wd:{{ q }} . BIND("publisher" AS ?aspect) }
     UNION 
+    { [] wdt:P872 wd:{{ q }} . BIND("printer" AS ?aspect) }
+    UNION 
     { [] wdt:P179 wd:{{ q }} . BIND("series" AS ?aspect) }
     UNION 
     { [] wdt:P859 wd:{{ q }} . BIND("sponsor" AS ?aspect) }
@@ -131,6 +133,10 @@
     { [] wdt:P4510 wd:{{ q }} . BIND("use" AS ?aspect) } 
     UNION
     { [] wdt:P1433 wd:{{ q }} . BIND("venue" AS ?aspect) } 
+    UNION
+    { wd:{{ q }} wdt:P235 [] . BIND("chemical" AS ?aspect) }
+    UNION
+    { [] wdt:P279 | wdt:P31 wd:{{ q }} . BIND("chemical" AS ?aspect) }
     UNION
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
@@ -213,6 +219,7 @@ type="button" data-toggle="dropdown">Work
 		    <li role="presentation"><a href="{{ url_for('app.show_series_empty') }}">Series</a></li>
                     <li role="presentation"><a href="{{ url_for('app.show_catalogue_empty') }}">Catalogue</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_printer_empty') }}">Printer</a></li>
 		</ul>
 	    </div>
 	</li>
@@ -224,6 +231,7 @@ type="button" data-toggle="dropdown">Organization
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_organization_empty') }}">Organization</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_printer_empty') }}">Printer</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a></li>
 		</ul>
 	    </div>

@@ -12,11 +12,12 @@ Usage:
   scholia.query issn-to-q <issn>
   scholia.query mesh-to-q <meshid>
   scholia.query orcid-to-q <orcid>
+  scholia.query pubmed-to-q <pmid>
   scholia.query q-to-label <q>
-  scholia.query viaf-to-q <viaf>
   scholia.query q-to-class <q>
   scholia.query random-author
   scholia.query twitter-to-q <twitter>
+  scholia.query viaf-to-q <viaf>
   scholia.query website-to-q <url>
 
 Examples
@@ -49,6 +50,15 @@ from six import u
 USER_AGENT = 'Scholia'
 
 HEADERS = {'User-Agent': USER_AGENT}
+
+# Instead of of querying common ISO 639 codes, they are just listed here
+ISO639_TO_Q = {'en': 'Q1860'}
+
+
+class QueryResultError(Exception):
+    """Generic query error."""
+
+    pass
 
 
 def escape_string(string):
@@ -210,6 +220,92 @@ def doi_to_qs(doi):
     """
     query = 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
         doi=escape_string(doi.upper()))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def iso639_to_q(language):
+    """Convert ISO639 to Q item.
+
+    Arguments
+    ---------
+    language : str
+        language represented as a ISO 639 format
+
+    Returns
+    -------
+    q : str or None
+        Language represented as a q identifier.
+
+    Examples
+    --------
+    >>> iso639_to_q('en') == 'Q1860'
+    True
+
+    >>> iso639_to_q('dan') == 'Q9035'
+    True
+
+    """
+    if language in ISO639_TO_Q:
+        return ISO639_TO_Q[language]
+
+    # Fallback on query
+    if len(language) == 2:
+        query = "SELECT * {{ ?language wdt:P218 '{}' }}".format(language)
+    elif len(language) == 3:
+        query = "SELECT * {{ ?language wdt:P219 '{}' }}".format(language)
+    else:
+        raise ValueError('ISO639 language code not recognized')
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+    qs = [item['language']['value'][31:]
+          for item in data['results']['bindings']]
+    if len(qs) == 1:
+        return qs[0]
+    elif len(qs) == 0:
+        return None
+    else:
+        # There shouldn't be multiple matching items, so it is not clear
+        # what we can do here.
+        raise QueryResultError("Multiple matching language found for "
+                               "ISO639 code")
+
+
+def pubmed_to_qs(pmid):
+    """Convert a PubMed identifier to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the PubMed identifier.
+
+    The PubMed identifier string is converted to uppercase before any
+    query is made.
+
+    Parameters
+    ----------
+    pmid : str
+        PubMed identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> pubmed_to_qs('29029422') == ['Q42371516']
+    True
+
+    """
+    query = 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(
+        pmid=pmid)
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
@@ -529,6 +625,7 @@ def q_to_class(q):
     ]):
         class_ = 'series'
     elif set(classes).intersection([
+            'Q737498',  # academic journal
             'Q5633421',  # scientific journal
             'Q1143604',  # proceedings
     ]):
@@ -556,6 +653,7 @@ def q_to_class(q):
             'Q571',  # book
             'Q191067',  # article
             'Q253623',  # patent
+            'Q580922',  # preprint
             'Q1980247',  # chapter
             'Q3331189',  # edition
             'Q5707594',  # news article
@@ -623,7 +721,19 @@ def q_to_class(q):
             ]):
         class_ = 'chemical'
     elif set(classes).intersection([
-            'Q17339814',  # group of chemical substances
+            'Q15711994',  # family of isomeric compounds
+            'Q17339814',  # group or class of chemical substances
+            'Q47154513',  # structural class of chemical compounds
+            'Q55499636',  # pharmacological class of chemical compounds
+            'Q55640599',  # group of ions
+            'Q55662456',  # group of ortho, meta, para isomers
+            'Q55662548',  # pair of cis-trans isomers
+            'Q55662747',  # pair of enantiomers
+            'Q55663030',  # pair of enantiomeric ions
+            'Q56256086',  # group of chemical compounds
+            'Q56256173',  # class of chemical compounds with similar
+                          # applications or functions
+            'Q59199015',  # group of stereoisomers
             ]):
         class_ = 'chemical_class'
     elif set(classes).intersection([
@@ -965,6 +1075,11 @@ def main():
 
     elif arguments['orcid-to-q']:
         qs = orcid_to_qs(arguments['<orcid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['pubmed-to-q']:
+        qs = pubmed_to_qs(arguments['<pmid>'])
         if len(qs) > 0:
             print(qs[0])
 
