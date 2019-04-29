@@ -113,8 +113,16 @@ ORDER BY DESC(?count)
  $(document).ready(function() {
      sparqlToDataTable(missingAuthorResolvingSparql, "#missing-author-resolving");
      sparqlToDataTable(missingCoauthorItemsSparql, "#missing-coauthor-items");
-     sparqlToDataTable(missingCitingAuthorItemsSparql, "#missing-citing-author-items");
-     sparqlToDataTable(missingTopicSparql, "#missing-topic");
+     sparqlToDataTable(missingCitingAuthorItemsSparql, "#missing-citing-author-items", {
+     linkPrefixes:{
+         "example_citing_work": "../../work/",
+     }
+     });
+     sparqlToDataTable(missingTopicSparql, "#missing-topic", {
+     linkPrefixes:{
+         "work": "../../work/",
+     }
+     });
  });
 
 
