@@ -964,7 +964,9 @@ def lipidmaps_to_qs(lmid):
 
     Examples
     --------
-    >>> lipidmaps_to_qs('50-00-0') == ['Q161210']
+    >>> lipidmaps_to_qs('LMFA') == ['Q63433687']
+    True
+    >>> lipidmaps_to_qs('LMFA00000007') == ['Q27114894']
     True
 
     """
