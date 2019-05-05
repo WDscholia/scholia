@@ -31,7 +31,7 @@ def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
         Flask app object.
 
     """
-    app = Flask(__name__)
+    app = Flask(__name__, instance_relative_config=True)
 
     Bootstrap(app)
 
@@ -47,5 +47,7 @@ def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
         app.text_to_topic_q_text = load_text_to_topic_q_text()
 
     app.third_parties_enabled = third_parties_enabled
+
+    app.config.from_pyfile('flask.cfg', silent=True)
 
     return app

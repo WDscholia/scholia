@@ -1,0 +1,8 @@
+# Python generated files
+**/*.pyc
+**/__pycache__
+
+# directories
+build
+dist
+scholia.egg-info

@@ -20,5 +20,5 @@ COPY . .
 RUN python setup.py bdist_wheel
 
 # run production server
-ENTRYPOINT [ "waitress-serve", "--call", "scholia.app:create_app" ]
 EXPOSE 8080
+ENTRYPOINT [ "waitress-serve", "--call", "scholia.app:create_app" ]
