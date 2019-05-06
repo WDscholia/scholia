@@ -10,6 +10,7 @@ Usage:
   scholia.query github-to-q <github>
   scholia.query inchikey-to-q <inchikey>
   scholia.query issn-to-q <issn>
+  scholia.query lipidmaps-to-q <lmid>
   scholia.query mesh-to-q <meshid>
   scholia.query orcid-to-q <orcid>
   scholia.query pubmed-to-q <pmid>
@@ -948,6 +949,40 @@ def cas_to_qs(cas):
             for item in data['results']['bindings']]
 
 
+def lipidmaps_to_qs(lmid):
+    """Convert a LIPID MAPS identifier to Wikidata ID.
+
+    Parameters
+    ----------
+    lmid : str
+        LIPID MAPS identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> lipidmaps_to_qs('LMFA') == ['Q63433687']
+    True
+    >>> lipidmaps_to_qs('LMFA00000007') == ['Q27114894']
+    True
+
+    """
+    # This query only matches on exact match
+    query = """select ?item
+               where {{ ?item wdt:P2063 "{lmid}" }}""".format(
+        lmid=lmid)
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['item']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def website_to_qs(url):
     """Convert URL for website to Wikidata ID.
 
@@ -1065,6 +1100,11 @@ def main():
 
     elif arguments['issn-to-q']:
         qs = issn_to_qs(arguments['<issn>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['lipidmaps-to-q']:
+        qs = lipidmaps_to_qs(arguments['<lmid>'])
         if len(qs) > 0:
             print(qs[0])
 
