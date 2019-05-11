@@ -64,6 +64,13 @@ ORDER BY DESC(?coauthor_count)
 
 <table class="table table-hover" id="list-of-common-authored-works"></table>
 
+<h2>Number of works per publication year</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%20%3Fyear%20%3Fnumber_of_works%20%3Fauthor_label%20WHERE%20%7B%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fyear%20%3Fnumber_of_works%20%3Fauthor%20%3Fauthor_label_%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20SELECT%20%3Fauthor%20%3Fyear%20%28COUNT%28%3Fwork%29%20AS%20%3Fnumber_of_works%29%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20%20%20%20%20%20%20%20%20VALUES%20%3Fauthor%20%7B%20%20%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%0A%20%20%20%20%20%20%20%20%20%20BIND%28STR%28YEAR%28%3Fpublication_date%29%29%20AS%20%3Fyear%29%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20GROUP%20BY%20%3Fauthor%20%3Fyear%20%0A%20%20%20%20%20%20%7D%20%0A%20%20%20%20%20%20%3Fauthor%20rdfs%3Alabel%20%3Fauthor_label_%20.%0A%20%20%20%20%20%20FILTER%20%28LANG%28%3Fauthor_label_%29%20%3D%20%27en%27%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20%23%20Represent%20the%20author%20by%20name%20and%20Q%20identifier%0A%20%20BIND%20%28CONCAT%28%3Fauthor_label_%2C%20%22%20%28%22%2C%20SUBSTR%28STR%28%3Fauthor%29%2C%2032%29%2C%20%22%29%22%29%20AS%20%3Fauthor_label%29%0A%7D%0AORDER%20BY%20%3Fyear"></iframe>
+</div>
+
+
 
 <h2>Number of citations per publication year</h2>
 
