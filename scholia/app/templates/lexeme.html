@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ worksSparql = `
+SELECT DISTINCT ?work ?workLabel ?workDescription {
+  wd:{{ l }} wdt:P1343 | ^wdt:P6254 ?work
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,cz,da,de,es,fi,fr,it,nl,nn,ru,sv,zh". }
+}
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(worksSparql, "#works", {
+	 linkPrefixes: {
+	     work: "../work/",
+	 }})
+     });
+
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Lexeme</h1>
+
+
+<h2>Works</h2>
+
+<table class="table table-hover" id="works"></table>
+
+
+{% endblock %}

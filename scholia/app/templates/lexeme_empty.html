@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ lexemesSparql = `
+SELECT 
+  ?count
+  ?lexeme (?lexeme_label AS ?lexemeLabel)
+  ?language ?languageLabel
+  ?example_work ?example_workLabel ?example_workDescription
+WHERE {
+  {
+    SELECT
+      (COUNT(DISTINCT ?work) AS ?count)
+      ?lexeme
+      (SAMPLE(?language_) AS ?language) 
+      (SAMPLE(?work) AS ?example_work)
+    WHERE {
+      { ?work wdt:P6254 ?lexeme . }
+      UNION
+      { ?lexeme wdt:P1343 ?work ; dct:language [] . }
+      ?lexeme dct:language ?language_ .
+    }
+    GROUP BY ?lexeme
+    ORDER BY DESC(?count)
+    LIMIT 500
+  }
+  ?lexeme wikibase:lemma ?lexeme_label
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],cz,da,de,en,es,fr,jp,nl,no,pl,ru,sv,zh" . }
+}
+ORDER BY DESC(?count)
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(lexemesSparql, "#lexemes", {
+	 linkPrefixes: {
+	     lexeme: "../lexeme/",
+	     example_work: "../work/",
+	 }
+     });
+ });
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1>Lexeme</h1>
+
+<table class="table table-hover" id="lexemes"></table>
+
+
+{% endblock %}

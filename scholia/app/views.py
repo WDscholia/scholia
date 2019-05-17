@@ -55,6 +55,9 @@ main = Blueprint('app', __name__)
 main.add_app_url_map_converter(RegexConverter, 'regex')
 
 # Wikidata item identifier matcher
+l_pattern = r'<regex(r"L[1-9]\d*"):l>'
+L_PATTERN = re.compile(r'L[1-9]\d*')
+
 q_pattern = r'<regex(r"Q[1-9]\d*"):q>'
 q1_pattern = r'<regex(r"Q[1-9]\d*"):q1>'
 q2_pattern = r'<regex(r"Q[1-9]\d*"):q2>'
@@ -78,6 +81,19 @@ def index():
 
     """
     return render_template('index.html')
+
+
+@main.route("/" + l_pattern)
+def redirect_l(l):
+    """Redirect to Scholia lexeme aspect.
+
+    Parameters
+    ----------
+    l : str
+        Wikidata lexeme identifier
+
+    """
+    return redirect(url_for('app.show_lexeme', l=l), code=302)
 
 
 @main.route("/" + q_pattern)
@@ -698,6 +714,37 @@ def redirect_issn(issn):
         q = qs[0]
         return redirect(url_for('app.show_venue', q=q), code=302)
     return render_template('404.html')
+
+
+@main.route('/lexeme/')
+def show_lexeme_empty():
+    """Return lexeme index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for lexeme view.
+
+    """
+    return render_template('lexeme_empty.html')
+
+
+@main.route('/lexeme/' + l_pattern)
+def show_lexeme(l):
+    """Return HTML rendering for specific lexeme.
+
+    Parameters
+    ----------
+    l : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific lexeme.
+
+    """
+    return render_template('lexeme.html', l=l)
 
 
 @main.route('/location/')
