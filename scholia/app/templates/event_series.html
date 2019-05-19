@@ -130,7 +130,7 @@ WITH {
   SELECT
     (xsd:date(MAX(?publication_datetime)) AS ?publication_date)
     ?work
-    (GROUP_CONCAT(?person_label; separator=" // ") AS ?authors)
+    (GROUP_CONCAT(DISTINCT ?person_label; separator=" // ") AS ?authors)
   WHERE {
     INCLUDE %people .
     ?work wdt:P50 ?person ; wdt:P577 ?publication_datetime .
