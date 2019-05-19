@@ -17,7 +17,7 @@ SELECT DISTINCT ?work ?workLabel ?workDescription {
 	 linkPrefixes: {
 	     work: "../work/",
 	 }})
-     });
+ });
 
 
 </script>
@@ -26,6 +26,21 @@ SELECT DISTINCT ?work ?workLabel ?workDescription {
 
 
 {% block page_content %}
+
+<p>
+    <a title="Lexeme index"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="../lexeme">←</a>
+    <a title="View and edit lexeme in Wikidata"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="https://www.wikidata.org/wiki/Lexeme:{{ l }}">Wikidata 🔗</a>
+    <a title="View lexeme in Ordia"
+       role="button"
+       class="btn btn-outline-dark btn-sm"
+       href="https://tools.wmflabs.org/ordia/{{ l }}">Ordia 🔗</a>
+</p>
 
 <h1 id="h1">Lexeme</h1>
 
