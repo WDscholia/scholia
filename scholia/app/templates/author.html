@@ -25,10 +25,8 @@ WHERE {
   }
   BIND(COALESCE(?author_label_, SUBSTR(STR(?author), 32)) AS ?author_label)
   OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
-  OPTIONAL {
-    ?work wdt:P577 ?datetimes .
-    BIND(xsd:date(?datetimes) AS ?dates)
-  }
+  ?work wdt:P577 ?datetimes .
+  BIND(xsd:date(?datetimes) AS ?dates)
   OPTIONAL { ?work wdt:P1104 ?pages_ }
   OPTIONAL { ?work wdt:P1433 ?venue }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }  
