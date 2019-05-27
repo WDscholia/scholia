@@ -17,6 +17,7 @@ Usage:
   scholia.query q-to-label <q>
   scholia.query q-to-class <q>
   scholia.query random-author
+  scholia.query ror-to-q <rorid>
   scholia.query twitter-to-q <twitter>
   scholia.query viaf-to-q <viaf>
   scholia.query website-to-q <url>
@@ -307,6 +308,39 @@ def pubmed_to_qs(pmid):
     """
     query = 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(
         pmid=pmid)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def ror_to_qs(rorid):
+    """Convert a ROR identifier to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the ROR identifier.
+
+    Parameters
+    ----------
+    rorid : str
+        ROR identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> ror_to_qs('038321296') == ['Q5566337']
+    True
+
+    """
+    query = 'select ?work where {{ ?work wdt:P6782 "{rorid}" }}'.format(
+        rorid=rorid)
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
@@ -1122,6 +1156,11 @@ def main():
 
     elif arguments['pubmed-to-q']:
         qs = pubmed_to_qs(arguments['<pmid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['ror-to-q']:
+        qs = ror_to_qs(arguments['<rorid>'])
         if len(qs) > 0:
             print(qs[0])
 
