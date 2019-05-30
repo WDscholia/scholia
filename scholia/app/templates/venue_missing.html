@@ -35,9 +35,40 @@ WHERE {
 ORDER BY DESC(?count)
 `
 
+ missingTopicsSparql = `
+SELECT
+  ?count
+  ?work ?workLabel
+  ?topics
+WITH {
+  # Count citations
+  SELECT
+    (COUNT(?citing_work) AS ?count)
+    ?work
+    (SAMPLE(?citing_work) AS ?example_citing_work)
+    (COUNT(DISTINCT ?topic) AS ?topics)
+  WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+    OPTIONAL { ?work wdt:P921 ?topic }
+    ?citing_work wdt:P2860 ?work.
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?count)
+  LIMIT 1000  
+} AS %result
+WHERE {
+  # Label results
+  INCLUDE %result
+  FILTER (?topics < 2)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count) DESC (?topics)
+`
 
   $(document).ready(function() {
       sparqlToDataTable(missingAuthorItemSparql, "#missing-author-item");
+      sparqlToDataTable(missingTopicsSparql, "#missing-topics");
   });
 </script>
 
@@ -56,6 +87,12 @@ If there are any author names listed below, it means that these name strings hav
 Follow the link to use the Author disambiguator tool to try to create links between the work items and the respective author items.
 
 <table class="table table-hover" id="missing-author-item"></table>
+
+<h2>Missing topics</h2>
+
+The following highly cited articles have little or no main subjects.
+
+<table class="table table-hover" id="missing-topics"></table>
 
 
 {% endblock %}
