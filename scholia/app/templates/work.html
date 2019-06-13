@@ -123,8 +123,7 @@ WITH {
     INCLUDE %statements
     ?item ?p ?statement .
     ?property wikibase:claim ?p . 
-    ?statement ?a ?value .
-    ?item ?b ?value . 
+    ?property wikibase:statementValueNormalized ?value . 
   }
 } AS %result
 WHERE {
