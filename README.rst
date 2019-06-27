@@ -7,7 +7,7 @@ Scholia is a python package and webapp for interaction with scholarly informatio
 Webapp
 ------
 
-As a webapp it currently runs from `Wikimedia Tool Labs`_, a facility provided by the `Wikimedia Foundation`_. It is accessible from
+As a webapp, it currently runs from `Wikimedia Tool Labs`_, a facility provided by the `Wikimedia Foundation`_. It is accessible from
 
     https://tools.wmflabs.org/scholia/
 
@@ -29,6 +29,10 @@ It is possible to use methods of the scholia package as a script:
 
 Contributing
 ------------
+
+A simple way to get up and running is to launch Scholia via Gitpod:
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/fnielsen/scholia)
 
 See file CONTRIBUTING.rst for technical details how to improve Scholia.
 
