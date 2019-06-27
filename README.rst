@@ -11,7 +11,7 @@ As a webapp, it currently runs from `Wikimedia Tool Labs`_, a facility provided 
 
     https://tools.wmflabs.org/scholia/
 
-The webapp displays the scholarly profile for individual researchers, for instance the scholarly profile for psychologist Uta Frith is accessible from
+The webapp displays scholarly profiles for individual researchers, research topics, organizations, journals, works, events, awards and so on. For instance, the scholarly profile for psychologist Uta Frith is accessible from
 
     https://tools.wmflabs.org/scholia/author/Q8219
     
@@ -30,15 +30,15 @@ It is possible to use methods of the scholia package as a script:
 Contributing
 ------------
 
-A simple way to get up and running is to launch Scholia via Gitpod:
+A simple way to get up and running is to `launch Scholia via Gitpod`_.
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/fnielsen/scholia)
-
-See file CONTRIBUTING.rst for technical details how to improve Scholia.
+See file `CONTRIBUTING.rst`_ for technical details how to improve Scholia.
 
 .. _Wikidata: https://www.wikidata.org
 .. _Wikimedia Foundation: https://wikimediafoundation.org
 .. _Wikimedia Tool Labs: https://tools.wmflabs.org/
+.. _launch Scholia via Gitpod: https://gitpod.io/#https://github.com/fnielsen/scholia
+.. _CONTRIBUTING.rst: https://github.com/fnielsen/scholia/blob/master/CONTRIBUTING.rst
 
 References
 ---------
