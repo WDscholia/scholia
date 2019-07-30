@@ -185,6 +185,36 @@ ORDER BY DESC(?number_of_citations)
 LIMIT 200
 `
 
+  citationsByYearSparql = `
+#defaultView:BarChart
+SELECT
+  ?year (COUNT(DISTINCT ?citing_work) AS ?count) ?kind
+WITH {
+  # Works in the topic
+  SELECT DISTINCT ?work WHERE {
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q2383032 .
+  }
+} AS %works
+WITH {
+  # Citing works also in the topic
+  SELECT DISTINCT ?citing_same_topic WHERE {
+    INCLUDE %works
+    ?citing_same_topic wdt:P2860 ?work ;
+                  wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q2383032 .
+  }
+} AS %citingworks
+WHERE {
+  INCLUDE %works
+  INCLUDE %citingworks
+  ?citing_work wdt:P2860 ?work .
+  BIND (IF(?citing_work = ?citing_same_topic, "Citations on same topic", "Citations about other topics") AS ?kind)
+  ?citing_work wdt:P577 ?date .
+  BIND(STR(YEAR(?date)) AS ?year)
+}
+GROUP BY ?year ?kind
+ORDER BY DESC(?year)
+`
+
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql,
@@ -195,6 +225,7 @@ LIMIT 200
      sparqlToDataTable(venuesSparql, "#venues");
      sparqlToDataTable(topCitedSparql, "#topCited");
      sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
+     sparqlToDataTable(citationsByYearSparql, "#citations-by-year");
  });
 </script>
 
@@ -291,6 +322,14 @@ page to resolve the author names.
 <h3 id="Authors cited from works on the topic">Authors cited from works on the topic</h3>
 
 <table class="table table-hover" id="most-cited-authors"></table>
+
+
+<h3 id="Citations by year">Citations by year</h3>
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%0A%20%20%3Fyear%20%28COUNT%28DISTINCT%20%3Fciting_work%29%20AS%20%3Fcount%29%20%3Fkind%0AWITH%20%7B%0A%20%20%23%20Works%20in%20the%20topic%0A%20%20SELECT%20DISTINCT%20%3Fwork%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%7C%20%28wdt%3AP31%2a%20%2F%20wdt%3AP279%2a%29%20%29%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20%23%20Citing%20works%20also%20in%20the%20topic%0A%20%20SELECT%20DISTINCT%20%3Fciting_same_topic%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fciting_same_topic%20wdt%3AP2860%20%3Fwork%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP921%20%2F%20%28wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%7C%20%28wdt%3AP31%2a%20%2F%20wdt%3AP279%2a%29%20%29%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%7D%20AS%20%25citingworks%0AWHERE%20%7B%0A%20%20INCLUDE%20%25works%0A%20%20INCLUDE%20%25citingworks%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20BIND%20%28IF%28%3Fciting_work%20%3D%20%3Fciting_same_topic%2C%20%22Citations%20on%20same%20topic%22%2C%20%22Citations%20about%20other%20topics%22%29%20AS%20%3Fkind%29%0A%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%0A%7D%0AGROUP%20BY%20%3Fyear%20%3Fkind%0AORDER%20BY%20DESC%28%3Fyear%29"></iframe>
+</div>
+
 
 {% endblock %}
     
