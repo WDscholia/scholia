@@ -152,7 +152,7 @@
 	     $( '#aspect-chooser' ).append(
 		 `<a role="button"
 		     class="btn btn-outline-dark btn-sm"
-                     href="../` + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
+                     href="{{ url_for('app.index') }}` + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
 	 });
      } );
 
