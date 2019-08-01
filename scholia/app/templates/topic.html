@@ -13,7 +13,7 @@ WITH {
   }
 } AS %works
 WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics) WHERE {
+  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
     INCLUDE %works
     ?work wdt:P921 ?topic . 
     OPTIONAL { ?work wdt:P577 ?dates . }
