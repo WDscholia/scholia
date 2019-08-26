@@ -4,14 +4,92 @@
 
 <h1>Biological pathways</h1>
 
-Biological pathways.
+<div class="container">
 
-<h2>Examples</h2>
+    <h2>Examples</h2>
 
-<ul>
-    <li><a href="Q30225516">Aryl Hydrocarbon Receptor Pathway</a></li>
-    <li><a href="Q30225468">TNF related weak inducer of apoptosis (TWEAK) Signaling Pathway</a></li>
-</ul>
+    <div class="card-deck mb-3">
+	<div class="card mb-4 box-shadow">
+
+            <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Single items</h4>
+            </div>
+            <div class="card-body">
+		<dl>
+		    <dt><a href="Q30225516">Aryl Hydrocarbon Receptor Pathway</a></dt>
+		    <dd>
+			A pathways from WikiPathways.
+		    </dd>
+
+		    <dt><a href="Q30225468">TNF related weak inducer of apoptosis (TWEAK) Signaling Pathway</a></dt>
+		    <dd>
+			A pathways from WikiPathways.
+		    </dd>
+		</dl>
+            </div>
+
+	</div>
+
+
+     <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+	    </div>
+	    <div class="card-body">
+		<p>If you know the identifier then Scholia can make a lookup based on the identifier:</p>
+
+		<dl>
+		    <dt><a href="../wikipathways/WP111">wikipathways/WP111</a></dt>
+		    <dd>Lookup WikiPathways identifier  WP111, <i>Electron Transport Chain (OXPHOS system in mitochondria)</i></dd>
+		</dl>
+	    </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+  <h2>Statistics</h2>
+
+  <table class="table table-hover" id="statistics"></table>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+ statisticsSparql = `
+SELECT ?count ?description
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2410 []. }
+} AS %wikipathways
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3937 []. }
+} AS %reactome
+WHERE {
+  {
+    INCLUDE %wikipathways
+    BIND("Total number of WikiPathways pathways" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %reactome
+    BIND("Total number of Reactome pathways" AS ?description)
+  }
+}
+ORDER BY DESC(?count)
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(statisticsSparql, "#statistics");
+ });
+
+</script>
+
 
 {% endblock %}
 
