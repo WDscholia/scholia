@@ -65,6 +65,12 @@
  statisticsSparql = `
 SELECT ?count ?description
 WITH {
+  SELECT (COUNT(DISTINCT ?article) AS ?count) WHERE {
+    VALUES ?database { wdt:P2410 wdt:P3937 }
+    [] ?database [] ; wdt:P2860 ?article .
+  }
+} AS %literature
+WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2410 []. }
 } AS %wikipathways
 WITH {
@@ -74,6 +80,11 @@ WHERE {
   {
     INCLUDE %wikipathways
     BIND("Total number of WikiPathways pathways" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %literature
+    BIND("Total number of articles cited by pathways" AS ?description)
   }
   UNION
   {
