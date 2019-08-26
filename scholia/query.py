@@ -21,6 +21,7 @@ Usage:
   scholia.query twitter-to-q <twitter>
   scholia.query viaf-to-q <viaf>
   scholia.query website-to-q <url>
+  scholia.query wikipathways-to-q <wpid>
 
 Examples
 --------
@@ -341,6 +342,39 @@ def ror_to_qs(rorid):
     """
     query = 'select ?work where {{ ?work wdt:P6782 "{rorid}" }}'.format(
         rorid=rorid)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def wikipathways_to_qs(wpid):
+    """Convert a WikiPathways identifier to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the WikiPathways identifier.
+
+    Parameters
+    ----------
+    wpid : str
+        WikiPathways identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> wikipathways_to_qs('WP111') == ['Q28031254']
+    True
+
+    """
+    query = 'select ?work where {{ VALUES ?wpid {{ "{wpid}" }} ?work wdt:P2410 ?wpid }}'.format(
+        wpid=wpid)
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
@@ -1161,6 +1195,11 @@ def main():
 
     elif arguments['ror-to-q']:
         qs = ror_to_qs(arguments['<rorid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['wikipathways-to-q']:
+        qs = wikipathways_to_qs(arguments['<wpid>'])
         if len(qs) > 0:
             print(qs[0])
 
