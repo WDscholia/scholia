@@ -747,6 +747,7 @@ def q_to_class(q):
             'Q12136',  # disease
             'Q389735',  # cardiovascular system disease
             'Q18965518',  # artery disease
+            'Q52260246', # scientific event
             ]):
         class_ = 'disease'
     elif set(classes).intersection([
