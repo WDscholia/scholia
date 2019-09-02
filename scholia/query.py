@@ -373,8 +373,9 @@ def wikipathways_to_qs(wpid):
     True
 
     """
-    query = 'select ?work where {{ VALUES ?wpid {{ "{wpid}" }} ?work wdt:P2410 ?wpid }}'.format(
-        wpid=wpid)
+    query = ('select ?work where {{ VALUES ?wpid {{ "{wpid}" }} '
+             '?work wdt:P2410 ?wpid }}').format(
+                 wpid=wpid)
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
