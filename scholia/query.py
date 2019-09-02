@@ -741,6 +741,7 @@ def q_to_class(q):
     elif set(classes).intersection([
             'Q1656682',  # event
             'Q27968055',  # recurrent event edition (event in a series)
+            'Q52260246',  # scientific event
             ]):
         class_ = 'event'
     elif set(classes).intersection([
