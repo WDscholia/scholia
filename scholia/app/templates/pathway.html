@@ -75,10 +75,33 @@ WHERE {
 ORDER BY DESC(?citations) DESC(?date)
 `
 
+const wikipathwaysSparql = `SELECT ?wpid ?organism
+WHERE {
+	wd:{{ q }} wdt:P2410 ?wpid .
+	wd:{{ q }} wdt:P703 ?organism .
+	SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}`
+const wikipathwaysSparqlURL = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=" + 
+	encodeURIComponent(wikipathwaysSparql) + '&format=json';
+
  $(document).ready(function() {
    sparqlToDataTable(participantsSparql, "#participants");
    sparqlToDataTable(recentArticlesSparql, "#recentArticles");
    sparqlToDataTable(citingArticlesSparql, "#citingArticles");
+   var pathwayViewerSection = document.getElementById("pathway-viewer")
+   pathwayViewerSection.style.display = "none"
+   $.getJSON(wikipathwaysSparqlURL, function(response) {
+	   const simpleData = sparqlDataToSimpleData(response);
+	   const wikipathwaysData = simpleData.data[0];
+	   if ("wpid" in wikipathwaysData) {
+		const wpid = wikipathwaysData.wpid;
+	   	const pathwayViewerIFrameResults = $.find("#pathway-viewer > iframe");
+		pathwayViewerIFrameResults.every(function(pathwayViewerIFrameResult) {
+			pathwayViewerIFrameResult.setAttribute("src", `https://tools.wmflabs.org/pathway-viewer/?id=${wpid}`);
+		});
+	  	pathwayViewerSection.style.display = "";
+	  }
+   });
  });
 </script>
 
@@ -90,6 +113,11 @@ ORDER BY DESC(?citations) DESC(?date)
 <h1 id="h1">Pathway</h1>
 
 <div id="intro"></div>
+
+<div id="pathway-viewer" class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
+</div>
+
 
 <h2 id="Participants">Participants</h2>
 
