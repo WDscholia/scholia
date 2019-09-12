@@ -4,6 +4,14 @@
 {{super()}}
 
 <script type="text/javascript">
+    
+    speciesSparql = `
+  SELECT $organism ?organismLabel 
+    WHERE {
+	wd:{{ q }} wdt:P703 ?organism .
+	SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+    }
+`
 
  participantsSparql = `
 SELECT ?part ?partLabel ?type
@@ -85,6 +93,7 @@ const wikipathwaysSparqlURL = "https://query.wikidata.org/bigdata/namespace/wdq/
 	encodeURIComponent(wikipathwaysSparql) + '&format=json';
 
  $(document).ready(function() {
+   sparqlToDataTable(speciesSparql, "#species");
    sparqlToDataTable(participantsSparql, "#participants");
    sparqlToDataTable(recentArticlesSparql, "#recentArticles");
    sparqlToDataTable(citingArticlesSparql, "#citingArticles");
@@ -118,6 +127,9 @@ const wikipathwaysSparqlURL = "https://query.wikidata.org/bigdata/namespace/wdq/
   <iframe class="embed-responsive-item" src="" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
 </div>
 
+<h2 id="Species"> Species </h2>
+
+<table class="table table-hover" id="species"></table>
 
 <h2 id="Participants">Participants</h2>
 
