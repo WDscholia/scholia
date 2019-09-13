@@ -5,7 +5,7 @@
 
 <script type="text/javascript">
     
- participantsSparql = `
+const participantsSparql = `
 SELECT ?part ?partLabel ?type
 WITH {
   SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
@@ -21,7 +21,7 @@ WHERE {
 } ORDER BY ASC(?partLabel)
 `
 
-  recentArticlesSparql = `
+const recentArticlesSparql = `
 SELECT ?date ?work ?workLabel ?type ?topics
 WITH {
   SELECT DISTINCT ?work WHERE {
@@ -52,7 +52,8 @@ WHERE {
 ORDER BY DESC(?date)
 LIMIT 500
 `
-  citingArticlesSparql = `
+
+const citingArticlesSparql = `
 #defaultView:Table
 SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
 WITH {
@@ -92,7 +93,7 @@ const wikipathwaysSparqlURL = "https://query.wikidata.org/bigdata/namespace/wdq/
    $.getJSON(wikipathwaysSparqlURL, function(response) {
 	   const simpleData = sparqlDataToSimpleData(response);
 	   const wikipathwaysData = simpleData.data[0];
-	   $("#Organism").after('<a href="'+wikipathwaysData["organism"]+'">'+wikipathwaysData["organismLabel"]+'</a>');
+	   $("#Organism").after('<a href="'+wikipathwaysData.organism+'">'+wikipathwaysData.organismLabel+'</a>');
 	   if ("wpid" in wikipathwaysData) {
 		const wpid = wikipathwaysData.wpid;
 	   	const pathwayViewerIFrameResults = $.find("#pathway-viewer > iframe");
