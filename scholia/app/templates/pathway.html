@@ -5,14 +5,6 @@
 
 <script type="text/javascript">
     
-    speciesSparql = `
-  SELECT $organism ?organismLabel 
-    WHERE {
-	wd:{{ q }} wdt:P703 ?organism .
-	SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
-    }
-`
-
  participantsSparql = `
 SELECT ?part ?partLabel ?type
 WITH {
@@ -60,7 +52,6 @@ WHERE {
 ORDER BY DESC(?date)
 LIMIT 500
 `
-
   citingArticlesSparql = `
 #defaultView:Table
 SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
@@ -83,7 +74,7 @@ WHERE {
 ORDER BY DESC(?citations) DESC(?date)
 `
 
-const wikipathwaysSparql = `SELECT ?wpid ?organism
+const wikipathwaysSparql = `SELECT ?wpid ?organism ?organismLabel
 WHERE {
 	wd:{{ q }} wdt:P2410 ?wpid .
 	wd:{{ q }} wdt:P703 ?organism .
@@ -93,7 +84,6 @@ const wikipathwaysSparqlURL = "https://query.wikidata.org/bigdata/namespace/wdq/
 	encodeURIComponent(wikipathwaysSparql) + '&format=json';
 
  $(document).ready(function() {
-   sparqlToDataTable(speciesSparql, "#species");
    sparqlToDataTable(participantsSparql, "#participants");
    sparqlToDataTable(recentArticlesSparql, "#recentArticles");
    sparqlToDataTable(citingArticlesSparql, "#citingArticles");
@@ -102,6 +92,7 @@ const wikipathwaysSparqlURL = "https://query.wikidata.org/bigdata/namespace/wdq/
    $.getJSON(wikipathwaysSparqlURL, function(response) {
 	   const simpleData = sparqlDataToSimpleData(response);
 	   const wikipathwaysData = simpleData.data[0];
+	   $("#Organism").after('<a href="'+wikipathwaysData["organism"]+'">'+wikipathwaysData["organismLabel"]+'</a>');
 	   if ("wpid" in wikipathwaysData) {
 		const wpid = wikipathwaysData.wpid;
 	   	const pathwayViewerIFrameResults = $.find("#pathway-viewer > iframe");
@@ -127,9 +118,7 @@ const wikipathwaysSparqlURL = "https://query.wikidata.org/bigdata/namespace/wdq/
   <iframe class="embed-responsive-item" src="" style="border-width: 1px; border-color: rgb(222,226,230); border-style: solid;" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
 </div>
 
-<h2 id="Species"> Species </h2>
-
-<table class="table table-hover" id="species"></table>
+<h2 id="Organism"> Organism </h2>
 
 <h2 id="Participants">Participants</h2>
 
