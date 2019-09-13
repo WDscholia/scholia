@@ -75,35 +75,47 @@ WHERE {
 ORDER BY DESC(?citations) DESC(?date)
 `
 
-const wikipathwaysSparql = `SELECT ?wpid ?organism ?organismLabel
+//Extensible query for muliple, optional values
+const optionalDataValuesSparql =`
+SELECT ?wpid ?organism ?organismLabel
 WHERE {
-	wd:{{ q }} wdt:P2410 ?wpid .
-	wd:{{ q }} wdt:P703 ?organism .
-	SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
-}`
-const wikipathwaysSparqlURL = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=" + 
-	encodeURIComponent(wikipathwaysSparql) + '&format=json';
+  OPTIONAL { wd:{{ q }} wdt:P2410 ?wpid . }
+  OPTIONAL { wd:{{ q }} wdt:P703 ?organism . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}
+`
 
- $(document).ready(function() {
-   sparqlToDataTable(participantsSparql, "#participants");
-   sparqlToDataTable(recentArticlesSparql, "#recentArticles");
-   sparqlToDataTable(citingArticlesSparql, "#citingArticles");
-   var pathwayViewerSection = document.getElementById("pathway-viewer")
-   pathwayViewerSection.style.display = "none"
-   $.getJSON(wikipathwaysSparqlURL, function(response) {
-	   const simpleData = sparqlDataToSimpleData(response);
-	   const wikipathwaysData = simpleData.data[0];
-	   $("#Organism").after('<a href="'+wikipathwaysData.organism+'">'+wikipathwaysData.organismLabel+'</a>');
-	   if ("wpid" in wikipathwaysData) {
-		const wpid = wikipathwaysData.wpid;
-	   	const pathwayViewerIFrameResults = $.find("#pathway-viewer > iframe");
-		pathwayViewerIFrameResults.every(function(pathwayViewerIFrameResult) {
-			pathwayViewerIFrameResult.setAttribute("src", `https://tools.wmflabs.org/pathway-viewer/?id=${wpid}`);
-		});
-	  	pathwayViewerSection.style.display = "";
-	  }
-   });
- });
+$(document).ready(function() {
+  sparqlToDataTable(participantsSparql, "#participants");
+  sparqlToDataTable(recentArticlesSparql, "#recentArticles");
+  sparqlToDataTable(citingArticlesSparql, "#citingArticles");
+
+  //Hide optional sections until data values are confirmed and ready
+  var organismSection = document.getElementById("Organism")                                                                                         
+  organismSection.style.display = "none"; 
+  var pathwayViewerSection = document.getElementById("pathway-viewer")                                                                                
+  pathwayViewerSection.style.display = "none"; 
+
+  //Check for optional data values and then use them if available
+  const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + 
+        encodeURIComponent(optionalDataValuesSparql) + '&format=json';
+  $.getJSON(sparqlURL, function(response) {
+    const simpleData = sparqlDataToSimpleData(response);
+    const dataValues = simpleData.data[0];
+    if ("organism" in dataValues) {
+      $("#Organism").after('<a href="'+dataValues.organism+'">'+dataValues.organismLabel+'</a>'); 
+      organismSection.style.display = "";
+    }
+    if ("wpid" in dataValues) {
+      const pathwayViewerIFrameResults = $.find("#pathway-viewer > iframe");
+      pathwayViewerIFrameResults.every(function(pathwayViewerIFrameResult) {
+        pathwayViewerIFrameResult.setAttribute("src", `https://tools.wmflabs.org/pathway-viewer/?id=${dataValues.wpid}`);
+      });
+      pathwayViewerSection.style.display = "";
+    }
+  });
+});
+
 </script>
 
 {% endblock %}
