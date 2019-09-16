@@ -4,8 +4,8 @@
 {{super()}}
 
 <script type="text/javascript">
-
- participantsSparql = `
+    
+const participantsSparql = `
 SELECT ?part ?partLabel ?type
 WITH {
   SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
@@ -21,7 +21,7 @@ WHERE {
 } ORDER BY ASC(?partLabel)
 `
 
-  recentArticlesSparql = `
+const recentArticlesSparql = `
 SELECT ?date ?work ?workLabel ?type ?topics
 WITH {
   SELECT DISTINCT ?work WHERE {
@@ -53,7 +53,7 @@ ORDER BY DESC(?date)
 LIMIT 500
 `
 
-  citingArticlesSparql = `
+const citingArticlesSparql = `
 #defaultView:Table
 SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
 WITH {
@@ -75,11 +75,47 @@ WHERE {
 ORDER BY DESC(?citations) DESC(?date)
 `
 
- $(document).ready(function() {
-   sparqlToDataTable(participantsSparql, "#participants");
-   sparqlToDataTable(recentArticlesSparql, "#recentArticles");
-   sparqlToDataTable(citingArticlesSparql, "#citingArticles");
- });
+//Extensible query for muliple, optional values
+const optionalDataValuesSparql =`
+SELECT ?wpid ?organism ?organismLabel
+WHERE {
+  OPTIONAL { wd:{{ q }} wdt:P2410 ?wpid . }
+  OPTIONAL { wd:{{ q }} wdt:P703 ?organism . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}
+`
+
+$(document).ready(function() {
+  sparqlToDataTable(participantsSparql, "#participants");
+  sparqlToDataTable(recentArticlesSparql, "#recentArticles");
+  sparqlToDataTable(citingArticlesSparql, "#citingArticles");
+
+  //Hide optional sections until data values are confirmed and ready
+  var organismSection = document.getElementById("Organism")                                                                                         
+  organismSection.style.display = "none"; 
+  var pathwayViewerSection = document.getElementById("pathway-viewer")                                                                                
+  pathwayViewerSection.style.display = "none"; 
+
+  //Check for optional data values and then use them if available
+  const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + 
+        encodeURIComponent(optionalDataValuesSparql) + '&format=json';
+  $.getJSON(sparqlURL, function(response) {
+    const simpleData = sparqlDataToSimpleData(response);
+    const dataValues = simpleData.data[0];
+    if ("organism" in dataValues) {
+      $("#Organism").after('<a href="'+dataValues.organism+'">'+dataValues.organismLabel+'</a>'); 
+      organismSection.style.display = "";
+    }
+    if ("wpid" in dataValues) {
+      const pathwayViewerIFrameResults = $.find("#pathway-viewer > iframe");
+      pathwayViewerIFrameResults.every(function(pathwayViewerIFrameResult) {
+        pathwayViewerIFrameResult.setAttribute("src", `https://tools.wmflabs.org/pathway-viewer/?id=${dataValues.wpid}`);
+      });
+      pathwayViewerSection.style.display = "";
+    }
+  });
+});
+
 </script>
 
 {% endblock %}
@@ -90,6 +126,12 @@ ORDER BY DESC(?citations) DESC(?date)
 <h1 id="h1">Pathway</h1>
 
 <div id="intro"></div>
+
+<div id="pathway-viewer" class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="" style="border-width: 1px; border-color: rgb(222,226,230); border-style: solid;" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
+</div>
+
+<h2 id="Organism"> Organism </h2>
 
 <h2 id="Participants">Participants</h2>
 
