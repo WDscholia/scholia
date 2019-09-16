@@ -12,7 +12,7 @@ Usage:
   scholia.query inchikey-to-q <inchikey>
   scholia.query issn-to-q <issn>
   scholia.query lipidmaps-to-q <lmid>
-  scholia.query atomicnumber-to-q <atomicnumber>
+  scholia.query atomic-number-to-q <atomicnumber>
   scholia.query mesh-to-q <meshid>
   scholia.query orcid-to-q <orcid>
   scholia.query pubmed-to-q <pmid>
@@ -798,7 +798,7 @@ def q_to_class(q):
     elif set(classes).intersection([
             'Q11344',  # chemical element
             ]):
-        class_ = 'chemical-element'
+        class_ = 'chemical_element'
     elif set(classes).intersection([
             'Q15711994',  # family of isomeric compounds
             'Q17339814',  # group or class of chemical substances
@@ -1061,13 +1061,13 @@ def lipidmaps_to_qs(lmid):
             for item in data['results']['bindings']]
 
 
-def atomicnumber_to_qs(atomicnumber):
+def atomic_number_to_qs(atomic_number):
     """Look up a chemical element by atomic number and return a Wikidata ID.
 
     Parameters
     ----------
-    atomicnumber : str
-        atomicnumber
+    atomic_number : str
+        Atomic number.
 
     Returns
     -------
@@ -1076,15 +1076,15 @@ def atomicnumber_to_qs(atomicnumber):
 
     Examples
     --------
-    >>> atomicnumber_to_qs('6') == ['Q623']
+    >>> atomic_number_to_qs('6') == ['Q623']
     True
 
     """
     # This query only matches on exact match
-    query = """select ?item
-               where {{ ?item wdt:P31 wd:Q11344 ; wdt:P1086 ?number . FILTER (STR(?number) = "{atomicnumber}") }}""".format(
-        atomicnumber=atomicnumber)
-    print(query)
+    query = """SELECT ?item
+               WHERE {{ ?item wdt:P31 wd:Q11344 ; wdt:P1086 ?number .
+                 FILTER (STR(?number) = "{atomic_number}") }}""".format(
+        atomic_number=atomic_number)
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
@@ -1094,13 +1094,13 @@ def atomicnumber_to_qs(atomicnumber):
             for item in data['results']['bindings']]
 
 
-def element_symbol_to_qs(symbol):
+def chemical_symbol_to_qs(symbol):
     """Look up a chemical element by symbol and return a Wikidata ID.
 
     Parameters
     ----------
     symbol : str
-        chemical_symbol
+        Chemical symbol.
 
     Returns
     -------
@@ -1114,8 +1114,8 @@ def element_symbol_to_qs(symbol):
 
     """
     # This query only matches on exact match
-    query = """select ?item
-               where {{ ?item wdt:P246 "{symbol}" }}""".format(
+    query = """SELECT ?item
+               WHERE {{ ?item wdt:P246 "{symbol}" }}""".format(
         symbol=symbol)
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
@@ -1203,8 +1203,8 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['atomicnumber-to-q']:
-        qs = atomicnumber_to_qs(arguments['<atomicnumber>'])
+    if arguments['atomic-number-to-q']:
+        qs = atomic_number_to_qs(arguments['<atomicnumber>'])
         if len(qs) > 0:
             print(qs[0])
 
