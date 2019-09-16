@@ -412,7 +412,7 @@ def redirect_chemical_symbol(symbol):
     return render_template('404.html')
 
 
-@main.route('/atomic-number/<atomicnumber>')
+@main.route('/atomic-number/<atomic_number>')
 def redirect_atomic_number(atomic_number):
     """Detect and redirect based on the atomic number of a chemical element.
 
