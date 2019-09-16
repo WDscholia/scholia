@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+
+isotopesSparql = `
+SELECT ?isotope ?isotopeLabel ?protons ?neutrons ?mass ?massUnit ?massUnitLabel ?halflife ?halflifeUnit?halflifeUnitLabel
+WHERE {
+  VALUES ?element { wd:{{ q }} }
+  ?element wdt:P1086 ?protons .
+  ?isotope wdt:P279 ?element ;
+           wdt:P1148 ?neutrons ;
+           p:P2067 ?massStat ;
+           p:P2114 ?halflifeStat .
+  ?massStat psv:P2067 ?massValNode .
+  ?massValNode wikibase:quantityAmount ?mass ;
+               wikibase:quantityUnit ?massUnit .
+  ?halflifeStat psv:P2114 ?halflifeValNode .
+  ?halflifeValNode wikibase:quantityAmount ?halflife ;
+                   wikibase:quantityUnit ?halflifeUnit .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY ?neutrons
+`
+
+allotropesSparql = `
+
+SELECT DISTINCT ?allotrope ?allotropeLabel ?density ?densityUnit ?densityUnitLabel WITH {
+  SELECT ?allotrope (SAMPLE(?densityStats) AS ?densityStat) WHERE {
+    ?allotrope wdt:P31|wdt:P279 ?allotropeType .
+    ?allotropeType p:P279 ?allotropeSpecsStatement .
+    ?allotropeSpecsStatement ps:P279 wd:Q21198401 ;
+                             pq:P642 wd:{{ q }} .
+    OPTIONAL {
+      ?allotrope p:P2054 ?densityStats .
+    }
+  } GROUP BY ?allotrope
+} AS %ALLOTROPES {
+  INCLUDE %ALLOTROPES
+  OPTIONAL {
+    ?allotrope p:P2054 ?densityStat .
+    ?densityStat psv:P2054 ?densityValNode .
+    ?densityValNode wikibase:quantityAmount ?density ;
+                    wikibase:quantityUnit ?densityUnit .
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY ASC(?allotropeLabel)
+`
+
+ recentArticlesSparql = `
+SELECT ?date ?work ?workLabel ?type ?topics
+WITH {
+  SELECT DISTINCT ?work WHERE {
+    {
+      ?work wdt:P921 / (wdt:P527+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+    } UNION {
+      wd:{{ q }} ?propp ?statement .
+      ?statement a wikibase:BestRank ;
+                 prov:wasDerivedFrom/pr:P248 ?work .
+    }
+  }
+} AS %works
+WITH {
+  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
+    INCLUDE %works
+    ?work wdt:P921 ?topic . 
+    OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
+    OPTIONAL { ?work wdt:P577 ?dates . }
+    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
+  }
+  GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  BIND(xsd:date(?datetime) AS ?date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?date)
+LIMIT 500
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(isotopesSparql, "#isotopes");
+     sparqlToDataTable(allotropesSparql, "#allotropes");
+     sparqlToDataTable(recentArticlesSparql, "#recentArticles");
+ });
+</script>
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Chemical</h1>
+
+<div id="intro"></div>
+
+<div id="wembedder"></div>
+
+<h2 id="Isotopes">Isotopes</h2>
+
+<table class="table table-hover" id="isotopes"></table>
+
+<h2 id="Isotopes">Allotropes</h2>
+
+<table class="table table-hover" id="allotropes"></table>
+
+<h2 id="Recently published works on the chemical">Recently published works on the chemical <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+
+<table class="table table-hover" id="recentArticles"></table>
+
+{% endblock %}
+    

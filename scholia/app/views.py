@@ -12,11 +12,13 @@ from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_sponsor_latest_works)
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
-from ..query import (arxiv_to_qs, cas_to_qs, doi_to_qs, github_to_qs,
+from ..query import (arxiv_to_qs, cas_to_qs, chemical_symbol_to_qs, doi_to_qs,
+                     github_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
                      q_to_class, random_author, twitter_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
-                     lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs)
+                     lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
+                     atomic_number_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -55,7 +57,7 @@ main = Blueprint('app', __name__)
 main.add_app_url_map_converter(RegexConverter, 'regex')
 
 # Wikidata item identifier matcher
-l_pattern = r'<regex(r"L[1-9]\d*"):l>'
+l_pattern = r'<regex(r"L[1-9]\d*"):lexeme>'
 L_PATTERN = re.compile(r'L[1-9]\d*')
 
 q_pattern = r'<regex(r"Q[1-9]\d*"):q>'
@@ -84,16 +86,16 @@ def index():
 
 
 @main.route("/" + l_pattern)
-def redirect_l(l):
+def redirect_l(lexeme):
     """Redirect to Scholia lexeme aspect.
 
     Parameters
     ----------
-    l : str
+    lexeme : str
         Wikidata lexeme identifier
 
     """
-    return redirect(url_for('app.show_lexeme', l=l), code=302)
+    return redirect(url_for('app.show_lexeme', lexeme=lexeme), code=302)
 
 
 @main.route("/" + q_pattern)
@@ -390,6 +392,40 @@ def redirect_lipidmaps(lmid):
             return redirect(url_for('app.show_chemical_class', q=q), code=302)
         else:
             return redirect(url_for('app.show_chemical', q=q), code=302)
+    return render_template('404.html')
+
+
+@main.route('/chemical-symbol/<symbol>')
+def redirect_chemical_symbol(symbol):
+    """Detect and redirect for chemical symbols.
+
+    Parameters
+    ----------
+    symbol : str
+        Chemical symbol.
+
+    """
+    qs = chemical_symbol_to_qs(symbol)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_chemical_element', q=q), code=302)
+    return render_template('404.html')
+
+
+@main.route('/atomic-number/<atomicnumber>')
+def redirect_atomic_number(atomic_number):
+    """Detect and redirect based on the atomic number of a chemical element.
+
+    Parameters
+    ----------
+    atomic_number : str
+        Atomic number.
+
+    """
+    qs = atomic_number_to_qs(atomic_number)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_chemical_element', q=q), code=302)
     return render_template('404.html')
 
 
@@ -730,12 +766,12 @@ def show_lexeme_empty():
 
 
 @main.route('/lexeme/' + l_pattern)
-def show_lexeme(l):
+def show_lexeme(lexeme):
     """Return HTML rendering for specific lexeme.
 
     Parameters
     ----------
-    l : str
+    lexeme : str
         Wikidata item identifier.
 
     Returns
@@ -744,7 +780,7 @@ def show_lexeme(l):
         Rendered HTML for a specific lexeme.
 
     """
-    return render_template('lexeme.html', l=l)
+    return render_template('lexeme.html', lexeme=lexeme)
 
 
 @main.route('/location/')
@@ -1384,6 +1420,37 @@ def show_chemical_empty():
 
     """
     return render_template('chemical_empty.html')
+
+
+@main.route('/chemical-element/' + q_pattern)
+def show_chemical_element(q):
+    """Return html render page for specific chemical element.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('chemical_element.html', q=q)
+
+
+@main.route('/chemical-element/')
+def show_chemical_element_empty():
+    """Return rendered HTML index page for chemical element.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for chemical element.
+
+    """
+    return render_template('chemical_element_empty.html')
 
 
 @main.route('/chemical-class/' + q_pattern)
