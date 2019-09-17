@@ -6,18 +6,25 @@
 <script type="text/javascript">
 
  infoSparql = `
-SELECT ?parent ?parentLabel (GROUP_CONCAT(DISTINCT ?rank_label_; separator=", ") AS ?rankList) WHERE {
+SELECT
+  (GROUP_CONCAT(DISTINCT ?rank_label_; separator=", ") AS ?rank)
+  ?parent ?parentLabel ?parentDescription
+{
   wd:{{ q }} wdt:P171+ ?parent .
   ?parent wdt:P105 ?rank .
   OPTIONAL {
     ?rank rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-} GROUP BY ?parent ?parentLabel
+}
+GROUP BY ?parent ?parentLabel ?parentDescription
 `
 
  genomeSparql = `
-SELECT ?gene ?geneLabel ?chromosome ?chromosomeLabel WITH {
+SELECT
+  ?gene ?geneLabel ?geneDescription
+  ?chromosome ?chromosomeLabel ?chromosomeDescription
+WITH {
   SELECT ?gene ?chromosome WHERE {
     ?gene wdt:P31 wd:Q7187 ;
           wdt:P703 wd:{{ q }} ;
@@ -30,7 +37,9 @@ SELECT ?gene ?geneLabel ?chromosome ?chromosomeLabel WITH {
 `
 
  metabolomeSparql = `
-SELECT ?metabolite ?metaboliteLabel WITH {
+SELECT
+  ?metabolite ?metaboliteLabel ?metaboliteDescription
+WITH {
   SELECT ?metabolite WHERE {
     ?metabolite wdt:P31|wdt:P279/wdt:P31 wd:Q11173 ;
           wdt:P703 wd:{{ q }} .
