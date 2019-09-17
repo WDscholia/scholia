@@ -757,8 +757,12 @@ def q_to_class(q):
             'Q3918',  # university
             'Q31855',  # research institute
             'Q38723',  # higher education institution
+            'Q414147', # academy of sciences
+            'Q484652', # international organization
+            'Q748019', # scientific society
             'Q875538',  # public university
             'Q902104',  # private university
+            'Q955824',  # learned society
             'Q1371037',  # technical university
             'Q2467461',  # university department
             'Q3354859',  # collegiate university
@@ -766,6 +770,7 @@ def q_to_class(q):
             'Q7315155',  # research center
             'Q15936437',  # research university
             'Q23002054',  # "private not-for-profit educational"
+            'Q29300714',  # international association
             ]):
         class_ = 'organization'
     elif set(classes).intersection([
