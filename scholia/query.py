@@ -1099,13 +1099,13 @@ def atomic_number_to_qs(atomic_number):
             for item in data['results']['bindings']]
 
 
-def chemical_symbol_to_qs(symbol):
-    """Look up a chemical element by symbol and return a Wikidata ID.
+def atomic_symbol_to_qs(symbol):
+    """Look up a chemical element by atomic symbol and return a Wikidata ID.
 
     Parameters
     ----------
     symbol : str
-        Chemical symbol.
+        Atomic symbol.
 
     Returns
     -------
@@ -1114,7 +1114,7 @@ def chemical_symbol_to_qs(symbol):
 
     Examples
     --------
-    >>> chemical_symbol_to_qs('C') == ['Q623']
+    >>> atomic_symbol_to_qs('C') == ['Q623']
     True
 
     """
