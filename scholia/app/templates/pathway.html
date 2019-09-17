@@ -6,7 +6,7 @@
 <script type="text/javascript">
     
 const participantsSparql = `
-SELECT ?part ?partLabel ?type
+SELECT ?part ?partLabel ?partDescription ?type
 WITH {
   SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
   WHERE {
