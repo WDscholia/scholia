@@ -77,11 +77,13 @@ ORDER BY DESC(?citations) DESC(?date)
 
 //Extensible query for muliple, optional values
 const optionalDataValuesSparql =`
-SELECT ?wpid ?organism ?organismLabel
+SELECT ?wpid ?organism ?organismLabel ?description
 WHERE {
   OPTIONAL { wd:{{ q }} wdt:P2410 ?wpid . }
   OPTIONAL { wd:{{ q }} wdt:P703 ?organism . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .
+    wd:{{ q }} schema:description ?description .
+  }
 }
 `
 
@@ -102,6 +104,10 @@ $(document).ready(function() {
   $.getJSON(sparqlURL, function(response) {
     const simpleData = sparqlDataToSimpleData(response);
     const dataValues = simpleData.data[0];
+    //console.log(dataValues);
+    if ("description" in dataValues) {
+      $("#description").text(dataValues.description);
+    }
     if ("organism" in dataValues) {
       $("#Organism").after('<a href="'+dataValues.organism+'">'+dataValues.organismLabel+'</a>'); 
       organismSection.style.display = "";
@@ -126,6 +132,8 @@ $(document).ready(function() {
 <h1 id="h1">Pathway</h1>
 
 <div id="intro"></div>
+
+<div id="description"></div>
 
 <div id="pathway-viewer" class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="" style="border-width: 1px; border-color: rgb(222,226,230); border-style: solid;" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
