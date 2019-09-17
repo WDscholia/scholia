@@ -3,21 +3,63 @@
 {% block scripts %}
 {{super()}}
 
-<script type="text/javascript">
- geneticallyAssociatedDiseaseSparql = `
-SELECT ?count ?disease ?diseaseLabel ?genes
-WITH {
-  SELECT ?disease (COUNT(?gene) AS ?count) (GROUP_CONCAT(?gene_label; separator=" // ") AS ?genes) WHERE {
-    BIND(wd:{{ q }} AS ?query_disease)
-    ?query_disease wdt:P2293 ?gene .
-    ?gene wdt:P2293 ?disease . 
-    FILTER (?query_disease != ?disease)
-    ?gene rdfs:label ?gene_label FILTER(lang(?gene_label) = "en")
-  }
-  GROUP BY ?disease
-} AS %result 
+  <script type="text/javascript">
+ clinicalTrialsSparql = `
+SELECT
+  ?start_date
+  ?trial ?trialLabel
+  ?intervention ?interventionLabel
+  ?sponsor ?sponsorLabel
 WHERE {
-  INCLUDE %result
+  ?trial wdt:P31 wd:Q30612 ;
+  wdt:P1050 / wdt:P279* wd:{{ q }} .
+  OPTIONAL {
+    ?trial wdt:P580 ?starttime
+    BIND(SUBSTR(STR(?starttime), 0, 11) AS ?start_date)
+  }
+  OPTIONAL { ?trial wdt:P4844 ?intervention }
+  OPTIONAL { ?trial wdt:P859 ?sponsor }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
+}
+ORDER BY DESC(?starttime)
+`
+
+ relatedDiseasesSparql = `
+
+SELECT
+  ?count
+  ?gene_count
+  ?symptom_count
+  ?disease ?diseaseLabel
+  ?genes
+  ?symptoms
+{
+  {
+    SELECT ?disease (COUNT(?gene) AS ?gene_count) (GROUP_CONCAT(?gene_label; separator=" // ") AS ?genes) WHERE {
+      wd:{{ q }} wdt:P2293 ?gene .
+      ?gene wdt:P2293 ?disease . 
+      FILTER (wd:{{ q }} != ?disease)
+      ?gene rdfs:label ?gene_label
+      FILTER(lang(?gene_label) = "en")
+    }
+    GROUP BY ?disease
+  }
+  UNION
+  {
+    SELECT
+      ?disease (COUNT(?symptom) AS ?symptom_count) (GROUP_CONCAT(?symptom_label; separator=" // ") AS ?symptoms)
+    {
+      wd:{{ q }} wdt:P780 ?symptom .
+      ?disease wdt:P780 ?symptom . 
+      FILTER (wd:{{ q }} != ?disease)
+      ?symptom rdfs:label ?symptom_label . FILTER(lang(?symptom_label) = "en")
+    }
+    GROUP BY ?disease
+  }
+
+  # Aggregate count
+  BIND((COALESCE(?symptom_count, 0) + COALESCE(?gene_count, 0)) AS ?count)
+
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 ORDER BY DESC(?count)
@@ -25,8 +67,10 @@ ORDER BY DESC(?count)
 
  
  $(document).ready(function() {
-     sparqlToDataTable(geneticallyAssociatedDiseaseSparql,
-		       "#genetically-associated-diseases");
+     sparqlToDataTable(clinicalTrialsSparql,
+		       "#clinical-trials");
+     sparqlToDataTable(relatedDiseasesSparql,
+		       "#related-diseases");
  });
 </script>
 
@@ -42,12 +86,18 @@ ORDER BY DESC(?count)
 <div id="wembedder"></div>
 
 
-<h2 id="Genetically associated diseases">Genetically associated diseases</h2>
+<h2 id="Clinical trials">Clinical trials</h2>
 
-Other diseases with reported genetic association via genes, 
-ordered according to number of co-associated genes.
+<table class="table table-hover" id="clinical-trials"></table>
 
-<table class="table table-hover" id="genetically-associated-diseases"></table>
+
+<h2 id="Related diseases">Possibly related diseases</h2>
+
+Other diseases with reported genetic association via genes or symptom overlap, 
+ordered according to number of co-associated genes and symptoms.
+
+
+<table class="table table-hover" id="related-diseases"></table>
 
 
 <h2 id="Publications per year">Publications per year</h2>
