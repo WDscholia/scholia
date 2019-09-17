@@ -12,7 +12,7 @@ from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_sponsor_latest_works)
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
-from ..query import (arxiv_to_qs, cas_to_qs, chemical_symbol_to_qs, doi_to_qs,
+from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      github_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
                      q_to_class, random_author, twitter_to_qs,
@@ -395,17 +395,17 @@ def redirect_lipidmaps(lmid):
     return render_template('404.html')
 
 
-@main.route('/chemical-symbol/<symbol>')
-def redirect_chemical_symbol(symbol):
-    """Detect and redirect for chemical symbols.
+@main.route('/atomic-symbol/<symbol>')
+def redirect_atomic_symbol(symbol):
+    """Detect and redirect for atomic symbols.
 
     Parameters
     ----------
     symbol : str
-        Chemical symbol.
+        Atomic symbol.
 
     """
-    qs = chemical_symbol_to_qs(symbol)
+    qs = atomic_symbol_to_qs(symbol)
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical_element', q=q), code=302)
