@@ -14,7 +14,7 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
     for (var i = 0 ; i < columns.length ; i++) {
 	column = columns[i];
 	if (column.substr(-11) == 'Description') {
-	    convertedColumns.push('description');
+	    convertedColumns.push(column.substr(0, column.length - 11) + ' description');
 	} else if (column.substr(-5) == 'Label') {
 	    // pass
 	} else if (column.substr(-3) == 'Url') {
@@ -27,7 +27,7 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 	var convertedRow = {};
 	for (var key in data[i]) {
 	    if (key.substr(-11) == 'Description') {
-		convertedRow['description'] = data[i][key];
+		convertedRow[key.substr(0, key.length - 11) + ' description'] = data[i][key];
 
 	    } else if (key + 'Label' in data[i]) {
 		convertedRow[key] = '<a href="' +
