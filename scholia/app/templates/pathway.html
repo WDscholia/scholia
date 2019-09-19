@@ -81,8 +81,8 @@ SELECT ?wpid ?organism ?organismLabel ?description
 WHERE {
   OPTIONAL { wd:{{ q }} wdt:P2410 ?wpid . }
   OPTIONAL { wd:{{ q }} wdt:P703 ?organism . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .
-    wd:{{ q }} schema:description ?description .
+  OPTIONAL { wd:{{ q }} schema:description ?description . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"
   }
 }
 `
