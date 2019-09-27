@@ -86,8 +86,33 @@ WHERE {
   }
 }
 `
+const  listOfAuthorsSparql = `
+# List of authors for a pathway
+SELECT
+  # Author order
+  ?order
+
+  # Author item and label
+  ?author ?authorAltLabel
+
+ # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
+  (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?authorAltLabel))) AS ?orcid)
+WHERE {
+  #wd:{{ q }} wdt:P2093 ?author .
+  wd:{{ q }} p:P2093 ?author_statement .
+  ?author_statement ps:P2093 ?author .
+  OPTIONAL {
+    ?author_statement pq:P1545 ?order_ .
+    BIND(xsd:integer(?order_) AS ?order)
+  }
+  OPTIONAL { ?author wdt:P496 ?orcid_ . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
+}
+ORDER BY ?order
+`
 
 $(document).ready(function() {
+  sparqlToDataTable(listOfAuthorsSparql, "#list-of-authors");
   sparqlToDataTable(participantsSparql, "#participants");
   sparqlToDataTable(recentArticlesSparql, "#recentArticles");
   sparqlToDataTable(citingArticlesSparql, "#citingArticles");
@@ -140,6 +165,10 @@ $(document).ready(function() {
 </div>
 
 <h2 id="Organism"> Organism </h2>
+
+<h2 id="Authors">Authors</h2>
+
+<table class="table table-hover" id="list-of-authors"></table>
 
 <h2 id="Participants">Participants</h2>
 
