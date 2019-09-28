@@ -1310,6 +1310,11 @@ def main():
         if len(qs) > 0:
             print(qs[0])
 
+    elif arguments['pubchem-to-q']:
+        qs = pubchem_to_qs(arguments['<cid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
     elif arguments['pubmed-to-q']:
         qs = pubmed_to_qs(arguments['<pmid>'])
         if len(qs) > 0:
