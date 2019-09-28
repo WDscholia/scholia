@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<script type="text/javascript">
+
+ relatedChemicalsSparql = `
+  SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WHERE {
+    ?mol wdt:P235 ?queryKey .
+    ?mol wdt:P235 ?InChIKey .
+    OPTIONAL { ?mol wdt:P231 ?CAS }
+    OPTIONAL { ?mol wdt:P661 ?ChemSpider }
+    OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
+    FILTER (regex(str(?InChIKey), concat("^", substr($queryKey,1,14), "-")))
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  }
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(relatedChemicalsSparql, "#related");
+ });
+
+</script>
+
+Not found.
+
+Maybe these related compounds are of interest:
+
+<table class="table table-hover" id="related"></table>
+
+{% endblock %}
