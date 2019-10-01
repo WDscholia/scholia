@@ -1,7 +1,7 @@
 Contributing to Scholia
 =======================
 
-Source code an issue tracker
+Source code and issue tracker
 ----------------------------
 
 Scholia development is hosted at https://github.com/fnielsen/scholia.
@@ -32,7 +32,7 @@ Getting started
 
    .. code:: shell
 
-       $ pip install -r requirements.txt   # either global
+       $ pip install -r requirements.txt   # either globally
        $ pip install -r requirements.txt   # or locally
 
    On Debian 8/9 you need to install the packages python3, python3-pip, and python3-flask and use pip3:
@@ -42,14 +42,14 @@ Getting started
        $ apt-get install python3 python3-pip python3-flask
        $ pip3 install -r requirements.txt
 
-3. Run Scholia functionality as script, e.g.:
+3. Run Scholia functionality as a script, e.g.:
 
    .. code:: shell
 
        $ python -m scholia.query twitter-to-q fnielsen
        Q20980928
 
-4. Run Scholia locally as web application
+4. Run Scholia locally as a web application
 
    .. code:: shell
 
