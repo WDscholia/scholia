@@ -100,8 +100,10 @@ STRING_TO_TEX_URL_PATTERN = re.compile(
     flags=re.UNICODE)
 
 COMBINING_DIACRITIC_TO_TEX_PATTERN = re.compile(
-    u'(.)({})'.format(u'|'.join(re.escape(key) for key in COMBINING_DIACRITIC_TO_TEX)),
+    u'(.)({})'.format(
+        u'|'.join(re.escape(key)for key in COMBINING_DIACRITIC_TO_TEX)),
     flags=re.UNICODE)
+
 
 def escape_to_tex(string, escape_type='normal'):
     r"""Escape a text to the a tex/latex safe.
@@ -109,7 +111,7 @@ def escape_to_tex(string, escape_type='normal'):
     Parameters
     ----------
     string : str or None
-        Unicode string to be excaped.
+        Unicode string to be escaped.
     escape_type : normal or url, default normal
         Type of escaping.
 
@@ -149,9 +151,9 @@ def escape_to_tex(string, escape_type='normal'):
         lambda match: '{{{} {}}}'.format(
             COMBINING_DIACRITIC_TO_TEX[match.group(2)],
             match.group(1)),
-        unicodedata.normalize('NFD', escaped_string))
-
+        unicodedata.normalize('NFD', u(escaped_string)))
     return escaped_string
+
 
 def guess_bibtex_entry_type(entity):
     """Guess Bibtex entry type.
