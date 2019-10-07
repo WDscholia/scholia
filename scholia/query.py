@@ -15,6 +15,7 @@ Usage:
   scholia.query atomic-number-to-q <atomicnumber>
   scholia.query mesh-to-q <meshid>
   scholia.query orcid-to-q <orcid>
+  scholia.query pubchem-to-q <cid>
   scholia.query pubmed-to-q <pmid>
   scholia.query q-to-label <q>
   scholia.query q-to-class <q>
@@ -283,6 +284,39 @@ def iso639_to_q(language):
         # what we can do here.
         raise QueryResultError("Multiple matching language found for "
                                "ISO639 code")
+
+
+def pubchem_to_qs(cid):
+    """Convert a PubChem compound identifier (CID) to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the PubChem identifier.
+
+    Parameters
+    ----------
+    pmid : str
+        PubChem compound identifier (CID)
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> pubchem_to_qs('14123361') == ['Q289372']
+    True
+
+    """
+    query = 'select ?chemical where {{ ?chemical wdt:P662 "{cid}" }}'.format(
+        cid=cid)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['chemical']['value'][31:]
+            for item in data['results']['bindings']]
 
 
 def pubmed_to_qs(pmid):
@@ -1273,6 +1307,11 @@ def main():
 
     elif arguments['orcid-to-q']:
         qs = orcid_to_qs(arguments['<orcid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['pubchem-to-q']:
+        qs = pubchem_to_qs(arguments['<cid>'])
         if len(qs) > 0:
             print(qs[0])
 
