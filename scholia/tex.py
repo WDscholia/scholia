@@ -32,6 +32,7 @@ from __future__ import print_function
 from os.path import splitext
 
 import re
+import unicodedata
 
 from six import u
 
@@ -72,12 +73,35 @@ STRING_TO_TEX_URL = {
     '_': r'\_',
 }
 
+COMBINING_DIACRITIC_TO_TEX = {
+    u'\u0300': r'\`',
+    u'\u0301': r"\'",
+    u'\u0302': r'\^',
+    u'\u0303': r'\~',
+    u'\u0304': r'\=',
+    u'\u0308': r'\"',
+    u'\u0327': r'\c',
+    u'\u0331': r'\b',
+    u'\u0306': r'\u',
+    u'\u030C': r'\v',
+    u'\u0307': r'\.',
+    u'\u0323': r'\d',
+    u'\u030A': r'\r',
+    u'\u030B': r'\H',
+    u'\u0328': r'\k'
+}
+
 STRING_TO_TEX_PATTERN = re.compile(
     u'|'.join(re.escape(key) for key in STRING_TO_TEX),
     flags=re.UNICODE)
 
 STRING_TO_TEX_URL_PATTERN = re.compile(
     u'|'.join(re.escape(key) for key in STRING_TO_TEX_URL),
+    flags=re.UNICODE)
+
+COMBINING_DIACRITIC_TO_TEX_PATTERN = re.compile(
+    u'(.)({})'.format(
+        u'|'.join(re.escape(key)for key in COMBINING_DIACRITIC_TO_TEX)),
     flags=re.UNICODE)
 
 
@@ -87,7 +111,7 @@ def escape_to_tex(string, escape_type='normal'):
     Parameters
     ----------
     string : str or None
-        Unicode string to be excaped.
+        Unicode string to be escaped.
     escape_type : normal or url, default normal
         Type of escaping.
 
@@ -122,6 +146,12 @@ def escape_to_tex(string, escape_type='normal'):
     else:
         raise ValueError('Wrong value for parameter "escape_type": {}'.format(
             escape_type))
+
+    escaped_string = COMBINING_DIACRITIC_TO_TEX_PATTERN.sub(
+        lambda match: '{{{} {}}}'.format(
+            COMBINING_DIACRITIC_TO_TEX[match.group(2)],
+            match.group(1)),
+        unicodedata.normalize('NFD', u(escaped_string)))
     return escaped_string
 
 
