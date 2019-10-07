@@ -3,7 +3,7 @@
 Usage:
   scholia.query arxiv-to-q <arxiv>
   scholia.query cas-to-q <cas>
-  scholia.query chemical-symbol-to-q <symbol>
+  scholia.query atomic-symbol-to-q <symbol>
   scholia.query cordis-to-q <cordis>
   scholia.query count-authorships
   scholia.query count-scientific-articles
@@ -791,9 +791,9 @@ def q_to_class(q):
             'Q3918',  # university
             'Q31855',  # research institute
             'Q38723',  # higher education institution
-            'Q414147', # academy of sciences
-            'Q484652', # international organization
-            'Q748019', # scientific society
+            'Q414147',  # academy of sciences
+            'Q484652',  # international organization
+            'Q748019',  # scientific society
             'Q875538',  # public university
             'Q902104',  # private university
             'Q955824',  # learned society
@@ -1257,8 +1257,8 @@ def main():
         if len(qs) > 0:
             print(qs[0])
 
-    elif arguments['chemical-symbol-to-q']:
-        qs = chemical_symbol_to_qs(arguments['<symbol>'])
+    elif arguments['atomic-symbol-to-q']:
+        qs = atomic_symbol_to_qs(arguments['<symbol>'])
         if len(qs) > 0:
             print(qs[0])
 
