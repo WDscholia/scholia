@@ -136,6 +136,8 @@
     UNION
     { wd:{{ q }} wdt:P235 [] . BIND("chemical" AS ?aspect) }
     UNION
+    { wd:{{ q }} wdt:P644 [] . BIND("gene" AS ?aspect) }
+    UNION
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
     `;
