@@ -95,10 +95,12 @@ ORDER BY ?order
 
 const authorListSparql = `
 # List of all authors for a pathway
-SELECT ?authors
+SELECT ?author ?url 
 WHERE {
   OPTIONAL { 
-    wd:{{ q }} wdt:P2093 ?authors ;                                                                                                                            
+    wd:{{ q }} p:P2093 ?author_statement .
+    ?author_statement ps:P2093 ?author .
+    ?author_statement pq:P2699 ?url .
   }                                                                                                                                                 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
   }                                                                                                                                                 
@@ -110,7 +112,7 @@ const pathwayontologyListSparql = `
 SELECT ?pathwayterms
 WHERE {
   OPTIONAL { 
-    wd:{{ q }} wdt:P7333 ?pathwayterms ; 
+    wd:{{ q }} wdt:P7333 ?pathwayterms . 
   }                                                                                                                                                 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
   }                                                                                                                                                 
@@ -122,7 +124,7 @@ const diseaseontologyListSparql = `
 SELECT ?diseaseterms
 WHERE {
   OPTIONAL { 
-    wd:{{ q }} wdt:P699 ?diseaseterms ; 
+    wd:{{ q }} wdt:P699 ?diseaseterms . 
   }                                                                                                                                                 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
   }                                                                                                                                                 
@@ -190,10 +192,10 @@ $(document).ready(function() {
   $.getJSON(authorURL, function(response) {                                                                                                         
     const authorData = sparqlDataToSimpleData(response);
 //    console.log(authorData);
-    if ("authors" in authorData.data[0]) {                                                                                                                  
+    if ("author" in authorData.data[0]) {                                                                                                                  
       var authorList = [];
       $.each(authorData.data, function (index, value) {
-        authorList.push(value.authors);
+        authorList.push('<a href="' + value.url + '">' + value.author + '</a>');
       });
       $("#Authors").after(authorList.join(", ") + "<br/><br/>");                                                                                                      
       authorsSection.style.display = "";                                                                                                            
