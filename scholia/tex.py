@@ -106,7 +106,7 @@ COMBINING_DIACRITIC_TO_TEX_PATTERN = re.compile(
 
 
 def escape_to_tex(string, escape_type='normal'):
-    r"""Escape a text to the a tex/latex safe.
+    r"""Escape a text to a tex/latex safe text.
 
     Parameters
     ----------
@@ -126,8 +126,9 @@ def escape_to_tex(string, escape_type='normal'):
     >>> escape_to_tex("^^") == r'\^{}\^{}'
     True
 
-    >>> escape_to_tex('10.1007/978-3-319-18111-0_26', 'url')
-    '10.1007/978-3-319-18111-0\\_26'
+    >>> escaped = escape_to_tex('10.1007/978-3-319-18111-0_26', 'url')
+    >>> escaped == '10.1007/978-3-319-18111-0\\_26'
+    True
 
     References
     ----------
