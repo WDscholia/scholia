@@ -109,10 +109,10 @@ WHERE {
 
 const pathwayontologyListSparql = `
 # List of all ontology terms for a pathway
-SELECT ?pathwayterms
+SELECT ?pathwayterms ?pathwaytermsLabel
 WHERE {
   OPTIONAL { 
-    wd:{{ q }} wdt:P7333 ?pathwayterms . 
+    wd:{{ q }} wdt:P921 ?pathwayterms . 
   }                                                                                                                                                 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
   }                                                                                                                                                 
@@ -121,10 +121,10 @@ WHERE {
 
 const diseaseontologyListSparql = `
 # List of all ontology terms for a pathway
-SELECT ?diseaseterms
+SELECT ?diseaseterms ?diseasetermsLabel
 WHERE {
   OPTIONAL { 
-    wd:{{ q }} wdt:P699 ?diseaseterms . 
+    wd:{{ q }} wdt:P1050 ?diseaseterms . 
   }                                                                                                                                                 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
   }                                                                                                                                                 
@@ -202,7 +202,25 @@ $(document).ready(function() {
     }  
   });
     
-  
+  const diseaseontologyURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' +
+        encodeURIComponent(diseaseontologyListSparql) + '&format=json';
+        
+     $.getJSON(diseaseontologyURL, function(response) {
+    
+     const diseaseontologyData = sparqlDataToSimpleData(response);
+        
+    if ("diseaseterms" in diseaseontologyData.data[0]) {                                                                                             
+      var diseasetermList = [];  
+      $.each(diseaseontologyData.data, function (index, value) {
+        diseasetermList.push('<a href="'+value.diseaseterms+'">'+value.diseasetermsLabel+'</a>');
+      });
+      $("#OntologyTerms").after("<h5>Disease ontology</h5>"+diseasetermList.join(", ") + "<br/><br/>");   
+     
+      ontologySection.style.display = "";
+         
+    } 
+});
+    
    const pathwayontologyURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' +             
         encodeURIComponent(pathwayontologyListSparql) + '&format=json';  
     
@@ -213,7 +231,7 @@ $(document).ready(function() {
      if ("pathwayterms" in pathwayontologyData.data[0]) {                                                                               
       var pathwaytermList = [];  
       $.each(pathwayontologyData.data, function (index, value) {
-        pathwaytermList.push('<a href="http://bioportal.bioontology.org/ontologies/PW?p=classes&conceptid='+value.pathwayterms+'">'+value.pathwayterms+'</a>');
+        pathwaytermList.push('<a href="'+value.pathwayterms+'">'+value.pathwaytermsLabel+'</a>');
           
       });
       $("#OntologyTerms").after("<h5>Pathway ontology</h5>"+pathwaytermList.join(", ") + "<br/><br/>");   
@@ -222,24 +240,7 @@ $(document).ready(function() {
     }  
     });    
     
-    const diseaseontologyURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' +
-        encodeURIComponent(diseaseontologyListSparql) + '&format=json';
-        
-     $.getJSON(diseaseontologyURL, function(response) {
     
-     const diseaseontologyData = sparqlDataToSimpleData(response);
-        
-    if ("diseaseterms" in diseaseontologyData.data[0]) {                                                                                             
-      var diseasetermList = [];  
-      $.each(diseaseontologyData.data, function (index, value) {
-        diseasetermList.push('<a href="http://www.disease-ontology.org/?id='+value.diseaseterms+'">'+value.diseaseterms+'</a>');
-      });
-      $("#OntologyTerms").after("<h5>Disease ontology</h5>"+diseasetermList.join(", ") + "<br/><br/>");   
-     
-      ontologySection.style.display = "";
-         
-    } 
-});
 });
 
 </script>
