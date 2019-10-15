@@ -138,9 +138,9 @@ ORDER BY DESC(?count)
  conferencesSparql = `
 #defaultView:Table
 SELECT
+  (year(?start) as ?year)  
   ?conference
   ?conferenceLabel
-  (year(?start) as ?year)
   # ?hashtag
   # (GROUP_CONCAT(DISTINCT ?shortName; separator=", ") AS ?shortNames)
   (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
