@@ -252,13 +252,17 @@ def extract_qs_from_aux_string(string):
     >>> extract_qs_from_aux_string(string)
     ['Q28042913', 'Q27615040']
 
+    >>> string = "\citation{Q28042913,Q27615040.Q27615040}
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913']
+
     """
     matches = re.findall(r'^\\citation{(.+?)}', string,
                          flags=re.MULTILINE | re.UNICODE)
     qs = []
     for submatches in matches:
         for q in submatches.split(','):
-            if re.match(r'Q\d+', q):
+            if re.match(r'^Q\d+$', q):
                 qs.append(q)
 
     return qs
