@@ -77,6 +77,8 @@ Adding new SPARQL queries to Scholia
 
 2. Get the new query e.g. Example from https://github.com/fnielsen/scholia/pull/848/files 
 
+.. code:: sparql
+
    SELECT DISTINCT ?author ?authorLabel ?award ?awardLabel WHERE {
        ?item wdt:P1433 wd:{{ q }} ;
            wdt:P50 ?author .
@@ -84,8 +86,9 @@ Adding new SPARQL queries to Scholia
    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
    }
 
-3. Add a name (within your own fork of the file https://github.com/fnielsen/scholia/tree/master/scholia[…])
-e.g. authorAwardsSparql
+3. Add a name (within your own fork of the file https://github.com/fnielsen/scholia/tree/master/scholia[…]) e.g. authorAwardsSparql
+
+.. code:: python
 
    authorAwardsSparql =
    SELECT DISTINCT ?author ?authorLabel ?award ?awardLabel WHERE {
@@ -97,9 +100,13 @@ e.g. authorAwardsSparql
 
 4. Add that name to the sparql-to-data table
 
+.. code:: python
+
    sparqlToDataTable(authorAwardsSparql, "#author-awards");
 
 5. Add some table formatting
+
+.. code:: html
 
    <h2 id="AuthorAwards">Author Awards</h2>
    <table class="table table-hover" id="author-awards"></table>
