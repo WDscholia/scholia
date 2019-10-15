@@ -173,7 +173,7 @@ WHERE {
     SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
 GROUP BY ?conference ?conferenceLabel ?start
-ORDER BY DESC(?start) 
+ORDER BY DESC(?year) 
 `;
  
  function resize() {
