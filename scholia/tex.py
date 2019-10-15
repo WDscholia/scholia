@@ -252,7 +252,7 @@ def extract_qs_from_aux_string(string):
     >>> extract_qs_from_aux_string(string)
     ['Q28042913', 'Q27615040']
 
-    >>> string = "\citation{Q28042913,Q27615040.Q27615040}
+    >>> string = "\citation{Q28042913,Q27615040.Q27615040}"
     >>> extract_qs_from_aux_string(string)
     ['Q28042913']
 
