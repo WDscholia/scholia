@@ -18,7 +18,7 @@ Scholia is mainly based on
 -  SPARQL to query the `Wikidata Query
    Service <http://query.wikidata.org/>`__
 
-Getting started
+Getting started - set up a local scholia server for testing purposes
 ---------------
 
 1. Clone Scholia repository from GitHub
@@ -67,3 +67,39 @@ Before committing please run the following code in the main directory:
 
 The style is checked with `flake8`. Also follow the commit message recommendations, 
 cf. `Writing good commit messages <https://github.com/erlang/otp/wiki/writing-good-commit-messages>`_.
+
+Examples
+-------
+
+Adding new SPARQL queries to Scholia
+
+1. Assign the task for yourself (if it is in an issue tracker)
+2. Get the new query e.g. 
+E.g. 
+SELECT DISTINCT ?author ?authorLabel ?award ?awardLabel WHERE {
+  ?item wdt:P1433 wd:{{ q }} ;
+        wdt:P50 ?author .
+  ?author wdt:P166 ?award .
+SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
+}
+Example from https://github.com/fnielsen/scholia/pull/848/files 
+
+3. Add a name (within your own fork of the file https://github.com/fnielsen/scholia/tree/master/scholia[…])
+e.g. authorAwardsSparql
+authorAwardsSparql =
+SELECT DISTINCT ?author ?authorLabel ?award ?awardLabel WHERE {
+  ?item wdt:P1433 wd:{{ q }} ;
+        wdt:P50 ?author .
+  ?author wdt:P166 ?award .
+SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
+}
+
+4. Add that name to the sparql-to-data table
+sparqlToDataTable(authorAwardsSparql, "#author-awards");
+
+5. Add some table formatting
+<h2 id="AuthorAwards">Author Awards</h2>
+<table class="table table-hover" id="author-awards"></table>
+
+6. Pull request to master file
+
