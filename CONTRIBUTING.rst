@@ -86,7 +86,7 @@ Adding new SPARQL queries to Scholia
    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
    }
 
-3. Add a name (within your own fork of the file https://github.com/fnielsen/scholia/tree/master/scholia[…]) e.g. authorAwardsSparql
+3. Add a name e.g. authorAwardsSparql to the query and the whole thing to your version/fork of the file https://github.com/fnielsen/scholia/tree/master/scholia[…]
 
 .. code:: python
 
