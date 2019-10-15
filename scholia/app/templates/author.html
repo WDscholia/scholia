@@ -32,7 +32,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }  
 }
 GROUP BY ?work ?workLabel ?venue ?venueLabel
-ORDER BY DESC(?date)    
+ORDER BY DESC(?year)    
  `
 
  venueStatisticsSparql = `
@@ -173,6 +173,7 @@ WHERE {
     SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
 GROUP BY ?conference ?conferenceLabel ?start
+ORDER BY DESC(?start) 
 `;
  
  function resize() {
