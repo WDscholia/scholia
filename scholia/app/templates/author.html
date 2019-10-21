@@ -138,7 +138,7 @@ ORDER BY DESC(?count)
  conferencesSparql = `
 #defaultView:Table
 SELECT
-  (year(?start) as ?year)  
+  (YEAR(?start) AS ?year)  
   ?conference
   ?conferenceLabel
   # ?hashtag
