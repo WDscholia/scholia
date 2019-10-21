@@ -135,12 +135,12 @@ WHERE {
 ORDER BY DESC(?count)
 `
 
- conferencesSparql = `
+ eventsSparql = `
 #defaultView:Table
 SELECT
   (YEAR(?start) AS ?year)  
-  ?conference
-  ?conferenceLabel
+  ?event
+  ?eventLabel
   # ?hashtag
   # (GROUP_CONCAT(DISTINCT ?shortName; separator=", ") AS ?shortNames)
   (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
@@ -148,31 +148,31 @@ SELECT
 WHERE {
     BIND(wd:{{ q }} as ?person)
     {  # speaker
-      ?conference wdt:P823 ?person .
+      ?event wdt:P823 ?person .
       BIND("speaker" AS ?role)
     } UNION {  # organizer
-      ?conference wdt:P664 ?person .
+      ?event wdt:P664 ?person .
       BIND("organizer" AS ?role)
     } UNION {  # participant
-      ?person wdt:P1344 | ^wdt:P710 ?conference  .
+      ?person wdt:P1344 | ^wdt:P710 ?event  .
       BIND("participant" AS ?role)
     } UNION {  # editor
-      ?person ^wdt:P98 / wdt:P4745 ?conference  .
+      ?person ^wdt:P98 / wdt:P4745 ?event  .
       BIND("editor of proceedings" AS ?role)
     } UNION {  # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?conference  .
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event  .
       BIND("author" AS ?role)
     } UNION {  # program committee member
-      ?conference wdt:P5804 ?person .
+      ?event wdt:P5804 ?person .
       BIND("program committee member" AS ?role)
     }
-    OPTIONAL { ?conference wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
-    OPTIONAL { ?conference wdt:P580 ?start }
-    # OPTIONAL { ?conference wdt:P2572 ?hashtag }
-    # OPTIONAL { ?conference wdt:P1813 ?shortName }
+    OPTIONAL { ?event wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
+    OPTIONAL { ?event wdt:P580 ?start }
+    # OPTIONAL { ?event wdt:P2572 ?hashtag }
+    # OPTIONAL { ?event wdt:P1813 ?shortName }
     SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
-GROUP BY ?conference ?conferenceLabel ?start
+GROUP BY ?event ?eventLabel ?start
 ORDER BY DESC(?year) 
 `;
  
@@ -200,7 +200,7 @@ ORDER BY DESC(?year)
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
      sparqlToDataTable(citingAuthorsSparql, "#citing-authors");
-     sparqlToDataTable(conferencesSparql, "#conferences");
+     sparqlToDataTable(eventsSparql, "#events");
 
      window.onresize = resize;
 
@@ -535,6 +535,6 @@ Are citing authors missing here? You can help curate them via the <a href="{{ ur
 
 Events the author has attended, organized, or in which they have participated in other ways.
 
-<table class="table table-hover table-striped" id="conferences"></table>
+<table class="table table-hover table-striped" id="events"></table>
 
 {% endblock %}
