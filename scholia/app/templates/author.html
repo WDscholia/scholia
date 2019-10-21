@@ -135,45 +135,41 @@ WHERE {
 ORDER BY DESC(?count)
 `
 
- conferencesSparql = `
-#defaultView:Table
+ eventsSparql = `
 SELECT
-  (year(?start) as ?year)  
-  ?conference
-  ?conferenceLabel
-  # ?hashtag
-  # (GROUP_CONCAT(DISTINCT ?shortName; separator=", ") AS ?shortNames)
+  (xsd:date(MIN(?start)) AS ?date)  
+  ?event
+  ?eventLabel
   (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
   (GROUP_CONCAT(DISTINCT ?location_label; separator=", ") AS ?locations)
 WHERE {
-    BIND(wd:{{ q }} as ?person)
+    BIND(wd:{{ q }} AS ?person)
     {  # speaker
-      ?conference wdt:P823 ?person .
+      ?event wdt:P823 ?person .
       BIND("speaker" AS ?role)
     } UNION {  # organizer
-      ?conference wdt:P664 ?person .
+      ?event wdt:P664 ?person .
       BIND("organizer" AS ?role)
     } UNION {  # participant
-      ?person wdt:P1344 | ^wdt:P710 ?conference  .
+      ?person wdt:P1344 | ^wdt:P710 ?event  .
       BIND("participant" AS ?role)
     } UNION {  # editor
-      ?person ^wdt:P98 / wdt:P4745 ?conference  .
+      ?person ^wdt:P98 / wdt:P4745 ?event  .
       BIND("editor of proceedings" AS ?role)
     } UNION {  # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?conference  .
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event  .
       BIND("author" AS ?role)
     } UNION {  # program committee member
-      ?conference wdt:P5804 ?person .
+      ?event wdt:P5804 ?person .
       BIND("program committee member" AS ?role)
     }
-    OPTIONAL { ?conference wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
-    OPTIONAL { ?conference wdt:P580 ?start }
-    # OPTIONAL { ?conference wdt:P2572 ?hashtag }
-    # OPTIONAL { ?conference wdt:P1813 ?shortName }
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }
+    OPTIONAL { ?event wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
+    OPTIONAL { ?event wdt:P580 | wdt:P585 ?start }
+ 
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
-GROUP BY ?conference ?conferenceLabel ?start
-ORDER BY DESC(?year) 
+GROUP BY ?event ?eventLabel
+ORDER BY DESC(?date) 
 `;
  
  function resize() {
@@ -200,7 +196,11 @@ ORDER BY DESC(?year)
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
      sparqlToDataTable(citingAuthorsSparql, "#citing-authors");
-     sparqlToDataTable(conferencesSparql, "#conferences");
+     sparqlToDataTable(eventsSparql, "#events",{
+	 linkPrefixes:{
+	     "event": "../event/",
+	 }
+     });
 
      window.onresize = resize;
 
@@ -531,10 +531,10 @@ Authors that cite the author (excluding self citations).
 Are citing authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_empty') }}{{ q }}/missing">missing</a> page.
 
 
-<h2>Conferences Attended</h2>
+<h2>Events</h2>
 
-Conferences the author has attended.
+Conferences, workshops and other events the author has attended or otherwise been associated with.
 
-<table class="table table-hover table-striped" id="conferences"></table>
+<table class="table table-hover table-striped" id="events"></table>
 
 {% endblock %}
