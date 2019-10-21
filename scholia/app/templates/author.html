@@ -32,7 +32,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }  
 }
 GROUP BY ?work ?workLabel ?venue ?venueLabel
-ORDER BY DESC(?date)    
+ORDER BY DESC(?date)  
  `
 
  venueStatisticsSparql = `
@@ -134,6 +134,47 @@ WHERE {
 } 
 ORDER BY DESC(?count)
 `
+
+ conferencesSparql = `
+#defaultView:Table
+SELECT
+  (year(?start) as ?year)  
+  ?conference
+  ?conferenceLabel
+  # ?hashtag
+  # (GROUP_CONCAT(DISTINCT ?shortName; separator=", ") AS ?shortNames)
+  (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
+  (GROUP_CONCAT(DISTINCT ?location_label; separator=", ") AS ?locations)
+WHERE {
+    BIND(wd:{{ q }} as ?person)
+    {  # speaker
+      ?conference wdt:P823 ?person .
+      BIND("speaker" AS ?role)
+    } UNION {  # organizer
+      ?conference wdt:P664 ?person .
+      BIND("organizer" AS ?role)
+    } UNION {  # participant
+      ?person wdt:P1344 | ^wdt:P710 ?conference  .
+      BIND("participant" AS ?role)
+    } UNION {  # editor
+      ?person ^wdt:P98 / wdt:P4745 ?conference  .
+      BIND("editor of proceedings" AS ?role)
+    } UNION {  # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?conference  .
+      BIND("author" AS ?role)
+    } UNION {  # program committee member
+      ?conference wdt:P5804 ?person .
+      BIND("program committee member" AS ?role)
+    }
+    OPTIONAL { ?conference wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
+    OPTIONAL { ?conference wdt:P580 ?start }
+    # OPTIONAL { ?conference wdt:P2572 ?hashtag }
+    # OPTIONAL { ?conference wdt:P1813 ?shortName }
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+GROUP BY ?conference ?conferenceLabel ?start
+ORDER BY DESC(?year) 
+`;
  
  function resize() {
      width = document.getElementById("topics-works-matrix").clientWidth;
@@ -159,6 +200,7 @@ ORDER BY DESC(?count)
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
      sparqlToDataTable(citingAuthorsSparql, "#citing-authors");
+     sparqlToDataTable(conferencesSparql, "#conferences");
 
      window.onresize = resize;
 
@@ -489,6 +531,10 @@ Authors that cite the author (excluding self citations).
 Are citing authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_empty') }}{{ q }}/missing">missing</a> page.
 
 
+<h2>Conferences Attended</h2>
 
+Conferences the author has attended.
+
+<table class="table table-hover table-striped" id="conferences"></table>
 
 {% endblock %}
