@@ -80,23 +80,24 @@ Adding new SPARQL queries to Scholia
 .. code:: sparql
 
    SELECT DISTINCT ?author ?authorLabel ?award ?awardLabel WHERE {
-       ?item wdt:P1433 wd:{{ q }} ;
+     ?item wdt:P1433 wd:{{ q }} ;
            wdt:P50 ?author .
-       ?author wdt:P166 ?award .
-   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
+     ?author wdt:P166 ?award .
+     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
    }
 
 3. Add a name e.g. authorAwardsSparql to the query and the whole thing to your version/fork of the file https://github.com/fnielsen/scholia/tree/master/scholia/[…]
 
 .. code:: javascript
 
-   authorAwardsSparql =
+   authorAwardsSparql = `
    SELECT DISTINCT ?author ?authorLabel ?award ?awardLabel WHERE {
-       ?item wdt:P1433 wd:{{ q }} ;
+     ?item wdt:P1433 wd:{{ q }} ;
            wdt:P50 ?author .
-       ?author wdt:P166 ?award .
-   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
+     ?author wdt:P166 ?award .
+     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
    }
+   `
 
 4. Add that name to the sparql-to-data table
 
@@ -108,7 +109,8 @@ Adding new SPARQL queries to Scholia
 
 .. code:: html
 
-   <h2 id="Author-awards">Author Awards</h2>
+   <h2 id="Author-awards">Author awards</h2>
+   
    <table class="table table-hover" id="author-awards"></table>
 
 6. Pull request to master file
