@@ -93,7 +93,7 @@ WHERE {
 ORDER BY ?order
 `
 
-const authorListSparql = `
+const authorsSparql = `
 # List of all authors for a pathway
 SELECT ?author ?url 
 WHERE {
@@ -188,7 +188,7 @@ $(document).ready(function() {
   });
   
   const authorURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' +                                                              
-        encodeURIComponent(authorListSparql) + '&format=json';                                                                              
+        encodeURIComponent(authorsSparql) + '&format=json';                                                                              
   $.getJSON(authorURL, function(response) {                                                                                                         
     const authorData = sparqlDataToSimpleData(response);
 //    console.log(authorData);
