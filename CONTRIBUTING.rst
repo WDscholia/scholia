@@ -88,7 +88,7 @@ Adding new SPARQL queries to Scholia
 
 3. Add a name e.g. authorAwardsSparql to the query and the whole thing to your version/fork of the file https://github.com/fnielsen/scholia/tree/master/scholia[…]
 
-.. code:: python
+.. code:: javascript
 
    authorAwardsSparql =
    SELECT DISTINCT ?author ?authorLabel ?award ?awardLabel WHERE {
@@ -100,7 +100,7 @@ Adding new SPARQL queries to Scholia
 
 4. Add that name to the sparql-to-data table
 
-.. code:: python
+.. code:: javascript
 
    sparqlToDataTable(authorAwardsSparql, "#author-awards");
 
@@ -108,7 +108,7 @@ Adding new SPARQL queries to Scholia
 
 .. code:: html
 
-   <h2 id="AuthorAwards">Author Awards</h2>
+   <h2 id="Author-awards">Author Awards</h2>
    <table class="table table-hover" id="author-awards"></table>
 
 6. Pull request to master file
