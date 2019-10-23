@@ -100,7 +100,7 @@ WITH {
 } AS %retracted_works
 WHERE {
   INCLUDE %retracted_works
-  ?citing_work wdt:P2860 ?retracted_work ; wdt:P1433 wd:Q180445 .
+  ?citing_work wdt:P2860 ?retracted_work ; wdt:P1433 wd:{{ q }} .
   OPTIONAL {
     ?retracted_work wdt:P5824 ?retraction .
     ?retraction wdt:P577 ?retraction_datetime
