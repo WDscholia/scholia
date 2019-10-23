@@ -136,7 +136,7 @@
     UNION
     { wd:{{ q }} wdt:P235 [] . BIND("chemical" AS ?aspect) }
     UNION
-    { [] wdt:P279 | wdt:P31 wd:{{ q }} . BIND("chemical" AS ?aspect) }
+    { wd:{{ q }} wdt:P644 [] . BIND("gene" AS ?aspect) }
     UNION
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
@@ -283,6 +283,7 @@
 		    <li role="presentation"><a href="{{ url_for('app.show_protein_empty') }}">Protein</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_pathway_empty') }}">Pathway</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_chemical_empty') }}">Chemical</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_chemical_element_empty') }}">Chemical element</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_chemical_class_empty') }}">Chemical class</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_lexeme_empty') }}">Lexeme</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_use_empty') }}">Use</a></li>

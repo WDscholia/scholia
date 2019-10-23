@@ -3,6 +3,7 @@
 Usage:
   scholia.query arxiv-to-q <arxiv>
   scholia.query cas-to-q <cas>
+  scholia.query atomic-symbol-to-q <symbol>
   scholia.query cordis-to-q <cordis>
   scholia.query count-authorships
   scholia.query count-scientific-articles
@@ -11,8 +12,10 @@ Usage:
   scholia.query inchikey-to-q <inchikey>
   scholia.query issn-to-q <issn>
   scholia.query lipidmaps-to-q <lmid>
+  scholia.query atomic-number-to-q <atomicnumber>
   scholia.query mesh-to-q <meshid>
   scholia.query orcid-to-q <orcid>
+  scholia.query pubchem-to-q <cid>
   scholia.query pubmed-to-q <pmid>
   scholia.query q-to-label <q>
   scholia.query q-to-class <q>
@@ -180,7 +183,7 @@ def count_scientific_articles():
     Returns
     -------
     count : int
-        Number of scientific articles in Wikidata.
+        #Number of scientific articles in Wikidata.
 
     """
     query = """
@@ -281,6 +284,39 @@ def iso639_to_q(language):
         # what we can do here.
         raise QueryResultError("Multiple matching language found for "
                                "ISO639 code")
+
+
+def pubchem_to_qs(cid):
+    """Convert a PubChem compound identifier (CID) to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the PubChem identifier.
+
+    Parameters
+    ----------
+    pmid : str
+        PubChem compound identifier (CID)
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> pubchem_to_qs('14123361') == ['Q289372']
+    True
+
+    """
+    query = 'select ?chemical where {{ ?chemical wdt:P662 "{cid}" }}'.format(
+        cid=cid)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['chemical']['value'][31:]
+            for item in data['results']['bindings']]
 
 
 def pubmed_to_qs(pmid):
@@ -732,6 +768,7 @@ def q_to_class(q):
             'Q13442814',  # scientific article
             'Q21481766',  # academic chapter
             'Q47461344',  # written work
+            'Q54670950',  # conference poster
             'Q58632367',  # conference abstract
     ]):
         class_ = 'work'
@@ -755,8 +792,12 @@ def q_to_class(q):
             'Q3918',  # university
             'Q31855',  # research institute
             'Q38723',  # higher education institution
+            'Q414147',  # academy of sciences
+            'Q484652',  # international organization
+            'Q748019',  # scientific society
             'Q875538',  # public university
             'Q902104',  # private university
+            'Q955824',  # learned society
             'Q1371037',  # technical university
             'Q2467461',  # university department
             'Q3354859',  # collegiate university
@@ -764,6 +805,7 @@ def q_to_class(q):
             'Q7315155',  # research center
             'Q15936437',  # research university
             'Q23002054',  # "private not-for-profit educational"
+            'Q29300714',  # international association
             ]):
         class_ = 'organization'
     elif set(classes).intersection([
@@ -793,6 +835,10 @@ def q_to_class(q):
             'Q2393187',  # molecular entity
             ]):
         class_ = 'chemical'
+    elif set(classes).intersection([
+            'Q11344',  # chemical element
+            ]):
+        class_ = 'chemical_element'
     elif set(classes).intersection([
             'Q15711994',  # family of isomeric compounds
             'Q17339814',  # group or class of chemical substances
@@ -1055,6 +1101,71 @@ def lipidmaps_to_qs(lmid):
             for item in data['results']['bindings']]
 
 
+def atomic_number_to_qs(atomic_number):
+    """Look up a chemical element by atomic number and return a Wikidata ID.
+
+    Parameters
+    ----------
+    atomic_number : str
+        Atomic number.
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> atomic_number_to_qs('6') == ['Q623']
+    True
+
+    """
+    # This query only matches on exact match
+    query = """SELECT ?item
+               WHERE {{ ?item wdt:P31 wd:Q11344 ; wdt:P1086 ?number .
+                 FILTER (STR(?number) = "{atomic_number}") }}""".format(
+        atomic_number=atomic_number)
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['item']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def atomic_symbol_to_qs(symbol):
+    """Look up a chemical element by atomic symbol and return a Wikidata ID.
+
+    Parameters
+    ----------
+    symbol : str
+        Atomic symbol.
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> atomic_symbol_to_qs('C') == ['Q623']
+    True
+
+    """
+    # This query only matches on exact match
+    query = """SELECT ?item
+               WHERE {{ ?item wdt:P246 "{symbol}" }}""".format(
+        symbol=symbol)
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['item']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def website_to_qs(url):
     """Convert URL for website to Wikidata ID.
 
@@ -1132,13 +1243,23 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['arxiv-to-q']:
+    if arguments['atomic-number-to-q']:
+        qs = atomic_number_to_qs(arguments['<atomicnumber>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['arxiv-to-q']:
         qs = arxiv_to_qs(arguments['<arxiv>'])
         if len(qs) > 0:
             print(qs[0])
 
     elif arguments['cas-to-q']:
         qs = cas_to_qs(arguments['<cas>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['atomic-symbol-to-q']:
+        qs = atomic_symbol_to_qs(arguments['<symbol>'])
         if len(qs) > 0:
             print(qs[0])
 
@@ -1187,6 +1308,11 @@ def main():
 
     elif arguments['orcid-to-q']:
         qs = orcid_to_qs(arguments['<orcid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['pubchem-to-q']:
+        qs = pubchem_to_qs(arguments['<cid>'])
         if len(qs) > 0:
             print(qs[0])
 

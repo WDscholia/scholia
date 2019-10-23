@@ -32,7 +32,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }  
 }
 GROUP BY ?work ?workLabel ?venue ?venueLabel
-ORDER BY DESC(?date)    
+ORDER BY DESC(?date)  
  `
 
  venueStatisticsSparql = `
@@ -134,6 +134,43 @@ WHERE {
 } 
 ORDER BY DESC(?count)
 `
+
+ eventsSparql = `
+SELECT
+  (xsd:date(MIN(?start)) AS ?date)  
+  ?event
+  ?eventLabel
+  (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
+  (GROUP_CONCAT(DISTINCT ?location_label; separator=", ") AS ?locations)
+WHERE {
+    BIND(wd:{{ q }} AS ?person)
+    {  # speaker
+      ?event wdt:P823 ?person .
+      BIND("speaker" AS ?role)
+    } UNION {  # organizer
+      ?event wdt:P664 ?person .
+      BIND("organizer" AS ?role)
+    } UNION {  # participant
+      ?person wdt:P1344 | ^wdt:P710 ?event  .
+      BIND("participant" AS ?role)
+    } UNION {  # editor
+      ?person ^wdt:P98 / wdt:P4745 ?event  .
+      BIND("editor of proceedings" AS ?role)
+    } UNION {  # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event  .
+      BIND("author" AS ?role)
+    } UNION {  # program committee member
+      ?event wdt:P5804 ?person .
+      BIND("program committee member" AS ?role)
+    }
+    OPTIONAL { ?event wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
+    OPTIONAL { ?event wdt:P580 | wdt:P585 ?start }
+ 
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+GROUP BY ?event ?eventLabel
+ORDER BY DESC(?date) 
+`;
  
  function resize() {
      width = document.getElementById("topics-works-matrix").clientWidth;
@@ -159,6 +196,11 @@ ORDER BY DESC(?count)
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
      sparqlToDataTable(citingAuthorsSparql, "#citing-authors");
+     sparqlToDataTable(eventsSparql, "#events",{
+	 linkPrefixes:{
+	     "event": "../event/",
+	 }
+     });
 
      window.onresize = resize;
 
@@ -489,6 +531,10 @@ Authors that cite the author (excluding self citations).
 Are citing authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_empty') }}{{ q }}/missing">missing</a> page.
 
 
+<h2>Events</h2>
 
+Conferences, workshops and other events the author has attended or otherwise been associated with.
+
+<table class="table table-hover table-striped" id="events"></table>
 
 {% endblock %}

@@ -6,13 +6,15 @@
 <script type="text/javascript">
 
   transcriptsSparql = `
-SELECT ?transcriptID ?reference ?referenceLabel
+SELECT
+  ?transcript_ID
+  ?reference ?referenceLabel ?referenceDescription
 WITH {
-  SELECT ?transcriptID ?reference
+  SELECT ?transcript_ID ?reference
   WHERE {
       wd:{{ q }} wdt:P31 wd:Q7187;
                  p:P704 ?transcriptid_statement .
-    ?transcriptid_statement ps:P704 ?transcriptID ;
+    ?transcriptid_statement ps:P704 ?transcript_ID ;
                             prov:wasDerivedFrom/pr:P248 ?reference .
   }
 } AS %result 
@@ -23,12 +25,13 @@ WHERE {
 `
 
  proteinsSparql = `
-SELECT ?protein ?proteinLabel
+SELECT
+  ?protein ?proteinLabel ?proteinDescription
 WITH {
   SELECT ?protein
   WHERE {
-    wd:{{ q }} wdt:P31 wd:Q7187;
-         wdt:P688 ?protein .
+    wd:{{ q }} wdt:P31 wd:Q7187 ;
+      wdt:P688 ?protein .
   }
 } AS %result 
 WHERE {
@@ -38,7 +41,9 @@ WHERE {
 `
 
  orthologsSparql = `
-SELECT ?ortholog ?orthologLabel ?taxon ?taxonLabel
+SELECT
+  ?ortholog ?orthologLabel ?orthologDescription
+  ?taxon ?taxonLabel ?taxonDescription
 WITH {
   SELECT ?ortholog ?taxon
   WHERE {
@@ -54,7 +59,9 @@ WHERE {
 `
 
  variantsSparql = `
-SELECT ?variant ?variantLabel ?types
+SELECT
+  ?variant ?variantLabel ?variantDescription
+  ?types
 WITH {
   SELECT ?variant ?type
   WHERE {

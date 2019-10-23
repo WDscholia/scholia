@@ -32,6 +32,7 @@ from __future__ import print_function
 from os.path import splitext
 
 import re
+import unicodedata
 
 from six import u
 
@@ -72,6 +73,24 @@ STRING_TO_TEX_URL = {
     '_': r'\_',
 }
 
+COMBINING_DIACRITIC_TO_TEX = {
+    u'\u0300': r'\`',
+    u'\u0301': r"\'",
+    u'\u0302': r'\^',
+    u'\u0303': r'\~',
+    u'\u0304': r'\=',
+    u'\u0308': r'\"',
+    u'\u0327': r'\c',
+    u'\u0331': r'\b',
+    u'\u0306': r'\u',
+    u'\u030C': r'\v',
+    u'\u0307': r'\.',
+    u'\u0323': r'\d',
+    u'\u030A': r'\r',
+    u'\u030B': r'\H',
+    u'\u0328': r'\k'
+}
+
 STRING_TO_TEX_PATTERN = re.compile(
     u'|'.join(re.escape(key) for key in STRING_TO_TEX),
     flags=re.UNICODE)
@@ -80,14 +99,19 @@ STRING_TO_TEX_URL_PATTERN = re.compile(
     u'|'.join(re.escape(key) for key in STRING_TO_TEX_URL),
     flags=re.UNICODE)
 
+COMBINING_DIACRITIC_TO_TEX_PATTERN = re.compile(
+    u'(.)({})'.format(
+        u'|'.join(re.escape(key)for key in COMBINING_DIACRITIC_TO_TEX)),
+    flags=re.UNICODE)
+
 
 def escape_to_tex(string, escape_type='normal'):
-    r"""Escape a text to the a tex/latex safe.
+    r"""Escape a text to a tex/latex safe text.
 
     Parameters
     ----------
     string : str or None
-        Unicode string to be excaped.
+        Unicode string to be escaped.
     escape_type : normal or url, default normal
         Type of escaping.
 
@@ -102,8 +126,9 @@ def escape_to_tex(string, escape_type='normal'):
     >>> escape_to_tex("^^") == r'\^{}\^{}'
     True
 
-    >>> escape_to_tex('10.1007/978-3-319-18111-0_26', 'url')
-    '10.1007/978-3-319-18111-0\\_26'
+    >>> escaped = escape_to_tex('10.1007/978-3-319-18111-0_26', 'url')
+    >>> escaped == '10.1007/978-3-319-18111-0\\_26'
+    True
 
     References
     ----------
@@ -122,6 +147,12 @@ def escape_to_tex(string, escape_type='normal'):
     else:
         raise ValueError('Wrong value for parameter "escape_type": {}'.format(
             escape_type))
+
+    escaped_string = COMBINING_DIACRITIC_TO_TEX_PATTERN.sub(
+        lambda match: '{{{} {}}}'.format(
+            COMBINING_DIACRITIC_TO_TEX[match.group(2)],
+            match.group(1)),
+        unicodedata.normalize('NFD', u(escaped_string)))
     return escaped_string
 
 
@@ -221,13 +252,17 @@ def extract_qs_from_aux_string(string):
     >>> extract_qs_from_aux_string(string)
     ['Q28042913', 'Q27615040']
 
+    >>> string = "\citation{Q28042913,Q27615040.Q27615040}"
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913']
+
     """
     matches = re.findall(r'^\\citation{(.+?)}', string,
                          flags=re.MULTILINE | re.UNICODE)
     qs = []
     for submatches in matches:
         for q in submatches.split(','):
-            if re.match(r'Q\d+', q):
+            if re.match(r'^Q\d+$', q):
                 qs.append(q)
 
     return qs

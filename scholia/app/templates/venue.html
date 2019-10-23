@@ -240,6 +240,27 @@ WHERE {
  ORDER BY DESC(?count)
  `
 
+ authorAwardsSparql = `
+SELECT DISTINCT
+  ?year 
+  ?author ?authorLabel
+  ?award ?awardLabel ?awardDescription
+WHERE {
+  [] wdt:P1433 wd:{{ q }} ;
+     wdt:P50 ?author .
+  ?author p:P166 ?award_statement .
+  ?award_statement ps:P166 ?award .
+  OPTIONAL {
+    { ?award_statement pq:P585 ?time }
+    UNION
+    { ?award_statement pq:P580 ?time }
+    BIND(YEAR(?time) AS ?year)
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,ep,fr,jp,nl,no,ru,sv,zh". }  
+}
+ORDER BY DESC(?year)
+LIMIT 500
+ `
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
@@ -252,6 +273,7 @@ WHERE {
      sparqlToDataTable(genderDistributionSparql, "#gender-distribution");
      sparqlToDataTable(authorshipsGenderDistributionSparql,
 		       "#authorships-gender-distribution");
+     sparqlToDataTable(authorAwardsSparql, "#author-awards");
  });
 </script>
 
@@ -351,6 +373,10 @@ Distinct authors.
 
 <table class="table table-hover" id="authorships-gender-distribution"></table>
 
+
+<h2 id="AuthorAwards">Author Awards</h2>
+
+<table class="table table-hover" id="author-awards"></table>
 
 {% endblock %}
     

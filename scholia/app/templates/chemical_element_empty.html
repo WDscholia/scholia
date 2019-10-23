@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<h1>Chemical elements</h1>
+
+The chemical elements.
+
+<div class="container">
+
+    <h2>Examples</h2>
+
+    <div class="card-deck mb-3">
+	<div class="card mb-4 box-shadow">
+
+            <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Single items</h4>
+            </div>
+            <div class="card-body">
+		<dl>
+		    <dt><a href="Q623">Carbon</a></dt>
+		    <dd>
+			View information about the chemical element central to life.
+		    </dd>
+
+		    <dt><a href="Q1098">Uranium</a></dt>
+		    <dd>
+			View information about the heaviest naturally occuring chemical element.
+		    </dd>
+		</dl>
+            </div>
+
+	</div>
+
+     <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+	    </div>
+	    <div class="card-body">
+		<p>Scholia supports redirecting with two chemical element properties:</p>
+
+		<dl>
+		    <dt><a href="../atomic-symbol/C">atomic-symbol/C</a></dt>
+		    <dd>Lookup carbon.</dd>
+
+		    <dt><a href="../atomic-number/8">atomic-number/8</a></dt>
+		    <dd>And oxygen</dd>
+		</dl>
+	    </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+{{super()}}
+
+{% endblock %}
+
+  
