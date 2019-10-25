@@ -130,20 +130,6 @@ SELECT ?compound ?compoundLabel ?formula WITH {
 }
 `
 
-  missingHasPartSparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
-    FILTER(NOT EXISTS {?compound wdt:P527 []})
-  }
-  LIMIT 100
-} AS %CHEMICALS WHERE {
-  INCLUDE %CHEMICALS
-  OPTIONAL { ?compound wdt:P274 ?formula }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-`
-
 missingFlashPointSparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
@@ -210,7 +196,6 @@ $(document).ready(function() {
      sparqlToDataTable(missingStandardMolarEnthropySparql, "#missing-molar-enthropy");
      sparqlToDataTable(missingDensitySparql, "#missing-density");     
      sparqlToDataTable(missingChemicalStructureSparql, "#missing-chemical-structure");
-     sparqlToDataTable(missingHasPartSparql, "#missing-has-part");
      sparqlToDataTable(missingFlashPointSparql, "#missing-flash-point");
      sparqlToDataTable(missingpKaSparql, "#missing-pKa");
      sparqlToDataTable(missingCombustionEnthalpy, "#missing-combustion-enthalpy");
@@ -260,10 +245,6 @@ $(document).ready(function() {
 <h1 id="h1">Missing Chemical Structure</h1>
 
 <table class="table table-hover" id="missing-chemical-structure"></table>
-
-<h1 id="h1">Missing Has Part</h1>
-
-<table class="table table-hover" id="missing-has-part"></table>
 
 <h1 id="h1">Missing Flash Point</h1>
 
