@@ -6,7 +6,12 @@
 
   <script type="text/javascript">
     missingBoilingPointsSparql = `
-THE SPARQL GOES HERE    
+SELECT ?compound ?compoundLabel WHERE
+{
+  ?compound wdt:P31 wd:Q11173.
+  FILTER(NOT EXISTS {?compound wdt:P2102 []})
+}
+LIMIT 500
 `
 
 
