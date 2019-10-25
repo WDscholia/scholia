@@ -130,6 +130,87 @@ $(document).ready(function() {
  });
 </script>
 
+<script type="text/javascript">
+  missingStandardMolarEnthropySparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P3071 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingStandardMolarEnthropySparql, "#missing-molar-enthropy");
+ });
+</script>
+
+<script type="text/javascript">
+  missingDensitySparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2054 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingDensitySparql, "#missing-density");
+ });
+</script>
+
+<script type="text/javascript">
+  missingChemicalStructureSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P117 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingChemicalStructureSparql, "#missing-chemical-structure");
+ });
+</script>
+
+<script type="text/javascript">
+  missingHasPartSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P527 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingHasPartSparql, "#missing-has-part");
+ });
+</script>
+
+
 
 {% endblock %}
 
@@ -160,5 +241,20 @@ $(document).ready(function() {
 
 <table class="table table-hover" id="missing-vapor-pressure"></table>
 
+<h1 id="h1">Missing Molar Enthropy</h1>
+
+<table class="table table-hover" id="missing-molar-enthropy"></table>
+
+<h1 id="h1">Missing Density</h1>
+
+<table class="table table-hover" id="missing-density"></table>
+
+<h1 id="h1">Missing Chemical Structure</h1>
+
+<table class="table table-hover" id="missing-chemical-structure"></table>
+
+<h1 id="h1">Missing Has Part</h1>
+
+<table class="table table-hover" id="missing-has-part"></table>
 
 {% endblock %}
