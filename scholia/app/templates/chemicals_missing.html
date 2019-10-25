@@ -18,17 +18,7 @@ SELECT ?compound ?compoundLabel ?formula WITH {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
-
-
- $(document).ready(function() {
-     sparqlToDataTable(missingBoilingPointsSparql, "#missing-boiling-points");
- });
-
-
-</script>
-
-<script type="text/javascript">
-  missingMeltingPointsSparql = `
+ missingMeltingPointsSparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
@@ -41,15 +31,6 @@ SELECT ?compound ?compoundLabel ?formula WITH {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
-
-$(document).ready(function() {
-     sparqlToDataTable(missingMeltingPointsSparql, "#missing-melting-points");
- });
-
-
-</script>
-
-<script type="text/javascript">
   missingMassSparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
@@ -63,18 +44,10 @@ $(document).ready(function() {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
-
-$(document).ready(function() {
-     sparqlToDataTable(missingMassSparql, "#missing-mass");
- });
-
-</script>
-
-<script type="text/javascript">
   missingSolubilitySparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+    SELECT ?compound WHERE {
+      ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2177 []})
   }
   LIMIT 100
@@ -84,13 +57,6 @@ $(document).ready(function() {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
-
-$(document).ready(function() {
-     sparqlToDataTable(missingSolubilitySparql, "#missing-solubility");
- });
-</script>
-
- <script type="text/javascript">
   missingEnthalpyOfFormationSparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
@@ -104,13 +70,6 @@ $(document).ready(function() {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
-
-$(document).ready(function() {
-     sparqlToDataTable(missingEnthalpyOfFormationSparql, "#missing-enthalpy-of-formation");
- });
-</script>
-
-<script type="text/javascript">
   missingVaporPressureSparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
@@ -124,13 +83,6 @@ $(document).ready(function() {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
-
-$(document).ready(function() {
-     sparqlToDataTable(missingVaporPressureSparql, "#missing-vapor-pressure");
- });
-</script>
-
-<script type="text/javascript">
   missingStandardMolarEnthropySparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
@@ -144,13 +96,6 @@ $(document).ready(function() {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
-
-$(document).ready(function() {
-     sparqlToDataTable(missingStandardMolarEnthropySparql, "#missing-molar-enthropy");
- });
-</script>
-
-<script type="text/javascript">
   missingDensitySparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
@@ -164,13 +109,6 @@ $(document).ready(function() {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 `
-
-$(document).ready(function() {
-     sparqlToDataTable(missingDensitySparql, "#missing-density");
- });
-</script>
-
-<script type="text/javascript">
   missingChemicalStructureSparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
@@ -185,12 +123,6 @@ $(document).ready(function() {
 }
 `
 
-$(document).ready(function() {
-     sparqlToDataTable(missingChemicalStructureSparql, "#missing-chemical-structure");
- });
-</script>
-
-<script type="text/javascript">
   missingHasPartSparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
@@ -206,12 +138,21 @@ $(document).ready(function() {
 `
 
 $(document).ready(function() {
-     sparqlToDataTable(missingHasPartSparql, "#missing-has-part");
+  sparqlToDataTable(missingBoilingPointsSparql, "#missing-boiling-points");
+  sparqlToDataTable(missingMeltingPointsSparql, "#missing-melting-points");
+  sparqlToDataTable(missingMassSparql, "#missing-mass");
+  sparqlToDataTable(missingSolubilitySparql, "#missing-solubility");
+  sparqlToDataTable(missingEnthalpyOfFormationSparql, "#missing-enthalpy-of-formation");
+  sparqlToDataTable(missingVaporPressureSparql, "#missing-vapor-pressure");
+  sparqlToDataTable(missingStandardMolarEnthropySparql, "#missing-molar-enthropy");
+  sparqlToDataTable(missingDensitySparql, "#missing-density");     
+  sparqlToDataTable(missingChemicalStructureSparql, "#missing-chemical-structure");
+  sparqlToDataTable(missingHasPartSparql, "#missing-has-part");
  });
 </script>
 
-
-
+ 
+ 
 {% endblock %}
 
 
