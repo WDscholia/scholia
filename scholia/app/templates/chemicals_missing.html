@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+  <script type="text/javascript">
+    missingBoilingPointsSparql = `
+THE SPARQL GOES HERE    
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(missingBoilingPointsSparql, "#missing-boiling-points");
+ });
+
+
+</script>
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Missing Boiling Points</h1>
+
+<table class="table table-hover" id="missing-boiling-points"></table>
+
+
+{% endblock %}
