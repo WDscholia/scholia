@@ -6,12 +6,17 @@
 
   <script type="text/javascript">
     missingBoilingPointsSparql = `
-SELECT ?compound ?compoundLabel WHERE
-{
-  ?compound wdt:P31 wd:Q11173.
-  FILTER(NOT EXISTS {?compound wdt:P2102 []})
+SELECT ?compound ?compoundLabel WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2102 []})
+  }
+  LIMIT 500
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-LIMIT 500
 `
 
 
