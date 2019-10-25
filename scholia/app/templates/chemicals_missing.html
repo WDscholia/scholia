@@ -27,6 +27,110 @@ SELECT ?compound ?compoundLabel ?formula WITH {
 
 </script>
 
+<script type="text/javascript">
+  missingMeltingPointsSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2101 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingMeltingPointsSparql, "#missing-melting-points");
+ });
+
+
+</script>
+
+<script type="text/javascript">
+  missingMassSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2067 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingMassSparql, "#missing-mass");
+ });
+
+</script>
+
+<script type="text/javascript">
+  missingSolubilitySparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2177 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingSolubilitySparql, "#missing-solubility");
+ });
+</script>
+
+ <script type="text/javascript">
+  missingEnthalpyOfFormationSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P3078 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingEnthalpyOfFormationSparql, "#missing-enthalpy-of-formation");
+ });
+</script>
+
+<script type="text/javascript">
+  missingVaporPressureSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2119 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingVaporPressureSparql, "#missing-vapor-pressure");
+ });
+</script>
+
+
 {% endblock %}
 
 
@@ -35,6 +139,26 @@ SELECT ?compound ?compoundLabel ?formula WITH {
 <h1 id="h1">Missing Boiling Points</h1>
 
 <table class="table table-hover" id="missing-boiling-points"></table>
+
+<h1 id="h1">Missing Melting Points</h1>
+
+<table class="table table-hover" id="missing-melting-points"></table>
+
+<h1 id="h1">Missing Mass</h1>
+
+<table class="table table-hover" id="missing-mass"></table>
+
+<h1 id="h1">Missing Solubility</h1>
+
+<table class="table table-hover" id="missing-solubility"></table>
+
+<h1 id="h1">Missing Enthalpy Of Formation</h1>
+
+<table class="table table-hover" id="missing-enthalpy-of-formation"></table>
+
+<h1 id="h1">Missing Vapor Pressure</h1>
+
+<table class="table table-hover" id="missing-vapor-pressure"></table>
 
 
 {% endblock %}
