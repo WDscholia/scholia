@@ -6,7 +6,7 @@
 
   <script type="text/javascript">
     missingBoilingPointsSparql = `
-SELECT ?compound ?compoundLabel WITH {
+SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2102 []})
