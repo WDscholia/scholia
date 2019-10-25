@@ -19,14 +19,207 @@ SELECT ?compound ?compoundLabel ?formula WITH {
 }
 `
 
+ missingMeltingPointsSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2101 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
 
- $(document).ready(function() {
+  missingMassSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2067 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+  missingSolubilitySparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+    SELECT ?compound WHERE {
+      ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2177 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+  missingEnthalpyOfFormationSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P3078 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+  missingVaporPressureSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2119 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+  missingStandardMolarEnthropySparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P3071 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+  missingDensitySparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2054 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+  missingChemicalStructureSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P117 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+  missingHasPartSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P527 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+missingFlashPointSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2128 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+missingpKaSparql = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P1117 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+missingCombustionEnthalpy = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2117 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+missingIDLH = `
+  SELECT ?compound ?compoundLabel ?formula WITH {
+  SELECT ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
+    FILTER(NOT EXISTS {?compound wdt:P2129 []})
+  }
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+`
+
+$(document).ready(function() {
      sparqlToDataTable(missingBoilingPointsSparql, "#missing-boiling-points");
+     sparqlToDataTable(missingMeltingPointsSparql, "#missing-melting-points");
+     sparqlToDataTable(missingMassSparql, "#missing-mass");
+     sparqlToDataTable(missingSolubilitySparql, "#missing-solubility");
+     sparqlToDataTable(missingEnthalpyOfFormationSparql, "#missing-enthalpy-of-formation");
+     sparqlToDataTable(missingVaporPressureSparql, "#missing-vapor-pressure");
+     sparqlToDataTable(missingStandardMolarEnthropySparql, "#missing-molar-enthropy");
+     sparqlToDataTable(missingDensitySparql, "#missing-density");     
+     sparqlToDataTable(missingChemicalStructureSparql, "#missing-chemical-structure");
+     sparqlToDataTable(missingHasPartSparql, "#missing-has-part");
+     sparqlToDataTable(missingFlashPointSparql, "#missing-flash-point");
+     sparqlToDataTable(missingpKaSparql, "#missing-pKa");
+     sparqlToDataTable(missingCombustionEnthalpy, "#missing-combustion-enthalpy");
+     sparqlToDataTable(missingIDLH, "#missing-idlh");
  });
-
-
 </script>
 
+ 
+ 
 {% endblock %}
 
 
@@ -36,5 +229,56 @@ SELECT ?compound ?compoundLabel ?formula WITH {
 
 <table class="table table-hover" id="missing-boiling-points"></table>
 
+<h1 id="h1">Missing Melting Points</h1>
+
+<table class="table table-hover" id="missing-melting-points"></table>
+
+<h1 id="h1">Missing Mass</h1>
+
+<table class="table table-hover" id="missing-mass"></table>
+
+<h1 id="h1">Missing Solubility</h1>
+
+<table class="table table-hover" id="missing-solubility"></table>
+
+<h1 id="h1">Missing Enthalpy Of Formation</h1>
+
+<table class="table table-hover" id="missing-enthalpy-of-formation"></table>
+
+<h1 id="h1">Missing Vapor Pressure</h1>
+
+<table class="table table-hover" id="missing-vapor-pressure"></table>
+
+<h1 id="h1">Missing Molar Enthropy</h1>
+
+<table class="table table-hover" id="missing-molar-enthropy"></table>
+
+<h1 id="h1">Missing Density</h1>
+
+<table class="table table-hover" id="missing-density"></table>
+
+<h1 id="h1">Missing Chemical Structure</h1>
+
+<table class="table table-hover" id="missing-chemical-structure"></table>
+
+<h1 id="h1">Missing Has Part</h1>
+
+<table class="table table-hover" id="missing-has-part"></table>
+
+<h1 id="h1">Missing Flash Point</h1>
+
+<table class="table table-hover" id="missing-flash-point"></table>
+
+<h1 id="h1">Missing pKa</h1>
+
+<table class="table table-hover" id="missing-pKa"></table>
+
+<h1 id="h1">Missing Combustion Enthalpy</h1>
+
+<table class="table table-hover" id="missing-combustion-enthalpy"></table>
+
+<h1 id="h1">Missing IDLH</h1>
+
+<table class="table table-hover" id="missing-idlh"></table>
 
 {% endblock %}
