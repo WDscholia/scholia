@@ -11,7 +11,7 @@ SELECT ?compound ?compoundLabel ?formula WITH {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2102 []})
   }
-  LIMIT 500
+  LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
