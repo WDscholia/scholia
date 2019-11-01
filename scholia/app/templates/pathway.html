@@ -75,17 +75,79 @@ WHERE {
 ORDER BY DESC(?citations) DESC(?date)
 `
 
+const  authorTableSparql = `
+# Table of Wikidata authors for a pathway
+SELECT DISTINCT
+  # Author item and label
+  ?author ?authorLabel
+
+ # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
+  (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?authorLabel))) AS ?ORCID)
+WHERE {
+  wd:{{ q }} wdt:P50 ?author .
+  OPTIONAL {
+    ?author wdt:P496 ?orcid_ . 
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
+}
+ORDER BY ?order
+`
+
+const authorsSparql = `
+# List of all authors for a pathway
+SELECT ?author ?url 
+WHERE {
+  OPTIONAL { 
+    wd:{{ q }} p:P2093 ?author_statement .
+    ?author_statement ps:P2093 ?author .
+    ?author_statement pq:P2699 ?url .
+  }                                                                                                                                                 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
+  }                                                                                                                                                 
+}  
+`
+
+const pathwayontologyListSparql = `
+# List of all ontology terms for a pathway
+SELECT ?pathwayterms ?pathwaytermsLabel
+WHERE {
+  OPTIONAL { 
+    wd:{{ q }} wdt:P921 ?pathwayterms . 
+  }                                                                                                                                                 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
+  }                                                                                                                                                 
+}  
+`
+
+const diseaseontologyListSparql = `
+# List of all ontology terms for a pathway
+SELECT ?diseaseterms ?diseasetermsLabel
+WHERE {
+  OPTIONAL { 
+    wd:{{ q }} wdt:P1050 ?diseaseterms . 
+  }                                                                                                                                                 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
+  }                                                                                                                                                 
+}  
+`
+
+
 //Extensible query for muliple, optional values
 const optionalDataValuesSparql =`
-SELECT ?wpid ?organism ?organismLabel
+SELECT ?wpid ?organism ?organismLabel ?description
 WHERE {
-  OPTIONAL { wd:{{ q }} wdt:P2410 ?wpid . }
-  OPTIONAL { wd:{{ q }} wdt:P703 ?organism . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+  OPTIONAL { 
+    wd:{{ q }} wdt:P2410 ?wpid ; 
+    wdt:P703 ?organism ; 
+    schema:description ?description ; 
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"
+  }
 }
 `
 
 $(document).ready(function() {
+  sparqlToDataTable(authorTableSparql, "#list-of-authors");
   sparqlToDataTable(participantsSparql, "#participants");
   sparqlToDataTable(recentArticlesSparql, "#recentArticles");
   sparqlToDataTable(citingArticlesSparql, "#citingArticles");
@@ -93,6 +155,12 @@ $(document).ready(function() {
   //Hide optional sections until data values are confirmed and ready
   var organismSection = document.getElementById("Organism")                                                                                         
   organismSection.style.display = "none"; 
+  var authorsSection = document.getElementById("AuthorSection")                                                                                         
+  authorsSection.style.display = "none"; 
+    
+  var ontologySection = document.getElementById("OntologySection")                                                                                         
+  ontologySection.style.display = "none"; 
+    
   var pathwayViewerSection = document.getElementById("pathway-viewer")                                                                                
   pathwayViewerSection.style.display = "none"; 
 
@@ -102,6 +170,10 @@ $(document).ready(function() {
   $.getJSON(sparqlURL, function(response) {
     const simpleData = sparqlDataToSimpleData(response);
     const dataValues = simpleData.data[0];
+//    console.log(dataValues);
+    if ("description" in dataValues) {
+      $("#description").text(dataValues.description);
+    }
     if ("organism" in dataValues) {
       $("#Organism").after('<a href="'+dataValues.organism+'">'+dataValues.organismLabel+'</a>'); 
       organismSection.style.display = "";
@@ -114,6 +186,61 @@ $(document).ready(function() {
       pathwayViewerSection.style.display = "";
     }
   });
+  
+  const authorURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' +                                                              
+        encodeURIComponent(authorsSparql) + '&format=json';                                                                              
+  $.getJSON(authorURL, function(response) {                                                                                                         
+    const authorData = sparqlDataToSimpleData(response);
+//    console.log(authorData);
+    if ("author" in authorData.data[0]) {                                                                                                                  
+      var authorList = [];
+      $.each(authorData.data, function (index, value) {
+        authorList.push('<a href="' + value.url + '">' + value.author + '</a>');
+      });
+      $("#Authors").after(authorList.join(", ") + "<br/><br/>");                                                                                                      
+      authorsSection.style.display = "";                                                                                                            
+    }  
+  });
+    
+  const diseaseontologyURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' +
+        encodeURIComponent(diseaseontologyListSparql) + '&format=json';
+        
+     $.getJSON(diseaseontologyURL, function(response) {
+    
+     const diseaseontologyData = sparqlDataToSimpleData(response);
+        
+    if ("diseaseterms" in diseaseontologyData.data[0]) {                                                                                             
+      var diseasetermList = [];  
+      $.each(diseaseontologyData.data, function (index, value) {
+        diseasetermList.push('<a href="'+value.diseaseterms+'">'+value.diseasetermsLabel+'</a>');
+      });
+      $("#OntologyTerms").after("<h5>Disease ontology</h5>"+diseasetermList.join(", ") + "<br/><br/>");   
+     
+      ontologySection.style.display = "";
+         
+    } 
+});
+    
+   const pathwayontologyURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' +             
+        encodeURIComponent(pathwayontologyListSparql) + '&format=json';  
+    
+    $.getJSON(pathwayontologyURL, function(response) {
+    
+    const pathwayontologyData = sparqlDataToSimpleData(response);
+        
+     if ("pathwayterms" in pathwayontologyData.data[0]) {                                                                               
+      var pathwaytermList = [];  
+      $.each(pathwayontologyData.data, function (index, value) {
+        pathwaytermList.push('<a href="'+value.pathwayterms+'">'+value.pathwaytermsLabel+'</a>');
+          
+      });
+      $("#OntologyTerms").after("<h5>Pathway ontology</h5>"+pathwaytermList.join(", ") + "<br/><br/>");   
+     ontologySection.style.display = "";
+         
+    }  
+    });    
+    
+    
 });
 
 </script>
@@ -127,11 +254,24 @@ $(document).ready(function() {
 
 <div id="intro"></div>
 
+<div id="description"></div>
+
 <div id="pathway-viewer" class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="" style="border-width: 1px; border-color: rgb(222,226,230); border-style: solid;" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
 </div>
 
 <h2 id="Organism"> Organism </h2>
+
+<div id="AuthorSection">
+<h2 id="Authors">Authors</h2>
+
+<table class="table table-hover" id="list-of-authors" style="width: 100%;"></table>
+</div>
+
+<div id="OntologySection">
+<h2 id="OntologyTerms">Ontology Terms</h2>
+    
+</div>
 
 <h2 id="Participants">Participants</h2>
 
