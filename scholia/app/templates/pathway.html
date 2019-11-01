@@ -11,8 +11,11 @@ WITH {
   SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
   WHERE {
     wd:{{ q }} wdt:P31 wd:Q4915012 ;
-             wdt:P527 ?part .
-    OPTIONAL { ?part wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
+               wdt:P527 ?part .
+    OPTIONAL {
+      ?part wdt:P31 ?type_ . ?type_ rdfs:label ?type_label .
+      FILTER (LANG(?type_label) = 'en')
+    }
   } GROUP BY ?part
 } AS %result
 WHERE {
@@ -33,13 +36,21 @@ WITH {
   }
 } AS %works
 WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics) WHERE {
+  SELECT
+    (MAX(?dates) as ?datetime)
+    ?work
+    (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
+    (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics)
+  {
     INCLUDE %works
     OPTIONAL {
       ?work wdt:P921 ?topic . 
       ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
     }
-    OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
+    OPTIONAL {
+      ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label .
+      FILTER (LANG(?type_label) = 'en')
+    }
     OPTIONAL { ?work wdt:P577 ?dates . }
   }
   GROUP BY ?work
@@ -47,7 +58,7 @@ WITH {
 WHERE {
   INCLUDE %result
   BIND(xsd:date(?datetime) AS ?date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }
 ORDER BY DESC(?date)
 LIMIT 500
@@ -57,7 +68,10 @@ const citingArticlesSparql = `
 #defaultView:Table
 SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
 WITH {
-  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work
+  SELECT
+    (MIN(?date) AS ?publication_date)
+    (COUNT(?citing_citing_work) AS ?citations)
+    ?citing_work
   WHERE {
     ?citing_work wdt:P2860 wd:{{ q }} .
     OPTIONAL {
@@ -70,84 +84,79 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . }
 }
 ORDER BY DESC(?citations) DESC(?date)
 `
 
-const  authorTableSparql = `
+const  authorsTableSparql = `
 # Table of Wikidata authors for a pathway
 SELECT DISTINCT
-  # Author item and label
   ?author ?authorLabel
 
- # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
+  # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
   (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?authorLabel))) AS ?ORCID)
-WHERE {
+{
   wd:{{ q }} wdt:P50 ?author .
   OPTIONAL {
-    ?author wdt:P496 ?orcid_ . 
+    ?author wdt:P496 ?orcid_ .
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,nl,no,ru,sv,zh". }
 }
 ORDER BY ?order
 `
 
 const authorsSparql = `
 # List of all authors for a pathway
-SELECT ?author ?url 
-WHERE {
-  OPTIONAL { 
+SELECT ?author ?url
+{
+  OPTIONAL {
     wd:{{ q }} p:P2093 ?author_statement .
     ?author_statement ps:P2093 ?author .
     ?author_statement pq:P2699 ?url .
-  }                                                                                                                                                 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
-  }                                                                                                                                                 
-}  
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}
 `
 
 const pathwayontologyListSparql = `
 # List of all ontology terms for a pathway
-SELECT ?pathwayterms ?pathwaytermsLabel
-WHERE {
-  OPTIONAL { 
-    wd:{{ q }} wdt:P921 ?pathwayterms . 
-  }                                                                                                                                                 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
-  }                                                                                                                                                 
+SELECT ?pathway_terms ?pathway_termsLabel
+{
+  OPTIONAL {
+    wd:{{ q }} wdt:P921 ?pathway_terms .
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
 }  
 `
 
 const diseaseontologyListSparql = `
 # List of all ontology terms for a pathway
 SELECT ?diseaseterms ?diseasetermsLabel
-WHERE {
-  OPTIONAL { 
+{
+  OPTIONAL {
     wd:{{ q }} wdt:P1050 ?diseaseterms . 
-  }                                                                                                                                                 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"                                                                   
-  }                                                                                                                                                 
-}  
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+} 
 `
 
 
-//Extensible query for muliple, optional values
+// Extensible query for muliple, optional values
 const optionalDataValuesSparql =`
 SELECT ?wpid ?organism ?organismLabel ?description
 WHERE {
-  OPTIONAL { 
-    wd:{{ q }} wdt:P2410 ?wpid ; 
-    wdt:P703 ?organism ; 
-    schema:description ?description ; 
+  OPTIONAL {
+    wd:{{ q }} wdt:P2410 ?wpid ;
+    wdt:P703 ?organism ;
+    schema:description ?description ;
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en"
-  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
 }
 `
 
 $(document).ready(function() {
-  sparqlToDataTable(authorTableSparql, "#list-of-authors");
+  sparqlToDataTable(authorsTableSparql, "#authors-table");
   sparqlToDataTable(participantsSparql, "#participants");
   sparqlToDataTable(recentArticlesSparql, "#recentArticles");
   sparqlToDataTable(citingArticlesSparql, "#citingArticles");
@@ -155,15 +164,15 @@ $(document).ready(function() {
   //Hide optional sections until data values are confirmed and ready
   var organismSection = document.getElementById("Organism")                                                                                         
   organismSection.style.display = "none"; 
-  var authorsSection = document.getElementById("AuthorSection")                                                                                         
-  authorsSection.style.display = "none"; 
-    
-  var ontologySection = document.getElementById("OntologySection")                                                                                         
-  ontologySection.style.display = "none"; 
-    
-  var pathwayViewerSection = document.getElementById("pathway-viewer")                                                                                
-  pathwayViewerSection.style.display = "none"; 
+  var authorsSection = document.getElementById("AuthorSection")
+  authorsSection.style.display = "none";
 
+  var ontologySection = document.getElementById("OntologySection")
+  ontologySection.style.display = "none";
+    
+  var pathwayViewerSection = document.getElementById("pathway-viewer")
+  pathwayViewerSection.style.display = "none";
+    
   //Check for optional data values and then use them if available
   const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + 
         encodeURIComponent(optionalDataValuesSparql) + '&format=json';
@@ -189,7 +198,8 @@ $(document).ready(function() {
   
   const authorURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' +                                                              
         encodeURIComponent(authorsSparql) + '&format=json';                                                                              
-  $.getJSON(authorURL, function(response) {                                                                                                         
+    $.getJSON(authorURL, function(response) {
+                
     const authorData = sparqlDataToSimpleData(response);
 //    console.log(authorData);
     if ("author" in authorData.data[0]) {                                                                                                                  
@@ -260,18 +270,22 @@ $(document).ready(function() {
   <iframe class="embed-responsive-item" src="" style="border-width: 1px; border-color: rgb(222,226,230); border-style: solid;" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
 </div>
 
-<h2 id="Organism"> Organism </h2>
+<h2 id="Organism">Organism</h2>
 
 <div id="AuthorSection">
-<h2 id="Authors">Authors</h2>
 
-<table class="table table-hover" id="list-of-authors" style="width: 100%;"></table>
+  <h2 id="Authors">Authors</h2>
+
+  <table class="table table-hover" id="authors-table" style="width: 100%;"></table>
+
 </div>
 
 <div id="OntologySection">
-<h2 id="OntologyTerms">Ontology Terms</h2>
+  
+  <h2 id="OntologyTerms">Ontology Terms</h2>
     
 </div>
+
 
 <h2 id="Participants">Participants</h2>
 
