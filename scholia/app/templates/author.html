@@ -8,170 +8,18 @@
 <script type="text/javascript" src="{{ url_for('static', filename='d3-scale-chromatic.v1.min.js') }}"></script>
 
 <script type="text/javascript">
- listOfPublicationsSparql = `
-#defaultView:Table
-SELECT
-  (MIN(?dates) AS ?date)
-  ?work ?workLabel
-  (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
-  (SAMPLE(?pages_) AS ?pages)
-  ?venue ?venueLabel
-  (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
-WHERE {
-  ?work wdt:P50 wd:{{ q }} .
-  ?work wdt:P50 ?author .
-  OPTIONAL {
-    ?author rdfs:label ?author_label_ . FILTER (LANG(?author_label_) = 'en')
-  }
-  BIND(COALESCE(?author_label_, SUBSTR(STR(?author), 32)) AS ?author_label)
-  OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
-  ?work wdt:P577 ?datetimes .
-  BIND(xsd:date(?datetimes) AS ?dates)
-  OPTIONAL { ?work wdt:P1104 ?pages_ }
-  OPTIONAL { ?work wdt:P1433 ?venue }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }  
-}
-GROUP BY ?work ?workLabel ?venue ?venueLabel
-ORDER BY DESC(?date)  
- `
+ listOfPublicationsSparql = `{% include 'sparql/author_publications.sparql' %}`;
 
- venueStatisticsSparql = `
-# Venue statistics for a specific author
-SELECT ?count (SAMPLE(?short_name_) AS ?short_name) ?venue ?venueLabel ?topics
-WITH {
-  SELECT
-    (COUNT(DISTINCT ?work) as ?count)
-    ?venue
-    (GROUP_CONCAT(DISTINCT ?topic; separator=" // ") AS ?topics)
-  WHERE {
-	  ?work wdt:P50 wd:{{ q }} .
-    ?work wdt:P1433 ?venue .
-    OPTIONAL { ?venue wdt:P921 / rdfs:label ?topic . FILTER(LANG(?topic) = 'en') }
-  }
-  GROUP BY ?venue
-} AS %result
-WHERE {
-  INCLUDE %result
-  OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }  
-} 
-GROUP BY ?count ?venue ?venueLabel ?topics
-ORDER BY DESC(?count)
- `
+ venueStatisticsSparql = `{% include 'sparql/author_venues.sparql' %}`;
 
- topicsSparql = `
-#defaultView:Table
-SELECT ?count ?theme ?themeLabel ?example_work ?example_workLabel
-WITH {
-  SELECT (COUNT(?work) AS ?count) ?theme (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work wdt:P50 wd:{{ q }} .
-    ?work wdt:P921 ?theme .
-  }
-  GROUP BY ?theme
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
-}
-ORDER BY DESC(?count) 
-`
+ topicsSparql = `{% include 'sparql/author_topics.sparql' %}`;
 
- mostCitedWorksSparql = `
-#defaultView:Table
-# Author's most cited works
-SELECT ?count ?work ?workLabel 
-WITH {
-  SELECT (count(?citing_work) as ?count) ?work WHERE {
-    ?work wdt:P50 wd:{{ q }} .
-    OPTIONAL { ?citing_work wdt:P2860 ?work . }
-  }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,jp". }        
-}  
-ORDER BY DESC(?count)
-LIMIT 500
-`
+ mostCitedWorksSparql = `{% include 'sparql/author_most_cited_works.sparql' %}`;
 
- citingAuthorsSparql = `
-#defaultView:Table
-SELECT
-  ?count
-  ?citing_author ?citing_authorLabel
+ citingAuthorsSparql = `{% include 'sparql/author_citing_authors.sparql' %}`;
 
-  # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
-  (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?citing_authorLabel))) AS ?orcid)
-WITH {
-  SELECT (COUNT(?citing_work) AS ?count) ?citing_author WHERE {
-    ?work wdt:P50 wd:{{ q }} .
-    ?citing_work wdt:P2860 ?work . 
-    MINUS { ?citing_work wdt:P50 wd:{{ q }} }
-    ?citing_work wdt:P50 ?citing_author .
-  }
-  GROUP BY ?citing_author 
-  ORDER BY DESC(?count)
-  LIMIT 500
-} AS %counts
-WITH {
-  # An author might have multiple ORCID iDs
-  SELECT
-    ?count
-    ?citing_author
-    (SAMPLE(?orcids) AS ?orcid_)
-  WHERE {
-    INCLUDE %counts
-    OPTIONAL { ?citing_author wdt:P496 ?orcids }
-  }
-  GROUP BY ?count ?citing_author
-} AS %result
-WHERE {
-  INCLUDE %result
-  
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-} 
-ORDER BY DESC(?count)
-`
+ eventsSparql = `{% include 'sparql/author_events.sparql' %}`;
 
- eventsSparql = `
-SELECT
-  (xsd:date(MIN(?start)) AS ?date)  
-  ?event
-  ?eventLabel
-  (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
-  (GROUP_CONCAT(DISTINCT ?location_label; separator=", ") AS ?locations)
-WHERE {
-    BIND(wd:{{ q }} AS ?person)
-    {  # speaker
-      ?event wdt:P823 ?person .
-      BIND("speaker" AS ?role)
-    } UNION {  # organizer
-      ?event wdt:P664 ?person .
-      BIND("organizer" AS ?role)
-    } UNION {  # participant
-      ?person wdt:P1344 | ^wdt:P710 ?event  .
-      BIND("participant" AS ?role)
-    } UNION {  # editor
-      ?person ^wdt:P98 / wdt:P4745 ?event  .
-      BIND("editor of proceedings" AS ?role)
-    } UNION {  # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event  .
-      BIND("author" AS ?role)
-    } UNION {  # program committee member
-      ?event wdt:P5804 ?person .
-      BIND("program committee member" AS ?role)
-    }
-    OPTIONAL { ?event wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
-    OPTIONAL { ?event wdt:P580 | wdt:P585 ?start }
- 
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
-}
-GROUP BY ?event ?eventLabel
-ORDER BY DESC(?date) 
-`;
- 
  function resize() {
      width = document.getElementById("topics-works-matrix").clientWidth;
      d3.select("#topics-works-matrix").attr("width", width);
@@ -441,7 +289,7 @@ Are co-authors missing here? You can help curate them via the <a href="{{ url_fo
 <h3>Topic scores</h3>
 
 Topics based on a weighting between fields of work,
-topics of authored works and topics of citing works.  
+topics of authored works and topics of citing works.
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fscore%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28SUM%28%3Fscore_%29%20AS%20%3Fscore%29%0A%20%20%20%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP101%20%3Ftopic%20.%0A%20%20%20%20%20%20BIND%2820%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%283%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%281%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25results%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cjp%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fscore%29%0ALIMIT%20200"></iframe>
