@@ -2,12 +2,12 @@ Contributing to Scholia
 =======================
 
 Source code and issue tracker
-----------------------------
+-----------------------------
 
 Scholia development is hosted at https://github.com/fnielsen/scholia.
 
 Technology stack
----------------
+----------------
 
 Scholia is mainly based on
 
@@ -19,11 +19,11 @@ Scholia is mainly based on
    Service <http://query.wikidata.org/>`__
 
 Getting started - set up a local scholia server for testing purposes
----------------
+--------------------------------------------------------------------
 
 1. Clone Scholia repository from GitHub
 
-   ::
+   .. code:: shell
 
        $ git clone https://github.com/fnielsen/scholia.git     # via HTTPS
        $ git clone git@github.com:fnielsen/scholia.git         # or via SSH
@@ -69,13 +69,15 @@ The style is checked with `flake8`. Also follow the commit message recommendatio
 cf. `Writing good commit messages <https://github.com/erlang/otp/wiki/writing-good-commit-messages>`_.
 
 Examples
--------
+--------
 
 Adding new SPARQL queries to Scholia
 
 1. Assign the task for yourself (if it is in an issue tracker)
 
-2. Get the new query e.g. Example from https://github.com/fnielsen/scholia/pull/848/files 
+2. Write a new query and add it in a template file (e.g. in  ``/app/templates/sparql/author_awards.sparql``)
+   e.g. Note that ``{{ q }}`` will be formatted in based on the page that renders the template.
+   See example at https://github.com/fnielsen/scholia/pull/848/files.
 
 .. code:: sparql
 
@@ -86,18 +88,13 @@ Adding new SPARQL queries to Scholia
      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
    }
 
-3. Add a name e.g. authorAwardsSparql to the query and the whole thing to your version/fork of the file https://github.com/fnielsen/scholia/tree/master/scholia/[…]
+4. Make a variable e.g. ``authorAwardsSparql`` that uses Jinja's templating system to load
+   the SPARQL query from the file. The ``{{ q }}`` inside the template will be populated
+   using the ``{{ q }}`` in the HTML template automatically.
 
 .. code:: javascript
 
-   authorAwardsSparql = `
-   SELECT DISTINCT ?author ?authorLabel ?award ?awardLabel WHERE {
-     ?item wdt:P1433 wd:{{ q }} ;
-           wdt:P50 ?author .
-     ?author wdt:P166 ?award .
-     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
-   }
-   `
+   authorAwardsSparql = `{% include 'sparql/author_awards.sparql' %}`;
 
 4. Add that name to the sparql-to-data table
 
@@ -113,5 +110,6 @@ Adding new SPARQL queries to Scholia
    
    <table class="table table-hover" id="author-awards"></table>
 
-6. Pull request to master file
-
+6. Add the whole thing to your version/fork of the file
+   https://github.com/fnielsen/scholia/tree/master/scholia/[…].
+   Pull request to master branch.
