@@ -77,6 +77,16 @@ WHERE {
     BIND(CONCAT(?value_, " 🔗") AS ?value)
     BIND(CONCAT("https://clinicaltrials.gov/show/", ?value_) AS ?valueUrl)
   }
+
+  UNION
+  {
+    BIND(101 AS ?order)
+    BIND("ClinWiki" AS ?description)
+    ?trial wdt:P3098 ?value_ .
+    BIND(CONCAT(?value_, " 🔗") AS ?value)
+    BIND(CONCAT("https://www.clinwiki.org/study/", ?value_) AS ?valueUrl)
+  }
+
 } 
 ORDER BY ?order
 `;
