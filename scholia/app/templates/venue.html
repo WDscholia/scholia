@@ -261,6 +261,39 @@ WHERE {
 ORDER BY DESC(?year)
 LIMIT 500
  `
+ retractionsJournalSparql =  `
+SELECT DISTINCT
+  ?retracted_work ?retracted_workLabel
+  ?date
+  ?citing_work ?citing_workLabel
+WITH {
+  # Find retracted papers indicated by instance of retracted paper, 
+  # by retraction notice property or by significant event
+  SELECT DISTINCT ?retracted_work WHERE {
+    { ?retracted_work wdt:P31 wd:{{ q }} }
+    UNION
+    { ?retracted_work wdt:P5824 [] }
+    UNION
+    { ?retracted_work wdt:P793 wd:Q45203135 }
+  }
+} AS %retracted_works
+WHERE {
+  INCLUDE %retracted_works
+  ?citing_work wdt:P2860 ?retracted_work ; wdt:P1433 wd:Q180445 .
+  OPTIONAL {
+    ?retracted_work wdt:P5824 ?retraction .
+    ?retraction wdt:P577 ?retraction_datetime
+    FILTER ( ?citing_work != ?retraction )
+  }
+  MINUS { ?citing_work wdt:P31 wd:Q1348305 }
+  OPTIONAL {
+    ?retracted_work p:P793 [ ps:P793 wd:Q45203135 ; pq:P585 ?keyevent_datetime ]
+  }
+  BIND(COALESCE(xsd:date(COALESCE(?retraction_datetime, ?keyevent_datetime)), "Unknown date") AS ?date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?date)
+ `
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
@@ -270,6 +303,7 @@ LIMIT 500
      sparqlToDataTable(citingVenuesSparql, "#citing-venues");
      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
      sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
+	 sparqlToDataTable(retractionsJournalSparql, "#retractions-of-journal");
      sparqlToDataTable(genderDistributionSparql, "#gender-distribution");
      sparqlToDataTable(authorshipsGenderDistributionSparql,
 		       "#authorships-gender-distribution");
@@ -358,6 +392,11 @@ This will make a very big graph for, e.g., PLOS ONE.
 <h3 id="Venues cited from">Venues cited from</h3>
 
 <table class="table table-hover" id="citing-venues"></table>
+
+
+<h2>Retracted articles</h2>
+
+<table class="table table-hover" id="retractions-of-journal"></table>
 
 
 <h2>Gender distribution</h2>
