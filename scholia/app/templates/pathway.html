@@ -92,12 +92,12 @@ ORDER BY DESC(?citations) DESC(?date)
 
 // Extensible query for muliple, optional values
 const optionalDataValuesSparql =`
-SELECT ?wpid ?organism ?organismLabel ?description
+SELECT ?wpid ?organism ?organismLabel ?pathwayDescription
 WHERE {
+  VALUES ?pathway { wd:{{q}} }
   OPTIONAL {
     wd:{{ q }} wdt:P2410 ?wpid ;
-    wdt:P703 ?organism ;
-    schema:description ?description .
+    wdt:P703 ?organism .
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . }
 }
@@ -121,8 +121,8 @@ $(document).ready(function() {
   $.getJSON(sparqlURL, function(response) {
     const simpleData = sparqlDataToSimpleData(response);
     const dataValues = simpleData.data[0];
-    if ("description" in dataValues) {
-      $("#description").text(dataValues.description);
+    if ("pathwayDescription" in dataValues) {
+      $("#description").text(dataValues.pathwayDescription);
     }
     if ("organism" in dataValues) {
       $("#Organism").after('<a href="'+dataValues.organism+'">'+dataValues.organismLabel+'</a>'); 
