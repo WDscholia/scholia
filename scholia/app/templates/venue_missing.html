@@ -63,7 +63,7 @@ WHERE {
   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
-ORDER BY DESC(?count) DESC (?topics)
+ORDER BY DESC(?count) ?topics
 `
 
   $(document).ready(function() {
