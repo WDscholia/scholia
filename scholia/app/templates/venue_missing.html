@@ -50,7 +50,7 @@ WITH {
   WHERE {
     ?work wdt:P1433 wd:{{ q }} .
     OPTIONAL { ?work wdt:P921 ?topic }
-    ?citing_work wdt:P2860 ?work.
+    OPTIONAL { ?citing_work wdt:P2860 ?work. }
   }
   GROUP BY ?work
   ORDER BY DESC(?count)
