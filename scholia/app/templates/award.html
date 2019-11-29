@@ -36,7 +36,7 @@ SELECT
   ?number_of_corecipients
   ?award ?awardLabel ?awardDescription
 WITH {
-     SELECT ?award (COUNT(?recipient) AS ?number_of_corecipients) WHERE {
+     SELECT DISTINCT ?award (COUNT(?recipient) AS ?number_of_corecipients) WHERE {
     ?recipient wdt:P166 wd:{{ q }} .
 	?recipient wdt:P166 ?award .
 			       FILTER (?award != wd:{{ q }})
