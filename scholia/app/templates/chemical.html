@@ -18,6 +18,9 @@ WITH {
     OPTIONAL { 
       ?IDpred wdt:P1630 ?formatterurl .
     }
+    FILTER (?IDpred != wd:P233)
+    FILTER (?IDpred != wd:P234)
+    FILTER (?IDpred != wd:P2017)
   } LIMIT 500
 } AS %RESULTS {
   { SELECT * WHERE {
