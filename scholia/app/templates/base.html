@@ -201,6 +201,24 @@
      });
  }
 
+ $('#searchterm').keyup(function( e ) {
+      var q = $('#searchterm').val();
+      $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
+          search: q,
+          action: "wbsearchentities",
+          language: "en",
+          uselang: "en",
+          format: "json",
+          strictlanguage: true,
+        },
+        function(data) {
+          $("#searchresult").empty();
+          $.each(data.search, function(i, item) {
+            $("#searchresult").append("<div><a href='" + item.title + "'>" + item.label + "</a> - " + item.description + "</div>");
+        });
+      });
+    });
+
 </script>
 
 {% endblock %}
@@ -316,7 +334,19 @@
 		</ul>
 	    </div>
 	</li>
+    
     </ul>
+    {% block nav_search %}
+    <div class='nav nav-search'>
+	    <div class="input-group">
+        <input type="text" class="form-control"
+            placeholder="Search..." id="searchterm"/>
+
+        </div>
+
+        <div id="searchresult"></div>
+    </div>
+    {% endblock %}
 </div>
 {% endblock %}
 
@@ -342,6 +372,10 @@
     |
     Report technical problems at Scholia's
     <a href="https://github.com/fnielsen/scholia/issues">Issues</a> GitHub page.
+    <hr>
   </div>
 {% endblock %}
 
+<script type="text/javascript">
+    
+</script>
