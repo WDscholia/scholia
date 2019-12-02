@@ -47,10 +47,6 @@ h2 {
     flex-wrap: wrap;
 }
 
-.nav> :first-child {
-    font-weight: bold;
-}
-
 .nav li {
     margin-right: 1em;
 }
