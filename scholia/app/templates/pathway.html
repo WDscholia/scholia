@@ -125,7 +125,11 @@ $(document).ready(function() {
       $("#description").text(dataValues.pathwayDescription);
     }
     if ("organism" in dataValues) {
-      $("#Organism").after('<a href="'+dataValues.organism+'">'+dataValues.organismLabel+'</a>'); 
+      $("#Organism").after('<a href="' +
+			   dataValues.organism +
+			   '">' +
+			   escapeHTML(dataValues.organismLabel) +
+			   '</a>'); 
       organismSection.style.display = "";
     }
     if ("wpid" in dataValues) {
