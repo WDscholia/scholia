@@ -201,6 +201,27 @@
      });
  }
 
+ $('#searchterm').keyup(function( e ) {
+      var q = $('#searchterm').val();
+      $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
+          search: q,
+          action: "wbsearchentities",
+          language: "en",
+          uselang: "en",
+          format: "json",
+          strictlanguage: true,
+        },
+        function(data) {
+          $("#searchresult").empty();
+          $.each(data.search, function(i, item) {
+            $("#searchresult")
+              .append("<div><a href='{{ url_for('app.index') }}" + item.title + "'>" + 
+                escapeHTML(item.label) + 
+                "</a> - " + escapeHTML(item.description) + "</div>");
+        });
+      });
+    });
+
 </script>
 
 {% endblock %}
@@ -208,7 +229,7 @@
 {% block navbar %}
 <div class="navbar navbar-static-top">
     <ul class="nav nav-pills">
-	<li role="presentation"><a href="{{ url_for('app.index') }}">Scholia</a></li>
+	<li role="presentation"><a href="{{ url_for('app.index') }}"><img src="{{ url_for('static', filename='images/scholia_wordmark.svg') }}" width="112px" height="24px" alt="Scholia"></a></li>
 	<li role="presentation"><a href="{{ url_for('app.show_author_empty') }}">Author</a></li>
 	<li role="presentation">
 	    <div class="dropdown">
@@ -316,7 +337,19 @@
 		</ul>
 	    </div>
 	</li>
+    
     </ul>
+    {% block nav_search %}
+    <div class='nav nav-search'>
+	    <div class="input-group">
+        <input type="text" class="form-control"
+            placeholder="Search..." id="searchterm"/>
+
+        </div>
+
+        <div id="searchresult"></div>
+    </div>
+    {% endblock %}
 </div>
 {% endblock %}
 
@@ -342,6 +375,10 @@
     |
     Report technical problems at Scholia's
     <a href="https://github.com/fnielsen/scholia/issues">Issues</a> GitHub page.
+    <hr>
   </div>
 {% endblock %}
 
+<script type="text/javascript">
+    
+</script>
