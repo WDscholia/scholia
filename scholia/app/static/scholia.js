@@ -1,6 +1,14 @@
 // https://stackoverflow.com/questions/6020714
 function escapeHTML(html) {
-    return html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if (typeof html !== "undefined") {
+	return html
+	    .replace(/&/g,'&amp;')
+	    .replace(/</g,'&lt;')
+	    .replace(/>/g,'&gt;');
+    }
+    else {
+	return "";
+    }
 }
 
 // http://stackoverflow.com/questions/1026069/
