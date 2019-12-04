@@ -17,6 +17,7 @@ SELECT
   (SAMPLE(?pages_) AS ?pages)
   ?venue ?venueLabel
   (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
+  (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
 WHERE {
   ?work wdt:P50 wd:{{ q }} .
   ?work wdt:P50 ?author .

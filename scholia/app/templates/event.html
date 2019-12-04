@@ -155,7 +155,7 @@ WHERE {
 SELECT
   ?publication_date
   ?work ?workLabel
-  ?authors
+  ?authors ?authorsUrl
 WITH {
   SELECT
     DISTINCT ?person
@@ -180,7 +180,8 @@ WITH {
   SELECT
     (xsd:date(MAX(?publication_datetime)) AS ?publication_date)
     ?work
-    (GROUP_CONCAT(DISTINCT ?person_label; separator=" // ") AS ?authors)
+    (GROUP_CONCAT(DISTINCT ?person_label; separator=", ") AS ?authors)
+    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?person), 32); separator=",")) AS ?authorsUrl)
   WHERE {
     INCLUDE %people .
     ?work wdt:P50 ?person ; wdt:P577 ?publication_datetime .
