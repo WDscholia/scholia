@@ -1859,5 +1859,5 @@ def show_about():
 
 
 @main.route('/favicon.ico')
-def show_test():
+def show_favicon():
     return redirect(url_for('static', filename='favicon/favicon.ico'))
