@@ -22,6 +22,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
+
 class RegexConverter(BaseConverter):
     """Converter for regular expression routes.
 
@@ -1859,5 +1860,5 @@ def show_about():
 
 
 @main.route('/favicon.ico')
-def show_test():
+def show_favicon():
     return redirect(url_for('static', filename='favicon/favicon.ico'))
