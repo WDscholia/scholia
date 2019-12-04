@@ -35,12 +35,16 @@ ORDER BY DESC(?works)
  `;
 
  recentPublicationsSparql = `
- #defaultView:Table
-SELECT ?publication_date ?work ?workLabel ?researchers
+#defaultView:Table
+SELECT
+  ?publication_date
+  ?work ?workLabel
+  ?researchers ?researchersUrl
 WITH {
   SELECT 
     (MIN(?publication_datetimes) AS ?publication_datetime) ?work 
     (GROUP_CONCAT(DISTINCT ?researcher_label; separator=', ') AS ?researchers)
+    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?researchersUrl)
   WHERE {                                                         
     ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
     ?work wdt:P50 ?researcher .
