@@ -77,6 +77,48 @@ WHERE {
 ORDER BY DESC(?count)
 LIMIT 50
  `
+  coAuthorsSparql = `
+#defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  # Find works published in the given venue
+  SELECT ?work WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+  }
+} AS %works
+WITH {
+  # Limit the number of authors
+  SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author1 .
+  }
+  GROUP BY ?author1
+  ORDER BY DESC(?count1)
+  LIMIT 15
+} AS %authors1
+WITH {
+  # Limit the number of coauthors
+  SELECT DISTINCT ?author2 ?author1  (COUNT(?work) AS ?count2)  WHERE {
+    INCLUDE %works
+    INCLUDE %authors1
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2) 
+  }
+  GROUP BY ?author2 ?author1 
+  ORDER BY DESC(?count2)
+  LIMIT 150
+} AS %authors2
+WHERE {
+#  INCLUDE %authors1
+  INCLUDE %authors2
+  OPTIONAL { ?author1 wdt:P21 ?gender1 . }
+  BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+  }
+}
+
+  `
 
   citedVenuesSparql = `
 # Cited venues from specific journal
@@ -266,6 +308,7 @@ LIMIT 500
      sparqlToDataTable(recentlyPublishedWorksSparql, "#recently-published-works");
      sparqlToDataTable(topicsSparql, "#topics");
      sparqlToDataTable(prolificAuthorsSparql, "#prolific-authors");
+     sparqlToDataTable(coAuthorsSparql, "#co-authors");
      sparqlToDataTable(citedVenuesSparql, "#cited-venues");
      sparqlToDataTable(citingVenuesSparql, "#citing-venues");
      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
@@ -321,13 +364,11 @@ Then go to the
 page to resolve the author names.
 
 
-<!-- h3 id="Co-author graph">Co-author graph</h2>
-
-This will make a very big graph for, e.g., PLOS ONE.
+<h3 id="Co-author graph">Co-author graph</h3>
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Fimage1%20%3Fauthor2%20%3Fauthor2Label%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fauthor1%20%28SAMPLE%28%3Fimage1_%29%20AS%20%3Fimage1%29%20%3Fauthor2%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%3B%0A%20%20%20%20%20%20%20%20%20%20wdt%3AP50%20%3Fauthor1%2C%20%3Fauthor2%20.%0A%20%20%20%20OPTIONAL%20%7B%20%3Fauthor1%20wdt%3AP18%20%3Fimage1_%20.%20%7D%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor1%20%3Fauthor2%0A%7D%20AS%20%25authors%0AWHERE%20%7B%0A%20%20INCLUDE%20%25authors%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl.no%2Cru%2Csv%2Czh%22%20.%20%7D%20%0A%7D%0A"></iframe>
-</div -->
+  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Frgb%20%3Fauthor2%20%3Fauthor2Label%0AWITH%20%7B%0A%20%20%23%20Find%20works%20published%20in%20the%20given%20venue%0A%20%20SELECT%20%3Fwork%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20%23%20Limit%20the%20number%20of%20authors%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount1%29%20%3Fauthor1%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor1%0A%20%20ORDER%20BY%20DESC%28%3Fcount1%29%0A%20%20LIMIT%2015%0A%7D%20AS%20%25authors1%0AWITH%20%7B%0A%20%20%23%20Limit%20the%20number%20of%20coauthors%0A%20%20SELECT%20DISTINCT%20%3Fauthor2%20%3Fauthor1%20%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount2%29%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20INCLUDE%20%25authors1%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20%2C%20%3Fauthor2%20.%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%20%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor2%20%3Fauthor1%20%0A%20%20ORDER%20BY%20DESC%28%3Fcount2%29%0A%20%20LIMIT%20150%0A%7D%20AS%20%25authors2%0AWHERE%20%7B%0A%23%20%20INCLUDE%20%25authors1%0A%20%20INCLUDE%20%25authors2%0A%20%20OPTIONAL%20%7B%20%3Fauthor1%20wdt%3AP21%20%3Fgender1%20.%20%7D%0A%20%20BIND%28%20IF%28%3Fgender1%20%3D%20wd%3AQ6581097%2C%20%223182BD%22%2C%20%22E6550D%22%29%20AS%20%3Frgb%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0A"></iframe>
+</div>
 
 
 <h2 id="Citations">Citations</h2>
