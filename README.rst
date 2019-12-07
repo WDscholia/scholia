@@ -1,4 +1,6 @@
-Scholia
+.. image:: scholia/app/static/images/scholia_logo.svg
+   :width: 100%
+   :alt: Scholia
 =======
 
 Scholia is a python package and webapp for interaction with scholarly information in Wikidata_.
