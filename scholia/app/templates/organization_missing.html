@@ -16,7 +16,7 @@ SELECT
 WHERE {
   {
     SELECT DISTINCT ?author_name {
-      ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:Q213439 . 
+      ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
       
       ?researcher_ skos:altLabel | rdfs:label ?author_name_ .
       
