@@ -185,6 +185,31 @@ ORDER BY DESC(?number_of_citations)
 LIMIT 200
 `
 
+  authorAwardsSparql = `
+
+SELECT ?count ?award ?awardLabel ?recipients
+WITH {
+  SELECT (COUNT(?researcher) AS ?count) ?award (GROUP_CONCAT(?researcher_label; separator=", ") AS ?recipients) WHERE {
+    hint:Query hint:optimizer "None" .
+    { 
+      SELECT DISTINCT ?researcher ?award WHERE {
+        ?work wdt:P50 ?researcher ;
+              wdt:P921 wd:{{ q }} .
+        ?researcher wdt:P166 ?award .
+      } 
+      LIMIT 100
+    }
+    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
+  }
+  GROUP BY ?award 
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+`
+
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql,
@@ -195,6 +220,7 @@ LIMIT 200
      sparqlToDataTable(venuesSparql, "#venues");
      sparqlToDataTable(topCitedSparql, "#topCited");
      sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
+     sparqlToDataTable(authorAwardsSparql, "#author-awards");
  });
 </script>
 
@@ -291,6 +317,11 @@ page to resolve the author names.
 <h3 id="Authors cited from works on the topic">Authors cited from works on the topic</h3>
 
 <table class="table table-hover" id="most-cited-authors"></table>
+
+
+<h3 id="Awards received by authors who published on the topic">Awards received by authors who published on the topic</h3>
+
+<table class="table table-hover" id="author-awards"></table>
 
 {% endblock %}
     
