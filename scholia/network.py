@@ -34,7 +34,8 @@ def write_pajek_from_sparql(filename, sparql):
     column1 = 'item1'
     column2 = 'item2'
 
-    url = 'https://query.wikidata.org/sparql'
+    #url = 'https://query.wikidata.org/sparql'
+    url = 'http://127.0.0.1:8080/sparql'
     params = {'query': sparql, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()['results']['bindings']

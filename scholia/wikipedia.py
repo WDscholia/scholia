@@ -105,6 +105,7 @@ def q_to_bibliography_templates(q):
     """
     query = BIBLIOGRAPHY_SPARQL_QUERY.format(q=q)
     url = 'https://query.wikidata.org/sparql'
+    #url = 'http://127.0.0.1:8080/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
