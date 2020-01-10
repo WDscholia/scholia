@@ -34,6 +34,40 @@ GROUP BY ?researcher ?researcherLabel ?researcherDescription
 ORDER BY DESC(?works)
  `;
 
+ topicsSparql = `
+SELECT
+  ?researchers
+  ?topic ?topicLabel
+  ("🔎" AS ?zoom)
+  (CONCAT("{{ q }}/topic/", SUBSTR(STR(?topic), 32)) AS ?zoomUrl)
+  ?topicDescription
+  ?samplework ?sampleworkLabel
+WITH {
+  SELECT DISTINCT ?researcher WHERE {
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
+  } 
+} AS %researchers
+WITH {
+  SELECT DISTINCT ?topic
+    (COUNT(DISTINCT ?researcher) AS ?researchers)
+    (SAMPLE(?work) AS ?samplework)
+  WHERE {
+    INCLUDE %researchers
+    ?work wdt:P50 ?researcher . 
+    ?work wdt:P921 ?topic . 
+  } 
+  GROUP BY ?topic
+  ORDER BY DESC(?researchers)
+  LIMIT 500
+} AS %works_and_number_of_researchers
+WHERE {
+  INCLUDE %works_and_number_of_researchers
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
+}
+GROUP BY ?researchers ?topic ?topicLabel ?topicDescription ?samplework ?sampleworkLabel
+ORDER BY DESC(?researchers)
+   `;
+
  recentPublicationsSparql = `
 #defaultView:Table
 SELECT
@@ -122,6 +156,11 @@ WHERE {
 
  $(document).ready(function() {
      sparqlToDataTable(employeesAndAffiliatedSparql, "#employees-and-affiliated");
+     sparqlToDataTable(topicsSparql, "#topics", {
+	 linkPrefixes:{
+	     "topic": "../topic/",
+	     "samplework": "../work/",
+	 }});
      sparqlToDataTable(recentPublicationsSparql, "#recent-publications");
      sparqlToDataTable(recentCitationsSparql, "#recent-citations");
      sparqlToDataTable(awardsSparql, "#awards");
@@ -165,6 +204,11 @@ Past and present employees, affiliated, and members<br/>
 </div>
 
 
+<h2 id="Topics that employees and affiliates have published on">Topics that employees and affiliates have published on</h2>
+
+Topics of publications by past and present employees, affiliates, and members, ranked by number of individuals having published on the topic.<br/>
+
+<table class="table table-hover" id="topics"></table>
 
 <h2 id="Recent-publications">Recent publications <a href="{{ url_for('app.show_organization_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 

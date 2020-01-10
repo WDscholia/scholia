@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+    recentPublicationsSparql = `
+SELECT
+  (xsd:date(MAX(?publication_date_)) AS ?publication_date)
+  ?work ?workLabel ?author ?authorLabel 
+WHERE {
+  { ?author ?p1 wd:{{ q1 }}. }
+  UNION
+  {
+    ?author ?p2 ?something .
+    ?something wdt:P361 wd:{{ q1 }}.
+  }
+  ?work wdt:P50 ?author;
+  wdt:P921 wd:{{ q2 }}.
+  OPTIONAL { ?work wdt:P577 ?publication_date_ . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+GROUP BY ?work ?workLabel ?author ?authorLabel 
+ORDER BY DESC (?publication_date)
+LIMIT 200
+`;
+
+
+  $(document).ready(function() {
+      sparqlToDataTable(
+	  recentPublicationsSparql, "#recent-publications", {
+	      linkPrefixes:{
+		  "author": "../../../author/",
+		  "work": "../../../work/"} });
+ });
+</script>
+
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1 id="h1">Organization-topic</h1>
+
+<div id="intro"></div>
+
+
+<h2 class="headline" id="Recent-publications"><a href="#Recent-publications">Recent publications</a></h2>
+
+<table class="table table-hover" id="recent-publications"></table>
+
+
+{% endblock %}
