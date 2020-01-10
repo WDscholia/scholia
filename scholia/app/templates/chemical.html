@@ -5,6 +5,40 @@
 
 <script type="text/javascript">
 
+
+ structuresSparql = `
+SELECT
+  ?IDpred ?IDpredLabel
+  ?id (SAMPLE(?idUrls) as ?idUrl)
+WITH {
+  SELECT ?IDpred ?id ?formatterurl WHERE {
+    VALUES ?IDpred { wd:P233 wd:P234 wd:P2017 }
+    wd:{{ q }} ?IDdir ?id .
+    ?IDpred wikibase:directClaim ?IDdir ;
+            wdt:P31 wd:Q19833835 .
+    OPTIONAL {
+      ?IDpred wdt:P1630 ?formatterurl .
+    }
+  } LIMIT 500
+} AS %RESULTS {
+  { SELECT * WHERE {
+      INCLUDE %RESULTS
+      FILTER (?IDpred = wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?id)))) AS ?idUrls).
+    }
+  } UNION {
+    SELECT * WHERE {
+      INCLUDE %RESULTS
+      FILTER (?IDpred != wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
+    }
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+GROUP BY ?IDpred ?IDpredLabel ?id
+ORDER BY ASC(?IDpredLabel)
+`
+
  identifiersSparql = `
 SELECT
   ?IDpred ?IDpredLabel
@@ -18,6 +52,9 @@ WITH {
     OPTIONAL { 
       ?IDpred wdt:P1630 ?formatterurl .
     }
+    FILTER (?IDpred != wd:P233)
+    FILTER (?IDpred != wd:P234)
+    FILTER (?IDpred != wd:P2017)
   } LIMIT 500
 } AS %RESULTS {
   { SELECT * WHERE {
@@ -95,7 +132,9 @@ ORDER BY ASC(?propEntityLabel)
 SELECT ?date ?work ?workLabel ?type ?topics
 WITH {
   SELECT DISTINCT ?work WHERE {
-    {
+    {INCLUDE %RESULTS
+  BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
       ?work wdt:P921 / (wdt:P527+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
     } UNION {
       wd:{{ q }} ?propp ?statement .
@@ -124,6 +163,7 @@ LIMIT 500
 `
 
  $(document).ready(function() {
+     sparqlToDataTable(structuresSparql, "#structures");
      sparqlToDataTable(identifiersSparql, "#identifiers");
      sparqlToDataTable(relatedChemicalsSparql, "#related");
      sparqlToDataTable(propertiesSparql, "#properties");
@@ -162,6 +202,9 @@ LIMIT 500
 
 {% endif %}
 
+<h2 id="StructuralInformation">Structural Information</h2>
+
+<table class="table table-hover" id="structures"></table>
 
 <h2 id="Identifiers">Identifiers</h2>
 
