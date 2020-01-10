@@ -37,11 +37,11 @@ ORDER BY DESC(?works)
  topicsSparql = `
 SELECT
   ?researchers
-  ?topic ?topicLabel ?topicDescription
-  ?Samplework ?SampleworkLabel
-  (CONCAT(
-      "../organization/{{ q }}/topic/",
-      ENCODE_FOR_URI(REPLACE(STR(?topic), ".*Q", "Q"))) AS ?list_url)
+  ?topic ?topicLabel
+  ("🔎" AS ?zoom)
+  (CONCAT("{{ q }}/topic/", SUBSTR(STR(?topic), 32)) AS ?zoomUrl)
+  ?topicDescription
+  ?samplework ?sampleworkLabel
 WITH {
   SELECT DISTINCT ?researcher WHERE {
     ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
@@ -50,7 +50,7 @@ WITH {
 WITH {
   SELECT DISTINCT ?topic
     (COUNT(DISTINCT ?researcher) AS ?researchers)
-    (SAMPLE(?work) AS ?Samplework)
+    (SAMPLE(?work) AS ?samplework)
   WHERE {
     INCLUDE %researchers
     ?work wdt:P50 ?researcher . 
@@ -64,7 +64,7 @@ WHERE {
   INCLUDE %works_and_number_of_researchers
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
 }
-GROUP BY ?researchers ?topic ?topicLabel ?topicDescription ?Samplework ?SampleworkLabel
+GROUP BY ?researchers ?topic ?topicLabel ?topicDescription ?samplework ?sampleworkLabel
 ORDER BY DESC(?researchers)
    `;
 
@@ -157,7 +157,10 @@ WHERE {
  $(document).ready(function() {
      sparqlToDataTable(employeesAndAffiliatedSparql, "#employees-and-affiliated");
      sparqlToDataTable(topicsSparql, "#topics", {
-	     linkPrefixes:{"list": "../../../{{listLabel}}"} });
+	 linkPrefixes:{
+	     "topic": "../topic/",
+	     "samplework": "../work/",
+	 }});
      sparqlToDataTable(recentPublicationsSparql, "#recent-publications");
      sparqlToDataTable(recentCitationsSparql, "#recent-citations");
      sparqlToDataTable(awardsSparql, "#awards");
