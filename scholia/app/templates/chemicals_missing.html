@@ -89,7 +89,7 @@ SELECT ?compound ?compoundLabel ?formula WITH {
 }
 `
 
-  missingStandardMolarEnthropySparql = `
+  missingStandardMolarEntropySparql = `
   SELECT ?compound ?compoundLabel ?formula WITH {
   SELECT ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
@@ -193,7 +193,7 @@ $(document).ready(function() {
      sparqlToDataTable(missingSolubilitySparql, "#missing-solubility");
      sparqlToDataTable(missingEnthalpyOfFormationSparql, "#missing-enthalpy-of-formation");
      sparqlToDataTable(missingVaporPressureSparql, "#missing-vapor-pressure");
-     sparqlToDataTable(missingStandardMolarEnthropySparql, "#missing-molar-enthropy");
+     sparqlToDataTable(missingStandardMolarEntropySparql, "#missing-molar-entropy");
      sparqlToDataTable(missingDensitySparql, "#missing-density");
      sparqlToDataTable(missingChemicalStructureSparql, "#missing-chemical-structure");
      sparqlToDataTable(missingFlashPointSparql, "#missing-flash-point");
@@ -233,9 +233,9 @@ $(document).ready(function() {
 
 <table class="table table-hover" id="missing-vapor-pressure"></table>
 
-<h2 id="h1">Missing Molar Enthropy</h2>
+<h2 id="h1">Missing Molar Entropy</h2>
 
-<table class="table table-hover" id="missing-molar-enthropy"></table>
+<table class="table table-hover" id="missing-molar-entropy"></table>
 
 <h2 id="h1">Missing Density</h2>
 
