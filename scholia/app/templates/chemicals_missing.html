@@ -6,184 +6,197 @@
 
   <script type="text/javascript">
     missingBoilingPointsSparql = `
-SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2102 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
  missingMeltingPointsSparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2101 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
   missingMassSparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2067 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
   missingSolubilitySparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-    SELECT ?compound WHERE {
-      ?compound wdt:P31 wd:Q11173.
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2177 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
   missingEnthalpyOfFormationSparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P3078 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
   missingVaporPressureSparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2119 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
   missingStandardMolarEntropySparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P3071 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
   missingDensitySparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2054 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
   missingChemicalStructureSparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P117 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
 missingFlashPointSparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2128 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
 missingpKaSparql = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P1117 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
 missingCombustionEnthalpy = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2117 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
 missingIDLH = `
-  SELECT ?compound ?compoundLabel ?formula WITH {
-  SELECT ?compound WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
     ?compound wdt:P31 wd:Q11173.
     FILTER(NOT EXISTS {?compound wdt:P2129 []})
-  }
+    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
+  } GROUP BY ?compound ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
   OPTIONAL { ?compound wdt:P274 ?formula }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+} ORDER BY DESC(?wikis)
 `
 
 $(document).ready(function() {
