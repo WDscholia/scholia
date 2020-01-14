@@ -1,0 +1,20 @@
+SELECT
+  ?work ?workLabel
+  ?authors
+  ?topics
+WITH {
+  SELECT
+    ?work
+    (GROUP_CONCAT(DISTINCT ?author; separator=" // ") AS ?authors)
+    (GROUP_CONCAT(DISTINCT ?topic; separator=" // ") AS ?topics)
+  WHERE {
+    ?work wdt:P1433 / wdt:P4745 wd:{{ q }} .
+    OPTIONAL { ?work wdt:P50 / rdfs:label ?author . FILTER(LANG(?author) = "en") }
+    OPTIONAL { ?work wdt:P921 / rdfs:label ?topic . FILTER(LANG(?topic) = "en") }
+  }
+  GROUP BY ?work
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
