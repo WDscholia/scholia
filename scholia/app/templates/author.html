@@ -8,17 +8,17 @@
 <script type="text/javascript" src="{{ url_for('static', filename='d3-scale-chromatic.v1.min.js') }}"></script>
 
 <script type="text/javascript">
- listOfPublicationsSparql = `{% include 'sparql/author_publications.sparql' %}`;
+ listOfPublicationsSparql = `{% include 'sparql/author/publications.sparql' %}`;
 
- venueStatisticsSparql = `{% include 'sparql/author_venues.sparql' %}`;
+ venueStatisticsSparql = `{% include 'sparql/author/venues.sparql' %}`;
 
- topicsSparql = `{% include 'sparql/author_topics.sparql' %}`;
+ topicsSparql = `{% include 'sparql/author/topics.sparql' %}`;
 
- mostCitedWorksSparql = `{% include 'sparql/author_most_cited_works.sparql' %}`;
+ mostCitedWorksSparql = `{% include 'sparql/author/most_cited_works.sparql' %}`;
 
- citingAuthorsSparql = `{% include 'sparql/author_citing_authors.sparql' %}`;
+ citingAuthorsSparql = `{% include 'sparql/author/citing_authors.sparql' %}`;
 
- eventsSparql = `{% include 'sparql/author_events.sparql' %}`;
+ eventsSparql = `{% include 'sparql/author/events.sparql' %}`;
 
  function resize() {
      width = document.getElementById("topics-works-matrix").clientWidth;
