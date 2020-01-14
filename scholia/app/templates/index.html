@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 
+<!-- don't show nav search on index.html -->
+{% block nav_search %}{% endblock %}
+
 {% block page_content %}
 
 
@@ -15,7 +18,7 @@
     
     <div class="input-group">
 	<input type="text" class="form-control"
-	       placeholder="Search for a scientist, paper, organization, venue, event, topic, etc." id="searchterm"/>
+	       placeholder="Search for a scientist, topic, publication, organization, award, event, etc." id="searchterm"/>
 	<!-- span class="input-group-btn">
 	    <button class="btn btn-primary" type="submit">Search</button>
 	</span -->
@@ -55,7 +58,7 @@
 		    </dt>
 		    <dd>
 			View information about a venue, e.g., a scientific journal or scientific conference.
-			Here, the <em>NeuroImage</em> journal, its recently published paper, 
+			Here, the <em>NeuroImage</em> journal, its recently published papers, 
 			authors, topics, citation pattern, etc.
 		    </dd>
 		    
@@ -81,14 +84,14 @@
 	    
         <div class="card mb-4 box-shadow">
 	    <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Comparisons</h4>
+		<h4 class="my-0 font-weight-normal">Combinations</h4>
 	    </div>
 	    <div class="card-body">
 		<p>Scholia can show multiple items together.</p>
 		
 		<dl>
 		    <dt>
-			<a href="organizations/Q1269766,Q193196">Technical University of Denmark and UCL</a>
+			<a href="organizations/Q1269766,Q193196">Technical University of Denmark and University College London</a>
 		    </dt>
 		    <dd>
 			Compare two or more organizations. Here a comparison between two universities with
@@ -96,11 +99,22 @@
 		    </dd>
 		</dl>
 
-		<dt>
-		    <a href="authors/Q80,Q6135847,Q30085536">Tim Berners-Lee, James Hendler and Ruben Verborgh</a></dt>
-		<dd>
+		<dl>
+		    <dt>
+		        <a href="authors/Q80,Q6135847,Q30085536">Tim Berners-Lee, James Hendler and Ruben Verborgh</a></dt>
+            <dd>
 		    Compare three Semantic Web researchers. 
-		</dd>
+		    </dd>
+		</dl>
+
+		<dl>
+		    <dt>
+		        <a href="organization/Q1305486/topic/Q68854">University of Costa Rica and snakebites</a></dt>
+            <dd>
+		    Explore what people affiliated with this institution have published on the topic. 
+		    </dd>
+		</dl>
+
 
 
 
@@ -163,117 +177,39 @@
 {{super()}}
 
 <script type="text/javascript">
-$('#searchterm').keyup(function( e ) {
-  var q = $('#searchterm').val();
-  $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
-      search: q,
-      action: "wbsearchentities",
-      language: "en",
-      uselang: "en",
-      format: "json",
-      strictlanguage: true,
-    },
-    function(data) {
-      $("#searchresult").empty();
-      $.each(data.search, function(i, item) {
-        $("#searchresult").append("<div><a href='" + item.title + "'>" + item.label + "</a> - " + item.description + "</div>");
-    });
-  });
-});
-
 
  statisticsSparql = `
 SELECT ?count ?description
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] ?p [] . }
-} AS %triples
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P50 []. }
-} AS %authors
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P225 []. }
-} AS %taxa
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P356 []. }
-} AS %dois
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P496 []. }
-} AS %orcids
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P625 []. }
-} AS %geoloc
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P698 []. }
-} AS %pmids
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P921 []. }
-} AS %topics
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P932 []. }
-} AS %pmcids
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2093 []. }
-} AS %authorstrings
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2860 [] . }
-} AS %cites
 WHERE {
-  {
-    INCLUDE %triples
-    BIND("Total number of triples" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %pmids
-    BIND("Items with a PubMed ID" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %pmcids
-    BIND("Items with a PubMed Central ID" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %dois
-    BIND("Items with a DOI" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %cites
-    BIND("Citations" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %authors
-    BIND("Links from items about works to items about their authors" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %authorstrings
-    BIND("Author name strings on items about works" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %orcids
-    BIND("Items about authors with an ORCID ID" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %taxa
-    BIND("Items with a taxon name" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %geoloc
-    BIND("Items with a geolocation" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %topics
-    BIND("Links from items about works to items about their main subjects" AS ?description)
-  }
+{ {SELECT (COUNT(*) AS ?c) WHERE {?s ?p ?o} } BIND("Total number of triples" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {?p a wikibase:Property} } BIND("Total number of properties" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P50 []} } BIND("Links from works to authors" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P69 []} } BIND("Links from people to where they were educated" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P108 []} } BIND("Links from people to employers" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P166 []} } BIND("Links from people to awards" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P212 []} } BIND("ISBN 13 book numbers" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P225 []} } BIND("Taxon names" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P234 []} } BIND("InChIs" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P236 []} } BIND("ISSNs" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P496 []} } BIND("ORCIDs" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P625 []} } BIND("Geolocations" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P638 []} } BIND("Protein Data Bank IDs" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P686 []} } BIND("Gene Ontology IDs" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P698 []} } BIND("PubMed ID" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P818 []} } BIND("arXiv IDs" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P859 []} } BIND("Links to sponsors" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P921 []} } BIND("Links from works to their main subjects" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P932 []} } BIND("Items with a PubMed Central ID" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P356 []} } BIND("Items with a DOI" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P1416 []} } BIND("Links from people to their affiliations" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P2093 []} } BIND("Author name strings" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P2427 []} } BIND("Items with a GRID ID" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P2860 []} } BIND("Citations" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P31 wd:Q13442814.} } BIND("Scholarly articles" AS ?d)}
+BIND (?c AS ?count)
+BIND (?d AS ?description)
 }
-ORDER BY DESC(?count)
+ORDER BY DESC(?c)
 `
 
  $(document).ready(function() {

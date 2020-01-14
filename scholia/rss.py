@@ -172,7 +172,7 @@ WITH {{
 ORDER BY DESC(?date)
 """
 
-ORGANIZATION_SPARQL_QUERY = """
+SPONSOR_SPARQL_QUERY = """
 SELECT ?work ?workLabel ?date (?author AS ?description)
 WITH {{
   SELECT
@@ -484,7 +484,7 @@ def wb_get_sponsor_latest_works(q):
                 q + '/latest-works/rss" rel="self" ' + \
                 'type="application/rss+xml" />\n'
 
-    query = ORGANIZATION_SPARQL_QUERY.format(q=q)
+    query = SPONSOR_SPARQL_QUERY.format(q=q)
     url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)

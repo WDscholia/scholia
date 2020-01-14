@@ -6,7 +6,35 @@
 
   <script type="text/javascript">
 
- missingAuthorResolvingSparql = `
+    missingAuthorItemsSparql = `
+SELECT
+  (COUNT(?work) AS ?count) 
+  ?author_name
+  (CONCAT(
+      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?author_name)) AS ?author_resolver_url)
+WHERE {
+  {
+    SELECT DISTINCT ?author_name {
+      ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
+      
+      ?researcher_ skos:altLabel | rdfs:label ?author_name_ .
+      
+      # The SELECT-DISTINCT-BIND trick here is due to Stanislav Kralin
+      # https://stackoverflow.com/questions/53933564
+      BIND (STR(?author_name_) AS ?author_name)
+    }
+    LIMIT 2000
+  }
+  OPTIONAL { ?work wdt:P2093 ?author_name . }
+}
+GROUP BY ?author_name 
+HAVING (?count > 0)
+ORDER BY DESC(?count)
+`
+
+ missingAuthorResolvingNoInitialsSparql = `
+
 # Find frequent unresolved author names that are coauthors with
 # people associated with an organization.
 SELECT
@@ -14,29 +42,78 @@ SELECT
   ?researcher ?researcherLabel
   ?author_name
   (CONCAT(
-      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
-      ENCODE_FOR_URI(?author_name)) AS ?resolver_url)
+      "https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=",
+      ENCODE_FOR_URI(?author_name ), "&filter=wdt%3AP50+wd%3A", ?qid ) AS ?resolver_url)
+
 WITH {
   SELECT DISTINCT ?researcher_ WHERE {
-    ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
+    ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{q}} . 
   } 
 } AS %researchers
 WITH {
+#  SELECT DISTINCT ?author_name (COUNT(DISTINCT ?work) as ?count) ?author (REPLACE(STR(?author), ".*Q", "Q") AS ?qid) WHERE {
+
   SELECT
     (COUNT(DISTINCT ?work) AS ?works)
     ?author_name
     (SAMPLE(?researcher_) AS ?researcher)
+    (REPLACE(STR(?researcher), ".*Q", "Q") AS ?qid)
   WHERE {
     INCLUDE %researchers
     ?work wdt:P50 ?researcher_ ; 
           wdt:P2093 ?author_name .
+    FILTER(!regex (LCASE(?author_name), "^.*?((\\\\b\\\\w{1}\\\\b)|[.]).*$")).
   } 
   GROUP BY ?author_name
   ORDER BY DESC(?works)
-  LIMIT 2000
+  LIMIT 200
 } AS %researchers_and_number_of_works
 WHERE {
   INCLUDE %researchers_and_number_of_works
+          
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?works)
+`
+
+
+ missingAuthorResolvingWithInitialsSparql = `
+# Find frequent unresolved author names that are coauthors with
+# people associated with an organization.
+SELECT
+  ?works
+  ?researcher ?researcherLabel
+  ?author_name
+  (CONCAT(
+      "https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=",
+      ENCODE_FOR_URI(?author_name ), "&filter=wdt%3AP50+wd%3A", ?qid ) AS ?resolver_url)
+
+WITH {
+  SELECT DISTINCT ?researcher_ WHERE {
+    ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{q}} . 
+  } 
+} AS %researchers
+WITH {
+#  SELECT DISTINCT ?author_name (COUNT(DISTINCT ?work) as ?count) ?author (REPLACE(STR(?author), ".*Q", "Q") AS ?qid) WHERE {
+
+  SELECT
+    (COUNT(DISTINCT ?work) AS ?works)
+    ?author_name
+    (SAMPLE(?researcher_) AS ?researcher)
+    (REPLACE(STR(?researcher), ".*Q", "Q") AS ?qid)
+  WHERE {
+    INCLUDE %researchers
+    ?work wdt:P50 ?researcher_ ; 
+          wdt:P2093 ?author_name .
+    FILTER(regex (LCASE(?author_name), "^.*?((\\\\b\\\\w{1}\\\\b)|[.]).*$")).
+  } 
+  GROUP BY ?author_name
+  ORDER BY DESC(?works)
+  LIMIT 200
+} AS %researchers_and_number_of_works
+WHERE {
+  INCLUDE %researchers_and_number_of_works
+          
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,nl,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?works)
@@ -44,12 +121,24 @@ ORDER BY DESC(?works)
 
  $(document).ready(function() {
      sparqlToDataTable(
-	 missingAuthorResolvingSparql, "#missing-author-resolving",
+	 missingAuthorResolvingWithInitialsSparql, "#missing-author-resolving-initials",
 	 {
 	     linkPrefixes: {
 		 researcher: '../../author/',
 	     },
-	 });
+	 }
+     );
+     sparqlToDataTable(
+	 missingAuthorResolvingNoInitialsSparql, "#missing-author-no-initials",
+	 {
+	     linkPrefixes: {
+		 researcher: '../../author/',
+	     },
+	 }
+     );
+     sparqlToDataTable(
+	 missingAuthorItemsSparql, "#missing-author-items",
+     );
  });
 
 
@@ -64,13 +153,30 @@ ORDER BY DESC(?works)
 
 Missing information with respect to the organization.
 
+<h2 id="h2">Missing author items</h2>
 
-<h2>Author name strings to be resolved</h2>
+The authors listed below may only be represented as strings in Wikidata
+with no link to Wikidata items.
+Follow the link to use the Author disambiguator tool to try to resolve
+the authors.
+
+<table class="table table-hover" id="missing-author-items"></table>
+
+<h2 id="h3">Author name strings to be resolved</h2>
+
+
+<h3 id="h31">Author name strings without initials</h3>
 
 The author may be represented as a string rather than a Wikidata item.
 Follow the link to use the Author disambiguator tool to try to resolve the author name.
+To facilitate curation, author name strings containing single-letter initials have been removed from this table.
+<table class="table table-hover" id="missing-author-no-initials"></table>
 
-<table class="table table-hover" id="missing-author-resolving"></table>
+<h3 id="h32">Author name strings with initials</h3>
+
+This table shows author name strings that contain single-letter initials.
+
+<table class="table table-hover" id="missing-author-resolving-initials"></table> 
 
 
 {% endblock %}

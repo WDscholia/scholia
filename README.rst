@@ -1,4 +1,6 @@
-Scholia
+.. image:: scholia/app/static/images/scholia_logo.svg
+   :width: 100%
+   :alt: Scholia
 =======
 
 Scholia is a python package and webapp for interaction with scholarly information in Wikidata_.
@@ -30,7 +32,7 @@ It is possible to use methods of the scholia package as a script:
 Contributing
 ------------
 
-A simple way to get up and running is to `launch Scholia via Gitpod`_.
+A simple way to get up and running is to `launch Scholia via Gitpod`_, which installs the dependencies listed in `requirements.txt`_ automatically and launches the web app via `runserver.py`_.
 
 See file `CONTRIBUTING.rst`_ for technical details on how to improve Scholia.
 
@@ -39,6 +41,8 @@ See file `CONTRIBUTING.rst`_ for technical details on how to improve Scholia.
 .. _Wikimedia Tool Labs: https://tools.wmflabs.org/
 .. _launch Scholia via Gitpod: https://gitpod.io/#https://github.com/fnielsen/scholia
 .. _CONTRIBUTING.rst: https://github.com/fnielsen/scholia/blob/master/CONTRIBUTING.rst
+.. _requirements.txt: https://github.com/fnielsen/scholia/blob/master/requirements.txt
+.. _runserver.py: https://github.com/fnielsen/scholia/blob/master/runserver.py
 
 References
 ---------

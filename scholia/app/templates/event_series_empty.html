@@ -1,8 +1,52 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ eventSeriesSparql = `
+SELECT
+  ?events ?short_name
+  ?event_series ?event_seriesLabel ?event_seriesDescription
+WITH {
+  SELECT (COUNT(?event) AS ?events) ?event_series {  
+    { ?event_series wdt:P31 wd:Q47258130 . }
+    UNION 
+    { ?event_series wdt:P31 wd:Q47459256 . }
+    OPTIONAL { ?event_series ^wdt:P179 ?event }
+  }
+  GROUP BY ?event_series
+} AS %events
+WHERE {
+  INCLUDE %events
+  OPTIONAL { ?event_series wdt:P1813 ?short_name }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,fr". }
+}
+ORDER BY DESC(?events)
+`
+
+
+ $(document).ready(function() {
+     sparqlToDataTable(eventSeriesSparql, "#event-series", {
+	 linkPrefixes:{
+	     "event": "./",
+	 }
+     });
+ });
+
+
+</script>
+
+{% endblock %}
+
+
 {% block page_content %}
 
 <h1>Event series</h1>
+
+<table class="table table-hover" id="event-series"></table>
+
+
 
 
 <h2>Examples</h2>

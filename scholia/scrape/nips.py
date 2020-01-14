@@ -6,6 +6,7 @@ Usage:
   scholia.scrape.nips scrape-proceedings-from-url <url>
   scholia.scrape.nips paper-url-to-q <url>
   scholia.scrape.nips paper-url-to-quickstatements <url>
+  scholia.scrape.nips paper-urls-to-quickstatements [options] <filename>
 
 Options:
   -o --output=file  Output filename, default output to stdout
@@ -37,6 +38,8 @@ import os
 
 import signal
 
+from time import sleep
+
 from lxml import etree
 
 import requests
@@ -57,10 +60,13 @@ SELECT ?paper WHERE {{
 
 URL_BASE = "https://papers.nips.cc"
 
+USER_AGENT = "Scholia"
+
 WDQS_URL = 'https://query.wikidata.org/sparql'
 
 # Year should be the nominal year, - not the year of publication
 YEAR_TO_Q = {
+    "2019": "Q68600639",
     "2018": "Q56580288",
     "2017": "Q39502823",
     "2016": "Q30715037",
@@ -135,8 +141,13 @@ def paper_to_q(paper):
         label=title, title=title,
         url=paper['url'], full_text_url=paper['full_text_url'])
 
-    response = requests.get(WDQS_URL,
-                            params={'query': query, 'format': 'json'})
+    response = requests.get(
+        WDQS_URL, params={'query': query, 'format': 'json'},
+        headers={'User-Agent': USER_AGENT})
+    if not response.ok:
+        raise Exception("Wikidata API response error: {}".format(
+            response.status_code))
+
     data = response.json()['results']['bindings']
 
     if len(data) == 0 or not data[0]:
@@ -243,7 +254,8 @@ def scrape_paper_from_url(url):
     """
     url_paper_base = URL_BASE + "/paper/"
     if url[:len(url_paper_base)] != url_paper_base:
-        raise ValueError("url should start with " + url_paper_base)
+        raise ValueError("url should start with {}. It was {}.".format(
+            url_paper_base, url))
 
     if url.endswith('.pdf'):
         url = url[:-4] + '.html'
@@ -305,8 +317,8 @@ def scrape_paper_urls_from_proceedings_url(url):
     # Check URL
     url_proceedings_base = URL_BASE + '/book/'
     if url[:len(url_proceedings_base)] != url_proceedings_base:
-        raise ValueError('url should begin with {}'.format(
-            url_proceedings_base))
+        raise ValueError('url should begin with {}. It was {}'.format(
+            url_proceedings_base, url))
 
     # Download proceedings HTML
     response = requests.get(url)
@@ -373,6 +385,18 @@ def main():
         qs = paper_url_to_quickstatements(url)
         os.write(output_file, qs.encode(output_encoding) + b('\n'))
 
+    elif arguments['paper-urls-to-quickstatements']:
+        filename = arguments['<filename>']
+
+        # Number of seconds to pause between downloads
+        pause = 2
+
+        with open(filename) as fid:
+            for index, url in enumerate(fid):
+                qs = paper_url_to_quickstatements(url.strip())
+                os.write(output_file, qs.encode(output_encoding) + b('\n'))
+                sleep(pause)
+
     elif arguments['scrape-paper-from-url']:
         url = arguments['<url>']
         entry = scrape_paper_from_url(url)
@@ -388,6 +412,7 @@ def main():
         url = arguments['<url>']
         entry = scrape_proceedings_from_url(url)
         print_(json.dumps(entry))
+
     else:
         assert False
 

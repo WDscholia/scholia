@@ -1008,6 +1008,26 @@ def show_organization_rss(q):
     return response
 
 
+@main.route('/organization/' + q1_pattern + '/topic/' + q2_pattern)
+def show_organization_topic(q1, q2):
+    """Return HTML rendering for specific organization and topic.
+
+    Parameters
+    ----------
+    q1 : str
+        Wikidata item identifier for organization.
+    q2 : str
+        Wikidata item identifier for topic
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific organization and topic.
+
+    """
+    return render_template('organization_topic.html', q1=q1, q2=q2, q=q1)
+
+
 @main.route('/organization/' + q_pattern + '/missing')
 def show_organization_missing(q):
     """Return HTML rendering for missing information about an organization.
@@ -1857,3 +1877,8 @@ def show_about():
 
     """
     return render_template('about.html')
+
+
+@main.route('/favicon.ico')
+def show_favicon():
+    return redirect(url_for('static', filename='favicon/favicon.ico'))

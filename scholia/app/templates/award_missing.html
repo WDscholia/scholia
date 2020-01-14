@@ -5,6 +5,34 @@
 {{super()}}
 
   <script type="text/javascript">
+    missingAuthorItemsSparql = `
+SELECT
+  (COUNT(?work) AS ?count) 
+  ?author_name
+  (CONCAT(
+      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?author_name)) AS ?author_resolver_url)
+WHERE {
+  {
+    SELECT DISTINCT ?author_name {
+      ?recipient p:P166 ?award_statement . 
+      ?award_statement ps:P166 wd:{{ q }} .
+      
+      ?recipient skos:altLabel | rdfs:label ?author_name_ .
+      
+      # The SELECT-DISTINCT-BIND trick here is due to Stanislav Kralin
+      # https://stackoverflow.com/questions/53933564
+      BIND (STR(?author_name_) AS ?author_name)
+    }
+    LIMIT 2000
+  }
+  OPTIONAL { ?work wdt:P2093 ?author_name . }
+}
+GROUP BY ?author_name 
+HAVING (?count > 0)
+ORDER BY DESC(?count)
+`
+
     missingCoauthorItemsSparql = `
 SELECT
   # Number of works with the coauthor
@@ -34,10 +62,47 @@ WHERE {
 ORDER BY DESC(?count)
 `
 
+    missingTopicsSparql = `
+SELECT
+?citations  ?work ?workLabel (?work AS ?wikidata_url)
+WITH {
+  SELECT (COUNT(?author) as ?count) ?work WHERE {
+  # Works by author
+    ?work wdt:P50 ?author .
+  # Author who received an award
+    ?author wdt:P166 wd:{{ q }} .
+  # Work does not have a main subject statement
+    FILTER NOT EXISTS { ?work wdt:P921 ?topic . }
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?count)
+  LIMIT 2000
+} AS %works
+WITH {
+  SELECT (COUNT(?work1) as ?citations) ?work WHERE {
+  INCLUDE %works
+  # Works cited
+    OPTIONAL { ?work1 wdt:P2860 ?work }.
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?citations)
+  LIMIT 200
+} AS %result
+WHERE {
+  INCLUDE %result
+  
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?citations)
+`
+
 
 
  $(document).ready(function() {
+     sparqlToDataTable(missingAuthorItemsSparql, "#missing-author-items");
      sparqlToDataTable(missingCoauthorItemsSparql, "#missing-coauthor-items");
+     sparqlToDataTable(missingTopicsSparql, "#missing-topics");
  });
 
 
@@ -48,6 +113,21 @@ ORDER BY DESC(?count)
 
 {% block page_content %}
 
+<h1 id="h1">Award</h1>
+
+Missing information with respect to the award.
+
+
+
+  <h2>Missing author items</h2>
+
+The authors listed below may only be represented as strings in Wikidata
+with no link to Wikidata items.
+Follow the link to use the Author disambiguator tool to try to resolve
+the authors.
+
+<table class="table table-hover" id="missing-author-items"></table>
+
 
   <h2>Missing coauthor items</h2>
 
@@ -57,6 +137,12 @@ Follow the link to use the Author disambiguator tool to try to resolve
 the authors.
 
 <table class="table table-hover" id="missing-coauthor-items"></table>
+
+  <h2>Missing topics</h2>
+
+The works listed below do not currently have statements about their main subjects.
+
+<table class="table table-hover" id="missing-topics"></table>
 
 
 

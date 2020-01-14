@@ -12,34 +12,46 @@ WITH {
   WHERE {
     wd:{{ q }} wdt:P31 wd:Q4915012 ;
              wdt:P527 ?part .
-    OPTIONAL { ?part wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
+    OPTIONAL { 
+      ?part wdt:P31 ?type_ .
+      ?type_ rdfs:label ?type_label .
+      FILTER (LANG(?type_label) = 'en')
+    }
   } GROUP BY ?part
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . }
 } ORDER BY ASC(?partLabel)
 `
 
 const recentArticlesSparql = `
 SELECT ?date ?work ?workLabel ?type ?topics
 WITH {
-  SELECT DISTINCT ?work WHERE {
-    {
-      ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
-    } UNION {
-      wd:{{ q }} wdt:P2860 ?work .
+  SELECT DISTINCT ?work 
+    WHERE {
+      { ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} . }
+      UNION { wd:{{ q }} wdt:P2860 ?work . }
     }
-  }
 } AS %works
 WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics) WHERE {
+  SELECT 
+    (MAX(?dates) as ?datetime)
+    ?work
+    (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
+    (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics) 
+  WHERE {
     INCLUDE %works
     OPTIONAL {
-      ?work wdt:P921 ?topic . 
-      ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
+      ?work wdt:P921 ?topic .
+      ?topic rdfs:label ?topic_label .
+      FILTER (lang(?topic_label) = 'en')
     }
-    OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
+    OPTIONAL { 
+      ?work wdt:P31 ?type_ .
+      ?type_ rdfs:label ?type_label .
+      FILTER (LANG(?type_label) = 'en') 
+    }
     OPTIONAL { ?work wdt:P577 ?dates . }
   }
   GROUP BY ?work
@@ -47,7 +59,7 @@ WITH {
 WHERE {
   INCLUDE %result
   BIND(xsd:date(?datetime) AS ?date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
 }
 ORDER BY DESC(?date)
 LIMIT 500
@@ -57,7 +69,10 @@ const citingArticlesSparql = `
 #defaultView:Table
 SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
 WITH {
-  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work
+  SELECT
+    (MIN(?date) AS ?publication_date)
+    (COUNT(?citing_citing_work) AS ?citations)
+    ?citing_work
   WHERE {
     ?citing_work wdt:P2860 wd:{{ q }} .
     OPTIONAL {
@@ -70,18 +85,21 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . }
 }
 ORDER BY DESC(?citations) DESC(?date)
 `
 
-//Extensible query for muliple, optional values
+// Extensible query for muliple, optional values
 const optionalDataValuesSparql =`
-SELECT ?wpid ?organism ?organismLabel
+SELECT ?wpid ?organism ?organismLabel ?pathwayDescription
 WHERE {
-  OPTIONAL { wd:{{ q }} wdt:P2410 ?wpid . }
-  OPTIONAL { wd:{{ q }} wdt:P703 ?organism . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+  VALUES ?pathway { wd:{{q}} }
+  OPTIONAL {
+    wd:{{ q }} wdt:P2410 ?wpid ;
+    wdt:P703 ?organism .
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . }
 }
 `
 
@@ -90,20 +108,28 @@ $(document).ready(function() {
   sparqlToDataTable(recentArticlesSparql, "#recentArticles");
   sparqlToDataTable(citingArticlesSparql, "#citingArticles");
 
-  //Hide optional sections until data values are confirmed and ready
+  // Hide optional sections until data values are confirmed and ready
   var organismSection = document.getElementById("Organism")                                                                                         
   organismSection.style.display = "none"; 
+
   var pathwayViewerSection = document.getElementById("pathway-viewer")                                                                                
   pathwayViewerSection.style.display = "none"; 
 
-  //Check for optional data values and then use them if available
+  // Check for optional data values and then use them if available
   const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + 
-        encodeURIComponent(optionalDataValuesSparql) + '&format=json';
+    encodeURIComponent(optionalDataValuesSparql) + '&format=json';
   $.getJSON(sparqlURL, function(response) {
     const simpleData = sparqlDataToSimpleData(response);
     const dataValues = simpleData.data[0];
+    if ("pathwayDescription" in dataValues) {
+      $("#description").text(dataValues.pathwayDescription);
+    }
     if ("organism" in dataValues) {
-      $("#Organism").after('<a href="'+dataValues.organism+'">'+dataValues.organismLabel+'</a>'); 
+      $("#Organism").after('<a href="' +
+			   dataValues.organism +
+			   '">' +
+			   escapeHTML(dataValues.organismLabel) +
+			   '</a>'); 
       organismSection.style.display = "";
     }
     if ("wpid" in dataValues) {
@@ -127,11 +153,13 @@ $(document).ready(function() {
 
 <div id="intro"></div>
 
+<div id="description"></div><br />
+
 <div id="pathway-viewer" class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="" style="border-width: 1px; border-color: rgb(222,226,230); border-style: solid;" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
 </div>
 
-<h2 id="Organism"> Organism </h2>
+<h2 id="Organism">Organism</h2>
 
 <h2 id="Participants">Participants</h2>
 
@@ -145,7 +173,6 @@ $(document).ready(function() {
 <h2 id="Works citing this pathway">Works citing this pathway</h2>
 
 <table class="table table-hover" id="citingArticles"></table>
-
 
 <h2 id="Publications per year">Publications per year</h2>
 
