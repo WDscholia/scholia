@@ -20,7 +20,7 @@ WHERE {
 }
 `
 
-  listOfCommonAuthoredWorksSparql = `
+  listOfJointlyAuthoredWorksSparql = `
 SELECT ?coauthor_count ?work ?workLabel ?authors
 WITH {
   SELECT (COUNT(?author) AS ?coauthor_count) ?work (GROUP_CONCAT(?author_label; separator=" // ") AS ?authors) WHERE {
@@ -40,7 +40,7 @@ ORDER BY DESC(?coauthor_count)
 
  $(document).ready(function() {
      sparqlToDataTable(listOfAuthorsSparql, "#list-of-authors");
-     sparqlToDataTable(listOfCommonAuthoredWorksSparql, "#list-of-common-authored-works");
+     sparqlToDataTable(listOfJointlyAuthoredWorksSparql, "#list-of-jointly-authored-works");
  });
 
 
@@ -60,9 +60,9 @@ ORDER BY DESC(?coauthor_count)
 <table class="table table-hover" id="list-of-authors"></table>
 
 
-<h2>List of common authored works</h2>
+<h2>List of jointly authored works</h2>
 
-<table class="table table-hover" id="list-of-common-authored-works"></table>
+<table class="table table-hover" id="list-of-jointly-authored-works"></table>
 
 <h2>Number of works per publication year</h2>
 
