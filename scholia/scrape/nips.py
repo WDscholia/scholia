@@ -43,6 +43,7 @@ from time import sleep
 from lxml import etree
 
 import requests
+import scholia.config
 
 from ..qs import paper_to_quickstatements
 from ..utils import escape_string
@@ -62,7 +63,7 @@ URL_BASE = "https://papers.nips.cc"
 
 USER_AGENT = "Scholia"
 
-WDQS_URL = 'https://query.wikidata.org/sparql'
+WDQS_URL = config.get('servers', 'SPARQLEndPointURL')
 
 # Year should be the nominal year, - not the year of publication
 YEAR_TO_Q = {

@@ -28,6 +28,7 @@ from six import b, print_, u
 from lxml import etree
 
 import requests
+import scholia.config
 
 from ..qs import paper_to_quickstatements
 from ..query import iso639_to_q, issn_to_qs
@@ -48,7 +49,7 @@ SELECT ?paper WHERE {{
 """)
 
 # SPARQL Endpoint for Wikidata Query Service
-WDQS_URL = 'https://query.wikidata.org/sparql'
+WDQS_URL = config.get('servers', 'SPARQLEndPointURL')
 
 
 def paper_to_q(paper):

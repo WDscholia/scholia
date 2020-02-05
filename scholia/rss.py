@@ -36,6 +36,7 @@ References
 from __future__ import print_function
 
 import requests
+import scholia.config
 
 from dateutil.parser import parse as parse_datetime
 
@@ -349,7 +350,7 @@ def wb_get_venue_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = VENUE_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+    url = config.get('servers', 'SPARQLEndPointURLbd')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
@@ -393,7 +394,7 @@ def wb_get_topic_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = TOPIC_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+    url = config.get('servers', 'SPARQLEndPointURLbd')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
@@ -439,7 +440,7 @@ def wb_get_organization_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = ORGANIZATION_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+    url = config.get('servers', 'SPARQLEndPointURLbd')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
@@ -485,7 +486,7 @@ def wb_get_sponsor_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = SPONSOR_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+    url = config.get('servers', 'SPARQLEndPointURLbd')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()

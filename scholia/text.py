@@ -30,6 +30,7 @@ from os.path import exists, expanduser, join
 from six.moves import cPickle as pickle
 
 import re
+import scholia.config
 
 from simplejson import JSONDecodeError
 
@@ -122,7 +123,7 @@ class TextToTopicQText():
 
         """
         response = requests.get(
-            'https://query.wikidata.org/sparql',
+            config.get('servers', 'SPARQLEndPointURL'),
             params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'},
             headers=self.headers)
 
@@ -132,7 +133,7 @@ class TextToTopicQText():
             # In some cases a timeout may occur in the middle of a response,
             # making the JSON returned invalid.
             response = requests.get(
-                'https://query.wikidata.org/sparql',
+                config.get('servers', 'SPARQLEndPointURL'),
                 params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'},
                 headers=self.headers)
             try:

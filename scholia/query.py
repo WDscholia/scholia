@@ -48,6 +48,7 @@ from __future__ import absolute_import, division, print_function
 from random import random
 
 import requests
+import scholia.config
 
 from simplejson import JSONDecodeError
 
@@ -109,7 +110,7 @@ def query_to_bindings(query):
         Data as list of dicts.
 
     """
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -139,7 +140,7 @@ def arxiv_to_qs(arxiv):
     query = 'select ?work where {{ ?work wdt:P818 "{arxiv}" }}'.format(
         arxiv=escape_string(arxiv))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -189,7 +190,7 @@ def count_scientific_articles():
     query = """
         SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31 wd:Q13442814 }"""
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -227,7 +228,7 @@ def doi_to_qs(doi):
     query = 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
         doi=escape_string(doi.upper()))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -269,7 +270,7 @@ def iso639_to_q(language):
     else:
         raise ValueError('ISO639 language code not recognized')
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -310,7 +311,7 @@ def pubchem_to_qs(cid):
     query = 'select ?chemical where {{ ?chemical wdt:P662 "{cid}" }}'.format(
         cid=cid)
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -346,7 +347,7 @@ def pubmed_to_qs(pmid):
     query = 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(
         pmid=pmid)
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -379,7 +380,7 @@ def ror_to_qs(rorid):
     query = 'select ?work where {{ ?work wdt:P6782 "{rorid}" }}'.format(
         rorid=rorid)
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -413,7 +414,7 @@ def wikipathways_to_qs(wpid):
              '?work wdt:P2410 ?wpid }}').format(
                  wpid=wpid)
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -444,7 +445,7 @@ def issn_to_qs(issn):
     query = 'select ?author where {{ ?author wdt:P236 "{issn}" }}'.format(
         issn=escape_string(issn))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -475,7 +476,7 @@ def orcid_to_qs(orcid):
     query = 'select ?author where {{ ?author wdt:P496 "{orcid}" }}'.format(
         orcid=escape_string(orcid))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -506,7 +507,7 @@ def mesh_to_qs(meshid):
     query = 'select ?cmp where {{ ?cmp wdt:P486 "{meshid}" }}'.format(
         meshid=meshid)
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -540,7 +541,7 @@ def q_to_label(q, language='en'):
         FILTER (LANG(?label) = "{language}") }}""".format(
         q=q, language=language)
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -600,7 +601,7 @@ def search_article_titles(q, search_string=None):
     # addition during query.
     article_count = count_scientific_articles() + 1000
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
 
     batch_size = 500000
     loops = article_count // batch_size + 1
@@ -672,7 +673,7 @@ def viaf_to_qs(viaf):
     query = 'select ?author where {{ ?author wdt:P214 "{viaf}" }}'.format(
         viaf=escape_string(viaf))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -706,7 +707,7 @@ def q_to_class(q):
     query = 'SELECT ?class {{ wd:{q} wdt:P31 ?class }}'.format(
         q=escape_string(q))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     try:
@@ -884,7 +885,7 @@ def q_to_class(q):
         query = 'select ?class where {{ wd:{q} wdt:P279+ ?class }}'.format(
             q=escape_string(q))
 
-        url = 'https://query.wikidata.org/sparql'
+        url = config.get('servers', 'SPARQLEndPointURL')
         params = {'query': query, 'format': 'json'}
         response = requests.get(url, params=params, headers=HEADERS)
         data = response.json()
@@ -926,7 +927,7 @@ def twitter_to_qs(twitter):
                where {{ ?item wdt:P2002 "{twitter}" }}""".format(
         twitter=escape_string(twitter))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -959,7 +960,7 @@ def github_to_qs(github):
                where {{ ?item wdt:P2037 "{github}" }}""".format(
         github=escape_string(github))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -992,7 +993,7 @@ def inchikey_to_qs(inchikey):
                where {{ ?item wdt:P235 "{inchikey}" }}""".format(
         inchikey=escape_string(inchikey))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -1025,7 +1026,7 @@ def cordis_to_qs(cordis):
                where {{ ?item wdt:P3400 "{cordis}" }}""".format(
         cordis=escape_string(cordis))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -1058,7 +1059,7 @@ def cas_to_qs(cas):
                where {{ ?item wdt:P231 "{cas}" }}""".format(
         cas=cas)
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -1092,7 +1093,7 @@ def lipidmaps_to_qs(lmid):
     query = """select ?item
                where {{ ?item wdt:P2063 "{lmid}" }}""".format(
         lmid=lmid)
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -1125,7 +1126,7 @@ def atomic_number_to_qs(atomic_number):
                WHERE {{ ?item wdt:P31 wd:Q11344 ; wdt:P1086 ?number .
                  FILTER (STR(?number) = "{atomic_number}") }}""".format(
         atomic_number=atomic_number)
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -1157,7 +1158,7 @@ def atomic_symbol_to_qs(symbol):
     query = """SELECT ?item
                WHERE {{ ?item wdt:P246 "{symbol}" }}""".format(
         symbol=symbol)
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -1191,7 +1192,7 @@ def website_to_qs(url):
     query = 'SELECT ?work WHERE {{ ?work wdt:P856 <{url}> }}'.format(
         url=url.strip())
 
-    url_ = 'https://query.wikidata.org/sparql'
+    url_ = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url_, params=params, headers=HEADERS)
     data = response.json()

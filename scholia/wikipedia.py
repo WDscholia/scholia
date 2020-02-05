@@ -27,6 +27,7 @@ from os import write
 import signal
 
 import requests
+import scholia.config
 
 from six import b, u
 
@@ -104,7 +105,7 @@ def q_to_bibliography_templates(q):
 
     """
     query = BIBLIOGRAPHY_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()

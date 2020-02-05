@@ -5,6 +5,7 @@
 
 <meta name="robots" content="index, nofollow">
 
+
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jquery.dataTables.min.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/scholia.css') }}">
@@ -17,6 +18,7 @@
 {% block scripts %}
 {{super()}}
 
+<script type="text/javascript" src="{{ url_for('static', filename='scholiaConfig.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='scholia.js') }}"></script>
 

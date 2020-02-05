@@ -8,6 +8,7 @@ Usage:
 from collections import OrderedDict
 
 import requests
+import scholia.config
 
 
 EXAMPLE_SPARQL_QUERY = """
@@ -34,7 +35,7 @@ def write_pajek_from_sparql(filename, sparql):
     column1 = 'item1'
     column2 = 'item2'
 
-    url = 'https://query.wikidata.org/sparql'
+    url = config.get('servers', 'SPARQLEndPointURL')
     params = {'query': sparql, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()['results']['bindings']
