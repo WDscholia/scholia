@@ -2,8 +2,10 @@
 
 import re
 
+
 from flask import (Blueprint, current_app, redirect, render_template, request,
                    Response, url_for)
+from flask import current_app as app
 from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
@@ -110,7 +112,7 @@ def redirect_q(q):
     """
     class_ = q_to_class(q)
     method = 'app.show_' + class_
-    return redirect(url_for(method, q=q), code=302)
+    return redirect( url_for(method, q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'), code=302))
 
 
 @main.route("/" + p_pattern)
@@ -148,7 +150,7 @@ def show_arxiv(arxiv):
     qs = arxiv_to_qs(arxiv)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_work', q=q), code=302)
+        return redirect( url_for('app.show_work', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -185,7 +187,7 @@ def show_arxiv_to_quickstatements():
         # The arxiv is already in Wikidata
         q = qs[0]
         return render_template('arxiv_to_quickstatements.html',
-                               arxiv=arxiv, q=q)
+                               arxiv=arxiv, q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
     try:
         metadata = get_arxiv_metadata(arxiv)
@@ -219,7 +221,7 @@ def show_author(q):
         first_initial, last_name = name[0], name.split()[-1]
     else:
         first_initial, last_name = '', ''
-    return render_template('author.html', q=q, first_initial=first_initial,
+    return render_template('author.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'),  first_initial=first_initial,
                            last_name=last_name)
 
 
@@ -260,7 +262,7 @@ def show_author_missing(q):
         Rendered HTML.
 
     """
-    return render_template('author_missing.html', q=q)
+    return render_template('author_missing.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/author/')
@@ -287,7 +289,7 @@ def show_author_random():
 
     """
     q = random_author()
-    return redirect(url_for('app.show_author', q=q), code=302)
+    return redirect(url_for('app.show_author', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
 
 
 @main.route('/authors/' + qs_pattern)
@@ -324,7 +326,7 @@ def show_award(q):
         Rendered HTML.
 
     """
-    return render_template('award.html', q=q)
+    return render_template('award.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/award/')
@@ -355,7 +357,7 @@ def show_award_missing(q):
         Rendered HTML.
 
     """
-    return render_template('award_missing.html', q=q)
+    return render_template('award_missing.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/cas/<cas>')
@@ -371,7 +373,7 @@ def redirect_cas(cas):
     qs = cas_to_qs(cas)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_chemical', q=q), code=302)
+        return redirect(url_for('app.show_chemical', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -389,9 +391,9 @@ def redirect_lipidmaps(lmid):
     if len(qs) > 0:
         q = qs[0]
         if (len(lmid) < 12):
-            return redirect(url_for('app.show_chemical_class', q=q), code=302)
+            return redirect(url_for('app.show_chemical_class', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
         else:
-            return redirect(url_for('app.show_chemical', q=q), code=302)
+            return redirect(url_for('app.show_chemical', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -408,7 +410,7 @@ def redirect_atomic_symbol(symbol):
     qs = atomic_symbol_to_qs(symbol)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_chemical_element', q=q), code=302)
+        return redirect(url_for('app.show_chemical_element', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -425,7 +427,7 @@ def redirect_atomic_number(atomic_number):
     qs = atomic_number_to_qs(atomic_number)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_chemical_element', q=q), code=302)
+        return redirect(url_for('app.show_chemical_element', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -442,7 +444,7 @@ def redirect_cordis(cordis):
     qs = cordis_to_qs(cordis)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_project', q=q), code=302)
+        return redirect(url_for('app.show_project', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -461,7 +463,7 @@ def show_catalogue(q):
         Rendered HTML page.
 
     """
-    return render_template('catalogue.html', q=q)
+    return render_template('catalogue.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/catalogue/')
@@ -505,7 +507,7 @@ def show_clinical_trial(q):
         Rendered HTML for a specific clinical trial.
 
     """
-    return render_template('clinical_trial.html', q=q)
+    return render_template('clinical_trial.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/countries/' + qs_pattern)
@@ -555,7 +557,7 @@ def show_country(q):
         Rendered HTML for a specific country.
 
     """
-    return render_template('country.html', q=q)
+    return render_template('country.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/country/' + q1_pattern + '/topic/' + q2_pattern)
@@ -575,7 +577,7 @@ def show_country_topic(q1, q2):
         Rendered HTML for a specific country and topic.
 
     """
-    return render_template('country_topic.html', q1=q1, q2=q2, q=q1)
+    return render_template('country_topic.html', q1=q1, q2=q2, q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/disease/' + q_pattern)
@@ -593,7 +595,7 @@ def show_disease(q):
         Rendered HTML.
 
     """
-    return render_template('disease.html', q=q)
+    return render_template('disease.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/disease/')
@@ -622,7 +624,7 @@ def redirect_doi(doi):
     qs = doi_to_qs(doi)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_work', q=q), code=302)
+        return redirect(url_for('app.show_work', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -641,7 +643,7 @@ def show_event(q):
         Rendered HTML.
 
     """
-    return render_template('event.html', q=q)
+    return render_template('event.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/event/')
@@ -672,7 +674,7 @@ def show_event_series(q):
         Rendered HTML.
 
     """
-    return render_template('event_series.html', q=q)
+    return render_template('event_series.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/event-series/')
@@ -714,7 +716,7 @@ def redirect_github(github):
     qs = github_to_qs(github)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_author', q=q), code=302)
+        return redirect(url_for('app.show_author', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -731,7 +733,7 @@ def redirect_inchikey(inchikey):
     qs = inchikey_to_qs(inchikey)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_chemical', q=q), code=302)
+        return redirect(url_for('app.show_chemical', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -748,7 +750,7 @@ def redirect_issn(issn):
     qs = issn_to_qs(issn)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_venue', q=q), code=302)
+        return redirect(url_for('app.show_venue', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -811,7 +813,7 @@ def show_location(q):
         Rendered HTML for a specific location.
 
     """
-    return render_template('location.html', q=q)
+    return render_template('location.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/location/' + q1_pattern + '/topic/' + q2_pattern)
@@ -831,7 +833,7 @@ def show_location_topic(q1, q2):
         Rendered HTML for a specific location and topic.
 
     """
-    return render_template('location_topic.html', q1=q1, q2=q2, q=q1)
+    return render_template('location_topic.html', q1=q1, q2=q2, q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/mesh/<meshid>')
@@ -849,7 +851,7 @@ def redirect_mesh(meshid):
         q = qs[0]
         class_ = q_to_class(q)
         method = 'app.show_' + class_
-        return redirect(url_for(method, q=q), code=302)
+        return redirect(url_for(method, q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -866,7 +868,7 @@ def redirect_orcid(orcid):
     qs = orcid_to_qs(orcid)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_author', q=q), code=302)
+        return redirect(url_for('app.show_author', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -883,7 +885,7 @@ def redirect_pubchem(cid):
     qs = pubchem_to_qs(cid)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_chemical', q=q), code=302)
+        return redirect(url_for('app.show_chemical', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -900,7 +902,7 @@ def redirect_pubmed(pmid):
     qs = pubmed_to_qs(pmid)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_work', q=q), code=302)
+        return redirect(url_for('app.show_work', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -917,7 +919,7 @@ def redirect_wikipathways(wpid):
     qs = wikipathways_to_qs(wpid)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_pathway', q=q), code=302)
+        return redirect(url_for('app.show_pathway', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -934,7 +936,7 @@ def redirect_ror(rorid):
     qs = ror_to_qs(rorid)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_organization', q=q), code=302)
+        return redirect(url_for('app.show_organization', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -951,7 +953,7 @@ def redirect_viaf(viaf):
     qs = viaf_to_qs(viaf)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_author', q=q), code=302)
+        return redirect(url_for('app.show_author', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -970,7 +972,7 @@ def show_organization(q):
         Rendered HTML.
 
     """
-    return render_template('organization.html', q=q)
+    return render_template('organization.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/organization/')
@@ -1025,7 +1027,7 @@ def show_organization_topic(q1, q2):
         Rendered HTML for a specific organization and topic.
 
     """
-    return render_template('organization_topic.html', q1=q1, q2=q2, q=q1)
+    return render_template('organization_topic.html', q1=q1, q2=q2, q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/organization/' + q_pattern + '/missing')
@@ -1043,7 +1045,7 @@ def show_organization_missing(q):
         Rendered HTML.
 
     """
-    return render_template('organization_missing.html', q=q)
+    return render_template('organization_missing.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/organizations/' + qs_pattern)
@@ -1080,7 +1082,7 @@ def show_printer(q):
         Rendered HTML.
 
     """
-    return render_template('printer.html', q=q)
+    return render_template('printer.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/printer/')
@@ -1111,7 +1113,7 @@ def show_protein(q):
         Rendered HTML.
 
     """
-    return render_template('protein.html', q=q)
+    return render_template('protein.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/protein/')
@@ -1142,7 +1144,7 @@ def show_project(q):
         Rendered HTML.
 
     """
-    return render_template('project.html', q=q)
+    return render_template('project.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/project/')
@@ -1192,7 +1194,7 @@ def show_gene(q):
         Rendered HTML.
 
     """
-    return render_template('gene.html', q=q)
+    return render_template('gene.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/gene/')
@@ -1223,7 +1225,7 @@ def show_taxon(q):
         Rendered HTML.
 
     """
-    return render_template('taxon.html', q=q)
+    return render_template('taxon.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/taxon/')
@@ -1264,7 +1266,7 @@ def show_q_to_bibliography_templates():
     wikitext = q_to_bibliography_templates(q)
 
     return render_template('q_to_bibliography_templates.html',
-                           q=q,
+                           q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'), 
                            wikitext=wikitext)
 
 
@@ -1283,7 +1285,7 @@ def show_software(q):
         Rendered HTML.
 
     """
-    return render_template('software.html', q=q)
+    return render_template('software.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/software/')
@@ -1347,7 +1349,7 @@ def show_topic(q):
         Rendered HTML.
 
     """
-    return render_template('topic.html', q=q)
+    return render_template('topic.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/topic/' + q_pattern + '/latest-works/rss')
@@ -1419,7 +1421,7 @@ def show_topic_missing(q):
         Rendered HTML index page for topic.
 
     """
-    return render_template('topic_missing.html', q=q)
+    return render_template('topic_missing.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/chemical/' + q_pattern)
@@ -1441,7 +1443,7 @@ def show_chemical(q):
     smiles = entity_to_smiles(entities[q])
     return render_template(
         'chemical.html',
-        q=q,
+        q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'), 
         smiles=smiles,
         third_parties_enabled=current_app.third_parties_enabled)
 
@@ -1474,7 +1476,7 @@ def show_chemical_element(q):
         Rendered HTML.
 
     """
-    return render_template('chemical_element.html', q=q)
+    return render_template('chemical_element.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/chemical-element/')
@@ -1505,7 +1507,7 @@ def show_chemical_class(q):
         Rendered HTML.
 
     """
-    return render_template('chemical_class.html', q=q)
+    return render_template('chemical_class.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/chemical-class/')
@@ -1535,7 +1537,7 @@ def redirect_twitter(twitter):
     q = ''
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.redirect_q', q=q), code=302)
+        return redirect(url_for('app.redirect_q', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')),code=302)
     return render_template('404.html')
 
 
@@ -1554,7 +1556,7 @@ def show_venue(q):
         Rendered HTML page.
 
     """
-    return render_template('venue.html', q=q)
+    return render_template('venue.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed')) 
 
 
 @main.route('/venue/' + q_pattern + '/missing')
@@ -1572,7 +1574,7 @@ def show_venue_missing(q):
         Rendered HTML.
 
     """
-    return render_template('venue_missing.html', q=q)
+    return render_template('venue_missing.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/venue/' + q_pattern + '/latest-works/rss')
@@ -1626,7 +1628,7 @@ def show_venues(qs):
 
     """
     qs = Q_PATTERN.findall(qs)
-    return render_template('venues.html', qs=qs)
+    return render_template('venues.html', qs=qs, webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed') )
 
 
 @main.route('/series/' + q_pattern)
@@ -1644,7 +1646,7 @@ def show_series(q):
         Rendered HTML for specific series.
 
     """
-    return render_template('series.html', q=q)
+    return render_template('series.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed') )
 
 
 @main.route('/series/')
@@ -1675,7 +1677,7 @@ def show_pathway(q):
         Rendered HTML.
 
     """
-    return render_template('pathway.html', q=q)
+    return render_template('pathway.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed') )
 
 
 @main.route('/pathway/')
@@ -1701,7 +1703,7 @@ def show_publisher(q):
        Rendered HTML page for specific publisher.
 
     """
-    return render_template('publisher.html', q=q)
+    return render_template('publisher.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed') )
 
 
 @main.route('/publisher/')
@@ -1747,7 +1749,7 @@ def show_sponsor(q):
         Rendered HTML page for specific sponsor.
 
     """
-    return render_template('sponsor.html', q=q)
+    return render_template('sponsor.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/sponsor/')
@@ -1800,7 +1802,7 @@ def show_use(q):
         Rendered HTML.
 
     """
-    return render_template('use.html', q=q)
+    return render_template('use.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/use/')
@@ -1831,7 +1833,7 @@ def show_work(q):
         Rendered HTML page for specific work.
 
     """
-    return render_template('work.html', q=q)
+    return render_template('work.html', q=q,  webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/work/')

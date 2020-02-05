@@ -25,6 +25,7 @@ DEFAULTS = """
 [servers]
 SPARQLEndPointURLbd = https://query.wikidata.org/bigdata/namespace/wdq/sparql
 SPARQLEndPointURL = https://query.wikidata.org/sparql
+SPAREndPointEmbed = https://query.wikidata.org/
 webserviceURL = http://www.wikidata.org/
 """
 

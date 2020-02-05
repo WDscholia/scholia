@@ -113,7 +113,7 @@ ORDER BY DESC(?count)
 <h2 id="Topics of sponsored work">Topics of sponsored work</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP859%2B%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%20%0A%20%20GROUP%20BY%20%3Ftopic%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%20200%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20%7D%0A%7D%20%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+  <iframe class="embed-responsive-item" src="{{ webserviceURL }}embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP859%2B%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%20%0A%20%20GROUP%20BY%20%3Ftopic%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%20200%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20%7D%0A%7D%20%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
 </div>
 
     
@@ -126,7 +126,7 @@ ORDER BY DESC(?count)
 <h2 id="Project budgets">Project budgets</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AScatterChart%0ASELECT%20%3Fstart_time%20%3Fbudget%20%3Fproject%20%3FprojectLabel%20WHERE%20%7B%0A%20%20%3Fproject%20wdt%3AP859%2B%20wd%3A{{ q }}%20.%0A%20%20%3Fproject%20wdt%3AP2769%20%3Fbudget%20.%0A%20%20%3Fproject%20%28wdt%3AP580%20%7C%20wdt%3AP571%29%20%3Fstart_time%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D"></iframe>
+    <iframe class="embed-responsive-item" src="{{ webserviceURL }}embed.html#%23defaultView%3AScatterChart%0ASELECT%20%3Fstart_time%20%3Fbudget%20%3Fproject%20%3FprojectLabel%20WHERE%20%7B%0A%20%20%3Fproject%20wdt%3AP859%2B%20wd%3A{{ q }}%20.%0A%20%20%3Fproject%20wdt%3AP2769%20%3Fbudget%20.%0A%20%20%3Fproject%20%28wdt%3AP580%20%7C%20wdt%3AP571%29%20%3Fstart_time%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D"></iframe>
 </div>
 
 

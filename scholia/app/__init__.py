@@ -8,6 +8,8 @@ from flask_bootstrap import Bootstrap, StaticCDN
 
 from ..text import load_text_to_topic_q_text
 
+from scholia.config import config
+
 
 def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
     """Create webapp.
@@ -32,6 +34,8 @@ def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
 
     """
     app = Flask(__name__)
+    
+    app.config['config'] = config
 
     Bootstrap(app)
 
