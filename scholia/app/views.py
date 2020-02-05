@@ -489,7 +489,7 @@ def show_clinical_trial_empty():
         Rendered index page for clinical trials.
 
     """
-    return render_template('clinical_trial_empty.html')
+    return render_template('clinical_trial_empty.html', webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/clinical-trial/' + q_pattern)
@@ -1095,7 +1095,7 @@ def show_printer_empty():
         Rendered index page for printer view.
 
     """
-    return render_template('printer_empty.html')
+    return render_template('printer_empty.html', webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/protein/' + q_pattern)
