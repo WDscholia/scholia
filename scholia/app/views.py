@@ -308,7 +308,7 @@ def show_authors(qs):
 
     """
     qs = Q_PATTERN.findall(qs)
-    return render_template('authors.html', qs=qs)
+    return render_template('authors.html', qs=qs, webserviceURL = app.config['config'].get('servers', 'SPAREndPointEmbed'))
 
 
 @main.route('/award/' + q_pattern)
