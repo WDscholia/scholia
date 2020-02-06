@@ -25,8 +25,8 @@ DEFAULTS = """
 [servers]
 SPARQLEndPointURLbd = https://query.wikidata.org/bigdata/namespace/wdq/sparql
 SPARQLEndPointURL = https://query.wikidata.org/sparql
-SPAREndPointEmbed = https://query.wikidata.org/
-webserviceURL = http://www.wikidata.org/api.php
+SPARQLEndPointEmbed = https://query.wikidata.org/
+webserviceURL = https://www.wikidata.org/api.php
 """
 
 logger = logging.getLogger(__name__)

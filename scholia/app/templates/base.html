@@ -27,7 +27,7 @@
 <script type="text/javascript">
  if ("{{ q }}" != "") {
 
-     var url = scholiaConfig.webserviceURL + '?action=wbgetentities&ids=' +
+     var url = '{{ SPARQLEndPointEmbed }}' + '?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
      
@@ -106,7 +106,7 @@
 
      });
 
-     var endpointUrl = '{{ webserviceURL }}sparql';
+     var endpointUrl = '{{ SPARQLEndPointEmbed }}sparql';
      var query = `
     SELECT DISTINCT ?aspect 
     WHERE {
@@ -182,7 +182,7 @@
 		 $( '#wembedder' ).append( html );
 
 		 // Convert Q identifier to labels
-                 $.getJSON(scholiaConfig.webserviceURL + "?callback=?", {
+                 $.getJSON(´{{webserviceURL}}' + "?callback=?", {
                      action: "wbgetentities",
                      ids: listed_q,
                      language: language,
@@ -205,7 +205,7 @@
 
  $('#searchterm').keyup(function( e ) {
       var q = $('#searchterm').val();
-      $.getJSON(scholiaConfig.webserviceURL +"?callback=?", {
+      $.getJSON('{{ SPARQLEndPointEmbed }}' +"?callback=?", {
           search: q,
           action: "wbsearchentities",
           language: "en",

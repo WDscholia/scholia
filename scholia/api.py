@@ -26,6 +26,7 @@ Examples
 from __future__ import print_function
 
 import requests
+from scholia.config import config
 
 from six import u
 
@@ -158,6 +159,7 @@ def wb_get_entities(qs):
     response_data = requests.get(
         config.get('servers', 'webserviceURL'),
         headers=headers, params=params).json()
+    
     if 'entities' in response_data:
         return response_data['entities']
 

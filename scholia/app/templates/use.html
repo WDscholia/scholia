@@ -94,14 +94,14 @@ Resources used together.
 
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="{{ webserviceURL }}embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20%28wdt%3AP2283%20%7C%20wdt%3AP4510%29%20%2F%20wdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+  <iframe class="embed-responsive-item" src="{{ SPARQLEndPointEmbed }}embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20%28wdt%3AP2283%20%7C%20wdt%3AP4510%29%20%2F%20wdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
 </div>
 
 <h2 id="Authors of works using the resource">Authors of works using
   the resource</h2> 
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="{{ webserviceURL }}embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fauthor%20%3FauthorLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20%28wdt%3AP2283%20%7C%20wdt%3AP4510%29%20%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+  <iframe class="embed-responsive-item" src="{{ SPARQLEndPointEmbed }}embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fauthor%20%3FauthorLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20%28wdt%3AP2283%20%7C%20wdt%3AP4510%29%20%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
 </div>
 
 
@@ -110,7 +110,7 @@ Resources used together.
 Works using the resource over time.
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="{{ webserviceURL }}embed.html#%23defaultView%3ABarChart%0ASELECT%20%3Fyear%20%28COUNT%28%3Fwork%29%20AS%20%3Fnumber_of_works%29%20%3FuseLabel%0AWITH%7B%0A%20%20SELECT%0A%20%20%20%20%28MIN%28%3Fyear_%29%20AS%20%3Fyear%29%20%3Fwork%20%3Fuse%0A%20%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20%28wdt%3AP2283%20%7C%20wdt%3AP4510%29%20%3Fuse%20.%0A%20%20%20%20%3Fuse%20wdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_datetime%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fpublication_datetime%29%29%20AS%20%3Fyear_%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fwork%20%3Fuse%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AGROUP%20BY%20%3Fyear%20%3FuseLabel%0AORDER%20BY%20%3Fyear%0A"></iframe>
+  <iframe class="embed-responsive-item" src="{{ SPARQLEndPointEmbed }}embed.html#%23defaultView%3ABarChart%0ASELECT%20%3Fyear%20%28COUNT%28%3Fwork%29%20AS%20%3Fnumber_of_works%29%20%3FuseLabel%0AWITH%7B%0A%20%20SELECT%0A%20%20%20%20%28MIN%28%3Fyear_%29%20AS%20%3Fyear%29%20%3Fwork%20%3Fuse%0A%20%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20%28wdt%3AP2283%20%7C%20wdt%3AP4510%29%20%3Fuse%20.%0A%20%20%20%20%3Fuse%20wdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_datetime%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fpublication_datetime%29%29%20AS%20%3Fyear_%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fwork%20%3Fuse%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AGROUP%20BY%20%3Fyear%20%3FuseLabel%0AORDER%20BY%20%3Fyear%0A"></iframe>
 </div>
 
 
