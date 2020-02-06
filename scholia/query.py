@@ -48,7 +48,7 @@ from __future__ import absolute_import, division, print_function
 from random import random
 
 import requests
-import scholia.config
+from scholia.config import config
 
 from simplejson import JSONDecodeError
 
