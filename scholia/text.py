@@ -30,7 +30,7 @@ from os.path import exists, expanduser, join
 from six.moves import cPickle as pickle
 
 import re
-import scholia.config
+from scholia.config import config
 
 from simplejson import JSONDecodeError
 

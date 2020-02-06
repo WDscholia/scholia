@@ -28,7 +28,7 @@ from six import b, print_, u
 from lxml import etree
 
 import requests
-import scholia.config
+from scholia.config import config
 
 from ..qs import paper_to_quickstatements
 from ..query import iso639_to_q, issn_to_qs

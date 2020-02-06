@@ -27,7 +27,7 @@ from os import write
 import signal
 
 import requests
-import scholia.config
+from scholia.config import config
 
 from six import b, u
 

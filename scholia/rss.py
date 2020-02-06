@@ -36,7 +36,7 @@ References
 from __future__ import print_function
 
 import requests
-import scholia.config
+from scholia.config import config
 
 from dateutil.parser import parse as parse_datetime
 

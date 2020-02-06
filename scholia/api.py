@@ -156,7 +156,7 @@ def wb_get_entities(qs):
         'User-Agent': 'Scholia',
     }
     response_data = requests.get(
-        'https://www.wikidata.org/w/api.php',
+        config.get('servers', 'webserviceURL'),
         headers=headers, params=params).json()
     if 'entities' in response_data:
         return response_data['entities']
@@ -546,7 +546,7 @@ def search(query, limit=10):
     """
     # Query the Wikidata API
     response = requests.get(
-        "https://www.wikidata.org/w/api.php",
+        config.get('servers', 'webserviceURL'),,
         params={
             'action': 'query',
             'list': 'search',
