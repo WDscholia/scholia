@@ -106,8 +106,8 @@
 
      });
 
-     var endpointUrl = '{{ SPARQLEndPointEmbed }}sparql';
-     var query = `
+    var endpointUrl = '{{ SPARQLEndPointURL }}';
+    var query = `
     SELECT DISTINCT ?aspect 
     WHERE {
     { [] wdt:P50 wd:{{ q }} . BIND("author" AS ?aspect) }

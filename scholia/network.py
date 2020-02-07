@@ -8,7 +8,7 @@ Usage:
 from collections import OrderedDict
 
 import requests
-from scholia.config import config
+from .config import config
 
 
 EXAMPLE_SPARQL_QUERY = """
