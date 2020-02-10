@@ -23,7 +23,6 @@ CONFIG_FILENAMES = [
 
 DEFAULTS = """
 [servers]
-SPARQLEndPointURLbd = https://query.wikidata.org/bigdata/namespace/wdq/sparql
 SPARQLEndPointURL = https://query.wikidata.org/sparql
 SPARQLEndPointEmbed = https://query.wikidata.org/
 webserviceURL = https://www.wikidata.org/w/api.php
