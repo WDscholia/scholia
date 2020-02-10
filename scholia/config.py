@@ -22,6 +22,9 @@ CONFIG_FILENAMES = [
     '~/scholia.cfg']
 
 DEFAULTS = """
+[system]
+listen=127.0.0.1
+port=8100
 [servers]
 SPARQLEndPointURL = https://query.wikidata.org/sparql
 SPARQLEndPointEmbed = https://query.wikidata.org/
