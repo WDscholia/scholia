@@ -56,7 +56,12 @@
 	     $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
 	 }
 	 catch(e) {}
-	 
+
+	 try {
+	     var twitterAccount = item.claims.P2002[0].mainsnak.datavalue.value;
+	     $( '#details' ).append( '<a href="https://twitter.com/' + twitterAccount + '">@' + twitterAccount + '</a> ');
+	 }
+	 catch(e) {}
 
 	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {
