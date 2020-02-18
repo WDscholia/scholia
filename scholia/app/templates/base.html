@@ -63,6 +63,12 @@
 	 }
 	 catch(e) {}
 
+	 try {
+	     var hashtag = item.claims.P2572[0].mainsnak.datavalue.value;
+	     $( '#details' ).append( '<a href="https://tools.wmflabs.org/hashtags-hub/' + hashtag + '">#' + hashtag + '</a> ');
+	 }
+	 catch(e) {}
+
 	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {
 	     var title = item.sitelinks.enwiki.title;
