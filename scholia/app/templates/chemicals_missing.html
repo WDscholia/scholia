@@ -7,11 +7,11 @@
   <script type="text/javascript">
     missingBoilingPointsSparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P2102 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -22,11 +22,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
  missingMeltingPointsSparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P2101 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -37,11 +37,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
   missingMassSparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P2067 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -52,11 +52,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
   missingSolubilitySparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P2177 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -67,11 +67,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
   missingEnthalpyOfFormationSparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P3078 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -82,11 +82,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
   missingVaporPressureSparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P2119 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -97,11 +97,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
   missingStandardMolarEntropySparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P3071 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -112,11 +112,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
   missingDensitySparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P2054 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -126,11 +126,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 `
   missingChemicalStructureSparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P117 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -141,11 +141,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
 missingFlashPointSparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P2128 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -156,11 +156,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
 missingpKaSparql = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P1117 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -171,11 +171,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
 missingCombustionEnthalpy = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P2117 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
@@ -186,11 +186,11 @@ SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
 
 missingIDLH = `
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT (SAMPLE(?wikis_) AS ?wikis) ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173.
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis .
     FILTER(NOT EXISTS {?compound wdt:P2129 []})
-    OPTIONAL { ?compound wikibase:sitelinks ?wikis_ }
-  } GROUP BY ?compound ORDER BY DESC(?wikis)
+  } ORDER BY DESC(?wikis)
   LIMIT 100
 } AS %CHEMICALS WHERE {
   INCLUDE %CHEMICALS
