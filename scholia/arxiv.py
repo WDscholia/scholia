@@ -24,7 +24,15 @@ from os import write
 
 import re
 
-from lxml import etree
+try:
+    # lxml can only be loaded into one interpreter per process.
+    # A webservice running uwsgi with multiple interpreters may fail to load
+    # the lxml library.
+    # Workarounds exists https://stackoverflow.com/questions/54092324/ but
+    # it may not be possible to implement.
+    from lxml import etree
+except ImportError:
+    from xml import etree
 
 import requests
 
