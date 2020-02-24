@@ -36,42 +36,50 @@
 	 }
 	 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 	 
+	 var detailsList = Array();
 	 try {
 	     var orcid = item.claims.P496[0].mainsnak.datavalue.value;
-	     $( '#details' ).append( '<div><a href="https://orcid.org/"><img alt="' +
-				     'ORCID logo" src="{{ url_for('static', filename='images/orcid_16x16.gif') }}"' +
-				     'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
-				     orcid + '">https://orcid.org/' + orcid + '</a></div>')
+	     detailsList.push( '<a href="https://orcid.org/"><img alt="' +
+			       'ORCID logo" src="{{ url_for('static', filename='images/orcid_16x16.gif') }}"' +
+			       'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
+			       encodeURI( orcid ) + '">https://orcid.org/' + escapeHTML( orcid ) + '</a>');
 	 }
 	 catch(e) {}
-	 
+
 	 try {
 	     var doi = item.claims.P356[0].mainsnak.datavalue.value;
-	     $( '#details' ).append( 'DOI: <a href="https://doi.org/' + doi + '">' + doi + '</a>. ');
+	     detailsList.push( 'DOI: <a href="https://doi.org/' + encodeURI( doi ) + '">' + escapeHTML( doi ) + '</a> ');
 	 }
 	 catch(e) {}
 	 
 	 try {
 	     var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
-	     $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
+	     detailsList.push( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a> ');
 	 }
 	 catch(e) {}
 
 	 try {
 	     var twitterAccount = item.claims.P2002[0].mainsnak.datavalue.value;
-	     $( '#details' ).append( '<img alt="Twitter t icon" src="' +
-	         'https://upload.wikimedia.org/wikipedia/commons/8/8b/Twitter_logo_initial.svg' +
-	         '" width="16" height="16" hspace="4" /> <a href="https://twitter.com/' +
-	         twitterAccount + '">@' + twitterAccount + '</a> ');
+	     detailsList.push( '<img alt="Twitter t icon" src="' +
+			       'https://upload.wikimedia.org/wikipedia/commons/8/8b/Twitter_logo_initial.svg' +
+			       '" width="16" height="16" hspace="4" /> <a href="https://twitter.com/' +
+			       encodeURI( twitterAccount ) + '">@' + escapeHTML( twitterAccount ) + '</a> ');
+	 }
+	 catch(e) { }
+
+	 try {
+	     var hashtag = item.claims.P2572[0].mainsnak.datavalue.value;
+	     detailsList.push( '<a href="https://tools.wmflabs.org/hashtags-hub/' +
+			       encodeURI( hashtag ) + '">#' + escapeHTML( hashtag ) + '</a> ');
 	 }
 	 catch(e) {}
 
 	 try {
-	     var hashtag = item.claims.P2572[0].mainsnak.datavalue.value;
-	     $( '#details' ).append( '<a href="https://tools.wmflabs.org/hashtags-hub/' + hashtag + '">#' + hashtag + '</a> ');
+	     $( '#details' ).append( detailsList.join( " | " ) );
 	 }
 	 catch(e) {}
-
+	 
+	 
 	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {
 	     var title = item.sitelinks.enwiki.title;
