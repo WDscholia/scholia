@@ -56,7 +56,21 @@
 	     $( '#details' ).append( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a>. ');
 	 }
 	 catch(e) {}
-	 
+
+	 try {
+	     var twitterAccount = item.claims.P2002[0].mainsnak.datavalue.value;
+	     $( '#details' ).append( '<img alt="Twitter t icon" src="' +
+	         'https://upload.wikimedia.org/wikipedia/commons/8/8b/Twitter_logo_initial.svg' +
+	         '" width="16" height="16" hspace="4" /> <a href="https://twitter.com/' +
+	         twitterAccount + '">@' + twitterAccount + '</a> ');
+	 }
+	 catch(e) {}
+
+	 try {
+	     var hashtag = item.claims.P2572[0].mainsnak.datavalue.value;
+	     $( '#details' ).append( '<a href="https://tools.wmflabs.org/hashtags-hub/' + hashtag + '">#' + hashtag + '</a> ');
+	 }
+	 catch(e) {}
 
 	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {
