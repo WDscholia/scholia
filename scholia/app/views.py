@@ -1891,6 +1891,7 @@ def show_favicon():
     return redirect(url_for('static', filename='favicon/favicon.ico'))
 
 @main.route('/report-error/', methods=['GET','POST'])
+def report_error():
     """Handles error reporting. Renders form. Treats input and posts it to github
 
     Returns
@@ -1899,7 +1900,7 @@ def show_favicon():
         Rendered HTML.
 
     """
-def report_error():
+
     app.secret_key="123232"
     app.config["SECRET_KEY"]="1234"
     app.config['CAPTCHA_ENABLE']=True
@@ -1920,7 +1921,7 @@ def report_error():
                 captcha_value=request.form['captcha']
                 
                 headers={
-                   "Authorization": "token ",
+                   "Authorization": "token 93130e94dfa96ed3928d28abd270cd68fa695d37",
                    "Accept": "application/vnd.github.golden-comet-preview+json"
                 }
                 postAnIssue={
