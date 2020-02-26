@@ -1920,7 +1920,7 @@ def report_error():
                 captcha_value=request.form['captcha']
                 
                 headers={
-                   "Authorization": "token 3b421d405617d8035b972dc281d99662c3342883",
+                   "Authorization": "token ",
                    "Accept": "application/vnd.github.golden-comet-preview+json"
                 }
                 postAnIssue={
