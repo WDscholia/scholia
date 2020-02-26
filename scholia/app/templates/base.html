@@ -27,7 +27,7 @@
 <script type="text/javascript">
  if ("{{ q }}" != "") {
 
-     var url = '{{ SPARQLEndPointEmbed }}' + '?action=wbgetentities&ids=' +
+     var url = '{{ SPARQLEndpointEmbed }}' + '?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
      
@@ -182,7 +182,7 @@
 		 $( '#wembedder' ).append( html );
 
 		 // Convert Q identifier to labels
-                 $.getJSON('{{webserviceURL}}' + "?callback=?", {
+                 $.getJSON('{{webservice_url}}' + "?callback=?", {
                      action: "wbgetentities",
                      ids: listed_q,
                      language: language,
@@ -205,7 +205,7 @@
 
  $('#searchterm').keyup(function( e ) {
       var q = $('#searchterm').val();
-      $.getJSON('{{ SPARQLEndPointEmbed }}' +"?callback=?", {
+      $.getJSON('{{ SPARQLEndpointEmbed }}' +"?callback=?", {
           search: q,
           action: "wbsearchentities",
           language: "en",
@@ -222,6 +222,11 @@
                 "</a> - " + escapeHTML(item.description) + "</div>");
         });
       });
+    });
+    
+    jQuery(function ($) { // First argument is the jQuery object
+        $('body').on('click', '[data-toggle="modal"]', function(){
+        $($(this).data("target")+' .modal-body').load($(this).data("remote"));
     });
 
 </script>
@@ -336,6 +341,7 @@
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_faq') }}">FAQ</a></li>
+		    <li role="presentation"><a href="#" data-toggle="modal" data-target="#emodal" data-remote="/report-error/">FeedBack</a></li>
 		</ul>
 	    </div>
 	</li>
@@ -379,8 +385,28 @@
     <a href="https://github.com/fnielsen/scholia/issues">Issues</a> GitHub page.
     <hr>
   </div>
-{% endblock %}
 
-<script type="text/javascript">
-    
-</script>
+
+<div class="modal" tabindex="-1" role="dialog" id="emodal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">FeedBack</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

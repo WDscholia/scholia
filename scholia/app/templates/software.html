@@ -77,14 +77,14 @@ ORDER BY DESC(?count)
 
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="{{ SPARQLEndPointEmbed }}embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2283%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+  <iframe class="embed-responsive-item" src="{{ SPARQLEndpointEmbed }}embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2283%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
 </div>
 
 <h2 id="Authors of works using the software">Authors of works using the software</h2>
 
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="{{ SPARQLEndPointEmbed }}embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fauthor%20%3FauthorLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2283%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+  <iframe class="embed-responsive-item" src="{{ SPARQLEndpointEmbed }}embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fauthor%20%3FauthorLabel%0AWITH%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2283%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
 </div>
 
 

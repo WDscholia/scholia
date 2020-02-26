@@ -549,7 +549,7 @@ def search(query, limit=10):
     """
     # Query the Wikidata API
     response = requests.get(
-        config.get('servers', 'webserviceURL'),
+        config.get('servers', 'webservice_url'),
         params={
             'action': 'query',
             'list': 'search',

@@ -1,0 +1,8 @@
+<div>{{error}}</div>
+<form method="POST" action="">
+    <div><textarea type="text" name="comment"></textarea></div>
+    <div><input type="text" name="url" value="{{url}}" readonly/></div>
+    <div>{{ captcha() }}</div>
+    <div><input type="text" name="captcha"></div>
+    <div><input type="submit"></div>
+</form>
