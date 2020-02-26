@@ -1891,6 +1891,14 @@ def show_favicon():
     return redirect(url_for('static', filename='favicon/favicon.ico'))
 
 @main.route('/report-error/', methods=['GET','POST'])
+    """Handles error reporting. Renders form. Treats input and posts it to github
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
 def report_error():
     app.secret_key="123232"
     app.config["SECRET_KEY"]="1234"
