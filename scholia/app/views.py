@@ -1912,6 +1912,7 @@ def show_about():
 
 @main.route('/favicon.ico')
 def show_favicon():
+    """Return favicon."""
     return redirect(url_for('static', filename='favicon/favicon.ico'))
 
 
@@ -1940,23 +1941,23 @@ def report_error():
         return render_template("report_error.html", url=url)
     else:
         if captcha.validate():
-                comment = request.form['comment']
-                captcha_value = request.form['captcha']
+            comment = request.form['comment']
+            captcha_value = request.form['captcha']
 
-                headers = {
+            headers = {
                    "Authorization": "token ",
                    "Accept": "application/vnd.github.golden-comet-preview+json"
-                }
-                postAnIssue = {
-                  "title": "Found a bug @ " + url,
-                  "body": comment + "\n" + url,
-                  "labels": [
-                    "bug"
-                  ]
-                }
-                postAnIssueString = json.dumps(postAnIssue)
-                reqResult = requests.post('https://api.github.com/repos/temp-scholia/scholia/issues', data=postAnIssueString, headers=headers)
-                return reqResult.content
+            }
+            postAnIssue = {
+              "title": "Found a bug @ " + url,
+              "body": comment + "\n" + url,
+              "labels": [
+                "bug"
+                ]
+              }
+            postAnIssueString = json.dumps(postAnIssue)
+            reqResult = requests.post('https://api.github.com/repos/temp-scholia/scholia/issues', data=postAnIssueString, headers=headers)
+            return reqResult.content
         else:
             url = ""
             if request.form['url']:
