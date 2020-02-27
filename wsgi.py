@@ -1,5 +1,4 @@
 from scholia.app import create_app
-from scholia.config import config
 
 app = create_app(
     text_to_topic_q_text_enabled=False,

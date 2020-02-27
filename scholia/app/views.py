@@ -27,8 +27,9 @@ from ..wikipedia import q_to_bibliography_templates
 from flask_sessionstore import Session
 from flask_session_captcha import FlaskSessionCaptcha
 import requests
-from requests.auth import HTTPBasicAuth
+# from requests.auth import HTTPBasicAuth
 import json
+
 
 class RegexConverter(BaseConverter):
     """Converter for regular expression routes.
@@ -38,11 +39,10 @@ class RegexConverter(BaseConverter):
     https://stackoverflow.com/questions/5870188
 
     """
-
     def __init__(self, url_map, *items):
         """Set up regular expression matcher."""
         super(RegexConverter, self).__init__(url_map)
-        self.regex=items[0]
+        self.regex = items[0]
 
 
 def add_app_url_map_converter(self, func, name=None):
@@ -54,13 +54,13 @@ def add_app_url_map_converter(self, func, name=None):
 
     """
     def register_converter(state):
-        state.app.url_map.converters[name or func.__name__]=func
+        state.app.url_map.converters[name or func.__name__] = func
 
     self.record_once(register_converter)
 
 
-Blueprint.add_app_url_map_converter=add_app_url_map_converter
-main=Blueprint('app', __name__)
+Blueprint.add_app_url_map_converter = add_app_url_map_converter
+main = Blueprint('app', __name__)
 main.add_app_url_map_converter(RegexConverter, 'regex')
 
 # Wikidata item identifier matcher
@@ -68,7 +68,7 @@ l_pattern = r'<regex(r"L[1-9]\d*"):lexeme>'
 L_PATTERN = re.compile(r'L[1-9]\d*')
 
 q_pattern = r'<regex(r"Q[1-9]\d*"):q>'
-q1_pattern= r'<regex(r"Q[1-9]\d*"):q1>'
+q1_pattern = r'<regex(r"Q[1-9]\d*"):q1>'
 q2_pattern = r'<regex(r"Q[1-9]\d*"):q2>'
 Q_PATTERN = re.compile(r'Q[1-9]\d*')
 
@@ -115,8 +115,8 @@ def redirect_q(q):
         Wikidata item identifier
 
     """
-    class_=q_to_class(q)
-    method='app.show_' + class_
+    class_ = q_to_class(q)
+    method = 'app.show_' + class_
     return redirect(url_for(method, q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'), code=302))
 
 
@@ -152,10 +152,10 @@ def show_arxiv(arxiv):
     show_arxiv_to_quickstatements.
 
     """
-    qs=arxiv_to_qs(arxiv)
+    qs = arxiv_to_qs(arxiv)
     if len(qs) > 0:
-        q=qs[0]
-        return redirect( url_for('app.show_work', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
+        q = qs[0]
+        return redirect(url_for('app.show_work', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -175,32 +175,38 @@ def show_arxiv_to_quickstatements():
     show_arxiv.
 
     """
-    query=request.args.get('arxiv')
+    query = request.args.get('arxiv')
 
     if not query:
         return render_template('arxiv_to_quickstatements.html')
 
     current_app.logger.debug("query: {}".format(query))
 
-    arxiv=string_to_arxiv(query)
+    arxiv = string_to_arxiv(query)
     if not arxiv:
         # Could not identify an arxiv identifier
         return render_template('arxiv_to_quickstatements.html')
 
-    qs=arxiv_to_qs(arxiv)
+    qs = arxiv_to_qs(arxiv)
     if len(qs) > 0:
         # The arxiv is already in Wikidata
-        q=qs[0]
+        q = qs[0]
         return render_template('arxiv_to_quickstatements.html',
-                               arxiv=arxiv, q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'))
+                               arxiv=arxiv, q=q,
+                               SPARQLEndPointURL=app.config['config']
+                               .get('servers', 'SPARQLEndPointURL'),
+                               webservice_url=app.config['config']
+                               .get('servers', 'webserviceURL'),
+                               SPARQLEndpointEmbed=app.config['config']
+                               .get('servers', 'SPARQLEndpointEmbed'))
 
     try:
-        metadata=get_arxiv_metadata(arxiv)
+        metadata = get_arxiv_metadata(arxiv)
     except Exception:
         return render_template('arxiv_to_quickstatements.html',
                                arxiv=arxiv)
 
-    quickstatements=metadata_to_quickstatements(metadata)
+    quickstatements = metadata_to_quickstatements(metadata)
     return render_template('arxiv_to_quickstatements.html',
                            arxiv=arxiv, quickstatements=quickstatements)
 
@@ -220,13 +226,20 @@ def show_author(q):
         Rendered HTML.
 
     """
-    entities=wb_get_entities([q])
-    name=entity_to_name(entities[q])
+    entities = wb_get_entities([q])
+    name = entity_to_name(entities[q])
     if name:
-        first_initial, last_name=name[0], name.split()[-1]
+        first_initial, last_name = name[0], name.split()[-1]
     else:
-        first_initial, last_name='', ''
-    return render_template('author.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'),  first_initial=first_initial,
+        first_initial, last_name = '', ''
+    return render_template('author.html', q=q,
+                           SPARQLEndPointURL=app.config['config']
+                           .get('servers', 'SPARQLEndPointURL'),
+                           webservice_url=app.config['config']
+                           .get('servers', 'webserviceURL'),
+                           SPARQLEndpointEmbed=app.config['config']
+                           .get('servers', 'SPARQLEndpointEmbed'),
+                           first_initial=first_initial,
                            last_name=last_name)
 
 
@@ -245,10 +258,10 @@ def show_author_rss(q):
         RSS-formated page with latest work of author.
 
     """
-    response_body=wb_get_author_latest_works(q)
-    response=Response(response=response_body,
+    response_body = wb_get_author_latest_works(q)
+    response = Response(response=response_body,
                         status=200, mimetype="application/rss+xml")
-    response.headers["Content-Type"]="text/xml; charset=utf-8"
+    response.headers["Content-Type"] = "text/xml; charset=utf-8"
     return response
 
 
@@ -293,7 +306,7 @@ def show_author_random():
         Redirect
 
     """
-    q=random_author()
+    q = random_author()
     return redirect(url_for('app.show_author', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
 
 
@@ -312,7 +325,7 @@ def show_authors(qs):
         Rendered HTML.
 
     """
-    qs=Q_PATTERN.findall(qs)
+    qs = Q_PATTERN.findall(qs)
     return render_template('authors.html', qs=qs, SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'))
 
 
@@ -375,9 +388,9 @@ def redirect_cas(cas):
         CAS registry number.
 
     """
-    qs=cas_to_qs(cas)
+    qs = cas_to_qs(cas)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_chemical', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -392,9 +405,9 @@ def redirect_lipidmaps(lmid):
         LIPID MAPS identifier.
 
     """
-    qs=lipidmaps_to_qs(lmid)
+    qs = lipidmaps_to_qs(lmid)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         if (len(lmid) < 12):
             return redirect(url_for('app.show_chemical_class', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
         else:
@@ -412,9 +425,9 @@ def redirect_atomic_symbol(symbol):
         Atomic symbol.
 
     """
-    qs=atomic_symbol_to_qs(symbol)
+    qs = atomic_symbol_to_qs(symbol)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_chemical_element', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -429,9 +442,9 @@ def redirect_atomic_number(atomic_number):
         Atomic number.
 
     """
-    qs=atomic_number_to_qs(atomic_number)
+    qs = atomic_number_to_qs(atomic_number)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_chemical_element', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -446,9 +459,9 @@ def redirect_cordis(cordis):
         CORDIS identifier.
 
     """
-    qs=cordis_to_qs(cordis)
+    qs = cordis_to_qs(cordis)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_project', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -530,7 +543,7 @@ def show_countries(qs):
         Rendered HTML for specific countries.
 
     """
-    qs=Q_PATTERN.findall(qs)
+    qs = Q_PATTERN.findall(qs)
     return render_template('countries.html', qs=qs)
 
 
@@ -626,9 +639,9 @@ def redirect_doi(doi):
         DOI identifier.
 
     """
-    qs=doi_to_qs(doi)
+    qs = doi_to_qs(doi)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_work', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -718,9 +731,9 @@ def redirect_github(github):
         Github user identifier.
 
     """
-    qs=github_to_qs(github)
+    qs = github_to_qs(github)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_author', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -735,9 +748,9 @@ def redirect_inchikey(inchikey):
         InChIkey user identifier.
 
     """
-    qs=inchikey_to_qs(inchikey)
+    qs = inchikey_to_qs(inchikey)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_chemical', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -752,9 +765,9 @@ def redirect_issn(issn):
         ISSN serial identifier.
 
     """
-    qs=issn_to_qs(issn)
+    qs = issn_to_qs(issn)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_venue', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -851,11 +864,11 @@ def redirect_mesh(meshid):
         MeSH identifier.
 
     """
-    qs=mesh_to_qs(meshid)
+    qs = mesh_to_qs(meshid)
     if len(qs) > 0:
-        q=qs[0]
-        class_=q_to_class(q)
-        method='app.show_' + class_
+        q = qs[0]
+        class_ = q_to_class(q)
+        method = 'app.show_' + class_
         return redirect(url_for(method, q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -870,9 +883,9 @@ def redirect_orcid(orcid):
         ORCID identifier.
 
     """
-    qs=orcid_to_qs(orcid)
+    qs = orcid_to_qs(orcid)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_author', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -887,9 +900,9 @@ def redirect_pubchem(cid):
         PubChem compound identifier (CID).
 
     """
-    qs=pubchem_to_qs(cid)
+    qs = pubchem_to_qs(cid)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_chemical', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -904,9 +917,9 @@ def redirect_pubmed(pmid):
         PubMed identifier.
 
     """
-    qs=pubmed_to_qs(pmid)
+    qs = pubmed_to_qs(pmid)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_work', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -921,9 +934,9 @@ def redirect_wikipathways(wpid):
         WikiPathways identifier.
 
     """
-    qs=wikipathways_to_qs(wpid)
+    qs = wikipathways_to_qs(wpid)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_pathway', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -938,9 +951,9 @@ def redirect_ror(rorid):
         ROR identifier.
 
     """
-    qs=ror_to_qs(rorid)
+    qs = ror_to_qs(rorid)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_organization', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -955,9 +968,9 @@ def redirect_viaf(viaf):
         VIAF identifier.
 
     """
-    qs=viaf_to_qs(viaf)
+    qs = viaf_to_qs(viaf)
     if len(qs) > 0:
-        q=qs[0]
+        q = qs[0]
         return redirect(url_for('app.show_author', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
@@ -1008,10 +1021,10 @@ def show_organization_rss(q):
         RSS feed.
 
     """
-    response_body=wb_get_organization_latest_works(q)
-    response=Response(response=response_body,
+    response_body = wb_get_organization_latest_works(q)
+    response = Response(response=response_body,
                         status=200, mimetype="application/rss+xml")
-    response.headers["Content-Type"]="text/xml; charset=utf-8"
+    response.headers["Content-Type"] = "text/xml; charset=utf-8"
     return response
 
 
@@ -1068,7 +1081,7 @@ def show_organizations(qs):
         Rendered HTML.
 
     """
-    qs=Q_PATTERN.findall(qs)
+    qs = Q_PATTERN.findall(qs)
     return render_template('organizations.html', qs=qs)
 
 
@@ -1175,11 +1188,11 @@ def show_search():
         Rendered index page for search view.
 
     """
-    query=request.args.get('q', '')
+    query = request.args.get('q', '')
     if query:
-        search_results=search(query)
+        search_results = search(query)
     else:
-        search_results=[]
+        search_results = []
     return render_template('search.html',
                            query=query, search_results=search_results)
 
@@ -1256,22 +1269,22 @@ def show_q_to_bibliography_templates():
         Rendered HTML.
 
     """
-    q_=request.args.get('q')
+    q_ = request.args.get('q')
 
     if not q_:
         return render_template('q_to_bibliography_templates.html')
 
     current_app.logger.debug("q: {}".format(q_))
 
-    q=sanitize_q(q_)
+    q = sanitize_q(q_)
     if not q:
         # Could not identify a wikidata identifier
         return render_template('q_to_bibliography_templates.html')
 
-    wikitext=q_to_bibliography_templates(q)
+    wikitext = q_to_bibliography_templates(q)
 
     return render_template('q_to_bibliography_templates.html',
-                           q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'), 
+                           q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'),
                            wikitext=wikitext)
 
 
@@ -1321,9 +1334,9 @@ def show_text_to_topics():
 
     """
     if request.method == 'GET':
-        text=request.args.get('text')
+        text = request.args.get('text')
     elif request.method == 'POST':
-        text=request.form.get('text')
+        text = request.form.get('text')
     else:
         assert False
 
@@ -1333,8 +1346,8 @@ def show_text_to_topics():
     if not text:
         return render_template('text_to_topics.html', enabled=True)
 
-    qs_list=current_app.text_to_topic_q_text.text_to_topic_qs(text)
-    qs=",".join(set(qs_list))
+    qs_list = current_app.text_to_topic_q_text.text_to_topic_qs(text)
+    qs = ",".join(set(qs_list))
 
     return redirect(url_for('app.show_topics', qs=qs), code=302)
 
@@ -1372,10 +1385,10 @@ def show_topic_rss(q):
         RSS feed.
 
     """
-    response_body=wb_get_topic_latest_works(q)
-    response=Response(response=response_body,
+    response_body = wb_get_topic_latest_works(q)
+    response = Response(response=response_body,
                         status=200, mimetype="application/rss+xml")
-    response.headers["Content-Type"]="text/xml; charset=utf-8"
+    response.headers["Content-Type"] = "text/xml; charset=utf-8"
     return response
 
 
@@ -1407,7 +1420,7 @@ def show_topics(qs):
         Rendered HTML.
 
     """
-    qs=Q_PATTERN.findall(qs)
+    qs = Q_PATTERN.findall(qs)
     return render_template('topics.html', qs=qs)
 
 
@@ -1426,7 +1439,13 @@ def show_topic_missing(q):
         Rendered HTML index page for topic.
 
     """
-    return render_template('topic_missing.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'))
+    return render_template('topic_missing.html', q=q,
+                           SPARQLEndPointURL=app.config['config']
+                           .get('servers', 'SPARQLEndPointURL'),
+                           webservice_url=app.config['config']
+                           .get('servers', 'webserviceURL'),
+                           SPARQLEndpointEmbed=app.config['config']
+                           .get('servers', 'SPARQLEndpointEmbed'))
 
 
 @main.route('/chemical/' + q_pattern)
@@ -1444,11 +1463,16 @@ def show_chemical(q):
         Rendered HTML.
 
     """
-    entities=wb_get_entities([q])
-    smiles=entity_to_smiles(entities[q])
+    entities = wb_get_entities([q])
+    smiles = entity_to_smiles(entities[q])
     return render_template(
         'chemical.html',
-        q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'), 
+        q=q,  SPARQLEndPointURL=app.config['config']
+        .get('servers', 'SPARQLEndPointURL'),
+        webservice_url=app.config['config']
+        .get('servers', 'webserviceURL'),
+        SPARQLEndpointEmbed=app.config['config']
+        .get('servers', 'SPARQLEndpointEmbed'),
         smiles=smiles,
         third_parties_enabled=current_app.third_parties_enabled)
 
@@ -1538,11 +1562,11 @@ def redirect_twitter(twitter):
         Twitter account name.
 
     """
-    qs=twitter_to_qs(twitter)
-    q=''
+    qs = twitter_to_qs(twitter)
+    q = ''
     if len(qs) > 0:
-        q=qs[0]
-        return redirect(url_for('app.redirect_q', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')),code=302)
+        q = qs[0]
+        return redirect(url_for('app.redirect_q', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')), code=302)
     return render_template('404.html')
 
 
@@ -1561,7 +1585,7 @@ def show_venue(q):
         Rendered HTML page.
 
     """
-    return render_template('venue.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed')) 
+    return render_template('venue.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'))
 
 
 @main.route('/venue/' + q_pattern + '/missing')
@@ -1597,10 +1621,10 @@ def show_venue_rss(q):
         RSS feed.
 
     """
-    response_body=wb_get_venue_latest_works(q)
-    response=Response(response=response_body,
+    response_body = wb_get_venue_latest_works(q)
+    response = Response(response=response_body,
                         status=200, mimetype="application/rss+xml")
-    response.headers["Content-Type"]="text/xml; charset=utf-8"
+    response.headers["Content-Type"] = "text/xml; charset=utf-8"
     return response
 
 
@@ -1632,8 +1656,8 @@ def show_venues(qs):
         Rendered HTML page.
 
     """
-    qs=Q_PATTERN.findall(qs)
-    return render_template('venues.html', qs=qs, SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed') )
+    qs = Q_PATTERN.findall(qs)
+    return render_template('venues.html', qs=qs, SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'))
 
 
 @main.route('/series/' + q_pattern)
@@ -1651,7 +1675,7 @@ def show_series(q):
         Rendered HTML for specific series.
 
     """
-    return render_template('series.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed') )
+    return render_template('series.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'))
 
 
 @main.route('/series/')
@@ -1682,7 +1706,7 @@ def show_pathway(q):
         Rendered HTML.
 
     """
-    return render_template('pathway.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed') )
+    return render_template('pathway.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'))
 
 
 @main.route('/pathway/')
@@ -1708,7 +1732,7 @@ def show_publisher(q):
        Rendered HTML page for specific publisher.
 
     """
-    return render_template('publisher.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed') )
+    return render_template('publisher.html', q=q,  SPARQLEndPointURL=app.config['config'].get('servers', 'SPARQLEndPointURL'), webservice_url=app.config['config'].get('servers', 'webserviceURL'), SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'))
 
 
 @main.route('/publisher/')
@@ -1734,7 +1758,7 @@ def show_robots_txt():
         Rendered HTML for publisher index page.
 
     """
-    ROBOTS_TXT=('User-agent: *\n'
+    ROBOTS_TXT = ('User-agent: *\n'
                   'Disallow: /scholia/\n')
     return Response(ROBOTS_TXT, mimetype="text/plain")
 
@@ -1785,10 +1809,10 @@ def show_sponsor_rss(q):
         RSS feed.
 
     """
-    response_body=wb_get_sponsor_latest_works(q)
-    response=Response(response=response_body,
+    response_body = wb_get_sponsor_latest_works(q)
+    response = Response(response=response_body,
                         status=200, mimetype="application/rss+xml")
-    response.headers["Content-Type"]="text/xml; charset=utf-8"
+    response.headers["Content-Type"] = "text/xml; charset=utf-8"
     return response
 
 
@@ -1869,7 +1893,7 @@ def show_works(qs):
         Rendered HTML.
 
     """
-    qs=Q_PATTERN.findall(qs)
+    qs = Q_PATTERN.findall(qs)
     return render_template('works.html', qs=qs)
 
 
@@ -1890,9 +1914,10 @@ def show_about():
 def show_favicon():
     return redirect(url_for('static', filename='favicon/favicon.ico'))
 
-@main.route('/report-error/', methods=['GET','POST'])
+
+@main.route('/report-error/', methods=['GET', 'POST'])
 def report_error():
-    """Handles error reporting. Renders form. Treats input and posts it to github
+    """Handle error reporting. Renders form. Treats input and posts it to github.
 
     Returns
     -------
@@ -1900,46 +1925,44 @@ def report_error():
         Rendered HTML.
 
     """
-
-    app.secret_key="123232"
-    app.config["SECRET_KEY"]="1234"
-    app.config['CAPTCHA_ENABLE']=True
-    app.config['CAPTCHA_LENGTH']=5
-    app.config['CAPTCHA_WIDTH']=160
-    app.config['CAPTCHA_HEIGHT']=60
-    app.config['SESSION_TYPE']='filesystem'
+    app.secret_key = "123232"
+    app.config["SECRET_KEY"] = "1234"
+    app.config['CAPTCHA_ENABLE'] = True
+    app.config['CAPTCHA_LENGTH'] = 5
+    app.config['CAPTCHA_WIDTH'] = 160
+    app.config['CAPTCHA_HEIGHT'] = 60
+    app.config['SESSION_TYPE'] = 'filesystem'
     Session(app)
-    captcha=FlaskSessionCaptcha(app)
-    
+    captcha = FlaskSessionCaptcha(app)
+
     if request.method == 'GET':
-        url=request.form['url']
+        url = request.form['url']
         return render_template("report_error.html", url=url)
     else:
         if captcha.validate():
-        #if 1 == 1:
-                comment=request.form['comment']
-                captcha_value=request.form['captcha']
-                
-                headers={
+                comment = request.form['comment']
+                captcha_value = request.form['captcha']
+
+                headers = {
                    "Authorization": "token ",
                    "Accept": "application/vnd.github.golden-comet-preview+json"
                 }
-                postAnIssue={
+                postAnIssue = {
                   "title": "Found a bug @ " + url,
                   "body": comment + "\n" + url,
                   "labels": [
                     "bug"
                   ]
                 }
-                postAnIssueString=json.dumps(postAnIssue)
-                reqResult=requests.post('https://api.github.com/repos/temp-scholia/scholia/issues', data=postAnIssueString, headers=headers)
-                return reqResult.content   
+                postAnIssueString = json.dumps(postAnIssue)
+                reqResult = requests.post('https://api.github.com/repos/temp-scholia/scholia/issues', data=postAnIssueString, headers=headers)
+                return reqResult.content
         else:
-            url="";
-            if request.form['url'] :
-                url="<no url>";
-            else: 
-                url=request.form['url']
+            url = ""
+            if request.form['url']:
+                url = "<no url>"
+            else:
+                url = request.form['url']
             return render_template("report_error.html", url=url)
-    
+
     return captcha

@@ -34,10 +34,9 @@ def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
 
     """
     app = Flask(__name__)
-    
     app.config['config'] = config
-    
-    #setting a default for client side caching
+
+    # setting a default for client side caching
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
     Bootstrap(app)

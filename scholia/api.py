@@ -156,13 +156,13 @@ def wb_get_entities(qs):
     headers = {
         'User-Agent': 'Scholia',
     }
-        
-    
-    response = requests.get('https://www.wikidata.org/w/api.php', headers=headers, params=params) 
-    response_data = response.json()    
-    
+
+    response = requests.get('https://www.wikidata.org/w/api.php',
+                            headers=headers, params=params)
+    response_data = response.json()
+
     if 'entities' in response_data:
-       return response_data['entities']
+        return response_data['entities']
 
     # TODO: Make informative/better error handling
     if 'error' in response_data:
