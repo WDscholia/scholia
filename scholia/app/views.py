@@ -1082,7 +1082,7 @@ def show_organizations(qs):
 
     """
     qs = Q_PATTERN.findall(qs)
-    return render_template('organizations.html', qs=qs)
+    return render_template('organizations.html', qs=qs, SPARQLEndpointEmbed=app.config['config'].get('servers', 'SPARQLEndpointEmbed'))
 
 
 @main.route('/printer/' + q_pattern)
