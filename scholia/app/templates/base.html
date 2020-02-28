@@ -27,7 +27,7 @@
 <script type="text/javascript">
  if ("{{ q }}" != "") {
 
-     var url = '{{ SPARQLEndpointEmbed }}' + '?action=wbgetentities&ids=' +
+     var url = '{{ sparql_endpoint_embed_url }}' + '?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
      
@@ -205,7 +205,7 @@
 
  $('#searchterm').keyup(function( e ) {
       var q = $('#searchterm').val();
-      $.getJSON('{{ SPARQLEndpointEmbed }}' +"?callback=?", {
+      $.getJSON('{{ sparql_endpoint_embed_url }}' +"?callback=?", {
           search: q,
           action: "wbsearchentities",
           language: "en",
@@ -341,7 +341,7 @@
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_faq') }}">FAQ</a></li>
-		    <li role="presentation"><a href="#" data-toggle="modal" data-target="#emodal" data-remote="/report-error/">FeedBack</a></li>
+		    <!--li role="presentation"><a href="#" data-toggle="modal" data-target="#emodal" data-remote="/report-error/">FeedBack</a></li-->
 		</ul>
 	    </div>
 	</li>
