@@ -68,7 +68,7 @@ LIMIT 500
   recentArticlesSparql = `
 SELECT ?date ?work ?workLabel ?type ?via ?topics
 WITH {
-  SELECT DISTINCT ?work ?via WHERE {
+  SELECT DISTINCT (MAX(?dates) as ?datetime) ?work ?via WHERE {
     { VALUES ?topic { wd:{{ q }}}
       ?work wdt:P921 ?topic . BIND ("main topic" AS ?via) }
     UNION
@@ -84,7 +84,11 @@ WITH {
                  prov:wasDerivedFrom/pr:P248 ?work .
       BIND ("statement" AS ?via)
     }
+    OPTIONAL { ?work wdt:P577 ?dateLits . BIND(xsd:date(?dateLits) AS ?dates) }
   }
+  GROUP BY ?work ?via
+  ORDER BY DESC(?datetime)
+  LIMIT 250
 } AS %works
 WITH {
   SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) ?via (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
