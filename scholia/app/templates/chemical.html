@@ -129,27 +129,35 @@ WHERE {
 ORDER BY ASC(?propEntityLabel)
 `
  recentArticlesSparql = `
-SELECT ?date ?work ?workLabel ?type ?topics
+SELECT ?date ?work ?workLabel ?type ?via ?topics
 WITH {
-  SELECT DISTINCT ?work WHERE {
-    { ?work wdt:P921 / (wdt:P527+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} . }
+  SELECT DISTINCT ?work  ?via ?topic WHERE {
+    { VALUES ?topic { wd:{{ q }}}
+      ?work wdt:P921 ?topic . BIND ("main topic" AS ?via) }
+    UNION
+    { ?work wdt:P921 ?topic . ?topic ((^wdt:P361)+) wd:{{ q }} . BIND ("part" AS ?via) }
+    UNION
+    { ?work wdt:P921 ?topic . ?topic (wdt:P31* / wdt:P279* ) wd:{{ q }} . BIND ("subclass" AS ?via). FILTER (?topic != wd:{{ q }}) }
+    UNION
+    { ?work wdt:P921 ?topic . ?topic (wdt:P1269+ ) wd:{{ q }} . BIND ("facet" AS ?via)}
     UNION
     {
       wd:{{ q }} ?propp ?statement .
       ?statement a wikibase:BestRank ;
                  prov:wasDerivedFrom/pr:P248 ?work .
+      BIND ("statement" AS ?via)
     }
   }
 } AS %works
 WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
+  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) ?via (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
     INCLUDE %works
     ?work wdt:P921 ?topic . 
     OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
     OPTIONAL { ?work wdt:P577 ?dates . }
     ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
   }
-  GROUP BY ?work
+  GROUP BY ?work ?via
 } AS %result
 WHERE {
   INCLUDE %result
