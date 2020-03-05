@@ -261,7 +261,7 @@ WHERE {
 ORDER BY DESC(?year)
 LIMIT 500
  `
- retractionsJournalSparql =  `
+ articlesCitingRetractionsSparql =  `
 SELECT DISTINCT
   ?retracted_work ?retracted_workLabel
   ?date
@@ -306,7 +306,7 @@ ORDER BY DESC(?date)
      sparqlToDataTable(citingVenuesSparql, "#citing-venues");
      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
      sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
-	 sparqlToDataTable(retractionsJournalSparql, "#retractions-of-journal");
+     sparqlToDataTable(articlesCitingRetractionsSparql, "articles-citing-retractions");
      sparqlToDataTable(genderDistributionSparql, "#gender-distribution");
      sparqlToDataTable(authorshipsGenderDistributionSparql,
 		       "#authorships-gender-distribution");
@@ -397,9 +397,9 @@ This will make a very big graph for, e.g., PLOS ONE.
 <table class="table table-hover" id="citing-venues"></table>
 
 
-<h2>Retracted articles</h2>
+<h2>Articles citing retracted articles</h2>
 
-<table class="table table-hover" id="retractions-of-journal"></table>
+<table class="table table-hover" id="articles-citing-retractions"></table>
 
 
 <h2>Gender distribution</h2>
