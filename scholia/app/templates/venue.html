@@ -270,7 +270,7 @@ WITH {
   # Find retracted papers indicated by instance of retracted paper, 
   # by retraction notice property or by significant event
   SELECT DISTINCT ?retracted_work WHERE {
-    { ?retracted_work wdt:P31 wd:{{ q }} }
+    { ?retracted_work wdt:P31 wd:Q45182324 }
     UNION
     { ?retracted_work wdt:P5824 [] }
     UNION
