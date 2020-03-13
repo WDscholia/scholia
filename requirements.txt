@@ -8,3 +8,5 @@ requests
 simplejson
 werkzeug>=0.9
 urllib3>=1.25.1
+flask-sessionstore
+flask-session-captcha

@@ -7,7 +7,5 @@ app = create_app(
 app.config['APPLICATION_ROOT'] = '/'
 
 if __name__ == '__main__':
-    app.run(debug=True, host=config.get('system', 'listen') ,  port=config.get('system', 'port'))
-    
-    
-    
+    app.run(debug=True, host=config.get('system', 'listen'),
+            port=config.get('system', 'port'))

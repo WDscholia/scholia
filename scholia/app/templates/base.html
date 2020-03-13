@@ -224,10 +224,13 @@
       });
     });
     
-    jQuery(function ($) { // First argument is the jQuery object
+        
+    $(function ($) { // First argument is the jQuery object
         $('body').on('click', '[data-toggle="modal"]', function(){
         $($(this).data("target")+' .modal-body').load($(this).data("remote"));
+        });
     });
+
 
 </script>
 
@@ -341,7 +344,7 @@
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_faq') }}">FAQ</a></li>
-		    <!--li role="presentation"><a href="#" data-toggle="modal" data-target="#emodal" data-remote="/report-error/">FeedBack</a></li-->
+		    <li role="presentation"><a href="#" data-toggle="modal" data-target="#emodal" data-remote="/report-error/">FeedBack</a></li>
 		</ul>
 	    </div>
 	</li>
@@ -399,10 +402,10 @@
       <div class="modal-body">
         <p>Modal body text goes here.</p>
       </div>
-      <div class="modal-footer">
+      <!--div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
+      </div-->
     </div>
   </div>
 </div>
