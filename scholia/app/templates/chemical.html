@@ -9,7 +9,7 @@
  structuresSparql = `
 SELECT
   ?IDpred ?IDpredLabel
-  ?id (SAMPLE(?idUrls) as ?idUrl)
+  ?finalid (SAMPLE(?idUrls) as ?idUrl)
 WITH {
   SELECT ?IDpred ?id ?formatterurl WHERE {
     VALUES ?IDpred { wd:P233 wd:P234 wd:P2017 }
@@ -25,17 +25,19 @@ WITH {
       INCLUDE %RESULTS
       FILTER (?IDpred = wd:P234)
       BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?id)))) AS ?idUrls).
+      BIND(CONCAT("InChI=",?id) AS ?finalid) .
     }
   } UNION {
     SELECT * WHERE {
       INCLUDE %RESULTS
       FILTER (?IDpred != wd:P234)
       BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
+      BIND(?id AS ?finalid) .
     }
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-GROUP BY ?IDpred ?IDpredLabel ?id
+GROUP BY ?IDpred ?IDpredLabel ?finalid
 ORDER BY ASC(?IDpredLabel)
 `
 

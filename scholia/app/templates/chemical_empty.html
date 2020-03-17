@@ -95,12 +95,6 @@ WITH {
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P235 []. }
 } AS %inchikeys
-WITH {
-  SELECT (COUNT(DISTINCT ?article) AS ?count) WHERE { ?article wdt:P921 / wdt:P235 []. }
-} AS %articlesAboutChemicals
-WITH {
-  SELECT (COUNT(DISTINCT ?chemical) AS ?count) WHERE { [] wdt:P921 / wdt:P235 ?chemical. }
-} AS %chemicalsWithArticle
 WHERE {
   {
     INCLUDE %meltingpoints
@@ -125,16 +119,6 @@ WHERE {
   {
     INCLUDE %inchikeys
     BIND("Total number of InChIKeys" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %articlesAboutChemicals
-    BIND("Total number of articles with a chemical as main subject" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %chemicalsWithArticle
-    BIND("Total number of chemicals that are main subject of an article" AS ?description)
   }
 }
 ORDER BY DESC(?count)

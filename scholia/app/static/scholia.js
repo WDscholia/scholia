@@ -54,7 +54,6 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 		convertedRow[key] = '<a href="' +
 		    data[i][key + 'Url'] +
 		    '">' + data[i][key] + '</a>';
-		console.log(convertedRow[key]);
 	    } else if (key.substr(-3) == 'Url') {
 		// pass
 

@@ -217,15 +217,14 @@ LIMIT 200
 `
 
   authorAwardsSparql = `
-
 SELECT ?count ?award ?awardLabel ?recipients
 WITH {
   SELECT (COUNT(?researcher) AS ?count) ?award (GROUP_CONCAT(?researcher_label; separator=", ") AS ?recipients) WHERE {
-    hint:Query hint:optimizer "None" .
     { 
       SELECT DISTINCT ?researcher ?award WHERE {
-        ?work wdt:P50 ?researcher ;
-              wdt:P921 wd:{{ q }} .
+        hint:Query hint:optimizer "None" .
+        ?work wdt:P921 wd:{{ q }} .
+        ?work wdt:P50 ?researcher .
         ?researcher wdt:P166 ?award .
       } 
       LIMIT 100
@@ -236,7 +235,7 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+    ?award rdfs:label ?awardLabel . FILTER (LANG(?awardLabel) = 'en')
 }
 ORDER BY DESC(?count)
 `
