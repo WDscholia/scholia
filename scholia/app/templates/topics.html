@@ -27,10 +27,11 @@ SELECT
   ?count 
   (MIN(?publication_date_) AS ?publication_date)
   ?work ?workLabel
-  ?topics
+  ?topics ?topicsUrl
 WITH {
   SELECT (COUNT(?topic) AS ?count) ?work
-    (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics)
+    (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
+    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl)                                    
   WHERE {
     VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
     
@@ -53,7 +54,7 @@ WHERE {
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }
-GROUP BY ?count ?work ?workLabel ?topics
+GROUP BY ?count ?work ?workLabel ?topics ?topicsUrl
 ORDER BY DESC(?count) DESC(?publication_date)
   `;
 
