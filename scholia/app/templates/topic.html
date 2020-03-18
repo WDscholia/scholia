@@ -6,14 +6,17 @@
 
 <script type="text/javascript">
  recentlyPublishedWorksSparql = `
-SELECT ?date ?work ?workLabel ?topics
+SELECT ?date ?work ?workLabel 
+  ?topicsUrl ?topics 
 WITH {
   SELECT DISTINCT ?work WHERE {
     ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
   }
 } AS %works
 WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
+  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
+                                    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl) 
+  WHERE {
     INCLUDE %works
     ?work wdt:P921 ?topic . 
     OPTIONAL { ?work wdt:P577 ?dates . }
@@ -30,19 +33,21 @@ WHERE {
     
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }
+GROUP BY ?date ?work ?workLabel ?topicsUrl ?topics
 ORDER BY DESC(?date)
-LIMIT 500
-`
+LIMIT 500`
 
  earliestPublishedWorksSparql = `
-SELECT ?date ?work ?workLabel ?topics
+SELECT ?date ?work ?workLabel ?topicsUrl ?topics 
 WITH {
   SELECT DISTINCT ?work WHERE {
     ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
   }
 } AS %works
 WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
+  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
+                                    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl) 
+                                    WHERE {
     INCLUDE %works
     ?work wdt:P921 ?topic . 
     ?work wdt:P577 ?dates . 
@@ -59,6 +64,7 @@ WHERE {
     
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }
+GROUP BY ?date ?work ?workLabel ?topicsUrl ?topics
 ORDER BY ASC(?date)
 LIMIT 500
 `
@@ -217,13 +223,16 @@ LIMIT 200
 `
 
   authorAwardsSparql = `
-SELECT ?count ?award ?awardLabel ?recipients
+SELECT ?count ?award ?awardLabel ?recipients ?recipientsUrl
 WITH {
-  SELECT (COUNT(?researcher) AS ?count) ?award (GROUP_CONCAT(?researcher_label; separator=", ") AS ?recipients) WHERE {
+  SELECT (COUNT(?researcher) AS ?count) ?award 
+  (GROUP_CONCAT(DISTINCT ?researcher_label; separator=", ") AS ?recipients) 
+  (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?recipientsUrl)
+  WHERE {
     { 
       SELECT DISTINCT ?researcher ?award WHERE {
         hint:Query hint:optimizer "None" .
-        ?work wdt:P921 wd:{{ q }} .
+        ?work wdt:P921 wd:Q742736 .
         ?work wdt:P50 ?researcher .
         ?researcher wdt:P166 ?award .
       } 
@@ -237,13 +246,14 @@ WHERE {
   INCLUDE %result
     ?award rdfs:label ?awardLabel . FILTER (LANG(?awardLabel) = 'en')
 }
+GROUP BY ?count ?award ?awardLabel ?recipients ?recipientsUrl
 ORDER BY DESC(?count)
 `
 
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql,
-		       "#recently-published-works");
+               "#recently-published-works");     
      sparqlToDataTable(earliestPublishedWorksSparql,
 		       "#earliest-published-works");
      sparqlToDataTable(authorsSparql, "#authors");
