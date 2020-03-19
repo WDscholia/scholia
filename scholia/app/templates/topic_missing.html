@@ -149,10 +149,22 @@ ORDER BY DESC(?count) ?topics
 
  $(document).ready(function() {
      sparqlToDataTable(missingAuthorItemsSparql, "#missing-author-items");
-     sparqlToDataTable(missingPubDateSparql, "#missing-pub-date");
-     sparqlToDataTable(missingPubVenueSparql, "#missing-pub-venue");
-     sparqlToDataTable(missingCoTopicSparql, "#missing-co-topic");
- });
+     sparqlToDataTable(missingPubDateSparql, "#missing-pub-date", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(missingPubVenueSparql, "#missing-pub-venue", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(missingCoTopicSparql, "#missing-co-topic", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+});
 
 
 </script>
