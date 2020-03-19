@@ -90,7 +90,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?count)
-  `
+`
 
  topicsSparql = `
 #defaultView:Table
@@ -114,7 +114,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?count)
-  `
+`
 
   authorScoreSparql = `
 SELECT ?score ?author ?authorLabel ?example_work ?example_workLabel
@@ -173,7 +173,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?count)
-  `
+`
 
  topCitedSparql = `
 #defaultView:Table
@@ -232,7 +232,7 @@ WITH {
     { 
       SELECT DISTINCT ?researcher ?award WHERE {
         hint:Query hint:optimizer "None" .
-        ?work wdt:P921 wd:Q742736 .
+        ?work wdt:P921 wd:{{ q }} .
         ?work wdt:P50 ?researcher .
         ?researcher wdt:P166 ?award .
       } 
