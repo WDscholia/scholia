@@ -68,7 +68,11 @@ ORDER BY DESC(?count) ?topics
 
   $(document).ready(function() {
       sparqlToDataTable(missingAuthorItemSparql, "#missing-author-item");
-      sparqlToDataTable(missingTopicsSparql, "#missing-topics");
+      sparqlToDataTable(missingTopicsSparql, "#missing-topics", {
+	         linkPrefixes: {
+	             work: "../../work/",
+  	       }
+      });
   });
 </script>
 
