@@ -181,7 +181,7 @@ ORDER BY DESC(?date)
 
 
  function sparqlToResponse(sparql, doneCallback) {
-     var endpointUrl = "{{ SPARQLEndpointURL }}";
+     var endpointUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
      var settings = {
 	 headers: { Accept: "application/sparql-results+json" },
 	 data: { query: sparql }

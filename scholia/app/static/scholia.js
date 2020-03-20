@@ -124,7 +124,9 @@ function sparqlToDataTable(sparql, element, options={}) {
     var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
         
-    var url = scholiaConfig.SPARQLEndPointURL + "?query=" + encodeURIComponent(sparql) + '&format=json';
+    // var url = scholiaConfig.SPARQLEndPointURL + "?query=" + encodeURIComponent(sparql) + '&format=json';
+    const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + 
+    encodeURIComponent(optionalDataValuesSparql) + '&format=json';
 
     $.getJSON(url, function(response) {
 	var simpleData = sparqlDataToSimpleData(response);

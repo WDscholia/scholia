@@ -394,7 +394,9 @@ def wb_get_topic_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = TOPIC_SPARQL_QUERY.format(q=q)
-    url = config.get('servers', 'SPARQLEndPointURLbd')
+    # TODO to be fixed
+    # url = config.get('servers', 'SPARQLEndPointURLbd')
+    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
