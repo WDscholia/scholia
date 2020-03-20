@@ -24,12 +24,6 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
-from flask_sessionstore import Session
-from flask_session_captcha import FlaskSessionCaptcha
-import requests
-# from requests.auth import HTTPBasicAuth
-import json
-
 
 class RegexConverter(BaseConverter):
     """Converter for regular expression routes.
@@ -248,10 +242,12 @@ def show_author(q):
     """
     entities = wb_get_entities([q])
     name = entity_to_name(entities[q])
+
     if name:
         first_initial, last_name = name[0], name.split()[-1]
     else:
         first_initial, last_name = '', ''
+
     return render_template('author.html', q=q,
                            sparql_endpoint_url=app.config['config']
                            .get('servers', 'SPARQLEndPointURL'),
@@ -2506,68 +2502,3 @@ def show_about():
 def show_favicon():
     """Return favicon."""
     return redirect(url_for('static', filename='favicon/favicon.ico'))
-
-
-@main.route('/report-error/', methods=['GET', 'POST'])
-def report_error():
-    """Handle error reporting. Renders form. Treats input and posts it to github.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML.
-
-    """
-    app.secret_key = "123232"
-    app.config["SECRET_KEY"] = "1234"
-    app.config['CAPTCHA_ENABLE'] = True
-    app.config['CAPTCHA_LENGTH'] = 5
-    app.config['CAPTCHA_WIDTH'] = 160
-    app.config['CAPTCHA_HEIGHT'] = 60
-    app.config['SESSION_TYPE'] = 'filesystem'
-    Session(app)
-    captcha = FlaskSessionCaptcha(app)
-
-    personal_access_token = app.config['config'] \
-                               .get('security', 'PersonalAccessToken')
-
-    if request.method == 'GET':
-        if 'url' in request.form.keys():
-            url = request.form['url']
-        else:
-            url = ''
-
-        return render_template("report_error.html", url=url)
-    else:
-        # if captcha.validate():
-        if 1 == 1:
-            comment = request.form['comment']
-            # captcha_value = request.form['captcha']
-            url = request.form['url']
-
-            headers = {
-                   "Authorization": "token "+personal_access_token,
-                   "Accept": "application/vnd.github.golden-comet-preview+json"
-            }
-            post_an_issue = {
-              "title": "Found a bug @ " + url,
-              "body": comment + "\n" + url,
-              "labels": [
-                "bug"
-                ]
-              }
-            post_an_issue_string = json.dumps(post_an_issue)
-            action = 'https://api.github.com/repos/temp-scholia/scholia/issues'
-            reqResult = requests.post(action,
-                                      data=post_an_issue_string,
-                                      headers=headers)
-            return reqResult.content
-        else:
-            url = ""
-            if request.form['url']:
-                url = "<no url>"
-            else:
-                url = request.form['url']
-            return render_template("report_error.html", url=url)
-
-    return captcha
