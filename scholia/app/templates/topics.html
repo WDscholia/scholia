@@ -90,9 +90,23 @@ ORDER BY DESC(?score)
 
 
  $(document).ready(function() {
-     sparqlToDataTable(listOfTopicsSparql, "#list-of-topics");
-     sparqlToDataTable(listOfWorksSparql, "#list-of-works");
-     sparqlToDataTable(authorsSparql, "#authors");
+     sparqlToDataTable(listOfTopicsSparql, "#list-of-topics",{
+	 linkPrefixes:{
+	     "topic": "../topic/",
+	     "example_work": "../work/",
+    	 }
+     });
+     sparqlToDataTable(listOfWorksSparql, "#list-of-works",{
+	 linkPrefixes:{
+	     "work": "../work/",
+    	 }
+     });
+     sparqlToDataTable(authorsSparql, "#authors",{
+	 linkPrefixes:{
+	     "author": "../author/",
+	     "example_work": "../work/",
+    	 }
+     });
  });
 
 

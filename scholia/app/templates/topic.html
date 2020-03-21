@@ -253,16 +253,55 @@ ORDER BY DESC(?count)
 
  $(document).ready(function() {
      sparqlToDataTable(recentlyPublishedWorksSparql,
-               "#recently-published-works");     
+               "#recently-published-works",{
+	 linkPrefixes:{
+	     "work": "../work/",
+	     }
+     });     
      sparqlToDataTable(earliestPublishedWorksSparql,
-		       "#earliest-published-works");
-     sparqlToDataTable(authorsSparql, "#authors");
-     sparqlToDataTable(topicsSparql, "#topics");
-     sparqlToDataTable(authorScoreSparql, "#author-score");
-     sparqlToDataTable(venuesSparql, "#venues");
-     sparqlToDataTable(topCitedSparql, "#topCited");
-     sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors");
-     sparqlToDataTable(authorAwardsSparql, "#author-awards");
+		       "#earliest-published-works",{
+	 linkPrefixes:{
+	     "work": "../work/",
+    	 }
+     });
+     sparqlToDataTable(authorsSparql, "#authors",{
+	 linkPrefixes:{
+	     "author": "../author/",
+    	 }
+     });
+     sparqlToDataTable(topicsSparql, "#topics",{
+	 linkPrefixes:{
+	     "topic": "../topic/",
+	     "example_work": "../work/",
+    	 }
+     });
+     sparqlToDataTable(authorScoreSparql, "#author-score",{
+	 linkPrefixes:{
+	     "author": "../author/",
+	     "example_work": "../work/",
+    	 }
+     });
+     sparqlToDataTable(venuesSparql, "#venues",{
+	 linkPrefixes:{
+	     "venue": "../venue/",
+    	 }
+     });
+     sparqlToDataTable(topCitedSparql, "#topCited",{
+	 linkPrefixes:{
+	     "cited_work": "../work/",
+    	 }
+     });
+     sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors",{
+	 linkPrefixes:{
+	     "author": "../author/",
+	     "cited_work_example": "../work/",
+    	 }
+     });
+     sparqlToDataTable(authorAwardsSparql, "#author-awards",{
+	 linkPrefixes:{
+	     "award": "../award/",
+    	 }
+     });
  });
 </script>
 
