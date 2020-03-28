@@ -388,6 +388,42 @@ def ror_to_qs(rorid):
             for item in data['results']['bindings']]
 
 
+def ncbigene_to_qs(gene):
+    """Convert a NCBI gene identifier to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the NCBI gene identifier.
+
+    The NCBI gene identifier string is converted to uppercase before any
+    query is made.
+
+    Parameters
+    ----------
+    gene : str
+        NCBI gene identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> ncbitaxon_to_qs('694009') == ['Q278567']
+    True
+
+    """
+    query = 'select ?work where {{ ?work wdt:P351 "{gene}" }}'.format(
+        gene=gene)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def ncbitaxon_to_qs(taxon):
     """Convert a NCBI taxon identifier to Wikidata ID.
 
