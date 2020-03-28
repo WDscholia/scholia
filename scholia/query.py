@@ -14,6 +14,8 @@ Usage:
   scholia.query lipidmaps-to-q <lmid>
   scholia.query atomic-number-to-q <atomicnumber>
   scholia.query mesh-to-q <meshid>
+  scholia.query ncbigene-to-q <gene>
+  scholia.query ncbitaxon-to-q <taxon>
   scholia.query orcid-to-q <orcid>
   scholia.query pubchem-to-q <cid>
   scholia.query pubmed-to-q <pmid>
@@ -412,7 +414,7 @@ def ncbigene_to_qs(gene):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P351 "{gene}" }}'.format(
+    query = 'select ?gene where {{ ?gene wdt:P351 "{gene}" }}'.format(
         gene=gene)
 
     url = 'https://query.wikidata.org/sparql'
@@ -420,7 +422,7 @@ def ncbigene_to_qs(gene):
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
-    return [item['work']['value'][31:]
+    return [item['gene']['value'][31:]
             for item in data['results']['bindings']]
 
 
@@ -1375,6 +1377,16 @@ def main():
 
     elif arguments['mesh-to-q']:
         qs = mesh_to_qs(arguments['<meshid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['ncbigene-to-q']:
+        qs = ncbigene_to_qs(arguments['<gene>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['ncbitaxon-to-q']:
+        qs = ncbitaxon_to_qs(arguments['<taxon>'])
         if len(qs) > 0:
             print(qs[0])
 
