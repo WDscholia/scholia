@@ -59,7 +59,8 @@ Testing
 -------
 
 Rudimentary testing and code style checking are implemented via `tox`.
-Before committing please run the following code in the main directory:
+Before committing please run the following code in the main directory, as pull requests
+which give `tox` errors are not directly merged:
 
 .. code:: shell
 
