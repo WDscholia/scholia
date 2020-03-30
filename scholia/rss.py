@@ -36,7 +36,7 @@ References
 from __future__ import print_function
 
 import requests
-from scholia.config import config
+# from scholia.config import config
 
 from dateutil.parser import parse as parse_datetime
 
@@ -350,7 +350,9 @@ def wb_get_venue_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = VENUE_SPARQL_QUERY.format(q=q)
-    url = config.get('servers', 'SPARQLEndPointURLbd')
+    # TODO to be fixed
+    # url = config.get('servers', 'SPARQLEndPointURLbd')
+    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
@@ -490,7 +492,9 @@ def wb_get_sponsor_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = SPONSOR_SPARQL_QUERY.format(q=q)
-    url = config.get('servers', 'SPARQLEndPointURLbd')
+    # TODO to be fixed
+    # url = config.get('servers', 'SPARQLEndPointURLbd')
+    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
