@@ -51,6 +51,7 @@ WITH {
     INCLUDE %works
     ?work wdt:P921 ?topic . 
     ?work wdt:P577 ?dates . 
+	FILTER (!isBLANK(?dates)) .
     ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
   }
   GROUP BY ?work
