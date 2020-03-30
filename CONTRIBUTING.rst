@@ -68,6 +68,15 @@ Before committing please run the following code in the main directory:
 The style is checked with `flake8`. Also follow the commit message recommendations, 
 cf. `Writing good commit messages <https://github.com/erlang/otp/wiki/writing-good-commit-messages>`_.
 
+Checks of pull requests
+-----------------------
+- Pull requests should have a reference to an issue number.
+- Branches should have be properly named with a name that is self-explanatory and reference to an issue number.
+- The code must be run with `tox` for style and test checks and any errors should be addressed. If it is not possible to fix the tox error then it should be indicated and discussed.
+- Pull requests should only address one single problem.
+- Pull requests should not have superfluous code: Code used for debugging, code used to other work.
+- The code should be a of proper standard. 
+
 Examples
 -------
 
