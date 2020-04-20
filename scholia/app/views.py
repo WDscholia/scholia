@@ -718,6 +718,7 @@ def redirect_ncbigene(gene):
         return redirect(url_for('app.show_gene', q=q), code=302)
     return render_template('404.html')
 
+
 @main.route('/github/<github>')
 def redirect_github(github):
     """Detect and redirect for Github user.
@@ -920,6 +921,7 @@ def redirect_pubmed(pmid):
         return redirect(url_for('app.show_work', q=q), code=302)
     return render_template('404.html')
 
+
 @main.route('/taxon/ncbi/<taxon>')
 def redirect_ncbitaxon(taxon):
     """Detect and redirect for NCBI taxon identifiers.
@@ -935,6 +937,7 @@ def redirect_ncbitaxon(taxon):
         q = qs[0]
         return redirect(url_for('app.show_taxon', q=q), code=302)
     return render_template('404.html')
+
 
 @main.route('/wikipathways/<wpid>')
 def redirect_wikipathways(wpid):
