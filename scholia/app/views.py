@@ -1459,6 +1459,19 @@ def show_chemical_empty():
     return render_template('chemical_empty.html')
 
 
+@main.route('/chemical/missing')
+def show_chemicals_missing():
+    """Return rendered HTML index page for missing information for chemicals.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for missing information for chemicals.
+
+    """
+    return render_template('chemicals_missing.html')
+
+
 @main.route('/chemical-element/' + q_pattern)
 def show_chemical_element(q):
     """Return html render page for specific chemical element.
