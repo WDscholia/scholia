@@ -41,6 +41,14 @@ Scientific journals, proceedings, ...
 </ul>
 
 
-{% endblock %}
+<h3>Curation</h3>
 
+You can help improve Scholia profiles by curating the underlying data in Wikidata.
+
+For instance, the profile of each individual venue links to a dedicated curation page like <a href="../venue/Q15749954/missing">this one</a> for the <a href="/venue/Q15749954">Malaria Journal</a>, which is <a href="https://www.wikidata.org/entity/Q15749954">Q15749954</a> on Wikidata. 
+This curation page can also be reached by way of adding "/missing" to the URL of the venue profile, e.g. <a href="../venue/Q15749954/missing">/venue/Q15749954/missing</a> for the Malaria Journal.
+
+Another way to assist with curation would be to use the TABernacle tool to <a href="https://tools.wmflabs.org/tabernacle/?#/tab/sparql/SELECT%20DISTINCT%20%3Fitem%20%3FitemLabel%20%0AWHERE%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20SERVICE%20wikibase%3Amwapi%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aapi%20%22Search%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Aendpoint%20%22www.wikidata.org%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mwapi%3Asrsearch%20%22%20%20haswbstatement%3AP236%22%20.%20%0A%20%20%20%20%3Ftitle%20wikibase%3AapiOutput%20mwapi%3Atitle.%0A%20%20%7D%0A%20%20BIND(IRI(CONCAT(STR(wd%3A)%2C%20%3Ftitle))%20AS%20%3Fitem)%0A%20%20FILTER%20NOT%20EXISTS%20%7B%20%3Fitem%20wdt%3AP921%20%5B%5D%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0ALIMIT%201000/Len%3BDen%3BAen%3BP407%3BP921">add "main subject" statements to items about venues</a> for which Wikidata is missing that information. 
+
+{% endblock %}
   
