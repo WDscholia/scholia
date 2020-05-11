@@ -100,6 +100,34 @@
 	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
 	       // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
 	    } catch(e) {}
+	 } else if (item.claims.P235) {
+	    try { /* Chemical Compound */
+	       var inchiKey = item.claims.P235[0].mainsnak.datavalue.value;
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "MolecularEntity" ,
+	          "identifier" : "{{ q }}" ,
+	          "inChIKey" : inchiKey ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       if (item.claims.P234 && item.claims.P234[0].mainsnak.datavalue) {
+	          var inchi = item.claims.P234[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.inChI = "InChI=" + inchi ;
+	       }
+	       if (item.claims.P274 && item.claims.P274[0].mainsnak.datavalue) {
+	          var chemformula = item.claims.P274[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.molecularFormula = chemformula ;
+	       }
+	       if (item.claims.P2017 && item.claims.P2017[0].mainsnak.datavalue) {
+	          var smiles = item.claims.P2017[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.molecularFormula = smiles.replace("\"", "\'\'") ;
+	       } else if (item.claims.P233 && item.claims.P233[0].mainsnak.datavalue) {
+	          var smiles = item.claims.P233[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.smiles = smiles.replace("\"", "\'\'") ;
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	    } catch(e) { console.log("Exception: " + e)
+	    }
 	 }
 	 
 	 /* English Wikipedia */
