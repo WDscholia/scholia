@@ -79,6 +79,27 @@
 	 }
 	 catch(e) {}
 	 
+	 /* BioSchemas annotation */
+	 if (item.claims.P225) {
+        try { /* Taxon */
+	       var taxonName = item.claims.P225[0].mainsnak.datavalue.value;
+	       bioschemasAnnotation = {
+	          "@type" : "Taxon" ,
+	          "name" : taxonName ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       if (item.claims.P105) {
+	          var taxonRank = item.claims.P105[0].mainsnak.datavalue.value.id;
+	          bioschemasAnnotation.taxonRank = [ "http://www.wikidata.org/entity/" + taxonRank ];
+	       }
+	       if (item.claims.P171) {
+	          var parent = item.claims.P171[0].mainsnak.datavalue.value.id;
+	          bioschemasAnnotation.parentTaxon = [ "http://www.wikidata.org/entity/" + parent ];
+	       }
+	       $( '#bioschemas' ).append( "foo " + JSON.stringify(bioschemasAnnotation) );
+	       console.log(JSON.stringify(bioschemasAnnotation, "", 2))
+	    } catch(e) {}
+	 }
 	 
 	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {
