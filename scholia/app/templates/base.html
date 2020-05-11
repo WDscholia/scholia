@@ -96,8 +96,8 @@
 	          var parent = item.claims.P171[0].mainsnak.datavalue.value.id;
 	          bioschemasAnnotation.parentTaxon = [ "http://www.wikidata.org/entity/" + parent ];
 	       }
-	       $( '#bioschemas' ).append( "foo " + JSON.stringify(bioschemasAnnotation) );
-	       console.log(JSON.stringify(bioschemasAnnotation, "", 2))
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	       // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
 	    } catch(e) {}
 	 }
 	 
