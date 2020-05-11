@@ -84,17 +84,18 @@
         try { /* Taxon */
 	       var taxonName = item.claims.P225[0].mainsnak.datavalue.value;
 	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
 	          "@type" : "Taxon" ,
 	          "name" : taxonName ,
 	          "url" : "http://www.wikidata.org/entity/{{ q }}"
 	       }
 	       if (item.claims.P105) {
 	          var taxonRank = item.claims.P105[0].mainsnak.datavalue.value.id;
-	          bioschemasAnnotation.taxonRank = [ "http://www.wikidata.org/entity/" + taxonRank ];
+	          bioschemasAnnotation.taxonRank = "http://www.wikidata.org/entity/" + taxonRank ;
 	       }
 	       if (item.claims.P171) {
 	          var parent = item.claims.P171[0].mainsnak.datavalue.value.id;
-	          bioschemasAnnotation.parentTaxon = [ "http://www.wikidata.org/entity/" + parent ];
+	          bioschemasAnnotation.parentTaxon = "http://www.wikidata.org/entity/" + parent ;
 	       }
 	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
 	       // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
