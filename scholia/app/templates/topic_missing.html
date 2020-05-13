@@ -150,8 +150,8 @@ ORDER BY DESC(?count) ?topics
 
     missingNgramsSparql = `
 # Most frequent n-grams from a set of up to 1000 publications on a topic
-SELECT *
-#DISTINCT ?Ngram ?Count ?Length ?CountTimesLength ?work ?workLabel ?N ?resolver1 ?resolver1Url ?resolver2 ?resolver2Url
+SELECT 
+DISTINCT ?Ngram ?Count ?Length ?CountTimesLength ?work ?workLabel ?N ?resolver1 ?resolver1Url ?resolver2 ?resolver2Url
 
 WITH
 { # Generating a list of regexes to look for the NumericValue-th word in a string                                                              
@@ -193,10 +193,6 @@ WITH
       { 
         INCLUDE %regexes
         INCLUDE %titles
-     BIND (LCASE(CONCAT("::: ::: ::: ::: ::: ::: ::: ::: ", # add start codon of colons to assist with processing of n-grams at beginning of title
-                            ?ClearTitle, 
-                            " ;;; ;;; ;;; ;;; ;;; ;;; ;;; ;;;")) # add stop codon of semicolons to assist with processing of n-grams at end of title
-                     AS ?Seeds )
          BIND( 
           (CONCAT(
             REPLACE(?Seeds, ?Regex1, "$1"), " ", 
@@ -222,12 +218,12 @@ WITH
           ) AS ?Ngram) 
 
         BIND(STRLEN(?Ngram) AS ?Length) 
-  #      FILTER (?Length > 2 )  
-  #      FILTER (?Length <= ?ClearTitleLength )  
+        FILTER (?Length > 2 )  
+        FILTER (?Length <= ?ClearTitleLength )  
 
       }
   GROUP BY ?Ngram ?Count ?work ?Length ?CountTimesLength
- # HAVING(?Count > 2)
+  HAVING(?Count > 2)
 } AS %ngrams 
 WHERE {
   INCLUDE %ngrams 
@@ -241,11 +237,11 @@ WHERE {
   BIND("🙋" AS ?resolver2) 
   BIND(CONCAT("https://query.wikidata.org/#%0ASELECT%0A%20%20%23%20Number%20of%20works%20on%20the%20topic%20with%20the%20author%20name%20string%0A%20%20%3Fcount%0A%0A%20%20%23%20Number%20of%20works%20with%20the%20author%20name%20string%0A%20%20%3Fcount1%0A%0A%20%20%23%20Author%20as%20a%20string%0A%20%20%3Fauthorstring%0A%0A%20%20%23%20Build%20URL%20to%20the%20Author%20disambiguator%20tool%0A%20%20%28CONCAT%28%0A%20%20%20%20%20%20%27https%3A%2F%2Ftools.wmflabs.org%2Fauthor-disambiguator%2Fnames_oauth.php%3Fname%3D%27%2C%0A%20%20%20%20%20%20ENCODE_FOR_URI%28%3Fauthorstring%29%29%20AS%20%3Fresolver_url%29%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fwork%20%3Fauthorstring%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2093%20%3Fauthorstring%20.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5B%20wdt%3AP21%20wd%3AQ6581072%20%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5Bwdt%3AP166%20%5B%5D%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP921%20%5Bwdt%3AP625%20%5B%5D%5D.%0A%20%20%20%20%7B%20%3Fwork%20wdt%3AP1476%20%3Ftitle%20.%20%7D%20%0A%20%20%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%20%20%0A%20%20%7D%0A%20%20LIMIT%20100%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork%29%20AS%20%3Fcount%29%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork1%29%20AS%20%3Fcount1%29%0A%20%20%20%20%3Fauthorstring%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork1%20wdt%3AP2093%20%3Fauthorstring%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthorstring%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%20DESC%28%3Fcount1%29%0A%23LIMIT%2050%0A%0A%20%20%0A") AS ?resolver2Url) 
 }
-#GROUP BY ?Ngram ?Count ?Length ?CountTimesLength ?work ?workLabel ?N ?resolver1 ?resolver1Url ?resolver2 ?resolver2Url
-#ORDER BY DESC(?CountTimesLength) DESC(?Count) DESC(?Length)
+GROUP BY ?Ngram ?Count ?Length ?CountTimesLength ?work ?workLabel ?N ?resolver1 ?resolver1Url ?resolver2 ?resolver2Url
+ORDER BY DESC(?CountTimesLength) DESC(?Count) DESC(?Length)
 `
 
-    debugSPARQL = `
+    debugSPARQL1 = `
 # Pulling out elements of the above query in order to find out why it fails    
 SELECT * 
 WITH
@@ -293,6 +289,237 @@ BIND(CONCAT("https://query.wikidata.org/#%0ASELECT%0A%20%20%23%20Number%20of%20w
 LIMIT 1
 `
 
+    debugSPARQL2 = `
+SELECT *
+WITH
+{ # Generating a list of regexes to look for the NumericValue-th word in a string                                                              
+  SELECT ?Regex1 ?Regex2 ?Regex3 ?Regex4 ?NumericValue 
+    { 
+      ?NumberItem wdt:P5176 []; wdt:P1181 ?NumericValue . 
+      FILTER( ?NumericValue > 0 ) 
+      FILTER( ?NumericValue < 51)
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue - 1 ),"}([^ ]+) .*") AS ?Regex1)
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue + 1 ),"}([^ ]+) .*") AS ?Regex2) 
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue + 3 ),"}([^ ]+) .*") AS ?Regex3) 
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue + 5 ),"}([^ ]+) .*") AS ?Regex4) 
+    }
+} AS %regexes 
+
+WHERE {
+INCLUDE %regexes 
+}
+LIMIT 1
+`
+
+    debugSPARQL3 = `
+SELECT * 
+   { # Choosing the entities whose titles are to be analyzed
+      SERVICE bd:sample { ?Publication wdt:P921 wd:{{ q }} . bd:serviceParam bd:sample.limit 1000 }     
+      ?Publication wdt:P1476 ?Title.
+      BIND (REPLACE(STR(?Title),"[\\\\.:,;\\\\[\\\\]$]","") AS ?ClearTitle) # remove some frequent special characters, including colons and semicolons
+      BIND(STRLEN(?ClearTitle) AS ?ClearTitleLength) 
+      FILTER(LANG(?Title)="en") 
+      # Basic processing of the titles
+      BIND (LCASE(CONCAT("::: ::: ::: ::: ::: ::: ::: ::: ", # add start codon of colons to assist with processing of n-grams at beginning of title
+                            ?ClearTitle, 
+                            " ;;; ;;; ;;; ;;; ;;; ;;; ;;; ;;;")) # add stop codon of semicolons to assist with processing of n-grams at end of title
+                     AS ?Seeds )
+   }
+LIMIT 1
+`
+
+    debugSPARQL4 = `
+SELECT *
+#    DISTINCT ?Ngram 
+#    (COUNT(DISTINCT ?Title) AS ?Count)
+#    (SAMPLE(DISTINCT ?Publication) AS ?work)
+#    ?Length 
+#    (( ?Count * ?Length ) AS ?CountTimesLength)
+      { 
+        VALUES ?Seeds { "::: ::: ::: ::: ::: ::: ::: ::: clock scan protocol for image analysis imagej plugins ;;; ;;; ;;; ;;; ;;; ;;; ;;; ;;;" }
+        VALUES ?Regex1 { "^([^ ]+ ){10}([^ ]+) .*" }
+        VALUES ?Regex2 { "^([^ ]+ ){12}([^ ]+) .*" }
+        BIND( 
+          (CONCAT(
+            REPLACE(?Seeds, ?Regex1, "$1"), " ", 
+            REPLACE(?Seeds, ?Regex2, "$1"), " "
+          )
+        ) AS ?NgramCandidate) 
+                            
+        BIND( 
+          (REPLACE
+           (REPLACE
+            (REPLACE
+             (REPLACE
+              (STR(?NgramCandidate),"([;:])",""),
+              "(^\\\\s+)",""),
+             "(\\\\s+$)",""),
+            "([ ]{2,})"," ")
+          ) AS ?Ngram) 
+
+        BIND(STRLEN(?Ngram) AS ?Length) 
+        FILTER (?Length > 2 )  
+#        FILTER (?Length <= ?ClearTitleLength )  
+
+      }
+#  GROUP BY ?Ngram ?Count ?work ?Length ?CountTimesLength
+#  HAVING(?Count > 2)
+`
+
+    debugSPARQL5 = `
+SELECT * WHERE {
+  VALUES ?Ngram {"scan protocol for"}
+  VALUES ?work {wd:Q40156508}
+   ?work rdfs:label ?workLabel.
+  FILTER(LANG(?workLabel)="en") 
+  BIND(STRLEN(REPLACE(?Ngram, "\\\\S", "")) + 1 as ?N)
+
+  BIND("📰" AS ?resolver1) 
+  BIND(CONCAT("https://query.wikidata.org/#SELECT%20%0A%20%20DISTINCT%0A%20%20%3Fitem%20%3Ftitle%0A%20%20%28REPLACE%28STR%28%3Fitem%29%2C%20%22.%2aQ%22%2C%20%22Q%22%29%20AS%20%3Fqid%29%20%0A%20%20%28%22P921%22%20AS%20%3Fproperty%29%0A%20%20%28%22Q4115189%22%20AS%20%3FReplaceWithYourTargetID%29%0A%20%20%28%22S887%22%20AS%20%3Fheuristic%29%0A%20%20%28%22Q69652283%22%20AS%20%3Fdeduced%29%0A%0AWHERE%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20%0A%7B%20%20SERVICE%20wikibase%3Amwapi%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aapi%20%22Search%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Aendpoint%20%22www.wikidata.org%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mwapi%3Asrsearch%20%22%5C%22", ENCODE_FOR_URI(?Ngram), "%5C%22%20haswbstatement%3AP31%3DQ13442814%20-haswbstatement%3AP921%3DQ4115189%22.%0A%20%20%20%20%20%20%3Fpage_title%20wikibase%3AapiOutput%20mwapi%3Atitle.%0A%20%20%7D%0A%20%7D%0A%20%20BIND%28IRI%28CONCAT%28STR%28wd%3A%29%2C%20%3Fpage_title%29%29%20AS%20%3Fitem%29%0A%20%20%0A%20%20%3Fitem%20wdt%3AP1476%20%3Ftitle.%0A%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%0A%0A%7D%0A") AS ?resolver1Url) 
+
+  BIND("🙋" AS ?resolver2) 
+  BIND(CONCAT("https://query.wikidata.org/#%0ASELECT%0A%20%20%23%20Number%20of%20works%20on%20the%20topic%20with%20the%20author%20name%20string%0A%20%20%3Fcount%0A%0A%20%20%23%20Number%20of%20works%20with%20the%20author%20name%20string%0A%20%20%3Fcount1%0A%0A%20%20%23%20Author%20as%20a%20string%0A%20%20%3Fauthorstring%0A%0A%20%20%23%20Build%20URL%20to%20the%20Author%20disambiguator%20tool%0A%20%20%28CONCAT%28%0A%20%20%20%20%20%20%27https%3A%2F%2Ftools.wmflabs.org%2Fauthor-disambiguator%2Fnames_oauth.php%3Fname%3D%27%2C%0A%20%20%20%20%20%20ENCODE_FOR_URI%28%3Fauthorstring%29%29%20AS%20%3Fresolver_url%29%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fwork%20%3Fauthorstring%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2093%20%3Fauthorstring%20.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5B%20wdt%3AP21%20wd%3AQ6581072%20%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5Bwdt%3AP166%20%5B%5D%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP921%20%5Bwdt%3AP625%20%5B%5D%5D.%0A%20%20%20%20%7B%20%3Fwork%20wdt%3AP1476%20%3Ftitle%20.%20%7D%20%0A%20%20%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%20%20%0A%20%20%7D%0A%20%20LIMIT%20100%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork%29%20AS%20%3Fcount%29%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork1%29%20AS%20%3Fcount1%29%0A%20%20%20%20%3Fauthorstring%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork1%20wdt%3AP2093%20%3Fauthorstring%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthorstring%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%20DESC%28%3Fcount1%29%0A%23LIMIT%2050%0A%0A%20%20%0A") AS ?resolver2Url) 
+
+}
+LIMIT 1
+`
+
+    debugSPARQL6 = `
+SELECT * 
+
+WITH {
+SELECT 
+    DISTINCT ?Ngram 
+    (COUNT(DISTINCT ?Title) AS ?Count)
+    (SAMPLE(DISTINCT ?Publication) AS ?work)
+    ?Length 
+    (( ?Count * ?Length ) AS ?CountTimesLength)
+      { 
+        VALUES ?Seeds { "::: ::: ::: ::: ::: ::: ::: ::: clock scan protocol for image analysis imagej plugins ;;; ;;; ;;; ;;; ;;; ;;; ;;; ;;;" }
+        VALUES ?Regex1 { "^([^ ]+ ){10}([^ ]+) .*" }
+        VALUES ?Regex2 { "^([^ ]+ ){12}([^ ]+) .*" }
+        VALUES ?Publication { wd:Q40156508 }
+        BIND( 
+          (CONCAT(
+            REPLACE(?Seeds, ?Regex1, "$1"), " ", 
+            REPLACE(?Seeds, ?Regex2, "$1"), " "
+          )
+        ) AS ?NgramCandidate) 
+                            
+        BIND( 
+          (REPLACE
+           (REPLACE
+            (REPLACE
+             (REPLACE
+              (STR(?NgramCandidate),"([;:])",""),
+              "(^\\\\s+)",""),
+             "(\\\\s+$)",""),
+            "([ ]{2,})"," ")
+          ) AS ?Ngram) 
+
+        BIND(STRLEN(?Ngram) AS ?Length) 
+        FILTER (?Length > 2 )  
+#        FILTER (?Length <= ?ClearTitleLength )  
+
+      }
+  GROUP BY ?Ngram ?Count ?work ?Length ?CountTimesLength
+#  HAVING(?Count > 2)
+
+} AS %ngrams  
+WHERE {
+  INCLUDE %ngrams
+  #  VALUES ?Ngram {"scan protocol for"}
+  #VALUES ?work {wd:Q40156508}
+   ?work rdfs:label ?workLabel.
+  FILTER(LANG(?workLabel)="en") 
+  BIND(STRLEN(REPLACE(?Ngram, "\\\\S", "")) + 1 as ?N)
+
+  BIND("📰" AS ?resolver1) 
+  BIND(CONCAT("https://query.wikidata.org/#SELECT%20%0A%20%20DISTINCT%0A%20%20%3Fitem%20%3Ftitle%0A%20%20%28REPLACE%28STR%28%3Fitem%29%2C%20%22.%2aQ%22%2C%20%22Q%22%29%20AS%20%3Fqid%29%20%0A%20%20%28%22P921%22%20AS%20%3Fproperty%29%0A%20%20%28%22Q4115189%22%20AS%20%3FReplaceWithYourTargetID%29%0A%20%20%28%22S887%22%20AS%20%3Fheuristic%29%0A%20%20%28%22Q69652283%22%20AS%20%3Fdeduced%29%0A%0AWHERE%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20%0A%7B%20%20SERVICE%20wikibase%3Amwapi%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aapi%20%22Search%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Aendpoint%20%22www.wikidata.org%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mwapi%3Asrsearch%20%22%5C%22", ENCODE_FOR_URI(?Ngram), "%5C%22%20haswbstatement%3AP31%3DQ13442814%20-haswbstatement%3AP921%3DQ4115189%22.%0A%20%20%20%20%20%20%3Fpage_title%20wikibase%3AapiOutput%20mwapi%3Atitle.%0A%20%20%7D%0A%20%7D%0A%20%20BIND%28IRI%28CONCAT%28STR%28wd%3A%29%2C%20%3Fpage_title%29%29%20AS%20%3Fitem%29%0A%20%20%0A%20%20%3Fitem%20wdt%3AP1476%20%3Ftitle.%0A%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%0A%0A%7D%0A") AS ?resolver1Url) 
+
+  BIND("🙋" AS ?resolver2) 
+  BIND(CONCAT("https://query.wikidata.org/#%0ASELECT%0A%20%20%23%20Number%20of%20works%20on%20the%20topic%20with%20the%20author%20name%20string%0A%20%20%3Fcount%0A%0A%20%20%23%20Number%20of%20works%20with%20the%20author%20name%20string%0A%20%20%3Fcount1%0A%0A%20%20%23%20Author%20as%20a%20string%0A%20%20%3Fauthorstring%0A%0A%20%20%23%20Build%20URL%20to%20the%20Author%20disambiguator%20tool%0A%20%20%28CONCAT%28%0A%20%20%20%20%20%20%27https%3A%2F%2Ftools.wmflabs.org%2Fauthor-disambiguator%2Fnames_oauth.php%3Fname%3D%27%2C%0A%20%20%20%20%20%20ENCODE_FOR_URI%28%3Fauthorstring%29%29%20AS%20%3Fresolver_url%29%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fwork%20%3Fauthorstring%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2093%20%3Fauthorstring%20.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5B%20wdt%3AP21%20wd%3AQ6581072%20%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5Bwdt%3AP166%20%5B%5D%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP921%20%5Bwdt%3AP625%20%5B%5D%5D.%0A%20%20%20%20%7B%20%3Fwork%20wdt%3AP1476%20%3Ftitle%20.%20%7D%20%0A%20%20%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%20%20%0A%20%20%7D%0A%20%20LIMIT%20100%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork%29%20AS%20%3Fcount%29%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork1%29%20AS%20%3Fcount1%29%0A%20%20%20%20%3Fauthorstring%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork1%20wdt%3AP2093%20%3Fauthorstring%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthorstring%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%20DESC%28%3Fcount1%29%0A%23LIMIT%2050%0A%0A%20%20%0A") AS ?resolver2Url) 
+
+}
+LIMIT 1
+`
+
+    debugSPARQL7 = `
+SELECT * 
+WITH {
+  
+SELECT * 
+   { # Choosing the entities whose titles are to be analyzed
+      SERVICE bd:sample { ?Publication wdt:P921 wd:Q1659584 . bd:serviceParam bd:sample.limit 1000 }     
+      ?Publication wdt:P1476 ?Title.
+      BIND (REPLACE(STR(?Title),"[\\\\.:,;\\\\[\\\\]$]","") AS ?ClearTitle) # remove some frequent special characters, including colons and semicolons
+      BIND(STRLEN(?ClearTitle) AS ?ClearTitleLength) 
+      FILTER(LANG(?Title)="en") 
+      # Basic processing of the titles
+      BIND (LCASE(CONCAT("::: ::: ::: ::: ::: ::: ::: ::: ", # add start codon of colons to assist with processing of n-grams at beginning of title
+                            ?ClearTitle, 
+                            " ;;; ;;; ;;; ;;; ;;; ;;; ;;; ;;;")) # add stop codon of semicolons to assist with processing of n-grams at end of title
+                     AS ?Seeds )
+   }
+LIMIT 100
+} AS %titles  
+WITH {
+SELECT 
+    DISTINCT ?Ngram 
+    (COUNT(DISTINCT ?Title) AS ?Count)
+    (SAMPLE(DISTINCT ?Publication) AS ?work)
+    ?Length 
+    (( ?Count * ?Length ) AS ?CountTimesLength)
+      { 
+#        VALUES ?Seeds { "::: ::: ::: ::: ::: ::: ::: ::: clock scan protocol for image analysis imagej plugins ;;; ;;; ;;; ;;; ;;; ;;; ;;; ;;;" }
+#        VALUES ?Publication { wd:Q40156508 }
+        INCLUDE %titles
+        VALUES ?Regex1 { "^([^ ]+ ){10}([^ ]+) .*" }
+        VALUES ?Regex2 { "^([^ ]+ ){12}([^ ]+) .*" }
+        BIND( 
+          (CONCAT(
+            REPLACE(?Seeds, ?Regex1, "$1"), " ", 
+            REPLACE(?Seeds, ?Regex2, "$1"), " "
+          )
+        ) AS ?NgramCandidate) 
+                            
+        BIND( 
+          (REPLACE
+           (REPLACE
+            (REPLACE
+             (REPLACE
+              (STR(?NgramCandidate),"([;:])",""),
+              "(^\\\\s+)",""),
+             "(\\\\s+$)",""),
+            "([ ]{2,})"," ")
+          ) AS ?Ngram) 
+
+        BIND(STRLEN(?Ngram) AS ?Length) 
+        FILTER (?Length > 2 )  
+#        FILTER (?Length <= ?ClearTitleLength )  
+
+      }
+  GROUP BY ?Ngram ?Count ?work ?Length ?CountTimesLength
+#  HAVING(?Count > 2)
+
+} AS %ngrams  
+WHERE {
+  INCLUDE %ngrams
+  #  VALUES ?Ngram {"scan protocol for"}
+  #VALUES ?work {wd:Q40156508}
+   ?work rdfs:label ?workLabel.
+  FILTER(LANG(?workLabel)="en") 
+  BIND(STRLEN(REPLACE(?Ngram, "\\\\S", "")) + 1 as ?N)
+
+  BIND("📰" AS ?resolver1) 
+  BIND(CONCAT("https://query.wikidata.org/#SELECT%20%0A%20%20DISTINCT%0A%20%20%3Fitem%20%3Ftitle%0A%20%20%28REPLACE%28STR%28%3Fitem%29%2C%20%22.%2aQ%22%2C%20%22Q%22%29%20AS%20%3Fqid%29%20%0A%20%20%28%22P921%22%20AS%20%3Fproperty%29%0A%20%20%28%22Q4115189%22%20AS%20%3FReplaceWithYourTargetID%29%0A%20%20%28%22S887%22%20AS%20%3Fheuristic%29%0A%20%20%28%22Q69652283%22%20AS%20%3Fdeduced%29%0A%0AWHERE%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20%0A%7B%20%20SERVICE%20wikibase%3Amwapi%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aapi%20%22Search%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Aendpoint%20%22www.wikidata.org%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mwapi%3Asrsearch%20%22%5C%22", ENCODE_FOR_URI(?Ngram), "%5C%22%20haswbstatement%3AP31%3DQ13442814%20-haswbstatement%3AP921%3DQ4115189%22.%0A%20%20%20%20%20%20%3Fpage_title%20wikibase%3AapiOutput%20mwapi%3Atitle.%0A%20%20%7D%0A%20%7D%0A%20%20BIND%28IRI%28CONCAT%28STR%28wd%3A%29%2C%20%3Fpage_title%29%29%20AS%20%3Fitem%29%0A%20%20%0A%20%20%3Fitem%20wdt%3AP1476%20%3Ftitle.%0A%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%0A%0A%7D%0A") AS ?resolver1Url) 
+
+  BIND("🙋" AS ?resolver2) 
+  BIND(CONCAT("https://query.wikidata.org/#%0ASELECT%0A%20%20%23%20Number%20of%20works%20on%20the%20topic%20with%20the%20author%20name%20string%0A%20%20%3Fcount%0A%0A%20%20%23%20Number%20of%20works%20with%20the%20author%20name%20string%0A%20%20%3Fcount1%0A%0A%20%20%23%20Author%20as%20a%20string%0A%20%20%3Fauthorstring%0A%0A%20%20%23%20Build%20URL%20to%20the%20Author%20disambiguator%20tool%0A%20%20%28CONCAT%28%0A%20%20%20%20%20%20%27https%3A%2F%2Ftools.wmflabs.org%2Fauthor-disambiguator%2Fnames_oauth.php%3Fname%3D%27%2C%0A%20%20%20%20%20%20ENCODE_FOR_URI%28%3Fauthorstring%29%29%20AS%20%3Fresolver_url%29%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fwork%20%3Fauthorstring%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2093%20%3Fauthorstring%20.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5B%20wdt%3AP21%20wd%3AQ6581072%20%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5Bwdt%3AP166%20%5B%5D%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP921%20%5Bwdt%3AP625%20%5B%5D%5D.%0A%20%20%20%20%7B%20%3Fwork%20wdt%3AP1476%20%3Ftitle%20.%20%7D%20%0A%20%20%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%20%20%0A%20%20%7D%0A%20%20LIMIT%20100%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork%29%20AS%20%3Fcount%29%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork1%29%20AS%20%3Fcount1%29%0A%20%20%20%20%3Fauthorstring%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork1%20wdt%3AP2093%20%3Fauthorstring%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthorstring%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%20DESC%28%3Fcount1%29%0A%23LIMIT%2050%0A%0A%20%20%0A") AS ?resolver2Url) 
+
+}
+LIMIT 5
+`
 
  $(document).ready(function() {
      sparqlToDataTable(missingAuthorItemsSparql, "#missing-author-items");
@@ -316,7 +543,37 @@ LIMIT 1
 	       work: "../../work/",
 	   }
     });
-     sparqlToDataTable(debugSPARQL, "#debug-escapes", {
+     sparqlToDataTable(debugSPARQL1, "#debug-escapes1", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(debugSPARQL2, "#debug-escapes2", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(debugSPARQL3, "#debug-escapes3", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(debugSPARQL4, "#debug-escapes4", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(debugSPARQL5, "#debug-escapes5", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(debugSPARQL6, "#debug-escapes6", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(debugSPARQL7, "#debug-escapes7", {
 	   linkPrefixes: {
 	       work: "../../work/",
 	   }
@@ -364,12 +621,35 @@ The following works have only been tagged with this one topic.
 
 <h2>Popular words and phrases contained in titles of works on the topic</h2>
 
-The links provided below assist in curating information on related topics.
+The links provided below assist in curating information on related topics. 
+Warning: the query, while <a href="https://query.wikidata.org/#%23%20Most%20frequent%20n-grams%20from%20a%20set%20of%20up%20to%201000%20publications%20on%20a%20topic%0ASELECT%20DISTINCT%20%3FNgram%20%3FCount%20%3FLength%20%3FCountTimesLength%20%3Fwork%20%3FworkLabel%20%3FN%20%0A%3Fresolver1%20%3Fresolver1Url%20%3Fresolver2%20%3Fresolver2Url%0AWITH%0A%7B%20%23%20Generating%20a%20list%20of%20regexes%20to%20look%20for%20the%20NumericValue-th%20word%20in%20a%20string%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20SELECT%20%3FRegex1%20%3FRegex2%20%3FRegex3%20%3FRegex4%20%3FNumericValue%20%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20%3FNumberItem%20wdt%3AP5176%20%5B%5D%3B%20wdt%3AP1181%20%3FNumericValue%20.%20%0A%20%20%20%20%20%20FILTER%28%20%3FNumericValue%20%3E%200%20%29%20%0A%20%20%20%20%20%20FILTER%28%20%3FNumericValue%20%3C%2051%29%0A%20%20%20%20%20%20BIND%28%20CONCAT%28%20%22%5E%28%5B%5E%20%5D%2B%20%29%7B%22%2C%20STR%28%20%3FNumericValue%20-%201%20%29%2C%22%7D%28%5B%5E%20%5D%2B%29%20.%2a%22%29%20AS%20%3FRegex1%29%0A%20%20%20%20%20%20BIND%28%20CONCAT%28%20%22%5E%28%5B%5E%20%5D%2B%20%29%7B%22%2C%20STR%28%20%3FNumericValue%20%2B%201%20%29%2C%22%7D%28%5B%5E%20%5D%2B%29%20.%2a%22%29%20AS%20%3FRegex2%29%20%0A%20%20%20%20%20%20BIND%28%20CONCAT%28%20%22%5E%28%5B%5E%20%5D%2B%20%29%7B%22%2C%20STR%28%20%3FNumericValue%20%2B%203%20%29%2C%22%7D%28%5B%5E%20%5D%2B%29%20.%2a%22%29%20AS%20%3FRegex3%29%20%0A%20%20%20%20%20%20BIND%28%20CONCAT%28%20%22%5E%28%5B%5E%20%5D%2B%20%29%7B%22%2C%20STR%28%20%3FNumericValue%20%2B%205%20%29%2C%22%7D%28%5B%5E%20%5D%2B%29%20.%2a%22%29%20AS%20%3FRegex4%29%20%0A%20%20%20%20%7D%0A%7D%20AS%20%25regexes%20%0AWITH%0A%7B%20%23%20Generating%20a%20list%20of%20titles%20to%20be%20analyzed%0A%20%20SELECT%20%3FTitle%20%3FPublication%20%3FSeeds%20%3FClearTitleLength%0A%20%20%20%7B%20%23%20Choosing%20the%20entities%20whose%20titles%20are%20to%20be%20analyzed%0A%20%20%20%20%20%20SERVICE%20bd%3Asample%20%7B%20%3FPublication%20wdt%3AP921%20wd%3A{{ q }}%20.%20bd%3AserviceParam%20bd%3Asample.limit%201000%20%7D%20%20%20%20%20%0A%20%20%20%20%20%20%3FPublication%20wdt%3AP1476%20%3FTitle.%0A%20%20%20%20%20%20BIND%20%28REPLACE%28STR%28%3FTitle%29%2C%22%5B%5C%5C.%3A%2C%3B%5C%5C%5B%5C%5C%5D%24%5D%22%2C%22%22%29%20AS%20%3FClearTitle%29%20%23%20remove%20some%20frequent%20special%20characters%2C%20including%20colons%20and%20semicolons%0A%20%20%20%20%20%20BIND%28STRLEN%28%3FClearTitle%29%20AS%20%3FClearTitleLength%29%20%0A%20%20%20%20%20%20FILTER%28LANG%28%3FTitle%29%3D%22en%22%29%20%0A%20%20%20%20%20%20%23%20Basic%20processing%20of%20the%20titles%0A%20%20%20%20%20%20BIND%20%28LCASE%28CONCAT%28%22%3A%3A%3A%20%3A%3A%3A%20%3A%3A%3A%20%3A%3A%3A%20%3A%3A%3A%20%3A%3A%3A%20%3A%3A%3A%20%3A%3A%3A%20%22%2C%20%23%20add%20start%20codon%20of%20colons%20to%20assist%20with%20processing%20of%20n-grams%20at%20beginning%20of%20title%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3FClearTitle%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22%20%3B%3B%3B%20%3B%3B%3B%20%3B%3B%3B%20%3B%3B%3B%20%3B%3B%3B%20%3B%3B%3B%20%3B%3B%3B%20%3B%3B%3B%22%29%29%20%23%20add%20stop%20codon%20of%20semicolons%20to%20assist%20with%20processing%20of%20n-grams%20at%20end%20of%20title%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20AS%20%3FSeeds%20%29%0A%20%20%20%7D%0A%7D%20AS%20%25titles%20%0AWITH%0A%7B%20%23%20Applying%20the%20regexes%20to%20the%20titles%20to%20extract%20ngrams%20%28for%20n%20%3C%3D%208%29%2C%20and%20counting%20occurrences%20of%20the%20ngrams%20across%20titles%0A%20%20SELECT%20%0A%20%20%20%20DISTINCT%20%3FNgram%20%0A%20%20%20%20%28COUNT%28DISTINCT%20%3FTitle%29%20AS%20%3FCount%29%0A%20%20%20%20%28SAMPLE%28DISTINCT%20%3FPublication%29%20AS%20%3Fwork%29%0A%20%20%20%20%3FLength%20%0A%20%20%20%20%28%28%20%3FCount%20%2a%20%3FLength%20%29%20AS%20%3FCountTimesLength%29%0A%20%20%20%20%20%20%7B%20%0A%20%20%20%20%20%20%20%20INCLUDE%20%25regexes%0A%20%20%20%20%20%20%20%20INCLUDE%20%25titles%0A%20%20%20%20%20%20%20%20BIND%28%20%0A%20%20%20%20%20%20%20%20%20%20%28CONCAT%28%0A%20%20%20%20%20%20%20%20%20%20%20%20REPLACE%28%3FSeeds%2C%20%3FRegex1%2C%20%22%241%22%29%2C%20%22%20%22%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20REPLACE%28%3FSeeds%2C%20%3FRegex1%2C%20%22%242%22%29%2C%20%22%20%22%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20REPLACE%28%3FSeeds%2C%20%3FRegex2%2C%20%22%241%22%29%2C%20%22%20%22%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20REPLACE%28%3FSeeds%2C%20%3FRegex2%2C%20%22%242%22%29%2C%20%22%20%22%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20REPLACE%28%3FSeeds%2C%20%3FRegex3%2C%20%22%241%22%29%2C%20%22%20%22%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20REPLACE%28%3FSeeds%2C%20%3FRegex3%2C%20%22%242%22%29%2C%20%22%20%22%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20REPLACE%28%3FSeeds%2C%20%3FRegex4%2C%20%22%241%22%29%2C%20%22%20%22%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20REPLACE%28%3FSeeds%2C%20%3FRegex4%2C%20%22%242%22%29%0A%20%20%20%20%20%20%20%20%20%20%29%0A%20%20%20%20%20%20%20%20%29%20AS%20%3FNgramCandidate%29%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%20%20%20%20%20%20BIND%28%20%0A%20%20%20%20%20%20%20%20%20%20%28REPLACE%0A%20%20%20%20%20%20%20%20%20%20%20%28REPLACE%0A%20%20%20%20%20%20%20%20%20%20%20%20%28REPLACE%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%28REPLACE%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%28STR%28%3FNgramCandidate%29%2C%22%28%5B%3B%3A%5D%29%22%2C%22%22%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22%28%5E%5C%5Cs%2B%29%22%2C%22%22%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%22%28%5C%5Cs%2B%24%29%22%2C%22%22%29%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%28%5B%20%5D%7B2%2C%7D%29%22%2C%22%20%22%29%0A%20%20%20%20%20%20%20%20%20%20%29%20AS%20%3FNgram%29%20%0A%0A%20%20%20%20%20%20%20%20BIND%28STRLEN%28%3FNgram%29%20AS%20%3FLength%29%20%0A%20%20%20%20%20%20%20%20FILTER%20%28%3FLength%20%3E%202%20%29%20%20%0A%20%20%20%20%20%20%20%20FILTER%20%28%3FLength%20%3C%3D%20%3FClearTitleLength%20%29%20%20%0A%0A%20%20%20%20%20%20%7D%0A%20%20GROUP%20BY%20%3FNgram%20%3FCount%20%3Fwork%20%3FLength%20%3FCountTimesLength%0A%20%20HAVING%28%3FCount%20%3E%202%29%0A%7D%20AS%20%25ngrams%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25ngrams%20%0A%20%20%3Fwork%20rdfs%3Alabel%20%3FworkLabel.%0A%20%20FILTER%28LANG%28%3FworkLabel%29%3D%22en%22%29%20%0A%20%20BIND%28STRLEN%28REPLACE%28%3FNgram%2C%20%22%5C%5CS%22%2C%20%22%22%29%29%20%2B%201%20as%20%3FN%29%0A%0A%20%20BIND%28%22%F0%9F%93%B0%22%20AS%20%3Fresolver1%29%20%0A%20%20BIND%28CONCAT%28%22https%3A%2F%2Fquery.wikidata.org%2F%23SELECT%2520%250A%2520%2520DISTINCT%250A%2520%2520%253Fitem%2520%253Ftitle%250A%2520%2520%2528REPLACE%2528STR%2528%253Fitem%2529%252C%2520%2522.%252aQ%2522%252C%2520%2522Q%2522%2529%2520AS%2520%253Fqid%2529%2520%250A%2520%2520%2528%2522P921%2522%2520AS%2520%253Fproperty%2529%250A%2520%2520%2528%2522Q4115189%2522%2520AS%2520%253FReplaceWithYourTargetID%2529%250A%2520%2520%2528%2522S887%2522%2520AS%2520%253Fheuristic%2529%250A%2520%2520%2528%2522Q69652283%2522%2520AS%2520%253Fdeduced%2529%250A%250AWHERE%2520%257B%250A%2520%2520hint%253AQuery%2520hint%253Aoptimizer%2520%2522None%2522.%250A%2520%2520%250A%257B%2520%2520SERVICE%2520wikibase%253Amwapi%2520%257B%250A%2520%2520%2520%2520bd%253AserviceParam%2520wikibase%253Aapi%2520%2522Search%2522%253B%250A%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520wikibase%253Aendpoint%2520%2522www.wikidata.org%2522%253B%250A%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520%2520mwapi%253Asrsearch%2520%2522%255C%2522%22%2C%20ENCODE_FOR_URI%28%3FNgram%29%2C%20%22%255C%2522%2520haswbstatement%253AP31%253DQ13442814%2520-haswbstatement%253AP921%253DQ4115189%2522.%250A%2520%2520%2520%2520%2520%2520%253Fpage_title%2520wikibase%253AapiOutput%2520mwapi%253Atitle.%250A%2520%2520%257D%250A%2520%257D%250A%2520%2520BIND%2528IRI%2528CONCAT%2528STR%2528wd%253A%2529%252C%2520%253Fpage_title%2529%2529%2520AS%2520%253Fitem%2529%250A%2520%2520%250A%2520%2520%253Fitem%2520wdt%253AP1476%2520%253Ftitle.%250A%2520%2520FILTER%2520CONTAINS%2528LCASE%2528%253Ftitle%2529%252C%2520%2522%22%2C%20ENCODE_FOR_URI%28%3FNgram%29%2C%20%22%2522%2529.%250A%250A%257D%250A%22%29%20AS%20%3Fresolver1Url%29%20%0A%0A%20%20BIND%28%22%F0%9F%99%8B%22%20AS%20%3Fresolver2%29%20%0A%20%20BIND%28CONCAT%28%22https%3A%2F%2Fquery.wikidata.org%2F%23%250ASELECT%250A%2520%2520%2523%2520Number%2520of%2520works%2520on%2520the%2520topic%2520with%2520the%2520author%2520name%2520string%250A%2520%2520%253Fcount%250A%250A%2520%2520%2523%2520Number%2520of%2520works%2520with%2520the%2520author%2520name%2520string%250A%2520%2520%253Fcount1%250A%250A%2520%2520%2523%2520Author%2520as%2520a%2520string%250A%2520%2520%253Fauthorstring%250A%250A%2520%2520%2523%2520Build%2520URL%2520to%2520the%2520Author%2520disambiguator%2520tool%250A%2520%2520%2528CONCAT%2528%250A%2520%2520%2520%2520%2520%2520%2527https%253A%252F%252Ftools.wmflabs.org%252Fauthor-disambiguator%252Fnames_oauth.php%253Fname%253D%2527%252C%250A%2520%2520%2520%2520%2520%2520ENCODE_FOR_URI%2528%253Fauthorstring%2529%2529%2520AS%2520%253Fresolver_url%2529%250AWITH%2520%257B%250A%2520%2520SELECT%2520DISTINCT%2520%253Fwork%2520%253Fauthorstring%2520WHERE%2520%257B%250A%2520%2520%2520%2520%253Fwork%2520wdt%253AP2093%2520%253Fauthorstring%2520.%250A%2523%2520%2520%2520%2520%253Fwork%2520wdt%253AP50%2520%255B%2520wdt%253AP21%2520wd%253AQ6581072%2520%255D.%250A%2523%2520%2520%2520%2520%253Fwork%2520wdt%253AP50%2520%255Bwdt%253AP166%2520%255B%255D%255D.%250A%2523%2520%2520%2520%2520%253Fwork%2520wdt%253AP921%2520%255Bwdt%253AP625%2520%255B%255D%255D.%250A%2520%2520%2520%2520%257B%2520%253Fwork%2520wdt%253AP1476%2520%253Ftitle%2520.%2520%257D%2520%250A%2520%2520%2520%2520FILTER%2520CONTAINS%2528LCASE%2528%253Ftitle%2529%252C%2520%2522%22%2C%20ENCODE_FOR_URI%28%3FNgram%29%2C%20%22%2522%2529.%2520%2520%250A%2520%2520%257D%250A%2520%2520LIMIT%2520100%250A%257D%2520AS%2520%2525works%250AWITH%2520%257B%250A%2520%2520SELECT%250A%2520%2520%2520%2520%2528COUNT%2528DISTINCT%2520%253Fwork%2529%2520AS%2520%253Fcount%2529%250A%2520%2520%2520%2520%2528COUNT%2528DISTINCT%2520%253Fwork1%2529%2520AS%2520%253Fcount1%2529%250A%2520%2520%2520%2520%253Fauthorstring%250A%2520%2520WHERE%2520%257B%250A%2520%2520%2520%2520INCLUDE%2520%2525works%250A%2520%2520%2520%2520%253Fwork1%2520wdt%253AP2093%2520%253Fauthorstring%2520.%250A%2520%2520%257D%250A%2520%2520GROUP%2520BY%2520%253Fauthorstring%250A%257D%2520AS%2520%2525result%250AWHERE%2520%257B%250A%2520%2520INCLUDE%2520%2525result%250A%257D%250AORDER%2520BY%2520DESC%2528%253Fcount%2529%2520DESC%2528%253Fcount1%2529%250A%2523LIMIT%252050%250A%250A%2520%2520%250A%22%29%20AS%20%3Fresolver2Url%29%20%0A%7D%0AGROUP%20BY%20%3FNgram%20%3FCount%20%3FLength%20%3FCountTimesLength%20%3Fwork%20%3FworkLabel%20%3FN%20%3Fresolver1%20%3Fresolver1Url%20%3Fresolver2%20%3Fresolver2Url%0AORDER%20BY%20DESC%28%3FCountTimesLength%29%20DESC%28%3FCount%29%20DESC%28%3FLength%29%0A">rendering fine on the Wikidata Query Service</a> currently does not work here.
+The remainder of the page is devoted to finding out why.
 <table class="table table-hover" id="missing-ngrams"></table>
 
 <h2>Debugging</h2>
 
 The SPARQL query above does not render, so this section is to assist with figuring out how to get it to render properly.
-<table class="table table-hover" id="debug-escapes"></table>
+
+<h3>Unordered subsets of the above target query</h3>
+<table class="table table-hover" id="debug-escapes1"></table>
+
+<h3>Systematic subsets of the target query</h3>
+<h4>Regexes</h4>
+<table class="table table-hover" id="debug-escapes2"></table>
+
+<h4>Titles</h4>
+<table class="table table-hover" id="debug-escapes3"></table>
+
+<h4>Ngrams</h4>
+<table class="table table-hover" id="debug-escapes4"></table>
+
+<h4>Main</h4>
+<table class="table table-hover" id="debug-escapes5"></table>
+
+<h4>Main and Ngrams</h4>
+<table class="table table-hover" id="debug-escapes6"></table>
+
+<h4>Main and Ngrams and Titles</h4>
+<table class="table table-hover" id="debug-escapes7"></table>
 
 {% endblock %}
