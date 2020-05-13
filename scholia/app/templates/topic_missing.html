@@ -5,6 +5,7 @@
 {{super()}}
 
 <script type="text/javascript">
+
     missingAuthorItemsSparql = `
 SELECT
   # Number of works with the author
@@ -114,7 +115,7 @@ WHERE {
 ORDER BY DESC(?citations)
 `
 
-        missingCoTopicSparql = `
+    missingCoTopicSparql = `
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
@@ -147,6 +148,152 @@ ORDER BY DESC(?count) ?topics
 `
 
 
+    missingNgramsSparql = `
+# Most frequent n-grams from a set of up to 1000 publications on a topic
+SELECT *
+#DISTINCT ?Ngram ?Count ?Length ?CountTimesLength ?work ?workLabel ?N ?resolver1 ?resolver1Url ?resolver2 ?resolver2Url
+
+WITH
+{ # Generating a list of regexes to look for the NumericValue-th word in a string                                                              
+  SELECT ?Regex1 ?Regex2 ?Regex3 ?Regex4 ?NumericValue 
+    { 
+      ?NumberItem wdt:P5176 []; wdt:P1181 ?NumericValue . 
+      FILTER( ?NumericValue > 0 ) 
+      FILTER( ?NumericValue < 51)
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue - 1 ),"}([^ ]+) .*") AS ?Regex1)
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue + 1 ),"}([^ ]+) .*") AS ?Regex2) 
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue + 3 ),"}([^ ]+) .*") AS ?Regex3) 
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue + 5 ),"}([^ ]+) .*") AS ?Regex4) 
+    }
+} AS %regexes 
+WITH
+{ # Generating a list of titles to be analyzed
+  SELECT ?Title ?Publication ?Seeds ?ClearTitleLength
+   { # Choosing the entities whose titles are to be analyzed
+      SERVICE bd:sample { ?Publication wdt:P921 wd:{{ q }} . bd:serviceParam bd:sample.limit 1000 }     
+      ?Publication wdt:P1476 ?Title.
+      BIND (REPLACE(STR(?Title),"[\\\\.:,;\\\\[\\\\]$]","") AS ?ClearTitle) # remove some frequent special characters, including colons and semicolons
+      BIND(STRLEN(?ClearTitle) AS ?ClearTitleLength) 
+      FILTER(LANG(?Title)="en") 
+      # Basic processing of the titles
+      BIND (LCASE(CONCAT("::: ::: ::: ::: ::: ::: ::: ::: ", # add start codon of colons to assist with processing of n-grams at beginning of title
+                            ?ClearTitle, 
+                            " ;;; ;;; ;;; ;;; ;;; ;;; ;;; ;;;")) # add stop codon of semicolons to assist with processing of n-grams at end of title
+                     AS ?Seeds )
+   }
+} AS %titles 
+WITH
+{ # Applying the regexes to the titles to extract ngrams (for n <= 8), and counting occurrences of the ngrams across titles
+  SELECT 
+    DISTINCT ?Ngram 
+    (COUNT(DISTINCT ?Title) AS ?Count)
+    (SAMPLE(DISTINCT ?Publication) AS ?work)
+    ?Length 
+    (( ?Count * ?Length ) AS ?CountTimesLength)
+      { 
+        INCLUDE %regexes
+        INCLUDE %titles
+     BIND (LCASE(CONCAT("::: ::: ::: ::: ::: ::: ::: ::: ", # add start codon of colons to assist with processing of n-grams at beginning of title
+                            ?ClearTitle, 
+                            " ;;; ;;; ;;; ;;; ;;; ;;; ;;; ;;;")) # add stop codon of semicolons to assist with processing of n-grams at end of title
+                     AS ?Seeds )
+         BIND( 
+          (CONCAT(
+            REPLACE(?Seeds, ?Regex1, "$1"), " ", 
+            REPLACE(?Seeds, ?Regex1, "$2"), " ", 
+            REPLACE(?Seeds, ?Regex2, "$1"), " ", 
+            REPLACE(?Seeds, ?Regex2, "$2"), " ", 
+            REPLACE(?Seeds, ?Regex3, "$1"), " ", 
+            REPLACE(?Seeds, ?Regex3, "$2"), " ", 
+            REPLACE(?Seeds, ?Regex4, "$1"), " ", 
+            REPLACE(?Seeds, ?Regex4, "$2")
+          )
+        ) AS ?NgramCandidate) 
+                            
+        BIND( 
+          (REPLACE
+           (REPLACE
+            (REPLACE
+             (REPLACE
+              (STR(?NgramCandidate),"([;:])",""),
+              "(^\\\\s+)",""),
+             "(\\\\s+$)",""),
+            "([ ]{2,})"," ")
+          ) AS ?Ngram) 
+
+        BIND(STRLEN(?Ngram) AS ?Length) 
+  #      FILTER (?Length > 2 )  
+  #      FILTER (?Length <= ?ClearTitleLength )  
+
+      }
+  GROUP BY ?Ngram ?Count ?work ?Length ?CountTimesLength
+ # HAVING(?Count > 2)
+} AS %ngrams 
+WHERE {
+  INCLUDE %ngrams 
+  ?work rdfs:label ?workLabel.
+  FILTER(LANG(?workLabel)="en") 
+  BIND(STRLEN(REPLACE(?Ngram, "\\\\S", "")) + 1 as ?N)
+
+  BIND("📰" AS ?resolver1) 
+  BIND(CONCAT("https://query.wikidata.org/#SELECT%20%0A%20%20DISTINCT%0A%20%20%3Fitem%20%3Ftitle%0A%20%20%28REPLACE%28STR%28%3Fitem%29%2C%20%22.%2aQ%22%2C%20%22Q%22%29%20AS%20%3Fqid%29%20%0A%20%20%28%22P921%22%20AS%20%3Fproperty%29%0A%20%20%28%22Q4115189%22%20AS%20%3FReplaceWithYourTargetID%29%0A%20%20%28%22S887%22%20AS%20%3Fheuristic%29%0A%20%20%28%22Q69652283%22%20AS%20%3Fdeduced%29%0A%0AWHERE%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20%0A%7B%20%20SERVICE%20wikibase%3Amwapi%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aapi%20%22Search%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Aendpoint%20%22www.wikidata.org%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mwapi%3Asrsearch%20%22%5C%22", ENCODE_FOR_URI(?Ngram), "%5C%22%20haswbstatement%3AP31%3DQ13442814%20-haswbstatement%3AP921%3DQ4115189%22.%0A%20%20%20%20%20%20%3Fpage_title%20wikibase%3AapiOutput%20mwapi%3Atitle.%0A%20%20%7D%0A%20%7D%0A%20%20BIND%28IRI%28CONCAT%28STR%28wd%3A%29%2C%20%3Fpage_title%29%29%20AS%20%3Fitem%29%0A%20%20%0A%20%20%3Fitem%20wdt%3AP1476%20%3Ftitle.%0A%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%0A%0A%7D%0A") AS ?resolver1Url) 
+
+  BIND("🙋" AS ?resolver2) 
+  BIND(CONCAT("https://query.wikidata.org/#%0ASELECT%0A%20%20%23%20Number%20of%20works%20on%20the%20topic%20with%20the%20author%20name%20string%0A%20%20%3Fcount%0A%0A%20%20%23%20Number%20of%20works%20with%20the%20author%20name%20string%0A%20%20%3Fcount1%0A%0A%20%20%23%20Author%20as%20a%20string%0A%20%20%3Fauthorstring%0A%0A%20%20%23%20Build%20URL%20to%20the%20Author%20disambiguator%20tool%0A%20%20%28CONCAT%28%0A%20%20%20%20%20%20%27https%3A%2F%2Ftools.wmflabs.org%2Fauthor-disambiguator%2Fnames_oauth.php%3Fname%3D%27%2C%0A%20%20%20%20%20%20ENCODE_FOR_URI%28%3Fauthorstring%29%29%20AS%20%3Fresolver_url%29%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fwork%20%3Fauthorstring%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2093%20%3Fauthorstring%20.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5B%20wdt%3AP21%20wd%3AQ6581072%20%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5Bwdt%3AP166%20%5B%5D%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP921%20%5Bwdt%3AP625%20%5B%5D%5D.%0A%20%20%20%20%7B%20%3Fwork%20wdt%3AP1476%20%3Ftitle%20.%20%7D%20%0A%20%20%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%20%20%0A%20%20%7D%0A%20%20LIMIT%20100%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork%29%20AS%20%3Fcount%29%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork1%29%20AS%20%3Fcount1%29%0A%20%20%20%20%3Fauthorstring%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork1%20wdt%3AP2093%20%3Fauthorstring%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthorstring%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%20DESC%28%3Fcount1%29%0A%23LIMIT%2050%0A%0A%20%20%0A") AS ?resolver2Url) 
+}
+#GROUP BY ?Ngram ?Count ?Length ?CountTimesLength ?work ?workLabel ?N ?resolver1 ?resolver1Url ?resolver2 ?resolver2Url
+#ORDER BY DESC(?CountTimesLength) DESC(?Count) DESC(?Length)
+`
+
+    debugSPARQL = `
+# Pulling out elements of the above query in order to find out why it fails    
+SELECT * 
+WITH
+{ # Generating a list of regexes to look for the NumericValue-th word in a string                                                              
+  SELECT ?Regex1 ?Regex2 ?Regex3 ?Regex4 ?NumericValue 
+    { 
+      ?NumberItem wdt:P5176 []; wdt:P1181 ?NumericValue . 
+      FILTER( ?NumericValue > 0 ) 
+      FILTER( ?NumericValue < 51)
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue - 1 ),"}([^ ]+) .*") AS ?Regex1)
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue + 1 ),"}([^ ]+) .*") AS ?Regex2) 
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue + 3 ),"}([^ ]+) .*") AS ?Regex3) 
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue + 5 ),"}([^ ]+) .*") AS ?Regex4) 
+    }
+} AS %regexes 
+WHERE {
+INCLUDE %regexes
+?Publication wdt:P1476 ?Title.
+      BIND (REPLACE(STR(?Title),"[\\\\.:,;\\\\[\\\\]$]","") AS ?ClearTitle)
+        BIND(STRLEN(REPLACE(?ClearTitle, "\\\\S", "")) + 1 as ?N)
+        BIND(     REPLACE
+              (STR(?ClearTitle),"([;:])","") AS ?Seeds)
+       BIND( 
+          (CONCAT(
+            REPLACE(?Seeds, ?Regex1, "$1"), " "
+          )
+        ) AS ?NgramCandidate1) 
+          BIND( 
+          (REPLACE
+           (REPLACE
+            (REPLACE
+             (REPLACE
+              (STR(?NgramCandidate1),"([;:])",""),
+              "(^\\\\s+)",""),
+             "(\\\\s+$)",""),
+            "([ ]{2,})"," ")
+          ) AS ?Ngram) 
+      BIND( CONCAT( "^([^ ]+ ){", STR( ?NumericValue - 1 ),"}([^ ]+) .*") AS ?Regex1b)
+BIND("📰" AS ?resolver1) 
+BIND(CONCAT("https://query.wikidata.org/#SELECT%20%0A%20%20DISTINCT%0A%20%20%3Fitem%20%3Ftitle%0A%20%20%28REPLACE%28STR%28%3Fitem%29%2C%20%22.%2aQ%22%2C%20%22Q%22%29%20AS%20%3Fqid%29%20%0A%20%20%28%22P921%22%20AS%20%3Fproperty%29%0A%20%20%28%22Q4115189%22%20AS%20%3FReplaceWithYourTargetID%29%0A%20%20%28%22S887%22%20AS%20%3Fheuristic%29%0A%20%20%28%22Q69652283%22%20AS%20%3Fdeduced%29%0A%0AWHERE%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20%0A%7B%20%20SERVICE%20wikibase%3Amwapi%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aapi%20%22Search%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Aendpoint%20%22www.wikidata.org%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mwapi%3Asrsearch%20%22%5C%22", ENCODE_FOR_URI(?Ngram), "%5C%22%20haswbstatement%3AP31%3DQ13442814%20-haswbstatement%3AP921%3DQ4115189%22.%0A%20%20%20%20%20%20%3Fpage_title%20wikibase%3AapiOutput%20mwapi%3Atitle.%0A%20%20%7D%0A%20%7D%0A%20%20BIND%28IRI%28CONCAT%28STR%28wd%3A%29%2C%20%3Fpage_title%29%29%20AS%20%3Fitem%29%0A%20%20%0A%20%20%3Fitem%20wdt%3AP1476%20%3Ftitle.%0A%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%0A%0A%7D%0A") AS ?resolver1Url) 
+
+BIND("🙋" AS ?resolver2) 
+BIND(CONCAT("https://query.wikidata.org/#%0ASELECT%0A%20%20%23%20Number%20of%20works%20on%20the%20topic%20with%20the%20author%20name%20string%0A%20%20%3Fcount%0A%0A%20%20%23%20Number%20of%20works%20with%20the%20author%20name%20string%0A%20%20%3Fcount1%0A%0A%20%20%23%20Author%20as%20a%20string%0A%20%20%3Fauthorstring%0A%0A%20%20%23%20Build%20URL%20to%20the%20Author%20disambiguator%20tool%0A%20%20%28CONCAT%28%0A%20%20%20%20%20%20%27https%3A%2F%2Ftools.wmflabs.org%2Fauthor-disambiguator%2Fnames_oauth.php%3Fname%3D%27%2C%0A%20%20%20%20%20%20ENCODE_FOR_URI%28%3Fauthorstring%29%29%20AS%20%3Fresolver_url%29%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fwork%20%3Fauthorstring%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP2093%20%3Fauthorstring%20.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5B%20wdt%3AP21%20wd%3AQ6581072%20%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP50%20%5Bwdt%3AP166%20%5B%5D%5D.%0A%23%20%20%20%20%3Fwork%20wdt%3AP921%20%5Bwdt%3AP625%20%5B%5D%5D.%0A%20%20%20%20%7B%20%3Fwork%20wdt%3AP1476%20%3Ftitle%20.%20%7D%20%0A%20%20%20%20FILTER%20CONTAINS%28LCASE%28%3Ftitle%29%2C%20%22", ENCODE_FOR_URI(?Ngram), "%22%29.%20%20%0A%20%20%7D%0A%20%20LIMIT%20100%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork%29%20AS%20%3Fcount%29%0A%20%20%20%20%28COUNT%28DISTINCT%20%3Fwork1%29%20AS%20%3Fcount1%29%0A%20%20%20%20%3Fauthorstring%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork1%20wdt%3AP2093%20%3Fauthorstring%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthorstring%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%20DESC%28%3Fcount1%29%0A%23LIMIT%2050%0A%0A%20%20%0A") AS ?resolver2Url) 
+}
+LIMIT 1
+`
+
+
  $(document).ready(function() {
      sparqlToDataTable(missingAuthorItemsSparql, "#missing-author-items");
      sparqlToDataTable(missingPubDateSparql, "#missing-pub-date", {
@@ -160,6 +307,16 @@ ORDER BY DESC(?count) ?topics
 	   }
     });
      sparqlToDataTable(missingCoTopicSparql, "#missing-co-topic", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(missingNgramsSparql, "#missing-ngrams", {
+	   linkPrefixes: {
+	       work: "../../work/",
+	   }
+    });
+     sparqlToDataTable(debugSPARQL, "#debug-escapes", {
 	   linkPrefixes: {
 	       work: "../../work/",
 	   }
@@ -204,5 +361,15 @@ For the listed publications, Wikidata does not have a statement as to where they
 
 The following works have only been tagged with this one topic.
 <table class="table table-hover" id="missing-co-topic"></table>
+
+<h2>Popular words and phrases contained in titles of works on the topic</h2>
+
+The links provided below assist in curating information on related topics.
+<table class="table table-hover" id="missing-ngrams"></table>
+
+<h2>Debugging</h2>
+
+The SPARQL query above does not render, so this section is to assist with figuring out how to get it to render properly.
+<table class="table table-hover" id="debug-escapes"></table>
 
 {% endblock %}
