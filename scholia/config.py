@@ -23,7 +23,7 @@ CONFIG_FILENAMES = [
 
 DEFAULTS = """
 [system]
-listen=127.0.0.1
+listen=0.0.0.0
 port=8100
 [servers]
 SPARQLEndpointURL = https://query.wikidata.org/sparql
