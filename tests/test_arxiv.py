@@ -15,3 +15,6 @@ def test_get_metadata():
     metadata = get_metadata('1803.04349')
     assert metadata['publication_date'] == '2018-03-05'
     assert metadata['full_text_url'] == "https://arxiv.org/pdf/1803.04349.pdf"
+
+    metadata = get_metadata('1710.04099')
+    assert metadata['publication_date'] == '2017-10-11'
