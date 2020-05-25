@@ -85,9 +85,10 @@ def get_metadata(arxiv):
     tree = etree.HTML(response.content)
 
     submissions = tree.xpath('//div[@class="submission-history"]/text()')
-    submissions = [submission
-                   for submission in submissions
-                   if len(submission.strip()) > 0
+    submissions = [
+        submission
+        for submission in submissions
+        if len(submission.strip()) > 0
     ]
     datetime_as_string = submissions[-1][5:30]
     isodatetime = parse_datetime(datetime_as_string).isoformat()
