@@ -387,11 +387,11 @@ def main():
         for doi in dois:
             qs_doi = doi_to_qs(doi)
             if len(qs_doi) == 0:
-                print('Could not find Wikidata item for {doi}'.format(doi))
+                print('Could not find Wikidata item for {doi}'.format(doi=doi))
                 continue
             if len(qs_doi) > 1:
                 print(('Multiple Wikidata items for {doi}: {qs}.'
-                       'Using first.').format(doi, qs_doi))
+                       'Using first.').format(doi=doi, qs=qs_doi))
             q = qs_doi[0]
             qs.append(q)
             keys.append(doi)
