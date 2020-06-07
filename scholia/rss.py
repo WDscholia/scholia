@@ -431,8 +431,8 @@ def wb_get_organization_latest_works(q):
                 q + '</title>\n'
     rss_body += "    <description>The organization's most " + \
                 "recent articles</description>\n"
-    rss_body += ('    <link>https://tools.wmflabs.org/'
-                 'scholia/organization/</link>\n')
+    rss_body += ('    <link>https://scholia.toolforge.org/'
+                 'organization/</link>\n')
     rss_body += '    <atom:link ' + \
                 'href="https://scholia.toolforge.org/organization/' + \
                 q + '/latest-works/rss" rel="self" ' + \
@@ -477,8 +477,8 @@ def wb_get_sponsor_latest_works(q):
                 q + '</title>\n'
     rss_body += "    <description>The sponsor's most " + \
                 "recent articles</description>\n"
-    rss_body += ('    <link>https://tools.wmflabs.org/'
-                 'scholia/sponsor/</link>\n')
+    rss_body += ('    <link>https://scholia.toolforge.org/'
+                 'sponsor/</link>\n')
     rss_body += '    <atom:link ' + \
                 'href="https://scholia.toolforge.org/sponsor/' + \
                 q + '/latest-works/rss" rel="self" ' + \
