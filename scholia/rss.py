@@ -223,7 +223,7 @@ def entities_to_works_rss(entities):
     rss = u('')
     for entity in entities:
         qid = _value(entity, 'work')[31:]
-        url = 'https://tools.wmflabs.org/scholia/work/' + qid
+        url = 'https://scholia.toolforge.org/work/' + qid
         item_date = parse_datetime(_value(entity, 'date'))
 
         # Dirty hack to get around the problem with dates before 1900
@@ -293,9 +293,9 @@ def wb_get_author_latest_works(q):
     rss_body += '   <title>Scholia - Latest Articles by ' + q + '</title>\n'
     rss_body += '   <description>The author''s most ' + \
                 'recent articles</description>\n'
-    rss_body += '   <link>https://tools.wmflabs.org/scholia/</link>\n'
+    rss_body += '   <link>https://scholia.toolforge.org/</link>\n'
     rss_body += '   <atom:link ' + \
-                'href="https://tools.wmflabs.org/scholia/author/' \
+                'href="https://scholia.toolforge.org/author/' \
                 + q + '/latest-works/rss" rel="self" ' + \
                 'type="application/rss+xml" />\n'
 
@@ -342,9 +342,9 @@ def wb_get_venue_latest_works(q):
                 q + '</title>\n'
     rss_body += "    <description>The venue's most " + \
                 "recent articles</description>\n"
-    rss_body += '    <link>https://tools.wmflabs.org/scholia/venue/</link>\n'
+    rss_body += '    <link>https://scholia.toolforge.org/venue/</link>\n'
     rss_body += '    <atom:link ' + \
-                'href="https://tools.wmflabs.org/scholia/venue/' + \
+                'href="https://scholia.toolforge.org/venue/' + \
                 q + '/latest-works/rss" rel="self" ' + \
                 'type="application/rss+xml" />\n'
 
@@ -386,9 +386,9 @@ def wb_get_topic_latest_works(q):
     rss_body += '    <title>Scholia - Latest Articles for ' + q + '</title>\n'
     rss_body += "    <description>The topic's most " + \
                 "recent articles</description>\n"
-    rss_body += '    <link>https://tools.wmflabs.org/scholia/</link>\n'
+    rss_body += '    <link>https://scholia.toolforge.org/</link>\n'
     rss_body += '    <atom:link ' + \
-                'href="https://tools.wmflabs.org/scholia/topic/' \
+                'href="https://scholia.toolforge.org/topic/' \
                 + q + '/latest-works/rss" rel="self" ' + \
                 'type="application/rss+xml" />\n'
 
@@ -434,7 +434,7 @@ def wb_get_organization_latest_works(q):
     rss_body += ('    <link>https://tools.wmflabs.org/'
                  'scholia/organization/</link>\n')
     rss_body += '    <atom:link ' + \
-                'href="https://tools.wmflabs.org/scholia/organization/' + \
+                'href="https://scholia.toolforge.org/organization/' + \
                 q + '/latest-works/rss" rel="self" ' + \
                 'type="application/rss+xml" />\n'
 
@@ -480,7 +480,7 @@ def wb_get_sponsor_latest_works(q):
     rss_body += ('    <link>https://tools.wmflabs.org/'
                  'scholia/sponsor/</link>\n')
     rss_body += '    <atom:link ' + \
-                'href="https://tools.wmflabs.org/scholia/sponsor/' + \
+                'href="https://scholia.toolforge.org/sponsor/' + \
                 q + '/latest-works/rss" rel="self" ' + \
                 'type="application/rss+xml" />\n'
 
