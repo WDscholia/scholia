@@ -732,7 +732,7 @@ def redirect_inchikey(inchikey):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404_chemical.html')
+    return render_template('404_chemical.html', inchikey=inchikey)
 
 
 @main.route('/issn/<issn>')
