@@ -128,6 +128,19 @@
 	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
 	    } catch(e) { console.log("Exception: " + e)
 	    }
+	 } else if (item.claims.P352) { // UniProt ID
+	    try { /* Protein */
+	       var uniprot = item.claims.P352[0].mainsnak.datavalue.value;
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "Protein" ,
+	          "identifier" : "{{ q }}" ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}" ,
+	          "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	    } catch(e) { console.log("Exception: " + e)
+	    }
 	 }
 	 
 	 /* English Wikipedia */
