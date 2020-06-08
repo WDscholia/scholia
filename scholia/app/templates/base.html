@@ -141,6 +141,28 @@
 	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
 	    } catch(e) { console.log("Exception: " + e)
 	    }
+	 } else if (item.claims.P351 || item.claims.P594) { // NCBI Gene or Ensembl
+	    try { /* Gene */
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "Gene" ,
+	          "identifier" : "{{ q }}" ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       counter = 0
+	       bioschemasAnnotation.sameAs = []
+	       if (item.claims.P351 && item.claims.P351[0].mainsnak.datavalue) {
+	          var ncbi = item.claims.P351[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.sameAs[counter] = "https://www.ncbi.nlm.nih.gov/gene/" + ncbi;
+	          counter++
+	       }
+	       if (item.claims.P594 && item.claims.P594[0].mainsnak.datavalue) {
+	          var ensembl = item.claims.P594[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.sameAs[counter] = "http://identifiers.org/ensembl/" + ensembl;
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	    } catch(e) { console.log("Exception: " + e)
+	    }
 	 }
 	 
 	 /* English Wikipedia */
