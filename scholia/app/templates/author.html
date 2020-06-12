@@ -45,7 +45,7 @@ WITH {
     ?venue
     (GROUP_CONCAT(DISTINCT ?topic; separator=" // ") AS ?topics)
   WHERE {
-	  ?work wdt:P50 wd:{{ q }} .
+      ?work wdt:P50 wd:{{ q }} .
     ?work wdt:P1433 ?venue .
     OPTIONAL { ?venue wdt:P921 / rdfs:label ?topic . FILTER(LANG(?topic) = 'en') }
   }
@@ -183,8 +183,8 @@ ORDER BY DESC(?date)
  function sparqlToResponse(sparql, doneCallback) {
      var endpointUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
      var settings = {
-	 headers: { Accept: "application/sparql-results+json" },
-	 data: { query: sparql }
+     headers: { Accept: "application/sparql-results+json" },
+     data: { query: sparql }
      };
      return $.ajax(endpointUrl, settings).then(doneCallback);
  }
@@ -198,9 +198,9 @@ ORDER BY DESC(?date)
      sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
      sparqlToDataTable(citingAuthorsSparql, "#citing-authors");
      sparqlToDataTable(eventsSparql, "#events",{
-	 linkPrefixes:{
-	     "event": "../event/",
-	 }
+     linkPrefixes:{
+         "event": "../event/",
+     }
      });
 
      window.onresize = resize;
@@ -217,147 +217,147 @@ ORDER BY ?publication_date
 
 
      sparqlToResponse(sparql, function(response) {
-	 var data = response.results.bindings;
+     var data = response.results.bindings;
 
-	 var qToLabel = new Object();
-	 data.forEach(function(item, index) {
-	     qToLabel[item.topic.value.substring(31)] = item.topicLabel.value || item.topic.value.substring(31);
-	     qToLabel[item.work.value.substring(31)] = item.workLabel.value || item.work.value.substring(31);
-	 });
+     var qToLabel = new Object();
+     data.forEach(function(item, index) {
+         qToLabel[item.topic.value.substring(31)] = item.topicLabel.value || item.topic.value.substring(31);
+         qToLabel[item.work.value.substring(31)] = item.workLabel.value || item.work.value.substring(31);
+     });
 
-	 var works = $.map(data, function(row) {
-	     return row.work.value.substring(31);
-	 });
-	 var topics = $.map(data, function(row) {
-	     return row.topic.value.substring(31);
-	 });
+     var works = $.map(data, function(row) {
+         return row.work.value.substring(31);
+     });
+     var topics = $.map(data, function(row) {
+         return row.topic.value.substring(31);
+     });
 
-	 // Sizes
-	 var margin = { top: 100, right: 0, bottom: 0, left: 0 },
-	     width =
-		 document.getElementById("topics-works-matrix").clientWidth,
-	     axis_height = works.length * 12,
-	     full_height = axis_height + margin.top;
+     // Sizes
+     var margin = { top: 100, right: 0, bottom: 0, left: 0 },
+         width =
+         document.getElementById("topics-works-matrix").clientWidth,
+         axis_height = works.length * 12,
+         full_height = axis_height + margin.top;
 
-	 var svg = d3
-	     .select("#topics-works-matrix")
-	     .append("svg")
-	     .attr("width", width)
-	     .attr("height", full_height)
-	     .append("g")
-	     .attr("transform", "translate(0, " + margin.top + ")");
+     var svg = d3
+         .select("#topics-works-matrix")
+         .append("svg")
+         .attr("width", width)
+         .attr("height", full_height)
+         .append("g")
+         .attr("transform", "translate(0, " + margin.top + ")");
 
-	 // X scales and axis
-	 var xScale = d3
-	     .scaleBand()
-	     .range([0, width])
-	     .domain(topics);
-	 svg
-	     .append("g")
-	     .call(
-		 d3
-		     .axisTop(xScale)
-		     .tickSize(0)
-		     .tickFormat(function(d) {
-			 return qToLabel[d];
-		     })
-	     )
-	     .selectAll("text")
-	     .style("text-anchor", "start")
-	     .attr("transform", "rotate(-65)");
+     // X scales and axis
+     var xScale = d3
+         .scaleBand()
+         .range([0, width])
+         .domain(topics);
+     svg
+         .append("g")
+         .call(
+         d3
+             .axisTop(xScale)
+             .tickSize(0)
+             .tickFormat(function(d) {
+             return qToLabel[d];
+             })
+         )
+         .selectAll("text")
+         .style("text-anchor", "start")
+         .attr("transform", "rotate(-65)");
 
-	 // Y scales and axis
-	 var yScale = d3
-	     .scaleBand()
-	     .range([0, axis_height])
-	     .domain(works)
+     // Y scales and axis
+     var yScale = d3
+         .scaleBand()
+         .range([0, axis_height])
+         .domain(works)
 
-	 svg
-	     .append("g")
-	     .style("font-size", "16px")
-	     .style("text-anchor", "start")
-	     .style("opacity", 0.3)
-	     .call(
-		 d3
-		     .axisLeft(yScale)
-		     .tickSize(0)
-		     .tickFormat(function(d) {
-			 return qToLabel[d];
-		     })
-	     )
+     svg
+         .append("g")
+         .style("font-size", "16px")
+         .style("text-anchor", "start")
+         .style("opacity", 0.3)
+         .call(
+         d3
+             .axisLeft(yScale)
+             .tickSize(0)
+             .tickFormat(function(d) {
+             return qToLabel[d];
+             })
+         )
 
-	 // Move y-label slight to the right so the first lette is not cut
-	     .selectAll("text")
-	     .attr("x", 1)
+     // Move y-label slight to the right so the first lette is not cut
+         .selectAll("text")
+         .attr("x", 1)
 
-	 svg.selectAll("g .domain").remove()
+     svg.selectAll("g .domain").remove()
 
-	 // Tooltip
-	 var tooltip = d3
-	     .select("body")
-	     .append("div")
-	     .style("opacity", 0)
-	     .attr("class", "tooltip")
-	     .style("background-color", "white")
-	     .style("border", "solid")
-	     .style("border-width", "2px")
-	     .style("padding", "10px")
-	     .style("font-size", "16px");
+     // Tooltip
+     var tooltip = d3
+         .select("body")
+         .append("div")
+         .style("opacity", 0)
+         .attr("class", "tooltip")
+         .style("background-color", "white")
+         .style("border", "solid")
+         .style("border-width", "2px")
+         .style("padding", "10px")
+         .style("font-size", "16px");
 
-	 var mouseover = function(d) {
-	     html =
-		 "<a href='../work/" +
-		 d.work.value.substring(31) +
-		 "'>" +
-		 d.workLabel.value +
-		 "</a>" +
-		 "<br/>" +
-		 "<a href='../topic/" +
-		 d.topic.value.substring(31) +
-		 "'>" +
-		 d.topicLabel.value +
-		 "</a>";
+     var mouseover = function(d) {
+         html =
+         "<a href='../work/" +
+         d.work.value.substring(31) +
+         "'>" +
+         d.workLabel.value +
+         "</a>" +
+         "<br/>" +
+         "<a href='../topic/" +
+         d.topic.value.substring(31) +
+         "'>" +
+         d.topicLabel.value +
+         "</a>";
 
-	     tooltip
-		 .html(html)
-		 .transition()
-		 .delay(0)
-		 .style("opacity", 1)
-		 .style("left", d3.event.pageX + "px")
-		 .style("top", d3.event.pageY + "px")
-		 .style("position", "absolute");
-	 };
-	 var inMouseOut = false;
-	 var mouseout = function(d) {
-	     tooltip
-		 .transition()
-		 .delay(2000)
-		 .duration(2000)
-		 .style("opacity", 0);
-	 };
+         tooltip
+         .html(html)
+         .transition()
+         .delay(0)
+         .style("opacity", 1)
+         .style("left", d3.event.pageX + "px")
+         .style("top", d3.event.pageY + "px")
+         .style("position", "absolute");
+     };
+     var inMouseOut = false;
+     var mouseout = function(d) {
+         tooltip
+         .transition()
+         .delay(2000)
+         .duration(2000)
+         .style("opacity", 0);
+     };
 
-	 // Add elements in matrix
-	 svg
-	     .selectAll()
-	     .data(data, function(d) {
-		 return true;
-	     })
-	     .enter()
-	     .append("rect")
-	     .attr("x", function(d) {
-		 var xIndex = d.topic.value.substring(31);
-		 var xValue = xScale(xIndex);
-		 return xValue;
-	     })
-	     .attr("y", function(d) {
-		 var yValue = yScale(d.work.value.substring(31));
-		 return yValue;
-	     })
-	     .attr("width", xScale.bandwidth())
-	     .attr("height", yScale.bandwidth())
-	     .style("opacity", 0.5)
-	     .on("mouseover", mouseover)
-	     .on("mouseout", mouseout);
+     // Add elements in matrix
+     svg
+         .selectAll()
+         .data(data, function(d) {
+         return true;
+         })
+         .enter()
+         .append("rect")
+         .attr("x", function(d) {
+         var xIndex = d.topic.value.substring(31);
+         var xValue = xScale(xIndex);
+         return xValue;
+         })
+         .attr("y", function(d) {
+         var yValue = yScale(d.work.value.substring(31));
+         return yValue;
+         })
+         .attr("width", xScale.bandwidth())
+         .attr("height", yScale.bandwidth())
+         .style("opacity", 0.5)
+         .on("mouseover", mouseover)
+         .on("mouseout", mouseout);
      });
 
 
@@ -435,6 +435,12 @@ div>
 
 Are co-authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_empty') }}{{ q }}/missing">missing</a> page.
 
+<h2 id="Co-author-map">Co-author map</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#PREFIX%20target%3A%20%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F{{ q }}%3E%0A%0A%23defaultView%3AMap%0ASELECT%20%3Forganization%20%3ForganizationLabel%20%3Fgeo%20%3Fcount%20%3Flayer%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Forganization%20%3Fgeo%20%28COUNT%28DISTINCT%20%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20target%3A%20%3B%0A%20%20%20%20%20%20%20%20%20%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20FILTER%20%28%3Fauthor%20%21%3D%20target%3A%20%29%0A%20%20%20%20%3Fauthor%20%28%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20wdt%3AP1416%20%29%20%2F%20wdt%3AP361%2a%20%3Forganization%20.%20%0A%20%20%20%20%3Forganization%20wdt%3AP625%20%3Fgeo%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Forganization%20%3Fgeo%20%3Fcount%0A%20%20ORDER%20BY%20DESC%20%28%3Fcount%29%0A%20%20LIMIT%202000%0A%7D%20AS%20%25organizations%0AWHERE%20%7B%0A%20%20INCLUDE%20%25organizations%0A%20%20BIND%28IF%28%20%28%3Fcount%20%3C%201%29%2C%20%22No%20results%22%2C%20IF%28%28%3Fcount%20%3C%202%29%2C%20%221%20result%22%2C%20IF%28%28%3Fcount%20%3C%205%29%2C%20%221%20%3C%20results%20%E2%89%A4%2010%22%2C%20IF%28%28%3Fcount%20%3C%20101%29%2C%20%2210%20%3C%20results%20%E2%89%A4%20100%22%2C%20IF%28%28%3Fcount%20%3C%201001%29%2C%20%22100%20%3C%20results%20%E2%89%A4%201000%22%2C%20IF%28%28%3Fcount%20%3C%2010001%29%2C%20%221000%20%3C%20results%20%E2%89%A4%2010000%22%2C%20%2210000%20or%20more%20results%22%29%20%29%20%29%20%29%20%29%29%20AS%20%3Flayer%20%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%20%20%20%20%20%20%20%20%0A%20%7D%0AORDER%20BY%20DESC%20%28%3Fcount%29%0A"></iframe>
+</div>
+
 
 <h2>Topics</h2>
 
@@ -500,13 +506,6 @@ topics of authored works and topics of citing works.
 </div>
 
 
-<h2 id="Locations">Locations</h2>
-
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20DISTINCT%20%3Fimage%20%3Fitem%20%3FitemLabel%20%3Fgeo%20%28%3Fproperty_item_label%20AS%20%3Flayer%29%0AWHERE%20%7B%0A%20%20wd%3A{{ q }}%20%3Fproperty%20%3Fitem%20.%20%0A%20%20%3Fitem%20p%3AP159%2Fpq%3AP625%20%7C%20wdt%3AP276%2a%2Fwdt%3AP625%20%3Fgeo%20.%0A%20%20%3Fproperty_item%20wikibase%3AdirectClaim%20%3Fproperty%20.%0A%20%20OPTIONAL%20%7B%20%3Fitem%20wdt%3AP18%20%3Fimage%20.%20%7D%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%20%20%0A%20%20%23%20No%20automatic%20labeling%20on%20the%20property%2C%20-%20for%20some%20reason.%0A%20%20%3Fproperty_item%20rdfs%3Alabel%20%3Fproperty_item_label%20.%20FILTER%28LANG%28%3Fproperty_item_label%29%20%3D%20%27en%27%29%0A%7D%20%20"></iframe>
-</div>
-
-
 <h2>Citation statistics</h2>
 
 <h3>Most cited works</h3>
@@ -539,3 +538,4 @@ Conferences, workshops and other events the author has attended or otherwise bee
 <table class="table table-hover table-striped" id="events"></table>
 
 {% endblock %}
+
