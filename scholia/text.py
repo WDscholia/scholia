@@ -18,7 +18,7 @@ Description:
   The result of the text-to-topic-qs command-line command can be used to query
   Scholia:
 
-  https://tools.wmflabs.org/scholia/topics/<qs>
+  https://scholia.toolforge.org/topics/<qs>
 
 """
 
