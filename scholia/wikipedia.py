@@ -111,7 +111,7 @@ def q_to_bibliography_templates(q):
 
     wikitext = ('<!-- Generated with scholia.wikipedia '
                 'q-to-bibliography-templates {q}\n').format(q=q)
-    wikitext += ('     or http://tools.wmflabs.org/scholia/'
+    wikitext += ('     or http://scholia.toolforge.org/'
                  'q-to-bibliography-templates?q={q} -->\n').format(q=q)
     for item in data['results']['bindings']:
         if (_value(item, 'type').endswith('Q5707594') or

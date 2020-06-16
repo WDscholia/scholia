@@ -410,7 +410,7 @@ page to resolve the author names.
 
 <table class="table table-hover" id="most-cited-authors"></table>
 
-<h3 id="Map-of-organizations">Map of organizations associated with works about the topic</h2>
+<h3 id="Map-of-organizations">Map of organizations associated with works about the topic</h3>
 
 The colours indicate how many publications on the topic are associated with organizations in the given location, as detailed in the legend (top right).
 
@@ -418,6 +418,19 @@ The colours indicate how many publications on the topic are associated with orga
     <iframe 
         class="embed-responsive-item" 
         src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Forganization%20%3ForganizationLabel%20%3Fgeo%20%3Fcount%20%3Flayer%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fwork%20WHERE%20%7B%0A%20%20%23%20Works%20on%20the%20topic%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%7C%20%28wdt%3AP31%2a%20%2F%20wdt%3AP279%2a%29%20%29%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%20%20LIMIT%2020000%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Forganization%20%3Fgeo%20%28COUNT%28DISTINCT%20%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%23%20Authors%20who%20have%20published%20works%20on%20the%20topic%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%20%0A%20%20%20%20%3Fauthor%20%28%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20wdt%3AP1416%20%29%20%2F%20wdt%3AP361%2a%20%3Forganization%20.%20%0A%20%20%20%20%3Forganization%20wdt%3AP625%20%3Fgeo%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Forganization%20%3Fgeo%0A%20%20ORDER%20BY%20DESC%20%28%3Fcount%29%0A%20%20LIMIT%202000%0A%7D%20AS%20%25organizations%0AWHERE%20%7B%0A%20%20INCLUDE%20%25organizations%0A%20%20BIND%28IF%28%20%28%3Fcount%20%3C%201%29%2C%20%22No%20results%22%2C%20IF%28%28%3Fcount%20%3C%202%29%2C%20%221%20result%22%2C%20IF%28%28%3Fcount%20%3C%2011%29%2C%20%221%20%3C%20results%20%E2%89%A4%2010%22%2C%20IF%28%28%3Fcount%20%3C%20101%29%2C%20%2210%20%3C%20results%20%E2%89%A4%20100%22%2C%20IF%28%28%3Fcount%20%3C%201001%29%2C%20%22100%20%3C%20results%20%E2%89%A4%201000%22%2C%20IF%28%28%3Fcount%20%3C%2010001%29%2C%20%221000%20%3C%20results%20%E2%89%A4%2010000%22%2C%20%2210000%20or%20more%20results%22%29%20%29%20%29%20%29%20%29%29%20AS%20%3Flayer%20%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%20%20%20%20%20%20%20%20%0A%20%7D%0AORDER%20BY%20DESC%20%28%3Fcount%29%0A">
+    </iframe>
+</div>
+
+
+
+<h3 id="Country-level-citation-graph">Citation graph of works about the topic, aggregated by country</h3>
+
+The graph indicates the countries associated with organizations whose authors have published works on the topic, and indicates the most cited countries as well as the countries they are most frequently cited from.
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe 
+        class="embed-responsive-item" 
+        src="https://query.wikidata.org/embed.html#PREFIX%20target%3A%20%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F{{ q }}%3E%20%0A%0A%23%20%23defaultView%3AGraph%0ASELECT%20DISTINCT%20%3Fcited_country%20%3Fcited_countryLabel%20%3Fcited_flag%20%3Fciting_country%20%3Fciting_countryLabel%20%3Fciting_flag%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fcited_country%20%3Fciting_country%20%28COUNT%28%3Fciting_country%29%20AS%20%3Fcount%29%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20WHERE%20%7B%0A%20%20%20%20%3Fciting_work%20wdt%3AP50%20%3Fciting_author%20.%20%0A%20%20%20%20%3Fciting_work%20wdt%3AP921%20target%3A%20.%0A%20%20%20%20%3Fcited_work%20wdt%3AP921%20target%3A%20.%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fcited_work%20.%20%0A%20%20%20%20%3Fcited_work%20wdt%3AP50%20%3Fcited_author%20.%20%20%0A%20%20%20%20FILTER%20%28%3Fciting_work%20%21%3D%20%3Fcited_work%29%0A%20%20%20%20FILTER%20NOT%20EXISTS%20%7B%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fcited_work%20.%0A%20%20%20%20%20%20%3Fcited_work%20%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%7D%0A%20%20%20%20%3Fciting_author%20%28wdt%3AP108%7Cwdt%3AP1416%29%20%3Fciting_organization%20.%20%0A%20%20%20%20%3Fcited_author%20%28wdt%3AP108%7Cwdt%3AP1416%29%20%3Fcited_organization%20.%20%0A%20%20%20%20%3Fcited_organization%20wdt%3AP17%20%3Fcited_country.%0A%20%20%20%20%3Fciting_organization%20wdt%3AP17%20%3Fciting_country.%0A%20%20%20%20FILTER%20%28%3Fciting_country%20%21%3D%20%3Fcited_country%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fcited_country%20%3Fciting_country%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%2042%20%23%20Adjust%20number%20of%20connections%20to%20display%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20%3Fcited_country%20wdt%3AP41%20%3Fcited_flag%20.%20%0A%20%20%3Fciting_country%20wdt%3AP41%20%3Fciting_flag%20.%20%0A%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%20%20%20%20%20%20%20%20%0A%20%7D%0A">
     </iframe>
 </div>
 
