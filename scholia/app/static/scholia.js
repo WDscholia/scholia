@@ -1,3 +1,4 @@
+
 // https://stackoverflow.com/questions/6020714
 function escapeHTML(html) {
     if (typeof html !== "undefined") {
@@ -120,13 +121,15 @@ function sparqlDataToSimpleData(response) {
 
 
 function sparqlToDataTable(sparql, element, options={}) {
+
     // Options: linkPrefixes={}, paging=true
     var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
         
     var url = scholiaConfig.SPARQLEndPointURL + "?query=" + encodeURIComponent(sparql) + '&format=json';
     const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + 
-    encodeURIComponent(optionalDataValuesSparql) + '&format=json';
+    encodeURIComponent(sparql) + '&format=json';
+
 
     $.getJSON(url, function(response) {
 	var simpleData = sparqlDataToSimpleData(response);

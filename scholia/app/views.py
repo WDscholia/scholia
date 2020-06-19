@@ -114,7 +114,7 @@ def redirect_q(q):
     method = 'app.show_' + class_
     return redirect(url_for(method, q=q,
                             sparql_endpoint_url=app.config['config']
-                            .get('servers', 'SPARQLEndPointURL'),
+                            .get('servers', 'SPARQLEndpointURL'),
                             webservice_url=app.config['config']
                             .get('servers', 'webserviceURL'),
                             sparql_endpoint_embed_url=app.config['config']
@@ -157,7 +157,7 @@ def show_arxiv(arxiv):
     if len(qs) > 0:
         q = qs[0]
         sparql_endpoint_url = app.config['config'] \
-                                 .get('servers', 'SPARQLEndPointURL')
+                                 .get('servers', 'SPARQLEndpointURL')
         webservice_url = app.config['config'] \
                             .get('servers', 'webserviceURL')
         sparql_ep_embed_url = app.config['config'] \
@@ -208,7 +208,7 @@ def show_arxiv_to_quickstatements():
         return render_template('arxiv_to_quickstatements.html',
                                arxiv=arxiv, q=q,
                                sparql_endpoint_url=app.config['config']
-                               .get('servers', 'SPARQLEndPointURL'),
+                               .get('servers', 'SPARQLEndpointURL'),
                                webservice_url=app.config['config']
                                .get('servers', 'webserviceURL'),
                                sparql_endpoint_embed_url=app.config['config']
@@ -250,7 +250,7 @@ def show_author(q):
 
     return render_template('author.html', q=q,
                            sparql_endpoint_url=app.config['config']
-                           .get('servers', 'SPARQLEndPointURL'),
+                           .get('servers', 'SPARQLEndpointURL'),
                            webservice_url=app.config['config']
                            .get('servers', 'webserviceURL'),
                            sparql_endpoint_embed_url=app.config['config']
@@ -298,7 +298,7 @@ def show_author_missing(q):
     """
     return render_template('author_missing.html', q=q,
                            sparql_endpoint_url=app.config['config']
-                           .get('servers', 'SPARQLEndPointURL'),
+                           .get('servers', 'SPARQLEndpointURL'),
                            webservice_url=app.config['config']
                            .get('servers', 'webserviceURL'),
                            sparql_endpoint_embed_url=app.config['config']
@@ -331,7 +331,7 @@ def show_author_random():
     q = random_author()
     return redirect(url_for('app.show_author', q=q,
                             sparql_endpoint_url=app.config['config']
-                            .get('servers', 'SPARQLEndPointURL'),
+                            .get('servers', 'SPARQLEndpointURL'),
                             webservice_url=app.config['config']
                             .get('servers', 'webserviceURL'),
                             sparql_endpoint_embed_url=app.config['config']
@@ -355,7 +355,7 @@ def show_authors(qs):
     """
     qs = Q_PATTERN.findall(qs)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
 
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
@@ -429,7 +429,7 @@ def show_award_missing(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
                                    .get('servers', 'SPARQLEndpointEmbed')
@@ -454,7 +454,7 @@ def redirect_cas(cas):
     if len(qs) > 0:
         q = qs[0]
         sparql_endpoint_url = app.config['config'] \
-                                 .get('servers', 'SPARQLEndPointURL')
+                                 .get('servers', 'SPARQLEndpointURL')
         webservice_url = app.config['config'] \
                             .get('servers', 'webserviceURL')
         sparql_ep_embed_url = app.config['config'] \
@@ -483,7 +483,7 @@ def redirect_lipidmaps(lmid):
         q = qs[0]
 
         sparql_endpoint_url = app.config['config'] \
-                                 .get('servers', 'SPARQLEndPointURL')
+                                 .get('servers', 'SPARQLEndpointURL')
         webservice_url = app.config['config'].get('servers', 'webserviceURL')
         sparql_embed = app.config['config'] \
                           .get('servers', 'SPARQLEndpointEmbed')
@@ -517,7 +517,7 @@ def redirect_atomic_symbol(symbol):
     """
     qs = atomic_symbol_to_qs(symbol)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -544,7 +544,7 @@ def redirect_atomic_number(atomic_number):
     """
     qs = atomic_number_to_qs(atomic_number)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -571,7 +571,7 @@ def redirect_cordis(cordis):
     """
     qs = cordis_to_qs(cordis)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -602,7 +602,7 @@ def show_catalogue(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -639,7 +639,7 @@ def show_clinical_trial_empty():
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -665,7 +665,7 @@ def show_clinical_trial(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -724,7 +724,7 @@ def show_country(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -753,7 +753,7 @@ def show_country_topic(q1, q2):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
     q = ''
@@ -783,7 +783,7 @@ def show_disease(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -819,7 +819,7 @@ def redirect_doi(doi):
     """
     qs = doi_to_qs(doi)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     embed_url = app.config['config'] \
@@ -852,7 +852,7 @@ def show_event(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -894,7 +894,7 @@ def show_event_series(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
                                    .get('servers', 'SPARQLEndpointEmbed')
@@ -944,7 +944,7 @@ def redirect_github(github):
     """
     qs = github_to_qs(github)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     embed_url = app.config['config'] \
@@ -973,7 +973,7 @@ def redirect_inchikey(inchikey):
     """
     qs = inchikey_to_qs(inchikey)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -1000,7 +1000,7 @@ def redirect_issn(issn):
     """
     qs = issn_to_qs(issn)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'] \
                    .get('servers', 'SPARQLEndpointEmbed')
@@ -1076,7 +1076,7 @@ def show_location(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -1106,7 +1106,7 @@ def show_location_topic(q1, q2):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -1133,7 +1133,7 @@ def redirect_mesh(meshid):
     """
     qs = mesh_to_qs(meshid)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     embed_url = app.config['config'] \
@@ -1164,7 +1164,7 @@ def redirect_orcid(orcid):
     """
     qs = orcid_to_qs(orcid)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     embed_url = app.config['config'] \
@@ -1193,7 +1193,7 @@ def redirect_pubchem(cid):
     """
     qs = pubchem_to_qs(cid)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -1220,7 +1220,7 @@ def redirect_pubmed(pmid):
     """
     qs = pubmed_to_qs(pmid)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -1248,7 +1248,7 @@ def redirect_wikipathways(wpid):
     qs = wikipathways_to_qs(wpid)
 
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     embed_url = app.config['config'] \
@@ -1277,7 +1277,7 @@ def redirect_ror(rorid):
     """
     qs = ror_to_qs(rorid)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -1304,7 +1304,7 @@ def redirect_viaf(viaf):
     """
     qs = viaf_to_qs(viaf)
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -1335,7 +1335,7 @@ def show_organization(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -1401,7 +1401,7 @@ def show_organization_topic(q1, q2):
 
     """
     q = ''
-    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndPointURL')
+    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
                                    .get('servers', 'SPARQLEndpointEmbed')
@@ -1430,7 +1430,7 @@ def show_organization_missing(q):
         Rendered HTML.
 
     """
-    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndPointURL')
+    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -1481,7 +1481,7 @@ def show_printer(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -1505,7 +1505,7 @@ def show_printer_empty():
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -1533,7 +1533,7 @@ def show_protein(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -1575,7 +1575,7 @@ def show_project(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -1636,7 +1636,7 @@ def show_gene(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -1678,7 +1678,7 @@ def show_taxon(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -1729,7 +1729,7 @@ def show_q_to_bibliography_templates():
     wikitext = q_to_bibliography_templates(q)
 
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
                                    .get('servers', 'SPARQLEndpointEmbed')
@@ -1757,7 +1757,7 @@ def show_software(q):
         Rendered HTML.
 
     """
-    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndPointURL')
+    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
                                    .get('servers', 'SPARQLEndpointEmbed')
@@ -1830,7 +1830,7 @@ def show_topic(q):
         Rendered HTML.
 
     """
-    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndPointURL')
+    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -1912,7 +1912,7 @@ def show_topic_missing(q):
     """
     return render_template('topic_missing.html', q=q,
                            sparql_endpoint_url=app.config['config']
-                           .get('servers', 'SPARQLEndPointURL'),
+                           .get('servers', 'SPARQLEndpointURL'),
                            webservice_url=app.config['config']
                            .get('servers', 'webserviceURL'),
                            sparql_endpoint_embed_url=app.config['config']
@@ -1939,7 +1939,7 @@ def show_chemical(q):
     return render_template(
         'chemical.html',
         q=q,  sparql_endpoint_url=app.config['config']
-        .get('servers', 'SPARQLEndPointURL'),
+        .get('servers', 'SPARQLEndpointURL'),
         webservice_url=app.config['config']
         .get('servers', 'webserviceURL'),
         sparql_endpoint_embed_url=app.config['config']
@@ -1977,7 +1977,7 @@ def show_chemical_element(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
@@ -2018,7 +2018,7 @@ def show_chemical_class(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -2054,7 +2054,7 @@ def redirect_twitter(twitter):
     """
     qs = twitter_to_qs(twitter)
     q = ''
-    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndPointURL')
+    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
     if len(qs) > 0:
@@ -2084,7 +2084,7 @@ def show_venue(q):
         Rendered HTML page.
 
     """
-    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndPointURL')
+    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -2111,7 +2111,7 @@ def show_venue_missing(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_ep_embed_url = app.config['config'] \
@@ -2175,7 +2175,7 @@ def show_venues(qs):
 
     """
     qs = Q_PATTERN.findall(qs)
-    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndPointURL')
+    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     sparql_ep_embed_url = app.config['config'] \
                              .get('servers', 'SPARQLEndpointEmbed')
@@ -2203,7 +2203,7 @@ def show_series(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_ep_embed_url = app.config['config'] \
@@ -2244,7 +2244,7 @@ def show_pathway(q):
         Rendered HTML.
 
     """
-    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndPointURL')
+    sparql_ep_url = app.config['config'].get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'].get('servers', 'webserviceURL')
     embed_url = app.config['config'].get('servers', 'SPARQLEndpointEmbed')
 
@@ -2279,7 +2279,7 @@ def show_publisher(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -2336,7 +2336,7 @@ def show_sponsor(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -2400,7 +2400,7 @@ def show_use(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL')
     sparql_endpoint_embed_url = app.config['config'] \
@@ -2441,7 +2441,7 @@ def show_work(q):
 
     """
     sparql_endpoint_url = app.config['config'] \
-                             .get('servers', 'SPARQLEndPointURL')
+                             .get('servers', 'SPARQLEndpointURL')
     webservice_url = app.config['config'] \
                         .get('servers', 'webserviceURL'),
     sparql_endpoint_embed_url = app.config['config'] \
