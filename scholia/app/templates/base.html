@@ -25,13 +25,15 @@
 
 
 <script type="text/javascript">
+
  if ("{{ q }}" != "") {
 
-     var url = '{{ SPARQLEndPointURL }}' + '?action=wbgetentities&ids=' +
+     var url = '{{ webservice_url }}' + '?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
      
      $.getJSON(url, function (data) {
+     
 	 var item = data.entities["{{ q }}"];
 	 if ('en' in item.labels) {
 	     $("#h1").text(item.labels.en.value);
