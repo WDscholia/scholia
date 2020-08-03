@@ -7,6 +7,7 @@ Options:
   -h --help  Documentation
 
 Example:
+-------
   python -m scholia.googlescholar get-user-data gQVuJh8AAAAJ
 
 """

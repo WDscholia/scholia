@@ -39,6 +39,8 @@ import requests
 
 USER_AGENT = 'Scholia'
 
+ARXIV_URL = 'https://export.arxiv.org/'
+
 
 def get_metadata(arxiv):
     """Get metadata about an arxiv publication from website.
@@ -77,12 +79,17 @@ def get_metadata(arxiv):
 
     """
     arxiv = arxiv.strip()
-    url = 'https://arxiv.org/abs/' + arxiv
+    url = ARXIV_URL + '/abs/' + arxiv
     headers = {'User-agent': USER_AGENT}
     response = requests.get(url, headers=headers)
     tree = etree.HTML(response.content)
 
     submissions = tree.xpath('//div[@class="submission-history"]/text()')
+    submissions = [
+        submission
+        for submission in submissions
+        if len(submission.strip()) > 0
+    ]
     datetime_as_string = submissions[-1][5:30]
     isodatetime = parse_datetime(datetime_as_string).isoformat()
 

@@ -79,6 +79,91 @@
 	 }
 	 catch(e) {}
 	 
+	 /* BioSchemas annotation */
+	 if (item.claims.P225) {
+        try { /* Taxon */
+	       var taxonName = item.claims.P225[0].mainsnak.datavalue.value;
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "Taxon" ,
+	          "name" : taxonName ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       if (item.claims.P105) {
+	          var taxonRank = item.claims.P105[0].mainsnak.datavalue.value.id;
+	          bioschemasAnnotation.taxonRank = "http://www.wikidata.org/entity/" + taxonRank ;
+	       }
+	       if (item.claims.P171) {
+	          var parent = item.claims.P171[0].mainsnak.datavalue.value.id;
+	          bioschemasAnnotation.parentTaxon = "http://www.wikidata.org/entity/" + parent ;
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	       // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
+	    } catch(e) {}
+	 } else if (item.claims.P235) {
+	    try { /* Chemical Compound */
+	       var inchiKey = item.claims.P235[0].mainsnak.datavalue.value;
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "MolecularEntity" ,
+	          "identifier" : "{{ q }}" ,
+	          "inChIKey" : inchiKey ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       if (item.claims.P234 && item.claims.P234[0].mainsnak.datavalue) {
+	          var inchi = item.claims.P234[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.inChI = "InChI=" + inchi ;
+	       }
+	       if (item.claims.P274 && item.claims.P274[0].mainsnak.datavalue) {
+	          var chemformula = item.claims.P274[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.molecularFormula = chemformula ;
+	       }
+	       if (item.claims.P2017 && item.claims.P2017[0].mainsnak.datavalue) {
+	          var smiles = item.claims.P2017[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.molecularFormula = smiles.replace("\"", "\'\'") ;
+	       } else if (item.claims.P233 && item.claims.P233[0].mainsnak.datavalue) {
+	          var smiles = item.claims.P233[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.smiles = smiles.replace("\"", "\'\'") ;
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	    } catch(e) { console.log("Exception: " + e)
+	    }
+	 } else if (item.claims.P352) { // UniProt ID
+	    try { /* Protein */
+	       var uniprot = item.claims.P352[0].mainsnak.datavalue.value;
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "Protein" ,
+	          "identifier" : "{{ q }}" ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}" ,
+	          "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	    } catch(e) { console.log("Exception: " + e)
+	    }
+	 } else if (item.claims.P351 || item.claims.P594) { // NCBI Gene or Ensembl
+	    try { /* Gene */
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "Gene" ,
+	          "identifier" : "{{ q }}" ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       counter = 0
+	       bioschemasAnnotation.sameAs = []
+	       if (item.claims.P351 && item.claims.P351[0].mainsnak.datavalue) {
+	          var ncbi = item.claims.P351[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.sameAs[counter] = "https://www.ncbi.nlm.nih.gov/gene/" + ncbi;
+	          counter++
+	       }
+	       if (item.claims.P594 && item.claims.P594[0].mainsnak.datavalue) {
+	          var ensembl = item.claims.P594[0].mainsnak.datavalue.value;
+	          bioschemasAnnotation.sameAs[counter] = "http://identifiers.org/ensembl/" + ensembl;
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	    } catch(e) { console.log("Exception: " + e)
+	    }
+	 }
 	 
 	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {

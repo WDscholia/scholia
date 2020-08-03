@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+  <script type="text/javascript">
+    missingBoilingPointsSparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P2102 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+ missingMeltingPointsSparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P2101 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+  missingMassSparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 30)
+    FILTER(NOT EXISTS {?compound wdt:P2067 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+  missingSolubilitySparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P2177 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+  missingEnthalpyOfFormationSparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P3078 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+  missingVaporPressureSparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P2119 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+  missingStandardMolarEntropySparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P3071 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+  missingDensitySparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P2054 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+  missingChemicalStructureSparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P117 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+missingFlashPointSparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P2128 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+missingpKaSparql = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P1117 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+missingCombustionEnthalpy = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P2117 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+missingIDLH = `
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P2129 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
+`
+
+$(document).ready(function() {
+     sparqlToDataTable(missingBoilingPointsSparql, "#missing-boiling-points");
+     sparqlToDataTable(missingMeltingPointsSparql, "#missing-melting-points");
+     sparqlToDataTable(missingMassSparql, "#missing-mass");
+     sparqlToDataTable(missingSolubilitySparql, "#missing-solubility");
+     sparqlToDataTable(missingEnthalpyOfFormationSparql, "#missing-enthalpy-of-formation");
+     sparqlToDataTable(missingVaporPressureSparql, "#missing-vapor-pressure");
+     sparqlToDataTable(missingStandardMolarEntropySparql, "#missing-molar-entropy");
+     sparqlToDataTable(missingDensitySparql, "#missing-density");
+     sparqlToDataTable(missingChemicalStructureSparql, "#missing-chemical-structure");
+     sparqlToDataTable(missingFlashPointSparql, "#missing-flash-point");
+     sparqlToDataTable(missingpKaSparql, "#missing-pKa");
+     sparqlToDataTable(missingCombustionEnthalpy, "#missing-combustion-enthalpy");
+     sparqlToDataTable(missingIDLH, "#missing-idlh");
+ });
+</script>
+ 
+{% endblock %}
+
+{% block page_content %}
+
+<h1>Missing physicochemical properties for chemicals</h1>
+
+When adding missing physicochemical properties, please take the following into account:
+
+<ul>
+  <li>use units: <a href="https://www.wikidata.org/wiki/Wikidata:Units">Wikidata:Units</a></li>
+  <li>use references: <a href="https://www.wikidata.org/wiki/Help:Sources">Help:Sources</a></li>
+</ul>
+
+The following links prioritize chemical compounds that are listed in most Wikis
+(Wikipedias, Wikimedia Commons, etc). To go to the Wikidata page for each item, click its name
+below, which will lead to its Scholia page which links to the Wikidata page via the <a href="https://www.wikidata.org/wiki/Wikidata:Glossary">Q number</a> link at the top.
+
+<h2 id="h1">Missing Boiling Points</h2>
+
+The <a href="https://www.wikidata.org/wiki/Property:P2102">boiling point</a> is the temperature
+at which boiling occurs under a pressure of one bar.
+Typical units given include degrees
+<a href="{{ url_for('app.show_topic_empty') }}Q11579">Kelvin</a> and degrees
+<a href="{{ url_for('app.show_topic_empty') }}Q25267">Celsius</a>. Because 
+it depends on the pressure, this is often also given, as shown in
+<a href="https://www.wikidata.org/wiki/Property:P2102#P1855">these examples</a>.
+
+<table class="table table-hover" id="missing-boiling-points"></table>
+
+<h2 id="h1">Missing Melting Points</h2>
+
+The <a href="https://www.wikidata.org/wiki/Property:P2101">melting point</a> is the temperature at which a compound melts. Typical units given include degrees
+<a href="{{ url_for('app.show_topic_empty') }}Q11579">Kelvin</a> and degrees
+<a href="{{ url_for('app.show_topic_empty') }}Q25267">Celsius</a>. It is
+often found for organic chemicals as part of their unique characterization. Check out
+<a href="https://www.wikidata.org/wiki/Property:P2101#P1855">these examples</a>.
+
+<table class="table table-hover" id="missing-melting-points"></table>
+
+<h2 id="h1">Missing Mass</h2>
+
+<table class="table table-hover" id="missing-mass"></table>
+
+<h2 id="h1">Missing Solubility</h2>
+
+The <a href="https://www.wikidata.org/wiki/Property:P2177">solubility</a>
+of a compound is always in some solvent and depending on the temperature. The
+latter two are therefore commonly given as qualifiers, as for this
+<a href="https://www.wikidata.org/wiki/Property:P2177#P1855">example</a>.
+
+<table class="table table-hover" id="missing-solubility"></table>
+
+<h2 id="h1">Missing Enthalpy of Formation</h2>
+
+The <a href="https://www.wikidata.org/wiki/Property:P3078">enthalpy of formation</a>
+is a measure of the stability of the compound.
+
+<table class="table table-hover" id="missing-enthalpy-of-formation"></table>
+
+<h2 id="h1">Missing Vapor Pressure</h2>
+
+<table class="table table-hover" id="missing-vapor-pressure"></table>
+
+<h2 id="h1">Missing Molar Entropy</h2>
+
+<table class="table table-hover" id="missing-molar-entropy"></table>
+
+<h2 id="h1">Missing Density</h2>
+
+<table class="table table-hover" id="missing-density"></table>
+
+<h2 id="h1">Missing Chemical Structure</h2>
+
+<table class="table table-hover" id="missing-chemical-structure"></table>
+
+<h2 id="h1">Missing Flash Point</h2>
+
+<table class="table table-hover" id="missing-flash-point"></table>
+
+<h2 id="h1">Missing pKa</h2>
+
+<table class="table table-hover" id="missing-pKa"></table>
+
+<h2 id="h1">Missing Combustion Enthalpy</h2>
+
+<table class="table table-hover" id="missing-combustion-enthalpy"></table>
+
+<h2 id="h1">Missing IDLH</h2>
+
+The <a href="https://www.wikidata.org/wiki/Property:P2129">Immediately Dangerous to Life and Health value</a>
+(IDLH) is an indication provided by the U.S. <a href="{{ url_for('app.show_organization_empty') }}Q583725">CDC</a> about the danger of the compound.
+
+<table class="table table-hover" id="missing-idlh"></table>
+
+{% endblock %}

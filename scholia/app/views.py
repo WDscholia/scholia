@@ -732,7 +732,7 @@ def redirect_inchikey(inchikey):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404_chemical.html', inchikey=inchikey)
 
 
 @main.route('/issn/<issn>')
@@ -1459,6 +1459,19 @@ def show_chemical_empty():
     return render_template('chemical_empty.html')
 
 
+@main.route('/chemical/missing')
+def show_chemicals_missing():
+    """Return rendered HTML index page for missing information for chemicals.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for missing information for chemicals.
+
+    """
+    return render_template('chemicals_missing.html')
+
+
 @main.route('/chemical-element/' + q_pattern)
 def show_chemical_element(q):
     """Return html render page for specific chemical element.
@@ -1881,4 +1894,5 @@ def show_about():
 
 @main.route('/favicon.ico')
 def show_favicon():
+    """Detect and redirect for the favicon.ico."""
     return redirect(url_for('static', filename='favicon/favicon.ico'))
