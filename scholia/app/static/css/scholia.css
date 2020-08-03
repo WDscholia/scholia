@@ -74,3 +74,11 @@ h2 {
     background: white;
     width: 100%;
 }
+
+.sfulldata{
+    display: none;
+}
+
+.sfulldata iframe{
+    display: none;
+}
