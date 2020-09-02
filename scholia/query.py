@@ -14,8 +14,8 @@ Usage:
   scholia.query lipidmaps-to-q <lmid>
   scholia.query atomic-number-to-q <atomicnumber>
   scholia.query mesh-to-q <meshid>
-  scholia.query ncbigene-to-q <gene>
-  scholia.query ncbitaxon-to-q <taxon>
+  scholia.query ncbi-gene-to-q <gene>
+  scholia.query ncbi-taxon-to-q <taxon>
   scholia.query orcid-to-q <orcid>
   scholia.query pubchem-to-q <cid>
   scholia.query pubmed-to-q <pmid>
@@ -410,7 +410,7 @@ def ncbigene_to_qs(gene):
 
     Examples
     --------
-    >>> ncbitaxon_to_qs('694009') == ['Q278567']
+    >>> ncbi-taxon_to_qs('694009') == ['Q278567']
     True
 
     """
@@ -446,7 +446,7 @@ def ncbitaxon_to_qs(taxon):
 
     Examples
     --------
-    >>> ncbitaxon_to_qs('694009') == ['Q278567']
+    >>> ncbi-taxon_to_qs('694009') == ['Q278567']
     True
 
     """
@@ -1380,12 +1380,12 @@ def main():
         if len(qs) > 0:
             print(qs[0])
 
-    elif arguments['ncbigene-to-q']:
+    elif arguments['ncbi-gene-to-q']:
         qs = ncbigene_to_qs(arguments['<gene>'])
         if len(qs) > 0:
             print(qs[0])
 
-    elif arguments['ncbitaxon-to-q']:
+    elif arguments['ncbi-taxon-to-q']:
         qs = ncbitaxon_to_qs(arguments['<taxon>'])
         if len(qs) > 0:
             print(qs[0])

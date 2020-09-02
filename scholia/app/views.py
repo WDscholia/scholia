@@ -702,7 +702,7 @@ def show_faq():
     return render_template('faq.html')
 
 
-@main.route('/gene/ncbi/<gene>')
+@main.route('/ncbi-gene/<gene>')
 def redirect_ncbigene(gene):
     """Detect and redirect for NCBI gene identifiers.
 
@@ -922,7 +922,7 @@ def redirect_pubmed(pmid):
     return render_template('404.html')
 
 
-@main.route('/taxon/ncbi/<taxon>')
+@main.route('/ncbi-taxon/<taxon>')
 def redirect_ncbitaxon(taxon):
     """Detect and redirect for NCBI taxon identifiers.
 
