@@ -9,7 +9,7 @@
 SELECT 
   (COUNT(?work) AS ?count) 
   ?author_name 
-  (CONCAT("https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=", 
+  (CONCAT("https://author-disambiguator.toolforge.org/?doit=Look+for+author&name=", 
           ENCODE_FOR_URI(?author_name)) AS ?author_resolver_url) 
 WHERE {
   {
@@ -43,7 +43,7 @@ SELECT
 
   # Build URL to the Author disambiguator tool
   (CONCAT(
-      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
+      'https://author-disambiguator.toolforge.org/?doit=Look+for+author&name=',
       ENCODE_FOR_URI(?coauthor)) AS ?resolver_url)
 WITH {
   SELECT (COUNT(?work) as ?count) ?coauthor WHERE {
@@ -70,7 +70,7 @@ SELECT
 
   # Build URL to the Author disambiguator tool
   (CONCAT(
-      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
+      'https://author-disambiguator.toolforge.org/?doit=Look+for+author&name=',
       ENCODE_FOR_URI(?citing_author)) AS ?resolver_url)
 
   ?example_citing_work ?example_citing_workLabel
@@ -163,7 +163,7 @@ Missing information with respect to the author.
 <h2>Author name strings to be resolved</h2>
 
 The authorship may be represented as an author name string rather than a Wikidata item.
-To try to resolve the author name strings, follow the links below to use the Author disambiguator tool, which also has a <a href="https://tools.wmflabs.org/author-disambiguator/author_item_oauth.php?id={{ q }}">dedicated page for this author</a>.
+To try to resolve the author name strings, follow the links below to use the Author disambiguator tool, which also has a <a href="https://author-disambiguator.toolforge.org/author_item_oauth.php?id={{ q }}">dedicated page for this author</a>.
 
 <table class="table table-hover" id="missing-author-resolving"></table>
 

@@ -18,7 +18,8 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      q_to_class, random_author, twitter_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
-                     pubchem_to_qs, atomic_number_to_qs)
+                     pubchem_to_qs, atomic_number_to_qs, ncbitaxon_to_qs,
+                     ncbigene_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -701,6 +702,23 @@ def show_faq():
     return render_template('faq.html')
 
 
+@main.route('/ncbi-gene/<gene>')
+def redirect_ncbigene(gene):
+    """Detect and redirect for NCBI gene identifiers.
+
+    Parameters
+    ----------
+    gene : str
+        NCBI gene identifier.
+
+    """
+    qs = ncbigene_to_qs(gene)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_gene', q=q), code=302)
+    return render_template('404.html')
+
+
 @main.route('/github/<github>')
 def redirect_github(github):
     """Detect and redirect for Github user.
@@ -732,7 +750,7 @@ def redirect_inchikey(inchikey):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404_chemical.html', inchikey=inchikey)
 
 
 @main.route('/issn/<issn>')
@@ -901,6 +919,23 @@ def redirect_pubmed(pmid):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_work', q=q), code=302)
+    return render_template('404.html')
+
+
+@main.route('/ncbi-taxon/<taxon>')
+def redirect_ncbitaxon(taxon):
+    """Detect and redirect for NCBI taxon identifiers.
+
+    Parameters
+    ----------
+    taxon : str
+        NCBI taxon identifier.
+
+    """
+    qs = ncbitaxon_to_qs(taxon)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_taxon', q=q), code=302)
     return render_template('404.html')
 
 
