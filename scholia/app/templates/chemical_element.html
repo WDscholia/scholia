@@ -92,23 +92,23 @@ LIMIT 500
 
 
 {% block page_content %}
-<h1 id="h1">Chemical</h1>
+<h1 id="chemical">Chemical</h1>
 
-<div id="intro"></div>
+<div id="chemical-intro"></div>
 
-<div id="wembedder"></div>
+<div id="chemical-wembedder"></div>
 
-<h2 id="Isotopes">Isotopes</h2>
+<h2 id="chemical-isotopes">Isotopes</h2>
 
-<table class="table table-hover" id="isotopes"></table>
+<table class="table table-hover" id="chemical-isotopes-table"></table>
 
-<h2 id="Isotopes">Allotropes</h2>
+<h2 id="chemical-allotropes">Allotropes</h2>
 
-<table class="table table-hover" id="allotropes"></table>
+<table class="table table-hover" id="chemical-allotropes-table"></table>
 
-<h2 id="Recently published works on the chemical">Recently published works on the chemical <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<h2 id="chemical-recent-articles">Recently published works on the chemical <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
-<table class="table table-hover" id="recentArticles"></table>
+<table class="table table-hover" id="chemical-recent-articles-table"></table>
 
 {% endblock %}
     
