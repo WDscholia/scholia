@@ -312,83 +312,82 @@ ORDER BY DESC(?count)
 
 {% block page_content %}
 
-<h1 id=h1>Topic</h1>
+<h1 id="topic">Topic</h1>
 
-<div id="intro"></div>
+<div id="topic-intro"></div>
 
-<div id="wembedder"></div>
+<div id="topic-wembedder"></div>
 
-<h2 id="Context">The topic in context</h2>
+<h2 id="context">The topic in context</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
+<div id="context-iframe" class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#PREFIX%20target%3A%20%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F{{ q }}%3E%0A%0A%23defaultView%3AGraph%0ASELECT%20%3Fnode%20%3FnodeLabel%20%3FnodeImage%20%3FchildNode%20%3FchildNodeLabel%20%3FchildNodeImage%20%3Frgb%20%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fproperty%20WHERE%20%7B%0A%20%20%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP31%20wd%3AQ18610173%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP31%20wd%3AQ26940804%20.%20%0A%20%20%20%20%7D%0A%7D%20AS%20%25properties%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fnode%20%3FchildNode%20WHERE%20%7B%0A%20%20%20%20%20%20BIND%28target%3A%20AS%20%3Fnode%29%0A%20%20%20%20%20%20%3Fnode%20%3Fp%20%3Fi.%0A%20%20%20%20%20%20%3FchildNode%20%3Fx%20%3Fp.%0A%20%20%20%20%20%20%3FchildNode%20rdf%3Atype%20wikibase%3AProperty.%0A%20%20%20%20%20%20FILTER%28STRSTARTS%28STR%28%3Fi%29%2C%20%22http%3A%2F%2Fwww.wikidata.org%2Fentity%2FQ%22%29%29%0A%20%20%20%20%20%20FILTER%28STRSTARTS%28STR%28%3FchildNode%29%2C%20%22http%3A%2F%2Fwww.wikidata.org%2Fentity%2FP%22%29%29%0A%20%20%20%20%7D%0A%20%20LIMIT%205000%0A%7D%20AS%20%25nodes%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3FchildNode%20%3Fnode%20%3Frgb%20WHERE%20%7B%0A%20%20%20%20%20%20BIND%28%22EFFBD8%22%20AS%20%3Frgb%29%0A%20%20%20%20%20%20target%3A%20%3Fp%20%3FchildNode.%0A%20%20%20%20%20%20%3Fnode%20%3Fx%20%3Fp.%0A%20%20%20%20%20%20%3Fnode%20rdf%3Atype%20wikibase%3AProperty.%0A%20%20%20%20%20%20FILTER%28STRSTARTS%28STR%28%3FchildNode%29%2C%20%22http%3A%2F%2Fwww.wikidata.org%2Fentity%2FQ%22%29%29%0A%20%20%20%20%7D%0A%20%20LIMIT%205000%0A%7D%20AS%20%25childNodes%0AWHERE%20%7B%0A%20%20%7B%0A%20%20%20%20INCLUDE%20%25nodes%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20INCLUDE%20%25childNodes%0A%20%20%7D%0A%0A%20%20OPTIONAL%20%7B%20%0A%20%20%20%20INCLUDE%20%25properties%0A%20%20%20%20%3Fproperty%20wikibase%3AdirectClaim%20%3Fnodeclaim.%0A%20%20%20%20%3Fnode%20%3Fnodeclaim%20%3FnodeImage.%20%0A%20%20%7D%0A%0A%20%20OPTIONAL%20%7B%20%0A%20%20%20%20INCLUDE%20%25properties%0A%20%20%20%20%3Fproperty%20wikibase%3AdirectClaim%20%3FchildNodeclaim.%0A%20%20%20%20%3FchildNode%20%3FchildNodeclaim%20%3FchildNodeImage.%20%0A%20%20%7D%0A%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%20%20%20%20%20%20%20%20%0A%7D"></iframe>
 </div>
 
-<h2 id="Recently published works on the topic">Recently published works on the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<h2 id="recently-published-works">Recently published works on the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
-<table class="table table-hover" id="recently-published-works"></table>
+<table class="table table-hover" id="recently-published-works-table"></table>
 
 
-<h2 id="Publications per year">Publications per year</h2>
+<h2 id="publications-per-year">Publications per year</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
+<div id="publications-per-year-iframe" class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%0A%20%20%28STR%28%3Fyear_%29%20AS%20%3Fyear%29%0A%20%20%28COUNT%28%3Fwork%29%20AS%20%3Fnumber_of_publications%29%0A%0A%20%20%23%20Work%20type%20used%20to%20color%20the%20bar%20chart%0A%20%20%3Ftype%0AWITH%20%7B%0A%20%20%23%20Find%20works%20with%20the%20topic.%20Also%20report%20the%20year%0A%20%20SELECT%0A%20%20%20%20%3Fwork%20%28MIN%28%3Fyears%29%20AS%20%3Fyear_%29%20%281%20AS%20%3Fdummy%29%20%28SAMPLE%28%3Farticle_type_%29%20AS%20%3Farticle_type%29%0A%20%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28wdt%3AP31%2a%2Fwdt%3AP279%2a%20%7C%20wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%29%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdates%20.%0A%20%20%20%20BIND%28YEAR%28%3Fdates%29%20AS%20%3Fyears%29%20.%0A%0A%20%20%20%20%3Fwork%20wdt%3AP31%20%3Farticle_type_%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fwork%20%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear_%20WHERE%20%7B%0A%20%20%20%20%23%20default%20values%20%3D%200%0A%20%20%20%20%3Fyear_item%20wdt%3AP31%20wd%3AQ577%20.%20%0A%20%20%20%20%3Fyear_item%20wdt%3AP585%20%3Fdate%20.%0A%20%20%20%20BIND%28YEAR%28%3Fdate%29%20AS%20%3Fyear_%29%0A%20%20%7D%0A%7D%20AS%20%25default_counts%0AWITH%20%7B%0A%20%20%23%20Find%20earliest%20publication%20year%0A%20%20SELECT%20%28MIN%28%3Fyear_%29%20AS%20%3Fearliest_year%29%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fdummy%0A%7D%20AS%20%25earliest%20%20%0AWHERE%20%7B%0A%20%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Farticle_type%20rdfs%3Alabel%20%3Ftype%20.%20FILTER%20%28LANG%28%3Ftype%29%20%3D%20%22en%22%29%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20INCLUDE%20%25default_counts%0A%20%20%20%20BIND%28%22_%22%20AS%20%3Ftype%29%0A%20%20%7D%0A%20%20INCLUDE%20%25earliest%0A%20%20BIND%28YEAR%28NOW%28%29%29%20AS%20%3Fthis_year%29%0A%20%20FILTER%20%28%3Fyear_%20%3E%3D%20%3Fearliest_year%20%26%26%20%3Fyear_%20%3C%3D%20%3Fthis_year%20%26%26%20%3Fyear_%20%3E%3D%20YEAR%28%221900-01-01%22%5E%5Exsd%3AdateTime%29%29%0A%7D%0AGROUP%20BY%20%3Fyear_%20%3Ftype%0AORDER%20BY%20%3Fyear"></iframe>
 </div>
 
 
-<h2 id="Earliest published works on the topic">Earliest published works on the topic</h2>
+<h2 id="earliest-published-works">Earliest published works on the topic</h2>
 
-<table class="table table-hover" id="earliest-published-works"></table>
-
-
-<h2 id="Authors">Authors</h2>
+<table class="table table-hover" id="earliest-published-works-table"></table>
 
 
-<h3 id="Authors publishing about the topic">Authors publishing about the topic</h3>
+<h2 id="authors">Authors</h2>
 
-<table class="table table-hover" id="authors"></table>
 
-<h3 id="Co-author graph">Co-author graph</h3>
+<h3 id="authors-publishing-about-the-topic">Authors publishing about the topic</h3>
+
+<table class="table table-hover" id="authors-publishing-about-the-topic-table"></table>
+
+<h3 id="co-author-graph">Co-author graph</h3>
 
 The 25 most prolific authors and some of their key co-authors.
 
-<div class="embed-responsive embed-responsive-4by3">
+<div id="co-author-graph-iframe" class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Frgb%20%3Fauthor2%20%3Fauthor2Label%0AWITH%20%7B%0A%20%20%23%20Find%20works%20with%20the%20topic%0A%20%20SELECT%20%3Fwork%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28wdt%3AP31%2a%20%2F%20wdt%3AP279%2a%20%7C%20wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%29%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20%23%20Limit%20the%20number%20of%20authors%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount1%29%20%3Fauthor1%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor1%0A%20%20ORDER%20BY%20DESC%28%3Fcount1%29%0A%20%20LIMIT%2025%0A%7D%20AS%20%25authors1%0AWITH%20%7B%0A%20%20%23%20Limit%20the%20number%20of%20coauthors%0A%20%20SELECT%20DISTINCT%20%3Fauthor2%20%3Fauthor1%20%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount2%29%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20INCLUDE%20%25authors1%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor1%20%2C%20%3Fauthor2%20.%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%20%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor2%20%3Fauthor1%20%0A%20%20ORDER%20BY%20DESC%28%3Fcount2%29%0A%20%20LIMIT%20250%0A%7D%20AS%20%25authors2%0AWHERE%20%7B%0A%23%20%20INCLUDE%20%25authors1%0A%20%20INCLUDE%20%25authors2%0A%20%20OPTIONAL%20%7B%20%3Fauthor1%20wdt%3AP21%20%3Fgender1%20.%20%7D%0A%20%20BIND%28%20IF%28%3Fgender1%20%3D%20wd%3AQ6581097%2C%20%223182BD%22%2C%20%22E6550D%22%29%20AS%20%3Frgb%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%0A%20%20%7D%0A%7D%0A"></iframe>
 </div>
 
 
-<h2 id="Topics">Topics</h2>
+<h2 id="topics">Topics</h2>
 
-<h3 id="Co-occurring topics">Co-occurring topics</h3>
+<h3 id="co-occurring-topics">Co-occurring topics</h3>
 
-<table class="table table-hover" id="topics"></table>
+<table class="table table-hover" id="co-occurring-topics-table"></table>
 
-<h3 id="Co-occurring topics graph">Co-occurring topics graph</h3>
+<h3 id="co-occurring-topics-graph">Co-occurring topics graph</h3>
 
 Only a maximum of the 400 most often occuring links are shown.
 
-<div class="embed-responsive embed-responsive-4by3">
+<div id="co-occurring-topics-graph-iframe" class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%0A%20%20%3Ftopic1%20%3Ftopic1Label%20%3Ftopic2%20%3Ftopic2Label%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Ftopic1%20%3Ftopic2%0A%20%20WHERE%20%7B%0A%20%20%20%20%23%20Find%20works%20that%20are%20marked%20with%20main%20subject%20of%20the%20topic.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28%20wdt%3AP31%2a%2Fwdt%3AP279%2a%20%7C%20wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%29%20wd%3A{{ q }}%20.%0A%20%20%20%20%0A%20%20%20%20%23%20Identify%20co-occuring%20topics.%20%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic1%2C%20%3Ftopic2%20.%20%0A%0A%20%20%20%20%23%20Exclude%20the%20topic%20it%20self%0A%20%20%20%20FILTER%20%28wd%3A{{ q }}%20%21%3D%20%3Ftopic1%20%26%26%20wd%3A{{ q }}%20%21%3D%20%3Ftopic2%20%26%26%20%3Ftopic1%20%21%3D%20%3Ftopic2%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic1%20%3Ftopic2%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%0A%20%20%23%20There%20a%20performance%20problems%20in%20the%20browser%3A%20We%20cannot%20show%20large%20graphs%2C%0A%20%20%23%20so%20we%20put%20a%20limit%20on%20the%20number%20of%20links%20displayed.%0A%20%20LIMIT%20400%0A%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20%0A%20%20%23%20Label%20the%20results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%0A%20%20%7D%0A%7D%0A%0A"></iframe>
 </div>
 
-<h3 id="Co-occurring topics map">Co-occurring topics map</h3>
+<h3 id="co-occurring-topics-map">Co-occurring topics map</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
+<div id="co-occurring-topics-map-iframe" class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%0A%20%20%3Flocation%20%3FlocationLabel%0A%20%20%3Fgeo%0A%20%20%3Fexample_work%20%3Fexample_workLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%3Flocation%20%3Fgeo%0A%20%20%20%20%28SAMPLE%28%3Fwork%29%20AS%20%3Fexample_work%29%0A%20%20WHERE%20%7B%0A%20%20%20%20%23%20Find%20works%20that%20are%20marked%20with%20main%20subject%20of%20the%20topic.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28%20wdt%3AP31%2a%2Fwdt%3AP279%2a%20%7C%20wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%29%20wd%3A{{ q }}%20.%0A%20%20%20%20%0A%20%20%20%20%23%20Identify%20co-occuring%20topic%20that%20is%20geo-locatable.%20%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Flocation%20.%0A%20%20%20%20%3Flocation%20wdt%3AP625%20%3Fgeo%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Flocation%20%3Fgeo%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20%0A%20%20%23%20Label%20the%20results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%0A%20%20%7D%0A%7D%0A"></iframe>
 </div>
 
 
-
-<h2 id="Author score">Author score</h2>
+<h2 id="author-score">Author score</h2>
 
 Authors scored according to field of work, publications within the topic
 and citing works within the topic.
 
-<div class="embed-responsive embed-responsive-4by3">
+<div id="author-score-iframe" class="embed-responsive embed-responsive-4by3">
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fscore%20%3Fauthor%20%3FauthorLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28SUM%28%3Fscore_%29%20AS%20%3Fscore%29%0A%20%20%20%20%3Fauthor%0A%20%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20%3Fauthor%20wdt%3AP101%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20BIND%2820%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%283%20AS%20%3Fscore_%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP921%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%281%20AS%20%3Fscore_%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fcited_work%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fcited_work%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP921%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25results%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cjp%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fscore%29%0ALIMIT%20200"></iframe>
 </div>
 
-<table class="table table-hover" id="author-score"></table>
+<table class="table table-hover" id="author-score-table"></table>
 
 Missing authors here?
 Then go to the
@@ -396,26 +395,26 @@ Then go to the
 page to resolve the author names.
 
 
-<h2 id="Venues and series publishing works about the topic">Venues and series publishing works about the topic</h2>
+<h2 id="venues-and-series-publishing-works">Venues and series publishing works about the topic</h2>
 
-<table class="table table-hover" id="venues"></table>
+<table class="table table-hover" id="venues-and-series-publishing-works-table"></table>
 
-<h2 id="Citations">Citations</h2>
+<h2 id="citations">Citations</h2>
 
-<h3 id="Works cited from works on the topic">Works cited from works on the topic</h3>
+<h3 id="top-cited">Works cited from works on the topic</h3>
 
-<table class="table table-hover" id="topCited"></table>
+<table class="table table-hover" id="top-cited-table"></table>
 
-<h3 id="Authors cited from works on the topic">Authors cited from works on the topic</h3>
+<h3 id="most-cited-authors">Authors cited from works on the topic</h3>
 
-<table class="table table-hover" id="most-cited-authors"></table>
+<table class="table table-hover" id="most-cited-authors-table"></table>
 
-<h3 id="Map-of-organizations">Map of organizations associated with works about the topic</h3>
+<h3 id="map-of-organizations">Map of organizations associated with works about the topic</h3>
 
 The colours indicate how many publications on the topic are associated with organizations in the given location, as detailed in the legend (top right).
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe 
+<div id="map-of-organizations-iframe" class="embed-responsive embed-responsive-4by3">
+    <iframe
         class="embed-responsive-item" 
         src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Forganization%20%3ForganizationLabel%20%3Fgeo%20%3Fcount%20%3Flayer%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fwork%20WHERE%20%7B%0A%20%20%23%20Works%20on%20the%20topic%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%7C%20%28wdt%3AP31%2a%20%2F%20wdt%3AP279%2a%29%20%29%20wd%3A{{ q }}%20.%0A%20%20%7D%0A%20%20LIMIT%2020000%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Forganization%20%3Fgeo%20%28COUNT%28DISTINCT%20%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%23%20Authors%20who%20have%20published%20works%20on%20the%20topic%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20.%20%0A%20%20%20%20%3Fauthor%20%28%20wdt%3AP108%20%7C%20wdt%3AP463%20%7C%20wdt%3AP1416%20%29%20%2F%20wdt%3AP361%2a%20%3Forganization%20.%20%0A%20%20%20%20%3Forganization%20wdt%3AP625%20%3Fgeo%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Forganization%20%3Fgeo%0A%20%20ORDER%20BY%20DESC%20%28%3Fcount%29%0A%20%20LIMIT%202000%0A%7D%20AS%20%25organizations%0AWHERE%20%7B%0A%20%20INCLUDE%20%25organizations%0A%20%20BIND%28IF%28%20%28%3Fcount%20%3C%201%29%2C%20%22No%20results%22%2C%20IF%28%28%3Fcount%20%3C%202%29%2C%20%221%20result%22%2C%20IF%28%28%3Fcount%20%3C%2011%29%2C%20%221%20%3C%20results%20%E2%89%A4%2010%22%2C%20IF%28%28%3Fcount%20%3C%20101%29%2C%20%2210%20%3C%20results%20%E2%89%A4%20100%22%2C%20IF%28%28%3Fcount%20%3C%201001%29%2C%20%22100%20%3C%20results%20%E2%89%A4%201000%22%2C%20IF%28%28%3Fcount%20%3C%2010001%29%2C%20%221000%20%3C%20results%20%E2%89%A4%2010000%22%2C%20%2210000%20or%20more%20results%22%29%20%29%20%29%20%29%20%29%29%20AS%20%3Flayer%20%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%20%20%20%20%20%20%20%20%0A%20%7D%0AORDER%20BY%20DESC%20%28%3Fcount%29%0A">
     </iframe>
@@ -423,11 +422,11 @@ The colours indicate how many publications on the topic are associated with orga
 
 
 
-<h3 id="Country-level-citation-graph">Citation graph of works about the topic, aggregated by country</h3>
+<h3 id="country-level-citation-graph">Citation graph of works about the topic, aggregated by country</h3>
 
 The graph indicates the countries associated with organizations whose authors have published works on the topic, and indicates the most cited countries (arrowheads) as well as the countries they are most frequently cited from.
 
-<div class="embed-responsive embed-responsive-4by3">
+<div id="country-level-citation-graph-iframe" class="embed-responsive embed-responsive-4by3">
     <iframe 
         class="embed-responsive-item" 
         src="https://query.wikidata.org/embed.html#PREFIX%20target%3A%20%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F{{ q }}%3E%20%0A%0A%23defaultView%3AGraph%0ASELECT%20DISTINCT%20%3Fciting_country%20%3Fciting_countryLabel%20%3Fciting_flag%20%3Fcited_country%20%3Fcited_countryLabel%20%3Fcited_flag%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fcited_country%20%3Fciting_country%20%28COUNT%28%3Fciting_country%29%20AS%20%3Fcount%29%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20WHERE%20%7B%0A%20%20%20%20%3Fciting_work%20wdt%3AP50%20%3Fciting_author%20.%20%0A%20%20%20%20%3Fciting_work%20wdt%3AP921%20target%3A%20.%0A%20%20%20%20%3Fcited_work%20wdt%3AP921%20target%3A%20.%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fcited_work%20.%20%0A%20%20%20%20%3Fcited_work%20wdt%3AP50%20%3Fcited_author%20.%20%20%0A%20%20%20%20FILTER%20%28%3Fciting_work%20%21%3D%20%3Fcited_work%29%0A%20%20%20%20FILTER%20NOT%20EXISTS%20%7B%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fcited_work%20.%0A%20%20%20%20%20%20%3Fcited_work%20%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%7D%0A%20%20%20%20%3Fciting_author%20%28wdt%3AP108%7Cwdt%3AP1416%29%20%3Fciting_organization%20.%20%0A%20%20%20%20%3Fcited_author%20%28wdt%3AP108%7Cwdt%3AP1416%29%20%3Fcited_organization%20.%20%0A%20%20%20%20%3Fcited_organization%20wdt%3AP17%20%3Fcited_country.%0A%20%20%20%20%3Fciting_organization%20wdt%3AP17%20%3Fciting_country.%0A%20%20%20%20FILTER%20%28%3Fciting_country%20%21%3D%20%3Fcited_country%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fcited_country%20%3Fciting_country%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%2042%20%23%20Adjust%20number%20of%20connections%20to%20display%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20%3Fcited_country%20wdt%3AP41%20%3Fcited_flag%20.%20%0A%20%20%3Fciting_country%20wdt%3AP41%20%3Fciting_flag%20.%20%0A%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%20%20%20%20%20%20%20%20%0A%20%7D%0A">
@@ -435,9 +434,9 @@ The graph indicates the countries associated with organizations whose authors ha
 </div>
 
 
-<h3 id="Awards received by authors who published on the topic">Awards received by authors who published on the topic</h3>
+<h3 id="author-awards">Awards received by authors who published on the topic</h3>
 
-<table class="table table-hover" id="author-awards"></table>
+<table class="table table-hover" id="author-awards-table"></table>
 
 {% endblock %}
     
