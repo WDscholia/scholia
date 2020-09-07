@@ -107,47 +107,47 @@ WHERE {
 
 
 
-<h1 id="h1">Award</h1>
+<h1 id="award">Award</h1>
 
-<div id="intro"></div>
+<div id="award-intro"></div>
 
-<div id="wembedder"></div>
-
-
-<h2 id="List-of-recipients">List of recipients</h2>
-
-<table class="table table-hover" id="list-of-recipients"></table>
+<div id="award-wembedder"></div>
 
 
-<h2 id="Images-of-recipients">Images of recipients</h2>
+<h2 id="list-of-recipients">List of recipients</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
+<table class="table table-hover" id="list-of-recipients-table"></table>
+
+
+<h2 id="images-of-recipients">Images of recipients</h2>
+
+<div id="images-of-recipients-iframe" class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%0A%20%20%3Fyear%0A%20%20%3Frecipient%20%3FrecipientLabel%20%0A%20%20%3Fimage%0AWITH%20%7B%0A%20%20SELECT%20%3Frecipient%20%3Fyear%20%28SAMPLE%28%3Fimage_%29%20AS%20%3Fimage%29%20WHERE%20%7B%0A%20%20%20%20%3Frecipient%20p%3AP166%20%3Faward_statement%20.%20%0A%20%20%20%20%3Faward_statement%20ps%3AP166%20wd%3A{{ q }}%20.%0A%20%20%20%20OPTIONAL%20%7B%0A%20%20%20%20%20%20%3Faward_statement%20pq%3AP585%20%3Ftime%20.%0A%09%20%20BIND%28YEAR%28%3Ftime%29%20AS%20%3Fyear%29%0A%09%7D%0A%20%20%20%20%3Frecipient%20wdt%3AP18%20%3Fimage_%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Frecipient%20%3Fyear%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%20%20%0A%7D%0AORDER%20BY%20DESC%28%3Fyear%29%0A%20%20"></iframe>
 </div>
 
 
-<h2 id="Topics-of-works-by-recipients">Topics of works by recipients</h2>
+<h2 id="topics-of-works-by-recipients">Topics of works by recipients</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
+<div id="topics-of-works-by-recipients-iframe" class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0A%23%20Count%20the%20number%20of%20time%20works%20by%20award%20recipients%20have%20set%20a%20main%20topic%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%3Ftopic%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%20%20%3Frecipient%20wdt%3AP166%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP50%20%3Frecipient%20.%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%20%20%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0ALIMIT%2050"></iframe>
 </div>
 
 
-<h2 id="Recent-publications-by-recipients">Recent publications by recipients</h2>
+<h2 id="recent-publications-by-recipients">Recent publications by recipients</h2>
 
-<table class="table table-hover" id="recent-publications-by-recipients"></table>
+<table class="table table-hover" id="recent-publications-by-recipients-table"></table>
 
 
-<h2 id="Co-awards">Co-awards</h2>
+<h2 id="co-awards">Co-awards</h2>
 
 Awards with co-recipients 
 
-<table class="table table-hover" id="co-awards"></table>
+<table class="table table-hover" id="co-awards-table"></table>
 
 
-<h2 id="Locations-of-recipients">Locations of recipients</h2>
+<h2 id="locations-of-recipients">Locations of recipients</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
+<div id="locations-of-recipients-iframe" class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20DISTINCT%20%3Frecipient%20%3FrecipientLabel%20%3Fimage%20%3Fitem%20%3FitemLabel%20%3Fgeo%20%3Flayer%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Frecipient%20%3Fimage%20%3Fitem%20%3Fgeo%20%28%3Fproperty_item_label%20AS%20%3Flayer%29%20WHERE%20%7B%0A%20%20%20%20%3Frecipient%20wdt%3AP166%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Frecipient%20%3Fproperty%20%3Fitem%20.%20%0A%20%20%20%20%3Fitem%20wdt%3AP625%20%3Fgeo%20.%0A%20%20%20%20%3Fproperty_item%20wikibase%3AdirectClaim%20%3Fproperty%20.%0A%20%20%20%20%3Fproperty_item%20rdfs%3Alabel%20%3Fproperty_item_label%20.%20FILTER%20%28LANG%28%3Fproperty_item_label%29%20%3D%20%27en%27%29%0A%20%20%20%20OPTIONAL%20%7B%20%3Fitem%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%20%0A%7D"></iframe>
 </div>
 
