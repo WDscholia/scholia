@@ -8,73 +8,73 @@
 
  structuresSparql = `
 SELECT
-  ?IDpred ?IDpredLabel
-  ?finalid (SAMPLE(?idUrls) as ?idUrl)
+  ?Structural_identifier ?Structural_identifierLabel
+  ?value (SAMPLE(?idUrls) as ?idUrl)
 WITH {
-  SELECT ?IDpred ?id ?formatterurl WHERE {
-    VALUES ?IDpred { wd:P233 wd:P234 wd:P2017 }
-    wd:{{ q }} ?IDdir ?id .
-    ?IDpred wikibase:directClaim ?IDdir ;
+  SELECT ?Structural_identifier ?idLit ?formatterurl WHERE {
+    VALUES ?Structural_identifier { wd:P233 wd:P234 wd:P2017 }
+    wd:{{ q }} ?IDdir ?idLit .
+    ?Structural_identifier wikibase:directClaim ?IDdir ;
             wdt:P31 wd:Q19833835 .
     OPTIONAL {
-      ?IDpred wdt:P1630 ?formatterurl .
+      ?Structural_identifier wdt:P1630 ?formatterurl .
     }
   } LIMIT 500
 } AS %RESULTS {
   { SELECT * WHERE {
       INCLUDE %RESULTS
-      FILTER (?IDpred = wd:P234)
-      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?id)))) AS ?idUrls).
-      BIND(CONCAT("InChI=",?id) AS ?finalid) .
+      FILTER (?Structural_identifier = wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?idLit)))) AS ?idUrls).
+      BIND(CONCAT("InChI=",?idLit) AS ?value) .
     }
   } UNION {
     SELECT * WHERE {
       INCLUDE %RESULTS
-      FILTER (?IDpred != wd:P234)
-      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
-      BIND(?id AS ?finalid) .
+      FILTER (?Structural_identifier != wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?idLit))) AS ?idUrls).
+      BIND(?idLit AS ?value) .
     }
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-GROUP BY ?IDpred ?IDpredLabel ?finalid
-ORDER BY ASC(?IDpredLabel)
+GROUP BY ?Structural_identifier ?Structural_identifierLabel ?value
+ORDER BY ASC(?ID_TypeLabel)
 `
 
  identifiersSparql = `
 SELECT
-  ?IDpred ?IDpredLabel
-  ?id (SAMPLE(?idUrls) as ?idUrl)
-  ?IDpredDescription
+  ?Identifier ?IdentifierLabel
+  ?Value (SAMPLE(?idUrls) as ?ValueUrl)
+  ?IdentifierDescription
 WITH {
-  SELECT ?IDpred ?id ?formatterurl WHERE {
-    wd:{{ q }} ?IDdir ?id .
-    ?IDpred wikibase:directClaim ?IDdir ;
+  SELECT ?Identifier ?Value ?formatterurl WHERE {
+    wd:{{ q }} ?IDdir ?Value .
+    ?Identifier wikibase:directClaim ?IDdir ;
             wdt:P31 wd:Q19833835 .
     OPTIONAL { 
-      ?IDpred wdt:P1630 ?formatterurl .
+      ?Identifier wdt:P1630 ?formatterurl .
     }
-    FILTER (?IDpred != wd:P233)
-    FILTER (?IDpred != wd:P234)
-    FILTER (?IDpred != wd:P2017)
+    FILTER (?Identifier != wd:P233)
+    FILTER (?Identifier != wd:P234)
+    FILTER (?Identifier != wd:P2017)
   } LIMIT 500
 } AS %RESULTS {
   { SELECT * WHERE {
       INCLUDE %RESULTS
-      FILTER (?IDpred = wd:P234)
-      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?id)))) AS ?idUrls).
+      FILTER (?Identifier = wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?Value)))) AS ?idUrls).
     }
   } UNION {
     SELECT * WHERE {
       INCLUDE %RESULTS
-      FILTER (?IDpred != wd:P234)
-      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
+      FILTER (?Identifier != wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?Value))) AS ?idUrls).
     }
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-GROUP BY ?IDpred ?IDpredLabel ?IDpredDescription ?id
-ORDER BY ASC(?IDpredLabel)
+GROUP BY ?Identifier ?IdentifierLabel ?IdentifierDescription ?Value
+ORDER BY ASC(?IdentifierLabel)
 `
 
  relatedChemicalsSparql = `
