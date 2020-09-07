@@ -40,19 +40,19 @@ LIMIT 1000
 
 {% block page_content %}
 
-<h1 id="h1">Catalogue</h1>
+<h1 id="catalouge">Catalogue</h1>
 
-<div id="intro"></div>
-
-
-<h2>Items in catalogue</h2>
-
-<table class="table table-hover" id="items-in-catalogue"></table>
+<div id="catalouge-intro"></div>
 
 
-<h2>Images</h2>
+<h2 id="items-in-catalogue">Items in catalogue</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
+<table class="table table-hover" id="items-in-catalogue-table"></table>
+
+
+<h2 id="catalogue-images">Images</h2>
+
+<div id="catalogue-images-iframe" class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%0A%20%20%3Fimage%0A%20%20%3Fitem%20%3FitemLabel%0AWHERE%20%7B%0A%20%20%3Fitem%20wdt%3AP972%20wd%3A{{ q }}%20%3B%0A%20%20%20%20%20%20%20%20wdt%3AP18%20%3Fimage%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0A"></iframe>
 </div>
 
