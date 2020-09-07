@@ -87,39 +87,39 @@ ORDER BY DESC(?number_of_works) DESC(?number_of_citations)
 
 
 {% block page_content %}
-<h1 id="h1">Series</h1>
+<h1 id="series">Series</h1>
 
-<div id="intro"></div>
+<div id="series-intro"></div>
 
-<div id="wembedder"></div>
-
-
-<h2 id="In series">In series</h2>
-
-<table class="table table-hover" id="in-series"></table>
+<div id="series-wembedder"></div>
 
 
-<h2 id="Published works">Published works</h2>
+<h2 id="in-series">In series</h2>
 
-<table class="table table-hover" id="published-works"></table>
+<table class="table table-hover" id="in-series-table"></table>
 
 
-<h2 id="Topics">Topics</h2>
+<h2 id="published-works">Published works</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
+<table class="table table-hover" id="published-works-table"></table>
+
+
+<h2 id="topics">Topics</h2>
+
+<div id="topics-iframe" class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%2a%29%20AS%20%3Fcount%29%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%23%20Topics%20of%20series%0A%20%20%20%20%7B%20wd%3A{{ q }}%20wdt%3AP921%20%3Ftopic%20.%20%7D%0A%20%20%20%20%0A%20%20%20%20%23%20Topics%20of%20collections%20in%20series%0A%20%20%20%20UNION%20%7B%20%3Fcollection%20wdt%3AP179%20wd%3A{{ q }}%20%3B%20wdt%3AP921%20%3Ftopic%20.%20%7D%0A%20%20%20%20%0A%20%20%20%20%23%20Topics%20of%20works%20in%20collections%20in%20series%0A%20%20%20%20UNION%20%7B%20%3Fwork%20wdt%3AP1433%2Fwdt%3AP179%20wd%3A{{ q }}%20%3B%20wdt%3AP921%20%3Ftopic%20.%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0ADESC%28%3Fcount%29%0ALIMIT%20100%0A"></iframe>
 </div>
 
-<h2 id="Authors">Authors</h2>
+<h2 id="authors">Authors</h2>
 
-<table class="table table-hover" id="authors"></table>
+<table class="table table-hover" id="authors-table"></table>
 
 
-<h2 id="Organization">Organizations</h2>
+<h2 id="organization">Organizations</h2>
 
 Employment relationships per year.
 
-<div class="embed-responsive embed-responsive-16by9">
+<div id="organization-iframe" class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%20%3Fyear%20%3Fcount%20%3Forganization%20%3ForganizationLabel%0AWITH%20%7B%0A%20%20SELECT%20%28MIN%28%3Fyear_%29%20AS%20%3Fyear%29%20%3Fwork%20WHERE%20%7B%0A%20%20%20%20%3Fcollection%20wdt%3AP179%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20%3Fcollection%20.%0A%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdatetimes%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fdatetimes%29%29%20AS%20%3Fyear_%29%0A%20%20%7D%20%0A%20%20GROUP%20BY%20%3Fwork%0A%7D%20AS%20%25works%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Forganization%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%09%3Fwork%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%0A%20%20%20%20%23%20For%20now%2C%20only%20employment%20relation%0A%20%20%20%20%23%20We%20could%20add%20affiliation%20with%20%22%7C%20wdt%3AP1416%2Fwdt%3AP361%2a%22%20%0A%20%20%20%20%23%20Note%20that%20this%20extra%20term%20will%20double%20count.%0A%20%20%20%20%3Fauthor%20wdt%3AP108%20%20%3Forganization%20.%20%0A%20%20%20%7D%0A%20%20%20GROUP%20BY%20%3Fyear%20%3Forganization%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%20%23%20Exclude%20organizations%20with%20only%20a%20single%20count%0A%20%20%20%23%20HAVING%28%3Fcount%20%3E%201%29%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20INCLUDE%20%25result%0A%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20%7D%0A%7D%0AORDER%20BY%20%3Fyear%0A"></iframe></iframe>
 </div>
 
