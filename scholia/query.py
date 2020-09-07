@@ -14,6 +14,8 @@ Usage:
   scholia.query lipidmaps-to-q <lmid>
   scholia.query atomic-number-to-q <atomicnumber>
   scholia.query mesh-to-q <meshid>
+  scholia.query ncbi-gene-to-q <gene>
+  scholia.query ncbi-taxon-to-q <taxon>
   scholia.query orcid-to-q <orcid>
   scholia.query pubchem-to-q <cid>
   scholia.query pubmed-to-q <pmid>
@@ -378,6 +380,78 @@ def ror_to_qs(rorid):
     """
     query = 'select ?work where {{ ?work wdt:P6782 "{rorid}" }}'.format(
         rorid=rorid)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def ncbigene_to_qs(gene):
+    """Convert a NCBI gene identifier to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the NCBI gene identifier.
+
+    The NCBI gene identifier string is converted to uppercase before any
+    query is made.
+
+    Parameters
+    ----------
+    gene : str
+        NCBI gene identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> ncbi-taxon_to_qs('694009') == ['Q278567']
+    True
+
+    """
+    query = 'select ?gene where {{ ?gene wdt:P351 "{gene}" }}'.format(
+        gene=gene)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['gene']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def ncbitaxon_to_qs(taxon):
+    """Convert a NCBI taxon identifier to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the NCBI taxon identifier.
+
+    The NCBI taxon identifier string is converted to uppercase before any
+    query is made.
+
+    Parameters
+    ----------
+    taxon : str
+        NCBI taxon identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> ncbi-taxon_to_qs('694009') == ['Q278567']
+    True
+
+    """
+    query = 'select ?work where {{ ?work wdt:P685 "{taxon}" }}'.format(
+        taxon=taxon)
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
@@ -1303,6 +1377,16 @@ def main():
 
     elif arguments['mesh-to-q']:
         qs = mesh_to_qs(arguments['<meshid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['ncbi-gene-to-q']:
+        qs = ncbigene_to_qs(arguments['<gene>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['ncbi-taxon-to-q']:
+        qs = ncbitaxon_to_qs(arguments['<taxon>'])
         if len(qs) > 0:
             print(qs[0])
 

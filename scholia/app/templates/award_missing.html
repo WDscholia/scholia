@@ -10,7 +10,7 @@ SELECT
   (COUNT(?work) AS ?count) 
   ?author_name
   (CONCAT(
-      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
+      'https://author-disambiguator.toolforge.org/?doit=Look+for+author&name=',
       ENCODE_FOR_URI(?author_name)) AS ?author_resolver_url)
 WHERE {
   {
@@ -43,7 +43,7 @@ SELECT
 
   # Build URL to the Author disambiguator tool
   (CONCAT(
-      'https://tools.wmflabs.org/author-disambiguator/?doit=Look+for+author&name=',
+      'https://author-disambiguator.toolforge.org/?doit=Look+for+author&name=',
       ENCODE_FOR_URI(?coauthor)) AS ?resolver_url)
 WITH {
   SELECT (COUNT(?work) as ?count) ?coauthor WHERE {
