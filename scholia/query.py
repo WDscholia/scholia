@@ -390,7 +390,7 @@ def ror_to_qs(rorid):
             for item in data['results']['bindings']]
 
 
-def ncbigene_to_qs(gene):
+def ncbi_gene_to_qs(gene):
     """Convert a NCBI gene identifier to Wikidata ID.
 
     Wikidata Query Service is used to resolve the NCBI gene identifier.
@@ -410,7 +410,7 @@ def ncbigene_to_qs(gene):
 
     Examples
     --------
-    >>> ncbi-taxon_to_qs('694009') == ['Q278567']
+    >>> ncbi_taxon_to_qs('694009') == ['Q278567']
     True
 
     """
@@ -426,7 +426,7 @@ def ncbigene_to_qs(gene):
             for item in data['results']['bindings']]
 
 
-def ncbitaxon_to_qs(taxon):
+def ncbi_taxon_to_qs(taxon):
     """Convert a NCBI taxon identifier to Wikidata ID.
 
     Wikidata Query Service is used to resolve the NCBI taxon identifier.
@@ -446,7 +446,7 @@ def ncbitaxon_to_qs(taxon):
 
     Examples
     --------
-    >>> ncbi-taxon_to_qs('694009') == ['Q278567']
+    >>> ncbi_taxon_to_qs('694009') == ['Q278567']
     True
 
     """
@@ -1381,12 +1381,12 @@ def main():
             print(qs[0])
 
     elif arguments['ncbi-gene-to-q']:
-        qs = ncbigene_to_qs(arguments['<gene>'])
+        qs = ncbi_gene_to_qs(arguments['<gene>'])
         if len(qs) > 0:
             print(qs[0])
 
     elif arguments['ncbi-taxon-to-q']:
-        qs = ncbitaxon_to_qs(arguments['<taxon>'])
+        qs = ncbi_taxon_to_qs(arguments['<taxon>'])
         if len(qs) > 0:
             print(qs[0])
 
