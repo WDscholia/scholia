@@ -47,7 +47,7 @@ Examples
 
 from __future__ import absolute_import, division, print_function
 
-from random import random
+from random import randrange
 
 import requests
 
@@ -1287,12 +1287,10 @@ def random_author():
 
     Notes
     -----
-    The SPARQL query is somewhat slow and takes several seconds. It sample
-    uniformly among authorships rather than authors. The SPARQL query is this:
-
-    `SELECT ?author {{ [] wdt:P50 ?author . }}`
-
     The author returned is not necessarily a scholarly author.
+
+    The algorithm uses a somewhat hopeful randomization and if no author is
+    found it falls back on Q18618629.
 
     Examples
     --------
@@ -1301,13 +1299,22 @@ def random_author():
     True
 
     """
-    count = count_authorships()
-    offset = int(random() * count)
+    # Generate 100 random Q-items and hope that one of them is a work with an
+    # author
+    values = " ".join("wd:Q{}".format(randrange(1, 100000000))
+                      for _ in range(100))
 
-    query = """SELECT ?author {{ [] wdt:P50 ?author . }}
-               OFFSET {} LIMIT 1""".format(offset)
+    query = """SELECT ?author {{
+                 VALUES ?work {{ {values} }}
+                 ?work wdt:P50 ?author .
+               }}
+               LIMIT 1""".format(values=values)
     bindings = query_to_bindings(query)
-    q = bindings[0]['author']['value'][31:]
+    if len(bindings) > 0:
+        q = bindings[0]['author']['value'][31:]
+    else:
+        # Fallback
+        q = "Q18618629"
     return q
 
 
