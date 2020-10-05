@@ -416,6 +416,32 @@ div>
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0Aselect%20%3Fyear%20%3Fnumber_of_pages%20%3Fwork_label%20where%20%7B%0A%20%20%7B%0A%20%20%20%20select%20%3Fyear%20%28sample%28%3Fpages%29%20as%20%3Fnumber_of_pages%29%20%3Fwork_label%20where%20%7B%0A%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20select%20%28str%28%3Fyear_%29%20as%20%3Fyear%29%20%280%20as%20%3Fpages%29%20%28%22_%22%20as%20%3Fwork_label%29%20where%20%7B%0A%20%20%20%20%20%20%20%20%20%20%3Fyear_item%20wdt%3AP31%20wd%3AQ577%20.%20%0A%20%20%20%20%20%20%20%20%20%20%3Fyear_item%20wdt%3AP585%20%3Fdate%20.%0A%20%20%20%20%20%20%20%20%20%20bind%28year%28%3Fdate%29%20as%20%3Fyear_%29%0A%20%20%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20select%20%28min%28%3Fyear_%29%20as%20%3Fearliest_year%29%20%28max%28%3Fyear_%29%20as%20%3Flatest_year%29%20where%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20bind%28year%28%3Fpublication_date%29%20as%20%3Fyear_%29%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20filter%20%28%3Fyear_%20%3E%3D%20%3Fearliest_year%20%26%26%20%3Fyear_%20%3C%3D%20%3Flatest_year%29%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20union%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP1104%20%3Fpages%20.%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdate%20.%20%0A%20%20%20%20%20%20%20%20%3Fwork%20rdfs%3Alabel%20%3Flong_work_label%20.%20filter%28lang%28%3Flong_work_label%29%20%3D%20%27en%27%29%0A%20%20%20%20%20%20%20%20bind%28substr%28%3Flong_work_label%2C%201%2C%2020%29%20as%20%3Fwork_label%29%0A%20%20%20%20%20%20%20%20bind%28str%28year%28%3Fdate%29%29%20as%20%3Fyear%29%20%0A%20%20%20%20%20%20%7D%0A%09%7D%20%0A%09group%20by%20%3Fyear%20%3Fwork%20%3Fwork_label%0A%09order%20by%20%3Fyear%20%0A%20%20%7D%0A%7D"></iframe>
 </div>
 
+<h2>Topics</h2>
+
+
+<h3>Topic scores</h3>
+
+Topics based on a weighting between fields of work,
+topics of authored works and topics of citing works.  
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fscore%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28SUM%28%3Fscore_%29%20AS%20%3Fscore%29%0A%20%20%20%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP101%20%3Ftopic%20.%0A%20%20%20%20%20%20BIND%2820%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%283%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%281%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25results%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cjp%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fscore%29%0ALIMIT%20200"></iframe>
+</div>
+
+
+
+<h3>Topics of authored works</h3>
+
+<table class="table table-hover" id="topics"></table>
+
+<h2 id="Topics-works matrix">Topics-works matrix</h2>
+
+<div id="topics-works-matrix"></div>
+
+<!-- <div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ADimensions%0ASELECT%20%3Fcount%20%3Ftheme_label%20%3Fwork_label%20WHERE%20%7B%0A%20%20%7B%20%0A%20%20%20%20SELECT%20%3Ftheme%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%09%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Ftheme%0A%20%20%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%3Ftheme%20rdfs%3Alabel%20%3Ftheme_label%20.%20FILTER%20%28LANG%28%3Ftheme_label%29%20%3D%20%27en%27%29%0A%20%20%3Fwork%20rdfs%3Alabel%20%3Flong_work_label%20.%20FILTER%20%28LANG%28%3Flong_work_label%29%20%3D%20%27en%27%29%0A%20%20BIND%28SUBSTR%28%3Flong_work_label%2C%201%2C%2060%29%20AS%20%3Fwork_label%29%0A%7D%20"></iframe>
+</div -->
+
 
 <h2 id="Venue statistics">Venue statistics</h2>
 
@@ -442,39 +468,11 @@ Are co-authors missing here? You can help curate them via the <a href="{{ url_fo
 </div>
 
 
-<h2>Topics</h2>
-
-
-<h3>Topic scores</h3>
-
-Topics based on a weighting between fields of work,
-topics of authored works and topics of citing works.  
+<h2 id="Other-locations">Other locations</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fscore%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28SUM%28%3Fscore_%29%20AS%20%3Fscore%29%0A%20%20%20%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP101%20%3Ftopic%20.%0A%20%20%20%20%20%20BIND%2820%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%283%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%281%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25results%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cjp%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fscore%29%0ALIMIT%20200"></iframe>
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20DISTINCT%20%3Fimage%20%3Fitem%20%3FitemLabel%20%3Fgeo%20%28%3Fproperty_item_label%20AS%20%3Flayer%29%0AWHERE%20%7B%0A%20%20wd%3A{{ q }}%20%3Fproperty%20%3Fitem%20.%20%0A%20%20%3Fitem%20p%3AP159%2Fpq%3AP625%20%7C%20wdt%3AP276%2a%2Fwdt%3AP625%20%3Fgeo%20.%0A%20%20%3Fproperty_item%20wikibase%3AdirectClaim%20%3Fproperty%20.%0A%20%20OPTIONAL%20%7B%20%3Fitem%20wdt%3AP18%20%3Fimage%20.%20%7D%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%20%20%0A%20%20%23%20No%20automatic%20labeling%20on%20the%20property%2C%20-%20for%20some%20reason.%0A%20%20%3Fproperty_item%20rdfs%3Alabel%20%3Fproperty_item_label%20.%20FILTER%28LANG%28%3Fproperty_item_label%29%20%3D%20%27en%27%29%0A%7D%20%20"></iframe>
 </div>
-
-
-
-<h3>Topics of authored works</h3>
-
-<table class="table table-hover" id="topics"></table>
-
-
-<h2>Associated images</h2>
-
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%20DISTINCT%20%3Fimage%20WHERE%20%7B%0A%20%20%7B%0A%20%20%20%20%23%20Images%20of%20the%20person%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP18%20%3Fimage%20.%0A%20%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20%23%20Images%20from%20whatever%20property%20value%20is%20linked.%0A%20%20%20%20%0A%20%20%20%20%23%20Excluded%20%22different%20from%22%20property%20and%20take%20all%20other%20properties%0A%20%20%20%20wd%3A{{ q }}%20%21wdt%3AP1889%20%3Fitem%20.%0A%0A%20%20%20%20%3Fitem%20wdt%3AP18%20%3Fimage%20.%20%0A%20%20%20%20%0A%20%20%20%20%23%20All%20people%20are%20humans%2C%20so%20these%20images%20are%20excluded.%0A%20%20%20%20FILTER%20%28%3Fitem%20%21%3D%20wd%3AQ5%29%0A%20%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20%23%20Images%20associated%20with%20works%20of%20the%20author%2C%20both%20direct%20images%2C%0A%20%20%20%20%23%20images%20of%20topics%20of%20the%20works%20and%20images%20of%20coauthors.%0A%20%20%20%20wd%3A{{ q }}%20%5Ewdt%3AP50%20%2F%20%28wdt%3AP921%2a%20%7C%20wdt%3AP50%29%20%2F%20wdt%3AP18%20%3Fimage%20.%0A%20%20%7D%0A%7D%20%20%20"></iframe>
-</div>
-
-
-<h2 id="Topics-works matrix">Topics-works matrix</h2>
-
-<div id="topics-works-matrix"></div>
-
-<!-- <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ADimensions%0ASELECT%20%3Fcount%20%3Ftheme_label%20%3Fwork_label%20WHERE%20%7B%0A%20%20%7B%20%0A%20%20%20%20SELECT%20%3Ftheme%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%09%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Ftheme%0A%20%20%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%3Ftheme%20rdfs%3Alabel%20%3Ftheme_label%20.%20FILTER%20%28LANG%28%3Ftheme_label%29%20%3D%20%27en%27%29%0A%20%20%3Fwork%20rdfs%3Alabel%20%3Flong_work_label%20.%20FILTER%20%28LANG%28%3Flong_work_label%29%20%3D%20%27en%27%29%0A%20%20BIND%28SUBSTR%28%3Flong_work_label%2C%201%2C%2060%29%20AS%20%3Fwork_label%29%0A%7D%20"></iframe>
-</div -->
 
 
 <h2>Timeline</h2>
@@ -529,6 +527,12 @@ Authors that cite the author (excluding self citations).
 <table class="table table-hover" id="citing-authors"></table>
 
 Are citing authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_empty') }}{{ q }}/missing">missing</a> page.
+
+<h2>Associated images</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AImageGrid%0ASELECT%20DISTINCT%20%3Fimage%20WHERE%20%7B%0A%20%20%7B%0A%20%20%20%20%23%20Images%20of%20the%20person%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP18%20%3Fimage%20.%0A%20%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20%23%20Images%20from%20whatever%20property%20value%20is%20linked.%0A%20%20%20%20%0A%20%20%20%20%23%20Excluded%20%22different%20from%22%20property%20and%20take%20all%20other%20properties%0A%20%20%20%20wd%3A{{ q }}%20%21wdt%3AP1889%20%3Fitem%20.%0A%0A%20%20%20%20%3Fitem%20wdt%3AP18%20%3Fimage%20.%20%0A%20%20%20%20%0A%20%20%20%20%23%20All%20people%20are%20humans%2C%20so%20these%20images%20are%20excluded.%0A%20%20%20%20FILTER%20%28%3Fitem%20%21%3D%20wd%3AQ5%29%0A%20%20%7D%0A%20%20UNION%20%7B%0A%20%20%20%20%23%20Images%20associated%20with%20works%20of%20the%20author%2C%20both%20direct%20images%2C%0A%20%20%20%20%23%20images%20of%20topics%20of%20the%20works%20and%20images%20of%20coauthors.%0A%20%20%20%20wd%3A{{ q }}%20%5Ewdt%3AP50%20%2F%20%28wdt%3AP921%2a%20%7C%20wdt%3AP50%29%20%2F%20wdt%3AP18%20%3Fimage%20.%0A%20%20%7D%0A%7D%20%20%20"></iframe>
+</div>
 
 
 <h2>Events</h2>
