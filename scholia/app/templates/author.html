@@ -45,7 +45,7 @@ WITH {
     ?venue
     (GROUP_CONCAT(DISTINCT ?topic; separator=" // ") AS ?topics)
   WHERE {
-      ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P50 wd:{{ q }} .
     ?work wdt:P1433 ?venue .
     OPTIONAL { ?venue wdt:P921 / rdfs:label ?topic . FILTER(LANG(?topic) = 'en') }
   }
