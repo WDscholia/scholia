@@ -38,7 +38,7 @@ See file `CONTRIBUTING.rst`_ for technical details on how to improve Scholia.
 
 .. _Wikidata: https://www.wikidata.org
 .. _Wikimedia Foundation: https://wikimediafoundation.org
-.. _Wikimedia Tool Labs: https://tools.wmflabs.org/
+.. _Wikimedia Toolforge: https://toolforge.org/
 .. _launch Scholia via Gitpod: https://gitpod.io/#https://github.com/fnielsen/scholia
 .. _CONTRIBUTING.rst: https://github.com/fnielsen/scholia/blob/master/CONTRIBUTING.rst
 .. _requirements.txt: https://github.com/fnielsen/scholia/blob/master/requirements.txt
