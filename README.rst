@@ -9,7 +9,7 @@ Scholia is a python package and webapp for interaction with scholarly informatio
 Webapp
 ------
 
-As a webapp, it currently runs from `Wikimedia Tool Labs`_, a facility provided by the `Wikimedia Foundation`_. It is accessible from
+As a webapp, it currently runs from `Wikimedia Toolforge`_, a facility provided by the `Wikimedia Foundation`_. It is accessible from
 
     https://scholia.toolforge.org/
 
