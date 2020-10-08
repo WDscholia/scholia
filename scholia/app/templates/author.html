@@ -393,9 +393,9 @@ div>
     {% if first_initial and last_name %}
     <a href="https://query.wikidata.org/#select%20%2a%20where%20%7B%20%3Fwork%20wdt%3AP2093%20%3Fauthorname%20.%20filter%28regex%28%3Fauthorname%2C%20%27%5E{{ first_initial | urlencode }}.%2b{{ last_name | urlencode }}%24%27%29%29%20%7D%20limit%201">Search for unlinked works on Wikidata</a>
     or
-    add new ones with <a href="https://tools.wmflabs.org/sourcemd/">sourcemd</a>.
+    add new ones with <a href="https://sourcemd.toolforge.org/">sourcemd</a>.
     {% else %}
-    Add new ones with <a href="https://tools.wmflabs.org/sourcemd/">sourcemd</a>.
+    Add new ones with <a href="https://sourcemd.toolforge.org/">sourcemd</a>.
     {% endif %}
     
 </div -->
