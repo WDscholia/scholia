@@ -26,7 +26,7 @@ listed at https://papers.nips.cc/. It will return a JSON with a list of URLs
 for the individual papers.
 
 The generated quickstatements from `paper-url-to-quickstatements` can be
-submitted to https://tools.wmflabs.org/quickstatements/.
+submitted to https://quickstatements.toolforge.org/.
 
 """
 
