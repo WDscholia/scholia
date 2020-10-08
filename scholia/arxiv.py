@@ -143,7 +143,7 @@ def metadata_to_quickstatements(metadata):
 
     References
     ----------
-    - https://tools.wmflabs.org/wikidata-todo/quick_statements.php
+    - https://wikidata-todo.toolforge.org/quick_statements.php
 
     """
     qs = u"CREATE\n"
