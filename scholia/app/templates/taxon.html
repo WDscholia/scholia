@@ -77,8 +77,10 @@ SELECT
   ?metabolite ?metaboliteLabel ?metaboliteDescription
 WITH {
   SELECT ?metabolite WHERE {
-    ?metabolite wdt:P31|wdt:P279/wdt:P31 wd:Q11173 ;
-          wdt:P703 wd:{{ q }} .
+    ?metabolite wdt:P31|wdt:P279/wdt:P31 wd:Q11173 .
+    { ?metabolite wdt:P703 wd:{{ q }} }
+    UNION
+    { ?metabolite wdt:P1582 wd:{{ q }} }
   }
 } AS %results {
   INCLUDE %results
