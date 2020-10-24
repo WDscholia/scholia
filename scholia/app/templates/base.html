@@ -47,18 +47,6 @@
 	 catch(e) {}
 
 	 try {
-	     var doi = item.claims.P356[0].mainsnak.datavalue.value;
-	     detailsList.push( 'DOI: <a href="https://doi.org/' + encodeURI( doi ) + '">' + escapeHTML( doi ) + '</a> ');
-	 }
-	 catch(e) {}
-	 
-	 try {
-	     var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
-	     detailsList.push( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a> ');
-	 }
-	 catch(e) {}
-
-	 try {
 	     var twitterAccount = item.claims.P2002[0].mainsnak.datavalue.value;
 	     detailsList.push( '<img alt="Twitter t icon" src="' +
 			       'https://upload.wikimedia.org/wikipedia/commons/8/8b/Twitter_logo_initial.svg' +

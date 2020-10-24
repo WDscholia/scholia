@@ -123,7 +123,7 @@ function sparqlToDataTable(sparql, element, options={}) {
     // Options: linkPrefixes={}, paging=true
     var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
-    
+    var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=" + 
 	encodeURIComponent(sparql) + '&format=json';
 
@@ -148,6 +148,7 @@ function sparqlToDataTable(sparql, element, options={}) {
 	    ordering: true,
 	    order: [], 
 	    paging: paging,
+	    sDom: sDom,
 	});
 
 	$(element).append(

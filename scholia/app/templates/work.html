@@ -58,6 +58,21 @@ WHERE {
     }
     GROUP BY ?dummy
   }
+  UNION
+  {
+    BIND(10 AS ?order)
+    BIND("DOI" AS ?description)
+    ?work wdt:P356 ?valueUrl_ .
+    BIND(CONCAT("https://dx.doi.org/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
+    BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
+  }
+  UNION
+  {
+    BIND(11 AS ?order)
+    BIND("Full text" AS ?description)
+    ?work wdt:P953 ?valueUrl .
+    BIND(CONCAT(STR(?valueUrl), " ↗") AS ?value)
+  }
 } 
 ORDER BY ?order
 `
@@ -243,7 +258,8 @@ ORDER BY DESC(?cited_works)
 `;
 
  $(document).ready(function() {
-     sparqlToDataTable(dataSparql, "#data");
+     sparqlToDataTable(dataSparql, "#data",
+		       options={paging: false, sDom: 'rt',});
      sparqlToDataTable(listOfAuthorsSparql, "#list-of-authors");
      sparqlToDataTable(relatedWorksSparql, "#related-works");
      sparqlToDataTable(citationsToTheWorkSparql, "#citations-to-the-work");
