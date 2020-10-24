@@ -4,7 +4,79 @@
 {{super()}}
 
 <script type="text/javascript">
-
+ dataSparql = `
+SELECT ?description ?value ?valueUrl
+WHERE {
+  BIND(wd:{{ q }} AS ?work)
+  {
+    BIND(2 AS ?order)
+    BIND("Title" AS ?description)
+    ?work wdt:P1476 ?value .
+  }
+  UNION
+  {
+    SELECT
+      (3 AS ?order)
+      ("Authors" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      wd:{{ q }} wdt:P50 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      ?iri rdfs:label ?value_string . 
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    BIND(3 AS ?order)
+    BIND("Published in" AS ?description)
+    ?work wdt:P1433 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../venue/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    SELECT
+      (5 AS ?order)
+      ("Topics" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../topics/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      wd:{{ q }} wdt:P921 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      ?iri rdfs:label ?value_string . 
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    BIND(10 AS ?order)
+    BIND("DOI" AS ?description)
+    ?work wdt:P356 ?valueUrl_ .
+    BIND(CONCAT("https://dx.doi.org/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
+    BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
+  }
+  UNION
+  {
+    BIND(11 AS ?order)
+    BIND("Full text" AS ?description)
+    ?work wdt:P953 ?valueUrl .
+    BIND(CONCAT(STR(?valueUrl), " ↗") AS ?value)
+  }
+} 
+ORDER BY ?order
+`
+ 
  listOfAuthorsSparql = `
 # List of authors for a work
 SELECT
@@ -186,6 +258,8 @@ ORDER BY DESC(?cited_works)
 `;
 
  $(document).ready(function() {
+     sparqlToDataTable(dataSparql, "#data",
+		       options={paging: false, sDom: 'rt',});
      sparqlToDataTable(listOfAuthorsSparql, "#list-of-authors");
      sparqlToDataTable(relatedWorksSparql, "#related-works");
      sparqlToDataTable(citationsToTheWorkSparql, "#citations-to-the-work");
@@ -205,8 +279,9 @@ ORDER BY DESC(?cited_works)
 
 <div id="details"></div>
 
+<table class="table table-hover" id="data"></table>
 
-<!-- h2>List of authors</h2 -->
+<h2>List of authors</h2>
 
 <table class="table table-hover" id="list-of-authors"></table>
 
