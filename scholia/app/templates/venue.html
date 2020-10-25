@@ -10,7 +10,8 @@
 SELECT
   (MIN(?publication_date_) AS ?publication_date)
   ?work ?workLabel
-  (GROUP_CONCAT(?author_label; separator=" // ") AS ?authors)
+  (GROUP_CONCAT(?author_label; separator=", ") AS ?authors)
+  (CONCAT("../authors/", GROUP_CONCAT(SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
 WHERE {
   ?work wdt:P1433 wd:{{ q }} .
   OPTIONAL {
@@ -18,7 +19,8 @@ WHERE {
     BIND(xsd:date(?publication_datetime) AS ?publication_date_)
   }
   OPTIONAL {
-    ?work wdt:P50/rdfs:label ?author_label .
+    ?work wdt:P50 ?author .
+    ?author rdfs:label ?author_label .
     FILTER (LANG(?author_label) = 'en')
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
@@ -77,7 +79,7 @@ WHERE {
 ORDER BY DESC(?count)
 LIMIT 50
  `
-  coAuthorsSparql = `
+ coAuthorsSparql = `
 #defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
@@ -120,7 +122,7 @@ WHERE {
 
   `
 
-  citedVenuesSparql = `
+ citedVenuesSparql = `
 # Cited venues from specific journal
 SELECT
   ?count
