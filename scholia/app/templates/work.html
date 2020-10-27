@@ -258,7 +258,7 @@ ORDER BY DESC(?cited_works)
 `;
 
 
-wikipediaMentioningsSparql = `
+wikipediaMentionsSparql = `
 SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel WHERE {
   {
     SELECT ?title_ ?titleUrl ?wikipedia {
@@ -303,7 +303,7 @@ SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel WHERE {
      sparqlToDataTable(citationsToTheWorkSparql, "#citations-to-the-work");
      sparqlToDataTable(citedWorksSparql, "#cited-works");
      sparqlToDataTable(citedWorksAuthorsSparql, "#cited-works-authors");
-     sparqlToDataTable(wikipediaMentioningsSparql, "#wikipedia-mentionings");
+     sparqlToDataTable(wikipediaMentionsSparql, "#wikipedia-mentions");
      sparqlToDataTable(statementsSparql, "#statements");
  });
 </script>
@@ -390,9 +390,9 @@ Recent citations to the work
 </div>
 
 
-<h3 id="Wikipedia-mentionings">Wikipedia mentionings</h3>
+<h3 id="Wikipedia-mentions">Wikipedia mentions</h3>
 
-<table class="table table-hover" id="wikipedia-mentionings"></table>
+<table class="table table-hover" id="wikipedia-mentions"></table>
 
 
 
