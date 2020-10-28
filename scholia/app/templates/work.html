@@ -43,6 +43,15 @@ WHERE {
   }
   UNION
   {
+    BIND(4 AS ?order)
+    BIND("Publication date" AS ?description)
+    ?work p:P577 / psv:P577 ?publication_date_value .
+    ?publication_date_value wikibase:timePrecision ?time_precision ;
+                            wikibase:timeValue ?publication_date .
+    BIND(IF(?time_precision = 9, YEAR(?publication_date), xsd:date(?publication_date)) AS ?value)
+  }
+  UNION
+  {
     SELECT
       (5 AS ?order)
       ("Topics" AS ?description)
@@ -258,7 +267,7 @@ ORDER BY DESC(?cited_works)
 `;
 
 
-wikipediaMentionsSparql = `
+ wikipediaMentionsSparql = `
 SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel WHERE {
   {
     SELECT ?title_ ?titleUrl ?wikipedia {
