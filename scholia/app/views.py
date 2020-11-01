@@ -1641,6 +1641,24 @@ def show_venue_cito(q):
     return render_template('venue_cito.html', q=q)
 
 
+@main.route('/cito/' + q_pattern)
+def show_cito(q):
+    """Return HTML rendering for a specific Citation Typing Ontology intention.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('cito.html', q=q)
+
+
 @main.route('/venue/' + q_pattern + '/latest-works/rss')
 def show_venue_rss(q):
     """Return a RSS feed for specific venue.

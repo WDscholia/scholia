@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ journalsSparql =  `
+SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) ?journal ?journalLabel WHERE {
+  VALUES ?INTENTION { wd:{{ q }} }
+  ?citingArticle p:P2860 ?citationStatement ;
+                 wdt:P1433 ?journal .
+  ?citationStatement pq:P3712 ?INTENTION .
+  ?intention wdt:P31 wd:Q96471816 .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?journal ?journalLabel
+  ORDER BY DESC(?count)
+  `
+
+ $(document).ready(function() {
+     sparqlToDataTable(journalsSparql, "#journals");
+ });
+ </script>
+
+
+{% endblock %}
+
+
+
+{% block page_content %}
+<h1 id="h1">Citation Typing Ontology (CiTO) Intention</h1>
+
+<div id="intro"></div>
+
+<div id="wembedder"></div>
+
+
+<h2 id="Journals">Journals using this intention</h2>
+
+<table class="table table-hover" id="journals"></table>
+
+
+{% endblock %}
+    
