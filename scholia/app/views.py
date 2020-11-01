@@ -1625,7 +1625,7 @@ def show_venue_missing(q):
 
 @main.route('/venue/' + q_pattern + '/cito')
 def show_venue_cito(q):
-    """Return HTML rendering for Citation Typing Ontology annotation of citations
+    """Return HTML rendering for Citation Typing Ontology annotation of citations.
 
     Parameters
     ----------
