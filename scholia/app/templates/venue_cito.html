@@ -34,12 +34,12 @@ SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHE
   $(document).ready(function() {
       sparqlToDataTable(citoIncomingSparql, "#cito-incoming", {
          linkPrefixes: {
-             intention: "../../topic/",
+             intention: "../../cito/",
          }
       });
       sparqlToDataTable(citoOutgoingSparql, "#cito-outgoing", {
          linkPrefixes: {
-             intention: "../../topic/",
+             intention: "../../cito/",
          }
       });
   });
