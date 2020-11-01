@@ -274,8 +274,8 @@ SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel WHERE {
       SERVICE wikibase:mwapi {
         bd:serviceParam wikibase:endpoint "da.wikipedia.org" ;
                         wikibase:api "Search" ;
-                        mwapi:srsearch "{{ q }}" ;
-                        mwapi:srlimit "max" .
+                        mwapi:srsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
+                        mwapi:srlimit "200" .
         ?title_ wikibase:apiOutput mwapi:title .
       }
       BIND(URI(CONCAT("https://da.wikipedia.org/wiki/", ENCODE_FOR_URI(?title_))) AS ?titleUrl)
@@ -288,8 +288,8 @@ SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel WHERE {
       SERVICE wikibase:mwapi {
         bd:serviceParam wikibase:endpoint "en.wikipedia.org" ;
                         wikibase:api "Search" ;
-                        mwapi:srsearch "{{ q }}" ;
-                        mwapi:srlimit "max" .
+                        mwapi:srsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
+                        mwapi:srlimit "200" .
         ?title_ wikibase:apiOutput mwapi:title .
       }
       BIND(URI(CONCAT("https://en.wikipedia.org/wiki/", ENCODE_FOR_URI(?title_))) AS ?titleUrl)

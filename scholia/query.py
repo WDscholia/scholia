@@ -589,6 +589,41 @@ def mesh_to_qs(meshid):
             for item in data['results']['bindings']]
 
 
+def q_to_dois(q):
+    """Get DOIs for a Q item.
+
+    Query the Wikidata Query Service to get zero or more DOIs for a particular
+    Q item identified by the Q identifier.
+
+    Parameters
+    ----------
+    q : str
+        String with Wikidata Q identifier.
+
+    Returns
+    -------
+    dois : list of str
+        List with zero or mores strings each containing a DOI.
+
+    Examples
+    --------
+    >>> dois = q_to_dois("Q87191917")
+    >>> dois == ['10.1016/S0140-6736(20)30211-7']
+    True
+
+    """
+    query = """SELECT ?doi {{ wd:{q} wdt:P356 ?doi }}""".format(q=q)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    results = data['results']['bindings']
+    dois = [result['doi']['value'] for result in results]
+    return dois
+
+
 def q_to_label(q, language='en'):
     """Get label for Q item.
 
