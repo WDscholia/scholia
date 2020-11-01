@@ -15,7 +15,7 @@ from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      github_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
-                     q_to_class, random_author, twitter_to_qs,
+                     q_to_class, q_to_dois, random_author, twitter_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
@@ -1879,7 +1879,11 @@ def show_work(q):
         Rendered HTML page for specific work.
 
     """
-    return render_template('work.html', q=q)
+    try:
+        dois = q_to_dois(q)
+    except Exception:
+        dois = []
+    return render_template('work.html', q=q, dois=dois)
 
 
 @main.route('/work/')
