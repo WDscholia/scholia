@@ -321,43 +321,43 @@ SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel WHERE {
 
 
 {% block page_content %}
-<h1 id="work">Work</h1>
+<h1 id="h1">Work</h1>
 
-<div id="work-intro"></div>
+<div id="intro"></div>
 
-<div id="work-details"></div>
+<div id="details"></div>
 
 <table class="table table-hover" id="data"></table>
 
 <h2>List of authors</h2>
 
-<table class="table table-hover" id="list-of-authors-table"></table>
+<table class="table table-hover" id="list-of-authors"></table>
 
 Are authors missing here? You can help curate them via the <a href="https://author-disambiguator.toolforge.org/work_item.php?id={{ q }}&doit=Get+author+links+for+work">Author Disambiguator page for this work</a>.
 
-<h2 id="topic-scores">Topic scores</h2>
+<h2>Topic scores</h2>
 
 Topics based on a weighting between main subject of work, cited and citing works.
 
-<div id="topic-scores-iframe" class="embed-responsive embed-responsive-16by9">
+<div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fscore%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28SUM%28%3Fscore_%29%20AS%20%3Fscore%29%0A%20%20%20%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%20%20%20%20BIND%2820%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%20%0A%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP921%2Fwdt%3AP279%20%3Ftopic%20.%0A%20%20%20%20%20BIND%283%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%23%20Topic%20of%20a%20cited%20work%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP2860%2Fwdt%3AP921%20%3Ftopic%20.%0A%20%20%20%20%20%20BIND%281%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%281%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25results%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cjp%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fscore%29%0ALIMIT%20200"></iframe>
 </div>
 
 
-<h2 id="timeline">Timeline</h2>
+<h2>Timeline</h2>
 
-<div id="timeline-iframe" class="embed-responsive embed-responsive-4by3">
+<div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%20DISTINCT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP577%20%3Fdatetime%20.%0A%20%20%20%20BIND%28%22%F0%9F%8C%9E%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP2507%20%2F%20wdt%3AP577%20%3Fdatetime%20.%0A%20%20%20%20BIND%28%22%E2%9D%97%20erratum%22%20AS%20%3Fdescription%29%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20wdt%3AP5824%20%2F%20wdt%3AP577%20%3Fdatetime%20.%0A%20%20%20%20BIND%28%22%E2%9B%94%20retracted%22%20AS%20%3Fdescription%29%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20p%3AP793%20%3Fevent_statement%20.%0A%20%20%20%20%3Fevent_statement%20ps%3AP793%20%3Fevent_type%20.%0A%20%20%20%20%3Fevent_type%20rdfs%3Alabel%20%3Fdescription_%20.%0A%20%20%20%20%3Fevent_statement%20pq%3AP585%20%3Fdatetime%20.%0A%20%20%20%20FILTER%20%28LANG%28%3Fdescription_%29%20%3D%20%22en%22%29%0A%20%20%20%20%0A%20%20%20%20%23%20Warning%20icon%20for%20retraction%0A%20%20%20%20BIND%28%0A%20%20%20%20%20%20IF%28%0A%20%20%20%20%20%20%20%20%3Fevent_type%20%3D%20wd%3AQ45203135%2C%0A%20%20%20%20%20%20%20%20CONCAT%28%22%E2%9B%94%20%22%2C%20%3Fdescription_%29%2C%0A%20%20%20%20%20%20%20%20IF%28%0A%20%20%20%20%20%20%20%20%20%20%3Fevent_type%20%3D%20wd%3AQ56478588%2C%0A%20%20%20%20%20%20%20%20%20%20CONCAT%28%22%E2%9D%93%20%22%2C%20%3Fdescription_%29%2C%0A%20%20%20%20%20%20%20%20%20%20%3Fdescription_%0A%20%20%20%20%20%20%20%20%20%20%29%0A%20%20%20%20%20%20%20%20%29%20AS%20%3Fdescription%29%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP2860%20%2F%20wdt%3AP577%20%3Fdatetime%0A%20%20%20%20%20%20BIND%28%22%F0%9F%93%96%E2%9E%A1%EF%B8%8F%20cited%20work%20with%20earliest%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%20%20%7D%0A%20%20%20%20ORDER%20BY%20%3Fdatetime%0A%20%20%20%20LIMIT%201%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP2860%20%2F%20wdt%3AP577%20%3Fdatetime%0A%20%20%20%20%20%20BIND%28%22%F0%9F%93%96%E2%9E%A1%EF%B8%8F%20cited%20work%20with%20latest%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%20%20%7D%0A%20%20%20%20ORDER%20BY%20DESC%28%3Fdatetime%29%0A%20%20%20%20LIMIT%201%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%20%20%20%20wd%3A{{ q }}%20%5Ewdt%3AP2860%20%2F%20wdt%3AP577%20%3Fdatetime%0A%20%20%20%20%20%20BIND%28%22%F0%9F%93%96%E2%AC%85%EF%B8%8F%20citing%20work%20with%20earliest%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%20%20%7D%0A%20%20%20%20ORDER%20BY%20%3Fdatetime%0A%20%20%20%20LIMIT%201%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20SELECT%20%3Fdatetime%20%3Fdescription%20WHERE%20%7B%0A%20%20%20%20%20%20wd%3A{{ q }}%20%5Ewdt%3AP2860%20%2F%20wdt%3AP577%20%3Fdatetime%0A%20%20%20%20%20%20BIND%28%22%F0%9F%93%96%E2%AC%85%EF%B8%8F%20citing%20work%20with%20latest%20publication%20date%22%20AS%20%3Fdescription%29%0A%20%20%20%20%7D%0A%20%20%20%20ORDER%20BY%20DESC%28%3Fdatetime%29%0A%20%20%20%20LIMIT%201%0A%20%20%7D%0A%20%20%20%20UNION%0A%20%20%7B%0A%20%20%20%20wd%3A{{ q }}%20%28wdt%3AP747%20%7C%20%5Ewdt%3AP629%29%20%2F%20wdt%3AP577%20%3Fdatetime%0A%20%20%20%20BIND%28%22%F0%9F%8C%9E%20Publication%20of%20edition%22%20AS%20%3Fdescription%29%0A%20%20%7D%0A%7D"></iframe>
 </div>
 
 <h2>Related works</h2>
 
-<h3 id="related-works" title="List of related works by co-citation analysis.">Related works from co-citation analysis</h3>
+<h3 title="List of related works by co-citation analysis.">Related works from co-citation analysis</h3>
 
-<table class="table table-hover" id="related-works-table"></table>
+<table class="table table-hover" id="related-works"></table>
 
 
-<h3 id="related-works-kg" title="Wembedder knowledge graph embedding related works">Related works from knowledge graph embedding</h3>
+<h3 title="Wembedder knowledge graph embedding related works">Related works from knowledge graph embedding</h3>
 
 <div id="wembedder"></div>
 
@@ -365,36 +365,36 @@ Topics based on a weighting between main subject of work, cited and citing works
 <h2>Citations</h2>
 
 
-<h3 id="citations-to-the-work">Citations to the work</h3>
+<h3>Citations to the work</h3>
 
 Recent citations to the work
 
-<table class="table table-hover" id="citations-to-the-work-table"></table>
+<table class="table table-hover" id="citations-to-the-work"></table>
 
 
-<h3 id="cited-works">Cited works</h3>
+<h3>Cited works</h3>
 
-<table class="table table-hover" id="cited-works-table"></table>
-
-
-<h3 id="cited-works-authors">Authors of cited works</h3>
-
-<table class="table table-hover" id="cited-works-authors-table"></table>
+<table class="table table-hover" id="cited-works"></table>
 
 
-<h3 id="citation-graph" title="Partial citation graph around the work with the up to 40 most important works displayed">Citation graph</h3>
+<h3>Authors of cited works</h3>
+
+<table class="table table-hover" id="cited-works-authors"></table>
+
+
+<h3 title="Partial citation graph around the work with the up to 40 most important works displayed">Citation graph</h3>
 
 
 
-<div id="citation-graph-iframe" class="embed-responsive embed-responsive-4by3">
+<div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%0A%20%20%3Fciting_work%20%3Fciting_workLabel%20%3Frgb%20%0A%20%20%3Fcited_work%20%3Fcited_workLabel%0AWITH%20%7B%20%0A%20%20SELECT%20%28COUNT%28%2a%29%20AS%20%3Fcount%29%20%3Fciting_work%20WHERE%20%7B%0A%20%20%20%20wd%3A{{ q }}%20%28%5Ewdt%3AP2860%20%7C%20wdt%3AP2860%29%20%2F%20%28%5Ewdt%3AP2860%20%7C%20wdt%3AP2860%29%3F%20%3Fciting_work%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fciting_work%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%2040%0A%7D%20AS%20%25citing_works%0AWITH%20%7B%20%0A%20%20SELECT%20%28COUNT%28%2a%29%20AS%20%3Fcount_%29%20%3Fcited_work%20WHERE%20%7B%0A%20%20%20%20wd%3A{{ q }}%20%28%5Ewdt%3AP2860%20%7C%20wdt%3AP2860%29%20%2F%20%28%5Ewdt%3AP2860%20%7C%20wdt%3AP2860%29%3F%20%3Fcited_work%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fcited_work%0A%20%20ORDER%20BY%20DESC%28%3Fcount_%29%0A%20%20LIMIT%2040%0A%7D%20AS%20%25cited_works%0AWITH%20%7B%0A%20%20SELECT%20%28MAX%28%3Fcount%29%20AS%20%3Fmax_count%29%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25citing_works%0A%20%20%20%20BIND%281%20AS%20%3Fdummy%29%0A%20%20%7D%20%0A%20%20GROUP%20BY%20%3Fdummy%0A%7D%20AS%20%25max_count%0AWHERE%20%7B%0A%20%20INCLUDE%20%25citing_works%0A%20%20INCLUDE%20%25max_count%0A%20%20INCLUDE%20%25cited_works%0A%20%20%0A%20%20%3Fciting_work%20wdt%3AP2860%20%3Fcited_work%20.%0A%20%20%0A%20%20BIND%28STR%28xsd%3Ainteger%2899%20%2a%20%281%20-%20%3Fcount%20%2F%20%3Fmax_count%29%29%29%20AS%20%3Fgrey%29%0A%20%20BIND%28CONCAT%28SUBSTR%28%220%22%2C%201%2C%202%20-%20STRLEN%28%3Fgrey%29%29%2C%20%3Fgrey%29%20AS%20%3Fpadded_grey%29%0A%20%20BIND%28CONCAT%28%3Fpadded_grey%2C%20%3Fpadded_grey%2C%20%3Fpadded_grey%29%20AS%20%3Frgb%29%0A%0A%20%20%7B%20%0A%20%20%20%20%20%20%3Fciting_work%20%28p%3AP50%29%20%3Fciting_author_statement%20.%20%0A%20%20%20%20%20%20%3Fciting_author_statement%20pq%3AP1545%20%221%22%20.%0A%20%20%20%20%20%20%3Fciting_author_statement%20ps%3AP50%20%3Fciting_author%20.%0A%20%20%20%20%20%20%3Fciting_author%20rdfs%3Alabel%20%3Fciting_author_name%20.%0A%20%20%20%20%20%20filter%28lang%28%3Fciting_author_name%29%20%3D%20%27en%27%29%0A%20%20%20%20%7D%0A%20%20%20%20union%20%0A%20%20%09%7B%20%0A%20%20%20%20%20%20%3Fciting_work%20%28p%3AP2093%29%20%3Fciting_author_statement%20.%20%0A%20%20%20%20%20%20%3Fciting_author_statement%20pq%3AP1545%20%221%22%20.%0A%20%20%20%20%20%20%3Fciting_author_statement%20ps%3AP2093%20%3Fciting_author_name%20.%0A%20%20%20%20%7D%0A%20%20%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20%3Fcited_work%20%28p%3AP50%29%20%3Fcited_author_statement%20.%20%0A%20%20%20%20%20%20%3Fcited_author_statement%20pq%3AP1545%20%221%22%20.%0A%20%20%20%20%20%20%3Fcited_author_statement%20ps%3AP50%20%3Fcited_author%20.%0A%20%20%20%20%20%20%3Fcited_author%20rdfs%3Alabel%20%3Fcited_author_name%20.%0A%20%20%20%20%20%20filter%28lang%28%3Fcited_author_name%29%20%3D%20%27en%27%29%0A%20%20%20%20%7D%0A%20%20%20%20union%20%0A%20%20%09%7B%20%0A%20%20%20%20%20%20%3Fcited_work%20%28p%3AP2093%29%20%3Fcited_author_statement%20.%20%0A%20%20%20%20%20%20%3Fcited_author_statement%20pq%3AP1545%20%221%22%20.%0A%20%20%20%20%20%20%3Fcited_author_statement%20ps%3AP2093%20%3Fcited_author_name%20.%0A%20%20%20%20%7D%0A%0A%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fciting_date%20.%20%0A%20%20%20%20%3Fcited_work%20wdt%3AP577%20%3Fcited_date%20.%20%0A%20%20%20%20bind%28year%28%3Fciting_date%29%20as%20%3Fciting_year%29%0A%20%20%20%20bind%28year%28%3Fcited_date%29%20as%20%3Fcited_year%29%0A%20%20%20%20bind%28concat%28%3Fciting_author_name%2C%20%22%2C%20%22%2C%20str%28%3Fciting_year%29%29%20as%20%3Fciting_workLabel%29%0A%20%20%20%20bind%28concat%28%3Fcited_author_name%2C%20%22%2C%20%22%2C%20str%28%3Fcited_year%29%29%20as%20%3Fcited_workLabel%29%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29"></iframe>
 </div>
 
 
-<h3 id="citations-per-year"
+<h3 id="Citations-per-year"
     title="Number of citations to the work per year">Citations per year</h3>
 
-<div id="citations-per-year-iframe" class="embed-responsive embed-responsive-16by9">
+<div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%0A%20%20%28STR%28%3Fyear_%29%20AS%20%3Fyear%29%0A%20%20%28SUM%28%3Fcount_%29%20AS%20%3Fcount%29%0A%20%20%3Fkind%0AWHERE%20%7B%0A%20%20%7B%0A%20%20%20%20VALUES%20%3Fyear_%20%7B%202000%202001%202002%202003%202004%202005%202006%202007%202008%202009%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%202010%202011%202012%202013%202014%202015%202016%202017%202018%202019%20%7D%0A%20%20%20%20BIND%280%20AS%20%3Fcount_%29%0A%20%20%20%20BIND%28%22_%22%20AS%20%3Fkind%29%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%0A%20%20%20%20SELECT%0A%20%20%20%20%20%20%3Fyear_%0A%20%20%20%20%20%20%28COUNT%28DISTINCT%20%3Fciting_work%29%20AS%20%3Fcount_%29%0A%20%20%20%20%20%20%3Fkind%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20wd%3A{{ q }}%20.%0A%20%20%0A%20%20%20%20%20%20%23%20Detect%20self-citations%0A%20%20%20%20%20%20BIND%28IF%28EXISTS%20%7B%20wd%3A{{ q }}%20wdt%3AP50%20%3Fselfauthor%20.%20%3Fciting_work%20%20wdt%3AP50%20%3Fselfauthor%20%7D%20%2C%0A%20%20%20%20%20%20%20%20%22detected%20incoming%20self-citations%22%2C%0A%20%20%20%20%20%20%20%20%22citations%20from%20others%20or%20non-detected%20self-citations%22%29%20AS%20%3Fkind%29%0A%0A%20%20%20%20%20%20%23%20Year%20of%20citation%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20%20%20%20%20BIND%28YEAR%28%3Fdate%29%20AS%20%3Fyear_%29%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Fyear_%20%3Fkind%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%0A%20%20%20%20SELECT%0A%20%20%20%20%20%20%3Fyear_%0A%20%20%20%20%20%20%28COUNT%28DISTINCT%20%3Fcited_work%29%20AS%20%3Fcount_%29%0A%20%20%20%20%20%20%3Fkind%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP2860%20%3Fcited_work%20.%0A%20%20%0A%20%20%20%20%20%20%23%20Detect%20self-citations%0A%20%20%20%20%20%20BIND%28IF%28EXISTS%20%7B%20%3Fcited_work%20wdt%3AP50%20%3Fselfauthor%20.%20wd%3A{{ q }}%20wdt%3AP50%20%3Fselfauthor%20%7D%2C%0A%20%20%20%20%20%20%20%20%22detected%20outgoing%20self-citations%22%2C%0A%20%20%20%20%20%20%20%20%22outgoing%20citations%20to%20others%20or%20non-detected%20self-citations%22%29%20AS%20%3Fkind%29%0A%0A%20%20%20%20%20%20%23%20Year%20of%20citation%0A%20%20%20%20%20%20%3Fcited_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20%20%20%20%20BIND%28YEAR%28%3Fdate%29%20AS%20%3Fyear_%29%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Fyear_%20%3Fkind%0A%20%20%7D%0A%7D%0AGROUP%20BY%20%3Fyear_%20%3Fkind%0AORDER%20BY%20DESC%28%3Fyear_%29%20"></iframe>
 </div>
 

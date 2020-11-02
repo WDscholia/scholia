@@ -295,49 +295,49 @@ ORDER BY DESC(?date)
 
 {% block page_content %}
 
-<h1 id="event">Event</h1>
+<h1 id="h1">Event</h1>
 
-<div id="event-intro"></div>
+<div id="intro"></div>
 
-<div id="event-details"></div>
-
-
-<h2 id="list-of-events">List of events</h2>
-
-<table class="table table-hover" id="list-of-events-table"></table>
+<div id="details"></div>
 
 
-<h2 id="event-timeline">Timeline</h2>
+<h2>List of events</h2>
 
-<div id="event-timeline-iframe" class="embed-responsive embed-responsive-16by9">
+<table class="table table-hover" id="list-of-events"></table>
+
+
+<h2>Timeline</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
     <iframe loading="lazy" class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ATimeline%0ASELECT%0A%20%20%3Ftime%20%3Fendtime%20%3Fevent%20%3FeventLabel%20%3Fimage%0A%20%20%3Fdescription%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fevent%20%3Ftime%20%3Fendtime%20WHERE%20%7B%0A%20%20%20%20%23%20It%20seems%20to%20be%20necessary%20to%20have%20this%20line%20together%20with%20the%20%0A%20%20%20%20%23%20optional%20event%20time%20triples%20here.%0A%20%20%20%20%3Fevent%20wdt%3AP179%20%7C%20wdt%3AP31%20wd%3A{{ q }}%20.%0A%20%20%20%20%0A%20%20%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP580%20%3Fstarttime%20.%20%7D%0A%0A%20%20%20%20%23%20If%20the%20endtime%20is%20not%20set%2C%20then%20use%20now%20as%20the%20end%20time%0A%20%20%20%20%23%20However%20this%20does%20not%20show%20well%20if%20the%20event%20is%20in%20the%20future%0A%20%20%20%20%23%20and%20no%20end%20date%20has%20been%20set.%0A%20%20%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP582%20%3Fendtime%20.%20%7D%0A%20%20%20%20%23%20BIND%28COALESCE%28%3Fendtime_%2C%20NOW%28%29%29%20AS%20%3Fendtime%29%0A%20%20%20%20%0A%20%20%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP585%20%3Ftimepoint%20.%20%7D%0A%20%20%20%20%0A%20%20%20%20%23%20If%20start%20time%20is%20defined%20the%20disregard%20timepoint%0A%20%20%20%20BIND%28COALESCE%28%3Fstarttime%2C%20%3Ftimepoint%29%20AS%20%3Ftime%29%0A%20%20%7D%0A%7D%20AS%20%25events1%0AWITH%20%7B%0A%20%20%23%20Include%20significant%20events%0A%20%20SELECT%20%3Fevent%20%3Ftime%20%3Fdescription%20WHERE%20%7B%0A%20%20%20%20%3Fevent%20wdt%3AP179%20%7C%20wdt%3AP31%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fevent%20p%3AP793%20%5B%20ps%3AP793%20%3Fitem%20%3B%20pq%3AP585%20%3Ftime%20%5D%20.%0A%20%20%20%20OPTIONAL%20%7B%0A%20%20%20%20%20%20%3Fitem%20rdfs%3Alabel%20%3Fdescription%20.%0A%20%20%20%20%20%20FILTER%20%28LANG%28%3Fdescription%29%20%3D%20%22en%22%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%20AS%20%25events2%0AWHERE%20%7B%0A%20%20%7B%20INCLUDE%20%25events1%20%7D%0A%20%20UNION%0A%20%20%7B%20INCLUDE%20%25events2%20%7D%0A%20%20%20%20%20%20%20%20%20%20%0A%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%0A%20%20%7D%0A%7D%0A%20%20%0A%20%20"></iframe>
 </div>
 
 
-<h2 id="event-map">Map</h2>
+<h2>Map</h2>
 
-<div id="event-map-iframe" class="embed-responsive embed-responsive-16by9">
+<div class="embed-responsive embed-responsive-16by9">
     <iframe loading="lazy" class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AMap%0ASELECT%20%3Fevent%20%3FeventLabel%20%3Fgeo%20%3Fimage%20WHERE%20%7B%0A%20%20%3Fevent%20%28wdt%3AP179%20%7C%20wdt%3AP31%29%20wd%3A{{ q }}%20.%0A%20%20%3Fevent%20wdt%3AP276%3F%20%2F%20wdt%3AP625%20%3Fgeo%20.%0A%20%20OPTIONAL%20%7B%20%3Fevent%20wdt%3AP18%20%3Fimage%20.%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D"></iframe>
 </div>
 
 
-<h2 id="event-topic-scores">Topic scores</h2>
+<h2>Topic scores</h2>
 
-<table class="table table-hover" id="event-topic-scores-table"></table>
+<table class="table table-hover" id="topics"></table>
 
 
-<h2 id="persons">Persons</h2>
+<h2>Persons</h2>
 
-<table class="table table-hover" id="persons-table"></table>
+<table class="table table-hover" id="persons"></table>
 
 
 <h2>Works</h2>
 
-<h3 id="recent-publications">Recent publications</h3>
+<h3>Recent publications</h3>
 
 Recent publications by organizers, speakers or participants of the events in the series.
 
-<table class="table table-hover" id="recent-publications-table"></table>
+<table class="table table-hover" id="recent-publications"></table>
 
 <h3>Proceedings publications</h3>
 

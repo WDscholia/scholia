@@ -127,31 +127,31 @@ ORDER BY DESC(?count)
 <h1>Clinical trials</h1>
 
 <h2 title="Recently initiated clinical trials"
-    id="recent-clinical-trials">Recent clinical trials</h2>
+    id="Recent clinical trials">Recent clinical trials</h2>
 
-<table class="table table-hover" id="recent-clinical-trials-table"></table>
+<table class="table table-hover" id="recent-clinical-trials"></table>
 
-<h2 title="Clinical trial phases during the years" id="clinical-trials-phases">Phases</h2>
+<h2 title="Clinical trial phases during the years">Phases</h2>
 
 
-<div id="clinical-trials-phases-iframe" class="embed-responsive embed-responsive-4by3">
+<div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%0A%20%20%28STR%28%3Fyear_%29%20AS%20%3Fyear%29%0A%20%20%3Fcount%0A%20%20%3Fphase%20%3FphaseLabel%0AWHERE%20%7B%0A%20%20%7B%20%0A%20%20%20%20SELECT%0A%20%20%20%20%20%20%3Fyear_%0A%20%20%20%20%20%20%28COUNT%28%2a%29%20AS%20%3Fcount%29%0A%20%20%20%20%20%20%3Fphase%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20%3Ftrial%20wdt%3AP6099%20%3Fphase%20.%0A%20%20%20%20%20%20%3Ftrial%20wdt%3AP580%20%3Fstart_datetime%20.%0A%20%20%20%20%20%20BIND%28YEAR%28%3Fstart_datetime%29%20AS%20%3Fyear_%29%20%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Fyear_%20%3Fphase%0A%20%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D"></iframe>
 </div>
 
 
-<h2 id="medical-conditions" title="Medical conditions in clinical trials sorted by number of trials">Medical conditions</h2>
+<h2 title="Medical conditions in clinical trials sorted by number of trials">Medical conditions</h2>
 
-<table class="table table-hover" id="medical-conditions-table"></table>
-
-
-<h2 id="interventions" title="Interventions in clinical trials sorted by number of trials">Interventions</h2>
-
-<table class="table table-hover" id="interventions-table"></table>
+<table class="table table-hover" id="medical-conditions"></table>
 
 
-<h2 id="statistics" title="Statistics for clinical trials">Statistics</h2>
+<h2 title="Interventions in clinical trials sorted by number of trials">Interventions</h2>
 
-<table class="table table-hover" id="statistics-table"></table>
+<table class="table table-hover" id="interventions"></table>
+
+
+<h2 title="Statistics for clinical trials">Statistics</h2>
+
+<table class="table table-hover" id="statistics"></table>
 
 
 {% endblock %}
