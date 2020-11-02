@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+ articleCountsSparql =  `
+SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
+  ?citingArticle p:P2860 ?citationStatement .
+  ?citationStatement pq:P3712 ?intention ;
+                     ps:P2860 ?citedArticle .
+  ?intention wdt:P31 wd:Q96471816 ;
+             wdt:P2888 ?cito .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?cito ?intention ?intentionLabel
+  ORDER BY DESC(?count)
+`
+
+ journalCountsSparql =  `
+SELECT ?journal ?journalLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
+  ?citingArticle p:P2860 ?citationStatement ;
+                 wdt:P1433 ?journal .
+  ?citationStatement pq:P3712 ?intention ;
+                     ps:P2860 ?citedArticle .
+  ?intention wdt:P31 wd:Q96471816 .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?journal ?journalLabel
+  ORDER BY DESC(?count)
+`
+
+ $(document).ready(function() {
+     sparqlToDataTable(articleCountsSparql, "#articleCounts", {
+         linkPrefixes: { intention: "../../cito/", }
+     });
+     sparqlToDataTable(journalCountsSparql, "#journalCounts", {
+         linkPrefixes: { journal: "../../venue/", },
+         linkSuffixes: { journal: "/cito", }
+     });
+ });
+ </script>
+
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1>Citation Typing Ontology Intentions</h1>
+
+Page with general info about CiTO annotation in Wikidata.
+
+<h2 id="ArticleCounts">Intentions by articles using them</h2>
+
+<table class="table table-hover" id="articleCounts"></table>
+
+<h2 id="JournalCounts">Intentions by journals using them</h2>
+
+<table class="table table-hover" id="journalCounts"></table>
+
+{% endblock %}
+
+  

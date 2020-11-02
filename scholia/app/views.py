@@ -1659,6 +1659,23 @@ def show_cito(q):
     return render_template('cito.html', q=q)
 
 
+@main.route('/cito/')
+def show_cito_empty():
+    """Return rendered HTML about CiTO annotation in Wikidata.
+
+    Return rendered HTML index page with general info about CiTO annotation
+    in Wikidata.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page with general info about CiTO annotation
+        in Wikidata.
+
+    """
+    return render_template('cito_empty.html')
+
+
 @main.route('/venue/' + q_pattern + '/latest-works/rss')
 def show_venue_rss(q):
     """Return a RSS feed for specific venue.
