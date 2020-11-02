@@ -101,10 +101,10 @@ WITH {
 
 
 {% block page_content %}
-<h1 id="h1">Taxon</h1>
+<h1 id="taxon">Taxon</h1>
 <script type="application/ld+json" id="bioschemas"></script>
 
-<div id="intro"></div>
+<div id="taxon-intro"></div>
 
 <div id="wembedder"></div>
 
@@ -112,25 +112,25 @@ WITH {
 
 <table class="table table-hover" id="identifiers"></table>
 
-<h2 id="Parent Taxa">Parent Taxa</h2>
+<h2 id="parent-taxa">Parent Taxa</h2>
 
-<table class="table table-hover" id="parents"></table>
+<table class="table table-hover" id="parent-taxa-table"></table>
 
 
-<div class="embed-responsive embed-responsive-4by3">
+<div id="parent-taxa-iframe" class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%0A%20%20%3Fchild%20%3FchildLabel%0A%20%20%3Frgb%20%0A%20%20%3Fparent%20%3FparentLabel%0AWITH%20%7B%0A%20%20SELECT%20%3Fchild%20%3Frgb%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20%23%20Parent%20taxons%0A%20%20%20%20%20%20SELECT%20%3Fchild%20%3Frgb%20%3Fparent%20%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20SERVICE%20gas%3Aservice%20%7B%0A%20%20%20%20%20%20%20%20%20%20gas%3Aprogram%20gas%3AgasClass%20%22com.bigdata.rdf.graph.analytics.BFS%22%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gas%3Ain%20wd%3A{{ q }}%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20We%20should%20not%20do%20undirected%20here%20because%20this%20could%20result%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20in%20very%20big%20graphs.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gas%3AtraversalDirection%20%22Forward%22%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gas%3Aout%20%3Fchild%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gas%3Aout1%20%3Fdepth%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gas%3Aout2%20%3Fparent1%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gas%3AlinkType%20wdt%3AP171%20%3B%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%3Fchild%20wdt%3AP171%20%3Fparent%20.%0A%20%20%20%20%20%20%20%20BIND%28IF%28%3Fchild%20%3D%20wd%3A{{ q }}%2C%20%22FF0000%22%2C%20%22FFFFFF%22%29%20AS%20%3Frgb%29%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%20%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%23%20Child%20taxons%0A%20%20%20%20%20%20SELECT%20%3Fchild%20%3Frgb%20%3Fparent%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20BIND%28wd%3A{{ q }}%20AS%20%3Fparent%29%0A%20%20%20%20%20%20%20%20%3Fchild%20wdt%3AP171%20%3Fparent%20.%20%0A%20%20%20%20%20%20%20%20BIND%28%22DDDDDD%22%20AS%20%3Frgb%29%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20LIMIT%20100%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%20%0A%20%20%20%20%20%20%20%20%20%20%0A%20%20%3Fchild%20rdfs%3Alabel%20%3Fchild_label%20.%20FILTER%28LANG%28%3Fchild_label%29%20%3D%20%27en%27%29%0A%20%20%3Fparent%20rdfs%3Alabel%20%3Fparent_label%20.%20FILTER%28LANG%28%3Fparent_label%29%20%3D%20%27en%27%29%0A%20%20OPTIONAL%20%7B%0A%20%20%20%20%3Fchild%20wdt%3AP105%20%2F%20rdfs%3Alabel%20%3Fchild_rank_label%20.%20FILTER%20%28LANG%28%3Fchild_rank_label%29%20%3D%20%27en%27%29%0A%20%20%7D%0A%20%20OPTIONAL%20%7B%0A%20%20%20%20%3Fparent%20wdt%3AP105%20%2F%20rdfs%3Alabel%20%3Fparent_rank_label%20.%20FILTER%20%28LANG%28%3Fparent_rank_label%29%20%3D%20%27en%27%29%0A%20%20%7D%0A%20%20BIND%28CONCAT%28%3Fchild_label%2C%20%22%20-%20%22%2C%20COALESCE%28%3Fchild_rank_label%2C%20%22%3F%3F%3F%22%29%29%20AS%20%3FchildLabel%29%0A%20%20BIND%28CONCAT%28%3Fparent_label%2C%20%22%20-%20%22%2C%20COALESCE%28%3Fparent_rank_label%2C%20%22%3F%3F%3F%22%29%29%20AS%20%3FparentLabel%29%0A%0A%7D"></iframe>
 </div>
 
 
 
-<h2 id="Genome">Genome</h2>
+<h2 id="genome">Genome</h2>
 
-<table class="table table-hover" id="genome"></table>
+<table class="table table-hover" id="genome-table"></table>
 
 
-<h2 id="Metabolome">Metabolome</h2>
+<h2 id="metabolome">Metabolome</h2>
 
-<table class="table table-hover" id="metabolome"></table>
+<table class="table table-hover" id="metabolome-table"></table>
 
 
 {% endblock %}
