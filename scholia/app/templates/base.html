@@ -47,6 +47,18 @@
 	 catch(e) {}
 
 	 try {
+	     var mastodonAccount = item.claims.P4033[0].mainsnak.datavalue.value;
+	     var mastodonComponents = mastodonAccount.split("@");
+	     if (mastodonComponents.length == 2) {
+			detailsList.push( '<img alt="Twitter t icon" src="' +
+			       'https://upload.wikimedia.org/wikipedia/commons/4/48/Mastodon_Logotype_%28Simple%29.svg' +
+			       '" width="16" height="16" hspace="4" /> <a href="https://' + mastodonComponents[1] + '/@' +
+			       encodeURI( mastodonComponents[0] ) + '">@' + escapeHTML( mastodonComponents[0] ) + '</a> ');
+		}
+	 }
+	 catch(e) { }
+
+	 try {
 	     var twitterAccount = item.claims.P2002[0].mainsnak.datavalue.value;
 	     detailsList.push( '<img alt="Twitter t icon" src="' +
 			       'https://upload.wikimedia.org/wikipedia/commons/8/8b/Twitter_logo_initial.svg' +
