@@ -249,6 +249,12 @@ WITH {
       }
       GROUP BY ?event
     }  
+    UNION
+    {
+      VALUES ?online_event { wd:Q1543677 wd:Q98381855 wd:Q98381912 }
+      ?event wdt:P31 ?online_event .
+      BIND(200 AS ?location_scores)
+    }
   
     BIND((?time_scores * ?location_scores) AS ?scores)
   }

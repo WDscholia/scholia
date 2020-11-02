@@ -219,12 +219,20 @@ def entities_to_works_rss(entities):
     rss : str
         RSS-formatted list of work items.
 
+    Notes
+    -----
+    Wikidata entities without a publication date are skipped.
+
     """
     rss = u('')
     for entity in entities:
         qid = _value(entity, 'work')[31:]
         url = 'https://scholia.toolforge.org/work/' + qid
-        item_date = parse_datetime(_value(entity, 'date'))
+        date_value = _value(entity, 'date')
+        if not date_value:
+            # Skip items without a publication date
+            continue
+        item_date = parse_datetime(date_value)
 
         # Dirty hack to get around the problem with dates before 1900
         old_year = item_date.year

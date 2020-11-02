@@ -1623,6 +1623,59 @@ def show_venue_missing(q):
     return render_template('venue_missing.html', q=q)
 
 
+@main.route('/venue/' + q_pattern + '/cito')
+def show_venue_cito(q):
+    """Return HTML rendering for Citation Typing Ontology annotation of citations.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('venue_cito.html', q=q)
+
+
+@main.route('/cito/' + q_pattern)
+def show_cito(q):
+    """Return HTML rendering for a specific Citation Typing Ontology intention.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('cito.html', q=q)
+
+
+@main.route('/cito/')
+def show_cito_empty():
+    """Return rendered HTML about CiTO annotation in Wikidata.
+
+    Return rendered HTML index page with general info about CiTO annotation
+    in Wikidata.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page with general info about CiTO annotation
+        in Wikidata.
+
+    """
+    return render_template('cito_empty.html')
+
+
 @main.route('/venue/' + q_pattern + '/latest-works/rss')
 def show_venue_rss(q):
     """Return a RSS feed for specific venue.
