@@ -17,7 +17,7 @@ function capitalizeFirstLetter(string) {
 }
 
 
-function convertDataTableData(data, columns, linkPrefixes={}) {
+function convertDataTableData(data, columns, linkPrefixes={}, linkSuffixes={}) {
     // Handle 'Label' columns.
 
     // var linkPrefixes = (options && options.linkPrefixes) || {};
@@ -46,6 +46,7 @@ function convertDataTableData(data, columns, linkPrefixes={}) {
 		convertedRow[key] = '<a href="' +
 		    (linkPrefixes[key] || "../") + 
 		    data[i][key].substr(31) +
+            (linkSuffixes[key] || "") +
 		    '">' + data[i][key + 'Label'] + '</a>';
 	    } else if (key.substr(-5) == 'Label') {
 		// pass
@@ -120,8 +121,9 @@ function sparqlDataToSimpleData(response) {
 
 
 function sparqlToDataTable(sparql, element, options={}) {
-    // Options: linkPrefixes={}, paging=true
+    // Options: linkPrefixes={}, linkSuffixes={}, paging=true
     var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
+    var linkSuffixes = (typeof options.linkSuffixes === 'undefined') ? {} : options.linkSuffixes;
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=" + 
@@ -130,7 +132,7 @@ function sparqlToDataTable(sparql, element, options={}) {
     $.getJSON(url, function(response) {
 	var simpleData = sparqlDataToSimpleData(response);
 
-	convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes=linkPrefixes);
+	convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes=linkPrefixes, linkSuffixes=linkSuffixes);
 	columns = [];
 	for ( i = 0 ; i < convertedData.columns.length ; i++ ) {
 	    var column = {
