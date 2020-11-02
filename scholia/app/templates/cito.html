@@ -18,7 +18,10 @@ SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) ?journal ?journalLabel WHERE {
   `
 
  $(document).ready(function() {
-     sparqlToDataTable(journalsSparql, "#journals");
+     sparqlToDataTable(journalsSparql, "#journals", {
+         linkPrefixes: { journal: "../../venue/", },
+         linkSuffixes: { journal: "/cito", }
+     });
  });
  </script>
 
