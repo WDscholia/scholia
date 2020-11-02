@@ -15,7 +15,7 @@ Examples
 
 References
 ----------
-  https://tools.wmflabs.org/wikidata-todo/quick_statements.php
+  https://wikidata-todo.toolforge.org/quick_statements.php
 
 """
 

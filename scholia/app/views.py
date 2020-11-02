@@ -15,11 +15,11 @@ from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      github_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
-                     q_to_class, random_author, twitter_to_qs,
+                     q_to_class, q_to_dois, random_author, twitter_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
-                     pubchem_to_qs, atomic_number_to_qs, ncbitaxon_to_qs,
-                     ncbigene_to_qs)
+                     pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
+                     ncbi_gene_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -703,7 +703,7 @@ def show_faq():
 
 
 @main.route('/ncbi-gene/<gene>')
-def redirect_ncbigene(gene):
+def redirect_ncbi_gene(gene):
     """Detect and redirect for NCBI gene identifiers.
 
     Parameters
@@ -712,7 +712,7 @@ def redirect_ncbigene(gene):
         NCBI gene identifier.
 
     """
-    qs = ncbigene_to_qs(gene)
+    qs = ncbi_gene_to_qs(gene)
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_gene', q=q), code=302)
@@ -923,7 +923,7 @@ def redirect_pubmed(pmid):
 
 
 @main.route('/ncbi-taxon/<taxon>')
-def redirect_ncbitaxon(taxon):
+def redirect_ncbi_taxon(taxon):
     """Detect and redirect for NCBI taxon identifiers.
 
     Parameters
@@ -932,7 +932,7 @@ def redirect_ncbitaxon(taxon):
         NCBI taxon identifier.
 
     """
-    qs = ncbitaxon_to_qs(taxon)
+    qs = ncbi_taxon_to_qs(taxon)
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_taxon', q=q), code=302)
@@ -1623,6 +1623,59 @@ def show_venue_missing(q):
     return render_template('venue_missing.html', q=q)
 
 
+@main.route('/venue/' + q_pattern + '/cito')
+def show_venue_cito(q):
+    """Return HTML rendering for Citation Typing Ontology annotation of citations.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('venue_cito.html', q=q)
+
+
+@main.route('/cito/' + q_pattern)
+def show_cito(q):
+    """Return HTML rendering for a specific Citation Typing Ontology intention.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('cito.html', q=q)
+
+
+@main.route('/cito/')
+def show_cito_empty():
+    """Return rendered HTML about CiTO annotation in Wikidata.
+
+    Return rendered HTML index page with general info about CiTO annotation
+    in Wikidata.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page with general info about CiTO annotation
+        in Wikidata.
+
+    """
+    return render_template('cito_empty.html')
+
+
 @main.route('/venue/' + q_pattern + '/latest-works/rss')
 def show_venue_rss(q):
     """Return a RSS feed for specific venue.
@@ -1879,7 +1932,11 @@ def show_work(q):
         Rendered HTML page for specific work.
 
     """
-    return render_template('work.html', q=q)
+    try:
+        dois = q_to_dois(q)
+    except Exception:
+        dois = []
+    return render_template('work.html', q=q, dois=dois)
 
 
 @main.route('/work/')

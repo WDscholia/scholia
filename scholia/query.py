@@ -47,7 +47,7 @@ Examples
 
 from __future__ import absolute_import, division, print_function
 
-from random import random
+from random import randrange
 
 import requests
 
@@ -390,7 +390,7 @@ def ror_to_qs(rorid):
             for item in data['results']['bindings']]
 
 
-def ncbigene_to_qs(gene):
+def ncbi_gene_to_qs(gene):
     """Convert a NCBI gene identifier to Wikidata ID.
 
     Wikidata Query Service is used to resolve the NCBI gene identifier.
@@ -410,7 +410,7 @@ def ncbigene_to_qs(gene):
 
     Examples
     --------
-    >>> ncbi-taxon_to_qs('694009') == ['Q278567']
+    >>> ncbi_taxon_to_qs('694009') == ['Q278567']
     True
 
     """
@@ -426,7 +426,7 @@ def ncbigene_to_qs(gene):
             for item in data['results']['bindings']]
 
 
-def ncbitaxon_to_qs(taxon):
+def ncbi_taxon_to_qs(taxon):
     """Convert a NCBI taxon identifier to Wikidata ID.
 
     Wikidata Query Service is used to resolve the NCBI taxon identifier.
@@ -446,7 +446,7 @@ def ncbitaxon_to_qs(taxon):
 
     Examples
     --------
-    >>> ncbi-taxon_to_qs('694009') == ['Q278567']
+    >>> ncbi_taxon_to_qs('694009') == ['Q278567']
     True
 
     """
@@ -587,6 +587,41 @@ def mesh_to_qs(meshid):
 
     return [item['cmp']['value'][31:]
             for item in data['results']['bindings']]
+
+
+def q_to_dois(q):
+    """Get DOIs for a Q item.
+
+    Query the Wikidata Query Service to get zero or more DOIs for a particular
+    Q item identified by the Q identifier.
+
+    Parameters
+    ----------
+    q : str
+        String with Wikidata Q identifier.
+
+    Returns
+    -------
+    dois : list of str
+        List with zero or mores strings each containing a DOI.
+
+    Examples
+    --------
+    >>> dois = q_to_dois("Q87191917")
+    >>> dois == ['10.1016/S0140-6736(20)30211-7']
+    True
+
+    """
+    query = """SELECT ?doi {{ wd:{q} wdt:P356 ?doi }}""".format(q=q)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    results = data['results']['bindings']
+    dois = [result['doi']['value'] for result in results]
+    return dois
 
 
 def q_to_label(q, language='en'):
@@ -1287,12 +1322,10 @@ def random_author():
 
     Notes
     -----
-    The SPARQL query is somewhat slow and takes several seconds. It sample
-    uniformly among authorships rather than authors. The SPARQL query is this:
-
-    `SELECT ?author {{ [] wdt:P50 ?author . }}`
-
     The author returned is not necessarily a scholarly author.
+
+    The algorithm uses a somewhat hopeful randomization and if no author is
+    found it falls back on Q18618629.
 
     Examples
     --------
@@ -1301,13 +1334,22 @@ def random_author():
     True
 
     """
-    count = count_authorships()
-    offset = int(random() * count)
+    # Generate 100 random Q-items and hope that one of them is a work with an
+    # author
+    values = " ".join("wd:Q{}".format(randrange(1, 100000000))
+                      for _ in range(100))
 
-    query = """SELECT ?author {{ [] wdt:P50 ?author . }}
-               OFFSET {} LIMIT 1""".format(offset)
+    query = """SELECT ?author {{
+                 VALUES ?work {{ {values} }}
+                 ?work wdt:P50 ?author .
+               }}
+               LIMIT 1""".format(values=values)
     bindings = query_to_bindings(query)
-    q = bindings[0]['author']['value'][31:]
+    if len(bindings) > 0:
+        q = bindings[0]['author']['value'][31:]
+    else:
+        # Fallback
+        q = "Q18618629"
     return q
 
 
@@ -1381,12 +1423,12 @@ def main():
             print(qs[0])
 
     elif arguments['ncbi-gene-to-q']:
-        qs = ncbigene_to_qs(arguments['<gene>'])
+        qs = ncbi_gene_to_qs(arguments['<gene>'])
         if len(qs) > 0:
             print(qs[0])
 
     elif arguments['ncbi-taxon-to-q']:
-        qs = ncbitaxon_to_qs(arguments['<taxon>'])
+        qs = ncbi_taxon_to_qs(arguments['<taxon>'])
         if len(qs) > 0:
             print(qs[0])
 

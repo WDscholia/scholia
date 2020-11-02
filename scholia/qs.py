@@ -24,12 +24,12 @@ def paper_to_quickstatements(paper):
 
     References
     ----------
-    https://tools.wmflabs.org/wikidata-todo/quick_statements.php
+    https://quickstatements.toolforge.org
 
     Notes
     -----
-    title, authors (list), date, year, language_q, url, full_text_url,
-    published_in_q are recognized.
+    title, authors (list), date, doi, year, language_q, volume, issue, pages,
+    number_of_pages, url, full_text_url, published_in_q are recognized.
 
     `date` takes precedence over `year`.
 
@@ -45,6 +45,10 @@ def paper_to_quickstatements(paper):
     # Title
     qs += u('LAST\tP1476\ten:"{}"\n').format(title)
 
+    # DOI
+    if 'doi' in paper:
+        qs += u('LAST\tP356\t"{}"\n').format(escape_string(paper['doi']))
+
     # Authors
     for n, author in enumerate(paper['authors'], start=1):
         qs += u('LAST\tP2093\t"{}"\tP1545\t"{}"\n').format(author, n)
@@ -57,15 +61,31 @@ def paper_to_quickstatements(paper):
         # Year precision
         qs += 'LAST\tP577\t+{}-01-01T00:00:00Z/9\n'.format(paper['year'])
 
+    # Volume
+    if 'volume' in paper:
+        qs += u('LAST\tP478\t"{}"\n').format(escape_string(paper['volume']))
+
+    # Issue
+    if 'issue' in paper:
+        qs += u('LAST\tP433\t"{}"\n').format(escape_string(paper['issue']))
+
+    if 'pages' in paper:
+        qs += u('LAST\tP304\t"{}"\n').format(escape_string(paper['pages']))
+
+    if 'number_of_pages' in paper:
+        qs += u('LAST\tP1104\t{}\n').format(paper['number_of_pages'])
+
     # Language
     if 'language_q' in paper:
         qs += 'LAST\tP407\t{}\n'.format(paper['language_q'])
 
     # Homepage
-    qs += 'LAST\tP856\t"{}"\n'.format(paper['url'])
+    if 'url' in paper:
+        qs += 'LAST\tP856\t"{}"\n'.format(paper['url'])
 
     # Fulltext URL
-    qs += 'LAST\tP953\t"{}"\n'.format(paper['full_text_url'])
+    if 'full_text_url' in paper:
+        qs += 'LAST\tP953\t"{}"\n'.format(paper['full_text_url'])
 
     # Published in
     if 'published_in_q' in paper and paper['published_in_q']:

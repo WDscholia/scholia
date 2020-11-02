@@ -135,7 +135,7 @@ $(document).ready(function() {
     if ("wpid" in dataValues) {
       const pathwayViewerIFrameResults = $.find("#pathway-viewer > iframe");
       pathwayViewerIFrameResults.every(function(pathwayViewerIFrameResult) {
-        pathwayViewerIFrameResult.setAttribute("src", `https://tools.wmflabs.org/pathway-viewer/?id=${dataValues.wpid}`);
+        pathwayViewerIFrameResult.setAttribute("src", `https://pathway-viewer.toolforge.org/?id=${dataValues.wpid}`);
       });
       pathwayViewerSection.style.display = "";
     }

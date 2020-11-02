@@ -47,18 +47,6 @@
 	 catch(e) {}
 
 	 try {
-	     var doi = item.claims.P356[0].mainsnak.datavalue.value;
-	     detailsList.push( 'DOI: <a href="https://doi.org/' + encodeURI( doi ) + '">' + escapeHTML( doi ) + '</a> ');
-	 }
-	 catch(e) {}
-	 
-	 try {
-	     var fullTextUrl = item.claims.P953[0].mainsnak.datavalue.value;
-	     detailsList.push( '<a href="' + fullTextUrl + '">' + fullTextUrl + '</a> ');
-	 }
-	 catch(e) {}
-
-	 try {
 	     var twitterAccount = item.claims.P2002[0].mainsnak.datavalue.value;
 	     detailsList.push( '<img alt="Twitter t icon" src="' +
 			       'https://upload.wikimedia.org/wikipedia/commons/8/8b/Twitter_logo_initial.svg' +
@@ -69,7 +57,7 @@
 
 	 try {
 	     var hashtag = item.claims.P2572[0].mainsnak.datavalue.value;
-	     detailsList.push( '<a href="https://tools.wmflabs.org/hashtags-hub/' +
+	     detailsList.push( '<a href="https://hashtags-hub.toolforge.org/' +
 			       encodeURI( hashtag ) + '">#' + escapeHTML( hashtag ) + '</a> ');
 	 }
 	 catch(e) {}
@@ -267,7 +255,7 @@
 
 
      /* Wembedder */
-     var wembedderUrl = "https://tools.wmflabs.org/wembedder/api/most-similar/{{ q }}";
+     var wembedderUrl = "https://wembedder.toolforge.org/api/most-similar/{{ q }}";
      $.ajax({
 	 url: wembedderUrl,
 	 success: function (data) {
@@ -475,13 +463,15 @@
     Code from
     <a href="https://github.com/fnielsen/scholia">GitHub repository</a>
     |
-    Hosted on   <a href="https://tools.wmflabs.org/">Wikimedia Toolforge</a>,
+    Hosted on   <a href="https://toolforge.org/">Wikimedia Toolforge</a>,
     a <a href="https://wikimediafoundation.org">Wikimedia Foundation</a> service
     |
     License for content: CC0 for data, CC-BY-SA for text and media
     |
     Report technical problems at Scholia's
     <a href="https://github.com/fnielsen/scholia/issues">Issues</a> GitHub page.
+    |
+    Follow us on <a href="https://twitter.com/wdscholia">Twitter</a>.
     <hr>
   </div>
 {% endblock %}
