@@ -434,18 +434,6 @@ topics of authored works and topics of citing works.
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fscore%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28SUM%28%3Fscore_%29%20AS%20%3Fscore%29%0A%20%20%20%20%3Ftopic%0A%20%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP101%20%3Ftopic%20.%0A%20%20%20%20%20%20BIND%2820%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%283%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%281%20AS%20%3Fscore_%29%20%3Ftopic%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP921%20%3Ftopic%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%7D%20AS%20%25results%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cjp%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fscore%29%0ALIMIT%20200"></iframe>
 </div>
 
-<h3>Topics of authored works</h3>
-
-<table class="table table-hover" id="topics"></table>
-
-<h2 id="Topics-works matrix">Topics-works matrix</h2>
-
-<div id="topics-works-matrix"></div>
-
-<!-- <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ADimensions%0ASELECT%20%3Fcount%20%3Ftheme_label%20%3Fwork_label%20WHERE%20%7B%0A%20%20%7B%20%0A%20%20%20%20SELECT%20%3Ftheme%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%09%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Ftheme%0A%20%20%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%3Ftheme%20rdfs%3Alabel%20%3Ftheme_label%20.%20FILTER%20%28LANG%28%3Ftheme_label%29%20%3D%20%27en%27%29%0A%20%20%3Fwork%20rdfs%3Alabel%20%3Flong_work_label%20.%20FILTER%20%28LANG%28%3Flong_work_label%29%20%3D%20%27en%27%29%0A%20%20BIND%28SUBSTR%28%3Flong_work_label%2C%201%2C%2060%29%20AS%20%3Fwork_label%29%0A%7D%20"></iframe>
-</div -->
-
 
 <h3>Topics of authored works</h3>
 
@@ -454,14 +442,9 @@ topics of authored works and topics of citing works.
 <h2 id="Topics-works matrix">Topics-works matrix</h2>
 
 <div id="topics-works-matrix"></div>
-
-<!-- <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ADimensions%0ASELECT%20%3Fcount%20%3Ftheme_label%20%3Fwork_label%20WHERE%20%7B%0A%20%20%7B%20%0A%20%20%20%20SELECT%20%3Ftheme%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20%09%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Ftheme%0A%20%20%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20%7D%0A%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%3Fwork%20wdt%3AP921%20%3Ftheme%20.%0A%20%20%3Ftheme%20rdfs%3Alabel%20%3Ftheme_label%20.%20FILTER%20%28LANG%28%3Ftheme_label%29%20%3D%20%27en%27%29%0A%20%20%3Fwork%20rdfs%3Alabel%20%3Flong_work_label%20.%20FILTER%20%28LANG%28%3Flong_work_label%29%20%3D%20%27en%27%29%0A%20%20BIND%28SUBSTR%28%3Flong_work_label%2C%201%2C%2060%29%20AS%20%3Fwork_label%29%0A%7D%20"></iframe>
-</div -->
 
 
 <h2 id="Venue statistics">Venue statistics</h2>
-
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fvenue%20%28SAMPLE%28%3Fvenue_label_%29%20AS%20%3Fvenue_label%29%20%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20as%20%3Fcount%29%20%3Fvenue%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20%3Fvenue%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fvenue%0A%7D%20AS%20%25counts%0AWHERE%20%7B%0A%20%20INCLUDE%20%25counts%0A%20%20%3Fvenue%20rdfs%3Alabel%20%3Flong_venue_label%20FILTER%28LANG%28%3Flong_venue_label%29%20%3D%20%27en%27%29%0A%20%20OPTIONAL%20%7B%20%3Fvenue%20wdt%3AP1813%20%3Fshort_name%20.%20%7D%0A%20%20BIND%28COALESCE%28%3Fshort_name%2C%20%3Flong_venue_label%29%20AS%20%3Fvenue_label_%29%0A%7D%0AGROUP%20BY%20%3Fvenue%20%3Fcount%0AORDER%20BY%20DESC%28%3Fcount%29%20%20"></iframe>
