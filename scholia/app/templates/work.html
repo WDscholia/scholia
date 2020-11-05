@@ -124,7 +124,7 @@ WHERE {
       ?authorstring_statement pq:P1545 ?order_ .
       BIND(xsd:integer(?order_) AS ?order)
     }
-    BIND(CONCAT("https://author-disambiguator.toolforge.org/?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_)) AS ?authorUrl)
+    BIND(CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_)) AS ?authorUrl)
   }
 }
 ORDER BY ?order
