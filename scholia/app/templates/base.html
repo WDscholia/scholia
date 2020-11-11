@@ -112,7 +112,7 @@
 	       }
 	       if (item.claims.P234 && item.claims.P234[0].mainsnak.datavalue) {
 	          var inchi = item.claims.P234[0].mainsnak.datavalue.value;
-	          bioschemasAnnotation.inChI = "InChI=" + inchi ;
+	          bioschemasAnnotation.inChI = inchi ;
 	       }
 	       if (item.claims.P274 && item.claims.P274[0].mainsnak.datavalue) {
 	          var chemformula = item.claims.P274[0].mainsnak.datavalue.value;
