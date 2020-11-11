@@ -9,7 +9,7 @@
  structuresSparql = `
 SELECT
   ?Structural_identifier ?Structural_identifierLabel
-  ?value (SAMPLE(?idUrls) as ?idUrl)
+  ?idLit (SAMPLE(?idUrls) as ?idUrl)
 WITH {
   SELECT ?Structural_identifier ?idLit ?formatterurl WHERE {
     VALUES ?Structural_identifier { wd:P233 wd:P234 wd:P2017 }
@@ -21,23 +21,11 @@ WITH {
     }
   } LIMIT 500
 } AS %RESULTS {
-  { SELECT * WHERE {
-      INCLUDE %RESULTS
-      FILTER (?Structural_identifier = wd:P234)
-      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?idLit)))) AS ?idUrls).
-      BIND(CONCAT("InChI=",?idLit) AS ?value) .
-    }
-  } UNION {
-    SELECT * WHERE {
-      INCLUDE %RESULTS
-      FILTER (?Structural_identifier != wd:P234)
-      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?idLit))) AS ?idUrls).
-      BIND(?idLit AS ?value) .
-    }
-  }
+  INCLUDE %RESULTS
+  BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?idLit))) AS ?idUrls).
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-GROUP BY ?Structural_identifier ?Structural_identifierLabel ?value
+GROUP BY ?Structural_identifier ?Structural_identifierLabel ?idLit
 ORDER BY ASC(?ID_TypeLabel)
 `
 
