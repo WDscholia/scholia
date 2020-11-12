@@ -11,7 +11,7 @@ SELECT
   (COUNT(?work) AS ?count) 
   ?author_name
   (CONCAT(
-      'https://author-disambiguator.toolforge.org/?doit=Look+for+author&name=',
+      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
       ENCODE_FOR_URI(?author_name)) AS ?author_resolver_url)
 WHERE {
   {
@@ -42,7 +42,7 @@ SELECT
   ?researcher ?researcherLabel
   ?author_name
   (CONCAT(
-      "https://author-disambiguator.toolforge.org/?doit=Look+for+author&name=",
+      "https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=",
       ENCODE_FOR_URI(?author_name ), "&filter=wdt%3AP50+wd%3A", ?qid ) AS ?resolver_url)
 
 WITH {
@@ -85,7 +85,7 @@ SELECT
   ?researcher ?researcherLabel
   ?author_name
   (CONCAT(
-      "https://author-disambiguator.toolforge.org/?doit=Look+for+author&name=",
+      "https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=",
       ENCODE_FOR_URI(?author_name ), "&filter=wdt%3AP50+wd%3A", ?qid ) AS ?resolver_url)
 
 WITH {
