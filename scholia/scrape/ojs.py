@@ -208,29 +208,51 @@ def scrape_paper_from_url(url):
         content = elements[0].attrib['content']
         return content
 
+    def _fields_to_content(fields):
+        for field in fields:
+            content = _field_to_content(field)
+            if content is not None:
+                return content
+        else:
+            return None
+
     entry = {'url': url}
 
     response = requests.get(url)
     tree = etree.HTML(response.content)
 
-    entry['authors'] = [
+    authors = [
         author_element.attrib['content']
         for author_element in tree.xpath("//meta[@name='citation_author']")
     ]
+    if len(authors) > 0:
+        entry['authors'] = authors
+    else:
+        authors = [
+            author_element.attrib['content']
+            for author_element in
+            tree.xpath("//meta[@name='DC.Creator.PersonalName']")
+        ]
+        if len(authors) > 1:
+            entry['authors'] = authors
 
-    entry['title'] = _field_to_content('citation_title')
+    title = _fields_to_content(['citation_title', 'DC.Title'])
+    if title is not None:
+        entry['title'] = title
 
-    entry['date'] = _field_to_content('citation_date').replace('/', '-')
+    citation_date = _fields_to_content(['citation_date', 'DC.Date.issued'])
+    if citation_date is not None:
+        entry['date'] = citation_date.replace('/', '-')
 
-    doi = _field_to_content('citation_doi')
+    doi = _fields_to_content(['citation_doi', 'DC.Identifier.DOI'])
     if doi is not None:
         entry['doi'] = doi.upper()
 
-    volume = _field_to_content('citation_volume')
+    volume = _fields_to_content(['citation_volume', 'DC.Source.Volume'])
     if volume is not None:
         entry['volume'] = volume
 
-    issue = _field_to_content('citation_issue')
+    issue = _fields_to_content(['citation_issue', 'DC.Source.Issue'])
     if issue is not None:
         entry['issue'] = issue
 
@@ -252,24 +274,37 @@ def scrape_paper_from_url(url):
     pdf_url = _field_to_content('citation_pdf_url')
     if pdf_url is not None:
         entry['full_text_url'] = pdf_url
+    else:
+        pdf_urls = [
+            element.attrib['href']
+            for element in tree.xpath("//a[@class='obj_galley_link pdf']")
+        ]
+        if len(pdf_urls) > 0:
+            entry['full_text_url'] = pdf_urls[0]
 
-    language_as_iso639 = _field_to_content('citation_language')
-    if language_as_iso639 is None:
-        language_as_iso639 = _field_to_content('DC.Language')
-    language_q = iso639_to_q(language_as_iso639)
-    if language_q:
-        entry['language_q'] = language_q
+    language_as_iso639 = _fields_to_content(
+        ['citation_language', 'DC.Language'])
+    if language_as_iso639 is not None:
+        entry['iso639'] = language_as_iso639
+        language_q = iso639_to_q(language_as_iso639)
+        if language_q:
+            entry['language_q'] = language_q
 
-    entry['published_in_title'] = _field_to_content('citation_journal_title')
+    published_in_title = _fields_to_content(
+        ['citation_journal_title', 'DC.Source'])
+    if published_in_title is not None:
+        entry['published_in_title'] = published_in_title
 
     # Find journal/venue based on ISSN information
-    issn = _field_to_content('citation_issn')
-    if len(issn) == 8:
-        # Oslo Studies in Language OJS does not have a dash between the numbers
-        issn = issn[:4] + '-' + issn[4:]
-    qs = issn_to_qs(issn)
-    if len(qs) == 1:
-        entry['published_in_q'] = qs[0]
+    issn = _fields_to_content(['citation_issn', 'DC.Source.ISSN'])
+    if issn is not None:
+        if len(issn) == 8:
+            # Oslo Studies in Language OJS does not have a dash between the
+            # numbers
+            issn = issn[:4] + '-' + issn[4:]
+        qs = issn_to_qs(issn)
+        if len(qs) == 1:
+            entry['published_in_q'] = qs[0]
 
     return entry
 
