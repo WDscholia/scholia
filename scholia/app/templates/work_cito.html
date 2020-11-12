@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+<script type="text/javascript">
+  citoIncomingSparql = `
+SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
+  VALUES ?CITEDARTICLE { wd:{{ q }} }
+  ?citingArticle p:P2860 ?citationStatement .
+  ?citationStatement pq:P3712 ?intention ;
+                     ps:P2860 ?CITEDARTICLE .
+  ?intention wdt:P31 wd:Q96471816 .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?intention ?intentionLabel
+  ORDER BY DESC(?count)`
+
+  $(document).ready(function() {
+      sparqlToDataTable(citoIncomingSparql, "#cito-incoming", {
+         linkPrefixes: {
+             intention: "../../cito/",
+         }
+      });
+  });
+</script>
+
+{% endblock %}
+
+{% block page_content %}
+<h1 id="h1">Work</h1>
+
+<h2>Reasons why this article is cited</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fintention%20%3FintentionLabel%20%28COUNT%28DISTINCT%20%3FcitingArticle%29%20AS%20%3Fcount%29%20WHERE%20%7B%0A%20%20VALUES%20%3FCITEDARTICLE%20%7B%20wd%3A{{q}}%20%7D%0A%20%20%3FcitingArticle%20p%3AP2860%20%3FcitationStatement%20.%0A%20%20%3FcitationStatement%20pq%3AP3712%20%3Fintention%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20ps%3AP2860%20%3FCITEDARTICLE%20.%0A%20%20%3Fintention%20wdt%3AP31%20wd%3AQ96471816%20.%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%20GROUP%20BY%20%3Fintention%20%3FintentionLabel%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29"></iframe>
+</div>
+
+<table class="table table-hover" id="cito-incoming"></table>
+
+{% endblock %}
+    
