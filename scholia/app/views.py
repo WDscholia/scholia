@@ -1641,6 +1641,24 @@ def show_venue_cito(q):
     return render_template('venue_cito.html', q=q)
 
 
+@main.route('/work/' + q_pattern + '/cito')
+def show_work_cito(q):
+    """Return HTML rendering for Citation Typing Ontology annotation of citations.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('work_cito.html', q=q)
+
+
 @main.route('/cito/' + q_pattern)
 def show_cito(q):
     """Return HTML rendering for a specific Citation Typing Ontology intention.

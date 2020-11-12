@@ -11,16 +11,30 @@ SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) ?journal ?journalLabel WHERE {
   ?citingArticle p:P2860 ?citationStatement ;
                  wdt:P1433 ?journal .
   ?citationStatement pq:P3712 ?INTENTION .
-  ?intention wdt:P31 wd:Q96471816 .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 } GROUP BY ?journal ?journalLabel
   ORDER BY DESC(?count)
   `
 
+  articlesSparql =  `
+SELECT (COUNT(?citingArticle) AS ?count) ?citedArticle ?citedArticleLabel WHERE {
+  VALUES ?INTENTION { wd:{{ q }} }
+  ?citingArticle p:P2860 ?citationStatement .
+  ?citationStatement ps:P2860 ?citedArticle ;
+                     pq:P3712 ?INTENTION .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?citedArticle ?citedArticleLabel
+  ORDER BY DESC(?count)  `
+
+
  $(document).ready(function() {
      sparqlToDataTable(journalsSparql, "#journals", {
          linkPrefixes: { journal: "../../venue/", },
          linkSuffixes: { journal: "/cito", }
+     });
+     sparqlToDataTable(articlesSparql, "#articles", {
+         linkPrefixes: { citedArticle: "../../work/", },
+         linkSuffixes: { citedArticle: "/cito", }
      });
  });
  </script>
@@ -40,6 +54,9 @@ SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) ?journal ?journalLabel WHERE {
 
 <h2 id="Journals">Journals using this intention</h2>
 
+This table lists the journals with CiTO-annotated citations, sorted by decreasing number of articles
+making an citation for this intention.
+
 <table class="table table-hover" id="journals"></table>
 
 <h2 id="Articles by year">Articles by year</h2>
@@ -49,6 +66,12 @@ This plot shows the number of articles each year that use this citation intentio
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%20(STR(%3Fyear_)%20AS%20%3Fyear)%20(SUM(%3Fcount_)%20AS%20%3Fcount)%0AWHERE%20%7B%0A%20%20%7B%0A%20%20%20%20VALUES%20%3Fyear_%20%7B%202000%202001%202002%202003%202004%202005%202006%202007%202008%202009%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%202010%202011%202012%202013%202014%202015%202016%202017%202018%202019%20%7D%0A%20%20%20%20BIND(0%20AS%20%3Fcount_)%0A%20%20%7D%0A%20%20UNION%20%0A%20%20%7B%0A%20%20%20%20SELECT%0A%20%20%20%20%20%20%3Fyear_%0A%20%20%20%20%20%20(COUNT(DISTINCT%20%3Fciting_work)%20AS%20%3Fcount_)%0A%20%20%20%20%20%20%3Fkind%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20VALUES%20%3FINTENTION%20%7B%20wd%3A{{q}}%20%7D%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3FcitedArticle%20%3B%0A%20%20%20%20%20%20%20%20p%3AP2860%2Fpq%3AP3712%20%3FINTENTION%20.%0A%0A%20%20%20%20%20%20%23%20Year%20of%20citation%0A%20%20%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20%20%20%20%20BIND(YEAR(%3Fdate)%20AS%20%3Fyear_)%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Fyear_%20%3Fkind%0A%20%20%7D%0A%7D%0AGROUP%20BY%20%3Fyear_%0AORDER%20BY%20DESC(%3Fyear_)%20"></iframe>
 </div>
+
+<h2 id="Articles Most Cited">Articles most cited for this intention</h2>
+
+This table lists the articles that are most cited for this intention.
+
+<table class="table table-hover" id="articles"></table>
 
 
 {% endblock %}
