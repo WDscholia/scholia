@@ -6,49 +6,66 @@
 
 Scientific journals, proceedings, ...
 
+
+
+<div class="container">
 <h2>Examples</h2>
-
+<div class="card-deck mb-3">
+<div class="card mb-4 box-shadow">
+<div class="card-header">
+<h4 class="my-0 font-weight-normal">Profiles</h4>
+</div>
+<div class="card-body">
 <ul>
-    <li><a href="Q4775205">Antiquity</a></li>
-    <li><a href="Q752075">Astronomy and Astrophysics</a></li>
-    <li><a href="Q757509">Atmospheric Chemistry and Physics</a></li>
-    <li><a href="Q2000008">eLife</a></li>
-    <li><a href="Q15756118">Indoor Air</a></li>
-    <li><a href="Q15749959">International Journal for Equity in Health</a></li>
-    <li><a href="Q15749949">International Gambling Studies</a></li>
-    <li><a href="Q6294930">Journal of Cheminformatics</a></li>
-    <li><a href="Q10310912">Journal of Climate</a></li>
-    <li><a href="Q1247946">Journal of Personality and Social Psychology</a></li>
-    <li><a href="Q15761931">Journal of Sports Sciences</a></li>
-    <li><a href="Q1251128">Journal of Virology</a></li>
-    <li><a href="Q15757263">Marine Policy</a></li>
-    <li><a href="Q7070485">Nutrients</a></li>
-    <li><a href="Q15763433">Reading and Writing</a></li>
-    <li><a href="Q20895800">Research Ideas and Outcomes</a></li>
-    <li><a href="Q166544">Science, Technology & Human Values</a></li>
-    <li><a href="Q3478643">Sensors</a></li>
-    <li><a href="Q15813953">Sustainability</a></li>
-    <li><a href="Q219980">ZooKeys</a></li>    
+<li><a href="Q4775205">Antiquity</a></li>
+<li><a href="Q752075">Astronomy and Astrophysics</a></li>
+<li><a href="Q757509">Atmospheric Chemistry and Physics</a></li>
+<li><a href="Q2000008">eLife</a></li>
+<li><a href="Q15756118">Indoor Air</a></li>
+<li><a href="Q15749959">International Journal for Equity in Health</a></li>
+<li><a href="Q15749949">International Gambling Studies</a></li>
+<li><a href="Q6294930">Journal of Cheminformatics</a></li>
+<li><a href="Q10310912">Journal of Climate</a></li>
+<li><a href="Q1247946">Journal of Personality and Social Psychology</a></li>
+<li><a href="Q15761931">Journal of Sports Sciences</a></li>
+<li><a href="Q1251128">Journal of Virology</a></li>
+<li><a href="Q15757263">Marine Policy</a></li>
+<li><a href="Q7070485">Nutrients</a></li>
+<li><a href="Q15763433">Reading and Writing</a></li>
+<li><a href="Q20895800">Research Ideas and Outcomes</a></li>
+<li><a href="Q166544">Science, Technology &amp; Human Values</a></li>
+<li><a href="Q3478643">Sensors</a></li>
+<li><a href="Q15813953">Sustainability</a></li>
+<li><a href="Q219980">ZooKeys</a></li>
 </ul>
-
-
-<h3>Multiple venues</h3>
-
+</div>
+</div>
+<div class="card mb-4 box-shadow">
+<div class="card-header">
+<h4 class="my-0 font-weight-normal">Combinations</h4>
+</div>
+<div class="card-body">
 <ul>
-    <li><a href="../venues/Q15751424,Q15757725,Q15751497">Annals of Tourism Research, Journal of Sustainable Tourism, and Tourism Management</a></li>
-    <li><a href="../venues/Q15755805,Q15757650">Biogeosciences and Biogeochemistry</a></li>
-    <li><a href="../venues/Q1981225,Q5936947">NeuroImage and Human Brain Mapping</a></li>
+<li><a href="../venues/Q15751424,Q15757725,Q15751497">Annals of Tourism Research, Journal of Sustainable Tourism, and Tourism Management</a></li>
+<li><a href="../venues/Q15755805,Q15757650">Biogeosciences and Biogeochemistry</a></li>
+<li><a href="../venues/Q1981225,Q5936947">NeuroImage and Human Brain Mapping</a></li>
 </ul>
-
-
-<h3>Curation</h3>
-
-You can help improve Scholia profiles by curating the underlying data in Wikidata.
-
-For instance, the profile of each individual venue links to a dedicated curation page like <a href="../venue/Q15749954/missing">this one</a> for the <a href="/venue/Q15749954">Malaria Journal</a>, which is <a href="https://www.wikidata.org/entity/Q15749954">Q15749954</a> on Wikidata. 
-This curation page can also be reached by way of adding "/missing" to the URL of the venue profile, e.g. <a href="../venue/Q15749954/missing">/venue/Q15749954/missing</a> for the Malaria Journal.
-
-Another way to assist with curation would be to use the TABernacle tool to <a href="https://tools.wmflabs.org/tabernacle/?#/tab/sparql/SELECT%20DISTINCT%20%3Fitem%20%3FitemLabel%20%0AWHERE%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20SERVICE%20wikibase%3Amwapi%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aapi%20%22Search%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Aendpoint%20%22www.wikidata.org%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mwapi%3Asrsearch%20%22%20%20haswbstatement%3AP236%22%20.%20%0A%20%20%20%20%3Ftitle%20wikibase%3AapiOutput%20mwapi%3Atitle.%0A%20%20%7D%0A%20%20BIND(IRI(CONCAT(STR(wd%3A)%2C%20%3Ftitle))%20AS%20%3Fitem)%0A%20%20FILTER%20NOT%20EXISTS%20%7B%20%3Fitem%20wdt%3AP921%20%5B%5D%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0ALIMIT%201000/Len%3BDen%3BAen%3BP407%3BP921">add "main subject" statements to items about venues</a> for which Wikidata is missing that information. 
-
-{% endblock %}
+</div>
+</div>
+<div class="card mb-4 box-shadow">
+<div class="card-header">
+<h4 class="my-0 font-weight-normal">Curation</h4>
+</div>
+<div class="card-body"><p>
+  
+  </p>You can help improve Scholia profiles by curating the underlying data in Wikidata.</p>
+  <p>
+    For instance, the profile of each individual venue links to a dedicated curation page like <a href="../venue/Q15749954/missing">this one</a> for the <a href="../venue/Q15749954">Malaria Journal</a>, which is <a href="https://www.wikidata.org/entity/Q15749954">Q15749954</a> on Wikidata. This curation page can also be reached by way of adding "/missing" to the URL of the venue profile, e.g. <a href="../venue/Q15749954/missing">/venue/Q15749954/missing</a> for the Malaria Journal.  </p>
+  <p>
+    Another way to assist with curation would be to use the TABernacle tool to <a href="https://tabernacle.toolforge.org/#/tab/sparql/SELECT%20DISTINCT%20%3Fitem%20%3FitemLabel%20%0AWHERE%20%7B%0A%20%20hint%3AQuery%20hint%3Aoptimizer%20%22None%22.%0A%20%20SERVICE%20wikibase%3Amwapi%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aapi%20%22Search%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wikibase%3Aendpoint%20%22www.wikidata.org%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mwapi%3Asrsearch%20%22%20%20haswbstatement%3AP236%22%20.%20%0A%20%20%20%20%3Ftitle%20wikibase%3AapiOutput%20mwapi%3Atitle.%0A%20%20%7D%0A%20%20BIND(IRI(CONCAT(STR(wd%3A)%2C%20%3Ftitle))%20AS%20%3Fitem)%0A%20%20FILTER%20NOT%20EXISTS%20%7B%20%3Fitem%20wdt%3AP921%20%5B%5D%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%7D%0ALIMIT%201000/Len%3BDen%3BAen%3BP407%3BP921">add "main subject" statements to items about venues</a> for which Wikidata is missing that information.
+    </p>
+  </div>
+</div>
+</div>
+</div>{% endblock %}
   
