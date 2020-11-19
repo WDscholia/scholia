@@ -5,18 +5,19 @@
 
 <script type="text/javascript">
  dataSparql = `
+
 SELECT ?description ?value ?valueUrl
 WHERE {
   BIND(wd:{{ q }} AS ?work)
   {
-    BIND(2 AS ?order)
+    BIND(1 AS ?order)
     BIND("Title" AS ?description)
     ?work wdt:P1476 ?value .
   }
   UNION
   {
     SELECT
-      (3 AS ?order)
+      (2 AS ?order)
       ("Authors" AS ?description)
       (GROUP_CONCAT(?value_; separator=", ") AS ?value)
       (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
@@ -32,7 +33,41 @@ WHERE {
   }
   UNION
   {
-    BIND(3 AS ?order)
+    SELECT
+      (3 AS ?order)
+      ("Editors" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      wd:{{ q }} wdt:P98 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      ?iri rdfs:label ?value_string . 
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    SELECT
+      (3 AS ?order)
+      ("Reviewers" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      wd:{{ q }} wdt:P4032 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      ?iri rdfs:label ?value_string . 
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    BIND(4 AS ?order)
     BIND("Published in" AS ?description)
     ?work wdt:P1433 ?iri .
     BIND(SUBSTR(STR(?iri), 32) AS ?q) 
@@ -44,6 +79,17 @@ WHERE {
   UNION
   {
     BIND(4 AS ?order)
+    BIND("Series" AS ?description)
+    ?work wdt:P179 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../series/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    BIND(6 AS ?order)
     BIND("Publication date" AS ?description)
     ?work p:P577 / psv:P577 ?publication_date_value .
     ?publication_date_value wikibase:timePrecision ?time_precision ;
@@ -53,7 +99,7 @@ WHERE {
   UNION
   {
     SELECT
-      (5 AS ?order)
+      (7 AS ?order)
       ("Topics" AS ?description)
       (GROUP_CONCAT(?value_; separator=", ") AS ?value)
       (CONCAT("../topics/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
@@ -78,55 +124,18 @@ WHERE {
   UNION
   {
     BIND(11 AS ?order)
+    BIND("Homepage" AS ?description)
+    ?work wdt:P856 ?valueUrl .
+    BIND(STR(?valueUrl) AS ?value)
+  }
+  UNION
+  {
+    BIND(12 AS ?order)
     BIND("Full text" AS ?description)
     ?work wdt:P953 ?valueUrl .
     BIND(CONCAT(STR(?valueUrl), " ↗") AS ?value)
   }
 } 
-ORDER BY ?order
-`
- 
- listOfAuthorsSparql = `
-# List of authors for a work
-SELECT
-  # Author order
-  ?order
-
-  # Author item and label
-  ?author ?authorUrl ?authorDescription
-  
-  ?orcid
-WHERE {
-  {
-    wd:{{ q }} p:P50 ?author_statement .
-    ?author_statement ps:P50 ?author_ .
-    ?author_ rdfs:label ?author .
-    FILTER (LANG(?author) = 'en')
-    BIND(CONCAT("../author/", SUBSTR(STR(?author_), 32)) AS ?authorUrl)
-    OPTIONAL {
-      ?author_statement pq:P1545 ?order_ .
-      BIND(xsd:integer(?order_) AS ?order)
-    }
-    OPTIONAL { ?author_ wdt:P496 ?orcid_ . }
-    # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
-    BIND(COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?author))) AS ?orcid)
-    OPTIONAL {
-      ?author_ schema:description ?authorDescription .
-      FILTER (LANG(?authorDescription) = "en")
-    }
-  }
-  UNION
-  {
-    wd:{{ q }} p:P2093 ?authorstring_statement .
-    ?authorstring_statement ps:P2093 ?author_
-    BIND(CONCAT("UNRESOLVED: ", ?author_) AS ?author)
-    OPTIONAL {
-      ?authorstring_statement pq:P1545 ?order_ .
-      BIND(xsd:integer(?order_) AS ?order)
-    }
-    BIND(CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_)) AS ?authorUrl)
-  }
-}
 ORDER BY ?order
 `
 
