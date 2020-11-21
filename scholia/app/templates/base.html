@@ -99,7 +99,22 @@ sparqlToIframe(`# tool: scholia
 	 catch(e) {}
 	 
 	 /* BioSchemas annotation */
-	 if (item.claims.P225) {
+	 console.log(item.claims.P31[0].mainsnak.datavalue.value.id)
+	 if (item.claims.P31[0].mainsnak.datavalue.value.id in set(['Q47461491', 'Q967847'])) {
+	   try { /* ChemicalSubstance */
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "ChemicalSubstance" ,
+	          "identifier" : "{{ q }}" ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       if ('en' in item.labels) {
+	         bioschemasAnnotation.name = item.labels.en.value;
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	       // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
+	    } catch(e) { console.log(e) }
+	 } else if (item.claims.P225) {
              try { /* Taxon */
 		 var taxonName = item.claims.P225[0].mainsnak.datavalue.value;
 		 bioschemasAnnotation = {
