@@ -1,5 +1,22 @@
 {% extends "bootstrap-base.html" %}
 
+{% macro sparql_to_table(panel, options={}) -%}
+// {{ panel }} table
+sparqlToDataTable2(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}
+`,
+"#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",
+options={{ options | tojson }});
+{%- endmacro %}
+
+{% macro sparql_to_iframe(panel) -%}
+// {{ panel }} iframe
+sparqlToIframe(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}`,
+"#{{ panel }}-iframe", "{{ aspect }}_{{ panel }}.sparql");
+{%- endmacro %}
+
+
 {% block head %}
 {{super()}}
 
@@ -52,11 +69,11 @@
 	     var mastodonAccount = item.claims.P4033[0].mainsnak.datavalue.value;
 	     var mastodonComponents = mastodonAccount.split("@");
 	     if (mastodonComponents.length == 2) {
-			detailsList.push( '<img alt="Twitter t icon" src="' +
-			       'https://upload.wikimedia.org/wikipedia/commons/4/48/Mastodon_Logotype_%28Simple%29.svg' +
-			       '" width="16" height="16" hspace="4" /> <a href="https://' + mastodonComponents[1] + '/@' +
-			       encodeURI( mastodonComponents[0] ) + '">@' + escapeHTML( mastodonComponents[0] ) + '</a> ');
-		}
+		 detailsList.push( '<img alt="Twitter t icon" src="' +
+				   'https://upload.wikimedia.org/wikipedia/commons/4/48/Mastodon_Logotype_%28Simple%29.svg' +
+				   '" width="16" height="16" hspace="4" /> <a href="https://' + mastodonComponents[1] + '/@' +
+				   encodeURI( mastodonComponents[0] ) + '">@' + escapeHTML( mastodonComponents[0] ) + '</a> ');
+	     }
 	 }
 	 catch(e) { }
 
@@ -83,88 +100,88 @@
 	 
 	 /* BioSchemas annotation */
 	 if (item.claims.P225) {
-        try { /* Taxon */
-	       var taxonName = item.claims.P225[0].mainsnak.datavalue.value;
-	       bioschemasAnnotation = {
-	          "@context" : "https://schema.org",
-	          "@type" : "Taxon" ,
-	          "name" : taxonName ,
-	          "url" : "http://www.wikidata.org/entity/{{ q }}"
-	       }
-	       if (item.claims.P105) {
-	          var taxonRank = item.claims.P105[0].mainsnak.datavalue.value.id;
-	          bioschemasAnnotation.taxonRank = "http://www.wikidata.org/entity/" + taxonRank ;
-	       }
-	       if (item.claims.P171) {
-	          var parent = item.claims.P171[0].mainsnak.datavalue.value.id;
-	          bioschemasAnnotation.parentTaxon = "http://www.wikidata.org/entity/" + parent ;
-	       }
-	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	       // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
-	    } catch(e) {}
+             try { /* Taxon */
+		 var taxonName = item.claims.P225[0].mainsnak.datavalue.value;
+		 bioschemasAnnotation = {
+	             "@context" : "https://schema.org",
+	             "@type" : "Taxon" ,
+	             "name" : taxonName ,
+	             "url" : "http://www.wikidata.org/entity/{{ q }}"
+		 }
+		 if (item.claims.P105) {
+	             var taxonRank = item.claims.P105[0].mainsnak.datavalue.value.id;
+	             bioschemasAnnotation.taxonRank = "http://www.wikidata.org/entity/" + taxonRank ;
+		 }
+		 if (item.claims.P171) {
+	             var parent = item.claims.P171[0].mainsnak.datavalue.value.id;
+	             bioschemasAnnotation.parentTaxon = "http://www.wikidata.org/entity/" + parent ;
+		 }
+		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+		 // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
+	     } catch(e) {}
 	 } else if (item.claims.P235) {
-	    try { /* Chemical Compound */
-	       var inchiKey = item.claims.P235[0].mainsnak.datavalue.value;
-	       bioschemasAnnotation = {
-	          "@context" : "https://schema.org",
-	          "@type" : "MolecularEntity" ,
-	          "identifier" : "{{ q }}" ,
-	          "inChIKey" : inchiKey ,
-	          "url" : "http://www.wikidata.org/entity/{{ q }}"
-	       }
-	       if (item.claims.P234 && item.claims.P234[0].mainsnak.datavalue) {
-	          var inchi = item.claims.P234[0].mainsnak.datavalue.value;
-	          bioschemasAnnotation.inChI = inchi ;
-	       }
-	       if (item.claims.P274 && item.claims.P274[0].mainsnak.datavalue) {
-	          var chemformula = item.claims.P274[0].mainsnak.datavalue.value;
-	          bioschemasAnnotation.molecularFormula = chemformula ;
-	       }
-	       if (item.claims.P2017 && item.claims.P2017[0].mainsnak.datavalue) {
-	          var smiles = item.claims.P2017[0].mainsnak.datavalue.value;
-	          bioschemasAnnotation.molecularFormula = smiles.replace("\"", "\'\'") ;
-	       } else if (item.claims.P233 && item.claims.P233[0].mainsnak.datavalue) {
-	          var smiles = item.claims.P233[0].mainsnak.datavalue.value;
-	          bioschemasAnnotation.smiles = smiles.replace("\"", "\'\'") ;
-	       }
-	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	    } catch(e) { console.log("Exception: " + e)
-	    }
+	     try { /* Chemical Compound */
+		 var inchiKey = item.claims.P235[0].mainsnak.datavalue.value;
+		 bioschemasAnnotation = {
+	             "@context" : "https://schema.org",
+	             "@type" : "MolecularEntity" ,
+	             "identifier" : "{{ q }}" ,
+	             "inChIKey" : inchiKey ,
+	             "url" : "http://www.wikidata.org/entity/{{ q }}"
+		 }
+		 if (item.claims.P234 && item.claims.P234[0].mainsnak.datavalue) {
+	             var inchi = item.claims.P234[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.inChI = inchi ;
+		 }
+		 if (item.claims.P274 && item.claims.P274[0].mainsnak.datavalue) {
+	             var chemformula = item.claims.P274[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.molecularFormula = chemformula ;
+		 }
+		 if (item.claims.P2017 && item.claims.P2017[0].mainsnak.datavalue) {
+	             var smiles = item.claims.P2017[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.molecularFormula = smiles.replace("\"", "\'\'") ;
+		 } else if (item.claims.P233 && item.claims.P233[0].mainsnak.datavalue) {
+	             var smiles = item.claims.P233[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.smiles = smiles.replace("\"", "\'\'") ;
+		 }
+		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	     } catch(e) { console.log("Exception: " + e)
+	     }
 	 } else if (item.claims.P352) { // UniProt ID
-	    try { /* Protein */
-	       var uniprot = item.claims.P352[0].mainsnak.datavalue.value;
-	       bioschemasAnnotation = {
-	          "@context" : "https://schema.org",
-	          "@type" : "Protein" ,
-	          "identifier" : "{{ q }}" ,
-	          "url" : "http://www.wikidata.org/entity/{{ q }}" ,
-	          "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
-	       }
-	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	    } catch(e) { console.log("Exception: " + e)
-	    }
+	     try { /* Protein */
+		 var uniprot = item.claims.P352[0].mainsnak.datavalue.value;
+		 bioschemasAnnotation = {
+	             "@context" : "https://schema.org",
+	             "@type" : "Protein" ,
+	             "identifier" : "{{ q }}" ,
+	             "url" : "http://www.wikidata.org/entity/{{ q }}" ,
+	             "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
+		 }
+		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	     } catch(e) { console.log("Exception: " + e)
+	     }
 	 } else if (item.claims.P351 || item.claims.P594) { // NCBI Gene or Ensembl
-	    try { /* Gene */
-	       bioschemasAnnotation = {
-	          "@context" : "https://schema.org",
-	          "@type" : "Gene" ,
-	          "identifier" : "{{ q }}" ,
-	          "url" : "http://www.wikidata.org/entity/{{ q }}"
-	       }
-	       counter = 0
-	       bioschemasAnnotation.sameAs = []
-	       if (item.claims.P351 && item.claims.P351[0].mainsnak.datavalue) {
-	          var ncbi = item.claims.P351[0].mainsnak.datavalue.value;
-	          bioschemasAnnotation.sameAs[counter] = "https://www.ncbi.nlm.nih.gov/gene/" + ncbi;
-	          counter++
-	       }
-	       if (item.claims.P594 && item.claims.P594[0].mainsnak.datavalue) {
-	          var ensembl = item.claims.P594[0].mainsnak.datavalue.value;
-	          bioschemasAnnotation.sameAs[counter] = "http://identifiers.org/ensembl/" + ensembl;
-	       }
-	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	    } catch(e) { console.log("Exception: " + e)
-	    }
+	     try { /* Gene */
+		 bioschemasAnnotation = {
+	             "@context" : "https://schema.org",
+	             "@type" : "Gene" ,
+	             "identifier" : "{{ q }}" ,
+	             "url" : "http://www.wikidata.org/entity/{{ q }}"
+		 }
+		 counter = 0
+		 bioschemasAnnotation.sameAs = []
+		 if (item.claims.P351 && item.claims.P351[0].mainsnak.datavalue) {
+	             var ncbi = item.claims.P351[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.sameAs[counter] = "https://www.ncbi.nlm.nih.gov/gene/" + ncbi;
+	             counter++
+		 }
+		 if (item.claims.P594 && item.claims.P594[0].mainsnak.datavalue) {
+	             var ensembl = item.claims.P594[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.sameAs[counter] = "http://identifiers.org/ensembl/" + ensembl;
+		 }
+		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	     } catch(e) { console.log("Exception: " + e)
+	     }
 	 }
 	 
 	 /* English Wikipedia */
@@ -311,25 +328,32 @@
  }
 
  $('#searchterm').keyup(function( e ) {
-      var q = $('#searchterm').val();
-      $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
-          search: q,
-          action: "wbsearchentities",
-          language: "en",
-          uselang: "en",
-          format: "json",
-          strictlanguage: true,
-        },
-        function(data) {
-          $("#searchresult").empty();
-          $.each(data.search, function(i, item) {
-            $("#searchresult")
-              .append("<div><a href='{{ url_for('app.index') }}" + item.title + "'>" + 
-                escapeHTML(item.label) + 
-                "</a> - " + escapeHTML(item.description) + "</div>");
-        });
-      });
-    });
+     var q = $('#searchterm').val();
+     $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
+         search: q,
+         action: "wbsearchentities",
+         language: "en",
+         uselang: "en",
+         format: "json",
+         strictlanguage: true,
+     },
+               function(data) {
+		   $("#searchresult").empty();
+		   $.each(data.search, function(i, item) {
+		       $("#searchresult")
+			   .append("<div><a href='{{ url_for('app.index') }}" + item.title + "'>" + 
+				   escapeHTML(item.label) + 
+				   "</a> - " + escapeHTML(item.description) + "</div>");
+		   });
+	       });
+ });
+
+ $(document).ready(function() {
+     
+     {% block in_ready %}{% endblock %}
+     
+ });
+
 
 </script>
 

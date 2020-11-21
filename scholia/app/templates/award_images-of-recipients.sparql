@@ -1,0 +1,23 @@
+#defaultView:ImageGrid
+SELECT
+  ?year
+  ?recipient ?recipientLabel 
+  ?image
+WITH {
+  SELECT ?recipient ?year (SAMPLE(?image_) AS ?image) WHERE {
+    ?recipient p:P166 ?award_statement . 
+    ?award_statement ps:P166 wd:{{ q }} .
+    OPTIONAL {
+      ?award_statement pq:P585 ?time .
+	  BIND(YEAR(?time) AS ?year)
+	}
+    ?recipient wdt:P18 ?image_ .
+  }
+  GROUP BY ?recipient ?year
+} AS %result
+WHERE {
+  INCLUDE %result 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+}
+ORDER BY DESC(?year)
+  
