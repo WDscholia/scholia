@@ -1,0 +1,16 @@
+#defaultView:Map
+SELECT DISTINCT ?recipient ?recipientLabel ?image ?item ?itemLabel ?geo ?layer
+WITH {
+  SELECT DISTINCT ?recipient ?image ?item ?geo (?property_item_label AS ?layer) WHERE {
+    ?recipient wdt:P166 wd:{{ q }} .
+    ?recipient ?property ?item . 
+    ?item wdt:P625 ?geo .
+    ?property_item wikibase:directClaim ?property .
+    ?property_item rdfs:label ?property_item_label . FILTER (LANG(?property_item_label) = 'en')
+    OPTIONAL { ?item wdt:P18 ?image . }
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}

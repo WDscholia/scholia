@@ -1,0 +1,16 @@
+SELECT
+  ?number_of_corecipients
+  ?award ?awardLabel ?awardDescription
+WITH {
+     SELECT DISTINCT ?award (COUNT(?recipient) AS ?number_of_corecipients) WHERE {
+    ?recipient wdt:P166 wd:{{ q }} .
+	?recipient wdt:P166 ?award .
+			       FILTER (?award != wd:{{ q }})
+     }
+     GROUP BY ?award
+} AS %result
+WHERE {
+  INCLUDE %result 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+}
+ORDER BY DESC(?number_of_corecipients)
