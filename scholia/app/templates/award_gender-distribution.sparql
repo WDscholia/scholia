@@ -1,0 +1,14 @@
+SELECT
+ ?count ?gender ?genderLabel 
+WITH {
+  SELECT (COUNT(DISTINCT ?recipient) AS ?count) ?gender WHERE {
+    ?recipient wdt:P166 wd:{{ q }} . 
+    ?recipient wdt:P21 ?gender . 
+  } 
+  GROUP BY ?gender
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,ep,fr,jp,nl,no,ru,sv,zh" . } 
+} 
+ORDER BY DESC(?count)

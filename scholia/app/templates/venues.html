@@ -22,7 +22,7 @@ WITH {
 WHERE {
   INCLUDE %result
   OPTIONAL { ?venue wdt:P123 ?publisher }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY ?venueLabel
 `
