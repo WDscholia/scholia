@@ -18,7 +18,7 @@ Scholia is mainly based on
 -  SPARQL to query the `Wikidata Query
    Service <http://query.wikidata.org/>`__
 
-Getting started - set up a local scholia server for testing purposes
+Getting started - set up a local Scholia server for testing purposes
 --------------------------------------------------------------------
 
 1. Clone Scholia repository from GitHub
@@ -59,7 +59,7 @@ Testing
 -------
 
 Rudimentary testing and code style checking are implemented via `tox`.
-Before committing please run the following code in the main directory, as pull requests
+Before committing, please run the following code in the main directory, as pull requests
 which give `tox` errors are not directly merged:
 
 .. code:: shell
@@ -72,11 +72,11 @@ cf. `Writing good commit messages <https://github.com/erlang/otp/wiki/writing-go
 Checks of pull requests
 -----------------------
 - Pull requests should have a reference to an issue number.
-- Branches should have be properly named with a name that is self-explanatory and reference to an issue number.
-- The code must be run with `tox` for style and test checks and any errors should be addressed. If it is not possible to fix the tox error then it should be indicated and discussed.
+- Branches should be properly named with a name that is self-explanatory and has a reference to an issue number.
+- The code must be run with `tox` for style, and test checks and any errors should be addressed. If it is not possible to fix the tox error, then it should be indicated and discussed.
 - Pull requests should only address one single problem.
-- Pull requests should not have superfluous code: Code used for debugging, code used to other work.
-- The code should be a of proper standard. 
+- Pull requests should not have superfluous code: Code used for debugging, code used to do other work.
+- The code should be of a proper standard. 
 
 Examples
 --------
@@ -86,7 +86,7 @@ Adding new SPARQL queries to Scholia
 1. Assign the task for yourself (if it is in an issue tracker)
 
 2. Write a new query and add it in a template file (e.g. in  ``/app/templates/sparql/author_awards.sparql``)
-   e.g. Note that ``{{ q }}`` will be formatted in based on the page that renders the template.
+   e.g. Note that ``{{ q }}`` will be formatted based on the page that renders the template.
    See example at https://github.com/fnielsen/scholia/pull/848/files.
 
 .. code:: sparql
@@ -98,7 +98,7 @@ Adding new SPARQL queries to Scholia
      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
    }
 
-4. Make a variable e.g. ``authorAwardsSparql`` that uses Jinja's templating system to load
+4. Make a variable e.g. ``authorAwardsSparql`` that uses `Jinja's <https://jinja.palletsprojects.com/>`_ templating system to load
    the SPARQL query from the file. The ``{{ q }}`` inside the template will be populated
    using the ``{{ q }}`` in the HTML template automatically.
 
