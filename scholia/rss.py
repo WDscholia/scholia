@@ -82,8 +82,7 @@ WITH {{
 }} AS %content {{
   INCLUDE %content
   SERVICE wikibase:label {{
-    bd:serviceParam wikibase:language
-    "[AUTO_LANGUAGE],en,da,es,fr,jp,nl,no,ru,sv,zh". }}
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }}
 }}
 ORDER BY DESC(?date)
 """

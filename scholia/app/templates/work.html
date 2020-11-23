@@ -326,7 +326,7 @@ WHERE {
   # Label the result
   INCLUDE %result
   OPTIONAL { ?author wdt:P496 ?orcid_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY DESC(?cited_works)
 `;
@@ -363,7 +363,7 @@ SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel WHERE {
   }
   hint:Prior hint:runFirst "true" .
   BIND(CONCAT(?title_, " ↗") AS ?title)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,fr,jp,ru,sv". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 } 
 `;
 

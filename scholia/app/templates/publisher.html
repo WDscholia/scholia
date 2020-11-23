@@ -28,7 +28,7 @@ WHERE {
     FILTER (LANG(?themes_labels) = 'en')
   }
   OPTIONAL { ?journal wdt:P1240 ?bfi . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,nl,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
 } 
 GROUP BY ?journal ?journalLabel
 ORDER BY DESC(?number_of_works)
@@ -56,7 +56,7 @@ WITH {
 WHERE {
   # Label the result
   INCLUDE %result 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,fr,jp,nl,sv,ru,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
 }
   `
 
@@ -78,7 +78,7 @@ WITH {
 WHERE {
   INCLUDE %result
   # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,es,da,sv,no,zh,ru,jp" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
 }
 ORDER BY DESC(?number_of_citations)
 `

@@ -39,7 +39,7 @@ WHERE {
   OPTIONAL { ?author wdt:P496 ?orcid . }
   
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY DESC(?count)
 LIMIT 50
@@ -93,7 +93,7 @@ WHERE {
   INCLUDE %result
   BIND(xsd:date(?datetime) AS ?date)
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .
   }
 }
 ORDER BY DESC(?date)
