@@ -1,0 +1,42 @@
+# title: physicochemical properties of this chemical
+SELECT DISTINCT ?propEntity ?propEntityLabel ?value ?units ?unitsLabel ?qualifiers ?source ?sourceLabel ?doi
+WITH {
+  SELECT DISTINCT ?propEntity ?value ?units ?source ?doi (GROUP_CONCAT(?qualifierStr; separator=", ") AS ?qualifiers) WHERE {
+    wd:{{ q }} ?propp ?statement .
+    ?statement a wikibase:BestRank ;
+      ?proppsv [
+        wikibase:quantityAmount ?value ;
+        wikibase:quantityUnit ?units
+      ] .
+    OPTIONAL {
+      ?statement prov:wasDerivedFrom/pr:P248 ?source .
+      OPTIONAL { ?source wdt:P356 ?doi . }
+    }
+    ?property wikibase:claim ?propp ;
+            wikibase:statementValue ?proppsv ;
+            wdt:P1629 ?propEntity ;
+            wdt:P31 wd:Q21077852 .
+    OPTIONAL {
+      {
+        ?qualifierProp wikibase:qualifier ?qualifier ;
+                       rdfs:label ?qProplabel; FILTER (lang(?qProplabel) = "en") .
+        ?qualifier a owl:DatatypeProperty .
+        ?statement ?qualifier ?qualifierVal .
+        BIND (CONCAT(str(?qProplabel), ": ", str(?qualifierVal)) AS ?qualifierStr)
+      } UNION {
+        ?qualifierProp wikibase:qualifier ?qualifier ;
+                       rdfs:label ?qProplabel; FILTER (lang(?qProplabel) = "en") .
+        ?qualifier a owl:ObjectProperty .
+        ?statement ?qualifier ?qualifierVal .
+        ?qualifierVal rdfs:label ?qVallabel; FILTER (lang(?qVallabel) = "en") .
+        BIND (CONCAT(str(?qProplabel), ": ", str(?qVallabel)) AS ?qualifierStr)
+      }
+    }
+  } GROUP BY ?propEntity ?value ?units ?source ?doi
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} 
+ORDER BY ASC(?propEntityLabel)
+

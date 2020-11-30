@@ -1,0 +1,35 @@
+# title: identifiers for this chemical
+SELECT
+  ?Identifier ?IdentifierLabel
+  ?Value (SAMPLE(?idUrls) as ?ValueUrl)
+  ?IdentifierDescription
+WITH {
+  SELECT ?Identifier ?Value ?formatterurl WHERE {
+    wd:{{ q }} ?IDdir ?Value .
+    ?Identifier wikibase:directClaim ?IDdir ;
+            wdt:P31 wd:Q19833835 .
+    OPTIONAL { 
+      ?Identifier wdt:P1630 ?formatterurl .
+    }
+    FILTER (?Identifier != wd:P233)
+    FILTER (?Identifier != wd:P234)
+    FILTER (?Identifier != wd:P2017)
+  } LIMIT 500
+} AS %RESULTS {
+  { SELECT * WHERE {
+      INCLUDE %RESULTS
+      FILTER (?Identifier = wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?Value)))) AS ?idUrls).
+    }
+  } UNION {
+    SELECT * WHERE {
+      INCLUDE %RESULTS
+      FILTER (?Identifier != wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?Value))) AS ?idUrls).
+    }
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+GROUP BY ?Identifier ?IdentifierLabel ?IdentifierDescription ?Value
+ORDER BY ASC(?IdentifierLabel)
+

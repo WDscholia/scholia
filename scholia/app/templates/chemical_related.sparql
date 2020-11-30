@@ -1,0 +1,10 @@
+# title: related chemical structures
+SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WHERE {
+  wd:{{ q }} wdt:P235 ?queryKey .
+  ?mol wdt:P235 ?InChIKey .
+  OPTIONAL { ?mol wdt:P231 ?CAS }
+  OPTIONAL { ?mol wdt:P661 ?ChemSpider }
+  OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
+  FILTER (regex(str(?InChIKey), concat("^", substr($queryKey,1,14), "-")))
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
