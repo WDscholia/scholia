@@ -1,0 +1,32 @@
+# title: Nearby academic institutions around a specified geographic entity.
+SELECT
+  (ROUND(1000 * ?distance_) / 1000 AS ?distance)
+  ?organization ?organizationLabel ?organizationDescription
+WITH {
+  # Universities, research centers, etc.
+  SELECT ?university WHERE {
+    VALUES ?university { wd:Q3918 wd:Q1371037 wd:Q7315155  wd:Q31855 }
+  }
+} AS %universities
+WITH {
+  # Academic institutions on all levels
+  SELECT DISTINCT ?organization ?other_geo WHERE {
+    INCLUDE %universities
+    ?organization wdt:P361* / wdt:P31 / wdt:P279* ?university .
+    ?organization wdt:P625 ?other_geo .
+  }
+} AS %organizations
+WITH {
+  # Compute distance.
+  SELECT ?organization ?distance_ WHERE {
+    INCLUDE %organizations
+    wd:{{ q }} wdt:P159* / wdt:P625 ?geo .
+    BIND(geof:distance(?other_geo, ?geo) AS ?distance_)
+    FILTER(?distance_ < 250)
+  }
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY ?distance
