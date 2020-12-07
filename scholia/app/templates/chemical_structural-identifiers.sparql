@@ -1,0 +1,21 @@
+# title: structural identifiers for this chemical structure
+SELECT
+  ?Structural_identifier ?Structural_identifierLabel
+  ?idLit (SAMPLE(?idUrls) as ?idUrl)
+WITH {
+  SELECT ?Structural_identifier ?idLit ?formatterurl WHERE {
+    VALUES ?Structural_identifier { wd:P233 wd:P234 wd:P2017 }
+    wd:{{ q }} ?IDdir ?idLit .
+    ?Structural_identifier wikibase:directClaim ?IDdir ;
+            wdt:P31 wd:Q19833835 .
+    OPTIONAL {
+      ?Structural_identifier wdt:P1630 ?formatterurl .
+    }
+  } LIMIT 500
+} AS %RESULTS {
+  INCLUDE %RESULTS
+  BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?idLit))) AS ?idUrls).
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+GROUP BY ?Structural_identifier ?Structural_identifierLabel ?idLit
+ORDER BY ASC(?ID_TypeLabel)
