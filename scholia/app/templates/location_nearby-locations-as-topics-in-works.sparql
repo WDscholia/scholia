@@ -1,0 +1,37 @@
+SELECT
+  (ROUND(1000 * ?distance_) / 1000 AS ?distance)
+  ?work ?workLabel
+  ?location ?locationLabel
+WITH {
+  SELECT
+    ?work ?location
+    (min(?distances) AS ?distance_)
+  WHERE {
+    ?work wdt:P921 ?location . 
+
+    ?location p:P625 ?other_geo_statement . 
+
+    # Some locations have unknown geocoordinates indicated with novalue
+    # psv will remove them. 
+    ?other_geo_statement ps:P625 ?other_geo .
+    ?other_geo_statement psv:P625 [] .
+
+    # Remove articles from encyclopedia and dictionaries
+    # Filter is more expensive when applied here. 
+    MINUS { ?work wdt:P31 wd:Q17329259 }
+    MINUS { ?work wdt:P31 wd:Q4423781 }
+   
+    wd:{{ q }} wdt:P159* / wdt:P625 ?geo .
+    BIND(geof:distance(?other_geo, ?geo) AS ?distances)
+  }
+  GROUP BY ?work ?location
+  ORDER BY ?distance_
+  LIMIT 500
+} AS %results
+WHERE {
+  INCLUDE %results
+          
+  # Label the result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,cs,da,de,es,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY ?distance

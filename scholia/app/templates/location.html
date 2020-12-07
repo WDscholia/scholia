@@ -1,103 +1,28 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
- nearbyOrganizationsSparql = `
-SELECT
-  (ROUND(1000 * ?distance_) / 1000 AS ?distance)
-  ?organization ?organizationLabel ?organizationDescription
-WITH {
-  # Universities, research centers, etc.
-  SELECT ?university WHERE {
-    VALUES ?university { wd:Q3918 wd:Q1371037 wd:Q7315155  wd:Q31855 }
-  }
-} AS %universities
-WITH {
-  # Academic institutions on all levels
-  SELECT DISTINCT ?organization ?other_geo WHERE {
-    INCLUDE %universities
-    ?organization wdt:P361* / wdt:P31 / wdt:P279* ?university .
-    ?organization wdt:P625 ?other_geo .
-  }
-} AS %organizations
-WITH {
-  # Compute distance.
-  SELECT ?organization ?distance_ WHERE {
-    INCLUDE %organizations
-    wd:{{ q }} wdt:P159* / wdt:P625 ?geo .
-    BIND(geof:distance(?other_geo, ?geo) AS ?distance_)
-    FILTER(?distance_ < 250)
-  }
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-ORDER BY ?distance
- `;
+{% set aspect = "location" %}
 
 
- nearbyLocationsAsTopicsInWorksSparql = `
-SELECT
-  (ROUND(1000 * ?distance_) / 1000 AS ?distance)
-  ?work ?workLabel
-  ?location ?locationLabel
-WITH {
-  SELECT
-    ?work ?location
-    (min(?distances) AS ?distance_)
-  WHERE {
-    ?work wdt:P921 ?location . 
+{% block in_ready %}
 
-    ?location p:P625 ?other_geo_statement . 
+{{ sparql_to_table("nearby-organizations",
+    options={
+        "linkPrefixes": {
+            "organization": "../organization/"
+      }
+    }
+  )
+}}
 
-    # Some locations have unknown geocoordinates indicated with novalue
-    # psv will remove them. 
-    ?other_geo_statement ps:P625 ?other_geo .
-    ?other_geo_statement psv:P625 [] .
-
-    # Remove articles from encyclopedia and dictionaries
-    # Filter is more expensive when applied here. 
-    MINUS { ?work wdt:P31 wd:Q17329259 }
-    MINUS { ?work wdt:P31 wd:Q4423781 }
-   
-    wd:{{ q }} wdt:P159* / wdt:P625 ?geo .
-    BIND(geof:distance(?other_geo, ?geo) AS ?distances)
-  }
-  GROUP BY ?work ?location
-  ORDER BY ?distance_
-  LIMIT 500
-} AS %results
-WHERE {
-  INCLUDE %results
-          
-  # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,cs,da,de,es,jp,nl,no,ru,sv,zh". }
-}
-ORDER BY ?distance
-`
-
-
-
- $(document).ready(function() {
-     sparqlToDataTable(nearbyOrganizationsSparql, "#nearby-organizations", {
-	 linkPrefixes: {
-	     organization: '../organization/',
-	 }
-     });
-     sparqlToDataTable(nearbyLocationsAsTopicsInWorksSparql,
-		       "#nearby-locations-as-topics-in-works", {
-			   linkPrefixes: {
-			       work: '../work/',
-			       location: '../topic/',
-			   }
-			   
-		       });
- });
-</script>
-
+{{ sparql_to_table('nearby-locations-as-topics-in-works',
+    options={
+        "linkPrefixes": {
+            "work": '../work/',
+                "location": '../topic/'
+        }
+    }
+  )
+}}
 
 {% endblock %}
 
@@ -113,14 +38,15 @@ ORDER BY ?distance
 
 
 <h2 title="Nearby academic organizations with distances in kilometers"
-    id="Nearby organizations">Nearby organizations</h2>
+    id="nearby-organizations-header">Nearby organizations</h2>
 
-<table class="table table-hover" id="nearby-organizations"></table>
+<table class="table table-hover" id="nearby-organizations-table"></table>
 
 
-<h2 id="Nearby locations as topics in works">Nearby locations as topics in works</h2>
+<h2 title="Nearby locations as topics in works (may timeout)"
+    id="nearby-locations-as-topics-in-works-header">Nearby locations as topics in works</h2>
 
-<table class="table table-hover" id="nearby-locations-as-topics-in-works"></table>
+<table class="table table-hover" id="nearby-locations-as-topics-in-works-table"></table>
 
 
 
