@@ -1,0 +1,65 @@
+# title: Nearby researchers that work with a specific topic and near a specified geographical entity
+SELECT
+  ?score
+  ?author ?authorLabel
+  ?example_work ?example_workLabel
+WITH {
+  # Universities, research centers, etc.
+  SELECT ?university WHERE {
+    VALUES ?university { wd:Q3918 wd:Q1371037 wd:Q7315155 wd:Q31855 wd:Q2385804 }
+  }
+} AS %universities
+WITH {
+  SELECT ?organization ?distance ?other_geo {
+    wd:{{ q1 }} wdt:P625 ?geo .
+    SERVICE wikibase:around { 
+      ?organization wdt:P625 ?other_geo .
+      bd:serviceParam wikibase:center ?geo .
+      bd:serviceParam wikibase:radius "50" .
+      bd:serviceParam wikibase:distance ?distance .
+    }
+  }
+} AS %near_organizations
+WITH {
+  # Academic institutions on all levels
+  SELECT DISTINCT ?organization ?other_geo ?distance WHERE {
+    INCLUDE %universities
+    INCLUDE %near_organizations
+            
+    ?organization wdt:P361* / wdt:P31 / wdt:P279* ?university .
+  }
+} AS %organizations
+WITH {
+  # Compute distance for authors
+  SELECT
+    (MAX(?inverse_distance_) AS ?inverse_distance)
+    ?author
+  WHERE {
+    INCLUDE %organizations
+
+    BIND(1 / ?distance AS ?inverse_distance_)
+    ?author wdt:P108 | wdt:P1416 ?organization .  
+  }
+  GROUP BY ?author
+} AS %authors_with_distance
+WITH {
+  SELECT
+    ?author
+    (SUM(?topic_score) * MAX(?inverse_distance) AS ?score)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    INCLUDE %authors_with_distance
+    {
+      ?work wdt:P50 ?author .
+      ?work wdt:P921 / wdt:P279* wd:{{ q2 }} . BIND(3 AS ?topic_score)
+    }
+    UNION
+    { ?author wdt:P101 wd:{{ q2 }} . BIND(20 AS ?topic_score) }
+  }
+  GROUP BY ?author
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score) 
