@@ -81,12 +81,12 @@ Checks of pull requests
 Examples
 --------
 
-Adding new SPARQL queries to Scholia
+Adding new SPARQL queries to Scholia:
 
 1. Assign the task for yourself (if it is in an issue tracker)
 
 2. Write a new query and add it in a template file (e.g. in  ``/app/templates/sparql/author_awards.sparql``)
-   e.g. Note that ``{{ q }}`` will be formatted based on the page that renders the template.
+   where the file names starts with the aspect name. Note that ``{{ q }}`` will be formatted based on the page that renders the template.
    See example at https://github.com/fnielsen/scholia/pull/848/files.
 
 .. code:: sparql
@@ -98,28 +98,31 @@ Adding new SPARQL queries to Scholia
      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }  
    }
 
-4. Make a variable e.g. ``authorAwardsSparql`` that uses `Jinja's <https://jinja.palletsprojects.com/>`_ templating system to load
-   the SPARQL query from the file. The ``{{ q }}`` inside the template will be populated
-   using the ``{{ q }}`` in the HTML template automatically.
+3. The external SPARQL can be included in the templating system for both tables and iframes:
 
 .. code:: javascript
 
-   authorAwardsSparql = `{% include 'sparql/author_awards.sparql' %}`;
+   {{ sparql_to_table('recent-literature') }}
+   {{ sparql_to_iframe('publications-per-year') }}
 
-4. Add that name to the sparql-to-data table
-
-.. code:: javascript
-
-   sparqlToDataTable(authorAwardsSparql, "#author-awards");
-
-5. Add some table formatting
+4. Add some table formatting
 
 .. code:: html
 
-   <h2 id="Author-awards">Author awards</h2>
+   <h2 id="recent-literature-header">Structural Information</h2>
    
-   <table class="table table-hover" id="author-awards"></table>
+   <table class="table table-hover" id="recent-literature-table"></table>
 
-6. Add the whole thing to your version/fork of the file
+And iframe formatting:
+
+.. code:: html
+
+   <h2 id="publications-per-year">Publications per year</h2>
+
+   <div class="embed-responsive embed-responsive-16by9">
+     <iframe class="embed-responsive-item" id="publications-per-year-iframe" ></iframe>
+   </div>
+
+5. Add the whole thing to your version/fork of the file
    https://github.com/fnielsen/scholia/tree/master/scholia/[…].
    Pull request to master branch.
