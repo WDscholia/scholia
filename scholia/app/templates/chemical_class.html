@@ -1,153 +1,44 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-{{super()}}
+{% set aspect = "chemical_class" %}
 
-<script type="text/javascript">
+{% block in_ready %}
 
- identifiersSparql = `
-SELECT
-  ?IDpred ?IDpredLabel
-  ?id ?idUrl
-  ?IDpredDescription
-{
-  wd:{{ q }} ?IDdir ?id .
-  ?IDpred wikibase:directClaim ?IDdir ;
-            wdt:P31 wd:Q19833835 .
-  OPTIONAL {
-    ?IDpred wdt:P1630 ?formatterurl .
-  }
-  BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrl).
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
-}
-ORDER BY ASC(?IDpredLabel)
-LIMIT 500
-`
-
- relatedChemicalsSparql = `
-  SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl WITH {
-    SELECT DISTINCT ?mol WHERE {
-      ?mol wdt:P31/wdt:P279* wd:{{ q }} .
-    } LIMIT 500
-  } AS %result
-  WHERE {
-    INCLUDE %result
-    OPTIONAL { ?mol wdt:P235 ?InChIKey }
-    OPTIONAL {
-      VALUES ?CASIDdir { wdt:P231 }
-      ?mol ?CASIDdir ?CAS .
-      OPTIONAL {
-        ?CASIDpred wikibase:directClaim ?CASIDdir .
-        ?CASIDpred wdt:P1630 ?CASformatterurl .
-      }
-      BIND(IRI(REPLACE(?CASformatterurl, '\\\\$1', str(?CAS))) AS ?CASUrl).
-    }
-    OPTIONAL {
-      VALUES ?IDdir { wdt:P661 }
-      ?mol ?IDdir ?ChemSpider .
-      OPTIONAL {
-        ?IDpred wikibase:directClaim ?IDdir .
-        ?IDpred wdt:P1630 ?formatterurl .
-      }
-      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?ChemSpider))) AS ?ChemSpiderUrl).
-    }
-    OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
-    OPTIONAL {
-      VALUES ?PCIDdir { wdt:P662 }
-      ?mol ?PCIDdir ?PubChem_CID .
-      OPTIONAL {
-        ?PCIDpred wikibase:directClaim ?PCIDdir .
-        ?PCIDpred wdt:P1630 ?PCformatterurl .
-      }
-      BIND(IRI(REPLACE(?PCformatterurl, '\\\\$1', str(?PubChem_CID))) AS ?PubChem_CIDUrl).
-    }
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-  }
-`
-
-  recentArticlesSparql = `
-SELECT ?date ?work ?workLabel ?type ?via ?topics
-WITH {
-  SELECT DISTINCT (MAX(?dates) as ?datetime) ?work ?via WHERE {
-    { VALUES ?topic { wd:{{ q }}}
-      ?work wdt:P921 ?topic . BIND ("main topic" AS ?via) }
-    UNION
-    { ?work wdt:P921 ?topic . ?topic ((^wdt:P361)+) wd:{{ q }} . BIND ("part" AS ?via) }
-    UNION
-    { ?work wdt:P921 ?topic . ?topic (wdt:P31* / wdt:P279* ) wd:{{ q }} . BIND ("subclass" AS ?via). FILTER (?topic != wd:{{ q }}) }
-    UNION
-    { ?work wdt:P921 ?topic . ?topic (wdt:P1269+ ) wd:{{ q }} . BIND ("facet" AS ?via)}
-    UNION
-    {
-      wd:{{ q }} ?propp ?statement .
-      ?statement a wikibase:BestRank ;
-                 prov:wasDerivedFrom/pr:P248 ?work .
-      BIND ("statement" AS ?via)
-    }
-    OPTIONAL { ?work wdt:P577 ?dateLits . BIND(xsd:date(?dateLits) AS ?dates) }
-  }
-  GROUP BY ?work ?via
-  ORDER BY DESC(?datetime)
-  LIMIT 250
-} AS %works
-WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) ?via (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
-    INCLUDE %works
-    ?work wdt:P921 ?topic . 
-    OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
-    OPTIONAL { ?work wdt:P577 ?dates . }
-    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
-  }
-  GROUP BY ?work ?via
-} AS %result
-WHERE {
-  INCLUDE %result
-  BIND(xsd:date(?datetime) AS ?date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-ORDER BY DESC(?date)
-LIMIT 500
-`
-
- $(document).ready(function() {
-   sparqlToDataTable(identifiersSparql, "#identifiers");
-   sparqlToDataTable(relatedChemicalsSparql, "#related");
-   sparqlToDataTable(recentArticlesSparql, "#recentArticles");
- });
-</script>
+{{ sparql_to_iframe('class-hierarchy') }}
+{{ sparql_to_table('identifiers') }}
+{{ sparql_to_table('related-chemicals') }}
+{{ sparql_to_table('recent-literature') }}
+{{ sparql_to_iframe('publications-per-year') }}
 
 {% endblock %}
-
-
 
 {% block page_content %}
 <h1 id="h1">Chemical</h1>
 
 <div id="intro"></div>
 
-<h2 id="ClassHierarchy">Class Hierarchy</h2>
+<h2 id="class-hierarchy-header">Class Hierarchy</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0ASELECT%20%3Fclass%20%3FclassLabel%20%3Fotherclass%20%3FotherclassLabel%20%3Frgb%20WITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fclass%20%3Fotherclass%20%3Frgb%20WHERE%20%7B%0A%20%20%20%20%7B%20VALUES%20%3Fclass%20%7B%20wd%3A{{ q }}%20%7D%0A%20%20%20%20%20%20%7B%20%3Fotherclass%20wdt%3AP279%20%3Fclass%20.%20BIND%28%20%223182BD%22%20AS%20%3Frgb%29%20%7D%0A%20%20%20%20%20%20UNION%0A%20%20%20%20%20%20%7B%20%3Fotherclass%20wdt%3AP31%20%3Fclass%20.%20BIND%28%20%22E6550D%22%20AS%20%3Frgb%29%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%20VALUES%20%3Fotherclass%20%7B%20wd%3A{{ q }}%20%7D%0A%20%20%20%20%20%20%3Fotherclass%20wdt%3AP279%20%3Fclass%20.%0A%20%20%20%20%7D%0A%20%20%7D%20LIMIT%20500%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22.%20%7D%0A%7D%0A"></iframe>
+  <iframe class="embed-responsive-item" id="class-hierarchy-iframe" ></iframe>
 </div>
 
-<h2 id="Identifiers">Identifiers</h2>
+<h2 id="identifiers-header">Identifiers</h2>
 
-<table class="table table-hover" id="identifiers"></table>
+<table class="table table-hover" id="identifiers-table"></table>
 
-<h2 id="Related">Example Compounds</h2>
+<h2 id="related-chemicals-header">Example Compounds</h2>
 
-<table class="table table-hover" id="related"></table>
+<table class="table table-hover" id="related-chemicals-table"></table>
 
+<h2 id="recent-literature-header">Recently published works on the chemical <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
-<h2 id="Recently published works on the chemical">Recently published works on the chemical <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<table class="table table-hover" id="recent-literature-table"></table>
 
-<table class="table table-hover" id="recentArticles"></table>
-
-<h2 id="Publications per year">Publications per year</h2>
+<h2 id="publications-per-year-header">Publications per year</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item"  src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0A%23%20Inspired%20from%20LEGOLAS%20-%20http%3A%2F%2Fabel.lis.illinois.edu%2Flegolas%2F%0A%23%20Shubhanshu%20Mishra%2C%20Vetle%20Torvik%0Aselect%20%3Fyear%20%28count%28%3Fwork%29%20as%20%3Fnumber_of_publications%29%20where%20%7B%0A%20%20%7B%0A%20%20%20%20select%20%28str%28%3Fyear_%29%20as%20%3Fyear%29%20%280%20as%20%3Fpages%29%20where%20%7B%0A%20%20%20%20%20%20%23%20default%20values%20%3D%200%0A%20%20%20%20%20%20%3Fyear_item%20wdt%3AP31%20wd%3AQ577%20.%20%0A%20%20%20%20%20%20%3Fyear_item%20wdt%3AP585%20%3Fdate%20.%0A%20%20%20%20%20%20bind%28year%28%3Fdate%29%20as%20%3Fyear_%29%0A%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20select%20%28min%28%3Fyear_%29%20as%20%3Fearliest_year%29%20where%20%7B%0A%20%20%20%20%20%20%20%20%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20union%20%7B%20wd%3A{{ q }}%20%3Fpropp%20%3Fstatement%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fstatement%20a%20wikibase%3ABestRank%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20prov%3AwasDerivedFrom%2Fpr%3AP248%20%3Fwork%20.%20%7D%0A%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%20%0A%20%20%20%20%20%20%20%20%20%20bind%28year%28%3Fpublication_date%29%20as%20%3Fyear_%29%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20bind%28year%28now%28%29%29%20as%20%3Fnext_year%29%0A%20%20%20%20%20%20filter%20%28%3Fyear_%20%3E%3D%20%3Fearliest_year%20%26%26%20%3Fyear_%20%3C%3D%20%3Fnext_year%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20union%20%7B%0A%20%20%20%20select%20%3Fwork%20%28min%28%3Fyears%29%20as%20%3Fyear%29%20where%20%7B%0A%20%20%20%20%20%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP31%2a%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP361%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20union%20%7B%20%3Fwork%20wdt%3AP921%2Fwdt%3AP1269%2B%20wd%3A{{ q }}%20.%20%7D%0A%20%20%20%20%20%20union%20%7B%20wd%3A{{ q }}%20%3Fpropp%20%3Fstatement%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fstatement%20a%20wikibase%3ABestRank%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20prov%3AwasDerivedFrom%2Fpr%3AP248%20%3Fwork%20.%20%7D%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdates%20.%0A%20%20%20%20%20%20bind%28str%28year%28%3Fdates%29%29%20as%20%3Fyears%29%20.%0A%20%20%20%20%7D%0A%20%20%20%20group%20by%20%3Fwork%20%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fyear%20%0Aorder%20by%20%3Fyear" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
+  <iframe class="embed-responsive-item" id="publications-per-year-iframe" ></iframe>
 </div>
 
 {% endblock %}
