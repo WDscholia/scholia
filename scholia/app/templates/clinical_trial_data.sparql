@@ -1,0 +1,92 @@
+SELECT ?description ?value ?valueUrl
+WHERE {
+  BIND(wd:{{ q }} AS ?trial)
+  {
+    BIND(1 AS ?order)
+    BIND("Title" AS ?description)
+    ?trial wdt:P1476 ?value .
+  }
+  UNION
+  {
+    BIND(10 AS ?order)
+    BIND("Number of participants" AS ?description)
+    ?trial wdt:P1132 ?value .
+  }
+  UNION
+  {
+    BIND(11 AS ?order)
+    BIND("Clinical trial phase" AS ?description)
+    ?trial wdt:P6099 ?iri .
+
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../topic/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    BIND(12 AS ?order)
+    BIND("Medical condition" AS ?description)
+    ?trial wdt:P1050 ?iri .
+
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../disease/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    BIND(13 AS ?order)
+    BIND("Research intervention" AS ?description)
+    ?trial wdt:P4844 ?iri .
+
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../topic/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    BIND(20 AS ?order)
+    BIND("Sponsor" AS ?description)
+    ?trial wdt:P859 ?iri .
+
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../sponsor/", ?q) AS ?valueUrl)
+  }
+
+  UNION
+  {
+    BIND(100 AS ?order)
+    BIND("ClinicalTrials.gov" AS ?description)
+    ?trial wdt:P3098 ?value_ .
+    BIND(CONCAT(?value_, " ↗") AS ?value)
+    BIND(CONCAT("https://clinicaltrials.gov/show/", ?value_) AS ?valueUrl)
+  }
+
+  UNION
+  {
+    BIND(101 AS ?order)
+    BIND("ClinWiki" AS ?description)
+    ?trial wdt:P3098 ?value_ .
+    BIND(CONCAT(?value_, " ↗") AS ?value)
+    BIND(CONCAT("https://www.clinwiki.org/study/", ?value_) AS ?valueUrl)
+  }
+
+  UNION
+  {
+    BIND(103 AS ?order)
+    BIND("OpenTrials" AS ?description)
+    ?trial wdt:P6220 ?value_ .
+    BIND(CONCAT(?value_, " ↗") AS ?value)
+    BIND(CONCAT("https://explorer.opentrials.net/trials/", ?value_) AS ?valueUrl)
+  }
+
+} 
+ORDER BY ?order
