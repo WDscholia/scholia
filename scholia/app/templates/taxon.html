@@ -5,7 +5,7 @@
 {% block in_ready %}
  
 {{ sparql_to_table('identifiers') }}
-{{ sparql_to_table('info') }}
+{{ sparql_to_table('parent-taxa') }}
 {{ sparql_to_iframe('tree') }}
 {{ sparql_to_table('genome') }}
 {{ sparql_to_table('metabolome') }}
@@ -25,9 +25,9 @@
 
 <table class="table table-hover" id="identifiers-table"></table>
 
-<h2 id="info-header">Parent Taxa</h2>
+<h2 id="parent-taxa-header">Parent Taxa</h2>
 
-<table class="table table-hover" id="info-table"></table>
+<table class="table table-hover" id="parent-taxa-table"></table>
 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" id="tree-iframe" ></iframe>
