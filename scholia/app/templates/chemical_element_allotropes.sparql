@@ -1,0 +1,20 @@
+SELECT DISTINCT ?allotrope ?allotropeLabel ?density ?densityUnit ?densityUnitLabel WITH {
+  SELECT ?allotrope (SAMPLE(?densityStats) AS ?densityStat) WHERE {
+    ?allotrope wdt:P31|wdt:P279 ?allotropeType .
+    ?allotropeType p:P279 ?allotropeSpecsStatement .
+    ?allotropeSpecsStatement ps:P279 wd:Q21198401 ;
+                             pq:P642 wd:{{ q }} .
+    OPTIONAL {
+      ?allotrope p:P2054 ?densityStats .
+    }
+  } GROUP BY ?allotrope
+} AS %ALLOTROPES {
+  INCLUDE %ALLOTROPES
+  OPTIONAL {
+    ?allotrope p:P2054 ?densityStat .
+    ?densityStat psv:P2054 ?densityValNode .
+    ?densityValNode wikibase:quantityAmount ?density ;
+                    wikibase:quantityUnit ?densityUnit .
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY ASC(?allotropeLabel)

@@ -1,0 +1,16 @@
+SELECT ?isotope ?isotopeLabel ?protons ?neutrons ?mass ?massUnit ?massUnitLabel ?halflife ?halflifeUnit?halflifeUnitLabel
+WHERE {
+  VALUES ?element { wd:{{ q }} }
+  ?element wdt:P1086 ?protons .
+  ?isotope wdt:P279 ?element ;
+           wdt:P1148 ?neutrons ;
+           p:P2067 ?massStat ;
+           p:P2114 ?halflifeStat .
+  ?massStat psv:P2067 ?massValNode .
+  ?massValNode wikibase:quantityAmount ?mass ;
+               wikibase:quantityUnit ?massUnit .
+  ?halflifeStat psv:P2114 ?halflifeValNode .
+  ?halflifeValNode wikibase:quantityAmount ?halflife ;
+                   wikibase:quantityUnit ?halflifeUnit .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY ?neutrons
