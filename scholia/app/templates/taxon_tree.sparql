@@ -10,7 +10,7 @@ WITH {
       SELECT ?child ?rgb ?parent  WHERE {
         SERVICE gas:service {
           gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                  gas:in wd:Q15978631 ;
+                  gas:in wd:{{ q }} ;
                   # We should not do undirected here because this could result
                   # in very big graphs.
                   gas:traversalDirection "Forward" ;
@@ -20,14 +20,14 @@ WITH {
                   gas:linkType wdt:P171 ;
         }
         ?child wdt:P171 ?parent .
-        BIND(IF(?child = wd:Q15978631, "FF0000", "FFFFFF") AS ?rgb) 
+        BIND(IF(?child = wd:{{ q }}, "FF0000", "FFFFFF") AS ?rgb)
       }
     }
     UNION 
     {
       # Child taxons
       SELECT ?child ?rgb ?parent WHERE {
-        BIND(wd:Q15978631 AS ?parent)
+        BIND(wd:{{ q }} AS ?parent)
         ?child wdt:P171 ?parent . 
         BIND("DDDDDD" AS ?rgb)
       }
