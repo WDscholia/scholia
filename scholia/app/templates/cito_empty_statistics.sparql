@@ -1,0 +1,63 @@
+SELECT ?count ?description
+WITH {
+  SELECT (COUNT(DISTINCT ?citationStatement) AS ?count) WHERE { [] p:P2860 ?citationStatement . ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 . }
+} AS %annotedCitations
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] p:P2860 ?citationStatement . ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 . }
+} AS %annotions
+WITH {
+  SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE { ?citingArticle p:P2860 / pq:P3712 / wdt:P31 wd:Q96471816 . }
+} AS %annotedCitingArticles
+WITH {
+  SELECT (COUNT(DISTINCT ?citedArticle) AS ?count) WHERE {
+    ?citingArticle p:P2860 ?citationStatement .
+    ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 ;
+                       ps:P2860 ?citedArticle .
+  }
+} AS %annotedCitedArticles
+WITH {
+  SELECT (COUNT(DISTINCT ?venue) AS ?count) WHERE {
+    ?citingArticle p:P2860 / pq:P3712 / wdt:P31 wd:Q96471816 ;
+                   wdt:P1433 ?venue .
+  }
+} AS %citoJournals
+WITH {
+  SELECT (COUNT(DISTINCT ?venue) AS ?count) WHERE {
+    ?citingArticle p:P2860 ?citationStatement .
+    ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 ;
+                       ps:P2860 ?citedArticle .
+    ?citedArticle wdt:P1433 ?venue .
+  }
+} AS %citedJournals
+WHERE {
+  {
+    INCLUDE %annotions
+    BIND("Total number of annotations" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %annotedCitations
+    BIND("Total number of annotated citations" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %annotedCitingArticles
+    BIND("Total number of articles providing annotated citations" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %annotedCitedArticles
+    BIND("Total number of articles receiving annotated citations" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %citoJournals
+    BIND("Number of citing venues with annotated citations" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %citedJournals
+    BIND("Number of cited venues with annotated citations" AS ?description)
+  }
+}
+ORDER BY DESC(?count)
