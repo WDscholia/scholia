@@ -2,7 +2,8 @@ SELECT
   ?metabolite ?metaboliteLabel ?metaboliteDescription
 WITH {
   SELECT ?metabolite WHERE {
-    ?metabolite wdt:P31|wdt:P279/wdt:P31 wd:Q11173 .
+    VALUES ?chemical { wd:Q11173 wd:Q59199015 wd:Q56256086 wd:Q15711994 }.
+    ?metabolite wdt:P31|wdt:P279/wdt:P31 ?chemical .
     { ?metabolite wdt:P703 wd:{{ q }} }
     UNION
     { ?metabolite wdt:P1582 wd:{{ q }} }
