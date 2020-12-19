@@ -1,0 +1,28 @@
+#defaultView:BarChart
+SELECT (STR(?year_) AS ?year) (SUM(?count_) AS ?count)
+WHERE {
+  {
+    VALUES ?year_ { 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009
+                   2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 }
+    BIND(0 AS ?count_)
+  }
+  UNION 
+  {
+    SELECT
+      ?year_
+      (COUNT(DISTINCT ?citing_work) AS ?count_)
+      ?kind
+    WHERE {
+      VALUES ?INTENTION { wd:{{ q }} }
+      ?citing_work wdt:P2860 ?citedArticle ;
+        p:P2860/pq:P3712 ?INTENTION .
+
+      # Year of citation
+      ?citing_work wdt:P577 ?date .
+      BIND(YEAR(?date) AS ?year_)
+    }
+    GROUP BY ?year_ ?kind
+  }
+}
+GROUP BY ?year_
+ORDER BY DESC(?year_) 
