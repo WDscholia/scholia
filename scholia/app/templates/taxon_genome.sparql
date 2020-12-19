@@ -1,0 +1,13 @@
+SELECT
+  ?gene ?geneLabel ?geneDescription
+  ?chromosome ?chromosomeLabel ?chromosomeDescription
+WITH {
+  SELECT ?gene ?chromosome WHERE {
+    ?gene wdt:P31 wd:Q7187 ;
+          wdt:P703 wd:{{ q }} ;
+          wdt:P1057 ?chromosome .
+  }
+} AS %results {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}

@@ -1,0 +1,12 @@
+SELECT
+  (GROUP_CONCAT(DISTINCT ?rank_label_; separator=", ") AS ?rank)
+  ?parent ?parentLabel ?parentDescription
+{
+  wd:{{ q }} wdt:P171+ ?parent .
+  ?parent wdt:P105 ?rank .
+  OPTIONAL {
+    ?rank rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+GROUP BY ?parent ?parentLabel ?parentDescription

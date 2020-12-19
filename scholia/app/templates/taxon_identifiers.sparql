@@ -1,0 +1,33 @@
+SELECT
+  ?Identifier ?IdentifierLabel
+  ?id (SAMPLE(?idUrls) as ?idUrl)
+  ?IdentifierDescription
+WITH {
+  SELECT ?Identifier ?id ?formatterurl WHERE {
+    wd:{{ q }} ?IDdir ?id .
+    ?Identifier wikibase:directClaim ?IDdir ;
+            wdt:P31/wdt:P279* wd:Q42396390 .
+    OPTIONAL {
+      ?Identifier wdt:P1630 ?formatterurl .
+    }
+    FILTER (?Identifier != wd:P233)
+    FILTER (?Identifier != wd:P234)
+    FILTER (?Identifier != wd:P2017)
+  } LIMIT 500
+} AS %RESULTS {
+  { SELECT * WHERE {
+      INCLUDE %RESULTS
+      FILTER (?Identifier = wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?id)))) AS ?idUrls).
+    }
+  } UNION {
+    SELECT * WHERE {
+      INCLUDE %RESULTS
+      FILTER (?Identifier != wd:P234)
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
+    }
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+GROUP BY ?Identifier ?IdentifierLabel ?IdentifierDescription ?id
+ORDER BY ASC(?IdentifierLabel)
