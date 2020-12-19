@@ -1,0 +1,38 @@
+  SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl WITH {
+    SELECT DISTINCT ?mol WHERE {
+      ?mol wdt:P31/wdt:P279* wd:{{ q }} .
+    } LIMIT 500
+  } AS %result
+  WHERE {
+    INCLUDE %result
+    OPTIONAL { ?mol wdt:P235 ?InChIKey }
+    OPTIONAL {
+      VALUES ?CASIDdir { wdt:P231 }
+      ?mol ?CASIDdir ?CAS .
+      OPTIONAL {
+        ?CASIDpred wikibase:directClaim ?CASIDdir .
+        ?CASIDpred wdt:P1630 ?CASformatterurl .
+      }
+      BIND(IRI(REPLACE(?CASformatterurl, '\\\\$1', str(?CAS))) AS ?CASUrl).
+    }
+    OPTIONAL {
+      VALUES ?IDdir { wdt:P661 }
+      ?mol ?IDdir ?ChemSpider .
+      OPTIONAL {
+        ?IDpred wikibase:directClaim ?IDdir .
+        ?IDpred wdt:P1630 ?formatterurl .
+      }
+      BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?ChemSpider))) AS ?ChemSpiderUrl).
+    }
+    OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
+    OPTIONAL {
+      VALUES ?PCIDdir { wdt:P662 }
+      ?mol ?PCIDdir ?PubChem_CID .
+      OPTIONAL {
+        ?PCIDpred wikibase:directClaim ?PCIDdir .
+        ?PCIDpred wdt:P1630 ?PCformatterurl .
+      }
+      BIND(IRI(REPLACE(?PCformatterurl, '\\\\$1', str(?PubChem_CID))) AS ?PubChem_CIDUrl).
+    }
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  }

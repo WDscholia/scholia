@@ -1,0 +1,19 @@
+#defaultView:Graph
+SELECT ?class ?classLabel ?otherclass ?otherclassLabel ?rgb WITH {
+  SELECT DISTINCT ?class ?otherclass ?rgb WHERE {
+    { VALUES ?class { wd:{{ q }} }
+      { ?otherclass wdt:P279 ?class . BIND( "3182BD" AS ?rgb) }
+      UNION
+      { ?otherclass wdt:P31 ?class . BIND( "E6550D" AS ?rgb) }
+    }
+    UNION
+    { VALUES ?otherclass { wd:{{ q }} }
+      ?otherclass wdt:P279 ?class .
+    }
+  } LIMIT 500
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+
