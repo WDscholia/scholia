@@ -1,3 +1,4 @@
+#defaultView:BarChart
 select ?year (count(?work) as ?number_of_publications) where {
   {
     select (str(?year_) as ?year) (0 as ?pages) where {

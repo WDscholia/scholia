@@ -1,3 +1,4 @@
+#defaultView:Timeline{"hide": ["?end_time", "?start_time"]}
 SELECT DISTINCT ?start_time ?end_time ?description WHERE {
   {  
     wd:{{ q }} (wdt:P571 | wdt:P580) ?start_time ;

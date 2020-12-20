@@ -1,3 +1,4 @@
+#defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)
   ?count

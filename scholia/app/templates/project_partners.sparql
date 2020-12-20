@@ -1,3 +1,4 @@
+#defaultView:Map
 SELECT ?partner ?partnerLabel ?location
 WITH {
   SELECT DISTINCT ?partner ?location WHERE {
