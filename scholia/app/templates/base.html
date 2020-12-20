@@ -99,7 +99,9 @@ sparqlToIframe(`# tool: scholia
 	 catch(e) {}
 	 
 	 /* BioSchemas annotation */
-	 if (item.claims.P31[0].mainsnak.datavalue.value.id in set(['Q47461491', 'Q967847'])) {
+	 if (item.claims.P31 &&
+	     ((item.claims.P31[0].mainsnak.datavalue.value.id == 'Q47461491') ||
+	      (item.claims.P31[0].mainsnak.datavalue.value.id == 'Q967847'))) {
 	   try { /* ChemicalSubstance */
 	       bioschemasAnnotation = {
 	          "@context" : "https://schema.org",
