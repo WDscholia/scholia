@@ -624,7 +624,7 @@ def redirect_doi(doi):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_work', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404_doi.html', doi=doi)
 
 
 @main.route('/event/' + q_pattern)
