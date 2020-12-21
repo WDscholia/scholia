@@ -1659,6 +1659,24 @@ def show_work_cito(q):
     return render_template('work_cito.html', q=q)
 
 
+@main.route('/work/' + q_pattern + '/export')
+def show_work_export(q):
+    """Return HTML rendering for export formats for this work.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('work_export.html', q=q)
+
+
 @main.route('/cito/' + q_pattern)
 def show_cito(q):
     """Return HTML rendering for a specific Citation Typing Ontology intention.
