@@ -1,177 +1,24 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-{{super()}}
+{% set aspect = "organization" %}
 
-<script type="text/javascript">
- employeesAndAffiliatedSparql = `
-SELECT
-  (SAMPLE(?number_of_works_) AS ?works)
-  (SAMPLE(?wikis_) AS ?wikis)
-  ?researcher ?researcherLabel ?researcherDescription
-  (SAMPLE(?orcid_) AS ?orcid)
-WITH {
-  SELECT DISTINCT ?researcher WHERE {
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
-  } 
-} AS %researchers
-WITH {
-  SELECT
-    (COUNT(?work) AS ?number_of_works_) ?researcher
-  WHERE {
-    INCLUDE %researchers
-    OPTIONAL { ?work wdt:P50 ?researcher . }
-  } 
-  GROUP BY ?researcher
-} AS %researchers_and_number_of_works
-WHERE {
-  INCLUDE %researchers_and_number_of_works
-  OPTIONAL { ?researcher wdt:P496 ?orcid_ . }
-  OPTIONAL { ?researcher wikibase:sitelinks ?wikis_ }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
-}
-GROUP BY ?researcher ?researcherLabel ?researcherDescription 
-ORDER BY DESC(?works)
- `;
+{% block in_ready %}
 
- topicsSparql = `
-SELECT
-  ?researchers
-  ?topic ?topicLabel
-  ("🔎" AS ?zoom)
-  (CONCAT("{{ q }}/topic/", SUBSTR(STR(?topic), 32)) AS ?zoomUrl)
-  ?topicDescription
-  ?samplework ?sampleworkLabel
-WITH {
-  SELECT DISTINCT ?researcher WHERE {
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
-  } 
-} AS %researchers
-WITH {
-  SELECT DISTINCT ?topic
-    (COUNT(DISTINCT ?researcher) AS ?researchers)
-    (SAMPLE(?work) AS ?samplework)
-  WHERE {
-    INCLUDE %researchers
-    ?work wdt:P50 ?researcher . 
-    ?work wdt:P921 ?topic . 
-  } 
-  GROUP BY ?topic
-  ORDER BY DESC(?researchers)
-  LIMIT 500
-} AS %works_and_number_of_researchers
-WHERE {
-  INCLUDE %works_and_number_of_researchers
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
-}
-GROUP BY ?researchers ?topic ?topicLabel ?topicDescription ?samplework ?sampleworkLabel
-ORDER BY DESC(?researchers)
-   `;
-
- recentPublicationsSparql = `
-#defaultView:Table
-SELECT
-  ?publication_date
-  ?work ?workLabel
-  ?researchers ?researchersUrl
-WITH {
-  SELECT 
-    (MIN(?publication_datetimes) AS ?publication_datetime) ?work 
-    (GROUP_CONCAT(DISTINCT ?researcher_label; separator=', ') AS ?researchers)
-    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?researchersUrl)
-  WHERE {                                                         
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
-    ?work wdt:P50 ?researcher .
-    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
-    OPTIONAL {
-      ?work wdt:P577 ?publication_datetimes .
-    }
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?publication_datetime)
-  LIMIT 200  
-} AS %results
-WHERE {
-  INCLUDE %results
-  BIND(xsd:date(?publication_datetime) AS ?publication_date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,nl,ru,zh". }
-}
-ORDER BY DESC(?publication_date)
- `;
-
- recentCitationsSparql = `
- #defaultView:Table
-SELECT DISTINCT ?publication_date ?citing_work ?citing_workLabel ?work ?workLabel
-WHERE {
-  ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
-  ?work wdt:P50 ?researcher .
-  ?citing_work wdt:P2860 ?work .
-  ?citing_work wdt:P577 ?publication_datetime .
-  BIND(xsd:date(?publication_datetime) AS ?publication_date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,nl,ru,sv,zh". }
- }
-ORDER BY DESC(?publication_date)
-LIMIT 200
-`;
-
- awardsSparql = `
-SELECT ?count ?award ?awardLabel ?recipients
-WITH {
-  SELECT (COUNT(?researcher) AS ?count) ?award (GROUP_CONCAT(?researcher_label; separator=", ") AS ?recipients) WHERE {
-    hint:Query hint:optimizer "None" .
-    { 
-      SELECT DISTINCT ?researcher WHERE {
-        ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
-      } 
-    }
-    ?researcher wdt:P166 ?award .
-    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
-  }
-  GROUP BY ?award 
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
-}
-ORDER BY DESC(?count)
-`;
-
-
- genderDistributionSparql = `
- SELECT ?count ?gender ?genderLabel 
-WITH {
-  SELECT (COUNT(DISTINCT ?researcher) AS ?count) ?gender WHERE {
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
-    ?researcher wdt:P21 ?gender . 
-  } 
-  GROUP BY ?gender
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,ep,fr,jp,nl,no,ru,sv,zh" . } 
-} 
- ORDER BY DESC(?count)
- `
-
-
- $(document).ready(function() {
-     sparqlToDataTable(employeesAndAffiliatedSparql, "#employees-and-affiliated");
-     sparqlToDataTable(topicsSparql, "#topics", {
-	 linkPrefixes:{
-	     "topic": "../topic/",
+{{ sparql_to_table('employees-and-affiliated') }}
+{{ sparql_to_table('topics',
+     options={
+       "linkPrefixes":{
+         "topic": "../topic/",
 	     "samplework": "../work/",
-	 }});
-     sparqlToDataTable(recentPublicationsSparql, "#recent-publications");
-     sparqlToDataTable(recentCitationsSparql, "#recent-citations");
-     sparqlToDataTable(awardsSparql, "#awards");
-     sparqlToDataTable(genderDistributionSparql, "#gender-distribution");
- });
-</script>
-
+       }
+     }
+   ) }}
+{{ sparql_to_table('recent-literature') }}
+{{ sparql_to_table('recent-citations') }}
+{{ sparql_to_table('awards') }}
+{{ sparql_to_table('gender-distribution') }}
 
 {% endblock %}
-
-
 
 
 {% block page_content %}
@@ -183,11 +30,11 @@ WHERE {
 <div id="wembedder"></div>
 
 
-<h2 id="Employees-and-affiliated">Employees and affiliated</h2>
+<h2 id="#employees-and-affiliated-header">Employees and affiliated</h2>
 
 Past and present employees, affiliated, and members<br/>
 
-<table class="table table-hover" id="employees-and-affiliated"></table>
+<table class="table table-hover" id="employees-and-affiliated-table"></table>
 
 
 <h2 id="Co-author-graph">Co-author graph</h2>
@@ -204,15 +51,15 @@ Past and present employees, affiliated, and members<br/>
 </div>
 
 
-<h2 id="Topics that employees and affiliates have published on">Topics that employees and affiliates have published on</h2>
+<h2 id="topics-header">Topics that employees and affiliates have published on</h2>
 
 Topics of publications by past and present employees, affiliates, and members, ranked by number of individuals having published on the topic.<br/>
 
-<table class="table table-hover" id="topics"></table>
+<table class="table table-hover" id="topics-table"></table>
 
-<h2 id="Recent-publications">Recent publications <a href="{{ url_for('app.show_organization_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<h2 id="recent-literature-header">Recent publications <a href="{{ url_for('app.show_organization_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
-<table class="table table-hover" id="recent-publications"></table>
+<table class="table table-hover" id="recent-literature-table"></table>
 
 
 <h2 id="Page-production">Page production</h2>
@@ -230,9 +77,9 @@ has been set.
 
 <h2 id="Citations">Citations</h2>
 
-<h3 id="Recent-citations">Recent citations</h3>
+<h3 id="recent-citations-header">Recent citations</h3>
 
-<table class="table table-hover" id="recent-citations"></table>
+<table class="table table-hover" id="recent-citations-table"></table>
 
 
 <h3>Most cited papers with affiliated first author</h2>
@@ -249,16 +96,16 @@ has been set.
 </div>
 
 
-<h2 id="Awards">Awards</h2>
+<h2 id="awards-header">Awards</h2>
 
-<table class="table table-hover" id="awards"></table>
+<table class="table table-hover" id="awards-table"></table>
 
 
-<h2 id="Gender-distribution">Gender distribution</h2>
+<h2 id="gender-distribution-header">Gender distribution</h2>
 
 Count of the number of researchers wrt. gender.
 
-<table class="table table-hover" id="gender-distribution"></table>
+<table class="table table-hover" id="gender-distribution-table"></table>
 
 
 {% endblock %}
