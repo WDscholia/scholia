@@ -875,6 +875,7 @@ def q_to_class(q):
             'Q10870555',  # report
             'Q10885494',  # scientific conference paper
             'Q13442814',  # scientific article
+            'Q15621286',  # intellectual work
             'Q21481766',  # academic chapter
             'Q47461344',  # written work
             'Q54670950',  # conference poster
