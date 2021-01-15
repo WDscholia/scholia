@@ -5,6 +5,7 @@
 {% block in_ready %}
 
 {{ sparql_to_table('participants') }}
+{{ sparql_to_table('identifiers') }}
 
 {% endblock %}
 
@@ -16,6 +17,10 @@
 <div id="intro"></div>
 
 <div id="description"></div><br />
+
+<h2 id="identifiers-header">Identifiers</h2>
+
+<table class="table table-hover" id="identifiers-table"></table>
 
 <h2 id="participants-header">Participants</h2>
 
