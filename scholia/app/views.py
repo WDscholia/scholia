@@ -1779,6 +1779,24 @@ def show_series_empty():
     return render_template('series_empty.html')
 
 
+@main.route('/complex/' + q_pattern)
+def show_complex(q):
+    """Return html render page for specific biological complex.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('complex.html', q=q)
+
+
 @main.route('/pathway/' + q_pattern)
 def show_pathway(q):
     """Return html render page for specific pathway.
