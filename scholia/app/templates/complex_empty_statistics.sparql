@@ -1,9 +1,9 @@
 SELECT ?count ?description
 WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31 wd:Q22325163 ; wdt:P7718 []. }
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31/wdt:P279* wd:Q22325163 ; wdt:P7718 []. }
 } AS %complexportal
 WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31 wd:Q22325163 ; wdt:P3937 []. }
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31/wdt:P279* wd:Q22325163 ; wdt:P3937 []. }
 } AS %reactome
 WHERE {
   {
