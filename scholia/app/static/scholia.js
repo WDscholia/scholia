@@ -164,6 +164,7 @@ function sparqlToDataTable(sparql, element, options={}) {
 function sparqlToDataTable2(sparql, element, filename, options={}) {
     // Options: linkPrefixes={}, paging=true
     var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
+    var linkSuffixes = (typeof options.linkSuffixes === 'undefined') ? {} : options.linkSuffixes;
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var url = "https://query.wikidata.org/sparql?query=" + 
@@ -172,7 +173,7 @@ function sparqlToDataTable2(sparql, element, filename, options={}) {
     $.getJSON(url, function(response) {
         var simpleData = sparqlDataToSimpleData(response);
         
-        convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes=linkPrefixes);
+        convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes=linkPrefixes, linkSuffixes=linkSuffixes);
         columns = [];
         for ( i = 0 ; i < convertedData.columns.length ; i++ ) {
             var column = {
