@@ -21,6 +21,7 @@ WITH {
   WHERE {
     INCLUDE %researchers
     OPTIONAL { ?work wdt:P50 ?researcher . }
+    MINUS { ?work wdt:P31 wd:Q4915012 }
   } 
   GROUP BY ?researcher
 } AS %researchers_and_number_of_works
