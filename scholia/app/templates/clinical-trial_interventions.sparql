@@ -1,0 +1,23 @@
+SELECT
+  ?count
+  ?intervention ?interventionLabel
+  ?as_chemical ?as_chemicalLabel
+  ?example_trial ?example_trialLabel
+ WHERE {
+  {
+    SELECT
+      (COUNT(?trial) AS ?count)
+      ?intervention
+      (SAMPLE(?trial) AS ?example_trial)
+    WHERE {
+      ?trial wdt:P31 wd:Q30612 .
+      ?trial wdt:P4844 ?intervention
+    }
+    GROUP BY ?intervention
+    ORDER BY DESC(?count)
+    LIMIT 500
+  }
+  BIND(IF(EXISTS { ?intervention wdt:P31 wd:Q11173 }, ?intervention, "") AS ?as_chemical) 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
+}
+ORDER BY DESC(?count)

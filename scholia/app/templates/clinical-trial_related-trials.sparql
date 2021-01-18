@@ -1,0 +1,34 @@
+SELECT
+  ?score
+  ?trial ?trialLabel
+WHERE {
+  {
+    SELECT
+      (SUM(?score_) AS ?score)
+      ?trial
+    WHERE {
+      BIND(wd:{{ q }} AS ?query_trial) 
+      ?trial wdt:P31 wd:Q30612 .
+      { 
+        ?query_trial wdt:P1050 / ^wdt:P1050 ?trial .
+        BIND(3 AS ?score_)
+      }
+      UNION 
+      {
+        ?query_trial wdt:P4844 / ^wdt:P4844 ?trial .
+        BIND(2 AS ?score_)        
+      }
+      UNION 
+      {
+        ?query_trial wdt:P859 / ^wdt:P859 ?trial .
+        BIND(1 AS ?score_)        
+      }
+    }
+    GROUP BY ?trial
+    ORDER BY DESC(?score)
+    LIMIT 500
+  }
+  FILTER (wd:{{ q }} != ?trial)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
+}
+ORDER BY DESC(?score)

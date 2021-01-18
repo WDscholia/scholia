@@ -1,0 +1,19 @@
+SELECT ?count ?description
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3400 []. }
+} AS %cordis
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P4870 []. }
+} AS %gepris
+WHERE {
+  {
+    INCLUDE %cordis
+    BIND("Total number of projects with a CORDIS number" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %gepris
+    BIND("Total number of projects with a GEPRIS number" AS ?description)
+  }
+}
+ORDER BY DESC(?count)

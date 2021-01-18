@@ -1,0 +1,20 @@
+#defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  ?count
+  ?phase ?phaseLabel
+WHERE {
+  { 
+    SELECT
+      ?year_
+      (COUNT(*) AS ?count)
+      ?phase
+    WHERE {
+      ?trial wdt:P6099 ?phase .
+      ?trial wdt:P580 ?start_datetime .
+      BIND(YEAR(?start_datetime) AS ?year_) 
+    }
+    GROUP BY ?year_ ?phase
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
