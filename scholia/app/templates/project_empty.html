@@ -1,15 +1,27 @@
 {% extends "base.html" %}
 
+{% set aspect = "project" %}
+
+
+{% block in_ready %}
+
+{{ sparql_to_table('statistics') }}
+
+{{ sparql_to_table('citations-per-budget') }}
+
+{% endblock %}
+
+
 {% block page_content %}
 
-<h1>Project</h1>
+<h1 id="project-header">Project</h1>
 
 Research projects.
 
 
 <div class="container">
 
-<h2>Examples</h2>
+<h2 id="examples-header">Examples</h2>
 
 <div class="card-deck mb-3">
 	<div class="card mb-4 box-shadow">
@@ -83,86 +95,14 @@ Research projects.
 
 <div class="container">
 
-<h2>Statistics</h2>
+<h2 id="statistics-header">Statistics</h2>
 
-<table class="table table-hover" id="statistics"></table>
+<table class="table table-hover" id="statistics-table"></table>
 
-<h3>Citations per budget</h3>
+<h3 id="citations-per-budget-header">Citations per budget</h3>
 
-<table class="table table-hover" id="citations-per-budget"></table>
+<table class="table table-hover" id="citations-per-budget-table"></table>
 
 </div>
 
 {% endblock %}
-
-
-
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
-
- statisticsSparql = `
-SELECT ?count ?description
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3400 []. }
-} AS %cordis
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P4870 []. }
-} AS %gepris
-WHERE {
-  {
-    INCLUDE %cordis
-    BIND("Total number of projects with a CORDIS number" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %gepris
-    BIND("Total number of projects with a GEPRIS number" AS ?description)
-  }
-}
-ORDER BY DESC(?count)
-`
-
- citationsPerBudgetSparql = `
-SELECT
-  ?cites_per_million
-  ?citations 
-  ?budget ?currency ?currencyLabel
-  ?short_name
-  ?project ?projectLabel
-WITH {
-  SELECT
-    (COUNT(?citing_work) / ?budget * 1000000 AS ?cites_per_million)
-    (COUNT(?citing_work) AS ?citations)
-    ?budget ?currency
-    ?project
-  WHERE {
-    ?project p:P2769 / psv:P2769 ?budget_value .
-    ?budget_value wikibase:quantityAmount ?budget .
-    ?budget_value wikibase:quantityUnit ?currency .
-    ?work wdt:P859 ?project .
-    ?citing_work wdt:P2860 ?work .
-  } 
-  GROUP BY ?project ?budget ?currency
-} AS %results
-WHERE {
-  INCLUDE %results
-  OPTIONAL { ?project wdt:P1813 ?short_name }
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-ORDER BY DESC(?cites_per_million)
-`
-
-
- $(document).ready(function() {
-     sparqlToDataTable(statisticsSparql, "#statistics");
-     sparqlToDataTable(citationsPerBudgetSparql, "#citations-per-budget");
- });
-
-</script>
-
-{% endblock %}
-
-  

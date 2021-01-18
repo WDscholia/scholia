@@ -1,0 +1,36 @@
+# Prolific authors for a specific project
+SELECT ?count ?author ?authorLabel ?orcid ?example_work ?example_workLabel
+WITH {
+  SELECT DISTINCT ?work WHERE {
+    {
+      ?work wdt:P921 / (wdt:P527+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+    } UNION { ?work wdt:P859/(wdt:P1344|^wdt:P710)* wd:{{ q }} .
+    } UNION {
+      wd:{{ q }} ?propp ?statement .
+      ?statement a wikibase:BestRank ;
+                 prov:wasDerivedFrom/pr:P248 ?work .
+    }
+  }
+} AS %works
+WITH {
+  SELECT
+    ?author
+    (COUNT(?work) AS ?count)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+          
+  # Include optional ORCID iD
+  OPTIONAL { ?author wdt:P496 ?orcid . }
+  
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?count)
+LIMIT 50
