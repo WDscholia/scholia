@@ -127,6 +127,27 @@ def show_p(p):
     return render_template('property.html', p=p)
 
 
+@main.route('/biorxiv/<biorxiv>')  
+def show_biorxiv(biorxiv_id):
+    """Return HTML rendering for bioRxiv.
+
+    Parameters
+    ----------
+    biorxiv_id : str
+        bioRxiv identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+    """
+    qs = biorxiv_to_qs(biorxiv_id)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_work', q=q), code=302)
+    return render_template('404.html')
+
+
 @main.route('/arxiv/<arxiv>')
 def show_arxiv(arxiv):
     """Return HTML rendering for arxiv.
