@@ -138,8 +138,36 @@ def arxiv_to_qs(arxiv):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P818 "{arxiv}" }}'.format(
-        arxiv=escape_string(arxiv))
+    return _identifier_to_qs('P818', arxiv)
+
+
+def biorxiv_to_qs(biorxiv_id):
+    """Convert bioRxiv ID to Wikidata ID.
+
+    Parameters
+    ----------
+    biorxiv_id : str
+        bioRxiv identifier.
+
+    Returns
+    -------
+    qs : list of str
+        List of string with Wikidata IDs.
+
+    Examples
+    --------
+    >>> biorxiv_to_qs('2020.08.20.259226') == ['Q104920313']
+    True
+
+    """
+    return _identifier_to_qs('P3951', biorxiv_id)
+
+
+def _identifier_to_qs(prop, identifier):
+    query = 'select ?work where {{ ?work wdt:{prop} "{identifier}" }}'.format(
+        prop=prop,
+        identifier=escape_string(identifier),
+    )
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
