@@ -127,7 +127,7 @@ def show_p(p):
     return render_template('property.html', p=p)
 
 
-@main.route('/biorxiv/<biorxiv>')  
+@main.route('/biorxiv/<biorxiv_id>')
 def show_biorxiv(biorxiv_id):
     """Return HTML rendering for bioRxiv.
 
