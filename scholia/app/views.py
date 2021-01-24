@@ -142,10 +142,7 @@ def show_biorxiv(biorxiv_id):
         Rendered HTML.
     """
     qs = biorxiv_to_qs(biorxiv_id)
-    if len(qs) > 0:
-        q = qs[0]
-        return redirect(url_for('app.show_work', q=q), code=302)
-    return render_template('404.html')
+    return _render_qs(qs)
 
 
 @main.route('/arxiv/<arxiv>')
@@ -168,6 +165,10 @@ def show_arxiv(arxiv):
 
     """
     qs = arxiv_to_qs(arxiv)
+    return _render_qs(qs)
+
+
+def _render_qs(qs):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_work', q=q), code=302)
