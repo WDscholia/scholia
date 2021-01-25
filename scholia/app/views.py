@@ -246,9 +246,9 @@ def show_author_rss(q):
     return response
 
 
-@main.route('/author/' + q_pattern + '/missing')
-def show_author_missing(q):
-    """Return HTML rendering for missing information about specific author.
+@main.route('/author/' + q_pattern + '/curation')
+def show_author_curation(q):
+    """Return HTML rendering for curation page about specific author.
 
     Parameters
     ----------
@@ -261,7 +261,7 @@ def show_author_missing(q):
         Rendered HTML.
 
     """
-    return render_template('author_missing.html', q=q)
+    return render_template('author_curation.html', q=q)
 
 
 @main.route('/author/')
@@ -341,9 +341,9 @@ def show_award_empty():
     return render_template('award_empty.html')
 
 
-@main.route('/award/' + q_pattern + '/missing')
-def show_award_missing(q):
-    """Return HTML rendering for missing information about specific award.
+@main.route('/award/' + q_pattern + '/curation')
+def show_award_curation(q):
+    """Return HTML rendering for curation page about specific award.
 
     Parameters
     ----------
@@ -356,7 +356,7 @@ def show_award_missing(q):
         Rendered HTML.
 
     """
-    return render_template('award_missing.html', q=q)
+    return render_template('award_curation.html', q=q)
 
 
 @main.route('/cas/<cas>')
@@ -1063,9 +1063,9 @@ def show_organization_topic(q1, q2):
     return render_template('organization_topic.html', q1=q1, q2=q2, q=q1)
 
 
-@main.route('/organization/' + q_pattern + '/missing')
-def show_organization_missing(q):
-    """Return HTML rendering for missing information about an organization.
+@main.route('/organization/' + q_pattern + '/curation')
+def show_organization_curation(q):
+    """Return HTML rendering for curation page about an organization.
 
     Parameters
     ----------
@@ -1078,7 +1078,7 @@ def show_organization_missing(q):
         Rendered HTML.
 
     """
-    return render_template('organization_missing.html', q=q)
+    return render_template('organization_curation.html', q=q)
 
 
 @main.route('/organizations/' + qs_pattern)
@@ -1439,9 +1439,9 @@ def show_topics(qs):
     return render_template('topics.html', qs=qs)
 
 
-@main.route('/topic/' + q_pattern + '/missing')
-def show_topic_missing(q):
-    """Return rendered HTML for missing page for topic.
+@main.route('/topic/' + q_pattern + '/curation')
+def show_topic_curation(q):
+    """Return rendered HTML for curation page for topic.
 
     Parameters
     ----------
@@ -1454,7 +1454,7 @@ def show_topic_missing(q):
         Rendered HTML index page for topic.
 
     """
-    return render_template('topic_missing.html', q=q)
+    return render_template('topic_curation.html', q=q)
 
 
 @main.route('/chemical/' + q_pattern)
@@ -1494,17 +1494,17 @@ def show_chemical_empty():
     return render_template('chemical_empty.html')
 
 
-@main.route('/chemical/missing')
-def show_chemicals_missing():
-    """Return rendered HTML index page for missing information for chemicals.
+@main.route('/chemical/curation')
+def show_chemicals_curation():
+    """Return rendered HTML index page for curation page for chemicals.
 
     Returns
     -------
     html : str
-        Rendered HTML index page for missing information for chemicals.
+        Rendered HTML index page for curation page for chemicals.
 
     """
-    return render_template('chemicals_missing.html')
+    return render_template('chemicals_curation.html')
 
 
 @main.route('/chemical-element/' + q_pattern)
@@ -1605,9 +1605,9 @@ def show_venue(q):
     return render_template('venue.html', q=q)
 
 
-@main.route('/venue/' + q_pattern + '/missing')
-def show_venue_missing(q):
-    """Return HTML rendering for missing information about specific venue.
+@main.route('/venue/' + q_pattern + '/curation')
+def show_venue_curation(q):
+    """Return HTML rendering for curation page about specific venue.
 
     Parameters
     ----------
@@ -1620,7 +1620,7 @@ def show_venue_missing(q):
         Rendered HTML.
 
     """
-    return render_template('venue_missing.html', q=q)
+    return render_template('venue_curation.html', q=q)
 
 
 @main.route('/venue/' + q_pattern + '/cito')
