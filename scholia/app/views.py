@@ -1495,7 +1495,7 @@ def show_chemical_empty():
 
 
 @main.route('/chemical/curation')
-def show_chemicals_curation():
+def show_chemical_curation():
     """Return rendered HTML index page for curation page for chemicals.
 
     Returns
@@ -1504,7 +1504,7 @@ def show_chemicals_curation():
         Rendered HTML index page for curation page for chemicals.
 
     """
-    return render_template('chemicals_curation.html')
+    return render_template('chemical_curation.html')
 
 
 @main.route('/chemical-element/' + q_pattern)
