@@ -246,6 +246,23 @@ def show_author_rss(q):
     return response
 
 
+@main.route('/author/' + q_pattern + '/missing')
+def show_author_missing(q):
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+    """
+    return redirect(url_for('app.show_author_curation', q=q), code=301)
+
+
 @main.route('/author/' + q_pattern + '/curation')
 def show_author_curation(q):
     """Return HTML rendering for curation page about specific author.
@@ -339,6 +356,23 @@ def show_award_empty():
 
     """
     return render_template('award_empty.html')
+
+
+@main.route('/award/' + q_pattern + '/missing')
+def show_award_missing(q):
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+    """
+    return redirect(url_for('app.show_award_curation', q=q), code=301)
 
 
 @main.route('/award/' + q_pattern + '/curation')
@@ -1063,6 +1097,23 @@ def show_organization_topic(q1, q2):
     return render_template('organization_topic.html', q1=q1, q2=q2, q=q1)
 
 
+@main.route('/organization/' + q_pattern + '/missing')
+def show_organization_missing(q):
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+    """
+    return redirect(url_for('app.show_organization_curation', q=q), code=301)
+
+
 @main.route('/organization/' + q_pattern + '/curation')
 def show_organization_curation(q):
     """Return HTML rendering for curation page about an organization.
@@ -1439,6 +1490,23 @@ def show_topics(qs):
     return render_template('topics.html', qs=qs)
 
 
+@main.route('/topic/' + q_pattern + '/missing')
+def show_topic_missing(q):
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+    """
+    return redirect(url_for('app.show_topic_curation', q=q), code=301)
+
+
 @main.route('/topic/' + q_pattern + '/curation')
 def show_topic_curation(q):
     """Return rendered HTML for curation page for topic.
@@ -1492,6 +1560,18 @@ def show_chemical_empty():
 
     """
     return render_template('chemical_empty.html')
+
+
+@main.route('/chemical/missing')
+def show_chemical_missing(q):
+    """Redirects to the new HTML rendering for missing information.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+    """
+    return redirect(url_for('app.show_chemical_curation', q=q), code=301)
 
 
 @main.route('/chemical/curation')
@@ -1603,6 +1683,23 @@ def show_venue(q):
 
     """
     return render_template('venue.html', q=q)
+
+
+@main.route('/venue/' + q_pattern + '/missing')
+def show_venue_missing(q):
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+    """
+    return redirect(url_for('app.show_venue_curation', q=q), code=301)
 
 
 @main.route('/venue/' + q_pattern + '/curation')
