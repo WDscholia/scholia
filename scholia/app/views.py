@@ -372,6 +372,7 @@ def show_award_missing(q):
     -------
     html : str
         Redirected HTML.
+
     """
     return redirect(url_for('app.show_award_curation', q=q), code=301)
 
