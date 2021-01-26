@@ -259,6 +259,7 @@ def show_author_missing(q):
     -------
     html : str
         Redirected HTML.
+
     """
     return redirect(url_for('app.show_author_curation', q=q), code=301)
 
@@ -1110,6 +1111,7 @@ def show_organization_missing(q):
     -------
     html : str
         Redirected HTML.
+
     """
     return redirect(url_for('app.show_organization_curation', q=q), code=301)
 
@@ -1503,6 +1505,7 @@ def show_topic_missing(q):
     -------
     html : str
         Redirected HTML.
+
     """
     return redirect(url_for('app.show_topic_curation', q=q), code=301)
 
@@ -1570,6 +1573,7 @@ def show_chemical_missing(q):
     -------
     html : str
         Redirected HTML.
+
     """
     return redirect(url_for('app.show_chemical_curation', q=q), code=301)
 
@@ -1698,6 +1702,7 @@ def show_venue_missing(q):
     -------
     html : str
         Redirected HTML.
+
     """
     return redirect(url_for('app.show_venue_curation', q=q), code=301)
 
