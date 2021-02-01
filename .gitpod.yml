@@ -5,7 +5,8 @@ ports:
 - port: 8100
   onOpen: open-preview
 tasks:
-- init: >
+- before: export ROOT_URL=$(gp url 8100)
+  init: >
     python -m pip install -r requirements.txt 
   command: >
     python runserver.py
