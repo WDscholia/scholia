@@ -1,0 +1,19 @@
+#defaultView:LineChart
+SELECT ?year (COUNT(?work) AS ?number_of_works) ?organization ?organizationLabel  
+WHERE {
+  {
+    SELECT DISTINCT ?year ?work ?organization WHERE {
+      hint:Query hint:optimizer "None".
+      VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+      ?author wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*) ?organization . 
+      ?work wdt:P50 ?author .
+      ?work wdt:P577 ?publication_date .
+      BIND(STR(YEAR(?publication_date)) AS ?year)
+    }
+    GROUP BY ?work ?year ?organization
+  } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+GROUP BY ?year ?organization ?organizationLabel
+ORDER BY ?year
+

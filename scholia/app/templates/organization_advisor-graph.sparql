@@ -1,0 +1,19 @@
+#defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label 
+WITH {
+  SELECT ?author1 ?author2 ?rgb WHERE {
+    VALUES ?organisation { wd:{{ q }} }
+    { ?author1 wdt:P108 ?organisation . } union { ?author1 wdt:P1416 [ wdt:P361* ?organisation ] .  }
+    { ?author2 wdt:P108 ?organisation . } union { ?author2 wdt:P1416 [ wdt:P361* ?organisation ] .  }
+    {?author1 wdt:P184 ?author2 }
+    UNION
+    {?author2 wdt:P185 ?author1 }
+    ?author1 wdt:P21 ?gender1 . 
+    BIND ( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,sv,ru,zh".
+  }
+}

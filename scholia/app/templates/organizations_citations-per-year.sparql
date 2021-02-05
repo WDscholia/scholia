@@ -1,0 +1,44 @@
+#defaultView:LineChart
+SELECT
+  ?year_of_citation
+  ?number_of_citations
+  ?organization ?organizationLabel  
+WITH {
+  # Bind organizations to variable
+  SELECT ?organization WHERE {
+    VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+  }
+} AS %organizations
+WITH {
+  # Find works author by the organization
+  SELECT
+    DISTINCT ?work ?organization
+  WHERE {
+    INCLUDE %organizations
+    ?work wdt:P50 / (wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*)) ?organization . 
+  }
+} AS %works
+WITH {
+  # Count citations per year per organization
+  SELECT
+    ?year_of_citation
+    (COUNT(?citing_work) AS ?number_of_citations)
+    ?organization
+  WHERE {
+    INCLUDE %works
+    ?citing_work wdt:P2860 ?work . 
+    ?citing_work wdt:P577 ?publication_date .
+    BIND(STR(YEAR(?publication_date)) AS ?year_of_citation)
+  }
+  GROUP BY ?year_of_citation ?organization
+} AS %results
+WHERE {
+  # Since 1990
+  # FILTER (?year_of_citation >= "1990")
+  
+  # Label the results
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY ?year_of_citation
+
