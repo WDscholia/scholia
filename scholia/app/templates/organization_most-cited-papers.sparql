@@ -1,0 +1,30 @@
+#defaultView:BubbleChart
+# Bubble chart of most cited works of first author associated
+# with an organization
+SELECT
+  ?count ?work ?workLabel
+WITH {
+  # Find researchers associated with the organization and count
+  # the number of citations.
+  SELECT
+    (COUNT(DISTINCT ?citing_work) AS ?count)
+    ?work
+  WHERE {
+    ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) wd:{{ q }} .
+    ?work p:P50 ?researcher_statement .
+    ?researcher_statement ps:P50 ?researcher .
+    ?researcher_statement pq:P1545 "1" .
+    ?citing_work wdt:P2860 ?work .
+  }
+  GROUP BY ?work                   
+  ORDER BY DESC(?count)
+  LIMIT 20
+} AS %works
+WHERE {
+  # Label the works
+  INCLUDE %works
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" .
+  }
+}
+ORDER BY DESC(?count)
