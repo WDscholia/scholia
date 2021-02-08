@@ -1,159 +1,49 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
-
- recentTrialsSparql = `
-SELECT ?start_date ?trial ?trialLabel WHERE {
-  {
-    SELECT * WHERE { 
-      ?trial wdt:P31 wd:Q30612 .
-      OPTIONAL {
-        ?trial wdt:P580 ?start_datetime .
-        BIND(xsd:date(?start_datetime) AS ?start_date) 
-      }
-    }
-    ORDER BY DESC(?start_datetime)
-    LIMIT 500
-  }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-ORDER BY DESC(?start_datetime)
-`
-
- medicalConditionsSparql = `
-SELECT
-  ?count
-  ?medical_condition ?medical_conditionLabel
-  ?example_trial ?example_trialLabel
-WHERE {
-  {
-    SELECT
-      (COUNT(?trial) AS ?count)
-      ?medical_condition
-      (SAMPLE(?trial) AS ?example_trial)
-    WHERE {
-      ?trial wdt:P31 wd:Q30612 .
-      ?trial wdt:P1050 ?medical_condition
-    }
-    GROUP BY ?medical_condition
-    ORDER BY DESC(?count)
-    LIMIT 500
-  }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
-}
-ORDER BY DESC(?count)
-`
-
- interventionsSparql = `
-SELECT
-  ?count
-  ?intervention ?interventionLabel
-  ?as_chemical ?as_chemicalLabel
-  ?example_trial ?example_trialLabel
- WHERE {
-  {
-    SELECT
-      (COUNT(?trial) AS ?count)
-      ?intervention
-      (SAMPLE(?trial) AS ?example_trial)
-    WHERE {
-      ?trial wdt:P31 wd:Q30612 .
-      ?trial wdt:P4844 ?intervention
-    }
-    GROUP BY ?intervention
-    ORDER BY DESC(?count)
-    LIMIT 500
-  }
-  BIND(IF(EXISTS { ?intervention wdt:P31 wd:Q11173 }, ?intervention, "") AS ?as_chemical) 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
-}
-ORDER BY DESC(?count)
-`;
-
- statisticsSparql = `
-SELECT ?count ?description
-WHERE {
-  {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31 wd:Q30612 . } }
-    BIND("Number of clinical trials" AS ?description)
-  }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3098 [] . } }
-    BIND("Links to ClinicalTrials.gov" AS ?description)
-  }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6099 [] . } }
-    BIND("Number of clinical trial phases links" AS ?description)
-  } 
-}
-ORDER BY DESC(?count)
-`
+{% set aspect = "clinical-trial" %}
 
 
- $(document).ready(function() {
-     sparqlToDataTable(recentTrialsSparql, "#recent-clinical-trials", {
-	 linkPrefixes: {
-	     trial: "./",
-	 }
-     });
-     sparqlToDataTable(medicalConditionsSparql, "#medical-conditions", {
-	 linkPrefixes: {
-	     medical_condition: "../disease/",
-	     example_trial: "./",
-	 }
-     });
-     sparqlToDataTable(interventionsSparql, "#interventions", {
-	 linkPrefixes: {
-	     intervention: "../topic/",
-	     as_chemical: "../chemical/",
-	     example_trial: "./",
-	 }
-     });
-     sparqlToDataTable(statisticsSparql, "#statistics")
- });
- 
-</script>
+{% block in_ready %}
+
+{{ sparql_to_table('interventions') }}
+{{ sparql_to_table('statistics') }}
+{{ sparql_to_table('medical-conditions') }}
+{{ sparql_to_table('recent-trials') }}
+
+{{ sparql_to_iframe('phases') }}
 
 {% endblock %}
 
 
 {% block page_content %}
 
-<h1>Clinical trials</h1>
+<h1 id="clinical-trials-header">Clinical trials</h1>
 
-<h2 title="Recently initiated clinical trials"
-    id="Recent clinical trials">Recent clinical trials</h2>
+<h2 title="Recently initiated clinical trials" id="recent-clinical-trials-header">Recent clinical trials</h2>
 
-<table class="table table-hover" id="recent-clinical-trials"></table>
+<table class="table table-hover" id="recent-clinical-trials-table"></table>
 
-<h2 title="Clinical trial phases during the years">Phases</h2>
 
+<h2 title="Clinical trial phases during the years" id="phases-header">Phases</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0ASELECT%0A%20%20%28STR%28%3Fyear_%29%20AS%20%3Fyear%29%0A%20%20%3Fcount%0A%20%20%3Fphase%20%3FphaseLabel%0AWHERE%20%7B%0A%20%20%7B%20%0A%20%20%20%20SELECT%0A%20%20%20%20%20%20%3Fyear_%0A%20%20%20%20%20%20%28COUNT%28%2a%29%20AS%20%3Fcount%29%0A%20%20%20%20%20%20%3Fphase%0A%20%20%20%20WHERE%20%7B%0A%20%20%20%20%20%20%3Ftrial%20wdt%3AP6099%20%3Fphase%20.%0A%20%20%20%20%20%20%3Ftrial%20wdt%3AP580%20%3Fstart_datetime%20.%0A%20%20%20%20%20%20BIND%28YEAR%28%3Fstart_datetime%29%20AS%20%3Fyear_%29%20%0A%20%20%20%20%7D%0A%20%20%20%20GROUP%20BY%20%3Fyear_%20%3Fphase%0A%20%20%7D%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D"></iframe>
+    <iframe class="embed-responsive-item" id="phases-iframe"></iframe>
 </div>
 
 
-<h2 title="Medical conditions in clinical trials sorted by number of trials">Medical conditions</h2>
+<h2 title="Medical conditions in clinical trials sorted by number of trials" id="medical-conditions-header">Medical conditions</h2>
 
-<table class="table table-hover" id="medical-conditions"></table>
-
-
-<h2 title="Interventions in clinical trials sorted by number of trials">Interventions</h2>
-
-<table class="table table-hover" id="interventions"></table>
+<table class="table table-hover" id="medical-conditions-table"></table>
 
 
-<h2 title="Statistics for clinical trials">Statistics</h2>
+<h2 title="Interventions in clinical trials sorted by number of trials" id="interventions-header">Interventions</h2>
 
-<table class="table table-hover" id="statistics"></table>
+<table class="table table-hover" id="interventions-table"></table>
+
+
+<h2 title="Statistics for clinical trials" id="statistics-header">Statistics</h2>
+
+<table class="table table-hover" id="statistics-table"></table>
 
 
 {% endblock %}
-
-  

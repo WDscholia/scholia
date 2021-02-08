@@ -1,0 +1,29 @@
+#defaultView:BarChart
+SELECT ?year (SUM(?citations_per_author_) AS ?citations_per_author) ?researcherLabel
+WITH {
+  # Find researchers affiliated with the organization
+  SELECT DISTINCT ?researcher WHERE {
+    ?researcher wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* wd:{{ q }} .
+  }
+} AS %researchers 
+WITH {
+  # Find works of the researchers and count the number of citations
+  SELECT
+    ?researcher ?work ?year (COUNT(DISTINCT ?citing_work) / COUNT(DISTINCT ?researcher_of_paper) AS ?citations_per_author_)
+  WHERE {
+    INCLUDE %researchers
+    ?work wdt:P50 | wdt:P2093 ?researcher_of_paper .
+    ?work wdt:P50 ?researcher .
+    ?citing_work wdt:P2860 ?work .
+    ?work wdt:P577 ?date . 
+    BIND(STR(YEAR(?date)) AS ?year)
+  }
+  GROUP BY ?work ?researcher ?year
+} AS %counts
+WHERE {
+  # Label the results
+  INCLUDE %counts    
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+GROUP BY ?year ?researcher ?researcherLabel
+ORDER BY ?year

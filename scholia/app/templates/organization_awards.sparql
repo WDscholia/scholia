@@ -1,0 +1,19 @@
+SELECT ?count ?award ?awardLabel ?recipients
+WITH {
+  SELECT (COUNT(?researcher) AS ?count) ?award (GROUP_CONCAT(?researcher_label; separator=", ") AS ?recipients) WHERE {
+    hint:Query hint:optimizer "None" .
+    { 
+      SELECT DISTINCT ?researcher WHERE {
+        ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
+      } 
+    }
+    ?researcher wdt:P166 ?award .
+    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
+  }
+  GROUP BY ?award 
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)

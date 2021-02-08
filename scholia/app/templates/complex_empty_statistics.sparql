@@ -1,0 +1,19 @@
+SELECT ?count ?description
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31/wdt:P279* wd:Q22325163 ; wdt:P7718 []. }
+} AS %complexportal
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31/wdt:P279* wd:Q22325163 ; wdt:P3937 []. }
+} AS %reactome
+WHERE {
+  {
+    INCLUDE %complexportal
+    BIND("Total number of Complex Portal complexes" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %reactome
+    BIND("Total number of Reactome complexes" AS ?description)
+  }
+}
+ORDER BY DESC(?count)

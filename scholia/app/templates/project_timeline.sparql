@@ -1,0 +1,29 @@
+#defaultView:Timeline{"hide": ["?end_time", "?start_time"]}
+SELECT DISTINCT ?start_time ?end_time ?description WHERE {
+  {  
+    wd:{{ q }} (wdt:P571 | wdt:P580) ?start_time ;
+      (wdt:P576 | wdt:P582) ?end_time .
+    BIND("Project time" AS ?description)
+  } 
+  UNION 
+  {  
+    wd:{{ q }} (^wdt:P1344 | wdt:P710)+ ?project .
+    ?project (wdt:P571 | wdt:P580) ?start_time ;
+             (wdt:P576 | wdt:P582) ?end_time .
+    ?project rdfs:label ?projectName .
+    FILTER (lang(?projectName) = "en")
+    BIND(?projectName AS ?description)
+  }   
+  UNION 
+  {
+    ?work wdt:P859/(wdt:P1344|^wdt:P710)* wd:{{ q }} ;
+                wdt:P577 ?start_time .
+    BIND("Publication" AS ?description)
+  }
+  UNION
+  {
+    ?event wdt:P859 wd:{{ q }} .
+    ?event wdt:P585 | wdt:P580 ?start_time .
+    BIND("📅 Sponsored event" AS ?description)
+  }
+}

@@ -1,0 +1,31 @@
+#defaultView:BarChart
+# Pages per year bar chart of an organization
+SELECT
+  ?year
+  (SUM(?pages_per_author) AS ?number_of_pages)
+  ?researcher_label
+WHERE {
+  {
+    SELECT
+      ?researcher_label ?work ?year
+      (SAMPLE(?pages) / COUNT(?researcher_of_paper) AS ?pages_per_author)
+    WHERE {
+      # Find authors associated with organization
+      FILTER EXISTS { ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) wd:{{ q }} . }
+      
+      ?work (wdt:P50|wdt:P2093) ?researcher_of_paper .
+      
+      # Disabled to only look on scholarly articles
+      # ?work wdt:P31 wd:Q13442814 .
+      
+      ?work wdt:P50 ?researcher .
+      ?work wdt:P1104 ?pages .
+      ?work wdt:P577 ?date . 
+      BIND(STR(YEAR(?date)) AS ?year) 
+      ?researcher rdfs:label ?researcher_label . FILTER(LANG(?researcher_label) = 'en')
+    } 
+    GROUP BY ?work ?researcher_label ?year
+  }
+}
+GROUP BY ?year ?researcher_label 
+ORDER BY ?year

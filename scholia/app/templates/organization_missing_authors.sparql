@@ -1,0 +1,24 @@
+SELECT
+  (COUNT(?work) AS ?count) 
+  ?author_name
+  (CONCAT(
+      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?author_name)) AS ?author_resolver_url)
+WHERE {
+  {
+    SELECT DISTINCT ?author_name {
+      ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
+      
+      ?researcher_ skos:altLabel | rdfs:label ?author_name_ .
+      
+      # The SELECT-DISTINCT-BIND trick here is due to Stanislav Kralin
+      # https://stackoverflow.com/questions/53933564
+      BIND (STR(?author_name_) AS ?author_name)
+    }
+    LIMIT 2000
+  }
+  OPTIONAL { ?work wdt:P2093 ?author_name . }
+}
+GROUP BY ?author_name 
+HAVING (?count > 0)
+ORDER BY DESC(?count)

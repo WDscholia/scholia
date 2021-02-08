@@ -1,0 +1,36 @@
+#defaultView:Graph
+SELECT
+  ?author1 ?author1Label ?image1 ?rgb
+  ?author2 ?author2Label ?image2 
+WITH {
+  SELECT
+    ?author1 (SAMPLE(?image1_) AS ?image1)
+    ?author2 (SAMPLE(?image2_) AS ?image2)
+    (SAMPLE(?rgb_) AS ?rgb)
+  WHERE {
+    wd:{{ q }} ^wdt:P361* / ^( wdt:P108 | wdt:P1416 | wdt:P463 ) ?author1 , ?author2 . 
+    ?work wdt:P50 ?author1 , ?author2 .
+
+    # Only display co-authorship for certain types of documents
+    # Journal and conference articles, books, not (yet?) software
+    VALUES ?publication_type { wd:Q13442814 wd:Q571 wd:Q26973022 wd:Q17928402 wd:Q947859 wd:Q54670950 }
+    FILTER EXISTS { ?work wdt:P31 ?publication_type . }
+
+    # No self-links.
+    FILTER (?author1 != ?author2)
+
+    # Images
+    OPTIONAL { ?author1 wdt:P18 ?image1_ }
+    OPTIONAL { ?author2 wdt:P18 ?image2_ }
+
+    # Coloring of the nodes
+    BIND("FFFFFF" AS ?rgb_)
+  }
+  GROUP BY ?author1 ?author2
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,sv,ru,zh".
+  }
+}
+

@@ -1,0 +1,21 @@
+SELECT
+  ?count
+  ?medical_condition ?medical_conditionLabel
+  ?example_trial ?example_trialLabel
+WHERE {
+  {
+    SELECT
+      (COUNT(?trial) AS ?count)
+      ?medical_condition
+      (SAMPLE(?trial) AS ?example_trial)
+    WHERE {
+      ?trial wdt:P31 wd:Q30612 .
+      ?trial wdt:P1050 ?medical_condition
+    }
+    GROUP BY ?medical_condition
+    ORDER BY DESC(?count)
+    LIMIT 500
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
