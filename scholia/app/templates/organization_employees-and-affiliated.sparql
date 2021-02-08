@@ -1,3 +1,4 @@
+# title: Employees and affiliated with a specified organization
 SELECT
   (SAMPLE(?number_of_works_) AS ?works)
   (SAMPLE(?wikis_) AS ?wikis)
@@ -14,6 +15,9 @@ WITH {
   WHERE {
     INCLUDE %researchers
     OPTIONAL { ?work wdt:P50 ?researcher . }
+
+    # No biological pathways; they skew the statistics too much 
+    MINUS { ?work wdt:P31 wd:Q4915012 } 
   } 
   GROUP BY ?researcher
 } AS %researchers_and_number_of_works
