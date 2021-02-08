@@ -1,0 +1,52 @@
+#defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (COUNT(?work) AS ?number_of_publications)
+
+  # Work type used to color the bar chart
+  ?type
+WITH {
+  # Find works with the topic. Also report the year
+  SELECT
+    ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
+  WHERE {
+    VALUES ?complex { wd:{{ q }} }
+    ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) ?complex .
+    ?work wdt:P577 ?dates .
+    BIND(YEAR(?dates) AS ?years) .
+
+    ?work wdt:P31 ?article_type_ .
+  }
+  GROUP BY ?work 
+} AS %works
+WITH {
+  SELECT ?year_ WHERE {
+    # default values = 0
+    ?year_item wdt:P31 wd:Q577 . 
+    ?year_item wdt:P585 ?date .
+    BIND(YEAR(?date) AS ?year_)
+  }
+} AS %default_counts
+WITH {
+  # Find earliest publication year
+  SELECT (MIN(?year_) AS ?earliest_year) WHERE {
+    INCLUDE %works
+  }
+  GROUP BY ?dummy
+} AS %earliest  
+WHERE {
+  {
+    INCLUDE %works
+    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+  }
+  UNION
+  {
+    INCLUDE %default_counts
+    BIND("_" AS ?type)
+  }
+  INCLUDE %earliest
+  BIND(YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR("1900-01-01"^^xsd:dateTime))
+}
+GROUP BY ?year_ ?type
+ORDER BY ?year

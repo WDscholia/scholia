@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% set aspect = "complex" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('participants') }}
+{{ sparql_to_table('identifiers') }}
+{{ sparql_to_table('articles-recent') }}
+{{ sparql_to_iframe('articles-by-year') }}
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Complex</h1>
+
+<div id="intro"></div>
+
+<div id="description"></div><br />
+
+<h2 id="identifiers-header">Identifiers</h2>
+
+<table class="table table-hover" id="identifiers-table"></table>
+
+<h2 id="participants-header">Participants</h2>
+
+<table class="table table-hover" id="participants-table"></table>
+
+<h2 id="articles-recent-header">Recent publications</h2>
+
+<table class="table table-hover" id="articles-recent-table"></table>
+
+<h2 id="articles-by-year-header">Publications per year</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" id="articles-by-year-iframe"></iframe>
+</div>
+
+{% endblock %}
+

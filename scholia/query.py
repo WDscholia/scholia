@@ -990,6 +990,11 @@ def q_to_class(q):
             'Q24529812',  # statistical package
             ]):
         class_ = 'use'
+    elif set(classes).intersection([
+            'Q420927',  # protein complex
+            'Q22325163',  # macromolecular complex
+            ]):
+        class_ = 'complex'
     else:
         query = 'select ?class where {{ wd:{q} wdt:P279+ ?class }}'.format(
             q=escape_string(q))
