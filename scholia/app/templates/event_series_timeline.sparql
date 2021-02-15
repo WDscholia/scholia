@@ -1,0 +1,45 @@
+#defaultView:Timeline
+SELECT
+  ?time ?endtime ?event ?eventLabel ?image
+  ?description
+WITH {
+  SELECT DISTINCT ?event ?time ?endtime WHERE {
+    # It seems to be necessary to have this line together with the 
+    # optional event time triples here.
+    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
+    
+    OPTIONAL { ?event wdt:P580 ?starttime . }
+
+    # If the endtime is not set, then use now as the end time
+    # However this does not show well if the event is in the future
+    # and no end date has been set.
+    OPTIONAL { ?event wdt:P582 ?endtime . }
+    # BIND(COALESCE(?endtime_, NOW()) AS ?endtime)
+    
+    OPTIONAL { ?event wdt:P585 ?timepoint . }
+    
+    # If start time is defined the disregard timepoint
+    BIND(COALESCE(?starttime, ?timepoint) AS ?time)
+  }
+} AS %events1
+WITH {
+  # Include significant events
+  SELECT ?event ?time ?description WHERE {
+    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
+    ?event p:P793 [ ps:P793 ?item ; pq:P585 ?time ] .
+    OPTIONAL {
+      ?item rdfs:label ?description .
+      FILTER (LANG(?description) = "en")
+    }
+  }
+} AS %events2
+WHERE {
+  { INCLUDE %events1 }
+  UNION
+  { INCLUDE %events2 }
+          
+  OPTIONAL { ?event wdt:P18 ?image . }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}

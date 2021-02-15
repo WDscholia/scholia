@@ -1,0 +1,50 @@
+SELECT
+  ?publication_date
+  ?work ?workLabel
+  ?authors ?authorsUrl
+WITH {
+  SELECT
+    DISTINCT ?person
+  WHERE {
+    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
+
+    {
+      # speaker
+      ?event wdt:P823 ?person .
+    }
+    UNION
+    {
+      # organizer
+      ?event wdt:P664 ?person .
+    }
+    UNION
+    {
+      # participant
+      ?person wdt:P1344 | ^wdt:P710 ?event .
+    }
+    UNION
+    {
+      # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event .
+    }
+  }
+} AS %people  
+WITH {
+  SELECT
+    (xsd:date(MAX(?publication_datetime)) AS ?publication_date)
+    ?work
+    (GROUP_CONCAT(DISTINCT ?person_label; separator=", ") AS ?authors)
+    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?person), 32); separator=",")) AS ?authorsUrl)
+  WHERE {
+    INCLUDE %people .
+    ?work wdt:P50 ?person ; wdt:P577 ?publication_datetime .
+    ?person rdfs:label ?person_label . FILTER(LANG(?person_label) = 'en')
+  }
+  GROUP BY ?work
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?publication_date)
+LIMIT 500
