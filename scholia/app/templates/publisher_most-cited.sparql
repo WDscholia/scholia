@@ -1,0 +1,20 @@
+# Count the number of citations for each journal published by a specified publisher
+SELECT
+  ?number_of_citations
+  ?work ?workLabel ?journal ?journalLabel 
+WITH {
+  SELECT ?work ?journal (COUNT(?citing_work) AS ?number_of_citations) WHERE {
+    ?journal wdt:P123 wd:{{ q }} .
+    ?work wdt:P1433 ?journal .
+    ?citing_work wdt:P2860 ?work
+  }
+  GROUP BY ?work ?journal
+  ORDER BY DESC(?number_of_citations)
+  LIMIT 500  
+} AS %result
+WHERE {
+  INCLUDE %result
+  # Label the result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+ORDER BY DESC(?number_of_citations)

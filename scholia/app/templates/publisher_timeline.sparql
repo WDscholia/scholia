@@ -1,0 +1,16 @@
+#defaultView:Timeline
+SELECT DISTINCT ?datetime ?venue ?venueLabel WHERE {
+  # Publisher
+  ?venue wdt:P123 wd:{{ q }} .
+  
+  # Periodic literature
+  ?venue wdt:P31 / wdt:P279* wd:Q1002697 .
+  
+  # When the journal was started 
+  ?venue wdt:P571 ?datetime.
+  
+  # Label the journal
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?datetime)
+LIMIT 50
