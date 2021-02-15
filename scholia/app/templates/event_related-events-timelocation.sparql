@@ -1,0 +1,69 @@
+SELECT
+  (ROUND(1000 * ?score_) / 1000 AS ?score)
+  (ROUND(1000 * ?time_score_) / 1000 AS ?time_score)
+  (ROUND(1000 * ?location_score_) / 1000 AS ?location_score) 
+  ?event ?eventLabel
+WITH {
+  SELECT ?event_type WHERE {
+    VALUES ?event_type { wd:Q2020153 wd:Q46855 wd:Q40444998 }
+  }
+} AS %event_types
+WITH {
+  SELECT ?event WHERE {
+    INCLUDE %event_types
+    ?event wdt:P31 / wdt:P279* ?event_type .
+  }
+} AS %events
+WITH {
+  SELECT
+    (SUM(?scores) AS ?score_)
+    (MAX(?time_scores) AS ?time_score_)
+    (MAX(?location_scores) AS ?location_score_)
+    ?event
+  WHERE {
+    INCLUDE %events 
+          
+    { 
+      # Around the same time
+      wd:{{ q }} wdt:P580 | wdt:P585 ?time0 .
+      ?event wdt:P580 | wdt:P585 ?time .
+      BIND((365.25 * YEAR(?time0) + 30.5 * MONTH(?time0) + DAY(?time0)) AS ?day0)
+      BIND((365.25 * YEAR(?time) + 30.5 * MONTH(?time) + DAY(?time)) AS ?day)
+      
+      # TODO: multiple days cause double counting
+      BIND(20 / (1 + ABS(?day - ?day0)) AS ?time_scores)
+    }
+    # UNION
+    {
+      SELECT ?event (MAX(?inverse_distance) AS ?location_scores) WHERE {
+        INCLUDE %events 
+                
+        # geocoordinate of the query event
+        wd:{{ q }} wdt:P276? / wdt:P159? / wdt:P625 ?geo0 .
+        
+        # geocoordinate of other events
+        ?event wdt:P276? / wdt:P625 ?geo .
+        
+        # inverse distance
+        BIND((200 / (1 + geof:distance(?geo, ?geo0))) AS ?inverse_distance)
+      }
+      GROUP BY ?event
+    }  
+    UNION
+    {
+      VALUES ?online_event { wd:Q1543677 wd:Q98381855 wd:Q98381912 }
+      ?event wdt:P31 ?online_event .
+      BIND(200 AS ?location_scores)
+    }
+  
+    BIND((?time_scores * ?location_scores) AS ?scores)
+  }
+  GROUP BY ?event
+  
+} AS %results
+WHERE {
+  INCLUDE %results
+  FILTER (?event != wd:{{ q }})
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
