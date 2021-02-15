@@ -1,295 +1,47 @@
 {% extends "base.html" %}
 
 
-{% block scripts %}
-{{super()}}
+{% set aspect = "event_series" %}
+ 
+{% block in_ready %}
 
-<script type="text/javascript">
- listOfEventsSparql = `
-SELECT DISTINCT 
-  (SAMPLE(?years) AS ?year)
-  (SAMPLE(?short_names) AS ?short_name)
-  ?event ?eventLabel
-  ?proceedings ?proceedingsLabel
-WHERE {
-	?event wdt:P179 | wdt:P31 wd:{{ q }} .
-  OPTIONAL {
-    ?event wdt:P585 | wdt:P580 ?datetime .
-    BIND(YEAR(?datetime) AS ?years)
-  }
-  OPTIONAL {
-    ?event wdt:P1813 ?short_names
-  }
-  OPTIONAL {
-    ?proceedings wdt:P4745 ?event
-  }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-  }
-GROUP BY ?event ?year ?eventLabel ?proceedings ?proceedingsLabel
-ORDER BY DESC(?year)
-`
-
- topicsSparql = `
-SELECT ?score ?topic ?topicLabel ?topicDescription
-WITH {
-  SELECT
-    DISTINCT ?person
-  WHERE {
-    ?event (wdt:P179 | wdt:P31) wd:{{ q }} .
-    {
-      # speaker
-      ?event wdt:P823 ?person .
-    }
-    UNION
-    {
-      # organizer
-      ?event wdt:P664 ?person .
-    }
-    UNION
-    {
-      # participant
-      ?person wdt:P1344 | ^wdt:P710 ?event .
-    }
-    UNION
-    {
-      # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event .
-    }
-  }
-} AS %people  
-WITH {
-  SELECT
-    (SUM(?score_) AS ?score) ?topic
-  WHERE {
-
-    # For some reason a path query does not work here.
-    { ?event wdt:P179 wd:{{ q }} . }
-    UNION
-    { ?event wdt:P31 wd:{{ q }} . }
-
-    {
-      ?event wdt:P921 ?topic .
-      BIND(50 AS ?score_)
-    }
-    UNION
-    {
-      INCLUDE %people
-      ?person ^wdt:P50 / wdt:P921 ?topic .
-      BIND(1 AS ?score_)
-    }
-    UNION
-    {
-      ?event ^wdt:P4745 / ^wdt:P1433 / wdt:P921 ?topic .
-      BIND(7 AS ?score_)
-    }
-  }
-  GROUP BY ?topic
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
-}
-ORDER BY DESC(?score)
-LIMIT 200
-`
-
- personsSparql = `
-SELECT
-  ?number_of_roles
-  # (?number_of_publications AS ?works)
-  ?person ?personLabel ?personDescription
-  ?roles
-  ?example_work ?example_workLabel
-WITH {
-  SELECT
-    (COUNT(?role) AS ?number_of_roles)
-    (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles) ?person
-  WHERE {
-    {
-      # speaker
-      wd:{{ q }} ^wdt:P179 / wdt:P823 ?person .
-      BIND("speaker" AS ?role)
-    }
-    UNION
-    {
-      # organizer
-      wd:{{ q }} ^wdt:P179 / wdt:P664 ?person .
-      BIND("organizer" AS ?role)
-    }
-    UNION
-    {
-      # participant
-      ?person (wdt:P1344 | ^wdt:P710) / wdt:P179 wd:{{ q }} .
-      BIND("participant" AS ?role)
-    }
-    UNION
-    {
-      # editor
-      ?person (^wdt:P98 / wdt:P4745) / wdt:P179 wd:{{ q }} .
-      BIND("editor of proceedings" AS ?role)
-    }
-    UNION
-    {
-      # author
-      ?person (^wdt:P50 / wdt:P1433 / wdt:P4745) / wdt:P179 wd:{{ q }} .
-      BIND("author" AS ?role)
-    }
-    UNION
-    {
-      # program committee member
-      wd:{{ q }} ^wdt:P179 / wdt:P5804 ?person .
-      BIND("program committee member" AS ?role)
-    }
-  }
-  GROUP BY ?person
-} AS %people  
-WITH {
-  SELECT
-    ?number_of_roles
-    # (COUNT(?work) AS ?number_of_publications)
-    ?roles
-    ?person (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    INCLUDE %people .
-    OPTIONAL { ?work wdt:P50 ?person . }
-  }
-  GROUP BY ?number_of_roles ?roles ?person
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
-}
-ORDER BY DESC(?number_of_roles)
-LIMIT 500
-  `
-
-
- recentPublicationsSparql = `
-SELECT
-  ?publication_date
-  ?work ?workLabel
-  ?authors ?authorsUrl
-WITH {
-  SELECT
-    DISTINCT ?person
-  WHERE {
-    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
-
-    {
-      # speaker
-      ?event wdt:P823 ?person .
-    }
-    UNION
-    {
-      # organizer
-      ?event wdt:P664 ?person .
-    }
-    UNION
-    {
-      # participant
-      ?person wdt:P1344 | ^wdt:P710 ?event .
-    }
-    UNION
-    {
-      # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event .
-    }
-  }
-} AS %people  
-WITH {
-  SELECT
-    (xsd:date(MAX(?publication_datetime)) AS ?publication_date)
-    ?work
-    (GROUP_CONCAT(DISTINCT ?person_label; separator=", ") AS ?authors)
-    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?person), 32); separator=",")) AS ?authorsUrl)
-  WHERE {
-    INCLUDE %people .
-    ?work wdt:P50 ?person ; wdt:P577 ?publication_datetime .
-    ?person rdfs:label ?person_label . FILTER(LANG(?person_label) = 'en')
-  }
-  GROUP BY ?work
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
-}
-ORDER BY DESC(?publication_date)
-LIMIT 500
-`
-
- proceedingsPublicationsSparql = `
-SELECT
-  ?date
-  ?work ?workLabel
-  ?authors ?authorsUrl
-  ?topics ?topicsUrl
-WITH {
-  SELECT
-    (MIN(?date_) AS ?date) 
-    ?work
-    (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
-    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
-    (GROUP_CONCAT(DISTINCT ?topic_label; separator=", ") AS ?topics)
-    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl)
-  WHERE {
-    ?work wdt:P1433 / wdt:P4745 / (wdt:P179 | wdt:P31) wd:{{ q }} .
-    OPTIONAL {
-      ?work wdt:P577 ?publication_datetime .
-      BIND(xsd:date(?publication_datetime) AS ?date_)
-    }
-    OPTIONAL {
-      ?work wdt:P50 ?author .
-      ?author rdfs:label ?author_label . FILTER(LANG(?author_label) = "en")
-    }
-    OPTIONAL {
-      ?work wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = "en")
-    }
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?date)
-  LIMIT 500
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-ORDER BY DESC(?date)
-`
-
-
- $(document).ready(function() {
-     sparqlToDataTable(listOfEventsSparql, "#list-of-events", {
-	 linkPrefixes:{
-	     "event": "../event/",
+{{ sparql_to_table('events',
+     options={
+       "linkPrefixes":{
+         "event": "../event/",
 	     "proceedings": "../venue/",
-	 }
-     });
-     sparqlToDataTable(topicsSparql, "#topics", {
-	 linkPrefixes:{
-	     "topic": "../topic/",
-	 }
-     });
-     sparqlToDataTable(personsSparql, "#persons", {
-	 linkPrefixes:{
-	     "person": "../author/",
-	 }
-     });
-     sparqlToDataTable(proceedingsPublicationsSparql, "#proceedings-publications", {
-	 linkPrefixes:{
-	     "work": "../work/",
-	 }
-     });
-     sparqlToDataTable(recentPublicationsSparql, "#recent-publications", {
-	 linkPrefixes:{
-	     "work": "../work/",
-	 }
-     });
- });
-
-
-</script>
-
+       }
+     }
+   ) }}
+{{ sparql_to_table('topics',
+     options={
+       "linkPrefixes":{
+         "topic": "../topic/",
+       }
+     }
+   ) }}
+{{ sparql_to_table('people',
+     options={
+       "linkPrefixes":{
+         "person": "../author/",
+       }
+     }
+   ) }}
+{{ sparql_to_table('recent-publications',
+     options={
+       "linkPrefixes":{
+         "work": "../work/",
+       }
+     }
+   ) }}
+{{ sparql_to_table('proceedings-publications',
+     options={
+       "linkPrefixes":{
+         "work": "../work/",
+       }
+     }
+   ) }}
+ 
 {% endblock %}
 
 
@@ -302,9 +54,9 @@ ORDER BY DESC(?date)
 <div id="details"></div>
 
 
-<h2>List of events</h2>
+<h2 id="events">List of events</h2>
 
-<table class="table table-hover" id="list-of-events"></table>
+<table class="table table-hover" id="events-table"></table>
 
 
 <h2>Timeline</h2>
@@ -321,29 +73,29 @@ ORDER BY DESC(?date)
 </div>
 
 
-<h2>Topic scores</h2>
+<h2 id="topics">Topic scores</h2>
 
-<table class="table table-hover" id="topics"></table>
+<table class="table table-hover" id="topics-table"></table>
 
 
-<h2>Persons</h2>
+<h2 id="people">Persons</h2>
 
-<table class="table table-hover" id="persons"></table>
+<table class="table table-hover" id="people-table"></table>
 
 
 <h2>Works</h2>
 
-<h3>Recent publications</h3>
+<h3 id="recent-publications">Recent publications</h3>
 
 Recent publications by organizers, speakers or participants of the events in the series.
 
-<table class="table table-hover" id="recent-publications"></table>
+<table class="table table-hover" id="recent-publications-table"></table>
 
-<h3>Proceedings publications</h3>
+<h3 id="proceedings-publications">Proceedings publications</h3>
 
 Works published in the proceedings related to the events in the series.
 
-<table class="table table-hover" id="proceedings-publications"></table>
+<table class="table table-hover" id="proceedings-publications-table"></table>
 
 
 {% endblock %}

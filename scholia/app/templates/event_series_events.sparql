@@ -1,0 +1,21 @@
+SELECT DISTINCT 
+  (SAMPLE(?years) AS ?year)
+  (SAMPLE(?short_names) AS ?short_name)
+  ?event ?eventLabel
+  ?proceedings ?proceedingsLabel
+WHERE {
+	?event wdt:P179 | wdt:P31 wd:{{ q }} .
+  OPTIONAL {
+    ?event wdt:P585 | wdt:P580 ?datetime .
+    BIND(YEAR(?datetime) AS ?years)
+  }
+  OPTIONAL {
+    ?event wdt:P1813 ?short_names
+  }
+  OPTIONAL {
+    ?proceedings wdt:P4745 ?event
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  }
+GROUP BY ?event ?year ?eventLabel ?proceedings ?proceedingsLabel
+ORDER BY DESC(?year)
