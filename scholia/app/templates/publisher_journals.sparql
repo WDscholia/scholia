@@ -1,0 +1,27 @@
+SELECT
+  (SAMPLE(?number_of_works_) AS ?number_of_works)
+  (MAX(?bfi) AS ?BFI)
+  ?journal ?journalLabel
+  (GROUP_CONCAT(?themes_labels; separator=", ") as ?theme)
+WITH {
+  SELECT 
+    ?journal
+    (COUNT(?work) AS ?number_of_works_)
+  WHERE {
+    ?journal wdt:P123 wd:{{ q }} .
+    OPTIONAL { ?work wdt:P1433 ?journal . }
+  }
+  GROUP BY ?journal 
+} AS %journals
+WHERE {
+  INCLUDE %journals
+  OPTIONAL {
+    ?journal wdt:P921 ?themes .
+    ?themes rdfs:label ?themes_labels .
+    FILTER (LANG(?themes_labels) = 'en')
+  }
+  OPTIONAL { ?journal wdt:P1240 ?bfi . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+} 
+GROUP BY ?journal ?journalLabel
+ORDER BY DESC(?number_of_works)

@@ -1,0 +1,39 @@
+# Find frequent unresolved author names that are coauthors with
+# people associated with an organization.
+SELECT
+  ?works
+  ?researcher ?researcherLabel
+  ?author_name
+  (CONCAT(
+      "https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=",
+      ENCODE_FOR_URI(?author_name ), "&filter=wdt%3AP50+wd%3A", ?qid ) AS ?resolver_url)
+
+WITH {
+  SELECT DISTINCT ?researcher_ WHERE {
+    ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{q}} . 
+  } 
+} AS %researchers
+WITH {
+#  SELECT DISTINCT ?author_name (COUNT(DISTINCT ?work) as ?count) ?author (REPLACE(STR(?author), ".*Q", "Q") AS ?qid) WHERE {
+
+  SELECT
+    (COUNT(DISTINCT ?work) AS ?works)
+    ?author_name
+    (SAMPLE(?researcher_) AS ?researcher)
+    (REPLACE(STR(?researcher), ".*Q", "Q") AS ?qid)
+  WHERE {
+    INCLUDE %researchers
+    ?work wdt:P50 ?researcher_ ; 
+          wdt:P2093 ?author_name .
+    FILTER(regex (LCASE(?author_name), "^.*?((\\\\b\\\\w{1}\\\\b)|[.]).*$")).
+  } 
+  GROUP BY ?author_name
+  ORDER BY DESC(?works)
+  LIMIT 200
+} AS %researchers_and_number_of_works
+WHERE {
+  INCLUDE %researchers_and_number_of_works
+          
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?works)

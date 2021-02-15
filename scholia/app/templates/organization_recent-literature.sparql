@@ -1,0 +1,28 @@
+#defaultView:Table
+SELECT
+  ?publication_date
+  ?work ?workLabel
+  ?researchers ?researchersUrl
+WITH {
+  SELECT 
+    (MIN(?publication_datetimes) AS ?publication_datetime) ?work 
+    (GROUP_CONCAT(DISTINCT ?researcher_label; separator=', ') AS ?researchers)
+    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?researchersUrl)
+  WHERE {                                                         
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
+    ?work wdt:P50 ?researcher .
+    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
+    OPTIONAL {
+      ?work wdt:P577 ?publication_datetimes .
+    }
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?publication_datetime)
+  LIMIT 200  
+} AS %results
+WHERE {
+  INCLUDE %results
+  BIND(xsd:date(?publication_datetime) AS ?publication_date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,nl,ru,zh". }
+}
+ORDER BY DESC(?publication_date)

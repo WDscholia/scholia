@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% set aspect = "complex_empty" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('statistics') }}
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1>Biological complexes</h1>
+
+<div class="container">
+
+    <h2>Examples</h2>
+
+    <div class="card-deck mb-3">
+	<div class="card mb-4 box-shadow">
+
+            <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Single items</h4>
+            </div>
+            <div class="card-body">
+		<dl>
+		    <dt><a href="Q409796">Erythrocruorin</a></dt>
+		    <dd>
+			A oxygen-carrying protein complex found in annelids and arthropods.
+		    </dd>
+
+		    <dt><a href="Q90012272">SARS-CoV-2 NSP3-NSP4-NSP6 complex</a></dt>
+		    <dd>
+			A complex from Complex Portal.
+		    </dd>
+
+		    <dt><a href="Q50177826">SCARF1:Ligand [plasma membrane]</a></dt>
+		    <dd>
+			A complex from Reactome.
+		    </dd>
+
+		</dl>
+            </div>
+
+	</div>
+
+
+     <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+	    </div>
+	    <div class="card-body">
+		<p>Nothing yet</p>
+	    </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+  <h2 id="statistics-header">Statistics</h2>
+
+  <table class="table table-hover" id="statistics-table"></table>
+
+</div>
+
+{% endblock %}
+
+  

@@ -1,0 +1,37 @@
+SELECT
+  ?number_of_works
+  ?topic ?topicLabel
+  ?organization ?organizationLabel  
+WITH {
+  # Bind organizations to variable
+  SELECT ?organization WHERE {
+    VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+  }
+} AS %organizations
+WITH {
+  # Find works associated with the organizations
+  SELECT
+    # Should not count authors twice
+    DISTINCT ?work ?organization
+  WHERE {
+    INCLUDE %organizations
+    ?work wdt:P50 / (wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*)) ?organization . 
+  }
+} AS %works
+WITH {
+  # Count the number of works per topic per organization
+  SELECT
+    (COUNT(?work) AS ?number_of_works) ?topic ?organization
+  WHERE {
+    INCLUDE %works
+    ?work wdt:P921 ?topic .
+  } 
+  GROUP BY ?topic ?organization
+} AS %work_numbers
+WHERE {
+  # Label the items returned
+  INCLUDE %work_numbers
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?number_of_works)
+LIMIT 100
