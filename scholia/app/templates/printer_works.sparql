@@ -1,0 +1,22 @@
+# List of printed works by date
+SELECT
+  ?date
+  ?work ?workLabel
+  ?example_author ?example_authorLabel
+WHERE {
+  {
+    SELECT
+      (MIN(?date_) AS ?date)
+      ?work
+      (SAMPLE(?author) AS ?example_author)
+    WHERE {
+      ?work wdt:P872 wd:{{ q }} .
+      OPTIONAL { ?work wdt:P577 ?datetime . BIND(xsd:date(?datetime) AS ?date_) }
+      OPTIONAL { ?work wdt:P50 ?author }
+    }
+    GROUP BY ?work
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?date)
+LIMIT 1000

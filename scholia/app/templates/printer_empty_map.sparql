@@ -1,0 +1,24 @@
+#defaultView:Map{"layer": "?counts"}
+SELECT
+  ?geo
+  ?printer ?printerLabel ?printerDescription
+  ?counts
+  ?example_work ?example_workLabel
+WHERE {
+  hint:Query hint:optimizer "None".
+  {
+    SELECT
+      (COUNT(?work) AS ?count)
+      ?printer
+      (SAMPLE(?work) AS ?example_work)
+    WHERE {
+      ?work wdt:P872 ?printer .
+    }
+    GROUP BY ?printer
+  }
+  BIND(IF(?count = 1, "1", IF(?count <= 5, "2-5", IF(?count <= 10, "6-10", "10+"))) AS ?counts)
+  ?printer wdt:P159? / wdt:P625 ?geo
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+LIMIT 1000
