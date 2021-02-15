@@ -1,0 +1,29 @@
+SELECT
+  ?date
+  ?short_name
+  ?event ?eventLabel
+  ?location ?locationLabel
+WITH {
+  SELECT
+    ?datetime ?event
+    (SAMPLE(?location_) AS ?location) 
+    (SAMPLE(?short_name_) AS ?short_name)
+  WHERE {
+    ?event p:P793 ?key_event_statement . 
+    ?key_event_statement ps:P793 / wdt:P279 wd:Q2404808 ;
+                         pq:P585 ?datetime . 
+    FILTER (NOW() < ?datetime)
+    OPTIONAL { ?event wdt:P276 ?location_ }
+    OPTIONAL { ?event wdt:P1813 ?short_name_ }
+  }
+  GROUP BY ?datetime ?event
+  ORDER BY(?datetime)
+  LIMIT 200  
+} AS %events
+WHERE {
+  INCLUDE %events
+  
+  BIND(xsd:date(?datetime) AS ?date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY(?date)

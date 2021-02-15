@@ -1,0 +1,7 @@
+#defaultView:Map
+SELECT ?event ?eventLabel ?geo ?image WHERE {
+  ?event (wdt:P179 | wdt:P31) wd:{{ q }} .
+  ?event wdt:P276? / wdt:P625 ?geo .
+  OPTIONAL { ?event wdt:P18 ?image . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}

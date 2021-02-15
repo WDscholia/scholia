@@ -1,0 +1,45 @@
+#defaultView:Graph
+SELECT 
+  ?author1 ?author1Label (SAMPLE(?image1_) AS ?image1) ?rgb
+  ?author2 ?author2Label (SAMPLE(?image2_) AS ?image2)
+WITH {
+  SELECT
+    ?author1
+    (SAMPLE(?dark_rgb_) AS ?dark_rgb)
+    (SAMPLE(?light_rgb_) AS ?light_rgb)
+  WHERE {
+    # Find people at the event
+    { 
+      wd:{{ q }} (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710) ?author1 . 
+      BIND ("EEEEEE" AS ?dark_rgb_)
+    }
+    UNION 
+    {
+      # author of article in proceedings, or program committee member
+      wd:{{ q }}  (^wdt:P4745 / ^wdt:P1433 / wdt:P50) | wdt:P5804 ?author1 .  
+      BIND ("FFFFFF" AS ?light_rgb_)
+    }
+  }
+  GROUP BY ?author1
+} AS %authors
+WITH {
+  SELECT DISTINCT ?author1 ?author2 ?rgb WHERE {
+    INCLUDE %authors
+    wd:{{ q }} (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710 | ^wdt:P4745 / ^wdt:P1433 / wdt:P50)  ?author2 . 
+            
+    # Find co-authors
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2)
+
+    BIND(COALESCE(?dark_rgb, ?light_rgb) AS ?rgb)
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+    
+  OPTIONAL { ?author1 wdt:P18 ?image1_ . }
+  OPTIONAL { ?author2 wdt:P18 ?image2_ . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,sv,ru,zh".
+  }
+}
+GROUP BY ?author1 ?author1Label ?rgb ?author2 ?author2Label  

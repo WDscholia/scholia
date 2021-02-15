@@ -1,0 +1,50 @@
+# Topics of works authored by people associated with an event
+SELECT ?score ?topic ?topicLabel ?topicDescription
+WITH {
+  SELECT
+    DISTINCT ?person
+  WHERE {
+    {
+      # speaker, organizer, program committee member
+      wd:{{ q }} wdt:P823 | wdt:P664 | wdt:P5804 ?person .
+    }
+    UNION
+    {
+      # participant
+      ?person wdt:P1344 | ^wdt:P710 wd:{{ q }} .
+    }
+    UNION
+    {
+      # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 wd:{{ q }} .
+    }
+  }
+} AS %people  
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score) ?topic
+  WHERE {
+    {
+      wd:{{ q }} wdt:P921 ?topic .
+      BIND(50 AS ?score_)
+    }
+    UNION
+    {
+      INCLUDE %people
+      ?person ^wdt:P50 / wdt:P921 ?topic .
+      BIND(1 AS ?score_)
+    }
+    UNION
+    {
+      wd:{{ q }} ^wdt:P4745 / ^wdt:P1433 / wdt:P921 ?topic .
+      BIND(7 AS ?score_)
+    }
+  }
+  GROUP BY ?topic
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
