@@ -1,139 +1,34 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-{{super()}}
+{% set aspect = "event" %}
+ 
+{% block in_ready %}
 
-<script type="text/javascript">
-
-  comingDeadlinesSparql = `
-SELECT
-  ?date
-  ?short_name
-  ?event ?eventLabel
-  ?location ?locationLabel
-WITH {
-  SELECT
-    ?datetime ?event
-    (SAMPLE(?location_) AS ?location) 
-    (SAMPLE(?short_name_) AS ?short_name)
-  WHERE {
-    ?event p:P793 ?key_event_statement . 
-    ?key_event_statement ps:P793 / wdt:P279 wd:Q2404808 ;
-                         pq:P585 ?datetime . 
-    FILTER (NOW() < ?datetime)
-    OPTIONAL { ?event wdt:P276 ?location_ }
-    OPTIONAL { ?event wdt:P1813 ?short_name_ }
-  }
-  GROUP BY ?datetime ?event
-  ORDER BY(?datetime)
-  LIMIT 200  
-} AS %events
-WHERE {
-  INCLUDE %events
-  
-  BIND(xsd:date(?datetime) AS ?date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-ORDER BY(?date)
-`
-
-
- futureEventsSparql = `
-SELECT ?time ?short_name ?event ?eventLabel ?location ?locationLabel
-WITH {
-  SELECT DISTINCT ?event WHERE {
-    # This union seems to be faster than a VALUES-based query
-    { ?event wdt:P31 / wdt:P279* wd:Q2020153 . }
-    UNION 
-    { ?event wdt:P31 / wdt:P279* wd:Q46855 . }
-    UNION 
-    { ?event wdt:P31 / wdt:P279* wd:Q40444998 . }
-  }
-} AS %events
-WITH {
-  SELECT 
-    ?event 
-    (xsd:date(MIN(?times)) AS ?time)
-    (SAMPLE(?locations) AS ?location)
-    (SAMPLE(?short_names) AS ?short_name)
-  WHERE {
-    INCLUDE %events
-    
-    ?event wdt:P580 | wdt:P585 ?times .
-    FILTER (?times > NOW())
-  
-    OPTIONAL { ?event wdt:P276 ?locations }
-    OPTIONAL { ?event wdt:P1813 ?short_names }
-  }
-  GROUP BY ?event
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,fr,jp,nl,no,pl,ru,sv,zh". }
-}
-ORDER BY ?time
-`
-
- pastEventsSparql = `
-SELECT ?time ?short_name ?event ?eventLabel ?location ?locationLabel
-WITH {
-  SELECT DISTINCT ?event WHERE {
-    # This union seems to be faster than a VALUES-based query
-    { ?event wdt:P31 / wdt:P279* wd:Q2020153 . }
-    UNION 
-    { ?event wdt:P31 / wdt:P279* wd:Q46855 . }
-    UNION 
-    { ?event wdt:P31 / wdt:P279* wd:Q40444998 . }
-  }
-} AS %events
-WITH {
-  SELECT 
-    ?event 
-    (xsd:date(MIN(?times)) AS ?time)
-    (SAMPLE(?locations) AS ?location)
-    (SAMPLE(?short_names) AS ?short_name)
-  WHERE {
-    INCLUDE %events
-    
-    ?event wdt:P580 | wdt:P585 ?times .
-    FILTER (?times < NOW())
-  
-    OPTIONAL { ?event wdt:P276 ?locations }
-    OPTIONAL { ?event wdt:P1813 ?short_names }
-  }
-  GROUP BY ?event
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,fr,jp,nl,no,pl,ru,sv,zh". }
-}
-ORDER BY DESC(?time)
-LIMIT 200
-`
-
-
- $(document).ready(function() {
-     sparqlToDataTable(comingDeadlinesSparql, "#coming-deadlines", {
-	 linkPrefixes: {
-	     event: "../event/",
-	     location: "../location/",
-	 }
-     });
-     sparqlToDataTable(futureEventsSparql, "#future-events", {
-	 linkPrefixes: {
-	     event: "../event/",
-	     location: "../location/",
-	 }
-     });
-     sparqlToDataTable(pastEventsSparql, "#past-events", {
-	 linkPrefixes: {
-	     event: "../event/",
-	     location: "../location/",
-	 }
-     });
- });
-</script>
-
+{{ sparql_to_table('upcoming-deadlines',
+     options={
+       "linkPrefixes":{
+         "event": "../event/",
+	     "location": "../location/",
+       }
+     }
+   ) }}
+{{ sparql_to_table('future-events',
+     options={
+       "linkPrefixes":{
+         "event": "../event/",
+	     "location": "../location/",
+       }
+    }
+  ) }}
+{{ sparql_to_table('past-events',
+     options={
+       "linkPrefixes":{
+         "event": "../event/",
+	     "location": "../location/",
+       }
+    }
+  ) }}
+ 
 {% endblock %}
 
 
@@ -141,19 +36,19 @@ LIMIT 200
 
 <h1>Events</h1>
 
-<h2 id="Coming deadlines">Coming deadlines</h2>
+<h2 id="upcoming-deadlines">Coming deadlines</h2>
 
-<table class="table table-hover" id="coming-deadlines"></table>
-
-
-<h2 id="Future events">Future events</h2>
-
-<table class="table table-hover" id="future-events"></table>
+<table class="table table-hover" id="upcoming-deadlines-table"></table>
 
 
-<h2 id="Future events">Past events</h2>
+<h2 id="future-events">Future events</h2>
 
-<table class="table table-hover" id="past-events"></table>
+<table class="table table-hover" id="future-events-table"></table>
+
+
+<h2 id="past-events">Past events</h2>
+
+<table class="table table-hover" id="past-events-table"></table>
 
 
 
