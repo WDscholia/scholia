@@ -315,7 +315,7 @@ def entity_to_bibtex_entry(entity, key=None):
     if key is None:
         entry = u("@Article{%s,\n") % entity['id']
     else:
-        entry = u("@Article{%s,\n") % escape_to_tex(key)
+        entry = u("@Article{%s,\n") % key
     authors = authors_to_bibtex_authors(
         entity_to_authors(entity, return_humanness=True))
     entry += "  author =   {%s},\n" % u" and ".join(authors)
