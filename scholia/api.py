@@ -121,7 +121,8 @@ def select_value_by_language_preferences(
             return choices[preference]
     else:
         # Select a random one
-        return next(choices.itervalues())
+        # iter here is for Python2
+        return next(iter(choices.values()))
 
 
 def wb_get_entities(qs):
