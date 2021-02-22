@@ -1,0 +1,20 @@
+SELECT
+  ?number
+  ?code
+  ?item ?itemLabel ?itemDescription
+WHERE {
+  # Find catalogue items
+  ?item p:P972 ?catalogue_statement .
+  ?catalogue_statement ps:P972 wd:{{ q }} .
+
+  # Optionally the catalogue code or the serial order
+  OPTIONAL { ?catalogue_statement pq:P528 | pq:P1545 ?code }
+
+  # For numerical sorting the catalogue code should be converted to an integer
+  BIND(xsd:integer(?code) AS ?number)
+
+  # Label the result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY ?number ?code
+LIMIT 1000
