@@ -89,10 +89,7 @@ sparqlToIframe(`# tool: scholia
 	 console.log(item.claims.P6782[0])
 	 try {
 	     var rorID = item.claims.P6782[0].mainsnak.datavalue.value;
-	     detailsList.push( '<img alt="ROR icon" src="' +
-			       'https://pbs.twimg.com/profile_images/1086592528038707200/qVDdvqOH_400x400.jpg' +
-			       '" width="16" height="16" hspace="4" /> <a href="https://ror.org/' +
-			       encodeURI( rorID ) + '">' + rorID + '</a> ');
+	     detailsList.push( '<a href="https://ror.org/' + encodeURI( rorID ) + '">' + rorID + '</a> ');
 	 }
 	 catch(e) {
 	     console.log("ERROR: " + e)
