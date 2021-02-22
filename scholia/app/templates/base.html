@@ -89,7 +89,7 @@ sparqlToIframe(`# tool: scholia
 	 console.log(item.claims.P6782[0])
 	 try {
 	     var rorID = item.claims.P6782[0].mainsnak.datavalue.value;
-	     detailsList.push( '<a href="https://ror.org/' + encodeURI( rorID ) + '">' + rorID + '</a> ');
+	     detailsList.push( 'ROR <a href="https://ror.org/' + encodeURI( rorID ) + '">' + rorID + '</a> ');
 	 }
 	 catch(e) {
 	     console.log("ERROR: " + e)
