@@ -1173,7 +1173,7 @@ def show_printer(q):
 
 
 @main.route('/printer/')
-def show_printer_empty():
+def show_printer_index():
     """Return printer index page.
 
     Returns
@@ -1182,7 +1182,7 @@ def show_printer_empty():
         Rendered index page for printer view.
 
     """
-    return render_template('printer_empty.html')
+    return render_template('printer-index.html')
 
 
 @main.route('/protein/' + q_pattern)
