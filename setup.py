@@ -20,6 +20,7 @@ setup(
     install_requires=requirements,
     long_description='',
     classifiers=[
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
         ],
     tests_require=['pytest', 'flake8'],
