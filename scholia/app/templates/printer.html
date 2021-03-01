@@ -1,61 +1,28 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-{{super()}}
+{% set aspect = "printer" %}
+ 
+{% block in_ready %}
 
-<script type="text/javascript">
-
-  printedWorksSparql = `
-# List of printed works by date
-SELECT
-  ?date
-  ?work ?workLabel
-  ?example_author ?example_authorLabel
-WHERE {
-  {
-    SELECT
-      (MIN(?date_) AS ?date)
-      ?work
-      (SAMPLE(?author) AS ?example_author)
-    WHERE {
-      ?work wdt:P872 wd:{{ q }} .
-      OPTIONAL { ?work wdt:P577 ?datetime . BIND(xsd:date(?datetime) AS ?date_) }
-      OPTIONAL { ?work wdt:P50 ?author }
-    }
-    GROUP BY ?work
-  }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-ORDER BY DESC(?date)
-LIMIT 1000
- `
-
-
- $(document).ready(function() {
-     sparqlToDataTable(
-	 printedWorksSparql, "#printed-works",
-	 {
-	     linkPrefixes: {
-		 work: '../work/',
-		 example_author: '../author/',
+{{ sparql_to_table('works',
+     options={
+	     "linkPrefixes": {
+		 "work": "../work/",
+		 "example_author": "../author/",
 	     },
-	 },
-     );
- });
-</script>
+	 }) }}
 
 {% endblock %}
 
-
-
 {% block page_content %}
+
 <h1 id="h1">Printer</h1>
 
 <div id="intro"></div>
 
-<h2 id="Printed works">Printed works</h2>
+<h2 id="works">Printed works</h2>
 
-<table class="table table-hover" id="printed-works"></table>
+<table class="table table-hover" id="works-table"></table>
 
 
 

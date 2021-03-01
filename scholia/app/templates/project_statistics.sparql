@@ -1,19 +1,18 @@
-SELECT ?count ?description
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3400 []. }
-} AS %cordis
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P4870 []. }
-} AS %gepris
-WHERE {
+# title: Statistics for projects identifiers
+SELECT ?count ?description {
   {
-    INCLUDE %cordis
+    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3400 []. } }
     BIND("Total number of projects with a CORDIS number" AS ?description)
   }
-  UNION
+  UNION 
   {
-    INCLUDE %gepris
+    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P4870 []. } }
     BIND("Total number of projects with a GEPRIS number" AS ?description)
+  }
+  UNION 
+  {
+    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6536 []. } }
+    BIND("Total number of projects with a Gateway to Research Project ID" AS ?description)
   }
 }
 ORDER BY DESC(?count)

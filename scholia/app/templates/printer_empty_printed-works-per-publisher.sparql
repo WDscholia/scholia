@@ -1,0 +1,19 @@
+SELECT
+  ?count
+  ?printer ?printerLabel ?printerDescription
+  ?example_work ?example_workLabel
+WHERE {
+  {
+    SELECT
+      (COUNT(?work) AS ?count)
+      ?printer
+      (SAMPLE(?work) AS ?example_work)
+    WHERE {
+      ?work wdt:P872 ?printer .
+    }
+    GROUP BY ?printer
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?count)
+LIMIT 1000
