@@ -1,0 +1,25 @@
+#defaultView:ImageGrid
+SELECT
+  ?image
+  ?editor ?editorLabel 
+  ?venues
+WITH {
+  SELECT DISTINCT
+    (SAMPLE(?image_) AS ?image)
+    ?editor 
+    (GROUP_CONCAT(?venue_label; separator=" // ") AS ?venues)
+  WHERE {
+    # Find editors for journals published by publisher
+    ?venue_ wdt:P123 wd:{{ q }} .
+    ?venue_ wdt:P98 | wdt:P5769 ?editor .
+    ?editor wdt:P18 ?image_ .
+    OPTIONAL {
+      ?venue_ rdfs:label ?venue_label . FILTER(LANG(?venue_label) = 'en')
+    }
+  }
+  GROUP BY ?editor
+} AS %result
+WHERE {
+  INCLUDE %result 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,fr,jp,nl,sv,ru,zh" . } 
+}

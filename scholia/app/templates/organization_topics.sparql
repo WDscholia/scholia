@@ -1,0 +1,31 @@
+SELECT
+  ?researchers
+  ?topic ?topicLabel
+  ("🔎" AS ?zoom)
+  (CONCAT("{{ q }}/topic/", SUBSTR(STR(?topic), 32)) AS ?zoomUrl)
+  ?topicDescription
+  ?samplework ?sampleworkLabel
+WITH {
+  SELECT DISTINCT ?researcher WHERE {
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
+  } 
+} AS %researchers
+WITH {
+  SELECT DISTINCT ?topic
+    (COUNT(DISTINCT ?researcher) AS ?researchers)
+    (SAMPLE(?work) AS ?samplework)
+  WHERE {
+    INCLUDE %researchers
+    ?work wdt:P50 ?researcher . 
+    ?work wdt:P921 ?topic . 
+  } 
+  GROUP BY ?topic
+  ORDER BY DESC(?researchers)
+  LIMIT 500
+} AS %works_and_number_of_researchers
+WHERE {
+  INCLUDE %works_and_number_of_researchers
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
+}
+GROUP BY ?researchers ?topic ?topicLabel ?topicDescription ?samplework ?sampleworkLabel
+ORDER BY DESC(?researchers)

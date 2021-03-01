@@ -1,0 +1,67 @@
+SELECT
+  ?number_of_roles
+  # (?number_of_publications AS ?works)
+  ?person ?personLabel ?personDescription
+  ?roles
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    (COUNT(?role) AS ?number_of_roles)
+    (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles) ?person
+  WHERE {
+    {
+      # speaker
+      wd:{{ q }} ^wdt:P179 / wdt:P823 ?person .
+      BIND("speaker" AS ?role)
+    }
+    UNION
+    {
+      # organizer
+      wd:{{ q }} ^wdt:P179 / wdt:P664 ?person .
+      BIND("organizer" AS ?role)
+    }
+    UNION
+    {
+      # participant
+      ?person (wdt:P1344 | ^wdt:P710) / wdt:P179 wd:{{ q }} .
+      BIND("participant" AS ?role)
+    }
+    UNION
+    {
+      # editor
+      ?person (^wdt:P98 / wdt:P4745) / wdt:P179 wd:{{ q }} .
+      BIND("editor of proceedings" AS ?role)
+    }
+    UNION
+    {
+      # author
+      ?person (^wdt:P50 / wdt:P1433 / wdt:P4745) / wdt:P179 wd:{{ q }} .
+      BIND("author" AS ?role)
+    }
+    UNION
+    {
+      # program committee member
+      wd:{{ q }} ^wdt:P179 / wdt:P5804 ?person .
+      BIND("program committee member" AS ?role)
+    }
+  }
+  GROUP BY ?person
+} AS %people  
+WITH {
+  SELECT
+    ?number_of_roles
+    # (COUNT(?work) AS ?number_of_publications)
+    ?roles
+    ?person (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    INCLUDE %people .
+    OPTIONAL { ?work wdt:P50 ?person . }
+  }
+  GROUP BY ?number_of_roles ?roles ?person
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?number_of_roles)
+LIMIT 500

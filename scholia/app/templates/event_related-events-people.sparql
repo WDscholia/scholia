@@ -1,0 +1,19 @@
+SELECT
+  ?score ?event ?eventLabel ?eventDescription
+  ?example_person ?example_personLabel
+WHERE {
+  { 
+    SELECT
+      (COUNT(DISTINCT ?person) AS ?score) ?event
+      (SAMPLE(?person) AS ?example_person)
+    WHERE {
+      ?person ^wdt:P823 | ^wdt:P664 | wdt:P1344 | ^wdt:P710 | (^wdt:P98 / wdt:P4745) | (^wdt:P50 / wdt:P1433 / wdt:P4745 ) | ^wdt:P5804 wd:{{ q }} , ?event . 
+      FILTER (?event != wd:{{ q }})
+    }
+    GROUP BY ?event
+    ORDER BY DESC(?score)
+    LIMIT 200
+  } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)

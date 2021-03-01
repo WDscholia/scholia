@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+
+{% set aspect = "organization_missing" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('authors',options={ "linkPrefixes":{ "researcher": '../../author/' }}) }}
+{{ sparql_to_table('authors-no-initials',options={ "linkPrefixes":{ "researcher": '../../author/' }}) }}
+{{ sparql_to_table('authors-with-initials') }}
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<h1 id="h1">Organization</h1>
+
+Missing information with respect to the organization.
+
+<h2 id="authors-header">Missing author items</h2>
+
+The authors listed below may only be represented as strings in Wikidata
+with no link to Wikidata items.
+Follow the link to use the Author disambiguator tool to try to resolve
+the authors.
+
+<table class="table table-hover" id="authors-table"></table>
+
+<h2 id="h3">Author name strings to be resolved</h2>
+
+
+<h3 id="authors-no-initials-header">Author name strings without initials</h3>
+
+The author may be represented as a string rather than a Wikidata item.
+Follow the link to use the Author disambiguator tool to try to resolve the author name.
+To facilitate curation, author name strings containing single-letter initials have been removed from this table.
+
+<table class="table table-hover" id="authors-no-initials-table"></table>
+
+<h3 id="authors-with-initials-header">Author name strings with initials</h3>
+
+This table shows author name strings that contain single-letter initials.
+
+<table class="table table-hover" id="authors-with-initials-table"></table> 
+
+
+{% endblock %}

@@ -248,7 +248,25 @@ def show_author_rss(q):
 
 @main.route('/author/' + q_pattern + '/missing')
 def show_author_missing(q):
-    """Return HTML rendering for missing information about specific author.
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+
+    """
+    return redirect(url_for('app.show_author_curation', q=q), code=301)
+
+
+@main.route('/author/' + q_pattern + '/curation')
+def show_author_curation(q):
+    """Return HTML rendering for curation page about specific author.
 
     Parameters
     ----------
@@ -261,7 +279,7 @@ def show_author_missing(q):
         Rendered HTML.
 
     """
-    return render_template('author_missing.html', q=q)
+    return render_template('author_curation.html', q=q)
 
 
 @main.route('/author/')
@@ -343,7 +361,25 @@ def show_award_empty():
 
 @main.route('/award/' + q_pattern + '/missing')
 def show_award_missing(q):
-    """Return HTML rendering for missing information about specific award.
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+
+    """
+    return redirect(url_for('app.show_award_curation', q=q), code=301)
+
+
+@main.route('/award/' + q_pattern + '/curation')
+def show_award_curation(q):
+    """Return HTML rendering for curation page about specific award.
 
     Parameters
     ----------
@@ -356,7 +392,7 @@ def show_award_missing(q):
         Rendered HTML.
 
     """
-    return render_template('award_missing.html', q=q)
+    return render_template('award_curation.html', q=q)
 
 
 @main.route('/cas/<cas>')
@@ -1065,7 +1101,25 @@ def show_organization_topic(q1, q2):
 
 @main.route('/organization/' + q_pattern + '/missing')
 def show_organization_missing(q):
-    """Return HTML rendering for missing information about an organization.
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+
+    """
+    return redirect(url_for('app.show_organization_curation', q=q), code=301)
+
+
+@main.route('/organization/' + q_pattern + '/curation')
+def show_organization_curation(q):
+    """Return HTML rendering for curation page about an organization.
 
     Parameters
     ----------
@@ -1078,7 +1132,7 @@ def show_organization_missing(q):
         Rendered HTML.
 
     """
-    return render_template('organization_missing.html', q=q)
+    return render_template('organization_curation.html', q=q)
 
 
 @main.route('/organizations/' + qs_pattern)
@@ -1441,7 +1495,25 @@ def show_topics(qs):
 
 @main.route('/topic/' + q_pattern + '/missing')
 def show_topic_missing(q):
-    """Return rendered HTML for missing page for topic.
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+
+    """
+    return redirect(url_for('app.show_topic_curation', q=q), code=301)
+
+
+@main.route('/topic/' + q_pattern + '/curation')
+def show_topic_curation(q):
+    """Return rendered HTML for curation page for topic.
 
     Parameters
     ----------
@@ -1454,7 +1526,7 @@ def show_topic_missing(q):
         Rendered HTML index page for topic.
 
     """
-    return render_template('topic_missing.html', q=q)
+    return render_template('topic_curation.html', q=q)
 
 
 @main.route('/chemical/' + q_pattern)
@@ -1495,16 +1567,29 @@ def show_chemical_empty():
 
 
 @main.route('/chemical/missing')
-def show_chemicals_missing():
-    """Return rendered HTML index page for missing information for chemicals.
+def show_chemical_missing(q):
+    """Redirects to the new HTML rendering for missing information.
 
     Returns
     -------
     html : str
-        Rendered HTML index page for missing information for chemicals.
+        Redirected HTML.
 
     """
-    return render_template('chemicals_missing.html')
+    return redirect(url_for('app.show_chemical_curation', q=q), code=301)
+
+
+@main.route('/chemical/curation')
+def show_chemical_curation():
+    """Return rendered HTML index page for curation page for chemicals.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for curation page for chemicals.
+
+    """
+    return render_template('chemical_curation.html')
 
 
 @main.route('/chemical-element/' + q_pattern)
@@ -1607,7 +1692,25 @@ def show_venue(q):
 
 @main.route('/venue/' + q_pattern + '/missing')
 def show_venue_missing(q):
-    """Return HTML rendering for missing information about specific venue.
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Redirected HTML.
+
+    """
+    return redirect(url_for('app.show_venue_curation', q=q), code=301)
+
+
+@main.route('/venue/' + q_pattern + '/curation')
+def show_venue_curation(q):
+    """Return HTML rendering for curation page about specific venue.
 
     Parameters
     ----------
@@ -1620,7 +1723,7 @@ def show_venue_missing(q):
         Rendered HTML.
 
     """
-    return render_template('venue_missing.html', q=q)
+    return render_template('venue_curation.html', q=q)
 
 
 @main.route('/venue/' + q_pattern + '/cito')
@@ -1777,6 +1880,37 @@ def show_series_empty():
 
     """
     return render_template('series_empty.html')
+
+
+@main.route('/complex/' + q_pattern)
+def show_complex(q):
+    """Return html render page for specific biological complex.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('complex.html', q=q)
+
+
+@main.route('/complex/')
+def show_complex_empty():
+    """Return rendered HTML index page for complex.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for complex.
+
+    """
+    return render_template('complex_empty.html')
 
 
 @main.route('/pathway/' + q_pattern)

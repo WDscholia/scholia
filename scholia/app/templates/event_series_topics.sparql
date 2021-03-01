@@ -1,0 +1,61 @@
+SELECT ?score ?topic ?topicLabel ?topicDescription
+WITH {
+  SELECT
+    DISTINCT ?person
+  WHERE {
+    ?event (wdt:P179 | wdt:P31) wd:{{ q }} .
+    {
+      # speaker
+      ?event wdt:P823 ?person .
+    }
+    UNION
+    {
+      # organizer
+      ?event wdt:P664 ?person .
+    }
+    UNION
+    {
+      # participant
+      ?person wdt:P1344 | ^wdt:P710 ?event .
+    }
+    UNION
+    {
+      # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event .
+    }
+  }
+} AS %people  
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score) ?topic
+  WHERE {
+
+    # For some reason a path query does not work here.
+    { ?event wdt:P179 wd:{{ q }} . }
+    UNION
+    { ?event wdt:P31 wd:{{ q }} . }
+
+    {
+      ?event wdt:P921 ?topic .
+      BIND(50 AS ?score_)
+    }
+    UNION
+    {
+      INCLUDE %people
+      ?person ^wdt:P50 / wdt:P921 ?topic .
+      BIND(1 AS ?score_)
+    }
+    UNION
+    {
+      ?event ^wdt:P4745 / ^wdt:P1433 / wdt:P921 ?topic .
+      BIND(7 AS ?score_)
+    }
+  }
+  GROUP BY ?topic
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200

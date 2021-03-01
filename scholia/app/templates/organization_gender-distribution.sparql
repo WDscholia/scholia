@@ -1,0 +1,13 @@
+ SELECT ?count ?gender ?genderLabel 
+WITH {
+  SELECT (COUNT(DISTINCT ?researcher) AS ?count) ?gender WHERE {
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
+    ?researcher wdt:P21 ?gender . 
+  } 
+  GROUP BY ?gender
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,ep,fr,jp,nl,no,ru,sv,zh" . } 
+} 
+ ORDER BY DESC(?count)

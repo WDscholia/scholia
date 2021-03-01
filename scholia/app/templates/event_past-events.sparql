@@ -1,0 +1,34 @@
+SELECT ?time ?short_name ?event ?eventLabel ?location ?locationLabel
+WITH {
+  SELECT DISTINCT ?event WHERE {
+    # This union seems to be faster than a VALUES-based query
+    { ?event wdt:P31 / wdt:P279* wd:Q2020153 . }
+    UNION 
+    { ?event wdt:P31 / wdt:P279* wd:Q46855 . }
+    UNION 
+    { ?event wdt:P31 / wdt:P279* wd:Q40444998 . }
+  }
+} AS %events
+WITH {
+  SELECT 
+    ?event 
+    (xsd:date(MIN(?times)) AS ?time)
+    (SAMPLE(?locations) AS ?location)
+    (SAMPLE(?short_names) AS ?short_name)
+  WHERE {
+    INCLUDE %events
+    
+    ?event wdt:P580 | wdt:P585 ?times .
+    FILTER (?times < NOW())
+  
+    OPTIONAL { ?event wdt:P276 ?locations }
+    OPTIONAL { ?event wdt:P1813 ?short_names }
+  }
+  GROUP BY ?event
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,fr,jp,nl,no,pl,ru,sv,zh". }
+}
+ORDER BY DESC(?time)
+LIMIT 200

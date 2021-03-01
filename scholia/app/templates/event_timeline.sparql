@@ -1,0 +1,19 @@
+#defaultView:Timeline
+SELECT ?time ?item ?itemLabel ?image
+WHERE {
+  {
+    wd:{{ q }} wdt:P580 | wdt:P585 ?time .
+    OPTIONAL { wd:{{ q }} wdt:P18 ?image . }
+    BIND(wd:Q24575110 AS ?item)
+  }
+  UNION
+  {
+    wd:{{ q }} wdt:P582 ?time .
+    OPTIONAL { wd:{{ q }} wdt:P18 ?image . }
+    BIND(wd:Q24575125 AS ?item)
+  }
+  UNION 
+  { wd:{{ q }} p:P793 [ ps:P793 ?item ; pq:P585 ?time ] . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
