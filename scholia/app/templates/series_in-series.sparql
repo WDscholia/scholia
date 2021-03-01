@@ -1,0 +1,17 @@
+SELECT ?publication_date ?number_of_papers ?short_name ?collection ?collectionLabel
+WITH {
+  SELECT (COUNT(?work) AS ?number_of_papers) (MIN(?datetimes) AS ?publication_datetime) (SAMPLE(?short_name_) AS ?short_name) ?collection
+  WHERE {
+    ?collection wdt:P179 wd:{{ q }} .
+    OPTIONAL { ?work wdt:P1433 ?collection . }
+    OPTIONAL { ?collection wdt:P1813 ?short_name_ . }
+    OPTIONAL { ?collection wdt:P577 ?datetimes . }
+  }
+  GROUP BY ?collection
+} AS %result
+WHERE {
+  INCLUDE %result
+  BIND(xsd:date(?publication_datetime) AS ?publication_date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}
+ORDER BY DESC(?publication_date) DESC(?number_of_papers)

@@ -1,0 +1,32 @@
+#defaultView:BarChart
+SELECT ?year ?count ?organization ?organizationLabel
+WITH {
+  SELECT (MIN(?year_) AS ?year) ?work WHERE {
+    ?collection wdt:P179 wd:{{ q }} . 
+    ?work wdt:P1433 ?collection .
+    ?work wdt:P577 ?datetimes .
+    BIND(STR(YEAR(?datetimes)) AS ?year_)
+  } 
+  GROUP BY ?work
+} AS %works                
+WITH {
+  SELECT ?year (COUNT(?work) AS ?count) ?organization
+  WHERE {
+    INCLUDE %works
+	?work wdt:P50 ?author .
+    
+    # For now, only employment relation
+    # We could add affiliation with "| wdt:P1416/wdt:P361*" 
+    # Note that this extra term will double count.
+    ?author wdt:P108  ?organization . 
+   }
+   GROUP BY ?year ?organization
+                  
+   # Exclude organizations with only a single count
+   # HAVING(?count > 1)
+} AS %result
+WHERE {
+ INCLUDE %result
+ SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" }
+}
+ORDER BY ?year
