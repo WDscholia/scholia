@@ -1,0 +1,24 @@
+# Statistics for a serial grouped by author
+SELECT
+  ?number_of_works ?number_of_citations
+  ?author ?authorLabel
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    (COUNT(DISTINCT ?work) AS ?number_of_works) 
+    (COUNT(?citing_work) AS ?number_of_citations)
+    (SAMPLE(?work) AS ?example_work)
+    ?author
+  WHERE {
+    ?collection wdt:P179 wd:{{ q }} .
+    ?work wdt:P1433 ?collection .
+    ?work wdt:P50 ?author .
+    OPTIONAL { ?citing_work wdt:P2860 ?work . }
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}
+ORDER BY DESC(?number_of_works) DESC(?number_of_citations)
