@@ -1,0 +1,23 @@
+#defaultView:BubbleChart
+SELECT ?count ?topic ?topicLabel
+WITH {
+  SELECT (COUNT(*) AS ?count) ?topic
+  WHERE {
+    # Topics of series
+    { wd:{{ q }} wdt:P921 ?topic . }
+    
+    # Topics of collections in series
+    UNION { ?collection wdt:P179 wd:{{ q }} ; wdt:P921 ?topic . }
+    
+    # Topics of works in collections in series
+    UNION { ?work wdt:P1433/wdt:P179 wd:{{ q }} ; wdt:P921 ?topic . }
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" }
+}
+ORDER BY DESC(?count)
+DESC(?count)
+LIMIT 100

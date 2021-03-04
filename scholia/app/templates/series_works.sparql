@@ -1,0 +1,17 @@
+ SELECT ?number_of_citations ?publication_date ?work ?workLabel
+ WITH {
+     SELECT (MIN(?datetimes) AS ?publication_datetime) (COUNT(?citing_work) AS ?number_of_citations) ?work
+     WHERE {
+    ?collection wdt:P179 wd:{{ q }} .
+	?work wdt:P1433 ?collection .
+				OPTIONAL { ?work wdt:P577 ?datetimes . }
+	 OPTIONAL { ?citing_work wdt:P2860 ?work . }
+     }
+     GROUP BY ?work
+ } AS %result
+ WHERE {
+     INCLUDE %result
+     BIND(xsd:date(?publication_datetime) AS ?publication_date)
+     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+ }
+ ORDER BY DESC(?number_of_citations) DESC(?publication_date)
