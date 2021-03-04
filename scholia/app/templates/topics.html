@@ -1,116 +1,29 @@
 {% extends "base.html" %}
 
-
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
- listOfTopicsSparql = `
-SELECT ?topic ?topicLabel ?example_work ?example_workLabel
-WITH {
-  SELECT ?topic (SAMPLE(?work) AS ?example_work) WHERE {
-    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    OPTIONAL { 
-      ?work wdt:P921 ?topic ; wdt:P31 wd:Q13442814 .
-    }
-  }
-  GROUP BY ?topic
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-  `;
-
- listOfWorksSparql = `
-SELECT
-  ?count 
-  (MIN(?publication_date_) AS ?publication_date)
-  ?work ?workLabel
-  ?topics ?topicsUrl
-WITH {
-  SELECT (COUNT(?topic) AS ?count) ?work
-    (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
-    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl)                                    
-  WHERE {
-    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    
-    # A broad query including "(wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )" seems to take
-    # long time and time out.
-    ?work wdt:P921 ?topic  .
-    ?topic rdfs:label ?topic_label .
-    FILTER(LANG(?topic_label) = 'en')
-  }
-  GROUP BY ?work ?topics
-  HAVING(?count > 1)
-  ORDER BY DESC(?count)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  OPTIONAL {
-    ?work wdt:P577 ?publication_datetime .
-    BIND(xsd:date(?publication_datetime) AS ?publication_date_)
-  }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-GROUP BY ?count ?work ?workLabel ?topics ?topicsUrl
-ORDER BY DESC(?count) DESC(?publication_date)
-  `;
+{% set aspect = "topics" %}
 
 
- authorsSparql = `
-SELECT
-  ?score
-  ?author ?authorLabel
-  ?example_work ?example_workLabel
-WITH {
-  SELECT (COUNT(?topic) AS ?score) ?author (SAMPLE(?work_) AS ?example_work)
-    WHERE {
-    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    
-    # A broad query including "(wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )" seems to take
-    # long time and time out.
-    ?work wdt:P921 ?topic  .
-    ?work wdt:P2860 ?cited_work .
-    { ?cited_work wdt:P50 ?author . BIND(?cited_work AS ?work_) }
-    UNION
-    { ?work wdt:P50 ?author . BIND(?work AS ?work_) }
-  }
-  GROUP BY ?author
-  ORDER BY DESC(?score)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-ORDER BY DESC(?score)
-`
+{% block in_ready %}
 
-
- $(document).ready(function() {
-     sparqlToDataTable(listOfTopicsSparql, "#list-of-topics",{
-	 linkPrefixes:{
+{{ sparql_to_table('list-of-topics',
+    options={
+	 "linkPrefixes": {
 	     "topic": "../topic/",
 	     "example_work": "../work/",
-    	 }
-     });
-     sparqlToDataTable(listOfWorksSparql, "#list-of-works",{
-	 linkPrefixes:{
-	     "work": "../work/",
-    	 }
-     });
-     sparqlToDataTable(authorsSparql, "#authors",{
-	 linkPrefixes:{
+         }
+    }) }}
+
+{{ sparql_to_table('list-of-works',
+    options={
+        "linkPrefixes": { "work": "../work/" }
+    }) }}
+
+{{ sparql_to_table('authors', options={
+	 "linkPrefixes": {
 	     "author": "../author/",
 	     "example_work": "../work/",
-    	 }
-     });
- });
-
-
-</script>
+         }
+     }) }}
 
 {% endblock %}
 
@@ -122,16 +35,17 @@ ORDER BY DESC(?score)
 
 <div id="intro"></div>
 
-<table class="table table-hover" id="list-of-topics"></table>
-
-<h2>List of works on any combination of these topics</h2>
-
-<table class="table table-hover" id="list-of-works"></table>
+<table class="table table-hover" id="list-of-topics-table"></table>
 
 
-<h2>Authors</h2>
+<h2 id="list-of-works-header">List of works on any combination of these topics</h2>
 
-<table class="table table-hover" id="authors"></table>
+<table class="table table-hover" id="list-of-works-table"></table>
+
+
+<h2 id="authors-header">Authors</h2>
+
+<table class="table table-hover" id="authors-table"></table>
 
 
 

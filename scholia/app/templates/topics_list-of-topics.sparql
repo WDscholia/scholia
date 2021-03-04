@@ -1,0 +1,17 @@
+# title: List of topics
+SELECT
+  ?topic ?topicLabel ?topicDescription
+  ?example_work ?example_workLabel
+WITH {
+  SELECT ?topic (SAMPLE(?work) AS ?example_work) WHERE {
+    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    OPTIONAL { 
+      ?work wdt:P921 ?topic ; wdt:P31 wd:Q13442814 .
+    }
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}

@@ -1,0 +1,34 @@
+# title: List of works on any combination of specific topics
+SELECT
+  ?count 
+  (MIN(?publication_date_) AS ?publication_date)
+  ?work ?workLabel
+  ?topics ?topicsUrl
+WITH {
+  SELECT (COUNT(?topic) AS ?count) ?work
+    (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
+    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl)                                    
+  WHERE {
+    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    
+    # A broad query including "(wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )" seems to take
+    # long time and time out.
+    ?work wdt:P921 ?topic  .
+    ?topic rdfs:label ?topic_label .
+    FILTER(LANG(?topic_label) = 'en')
+  }
+  GROUP BY ?work ?topics
+  HAVING(?count > 1)
+  ORDER BY DESC(?count)
+  LIMIT 200
+} AS %results
+WHERE {
+  INCLUDE %results
+  OPTIONAL {
+    ?work wdt:P577 ?publication_datetime .
+    BIND(xsd:date(?publication_datetime) AS ?publication_date_)
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+GROUP BY ?count ?work ?workLabel ?topics ?topicsUrl
+ORDER BY DESC(?count) DESC(?publication_date)
