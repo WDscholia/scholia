@@ -1,0 +1,17 @@
+# title: Co-funders to a specific funder including an example funded work
+SELECT ?count ?sponsor ?sponsorLabel ?example_work ?example_workLabel
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?sponsor (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    ?work wdt:P859+ wd:{{ q }} .
+    ?work wdt:P859+ ?sponsor .
+    FILTER (wd:{{ q }} != ?sponsor)
+  }
+  GROUP BY ?sponsor
+} AS %result
+WHERE {
+  # Label the result
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}
+ORDER BY DESC(?count)

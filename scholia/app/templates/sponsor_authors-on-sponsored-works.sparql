@@ -1,0 +1,18 @@
+# title: Authors on works sponsored or funded from a specific entity.
+SELECT
+  ?publication_count
+  ?author ?authorLabel
+  ?example_work ?example_workLabel
+WITH {
+  SELECT ?author (count(?work) as ?publication_count) (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    ?work wdt:P859+ wd:{{ q }} .
+    ?work wdt:P50 ?author .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+} 
+ORDER BY DESC(?publication_count)
