@@ -87,6 +87,12 @@ sparqlToIframe(`# tool: scholia
 	 catch(e) { }
 
 	 try {
+	     var rorID = item.claims.P6782[0].mainsnak.datavalue.value;
+	     detailsList.push( 'ROR <a href="https://ror.org/' + encodeURI( rorID ) + '">' + rorID + '</a> ');
+	 }
+	 catch(e) { }
+
+	 try {
 	     var hashtag = item.claims.P2572[0].mainsnak.datavalue.value;
 	     detailsList.push( '<a href="https://hashtags-hub.toolforge.org/' +
 			       encodeURI( hashtag ) + '">#' + escapeHTML( hashtag ) + '</a> ');
