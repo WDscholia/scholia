@@ -140,6 +140,7 @@ def show_biorxiv(biorxiv_id):
     -------
     html : str
         Rendered HTML.
+
     """
     qs = biorxiv_to_qs(biorxiv_id)
     return _render_work_qs(qs)
