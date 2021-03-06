@@ -3,7 +3,7 @@
 # Shubhanshu Mishra, Vetle Torvik
 select ?year (count(?work) as ?number_of_publications) ?intention where {
   {
-    select (str(?year_) as ?year) (0 as ?pages) ("_" as ?role) where {
+    select (str(?year_) as ?year) (0 as ?pages) ("_" as ?intention) where {
       # default values = 0
       ?year_item wdt:P31 wd:Q577 . 
       ?year_item wdt:P585 ?date .
