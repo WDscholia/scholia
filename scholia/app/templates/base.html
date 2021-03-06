@@ -313,9 +313,7 @@ sparqlToIframe(`# tool: scholia
     WHERE {
     { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 / wdt:P1433 wd:{{ q }} . BIND("venue-cito" AS ?aspectsubpage) }
     UNION
-    { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 wd:Q30149558 . BIND("work-cito" AS ?aspectsubpage) }
-    UNION
-    { wd:Q30149558 pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 [] . BIND("work-cito" AS ?aspectsubpage) }
+    { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 wd:{{ q }} . BIND("work-cito" AS ?aspectsubpage) }
     }
     `;
      settings = {
