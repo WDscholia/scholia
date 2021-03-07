@@ -1,0 +1,11 @@
+SELECT DISTINCT ?taxon ?taxonLabel ?source ?sourceLabel ?doi WHERE {
+  VALUES ?chemical { wd:{{ q }} }
+  ?chemical p:P703 ?taxonStatement .
+  ?taxonStatement ps:P703 ?taxon .
+  OPTIONAL {
+      ?taxonStatement prov:wasDerivedFrom/pr:P248 ?source .
+      OPTIONAL { ?source wdt:P356 ?doi . }
+    }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY ASC(?taxonLabel)
+  LIMIT 250
