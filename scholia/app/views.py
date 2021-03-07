@@ -1574,7 +1574,7 @@ def show_chemical(q):
 
 
 @main.route('/chemical/')
-def show_chemical_empty():
+def show_chemical_index():
     """Return rendered HTML index page for chemical.
 
     Returns
@@ -1583,7 +1583,7 @@ def show_chemical_empty():
         Rendered HTML index page for chemical.
 
     """
-    return render_template('chemical_empty.html')
+    return render_template('chemical-index.html')
 
 
 @main.route('/chemical/missing')
@@ -1596,11 +1596,11 @@ def show_chemical_missing(q):
         Redirected HTML.
 
     """
-    return redirect(url_for('app.show_chemical_curation', q=q), code=301)
+    return redirect(url_for('app.show_chemical_index_curation', q=q), code=301)
 
 
 @main.route('/chemical/curation')
-def show_chemical_curation():
+def show_chemical_index_curation():
     """Return rendered HTML index page for curation page for chemicals.
 
     Returns
@@ -1609,7 +1609,7 @@ def show_chemical_curation():
         Rendered HTML index page for curation page for chemicals.
 
     """
-    return render_template('chemical_curation.html')
+    return render_template('chemical-index-curation.html')
 
 
 @main.route('/chemical-element/' + q_pattern)
