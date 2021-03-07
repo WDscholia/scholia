@@ -1,0 +1,10 @@
+SELECT ?citedArticle ?citedArticleLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
+  VALUES ?JOURNAL { wd:{{ q }} }
+  VALUES ?INTENTION { wd:Q96472102 wd:Q96471820 wd:Q101149476 }
+  ?citingArticle p:P2860 ?citationStatement .
+  ?citationStatement pq:P3712 ?INTENTION ;
+                     ps:P2860 ?citedArticle .
+  ?citedArticle wdt:P1433 ?JOURNAL .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?citedArticle ?citedArticleLabel
+  ORDER BY DESC(?count)
