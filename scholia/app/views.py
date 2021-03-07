@@ -1574,7 +1574,7 @@ def show_chemical(q):
 
 
 @main.route('/chemical/')
-def show_chemical_empty():
+def show_chemical_index():
     """Return rendered HTML index page for chemical.
 
     Returns
@@ -1583,7 +1583,7 @@ def show_chemical_empty():
         Rendered HTML index page for chemical.
 
     """
-    return render_template('chemical_empty.html')
+    return render_template('chemical-index.html')
 
 
 @main.route('/chemical/missing')
