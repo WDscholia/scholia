@@ -1,0 +1,32 @@
+SELECT
+  ?number_of_citing_works
+  ?author ?authorLabel
+  ?organization ?organizationLabel
+  ?example_work ?example_workLabel
+WITH {
+  SELECT DISTINCT ?author WHERE {
+    ?author wdt:P27 | wdt:P1416/wdt:P17 | wdt:P108/wdt:P17 wd:{{ q }} .
+  }
+} AS %authors
+WITH {
+  SELECT
+    ?author 
+    (COUNT(DISTINCT ?citing_work) AS ?number_of_citing_works)
+    (SAMPLE(?organization_) AS ?organization)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    INCLUDE %authors
+    ?work wdt:P50 ?author .
+    OPTIONAL { ?citing_work wdt:P2860 ?work . }
+    OPTIONAL {
+      ?author wdt:P1416 | wdt:P108 ?organization_ .
+      ?organization_ wdt:P17 wd:{{ q }}
+    }
+  }
+  GROUP BY ?author 
+} AS %results
+WHERE {
+  INCLUDE %results
+  service wikibase:label { bd:serviceParam wikibase:language "en" . } 
+}
+ORDER BY DESC(?number_of_citing_works) 
