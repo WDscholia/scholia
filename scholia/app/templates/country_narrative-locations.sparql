@@ -1,0 +1,26 @@
+# title: Narrative locations for a specific country
+#defaultView:Map{"markercluster":true}.
+SELECT 
+  ?location ?locationLabel 
+  ?work ?workLabel 
+  ?geo
+  ?layer
+WITH {
+  SELECT DISTINCT ?location ?work ?geo ?layer WHERE {
+    ?location wdt:P17 wd:{{ q }} .
+    
+    # Geocoordinates may possible be under a headquarter property
+    ?location wdt:P159? / wdt:P625 ?geo.
+    ?work wdt:P840 ?location .
+    
+    # Filter encyclopedic articles - that may not be so relevant
+    FILTER NOT EXISTS { ?work wdt:P31 wd:Q17329259 }
+
+    OPTIONAL { ?work wdt:P31 / rdfs:label ?layer . FILTER (LANG(?layer) = 'en') }
+  }
+} AS %results
+WHERE {
+  INCLUDE %results 
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+} 

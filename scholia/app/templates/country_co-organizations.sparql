@@ -1,0 +1,23 @@
+# title: Co-organizations for a specific country
+#defaultView:Map
+SELECT ?coorganization ?coorganizationLabel ?geocoordinates ?example_coauthor ?example_coauthorLabel ?example_work ?example_workLabel
+WITH {  
+  SELECT
+    ?coorganization
+    (SAMPLE(?geocoordinates_) AS ?geocoordinates)
+    (SAMPLE(?coauthor) AS ?example_coauthor)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    ?organization wdt:P17 wd:{{ q }} .
+    ?author wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?organization .
+    ?work wdt:P50 ?author, ?coauthor .
+    ?coauthor wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?coorganization .
+    FILTER NOT EXISTS { ?coorganization wdt:P17 wd:{{ q }} }
+    ?coorganization wdt:P625 ?geocoordinates_ .
+  }
+  GROUP BY ?coorganization 
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
