@@ -1,4 +1,4 @@
-SELECT ?journal ?journalLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
+SELECT ?journal ?journalLabel (COUNT(DISTINCT ?citationStatement) AS ?citations) (COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
   ?citingArticle p:P2860 ?citationStatement ;
                  wdt:P1433 ?journal .
   ?citationStatement pq:P3712 ?intention ;
@@ -6,4 +6,4 @@ SELECT ?journal ?journalLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
   ?intention wdt:P31 wd:Q96471816 .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 } GROUP BY ?journal ?journalLabel
-  ORDER BY DESC(?count)
+  ORDER BY DESC(?citations)

@@ -251,6 +251,7 @@ sparqlToIframe(`# tool: scholia
 
      });
 
+     // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
      var query = `
     SELECT DISTINCT ?aspect 
@@ -302,6 +303,33 @@ sparqlToIframe(`# tool: scholia
 		 `<a role="button"
 		     class="btn btn-outline-dark btn-sm"
                      href="{{ url_for('app.index') }}` + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
+	 });
+     } );
+
+     // this query opens a subpage for the Wikidata item, e.g. as cito subpage
+     var endpointUrl = 'https://query.wikidata.org/sparql';
+     var query = `
+    SELECT DISTINCT ?aspectsubpage
+    WHERE {
+    { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 / wdt:P1433 wd:{{ q }} . BIND("venue-cito" AS ?aspectsubpage) }
+    UNION
+    { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 wd:{{ q }} . BIND("work-cito" AS ?aspectsubpage) }
+    }
+    `;
+     settings = {
+	 headers: { Accept: 'application/sparql-results+json' },
+	 data: { query: query }
+     };
+
+     $.ajax( endpointUrl, settings ).then( function ( data ) {
+	 data.results.bindings.forEach(function(entry) {
+	     var props = entry.aspectsubpage.value.split("-");
+	     var aspect = props[0];
+	     var subpage = props[1];
+	     $( '#aspect-chooser' ).append(
+		 `<a role="button"
+		     class="btn btn-outline-dark btn-sm"
+                     href="{{ url_for('app.index') }}` + aspect + '/' + '{{ q }}' + '/' + subpage + '">' + subpage + '</a> ' );
 	 });
      } );
 

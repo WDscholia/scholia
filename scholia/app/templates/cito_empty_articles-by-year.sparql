@@ -1,0 +1,11 @@
+#defaultView:BarChart
+select ?year (count(?work) as ?number_of_publications) where {
+  select ?work (min(?years) as ?year) where {
+    ?work wdt:P577 ?dates ;
+          p:P2860 / pq:P3712 / wdt:P31 wd:Q96471816 .
+    bind(str(year(?dates)) as ?years) .
+  }
+  group by ?work
+}
+group by ?year
+order by ?year
