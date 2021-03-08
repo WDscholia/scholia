@@ -2,6 +2,8 @@
 
 Usage:
   scholia.query arxiv-to-q <arxiv>
+  scholia.query biorxiv-to-q <biorxiv>
+  scholia.query chemrxiv-to-q <chemrxiv>
   scholia.query cas-to-q <cas>
   scholia.query atomic-symbol-to-q <symbol>
   scholia.query cordis-to-q <cordis>
@@ -1422,6 +1424,16 @@ def main():
 
     elif arguments['arxiv-to-q']:
         qs = arxiv_to_qs(arguments['<arxiv>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['biorxiv-to-q']:
+        qs = biorxiv_to_qs(arguments['<biorxiv>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['chemrxiv-to-q']:
+        qs = chemrxiv_to_qs(arguments['<chemrxiv>'])
         if len(qs) > 0:
             print(qs[0])
 
