@@ -184,8 +184,8 @@ def chemrxiv_to_qs(chemrxiv_id):
     True
 
     """
-    return _identifier_to_qs('P9262', chemrxiv_id)  
-  
+    return _identifier_to_qs('P9262', chemrxiv_id)
+
 
 def _identifier_to_qs(prop, identifier):
     query = 'select ?work where {{ ?work wdt:{prop} "{identifier}" }}'.format(
