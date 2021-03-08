@@ -13,7 +13,7 @@ from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
-                     github_to_qs, biorxiv_to_qs,
+                     github_to_qs, biorxiv_to_qs, chemrxiv_to_qs,
                      inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
                      q_to_class, q_to_dois, random_author, twitter_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
@@ -143,6 +143,25 @@ def show_biorxiv(biorxiv_id):
 
     """
     qs = biorxiv_to_qs(biorxiv_id)
+    return _render_work_qs(qs)
+
+
+@main.route('/chemrxiv/<chemrxiv_id>')
+def show_chemrxiv(chemrxiv_id):
+    """Return HTML rendering for ChemRxiv.
+
+    Parameters
+    ----------
+    chemrxiv_id : str
+        ChemRxiv identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    qs = chemrxiv_to_qs(chemrxiv_id)
     return _render_work_qs(qs)
 
 

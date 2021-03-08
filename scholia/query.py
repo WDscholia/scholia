@@ -2,6 +2,8 @@
 
 Usage:
   scholia.query arxiv-to-q <arxiv>
+  scholia.query biorxiv-to-q <biorxiv>
+  scholia.query chemrxiv-to-q <chemrxiv>
   scholia.query cas-to-q <cas>
   scholia.query atomic-symbol-to-q <symbol>
   scholia.query cordis-to-q <cordis>
@@ -162,6 +164,28 @@ def biorxiv_to_qs(biorxiv_id):
     """
     return _identifier_to_qs('P3951', biorxiv_id)
 
+
+def chemrxiv_to_qs(chemrxiv_id):
+    """Convert ChemRxiv ID to Wikidata ID.
+
+    Parameters
+    ----------
+    chemrxiv_id : str
+        ChemRxiv identifier.
+
+    Returns
+    -------
+    qs : list of str
+        List of string with Wikidata IDs.
+
+    Examples
+    --------
+    >>> chemrxiv_to_qs('12791954') == ['Q98577324']
+    True
+
+    """
+    return _identifier_to_qs('P9262', chemrxiv_id)  
+  
 
 def _identifier_to_qs(prop, identifier):
     query = 'select ?work where {{ ?work wdt:{prop} "{identifier}" }}'.format(
@@ -1400,6 +1424,16 @@ def main():
 
     elif arguments['arxiv-to-q']:
         qs = arxiv_to_qs(arguments['<arxiv>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['biorxiv-to-q']:
+        qs = biorxiv_to_qs(arguments['<biorxiv>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['chemrxiv-to-q']:
+        qs = chemrxiv_to_qs(arguments['<chemrxiv>'])
         if len(qs) > 0:
             print(qs[0])
 
