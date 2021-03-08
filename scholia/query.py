@@ -163,6 +163,28 @@ def biorxiv_to_qs(biorxiv_id):
     return _identifier_to_qs('P3951', biorxiv_id)
 
 
+def chemrxiv_to_qs(chemrxiv_id):
+    """Convert ChemRxiv ID to Wikidata ID.
+
+    Parameters
+    ----------
+    chemrxiv_id : str
+        ChemRxiv identifier.
+
+    Returns
+    -------
+    qs : list of str
+        List of string with Wikidata IDs.
+
+    Examples
+    --------
+    >>> chemrxiv_to_qs('12791954') == ['Q98577324']
+    True
+
+    """
+    return _identifier_to_qs('P9262', chemrxiv_id)  
+  
+
 def _identifier_to_qs(prop, identifier):
     query = 'select ?work where {{ ?work wdt:{prop} "{identifier}" }}'.format(
         prop=prop,
