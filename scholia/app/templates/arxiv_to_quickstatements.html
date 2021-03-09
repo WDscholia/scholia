@@ -40,10 +40,12 @@ ID is found in Wikidata. However, note that new items may not be immediately fou
 
 {% if quickstatements %}
 
-<div id="quickstatements"><pre>{{ quickstatements }} </pre></div>
+<div id="quickstatements"><pre>{{ quickstatements }}</pre></div>
 
-<a href="https://wikidata-todo.toolforge.org/quick_statements.php?list={{ quickstatements | urlencode }}">Forward to Magnus Manske's quickstatements</a>
-
+<a href="https://quickstatements.toolforge.org/#/v1={{ quickstatements | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}">
+  <button class="btn btn-primary">Submit to Quickstatements ↗</button>
+</a>
+  
 {% endif %}
 
 
