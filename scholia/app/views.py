@@ -237,6 +237,15 @@ def show_arxiv_to_quickstatements():
                                arxiv=arxiv)
 
     quickstatements = metadata_to_quickstatements(metadata)
+
+    # For Quickstatements Version 2 in URL components,
+    # TAB and newline should be replace by | and ||
+    # https://www.wikidata.org/wiki/Help:QuickStatements
+    # Furthermore the '/' also needs to be encoded, but Jinja2 urlencode does
+    # not encode that character.
+    # https://github.com/pallets/jinja/issues/515
+    # Here, we let jinja2 handle the encoding rather than adding an extra
+    # parameter
     return render_template('arxiv_to_quickstatements.html',
                            arxiv=arxiv, quickstatements=quickstatements)
 
