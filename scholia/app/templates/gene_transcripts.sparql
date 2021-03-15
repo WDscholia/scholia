@@ -1,0 +1,16 @@
+SELECT
+  ?transcript_ID
+  ?reference ?referenceLabel ?referenceDescription
+WITH {
+  SELECT ?transcript_ID ?reference
+  WHERE {
+      wd:{{ q }} wdt:P31 wd:Q7187;
+                 p:P704 ?transcriptid_statement .
+    ?transcriptid_statement ps:P704 ?transcript_ID ;
+                            prov:wasDerivedFrom/pr:P248 ?reference .
+  }
+} AS %result 
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}

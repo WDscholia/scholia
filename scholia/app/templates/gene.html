@@ -1,99 +1,15 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-{{super()}}
+{% set aspect = "gene" %}
 
-<script type="text/javascript">
+{% block in_ready %}
 
-  transcriptsSparql = `
-SELECT
-  ?transcript_ID
-  ?reference ?referenceLabel ?referenceDescription
-WITH {
-  SELECT ?transcript_ID ?reference
-  WHERE {
-      wd:{{ q }} wdt:P31 wd:Q7187;
-                 p:P704 ?transcriptid_statement .
-    ?transcriptid_statement ps:P704 ?transcript_ID ;
-                            prov:wasDerivedFrom/pr:P248 ?reference .
-  }
-} AS %result 
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-`
-
- proteinsSparql = `
-SELECT
-  ?protein ?proteinLabel ?proteinDescription
-WITH {
-  SELECT ?protein
-  WHERE {
-    wd:{{ q }} wdt:P31 wd:Q7187 ;
-      wdt:P688 ?protein .
-  }
-} AS %result 
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-`
-
- orthologsSparql = `
-SELECT
-  ?ortholog ?orthologLabel ?orthologDescription
-  ?taxon ?taxonLabel ?taxonDescription
-WITH {
-  SELECT ?ortholog ?taxon
-  WHERE {
-    wd:{{ q }} wdt:P31 wd:Q7187;
-         wdt:P684 ?ortholog .
-    ?ortholog wdt:P703 ?taxon .
-  }
-} AS %result 
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-`
-
- variantsSparql = `
-SELECT
-  ?variant ?variantLabel ?variantDescription
-  ?types
-WITH {
-  SELECT ?variant ?type
-  WHERE {
-    ?variant wdt:P3433 wd:{{ q }}
-  }
-} AS %variants
-WITH {
-  SELECT ?variant (GROUP_CONCAT(?type_label; separator=" // ") AS ?types) WHERE {
-    INCLUDE %variants
-    OPTIONAL {
-      ?variant wdt:P279 ?variantType . 
-      ?variantType rdfs:label ?type_label .  FILTER (lang(?type_label) = 'en')
-    }
-  }
-  GROUP BY ?variant
-} AS %result 
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-`
-
- $(document).ready(function() {
-     sparqlToDataTable(transcriptsSparql, "#transcripts");
-     sparqlToDataTable(proteinsSparql, "#proteins");
-     sparqlToDataTable(orthologsSparql, "#orthologs");
-     sparqlToDataTable(variantsSparql, "#variants");
- });
-</script>
+{{ sparql_to_table('transcripts') }}
+{{ sparql_to_table('proteins') }}
+{{ sparql_to_table('orthologs') }}
+{{ sparql_to_table('variants') }}
 
 {% endblock %}
-
 
 
 {% block page_content %}
@@ -102,30 +18,28 @@ WHERE {
 
 <div id="intro"></div>
 
-<h2 id="Transcripts">Transcripts</h2>
+<h2 id="transcripts-header">Transcripts</h2>
 
 Transcripts encoded by this gene.
 
-<table class="table table-hover" id="transcripts"></table>
+<table class="table table-hover" id="transcripts-table"></table>
 
-<h2 id="Proteins">Proteins</h2>
+<h2 id="proteins-header">Proteins</h2>
 
 Proteins encoded by this gene.
 
-<table class="table table-hover" id="proteins"></table>
+<table class="table table-hover" id="proteins-table"></table>
 
-<h2 id="Orthologs">Orthologs</h2>
+<h2 id="orthologs-header">Orthologs</h2>
 
 Orthologs encoded by this gene.
 
-<table class="table table-hover" id="orthologs"></table>
+<table class="table table-hover" id="orthologs-table"></table>
 
-<h2 id="Variants">Variants</h2>
+<h2 id="variants-header">Variants</h2>
 
 Variants encoded by this gene.
 
-<table class="table table-hover" id="variants"></table>
-
+<table class="table table-hover" id="variants-table"></table>
 
 {% endblock %}
-    

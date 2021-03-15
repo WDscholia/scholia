@@ -1,0 +1,13 @@
+SELECT
+  ?protein ?proteinLabel ?proteinDescription
+WITH {
+  SELECT ?protein
+  WHERE {
+    wd:{{ q }} wdt:P31 wd:Q7187 ;
+      wdt:P688 ?protein .
+  }
+} AS %result 
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
