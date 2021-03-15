@@ -6,7 +6,7 @@ SELECT
 WITH {
   SELECT ?child ?rgb ?parent WHERE {
     { 
-      # Parent taxons
+      # Parent taxa
       SELECT ?child ?rgb ?parent  WHERE {
         SERVICE gas:service {
           gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
@@ -25,7 +25,7 @@ WITH {
     }
     UNION 
     {
-      # Child taxons
+      # Child taxa
       SELECT ?child ?rgb ?parent WHERE {
         BIND(wd:{{ q }} AS ?parent)
         ?child wdt:P171 ?parent . 
