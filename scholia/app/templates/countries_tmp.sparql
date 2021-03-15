@@ -1,0 +1,13 @@
+SELECT
+  ?country ?countryLabel ?countryDescription
+  ?example_work ?example_workLabel
+WITH {
+  SELECT ?country WHERE {
+    VALUES ?country { {% for q in qs %} wd:{{ q }} {% endfor %} }
+  }
+  GROUP BY ?country
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,nl,no,ru,sv,zh". }
+}

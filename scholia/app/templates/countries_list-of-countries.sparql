@@ -1,0 +1,31 @@
+SELECT 
+  ?number_of_publications
+  ?country ?countryLabel
+  ?example_author ?example_authorLabel
+  ?example_work ?example_workLabel
+WITH {
+  SELECT ?country WHERE {
+    VALUES ?country { {% for q in qs %} wd:{{ q }} {% endfor %} }
+  }
+} AS %countries
+WITH {
+  SELECT 
+    ?country 
+    (COUNT(DISTINCT ?work) AS ?number_of_publications)
+    (SAMPLE(?work) AS ?example_work)
+    (SAMPLE(?author) AS ?example_author)
+  WHERE {
+    INCLUDE %countries
+    OPTIONAL {
+      ?organization wdt:P17 ?country .
+      ?author wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?organization .
+      ?work wdt:P50 ?author .
+    }
+  }
+  GROUP BY ?country
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?number_of_publications)
