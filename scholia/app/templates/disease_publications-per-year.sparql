@@ -1,0 +1,36 @@
+#defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year) where {
+          { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{q}} . }
+          union { ?work wdt:P921/wdt:P361+ wd:{{q}} . }
+          union { ?work wdt:P921/wdt:P1269+ wd:{{q}} . }
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now()) as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?next_year)
+    }
+  }
+  union {
+    select ?work (min(?years) as ?year) where {
+      { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{q}} . }
+      union { ?work wdt:P921/wdt:P361+ wd:{{q}} . }
+      union { ?work wdt:P921/wdt:P1269+ wd:{{q}} . }
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work 
+  }
+}
+group by ?year 
+order by ?year
