@@ -1,0 +1,22 @@
+#defaultView:Table
+SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
+WITH {
+  SELECT
+    (MIN(?date) AS ?publication_date)
+    (COUNT(?citing_citing_work) AS ?citations)
+    ?citing_work
+  WHERE {
+    ?citing_work wdt:P2860 wd:{{ q }} .
+    OPTIONAL {
+      ?citing_work wdt:P577 ?datetime .
+      BIND(xsd:date(?datetime) AS ?date)
+    }
+    OPTIONAL { ?citing_citing_work wdt:P2860 ?citing_work }
+  }
+  GROUP BY ?citing_work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?citations) DESC(?date)

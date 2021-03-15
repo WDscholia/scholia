@@ -1,96 +1,20 @@
 {% extends "base.html" %}
 
+{% set aspect = "pathway" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('participants') }}
+{{ sparql_to_table('citing-articles') }}
+{{ sparql_to_table('recent-articles') }}
+{{ sparql_to_iframe('publications-per-year') }}
+
+{% endblock %}
+
 {% block scripts %}
 {{super()}}
 
 <script type="text/javascript">
-    
-const participantsSparql = `
-SELECT ?part ?partLabel ?partDescription ?type
-WITH {
-  SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
-  WHERE {
-    wd:{{ q }} wdt:P31 wd:Q4915012 ;
-             wdt:P527 ?part .
-    OPTIONAL { 
-      ?part wdt:P31 ?type_ .
-      ?type_ rdfs:label ?type_label .
-      FILTER (LANG(?type_label) = 'en')
-    }
-  } GROUP BY ?part
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-} ORDER BY ASC(?partLabel)
-`
-
-const recentArticlesSparql = `
-SELECT ?date ?work ?workLabel ?type ?topics
-WITH {
-  SELECT DISTINCT ?work 
-    WHERE {
-      { ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} . }
-      UNION { wd:{{ q }} wdt:P2860 ?work . }
-    }
-} AS %works
-WITH {
-  SELECT 
-    (MAX(?dates) as ?datetime)
-    ?work
-    (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
-    (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics) 
-  WHERE {
-    INCLUDE %works
-    OPTIONAL {
-      ?work wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label .
-      FILTER (lang(?topic_label) = 'en')
-    }
-    OPTIONAL { 
-      ?work wdt:P31 ?type_ .
-      ?type_ rdfs:label ?type_label .
-      FILTER (LANG(?type_label) = 'en') 
-    }
-    OPTIONAL { ?work wdt:P577 ?dates . }
-  }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-  BIND(xsd:date(?datetime) AS ?date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-ORDER BY DESC(?date)
-LIMIT 500
-`
-
-const citingArticlesSparql = `
-#defaultView:Table
-SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
-WITH {
-  SELECT
-    (MIN(?date) AS ?publication_date)
-    (COUNT(?citing_citing_work) AS ?citations)
-    ?citing_work
-  WHERE {
-    ?citing_work wdt:P2860 wd:{{ q }} .
-    OPTIONAL {
-      ?citing_work wdt:P577 ?datetime .
-      BIND(xsd:date(?datetime) AS ?date)
-    }
-    OPTIONAL { ?citing_citing_work wdt:P2860 ?citing_work }
-  }
-  GROUP BY ?citing_work
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-ORDER BY DESC(?citations) DESC(?date)
-`
-
-// Extensible query for muliple, optional values
 const optionalDataValuesSparql =`
 SELECT ?wpid ?organism ?organismLabel ?pathwayDescription
 WHERE {
@@ -104,10 +28,6 @@ WHERE {
 `
 
 $(document).ready(function() {
-  sparqlToDataTable(participantsSparql, "#participants");
-  sparqlToDataTable(recentArticlesSparql, "#recentArticles");
-  sparqlToDataTable(citingArticlesSparql, "#citingArticles");
-
   // Hide optional sections until data values are confirmed and ready
   var organismSection = document.getElementById("Organism")                                                                                         
   organismSection.style.display = "none"; 
@@ -146,8 +66,6 @@ $(document).ready(function() {
 
 {% endblock %}
 
-
-
 {% block page_content %}
 <h1 id="h1">Pathway</h1>
 
@@ -161,25 +79,23 @@ $(document).ready(function() {
 
 <h2 id="Organism">Organism</h2>
 
-<h2 id="Participants">Participants</h2>
+<h2 id="participants-header">Participants</h2>
 
-<table class="table table-hover" id="participants"></table>
+<table class="table table-hover" id="participants-table"></table>
 
-<h2 id="Published works related to the pathway">Published works related to the pathway</h2>
+<h2 id="recent-articles-header">Published works related to the pathway</h2>
 
-<table class="table table-hover" id="recentArticles"></table>
+<table class="table table-hover" id="recent-articles-table"></table>
 
 
-<h2 id="Works citing this pathway">Works citing this pathway</h2>
+<h2 id="citing-articles-header">Works citing this pathway</h2>
 
-<table class="table table-hover" id="citingArticles"></table>
+<table class="table table-hover" id="citing-articles-table"></table>
 
-<h2 id="Publications per year">Publications per year</h2>
+<h2 id="publications-per-year-header">Publications per year</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABarChart%0A%23%20Inspired%20from%20LEGOLAS%20-%20http%3A%2F%2Fabel.lis.illinois.edu%2Flegolas%2F%0A%23%20Shubhanshu%20Mishra%2C%20Vetle%20Torvik%0Aselect%20%3Fyear%20%28count%28%3Fwork%29%20as%20%3Fnumber_of_publications%29%20where%20%7B%0A%20%20%7B%0A%20%20%20%20select%20%28str%28%3Fyear_%29%20as%20%3Fyear%29%20%280%20as%20%3Fpages%29%20where%20%7B%0A%20%20%20%20%20%20%23%20default%20values%20%3D%200%0A%20%20%20%20%20%20%3Fyear_item%20wdt%3AP31%20wd%3AQ577%20.%20%0A%20%20%20%20%20%20%3Fyear_item%20wdt%3AP585%20%3Fdate%20.%0A%20%20%20%20%20%20bind%28year%28%3Fdate%29%20as%20%3Fyear_%29%0A%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20select%20%28min%28%3Fyear_%29%20as%20%3Fearliest_year%29%20where%20%7B%0A%20%20%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%7C%20%28wdt%3AP31%2a%20%2F%20wdt%3AP279%2a%29%20%29%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%20%20%20%20%7D%20union%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_date%20.%20%0A%20%20%20%20%20%20%20%20%20%20bind%28year%28%3Fpublication_date%29%20as%20%3Fyear_%29%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20bind%28year%28now%28%29%29%20as%20%3Fnext_year%29%0A%20%20%20%20%20%20filter%20%28%3Fyear_%20%3E%3D%20%3Fearliest_year%20%26%26%20%3Fyear_%20%3C%3D%20%3Fnext_year%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20union%20%7B%0A%20%20%20%20select%20%3Fwork%20%28min%28%3Fyears%29%20as%20%3Fyear%29%20where%20%7B%0A%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP921%20%2F%20%28wdt%3AP361%2B%20%7C%20wdt%3AP1269%2B%20%7C%20%28wdt%3AP31%2a%20%2F%20wdt%3AP279%2a%29%20%29%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20%7D%20union%20%7B%0A%20%20%20%20%20%20%20%20wd%3A{{ q }}%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fdates%20.%0A%20%20%20%20%20%20bind%28str%28year%28%3Fdates%29%29%20as%20%3Fyears%29%20.%0A%20%20%20%20%7D%0A%20%20%20%20group%20by%20%3Fwork%20%0A%20%20%7D%0A%7D%0Agroup%20by%20%3Fyear%20%0Aorder%20by%20%3Fyear" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
+  <iframe class="embed-responsive-item" id="publications-per-year-iframe" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
 </div>
 
-
 {% endblock %}
-
