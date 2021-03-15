@@ -1,0 +1,15 @@
+SELECT
+  ?ortholog ?orthologLabel ?orthologDescription
+  ?taxon ?taxonLabel ?taxonDescription
+WITH {
+  SELECT ?ortholog ?taxon
+  WHERE {
+    wd:{{ q }} wdt:P31 wd:Q7187;
+         wdt:P684 ?ortholog .
+    ?ortholog wdt:P703 ?taxon .
+  }
+} AS %result 
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}

@@ -1,0 +1,23 @@
+SELECT
+  ?variant ?variantLabel ?variantDescription
+  ?types
+WITH {
+  SELECT ?variant ?type
+  WHERE {
+    ?variant wdt:P3433 wd:{{ q }}
+  }
+} AS %variants
+WITH {
+  SELECT ?variant (GROUP_CONCAT(?type_label; separator=" // ") AS ?types) WHERE {
+    INCLUDE %variants
+    OPTIONAL {
+      ?variant wdt:P279 ?variantType . 
+      ?variantType rdfs:label ?type_label .  FILTER (lang(?type_label) = 'en')
+    }
+  }
+  GROUP BY ?variant
+} AS %result 
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
