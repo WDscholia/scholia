@@ -90,8 +90,19 @@ WHERE {
   }
   UNION
   {
+    BIND(7 AS ?order)
+    BIND("Publisher" AS ?description)
+    ?work wdt:P123 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../publisher/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
     SELECT
-      (7 AS ?order)
+      (8 AS ?order)
       ("Topics" AS ?description)
       (GROUP_CONCAT(?value_; separator=", ") AS ?value)
       (CONCAT("../topics/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
