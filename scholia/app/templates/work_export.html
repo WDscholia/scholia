@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<br />
+This page contains export formats for <a href="{{ url_for('app.show_work_empty') + q }}">{{ q }}</a>.
+
+<script src="{{ url_for('static', filename='js/citation.js') }}"></script>
+
+<h2>BibTeX</h2>
+
+<pre class="citation-js" data-input="{{ q }}" data-output-format="bibtex"></pre>
+
+<h2>CITATION.cff</h2>
+
+<i>CITATION.cff</i> files are files that can be added to source code repository and distributions
+to indicate what literature can be cited when using that software. See
+<a href="https://github.com/citation-file-format/">this website</a>.<p />
+
+<pre class="citation-js" data-input="{{ q }}" data-output-format="cff"></pre>
+
+{% endblock %}
