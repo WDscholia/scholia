@@ -1,0 +1,78 @@
+#defaultView:Timeline
+SELECT DISTINCT ?datetime ?description WHERE {
+  {
+    wd:{{q}} wdt:P577 ?datetime .
+    BIND("🌞 publication date" AS ?description)
+  }
+  UNION 
+  {
+    wd:{{q}} wdt:P2507 / wdt:P577 ?datetime .
+    BIND("❗ erratum" AS ?description)
+  }
+  UNION 
+  {
+    wd:{{q}} wdt:P5824 / wdt:P577 ?datetime .
+    BIND("⛔ retracted" AS ?description)
+  }
+  UNION 
+  {
+    wd:{{q}} p:P793 ?event_statement .
+    ?event_statement ps:P793 ?event_type .
+    ?event_type rdfs:label ?description_ .
+    ?event_statement pq:P585 ?datetime .
+    FILTER (LANG(?description_) = "en")
+    
+    # Warning icon for retraction
+    BIND(
+      IF(
+        ?event_type = wd:Q45203135,
+        CONCAT("⛔ ", ?description_),
+        IF(
+          ?event_type = wd:Q56478588,
+          CONCAT("❓ ", ?description_),
+          ?description_
+          )
+        ) AS ?description)
+  }
+  UNION
+  {
+    SELECT ?datetime ?description WHERE {
+      wd:{{q}} wdt:P2860 / wdt:P577 ?datetime
+      BIND("📖➡️ cited work with earliest publication date" AS ?description)
+    }
+    ORDER BY ?datetime
+    LIMIT 1
+  }
+  UNION
+  {
+    SELECT ?datetime ?description WHERE {
+      wd:{{q}} wdt:P2860 / wdt:P577 ?datetime
+      BIND("📖➡️ cited work with latest publication date" AS ?description)
+    }
+    ORDER BY DESC(?datetime)
+    LIMIT 1
+  }
+  UNION
+  {
+    SELECT ?datetime ?description WHERE {
+      wd:{{q}} ^wdt:P2860 / wdt:P577 ?datetime
+      BIND("📖⬅️ citing work with earliest publication date" AS ?description)
+    }
+    ORDER BY ?datetime
+    LIMIT 1
+  }
+  UNION
+  {
+    SELECT ?datetime ?description WHERE {
+      wd:{{q}} ^wdt:P2860 / wdt:P577 ?datetime
+      BIND("📖⬅️ citing work with latest publication date" AS ?description)
+    }
+    ORDER BY DESC(?datetime)
+    LIMIT 1
+  }
+    UNION
+  {
+    wd:{{q}} (wdt:P747 | ^wdt:P629) / wdt:P577 ?datetime
+    BIND("🌞 Publication of edition" AS ?description)
+  }
+}

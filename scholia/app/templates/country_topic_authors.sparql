@@ -1,0 +1,26 @@
+SELECT
+  ?number_of_works
+  ?author ?authorLabel
+  ?example_work ?example_workLabel
+WITH {
+  SELECT DISTINCT ?author WHERE {
+    ?author ( wdt:P108 | wdt:P1416 ) / wdt:P17 wd:{{ q1 }} .
+  }
+} AS %authors
+WITH {  
+  SELECT
+    ?author 
+    (COUNT(DISTINCT ?work) AS ?number_of_works)
+    (SAMPLE(?work) AS ?example_work) 
+  WHERE {
+    INCLUDE %authors
+    ?work wdt:P50 ?author .       
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q2 }} .
+  }
+  GROUP BY ?author
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+} 
+ORDER BY DESC(?number_of_works) 

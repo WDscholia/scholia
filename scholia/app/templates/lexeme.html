@@ -1,29 +1,12 @@
 {% extends "base.html" %}
 
+{% set aspect = "lexeme" %}
 
-{% block scripts %}
-{{super()}}
+{% block in_ready %}
 
-<script type="text/javascript">
- worksSparql = `
-SELECT DISTINCT ?work ?workLabel ?workDescription {
-  wd:{{ lexeme }} wdt:P1343 | ^wdt:P6254 ?work
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,cz,da,de,es,fi,fr,it,nl,nn,ru,sv,zh". }
-}
-`
-
- $(document).ready(function() {
-     sparqlToDataTable(worksSparql, "#works", {
-	 linkPrefixes: {
-	     work: "../work/",
-	 }})
- });
-
-
-</script>
+{{ sparql_to_table('works') }}
 
 {% endblock %}
-
 
 {% block page_content %}
 
@@ -44,10 +27,8 @@ SELECT DISTINCT ?work ?workLabel ?workDescription {
 
 <h1 id="h1">Lexeme</h1>
 
+<h2 id="works-header">Works</h2>
 
-<h2>Works</h2>
-
-<table class="table table-hover" id="works"></table>
-
+<table class="table table-hover" id="works-table"></table>
 
 {% endblock %}

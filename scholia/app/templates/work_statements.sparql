@@ -1,0 +1,24 @@
+#defaultView:Table
+# Statements referencing this article
+SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel 
+WITH {
+  SELECT ?statement WHERE { 
+	  ?statement prov:wasDerivedFrom/pr:P248 wd:{{ q }} .
+  }
+  LIMIT 2000
+} AS %statements 
+WITH {
+  SELECT distinct ?item ?property ?value
+  WHERE {
+    INCLUDE %statements
+    ?item ?p ?statement .
+    ?property wikibase:claim ?p . 
+    ?statement ?a ?value .
+    ?item ?b ?value . 
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . } 
+} 
+ORDER BY DESC(?itemLabel)

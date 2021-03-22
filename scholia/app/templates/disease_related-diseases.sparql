@@ -1,0 +1,37 @@
+SELECT
+  ?count
+  ?gene_count
+  ?symptom_count
+  ?disease ?diseaseLabel
+  ?genes
+  ?symptoms
+{
+  {
+    SELECT ?disease (COUNT(?gene) AS ?gene_count) (GROUP_CONCAT(?gene_label; separator=" // ") AS ?genes) WHERE {
+      wd:{{ q }} wdt:P2293 ?gene .
+      ?gene wdt:P2293 ?disease . 
+      FILTER (wd:{{ q }} != ?disease)
+      ?gene rdfs:label ?gene_label
+      FILTER(lang(?gene_label) = "en")
+    }
+    GROUP BY ?disease
+  }
+  UNION
+  {
+    SELECT
+      ?disease (COUNT(?symptom) AS ?symptom_count) (GROUP_CONCAT(?symptom_label; separator=" // ") AS ?symptoms)
+    {
+      wd:{{ q }} wdt:P780 ?symptom .
+      ?disease wdt:P780 ?symptom . 
+      FILTER (wd:{{ q }} != ?disease)
+      ?symptom rdfs:label ?symptom_label . FILTER(lang(?symptom_label) = "en")
+    }
+    GROUP BY ?disease
+  }
+
+  # Aggregate count
+  BIND((COALESCE(?symptom_count, 0) + COALESCE(?gene_count, 0)) AS ?count)
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY DESC(?count)

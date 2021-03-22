@@ -1,0 +1,18 @@
+SELECT ?publication_date ?work ?workLabel ?quote
+WITH{
+  SELECT
+    (MIN(?publication_date_) AS ?publication_date) ?work (SAMPLE(?quote_) AS ?quote)
+  WHERE {
+    ?work p:P2283 ?uses_statement .
+	  ?uses_statement ps:P2283/(wdt:P279*) wd:{{ q }} .
+    OPTIONAL { ?uses_statement prov:wasDerivedFrom/pr:P1683 ?quote_ . }
+    ?work wdt:P577 ?publication_datetime .
+    BIND(xsd:date(?publication_datetime) AS ?publication_date_)
+  }
+  GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?publication_date)

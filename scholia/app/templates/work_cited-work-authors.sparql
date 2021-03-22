@@ -1,0 +1,28 @@
+#defaultView:Table
+# List of authors with works that are cited by the specified work
+SELECT
+  ?cited_works
+
+  ?author ?authorLabel
+
+  # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
+  (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?authorLabel))) AS ?orcid)
+WITH {
+  SELECT (COUNT(?cited_work) AS ?cited_works) ?author
+  WHERE {
+    # Find works that are cited by the queried work
+    wd:{{ q }} wdt:P2860 ?cited_work .
+    ?cited_work wdt:P50 ?author .
+  }
+  GROUP BY ?author
+  # Limit the number of results to avoid downloading too much data
+  ORDER BY DESC(?cited_works)
+  LIMIT 1000
+} AS %result
+WHERE {
+  # Label the result
+  INCLUDE %result
+  OPTIONAL { ?author wdt:P496 ?orcid_ . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?cited_works)
