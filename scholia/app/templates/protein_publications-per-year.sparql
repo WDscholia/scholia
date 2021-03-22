@@ -1,4 +1,4 @@
-# defaultView:BarChart
+#defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
 select ?year (count(?work) as ?number_of_publications) where {
