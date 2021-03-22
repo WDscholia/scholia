@@ -1,0 +1,74 @@
+#defaultView:Graph
+SELECT
+  ?citing_work ?citing_workLabel ?rgb 
+  ?cited_work ?cited_workLabel
+WITH { 
+  SELECT (COUNT(*) AS ?count) ?citing_work WHERE {
+    wd:{{q}} (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?citing_work .
+  }
+  GROUP BY ?citing_work
+  ORDER BY DESC(?count)
+  LIMIT 40
+} AS %citing_works
+WITH { 
+  SELECT (COUNT(*) AS ?count_) ?cited_work WHERE {
+    wd:{{q}} (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?cited_work .
+  }
+  GROUP BY ?cited_work
+  ORDER BY DESC(?count_)
+  LIMIT 40
+} AS %cited_works
+WITH {
+  SELECT (MAX(?count) AS ?max_count) WHERE {
+    INCLUDE %citing_works
+    BIND(1 AS ?dummy)
+  } 
+  GROUP BY ?dummy
+} AS %max_count
+WHERE {
+  INCLUDE %citing_works
+  INCLUDE %max_count
+  INCLUDE %cited_works
+  
+  ?citing_work wdt:P2860 ?cited_work .
+  
+  BIND(STR(xsd:integer(99 * (1 - ?count / ?max_count))) AS ?grey)
+  BIND(CONCAT(SUBSTR("0", 1, 2 - STRLEN(?grey)), ?grey) AS ?padded_grey)
+  BIND(CONCAT(?padded_grey, ?padded_grey, ?padded_grey) AS ?rgb)
+
+  { 
+      ?citing_work (p:P50) ?citing_author_statement . 
+      ?citing_author_statement pq:P1545 "1" .
+      ?citing_author_statement ps:P50 ?citing_author .
+      ?citing_author rdfs:label ?citing_author_name .
+      filter(lang(?citing_author_name) = 'en')
+    }
+    union 
+  	{ 
+      ?citing_work (p:P2093) ?citing_author_statement . 
+      ?citing_author_statement pq:P1545 "1" .
+      ?citing_author_statement ps:P2093 ?citing_author_name .
+    }
+  
+    { 
+      ?cited_work (p:P50) ?cited_author_statement . 
+      ?cited_author_statement pq:P1545 "1" .
+      ?cited_author_statement ps:P50 ?cited_author .
+      ?cited_author rdfs:label ?cited_author_name .
+      filter(lang(?cited_author_name) = 'en')
+    }
+    union 
+  	{ 
+      ?cited_work (p:P2093) ?cited_author_statement . 
+      ?cited_author_statement pq:P1545 "1" .
+      ?cited_author_statement ps:P2093 ?cited_author_name .
+    }
+
+    ?citing_work wdt:P577 ?citing_date . 
+    ?cited_work wdt:P577 ?cited_date . 
+    bind(year(?citing_date) as ?citing_year)
+    bind(year(?cited_date) as ?cited_year)
+    bind(concat(?citing_author_name, ", ", str(?citing_year)) as ?citing_workLabel)
+    bind(concat(?cited_author_name, ", ", str(?cited_year)) as ?cited_workLabel)
+}
+ORDER BY DESC(?count)

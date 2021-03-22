@@ -1,0 +1,32 @@
+SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel WHERE {
+  {
+    SELECT ?title_ ?titleUrl ?wikipedia {
+      SERVICE wikibase:mwapi {
+        bd:serviceParam wikibase:endpoint "da.wikipedia.org" ;
+                        wikibase:api "Search" ;
+                        mwapi:srsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
+                        mwapi:srlimit "200" .
+        ?title_ wikibase:apiOutput mwapi:title .
+      }
+      BIND(URI(CONCAT("https://da.wikipedia.org/wiki/", ENCODE_FOR_URI(?title_))) AS ?titleUrl)
+      BIND(wd:Q181163 AS ?wikipedia)
+    } 
+  }
+  UNION
+  {
+    SELECT ?title_ ?titleUrl ?wikipedia {
+      SERVICE wikibase:mwapi {
+        bd:serviceParam wikibase:endpoint "en.wikipedia.org" ;
+                        wikibase:api "Search" ;
+                        mwapi:srsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
+                        mwapi:srlimit "200" .
+        ?title_ wikibase:apiOutput mwapi:title .
+      }
+      BIND(URI(CONCAT("https://en.wikipedia.org/wiki/", ENCODE_FOR_URI(?title_))) AS ?titleUrl)
+      BIND(wd:Q328 AS ?wikipedia)
+    }     
+  }
+  hint:Prior hint:runFirst "true" .
+  BIND(CONCAT(?title_, " ↗") AS ?title)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+} 

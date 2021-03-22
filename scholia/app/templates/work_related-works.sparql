@@ -1,0 +1,17 @@
+#defaultView:Table
+# List of related works by co-citation analysis
+SELECT ?count ?work ?workLabel
+WITH {
+  SELECT ?work (COUNT(?work) AS ?count)
+  WHERE {
+    wd:{{ q }} (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?work .
+    FILTER (wd:{{ q }} != ?work)
+  }
+  GROUP BY ?work
+  LIMIT 500
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . } 
+} 
+ORDER BY DESC(?count) 

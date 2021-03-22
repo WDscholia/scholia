@@ -1,0 +1,14 @@
+#defaultView:BubbleChart
+SELECT ?count ?author ?authorLabel
+WITH{
+  SELECT (COUNT(?work) AS ?count) ?author WHERE {
+    ?work wdt:P2283/wdt:P279* wd:{{q}} .
+    ?work wdt:P50 ?author .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
+}
+ORDER BY DESC(?count)

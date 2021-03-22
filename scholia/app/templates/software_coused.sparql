@@ -1,0 +1,17 @@
+SELECT ?count ?coused ?cousedLabel ?example_work ?example_workLabel
+WITH{
+  # Find works that are using a specific software,
+  # and find other software used in the found works
+  SELECT ?coused (COUNT(?work) as ?count) (SAMPLE(?work) AS ?example_work) WHERE {
+    ?work wdt:P2283/(wdt:P279*) wd:{{ q }} .
+    ?work wdt:P2283 ?coused .
+    FILTER (?coused != wd:{{ q }})
+  }
+  GROUP BY ?coused
+} AS %result
+WHERE {
+  # Label the result
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?count)  
