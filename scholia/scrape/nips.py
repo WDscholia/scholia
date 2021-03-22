@@ -14,7 +14,9 @@ Options:
 
 Notes
 -----
-NIPS papers are available from https://papers.nips.cc.
+NeurIPS/NIPS papers are available from https://papers.nips.cc. The format of
+the NIPS/NeurIPS proceeding homepage has changed, so the scraper may not always
+work.
 
 Papers may be published the year after the conference. Newer conferences seems
 to publish the same year while older conferences published the year after,
@@ -66,6 +68,7 @@ WDQS_URL = 'https://query.wikidata.org/sparql'
 
 # Year should be the nominal year, - not the year of publication
 YEAR_TO_Q = {
+    "2020": "Q100913796",
     "2019": "Q68600639",
     "2018": "Q56580288",
     "2017": "Q39502823",
@@ -175,10 +178,10 @@ def paper_url_to_q(url):
 
     Examples
     --------
-    >>> url = ('https://papers.nips.cc/paper/7078-hash-embeddings-for-'
-    ...        'efficient-word-representations')
+    >>> url = ("https://papers.nips.cc/paper/2020/hash/"
+    ...        "00482b9bed15a272730fcb590ffebddd-Abstract.html")
     >>> paper_url_to_q(url)
-    'Q39502551'
+    'Q104089790'
 
     """
     paper = scrape_paper_from_url(url)
@@ -220,10 +223,100 @@ def paper_url_to_quickstatements(url):
 
 
 def scrape_paper_from_url(url):
+    """Scrape NeurIPS paper from uURL.
+
+    Download HTML page from https://proceedings.neurips.cc, extract and
+    return bibliographic metadata.
+
+    Parameters
+    ----------
+    url : str
+        URL to NeurIPS paper. Should start with
+        https://proceedings.neurips.cc/paper/. The URL should be to the HTML
+        page.
+
+    Returns
+    -------
+    paper : dict
+        Dictionary with paper.
+
+    Notes
+    -----
+    The information is scraped from the individual HTML pages on the website
+    https://proceedings.neurips.cc.
+
+    The returned `paper` dict contains url, title, authors as list,
+    full_text_url, abstract, year and published_in_q. The year is corrected
+    from the nominal to the actual publication year, such that papers published
+    before NIPS 2009 has the publication year set to the year after the
+    conference.
+
+    If the abstract is not listed on the papers.nips.cc HTML page then the
+    `abstract` field is not available in the returned `paper` variable. Some
+    of the earliest conferences does not list the abstract.
+
+    Examples
+    --------
+    >>> url = ("https://proceedings.neurips.cc/paper/2020/hash/"
+    ...    "00482b9bed15a272730fcb590ffebddd-Abstract.html")
+    >>> entry = scrape_paper_from_url(url)
+    >>> entry['title'].startswith("An Unsupervised Information-Theoretic")
+    True
+
+    """
+    if (not url.startswith("https://proceedings.neurips.cc/paper/") and
+            not url.startswith("https://papers.nips.cc/paper/")):
+        raise ValueError((
+            "url should start with https://proceedings.neurips.cc/paper/"
+            " or https://papers.nips.cc/paper/. It was {}.").format(
+            url))
+
+    if not url.endswith('.html'):
+        raise ValueError("url should end with '.html'. It was {}.".format(
+            url))
+
+    entry = {'url': url}
+
+    response = requests.get(url)
+    tree = etree.HTML(response.content)
+
+    entry['title'] = "".join(
+        text for text in
+        tree.xpath("//meta[@name='citation_title']/@content"))
+
+    entry['authors'] = [
+        text.split(', ')[-1] + ' ' + ", ".join(text.split(', ')[0:-1])
+        for text in tree.xpath("//meta[@name='citation_author']/@content")]
+
+    urls = tree.xpath("//meta[@name='citation_pdf_url']/@content")
+    if len(urls) > 0:
+        entry['full_text_url'] = urls[0]
+
+    abstracts = tree.xpath("//h4[text()='Abstract']/following::p/text()")
+    if len(abstracts) > 0:
+        entry['abstract'] = abstracts[0]
+
+    dates = tree.xpath("//meta[@name='citation_publication_date']/@content")
+    if len(dates) > 0:
+        nominal_year = dates[0]
+        year = int(nominal_year)
+        if year < 2009:
+            year += 1
+        entry['year'] = str(year)
+
+        entry['published_in_q'] = YEAR_TO_Q.get(nominal_year, None)
+
+    # All NIPS papers are in English
+    entry['language_q'] = "Q1860"
+
+    return entry
+
+
+def scrape_paper_from_old_url(url):
     """Scrape NIPS paper from uURL.
 
-    Download HTML page from https://papers.nips.cc/paper/, extract and return
-    bibliographic metadata.
+    Download legacy HTML page from https://papers.nips.cc/paper/, extract and
+    return bibliographic metadata.
 
     Parameters
     ----------
@@ -239,7 +332,8 @@ def scrape_paper_from_url(url):
     Notes
     -----
     The information is scraped from the individual HTML pages on the website
-    https://papers.nips.cc.
+    https://papers.nips.cc as it was formatted before 2020. The new format
+    means that the scraping no longer works.
 
     The returned `paper` dict contains url, title, authors as list,
     full_text_url, abstract, year and published_in_q. The year is corrected
