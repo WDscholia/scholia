@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+There was no work found with DOI <a href="https://doi.org/{{ doi }}">{{ doi }}</a>.
+
+<script src="{{ url_for('static', filename='js/citation.js') }}"></script>
+
+<h2>QuickStatements</h2>
+
+<pre class="citation-js" data-input="{{ doi }}" data-output-format="quickstatements"></pre>
+
+{% endblock %}
