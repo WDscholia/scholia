@@ -8,14 +8,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [2.7, 3.5]
+        python: [2.7, 3.5, 3.7]
 
     steps:
       - uses: actions/checkout@v2
+      - name: Install lxml dependencies
+        run: sudo apt install libxml2-dev libxslt-dev
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python }}
+      - name: Install Cython for lxml installation
+        run: pip install Cython
       - name: Install Tox and any other packages
         run: pip install tox
       - name: Run Tox

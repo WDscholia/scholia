@@ -36,7 +36,12 @@ from os.path import splitext
 import re
 import unicodedata
 
-from six import ensure_text, u
+from six import u
+try:
+    from six import ensure_text
+except ImportError:
+    # enture_text is not available in Python3.7 apparently
+    ensure_text = str
 
 from .api import (
     entity_to_authors, entity_to_classes, entity_to_doi,
