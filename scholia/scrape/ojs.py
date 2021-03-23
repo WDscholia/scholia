@@ -174,8 +174,17 @@ def paper_url_to_quickstatements(url):
     qs : str
         Quickstatements for paper as a string.
 
+    Notes
+    -----
+    It the paper is already entered in Wikidata then a comment will just
+    be produced, - no quickstatements.
+
     """
     paper = scrape_paper_from_url(url)
+    q = paper_to_q(paper)
+    if q:
+        return "# {q} is {url}".format(q=q, url=url)
+
     qs = paper_to_quickstatements(paper)
     return qs
 
