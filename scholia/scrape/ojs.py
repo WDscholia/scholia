@@ -2,6 +2,7 @@ r"""Scraping Open Journal Systems.
 
 Usage:
   scholia.scrape.ojs scrape-paper-from-url <url>
+  scholia.scrape.ojs issue-url-to-quickstatements [options] <url>
   scholia.scrape.ojs paper-url-to-q <url>
   scholia.scrape.ojs paper-url-to-quickstatements [options] <url>
 
@@ -47,8 +48,63 @@ SELECT ?paper WHERE {{
 }}
 """)
 
+SHORT_TITLED_PAPER_TO_Q_QUERY = u("""
+SELECT ?paper WHERE {{
+  ?paper wdt:P953 <{url}> .
+}}
+""")
+
+
 # SPARQL Endpoint for Wikidata Query Service
 WDQS_URL = 'https://query.wikidata.org/sparql'
+
+
+def issue_url_to_paper_urls(url):
+    """Scrape paper URLs from issue URL.
+
+    Scrape paper (article) URLs from a given Open Journal System
+    issue URL.
+
+    Parameters
+    ----------
+    url : str
+        URL to an OJS issue.
+
+    Returns
+    -------
+    urls : list of strs
+        List of URLs to papers.
+
+    """
+    response = requests.get(url, headers=HEADERS)
+    tree = etree.HTML(response.content)
+    urls = tree.xpath("//div[@class='title']/a/@href")
+    return urls
+
+
+def issue_url_to_quickstatements(url):
+    """Return Quickstatements for papers in an issue.
+
+    From a Open Journal System issue URL extract metadata for individual
+    papers and format them in the Quickstatement format for entry in
+    Wikidata.
+
+    Parameters
+    ----------
+    url : str
+        URL for a OJS issue.
+
+    Returns
+    -------
+    qs : str
+        String with quickstatements.
+
+    """
+    paper_urls = issue_url_to_paper_urls(url)
+    qs = ''
+    for paper_url in paper_urls:
+        qs += paper_url_to_quickstatements(paper_url) + "\n"
+    return qs
 
 
 def pages_to_number_of_pages(pages):
@@ -100,7 +156,8 @@ def paper_to_q(paper):
     present in Wikidata.
 
     The match on title is using an exact query, meaning that any variation in
-    lowercase/uppercase will not find the Wikidata item.
+    lowercase/uppercase will not find the Wikidata item. If the title is
+    shorter than 21 character then only the URL is used to match.
 
     Examples
     --------
@@ -113,9 +170,15 @@ def paper_to_q(paper):
 
     """
     title = escape_string(paper['title'])
-    query = PAPER_TO_Q_QUERY.format(
-        label=title, title=title,
-        url=paper['url'])
+
+    if len(paper['title']) > 20:
+        query = PAPER_TO_Q_QUERY.format(
+            label=title, title=title,
+            url=paper['url'])
+    else:
+        # The title is too short to match. Too many wrong matches.
+        query = SHORT_TITLED_PAPER_TO_Q_QUERY.format(
+            url=paper['url'])
 
     response = requests.get(WDQS_URL,
                             params={'query': query, 'format': 'json'},
@@ -335,7 +398,12 @@ def main():
     # Ignore broken pipe errors
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
-    if arguments['paper-url-to-q']:
+    if arguments['issue-url-to-quickstatements']:
+        url = arguments['<url>']
+        qs = issue_url_to_quickstatements(url)
+        os.write(output_file, qs.encode(output_encoding) + b('\n'))
+
+    elif arguments['paper-url-to-q']:
         url = arguments['<url>']
         entry = paper_url_to_q(url)
         print_(entry)
