@@ -305,7 +305,7 @@ def scrape_paper_from_url(url):
             for author_element in
             tree.xpath("//meta[@name='DC.Creator.PersonalName']")
         ]
-        if len(authors) > 1:
+        if len(authors) > 0:
             entry['authors'] = authors
 
     title = _fields_to_content(['citation_title', 'DC.Title'])
