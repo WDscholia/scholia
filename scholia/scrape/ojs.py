@@ -283,7 +283,7 @@ def scrape_paper_from_url(url):
     def _fields_to_content(fields):
         for field in fields:
             content = _field_to_content(field)
-            if content is not None:
+            if content is not None and content != '':
                 return content
         else:
             return None
@@ -308,7 +308,8 @@ def scrape_paper_from_url(url):
         if len(authors) > 0:
             entry['authors'] = authors
 
-    title = _fields_to_content(['citation_title', 'DC.Title'])
+    title = _fields_to_content(['citation_title', 'DC.Title',
+                                'DC.Title.Alternative'])
     if title is not None:
         entry['title'] = title
 
@@ -354,8 +355,11 @@ def scrape_paper_from_url(url):
         if len(pdf_urls) > 0:
             entry['full_text_url'] = pdf_urls[0]
 
+    # There may be inconsistent metadata for the language.
+    # For for instance, https://tidsskrift.dk/sygdomogsamfund/article/view/579
+    # "DC.Language" is correct, while "citation_language" is wrong.
     language_as_iso639 = _fields_to_content(
-        ['citation_language', 'DC.Language'])
+        ['DC.Language', 'citation_language'])
     if language_as_iso639 is not None:
         entry['iso639'] = language_as_iso639
         language_q = iso639_to_q(language_as_iso639)
