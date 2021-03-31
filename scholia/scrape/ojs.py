@@ -7,6 +7,7 @@ Usage:
   scholia.scrape.ojs paper-url-to-quickstatements [options] <url>
 
 Options:
+  --iso639=iso639 Overwrite default iso639
   -o --output=file  Output filename, default output to stdout
   --oe=encoding     Output encoding [default: utf-8]
 
@@ -82,7 +83,7 @@ def issue_url_to_paper_urls(url):
     return urls
 
 
-def issue_url_to_quickstatements(url):
+def issue_url_to_quickstatements(url, iso639=None):
     """Return Quickstatements for papers in an issue.
 
     From a Open Journal System issue URL extract metadata for individual
@@ -93,6 +94,9 @@ def issue_url_to_quickstatements(url):
     ----------
     url : str
         URL for a OJS issue.
+    iso639 : str, optional
+        String with ISO639 code. Default is None, meaning the iso639 will be
+        read from the metadata.
 
     Returns
     -------
@@ -103,7 +107,7 @@ def issue_url_to_quickstatements(url):
     paper_urls = issue_url_to_paper_urls(url)
     qs = ''
     for paper_url in paper_urls:
-        qs += paper_url_to_quickstatements(paper_url) + "\n"
+        qs += paper_url_to_quickstatements(paper_url, iso639=iso639) + "\n"
     return qs
 
 
@@ -201,7 +205,7 @@ def paper_url_to_q(url):
     Parameters
     ----------
     url : str
-        URL to NIPS HTML page.
+        URL to Open Journal System article webpage.
 
     Returns
     -------
@@ -210,7 +214,7 @@ def paper_url_to_q(url):
 
     Examples
     --------
-    >>> url = 'https://journals.uio.no/index.php/osla/article/view/5855'
+    >>> url ='https://journals.uio.no/index.php/osla/article/view/5855'
     >>> paper_url_to_q(url)
     'Q61708017'
 
@@ -220,7 +224,7 @@ def paper_url_to_q(url):
     return q
 
 
-def paper_url_to_quickstatements(url):
+def paper_url_to_quickstatements(url, iso639=None):
     """Scrape OJS paper and return quickstatements.
 
     Given a URL to a HTML web page representing a paper formatted by the Open
@@ -231,6 +235,9 @@ def paper_url_to_quickstatements(url):
     ----------
     url : str
         URL to OJS paper as a string.
+    iso639 : str, optional
+        String with ISO639 language code. Default is None, meaning the iso639
+        will be read from the metadata.
 
     Returns
     -------
@@ -242,8 +249,16 @@ def paper_url_to_quickstatements(url):
     It the paper is already entered in Wikidata then a comment will just
     be produced, - no quickstatements.
 
+    The quickstatement tool is available at
+    https://quickstatements.toolforge.org.
+
     """
     paper = scrape_paper_from_url(url)
+
+    if iso639 is not None:
+        paper['iso639'] = iso639
+        paper['language_q'] = iso639_to_q(iso639)
+
     q = paper_to_q(paper)
     if q:
         return "# {q} is {url}".format(q=q, url=url)
@@ -391,6 +406,11 @@ def main():
 
     arguments = docopt(__doc__)
 
+    if arguments['--iso639']:
+        iso639 = arguments['--iso639']
+    else:
+        iso639 = None
+
     if arguments['--output']:
         output_filename = arguments['--output']
         output_file = os.open(output_filename, os.O_RDWR | os.O_CREAT)
@@ -404,7 +424,7 @@ def main():
 
     if arguments['issue-url-to-quickstatements']:
         url = arguments['<url>']
-        qs = issue_url_to_quickstatements(url)
+        qs = issue_url_to_quickstatements(url, iso639=iso639)
         os.write(output_file, qs.encode(output_encoding) + b('\n'))
 
     elif arguments['paper-url-to-q']:
@@ -414,7 +434,7 @@ def main():
 
     elif arguments['paper-url-to-quickstatements']:
         url = arguments['<url>']
-        qs = paper_url_to_quickstatements(url)
+        qs = paper_url_to_quickstatements(url, iso639=iso639)
         os.write(output_file, qs.encode(output_encoding) + b('\n'))
 
     elif arguments['scrape-paper-from-url']:
