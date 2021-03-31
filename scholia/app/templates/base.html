@@ -44,11 +44,11 @@ sparqlToIframe(`# tool: scholia
 <script type="text/javascript">
  if ("{{ q }}" != "") {
 
-     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+    var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
      
-     $.getJSON(url, function (data) {
+    $.getJSON(url, function (data) {
 	 var item = data.entities["{{ q }}"];
 	 if ('en' in item.labels) {
 	     $("#h1").text(item.labels.en.value);
@@ -251,6 +251,20 @@ sparqlToIframe(`# tool: scholia
 
      });
 
+	if ("{{ q2 }}" != "") {
+			
+		var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+				   '{{ q2 }}' + 
+				   '&format=json&callback=?';
+		$.getJSON(url2, function (data) {
+			 var item = data.entities["{{ q2 }}"];
+			 if ('en' in item.labels) {
+				 $("#h1").append(' - '+item.labels.en.value);
+			 }
+			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');	
+		});
+	}
+	
      // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
      var query = `
