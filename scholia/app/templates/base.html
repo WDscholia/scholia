@@ -101,7 +101,7 @@ sparqlToIframe(`# tool: scholia
 
 	 try {
 	     var doi = item.claims.P356[0].mainsnak.datavalue.value;
-	     detailsList.push( '<meta name="citation_doi" content="' + doi + '"/>');
+	     $("head").append( '<meta name="citation_doi" content="' + doi + '"/>' );
 	 }
 	 catch(e) {}
 
