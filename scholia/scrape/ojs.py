@@ -44,14 +44,17 @@ PAPER_TO_Q_QUERY = u("""
 SELECT ?paper WHERE {{
   OPTIONAL {{ ?label rdfs:label "{label}"@en . }}
   OPTIONAL {{ ?title wdt:P1476 "{title}"@en . }}
-  OPTIONAL {{ ?url wdt:P953 <{url}> . }}
-  BIND(COALESCE(?full_text_url, ?url, ?label, ?title) AS ?paper)
+  OPTIONAL {{ ?full_text_url wdt:P953 <{url}> . }}
+  OPTIONAL {{ ?url wdt:P856 <{url}> . }}
+  BIND(COALESCE(?full_text_url, ?url, ?label, ?title, ?doi) AS ?paper)
 }}
 """)
 
 SHORT_TITLED_PAPER_TO_Q_QUERY = u("""
 SELECT ?paper WHERE {{
-  ?paper wdt:P953 <{url}> .
+  OPTIONAL {{ ?full_text_url wdt:P953 <{url}> . }}
+  OPTIONAL {{ ?url wdt:P856 <{url}> . }}
+  BIND(COALESCE(?full_text_url, ?url) AS ?paper)
 }}
 """)
 
@@ -173,9 +176,9 @@ def paper_to_q(paper):
     'Q61708017'
 
     """
-    title = escape_string(paper['title'])
+    if 'title' in paper and len(paper['title']) > 20:
+        title = escape_string(paper['title'])
 
-    if len(paper['title']) > 20:
         query = PAPER_TO_Q_QUERY.format(
             label=title, title=title,
             url=paper['url'])
@@ -253,6 +256,10 @@ def paper_url_to_quickstatements(url, iso639=None):
     https://quickstatements.toolforge.org.
 
     """
+    if url.endswith('/'):
+        # remove trailing '/' from the URL
+        url = url[:-1]
+
     paper = scrape_paper_from_url(url)
 
     if iso639 is not None:
