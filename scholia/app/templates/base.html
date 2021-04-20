@@ -100,6 +100,12 @@ sparqlToIframe(`# tool: scholia
 	 catch(e) {}
 
 	 try {
+	     var doi = item.claims.P356[0].mainsnak.datavalue.value;
+	     $("head").append( '<meta name="citation_doi" content="' + doi + '"/>' );
+	 }
+	 catch(e) {}
+
+	 try {
 	     $( '#details' ).append( detailsList.join( " | " ) );
 	 }
 	 catch(e) {}
