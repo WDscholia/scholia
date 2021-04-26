@@ -1,314 +1,61 @@
 {% extends "base.html" %}
 
 
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
- recentlyPublishedWorksSparql = `
-SELECT ?date ?work ?workLabel 
-  ?topicsUrl ?topics 
-WITH {
-  SELECT DISTINCT ?work WHERE {
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
-  }
-} AS %works
-WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
-                                    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl) 
-  WHERE {
-    INCLUDE %works
-    ?work wdt:P921 ?topic . 
-    OPTIONAL { ?work wdt:P577 ?dates . }
-    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
-  }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-
-  # There is a problem with BC dates
-  # BIND(xsd:date(?datetime) AS ?date)
-  BIND(REPLACE(STR(?datetime), 'T.*', '') AS ?date)
-    
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-GROUP BY ?date ?work ?workLabel ?topicsUrl ?topics
-ORDER BY DESC(?date)
-LIMIT 500`
-
- earliestPublishedWorksSparql = `
-SELECT ?date ?work ?workLabel ?topicsUrl ?topics 
-WITH {
-  SELECT DISTINCT ?work WHERE {
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
-  }
-} AS %works
-WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
-                                    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl) 
-                                    WHERE {
-    INCLUDE %works
-    ?work wdt:P921 ?topic . 
-    ?work wdt:P577 ?dates . 
-	FILTER (!isBLANK(?dates)) .
-    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
-  }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-
-  # There is a problem with BC dates
-  # BIND(xsd:date(?datetime) AS ?date)
-  BIND(REPLACE(STR(?datetime), 'T.*', '') AS ?date)
-    
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-GROUP BY ?date ?work ?workLabel ?topicsUrl ?topics
-ORDER BY ASC(?date)
-LIMIT 500
-`
+{% set aspect = "topic" %}
 
 
- authorsSparql = `
-#defaultView:Table
-SELECT ?count ?author ?authorLabel (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ?authorLabel)) AS ?orcid) 
-WITH {
-  SELECT (count(?work) as ?count) ?author WHERE {
-    { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
-    union { ?work wdt:P921/wdt:P361+ wd:{{ q }} . }
-    union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
-    ?work wdt:P50 ?author .
-  }
-  GROUP BY ?author
-} AS %result
-WHERE {
-  INCLUDE %result
-          
-  # Include optional ORCID iD
-  OPTIONAL { ?author wdt:P496 ?orcid_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
-}
-ORDER BY DESC(?count)
-`
+{% block in_ready %}
 
- topicsSparql = `
-#defaultView:Table
-SELECT ?count ?topic ?topicLabel ?example_work ?example_workLabel
-WITH {
-  SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
-    # Find works for the specific queried topic
-	  ?work wdt:P921/( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) wd:{{ q }} .
-    
-    # Find co-occuring topics
-    ?work wdt:P921 ?topic .
-    
-    # Avoid listing the queried topic
-      FILTER (wd:{{ q }} != ?topic)
-  }
-  GROUP BY ?topic
-} AS %result
-WHERE {
-  # Label the results
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
-}
-ORDER BY DESC(?count)
-`
-
-  authorScoreSparql = `
-SELECT ?score ?author ?authorLabel ?example_work ?example_workLabel
-WITH {
-  SELECT
-    (SUM(?score_) AS ?score)
-    ?author
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    { 
-      ?author wdt:P101/wdt:P279* wd:{{ q }} .
-      BIND(20 AS ?score_)
-    }
-    UNION
-    {
-      SELECT (3 AS ?score_) ?author ?work WHERE {
-        ?work wdt:P50 ?author ;
-              wdt:P921/wdt:P279* wd:{{ q }} . 
-      }
-    }
-    UNION
-    {
-      SELECT (1 AS ?score_) ?author ?work WHERE {
-        ?work wdt:P50 ?author .
-        ?citing_work wdt:P2860 ?work .
-        ?citing_work wdt:P921/wdt:P279* wd:{{ q }} . 
-      }
-    }
-  }
-  GROUP BY ?author
-} AS %results 
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
-}
-ORDER BY DESC(?score)
-LIMIT 200
-`
-
-
- venuesSparql = `
-#defaultView:Table
-SELECT ?count ?short_name ?venue ?venueLabel
-WITH {
-  SELECT (count(?work) as ?count) ?venue (SAMPLE(?short_name_) AS ?short_name) WHERE {
-    { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
-    union { ?work wdt:P921/wdt:P361+ wd:{{ q }} . }
-    union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
-    ?work wdt:P1433/wdt:P179* ?venue .
-    OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
-  }
-  GROUP BY ?venue
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
-}
-ORDER BY DESC(?count)
-LIMIT 200
-`
-
- topCitedSparql = `
-#defaultView:Table
-SELECT ?count ?cited_work ?cited_workLabel
-WITH {
-  SELECT (count(?work) as ?count) ?cited_work WHERE {
-    { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
-    union { ?work wdt:P921/wdt:P361+ wd:{{ q }} . }
-    union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
-    ?work wdt:P2860 ?cited_work .
-  }
-  GROUP BY ?cited_work
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
-}
-ORDER BY DESC(?count)
-LIMIT 200
-`
-
-  mostCitedAuthorsSparql = `
-SELECT ?number_of_citations ?author ?authorLabel ?cited_work_example ?cited_work_exampleLabel
-WITH {
-  # Find works about the topic
-  SELECT DISTINCT ?work WHERE {
-	  ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
-  }
-} AS %works
-WITH {
-  # Find cited works
-  SELECT (COUNT(?work) AS ?number_of_citations) ?author (SAMPLE(?cited_work) AS ?cited_work_example)
-  WHERE {
-    INCLUDE %works
-    ?cited_work wdt:P50 ?author . 
-    ?work wdt:P2860 ?cited_work .
-  } 
-  GROUP BY ?author
-} AS %result
-WHERE {
-  # Label the results
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-} 
-ORDER BY DESC(?number_of_citations)
-LIMIT 200
-`
-
-  authorAwardsSparql = `
-SELECT ?count ?award ?awardLabel ?recipients ?recipientsUrl
-WITH {
-  SELECT (COUNT(?researcher) AS ?count) ?award 
-  (GROUP_CONCAT(DISTINCT ?researcher_label; separator=", ") AS ?recipients) 
-  (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?recipientsUrl)
-  WHERE {
-    { 
-      SELECT DISTINCT ?researcher ?award WHERE {
-        hint:Query hint:optimizer "None" .
-        ?work wdt:P921 wd:{{ q }} .
-        ?work wdt:P50 ?researcher .
-        ?researcher wdt:P166 ?award .
-      } 
-      LIMIT 100
-    }
-    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
-  }
-  GROUP BY ?award 
-} AS %result
-WHERE {
-  INCLUDE %result
-    ?award rdfs:label ?awardLabel . FILTER (LANG(?awardLabel) = 'en')
-}
-GROUP BY ?count ?award ?awardLabel ?recipients ?recipientsUrl
-ORDER BY DESC(?count)
-`
-
-
- $(document).ready(function() {
-     sparqlToDataTable(recentlyPublishedWorksSparql,
-               "#recently-published-works",{
-	 linkPrefixes:{
+{{ sparql_to_table('recently-published-works',
+    options={
+    "linkPrefixes": {
 	     "work": "../work/",
-	     }
-     });     
-     sparqlToDataTable(earliestPublishedWorksSparql,
-		       "#earliest-published-works",{
-	 linkPrefixes:{
+     }})}}
+{{ sparql_to_table('earliest-published-works',
+    options={
+    "linkPrefixes": {
 	     "work": "../work/",
-    	 }
-     });
-     sparqlToDataTable(authorsSparql, "#authors",{
-	 linkPrefixes:{
+     }})}}
+{{ sparql_to_table('authors',
+    options={
+    "linkPrefixes": {
 	     "author": "../author/",
-    	 }
-     });
-     sparqlToDataTable(topicsSparql, "#topics",{
-	 linkPrefixes:{
+     }})}}
+{{ sparql_to_table('topics',
+    options={
+    "linkPrefixes": {
 	     "topic": "../topic/",
 	     "example_work": "../work/",
-    	 }
-     });
-     sparqlToDataTable(authorScoreSparql, "#author-score",{
-	 linkPrefixes:{
+     }})}}
+{{ sparql_to_table('author-scores',
+    options={
+    "linkPrefixes": {
 	     "author": "../author/",
 	     "example_work": "../work/",
-    	 }
-     });
-     sparqlToDataTable(venuesSparql, "#venues",{
-	 linkPrefixes:{
+     }})}}
+{{ sparql_to_table('venues',
+    options={
+    "linkPrefixes": {
 	     "venue": "../venue/",
-    	 }
-     });
-     sparqlToDataTable(topCitedSparql, "#topCited",{
-	 linkPrefixes:{
+     }})}}
+{{ sparql_to_table('top-cited',
+    options={
+    "linkPrefixes": {
 	     "cited_work": "../work/",
-    	 }
-     });
-     sparqlToDataTable(mostCitedAuthorsSparql, "#most-cited-authors",{
-	 linkPrefixes:{
+     }})}}
+{{ sparql_to_table('most-cited-authors',
+    options={
+    "linkPrefixes": {
 	     "author": "../author/",
 	     "cited_work_example": "../work/",
-    	 }
-     });
-     sparqlToDataTable(authorAwardsSparql, "#author-awards",{
-	 linkPrefixes:{
+     }})}}
+{{ sparql_to_table('author-awards',
+    options={
+    "linkPrefixes": {
 	     "award": "../award/",
-    	 }
-     });
- });
-</script>
+     }})}}
 
 {% endblock %}
-
 
 
 {% block page_content %}
@@ -325,9 +72,9 @@ ORDER BY DESC(?count)
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#PREFIX%20target%3A%20%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F{{ q }}%3E%0A%0A%23defaultView%3AGraph%0ASELECT%20%3Fnode%20%3FnodeLabel%20%3FnodeImage%20%3FchildNode%20%3FchildNodeLabel%20%3FchildNodeImage%20%3Frgb%20%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fproperty%20WHERE%20%7B%0A%20%20%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP31%20wd%3AQ18610173%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP31%20wd%3AQ26940804%20.%20%0A%20%20%20%20%7D%0A%7D%20AS%20%25properties%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3Fnode%20%3FchildNode%20WHERE%20%7B%0A%20%20%20%20%20%20BIND%28target%3A%20AS%20%3Fnode%29%0A%20%20%20%20%20%20%3Fnode%20%3Fp%20%3Fi.%0A%20%20%20%20%20%20%3FchildNode%20%3Fx%20%3Fp.%0A%20%20%20%20%20%20%3FchildNode%20rdf%3Atype%20wikibase%3AProperty.%0A%20%20%20%20%20%20FILTER%28STRSTARTS%28STR%28%3Fi%29%2C%20%22http%3A%2F%2Fwww.wikidata.org%2Fentity%2FQ%22%29%29%0A%20%20%20%20%20%20FILTER%28STRSTARTS%28STR%28%3FchildNode%29%2C%20%22http%3A%2F%2Fwww.wikidata.org%2Fentity%2FP%22%29%29%0A%20%20%20%20%7D%0A%20%20LIMIT%205000%0A%7D%20AS%20%25nodes%0AWITH%20%7B%0A%20%20SELECT%20DISTINCT%20%3FchildNode%20%3Fnode%20%3Frgb%20WHERE%20%7B%0A%20%20%20%20%20%20BIND%28%22EFFBD8%22%20AS%20%3Frgb%29%0A%20%20%20%20%20%20target%3A%20%3Fp%20%3FchildNode.%0A%20%20%20%20%20%20%3Fnode%20%3Fx%20%3Fp.%0A%20%20%20%20%20%20%3Fnode%20rdf%3Atype%20wikibase%3AProperty.%0A%20%20%20%20%20%20FILTER%28STRSTARTS%28STR%28%3FchildNode%29%2C%20%22http%3A%2F%2Fwww.wikidata.org%2Fentity%2FQ%22%29%29%0A%20%20%20%20%7D%0A%20%20LIMIT%205000%0A%7D%20AS%20%25childNodes%0AWHERE%20%7B%0A%20%20%7B%0A%20%20%20%20INCLUDE%20%25nodes%0A%20%20%7D%0A%20%20UNION%0A%20%20%7B%0A%20%20%20%20INCLUDE%20%25childNodes%0A%20%20%7D%0A%0A%20%20OPTIONAL%20%7B%20%0A%20%20%20%20INCLUDE%20%25properties%0A%20%20%20%20%3Fproperty%20wikibase%3AdirectClaim%20%3Fnodeclaim.%0A%20%20%20%20%3Fnode%20%3Fnodeclaim%20%3FnodeImage.%20%0A%20%20%7D%0A%0A%20%20OPTIONAL%20%7B%20%0A%20%20%20%20INCLUDE%20%25properties%0A%20%20%20%20%3Fproperty%20wikibase%3AdirectClaim%20%3FchildNodeclaim.%0A%20%20%20%20%3FchildNode%20%3FchildNodeclaim%20%3FchildNodeImage.%20%0A%20%20%7D%0A%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%20%20%20%20%20%20%20%20%0A%7D"></iframe>
 </div>
 
-<h2 id="Recently published works on the topic">Recently published works on the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<h2 id="recently-published-works-header">Recently published works on the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
-<table class="table table-hover" id="recently-published-works"></table>
+<table class="table table-hover" id="recently-published-works-table"></table>
 
 
 <h2 id="Publications per year">Publications per year</h2>
@@ -337,17 +84,17 @@ ORDER BY DESC(?count)
 </div>
 
 
-<h2 id="Earliest published works on the topic">Earliest published works on the topic</h2>
+<h2 id="earliest-published-works-header">Earliest published works on the topic</h2>
 
-<table class="table table-hover" id="earliest-published-works"></table>
+<table class="table table-hover" id="earliest-published-works-table"></table>
 
 
 <h2 id="Authors">Authors</h2>
 
 
-<h3 id="Authors publishing about the topic">Authors publishing about the topic</h3>
+<h3 id="authors-header">Authors publishing about the topic</h3>
 
-<table class="table table-hover" id="authors"></table>
+<table class="table table-hover" id="authors-table"></table>
 
 <h3 id="Co-author graph">Co-author graph</h3>
 
@@ -360,9 +107,9 @@ The 25 most prolific authors and some of their key co-authors.
 
 <h2 id="Topics">Topics</h2>
 
-<h3 id="Co-occurring topics">Co-occurring topics</h3>
+<h3 id="topics-header">Co-occurring topics</h3>
 
-<table class="table table-hover" id="topics"></table>
+<table class="table table-hover" id="topics-table"></table>
 
 <h3 id="Co-occurring topics graph">Co-occurring topics graph</h3>
 
@@ -380,7 +127,7 @@ Only a maximum of the 400 most often occuring links are shown.
 
 
 
-<h2 id="Author score">Author score</h2>
+<h2 id="author-scores-header">Author score</h2>
 
 Authors scored according to field of work, publications within the topic
 and citing works within the topic.
@@ -389,7 +136,7 @@ and citing works within the topic.
   <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fscore%20%3Fauthor%20%3FauthorLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28SUM%28%3Fscore_%29%20AS%20%3Fscore%29%0A%20%20%20%20%3Fauthor%0A%20%20WHERE%20%7B%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20%3Fauthor%20wdt%3AP101%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%0A%20%20%20%20%20%20BIND%2820%20AS%20%3Fscore_%29%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%283%20AS%20%3Fscore_%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fwork%20wdt%3AP50%20%3Fauthor%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP921%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%20%20UNION%0A%20%20%20%20%7B%0A%20%20%20%20%20%20SELECT%20%281%20AS%20%3Fscore_%29%20%3Fauthor%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%3Fcited_work%20wdt%3AP50%20%3Fauthor%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fcited_work%20.%0A%20%20%20%20%20%20%20%20%3Fciting_work%20wdt%3AP921%2Fwdt%3AP279%2a%20wd%3A{{ q }}%20.%20%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor%0A%7D%20AS%20%25results%20%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cjp%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fscore%29%0ALIMIT%20200"></iframe>
 </div>
 
-<table class="table table-hover" id="author-score"></table>
+<table class="table table-hover" id="author-scores-table"></table>
 
 Missing authors here?
 Then go to the
@@ -397,19 +144,19 @@ Then go to the
 page to resolve the author names.
 
 
-<h2 id="Venues and series publishing works about the topic">Venues and series publishing works about the topic</h2>
+<h2 id="venues-header">Venues and series publishing works about the topic</h2>
 
-<table class="table table-hover" id="venues"></table>
+<table class="table table-hover" id="venues-table"></table>
 
 <h2 id="Citations">Citations</h2>
 
-<h3 id="Works cited from works on the topic">Works cited from works on the topic</h3>
+<h3 id="top-cited-header">Works cited from works on the topic</h3>
 
-<table class="table table-hover" id="topCited"></table>
+<table class="table table-hover" id="top-cited-table"></table>
 
-<h3 id="Authors cited from works on the topic">Authors cited from works on the topic</h3>
+<h3 id="most-cited-authors-header">Authors cited from works on the topic</h3>
 
-<table class="table table-hover" id="most-cited-authors"></table>
+<table class="table table-hover" id="most-cited-authors-table"></table>
 
 <h3 id="Map-of-organizations">Map of organizations associated with works about the topic</h3>
 
@@ -436,9 +183,9 @@ The graph indicates the countries associated with organizations whose authors ha
 </div>
 
 
-<h3 id="Awards received by authors who published on the topic">Awards received by authors who published on the topic</h3>
+<h3 id="author-awards-header">Awards received by authors who published on the topic</h3>
 
-<table class="table table-hover" id="author-awards"></table>
+<table class="table table-hover" id="author-awards-table"></table>
 
 {% endblock %}
     

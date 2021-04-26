@@ -1,0 +1,35 @@
+SELECT ?score ?author ?authorLabel ?example_work ?example_workLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?author
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    { 
+      ?author wdt:P101/wdt:P279* wd:{{ q }} .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?author ?work WHERE {
+        ?work wdt:P50 ?author ;
+              wdt:P921/wdt:P279* wd:{{ q }} . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?author ?work WHERE {
+        ?work wdt:P50 ?author .
+        ?citing_work wdt:P2860 ?work .
+        ?citing_work wdt:P921/wdt:P279* wd:{{ q }} . 
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200

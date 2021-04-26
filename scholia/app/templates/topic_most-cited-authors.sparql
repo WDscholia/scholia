@@ -1,0 +1,24 @@
+SELECT ?number_of_citations ?author ?authorLabel ?cited_work_example ?cited_work_exampleLabel
+WITH {
+  # Find works about the topic
+  SELECT DISTINCT ?work WHERE {
+	  ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+  }
+} AS %works
+WITH {
+  # Find cited works
+  SELECT (COUNT(?work) AS ?number_of_citations) ?author (SAMPLE(?cited_work) AS ?cited_work_example)
+  WHERE {
+    INCLUDE %works
+    ?cited_work wdt:P50 ?author . 
+    ?work wdt:P2860 ?cited_work .
+  } 
+  GROUP BY ?author
+} AS %result
+WHERE {
+  # Label the results
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+} 
+ORDER BY DESC(?number_of_citations)
+LIMIT 200
