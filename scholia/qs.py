@@ -33,12 +33,21 @@ def paper_to_quickstatements(paper):
 
     `date` takes precedence over `year`.
 
+    The label is shortened to 250 characters due if the title is longer than
+    that due to a limitation in Wikidata.
+
     """
     qs = u("CREATE\n")
 
     if 'title' in paper and paper['title']:
         title = escape_string(paper['title'])
-        qs += u('LAST\tLen\t"{}"\n').format(title)
+
+        # "Label must be no more than 250 characters long"
+        short_title = escape_string(title)[:250]
+        while short_title.endswith("\\"):
+            short_title = short_title[:-1]
+
+        qs += u('LAST\tLen\t"{}"\n').format(short_title)
 
     # Instance of scientific article
     qs += 'LAST\tP31\tQ13442814\n'

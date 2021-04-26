@@ -83,6 +83,9 @@ def issue_url_to_paper_urls(url):
     response = requests.get(url, headers=HEADERS)
     tree = etree.HTML(response.content)
     urls = tree.xpath("//div[@class='title']/a/@href")
+    if len(urls) == 0:
+        # This scheme seems to be used for version 3.2.1.4 of OJS
+        urls = tree.xpath("//h3[@class='title']/a/@href")
     return urls
 
 
