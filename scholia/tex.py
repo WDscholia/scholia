@@ -216,7 +216,7 @@ def extract_dois_from_aux_string(string):
 
     Examples
     --------
-    >>> string = "\citation{10.1186/S13321-016-0161-3}"
+    >>> string = "\\citation{10.1186/S13321-016-0161-3}"
     >>> extract_dois_from_aux_string(string)
     ['10.1186/S13321-016-0161-3']
 
@@ -246,23 +246,23 @@ def extract_qs_from_aux_string(string):
 
     Examples
     --------
-    >>> string = "\citation{Q28042913}"
+    >>> string = "\\citation{Q28042913}"
     >>> extract_qs_from_aux_string(string)
     ['Q28042913']
 
-    >>> string = "\citation{Q28042913,Q27615040}"
+    >>> string = "\\citation{Q28042913,Q27615040}"
     >>> extract_qs_from_aux_string(string)
     ['Q28042913', 'Q27615040']
 
-    >>> string = "\citation{Q28042913,Q27615040,Q27615040}"
+    >>> string = "\\citation{Q28042913,Q27615040,Q27615040}"
     >>> extract_qs_from_aux_string(string)
     ['Q28042913', 'Q27615040', 'Q27615040']
 
-    >>> string = "\citation{Q28042913,NielsenF2002Neuroinformatics,Q27615040}"
+    >>> string = "\\citation{Q28042913,NielsenF2002Neuroinformatics,Q27615040}"
     >>> extract_qs_from_aux_string(string)
     ['Q28042913', 'Q27615040']
 
-    >>> string = "\citation{Q28042913,Q27615040.Q27615040}"
+    >>> string = "\\citation{Q28042913,Q27615040.Q27615040}"
     >>> extract_qs_from_aux_string(string)
     ['Q28042913']
 
