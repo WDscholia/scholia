@@ -1,0 +1,20 @@
+#defaultView:Table
+SELECT ?count ?author ?authorLabel (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ?authorLabel)) AS ?orcid) 
+WITH {
+  SELECT (count(?work) as ?count) ?author WHERE {
+    { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P361+ wd:{{ q }} . }
+    union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
+    ?work wdt:P50 ?author .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+          
+  # Include optional ORCID iD
+  OPTIONAL { ?author wdt:P496 ?orcid_ . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count)
+

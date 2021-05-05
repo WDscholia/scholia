@@ -1,0 +1,33 @@
+#defaultView:Graph
+SELECT
+  ?topic1 ?topic1Label ?topic2 ?topic2Label
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count) ?topic1 ?topic2
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:{{ q }} .
+    
+    # Identify co-occuring topics. 
+    ?work wdt:P921 ?topic1, ?topic2 . 
+
+    # Exclude the topic it self
+    FILTER (wd:{{ q }} != ?topic1 && wd:{{ q }} != ?topic2 && ?topic1 != ?topic2)
+  }
+  GROUP BY ?topic1 ?topic2
+  ORDER BY DESC(?count)
+
+  # There a performance problems in the browser: We cannot show large graphs,
+  # so we put a limit on the number of links displayed.
+  LIMIT 400
+
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
