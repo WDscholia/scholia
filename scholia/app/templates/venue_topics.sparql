@@ -1,0 +1,18 @@
+# title: Count of topics in published work in specified venue
+SELECT ?count ?topic ?topicLabel ?example_work ?example_workLabel
+WITH {
+  SELECT 
+    (COUNT(?work) as ?count)
+    ?topic
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P921 ?topic .
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+ORDER BY DESC(?count)

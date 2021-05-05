@@ -1,0 +1,27 @@
+# title: Venues citing articles from this specific journal
+#defaultView:Table
+SELECT
+  ?count
+  ?short_name
+  ?citing_journal ?citing_journalLabel 
+WITH {
+  SELECT
+    (COUNT(?citing_work) AS ?count)
+    ?citing_journal
+    (SAMPLE(?short_name_) AS ?short_name)
+  WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+    ?citing_work wdt:P2860 ?work .
+    ?citing_work wdt:P1433 ?citing_journal .
+    OPTIONAL { ?citing_journal wdt:P1813 ?short_name_ . }
+  }
+  GROUP BY ?citing_journal
+  ORDER BY DESC(?count)
+  LIMIT 1000
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+ORDER BY DESC(?count)

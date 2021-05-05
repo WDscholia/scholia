@@ -1,0 +1,20 @@
+# title: Author awards for a specific venue
+SELECT DISTINCT
+  ?year 
+  ?author ?authorLabel
+  ?award ?awardLabel ?awardDescription
+WHERE {
+  [] wdt:P1433 wd:{{ q }} ;
+     wdt:P50 ?author .
+  ?author p:P166 ?award_statement .
+  ?award_statement ps:P166 ?award .
+  OPTIONAL {
+    { ?award_statement pq:P585 ?time }
+    UNION
+    { ?award_statement pq:P580 ?time }
+    BIND(YEAR(?time) AS ?year)
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }  
+}
+ORDER BY DESC(?year)
+LIMIT 500
