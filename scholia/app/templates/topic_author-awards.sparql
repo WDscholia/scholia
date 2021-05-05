@@ -1,0 +1,25 @@
+SELECT ?count ?award ?awardLabel ?recipients ?recipientsUrl
+WITH {
+  SELECT (COUNT(?researcher) AS ?count) ?award 
+  (GROUP_CONCAT(DISTINCT ?researcher_label; separator=", ") AS ?recipients) 
+  (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?recipientsUrl)
+  WHERE {
+    { 
+      SELECT DISTINCT ?researcher ?award WHERE {
+        hint:Query hint:optimizer "None" .
+        ?work wdt:P921 wd:{{ q }} .
+        ?work wdt:P50 ?researcher .
+        ?researcher wdt:P166 ?award .
+      } 
+      LIMIT 100
+    }
+    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
+  }
+  GROUP BY ?award 
+} AS %result
+WHERE {
+  INCLUDE %result
+    ?award rdfs:label ?awardLabel . FILTER (LANG(?awardLabel) = 'en')
+}
+GROUP BY ?count ?award ?awardLabel ?recipients ?recipientsUrl
+ORDER BY DESC(?count)
