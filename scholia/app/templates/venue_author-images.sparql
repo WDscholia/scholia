@@ -1,0 +1,18 @@
+# title: Author images for a specific venue
+#defaultView:ImageGrid
+SELECT (SAMPLE(?image_) AS ?image) ?author ?authorLabel ?count
+WITH {
+  SELECT ?author (COUNT(?work) AS ?count) WHERE {
+    ?work wdt:P1433 wd:{{ q }};
+          wdt:P50 ?author .
+  }
+  GROUP BY ?author
+} AS %authors
+WHERE {
+  INCLUDE %authors
+  ?author wdt:P18 ?image_ .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl.no,ru,sv,zh" . } 
+}
+GROUP BY ?author ?authorLabel ?count
+ORDER BY DESC(?count)
+LIMIT 50  
