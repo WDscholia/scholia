@@ -374,9 +374,17 @@ def show_authors(qs):
     html : str
         Rendered HTML.
 
+    Notes
+    -----
+    In case there is only one author identifier in the URL, then the request is
+    redirected to the "author" aspect.
+
     """
     qs = Q_PATTERN.findall(qs)
-    return render_template('authors.html', qs=qs)
+    if len(qs) == 1:
+        return redirect(url_for('app.show_author', q=qs[0]), code=301)
+    else:
+        return render_template('authors.html', qs=qs)
 
 
 @main.route('/award/' + q_pattern)
@@ -1536,9 +1544,17 @@ def show_topics(qs):
     html : str
         Rendered HTML.
 
+    Notes
+    -----
+    In case there is only one topic identifier in the URL, then the request is
+    redirected to the "topic" aspect.
+
     """
     qs = Q_PATTERN.findall(qs)
-    return render_template('topics.html', qs=qs)
+    if len(qs) == 1:
+        return redirect(url_for('app.show_topic', q=qs[0]), code=301)
+    else:
+        return render_template('topics.html', qs=qs)
 
 
 @main.route('/topic/' + q_pattern + '/missing')
