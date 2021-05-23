@@ -45,9 +45,8 @@ $(document).ready(function() {
       $("#description").text(dataValues.pathwayDescription);
     }
     if ("organism" in dataValues) {
-      $("#Organism").after('<a href="' +
-			   dataValues.organism +
-			   '">' +
+      organismScholia = dataValues.organism.replace("http://www.wikidata.org/entity/","https://scholia.toolforge.org/taxon/")
+      $("#Organism").after('<a href="' + organismScholia + '">' +
 			   escapeHTML(dataValues.organismLabel) +
 			   '</a>'); 
       organismSection.style.display = "";
