@@ -57,6 +57,9 @@ $(document).ready(function() {
         pathwayViewerIFrameResult.setAttribute("src", `https://pathway-viewer.toolforge.org/?id=${dataValues.wpid}`);
       });
       pathwayViewerSection.style.display = "";
+      $("#pathway-viewer").after('<p>This diagram is showing WikiPathways <a href="https://www.wikipathways.org/instance/' + dataValues.wpid + '">' +
+        dataValues.wpid + '</a> in an iframe with this <a href=' +
+        '"https://pathway-viewer.toolforge.org/?id=' + dataValues.wpid + '">pathway-viewer running on Toolforge</a>.</p>');
     }
   });
 });
