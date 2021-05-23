@@ -26,6 +26,7 @@ Usage:
   scholia.query random-author
   scholia.query ror-to-q <rorid>
   scholia.query twitter-to-q <twitter>
+  scholia.query uniprot-to-q <protein>
   scholia.query viaf-to-q <viaf>
   scholia.query website-to-q <url>
   scholia.query wikipathways-to-q <wpid>
@@ -498,6 +499,42 @@ def ror_to_qs(rorid):
     data = response.json()
 
     return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def uniprot_to_qs(protein):
+    """Convert a UniProt identifier to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the UniProt identifier.
+
+    The UniProt identifier string is converted to uppercase before any
+    query is made.
+
+    Parameters
+    ----------
+    protein : str
+        UniProt identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> uniprot_to_qs('P02649') == ['Q424728']
+    True
+
+    """
+    query = 'select ?protein where {{ ?protein wdt:P352 "{protein}" }}'.format(
+        protein=protein)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['protein']['value'][31:]
             for item in data['results']['bindings']]
 
 
@@ -1576,6 +1613,11 @@ def main():
 
     elif arguments['ror-to-q']:
         qs = ror_to_qs(arguments['<rorid>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['uniprot-to-q']:
+        qs = uniprot_to_qs(arguments['<protein>'])
         if len(qs) > 0:
             print(qs[0])
 
