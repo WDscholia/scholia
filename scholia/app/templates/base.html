@@ -117,6 +117,7 @@ sparqlToIframe(`# tool: scholia
 	       bioschemasAnnotation = {
 	          "@context" : "https://schema.org",
 	          "@type" : "Person" ,
+	          "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/" },
 	          "description" : "A person" ,
 	          "identifier" : "{{ q }}" ,
 	          "mainEntityOfPage" : "http://www.wikidata.org/entity/{{ q }}"
@@ -133,6 +134,7 @@ sparqlToIframe(`# tool: scholia
 	       bioschemasAnnotation = {
 	          "@context" : "https://schema.org",
 	          "@type" : "ChemicalSubstance" ,
+	          "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE/" },
 	          "identifier" : "{{ q }}" ,
 	          "url" : "http://www.wikidata.org/entity/{{ q }}"
 	       }
@@ -147,6 +149,7 @@ sparqlToIframe(`# tool: scholia
 		 bioschemasAnnotation = {
 	             "@context" : "https://schema.org",
 	             "@type" : "Taxon" ,
+	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Taxon/0.6-RELEASE/" },
 	             "name" : taxonName ,
 	             "url" : "http://www.wikidata.org/entity/{{ q }}"
 		 }
@@ -167,6 +170,7 @@ sparqlToIframe(`# tool: scholia
 		 bioschemasAnnotation = {
 	             "@context" : "https://schema.org",
 	             "@type" : "MolecularEntity" ,
+	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE/" },
 	             "identifier" : "{{ q }}" ,
 	             "inChIKey" : inchiKey ,
 	             "url" : "http://www.wikidata.org/entity/{{ q }}"
@@ -195,6 +199,7 @@ sparqlToIframe(`# tool: scholia
 		 bioschemasAnnotation = {
 	             "@context" : "https://schema.org",
 	             "@type" : "Protein" ,
+	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Protein/0.11-RELEASE/" },
 	             "identifier" : "{{ q }}" ,
 	             "url" : "http://www.wikidata.org/entity/{{ q }}" ,
 	             "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
@@ -207,6 +212,7 @@ sparqlToIframe(`# tool: scholia
 		 bioschemasAnnotation = {
 	             "@context" : "https://schema.org",
 	             "@type" : "Gene" ,
+	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Gene/0.7-RELEASE/" },
 	             "identifier" : "{{ q }}" ,
 	             "url" : "http://www.wikidata.org/entity/{{ q }}"
 		 }
