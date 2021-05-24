@@ -112,6 +112,21 @@ sparqlToIframe(`# tool: scholia
 	 
 	 /* BioSchemas annotation */
 	 if (item.claims.P31 &&
+	     ((item.claims.P31[0].mainsnak.datavalue.value.id == 'Q5'))) {
+	   try { /* Person */
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "Person" ,
+	          "description" : "A person" ,
+	          "identifier" : "{{ q }}" ,
+	          "mainEntityOfPage" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       if ('en' in item.labels) {
+	         bioschemasAnnotation.name = item.labels.en.value;
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	    } catch(e) {}
+	 } else if (item.claims.P31 &&
 	     ((item.claims.P31[0].mainsnak.datavalue.value.id == 'Q47461491') ||
 	      (item.claims.P31[0].mainsnak.datavalue.value.id == 'Q967847'))) {
 	   try { /* ChemicalSubstance */
