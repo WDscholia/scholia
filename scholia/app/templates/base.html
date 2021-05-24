@@ -175,6 +175,9 @@ sparqlToIframe(`# tool: scholia
 	             "inChIKey" : inchiKey ,
 	             "url" : "http://www.wikidata.org/entity/{{ q }}"
 		 }
+		 if ('en' in item.labels) {
+	         bioschemasAnnotation.name = item.labels.en.value;
+         }
 		 if (item.claims.P234 && item.claims.P234[0].mainsnak.datavalue) {
 	             var inchi = item.claims.P234[0].mainsnak.datavalue.value;
 	             bioschemasAnnotation.inChI = inchi ;
@@ -204,6 +207,9 @@ sparqlToIframe(`# tool: scholia
 	             "url" : "http://www.wikidata.org/entity/{{ q }}" ,
 	             "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
 		 }
+		 if ('en' in item.labels) {
+	       bioschemasAnnotation.name = item.labels.en.value;
+         }
 		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
 	     } catch(e) { console.log("Exception: " + e)
 	     }
@@ -216,6 +222,9 @@ sparqlToIframe(`# tool: scholia
 	             "identifier" : "{{ q }}" ,
 	             "url" : "http://www.wikidata.org/entity/{{ q }}"
 		 }
+		 if ('en' in item.labels) {
+	       bioschemasAnnotation.name = item.labels.en.value;
+         }
 		 counter = 0
 		 bioschemasAnnotation.sameAs = []
 		 if (item.claims.P351 && item.claims.P351[0].mainsnak.datavalue) {
