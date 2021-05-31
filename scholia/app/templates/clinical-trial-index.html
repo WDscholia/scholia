@@ -1,16 +1,19 @@
 {% extends "base.html" %}
 
-{% set aspect = "clinical-trial" %}
+{% set aspect = "clinical-trial-index" %}
 
 
 {% block in_ready %}
 
-{{ sparql_to_table('interventions') }}
-{{ sparql_to_table('statistics') }}
-{{ sparql_to_table('medical-conditions') }}
-{{ sparql_to_table('recent-trials') }}
+{{ sparql_to_table('recent-clinical-trials') }}
 
 {{ sparql_to_iframe('phases') }}
+
+{{ sparql_to_table('medical-conditions', options={'linkPrefixes': {'medical_condition': "../disease/"}}) }}
+
+{{ sparql_to_table('interventions') }}
+
+{{ sparql_to_table('statistics') }}
 
 {% endblock %}
 
