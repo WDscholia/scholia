@@ -587,7 +587,7 @@ def show_catalogue_empty():
 
 
 @main.route('/clinical-trial/')
-def show_clinical_trial_empty():
+def show_clinical_trial_index():
     """Return clinical trial index page.
 
     Returns
@@ -596,7 +596,7 @@ def show_clinical_trial_empty():
         Rendered index page for clinical trials.
 
     """
-    return render_template('clinical_trial_empty.html')
+    return render_template('clinical-trial-index.html')
 
 
 @main.route('/clinical-trial/' + q_pattern)
@@ -614,7 +614,7 @@ def show_clinical_trial(q):
         Rendered HTML for a specific clinical trial.
 
     """
-    return render_template('clinical_trial.html', q=q)
+    return render_template('clinical-trial.html', q=q)
 
 
 @main.route('/countries/' + qs_pattern)

@@ -1,0 +1,17 @@
+# title: Clinical trials sorted according to date
+SELECT ?start_date ?trial ?trialLabel
+WITH {
+  SELECT * WHERE { 
+    ?trial wdt:P31 wd:Q30612 .
+    ?trial wdt:P580 ?start_datetime .
+    hint:Prior hint:rangeSafe true .
+  }
+  ORDER BY DESC(?start_datetime)
+  LIMIT 500
+} AS %trials
+WHERE {
+  INCLUDE %trials
+  BIND(xsd:date(?start_datetime) AS ?start_date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?start_datetime)
