@@ -1,0 +1,22 @@
+# title: Recent works published in venue
+SELECT
+  (MIN(?publication_date_) AS ?publication_date)
+  ?work ?workLabel
+  (GROUP_CONCAT(?author_label; separator=", ") AS ?authors)
+  (CONCAT("../authors/", GROUP_CONCAT(SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
+WHERE {
+  ?work wdt:P1433 wd:{{ q }} .
+  OPTIONAL {
+    ?work wdt:P577 ?publication_datetime . 
+    BIND(xsd:date(?publication_datetime) AS ?publication_date_)
+  }
+  OPTIONAL {
+    ?work wdt:P50 ?author .
+    ?author rdfs:label ?author_label .
+    FILTER (LANG(?author_label) = 'en')
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+GROUP BY ?work ?workLabel
+ORDER BY DESC(?publication_date)
+LIMIT 1000

@@ -1,0 +1,29 @@
+# title: Cited venues from specific journal
+SELECT
+  ?count
+  ?short_name
+  ?cited_journal ?cited_journalLabel
+WITH {
+  SELECT
+    (COUNT(?cited_work) AS ?count)
+    ?cited_journal
+    (SAMPLE(?short_name_) AS ?short_name)
+  WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P2860 ?cited_work .
+    ?cited_work wdt:P1433 ?cited_journal . 
+    OPTIONAL {
+      ?work wdt:P577 ?publication_datetime .
+      BIND(xsd:date(?publication_datetime) AS ?publication_date)
+    }
+    OPTIONAL { ?cited_journal wdt:P1813 ?short_name_ . }
+  }
+  GROUP BY ?cited_journal
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+ORDER BY DESC(?count)
+LIMIT 200

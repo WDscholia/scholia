@@ -1,0 +1,16 @@
+# title: Citation distribution for a venue
+#defaultView:LineChart
+SELECT
+  ?number_of_citations (COUNT(?work) AS ?count)
+WHERE {
+  {
+    SELECT ?work (COUNT(?citing_work) AS ?number_of_citations)
+    WHERE {
+      ?work wdt:P1433 wd:{{ q }} .   
+      OPTIONAL { ?citing_work wdt:P2860 ?work . }
+    }
+    GROUP BY ?work 
+  }
+} 
+GROUP BY ?number_of_citations
+ORDER BY DESC(?number_of_citations)

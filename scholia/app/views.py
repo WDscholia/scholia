@@ -19,7 +19,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
-                     ncbi_gene_to_qs)
+                     ncbi_gene_to_qs, uniprot_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -387,9 +387,17 @@ def show_authors(qs):
     html : str
         Rendered HTML.
 
+    Notes
+    -----
+    In case there is only one author identifier in the URL, then the request is
+    redirected to the "author" aspect.
+
     """
     qs = Q_PATTERN.findall(qs)
-    return render_template('authors.html', qs=qs)
+    if len(qs) == 1:
+        return redirect(url_for('app.show_author', q=qs[0]), code=301)
+    else:
+        return render_template('authors.html', qs=qs)
 
 
 @main.route('/award/' + q_pattern)
@@ -816,6 +824,23 @@ def redirect_ncbi_gene(gene):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_gene', q=q), code=302)
+    return render_template('404.html')
+
+
+@main.route('/uniprot/<protein>')
+def redirect_uniprot(protein):
+    """Detect and redirect for UniProt identifiers.
+
+    Parameters
+    ----------
+    gene : str
+        UniProt identifier.
+
+    """
+    qs = uniprot_to_qs(protein)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_protein', q=q), code=302)
     return render_template('404.html')
 
 
@@ -1549,9 +1574,17 @@ def show_topics(qs):
     html : str
         Rendered HTML.
 
+    Notes
+    -----
+    In case there is only one topic identifier in the URL, then the request is
+    redirected to the "topic" aspect.
+
     """
     qs = Q_PATTERN.findall(qs)
-    return render_template('topics.html', qs=qs)
+    if len(qs) == 1:
+        return redirect(url_for('app.show_topic', q=qs[0]), code=301)
+    else:
+        return render_template('topics.html', qs=qs)
 
 
 @main.route('/topic/' + q_pattern + '/missing')
