@@ -1,0 +1,25 @@
+# title: Prolific authors for a specific journal
+SELECT ?count ?author ?authorLabel ?orcid ?example_work ?example_workLabel
+WITH {
+  # Count the number of works author by the author publishing in the journal
+  SELECT
+    ?author
+    (COUNT(?work) AS ?count)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    ?work wdt:P50 ?author ;
+          wdt:P1433 wd:{{ q }} .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result 
+          
+  # Include optional ORCID iD
+  OPTIONAL { ?author wdt:P496 ?orcid . }
+  
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+ORDER BY DESC(?count)
+LIMIT 50

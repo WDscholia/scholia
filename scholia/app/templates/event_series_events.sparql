@@ -1,19 +1,31 @@
+# title: List of event and proceedings for a specific event series
 SELECT DISTINCT 
   (SAMPLE(?years) AS ?year)
   (SAMPLE(?short_names) AS ?short_name)
   ?event ?eventLabel
   ?proceedings ?proceedingsLabel
 WHERE {
-	?event wdt:P179 | wdt:P31 wd:{{ q }} .
-  OPTIONAL {
-    ?event wdt:P585 | wdt:P580 ?datetime .
-    BIND(YEAR(?datetime) AS ?years)
+  {
+    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
+    OPTIONAL {
+      ?event wdt:P585 | wdt:P580 ?datetime .
+      BIND(YEAR(?datetime) AS ?years)
+    }
+    OPTIONAL {
+      ?event wdt:P1813 ?short_names
+    }
+    OPTIONAL {
+      ?proceedings wdt:P4745 ?event
+    }
   }
-  OPTIONAL {
-    ?event wdt:P1813 ?short_names
-  }
-  OPTIONAL {
-    ?proceedings wdt:P4745 ?event
+  UNION
+  {
+    # proceedings even if the event is not there!!!
+    ?proceedings ( wdt:P179 / wdt:P4745 ) wd:{{ q }} .
+    OPTIONAL {
+      ?proceedings wdt:P577 ?datetime .
+      BIND(YEAR(?datetime) AS ?years)    
+    }
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
   }
