@@ -86,6 +86,19 @@ def index():
     return render_template('index.html')
 
 
+@main.route("/statistics")
+def index_statistics():
+    """Return rendered main statistics page.
+
+    Returns
+    -------
+    html : str
+        Rederende HTML for main statistics page.
+
+    """
+    return render_template('index-statistics.html')
+
+
 @main.route("/" + l_pattern)
 def redirect_l(lexeme):
     """Redirect to Scholia lexeme aspect.
