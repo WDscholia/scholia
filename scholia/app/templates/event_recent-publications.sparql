@@ -21,6 +21,11 @@ WITH {
       # author
       ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 wd:{{ q }} .
     }
+    UNION
+    {
+      # editor of proceedings
+      ?person ^wdt:P98 / wdt:P4745 wd:{{ q }} .
+    }
   }
 } AS %people  
 WITH {
