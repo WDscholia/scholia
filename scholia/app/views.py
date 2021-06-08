@@ -586,6 +586,37 @@ def show_catalogue_empty():
     return render_template('catalogue_empty.html')
 
 
+@main.route('/dataset/' + q_pattern)
+def show_dataset(q):
+    """Return rendered HTML page for specific dataset.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page.
+
+    """
+    return render_template('dataset.html', q=q)
+
+
+@main.route('/dataset/')
+def show_dataset_empty():
+    """Return rendered HTML index page for a dataset.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for a dataset.
+
+    """
+    return render_template('dataset-index.html')
+
+
 @main.route('/clinical-trial/')
 def show_clinical_trial_index():
     """Return clinical trial index page.

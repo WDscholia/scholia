@@ -1,0 +1,29 @@
+#defaultView:Table
+# List of works that is cited by the specified work
+SELECT ?citations ?publication_date ?citing_work ?citing_workLabel 
+WITH {
+  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work 
+  WHERE {
+    # Find works that cite the queried work
+    ?citing_work wdt:P2860 wd:{{ q }} .
+
+    OPTIONAL {
+      ?citing_work wdt:P577 ?datetime .
+      
+      # Simplify the datetime to one with day, month and year only
+      BIND(xsd:date(?datetime) AS ?date)
+    }
+    OPTIONAL { ?citing_citing_work wdt:P2860 ?citing_work }
+  }
+  GROUP BY ?citing_work
+  
+  # Limit the number of results to avoid downloading too much data
+  ORDER BY DESC(?citations) DESC(?date) 
+  LIMIT 1000
+} AS %result
+WHERE {
+  # Label the result
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,it,jp,nl,no,ru,sv,zh" . } 
+} 
+ORDER BY DESC(?citations) DESC(?publication_date) 
