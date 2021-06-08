@@ -1,0 +1,38 @@
+#defaultView:BubbleChart
+SELECT ?score ?topic ?topicLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?topic
+  WHERE {
+    { 
+      wd:{{q}} wdt:P921 ?topic .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    { 
+     wd:{{q}} wdt:P921/wdt:P279 ?topic .
+     BIND(3 AS ?score_)
+    }
+    UNION
+    {
+      # Topic of a cited work
+      wd:{{q}} wdt:P2860/wdt:P921 ?topic .
+      BIND(1 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?topic WHERE {
+        ?citing_work wdt:P2860 wd:{{q}} .
+        ?citing_work wdt:P921 ?topic . 
+      }
+    }
+  }
+  GROUP BY ?topic
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
