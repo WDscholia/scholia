@@ -1,0 +1,45 @@
+#defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) ?role where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) ("_" as ?role) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year)  (max(?year_) as ?latest_year) where {
+          ?work wdt:P50 wd:{{ q }} .
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now())+1 as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+    }
+  }
+  union {
+  {
+    select ?work (min(?years) as ?year) (count(?coauthors) as ?number_of_authors) ?author_number where {
+      ?work (p:P50|p:P2093) ?author_statement . 
+      ?author_statement ps:P50 wd:{{ q }} .
+      optional { ?author_statement pq:P1545 ?author_number . }
+      ?work (wdt:P50|wdt:P2093) ?coauthors . 
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work ?author_number
+  }
+  bind(coalesce(if(?number_of_authors = 1,
+            'Solo author',
+            if(xsd:integer(?author_number) = 1,
+               'First author',
+               if(xsd:integer(?author_number) = ?number_of_authors,
+                  'Last author',
+                  'Middle author'))), 'Unknown')
+       as ?role)
+   }
+}
+group by ?year ?role
+order by ?year
