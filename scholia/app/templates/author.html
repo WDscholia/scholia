@@ -386,7 +386,7 @@ ORDER BY ?publication_date
 
 <div id="details"></div>
 
-<h2>List of publications <a href="{{ url_for('app.show_author_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<h2>List of publications <a href="{{ url_for('app.show_author_index') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
 <table class="table table-hover" id="list-of-publications"></table>
 
@@ -460,7 +460,7 @@ topics of authored works and topics of citing works.
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AGraph%0A%23%20Egocentric%20co-author%20graph%20for%20an%20author%0ASELECT%20%3Fauthor1%20%3Fauthor1Label%20%3Frgb%20%3Fauthor2%20%3Fauthor2Label%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fauthor1%20%3Fauthor2%20WHERE%20%7B%0A%20%20%20%20%23%20Find%20co-authors%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%2C%20%3Fauthor1%2C%20%3Fauthor2%20.%0A%0A%20%20%20%20%23%20Filtering%20%0A%20%20%20%20%23%20Only%20journal%20and%20conference%20articles%2C%20books%2C%20not%20%28yet%3F%29%20software%0A%20%20%20%20%23%20VALUES%20%3Fpublication_type%20%7B%20wd%3AQ13442814%20wd%3AQ571%20wd%3AQ26973022%7D%20%20%0A%20%20%20%20%23%20%3Fwork%20wdt%3AP31%20%3Fpublication_type%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fauthor1%20%3Fauthor2%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%23%20Limit%20the%20size%20of%20the%20graph%2C%20to%20avoid%20overburdening%20the%20browser%0A%20%20LIMIT%201000%0A%7D%20AS%20%25authors%0AWITH%20%7B%0A%20%20SELECT%20%3Fauthor1%20%3Fauthor2%20%3Frgb%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25authors%0A%20%20%20%20%0A%20%20%20%20%23%20Exclude%20self-links%0A%20%20%20%20FILTER%20%28%3Fauthor1%20%21%3D%20%3Fauthor2%29%0A%20%20%20%20%0A%20%20%20%20%23%20Color%20according%20to%20gender%0A%20%20%20%20OPTIONAL%20%7B%0A%20%20%20%20%20%20%3Fauthor1%20wdt%3AP21%20%3Fgender1%20.%20%0A%20%20%20%20%20%20BIND%28%20IF%28%3Fgender1%20%3D%20wd%3AQ6581097%2C%20%223182BD%22%2C%20%22E6550D%22%29%20AS%20%3Frgb%29%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20%23%20Label%20the%20results%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cfr%2Cde%2Cru%2Ces%2Czh%2Cjp%22.%20%7D%0A%7D"></iframe>
 </div>
 
-Are co-authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_empty') }}{{ q }}/curation">curation</a> page.
+Are co-authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_index') }}{{ q }}/curation">curation</a> page.
 
 <h2 id="Co-author-map">Co-author map</h2>
 
@@ -527,7 +527,7 @@ Authors that cite the author (excluding self citations).
 
 <table class="table table-hover" id="citing-authors"></table>
 
-Are citing authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_empty') }}{{ q }}/curation">curation</a> page.
+Are citing authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_index') }}{{ q }}/curation">curation</a> page.
 
 <h2>Associated images</h2>
 
