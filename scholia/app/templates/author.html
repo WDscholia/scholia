@@ -1,184 +1,30 @@
 {% extends "base.html" %}
 
+{% set aspect = "author" %}
 
-{% block scripts %}
-{{super()}}
+{% block in_ready %}
+
+{{ sparql_to_table('list-of-publications') }}
+{{ sparql_to_table('venue-statistics') }}
+{{ sparql_to_table('topics') }}
+{{ sparql_to_table('most-cited-works') }}
+{{ sparql_to_table('most-citing-authors') }}
+{{ sparql_to_table('events',
+     options={
+         "linkPrefixes": { "event": "../event/" }
+     }
+   )
+}}
+
+{% endblock %}
+
+{% block page_content %}
 
 <script type="text/javascript" src="{{ url_for('static', filename='d3.v5.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='d3-scale-chromatic.v1.min.js') }}"></script>
 
 <script type="text/javascript">
- listOfPublicationsSparql = `
-#defaultView:Table
-SELECT
-  (MIN(?dates) AS ?date)
-  ?work ?workLabel
-  (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
-  (SAMPLE(?pages_) AS ?pages)
-  ?venue ?venueLabel
-  (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
-  (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
-WHERE {
-  ?work wdt:P50 wd:{{ q }} .
-  ?work wdt:P50 ?author .
-  OPTIONAL {
-    ?author rdfs:label ?author_label_ . FILTER (LANG(?author_label_) = 'en')
-  }
-  BIND(COALESCE(?author_label_, SUBSTR(STR(?author), 32)) AS ?author_label)
-  OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
-  ?work wdt:P577 ?datetimes .
-  BIND(xsd:date(?datetimes) AS ?dates)
-  OPTIONAL { ?work wdt:P1104 ?pages_ }
-  OPTIONAL { ?work wdt:P1433 ?venue }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }  
-}
-GROUP BY ?work ?workLabel ?venue ?venueLabel
-ORDER BY DESC(?date)  
- `
 
- venueStatisticsSparql = `
-# Venue statistics for a specific author
-SELECT
-  ?count (SAMPLE(?short_name_) AS ?short_name)
-  ?venue ?venueLabel
-  ?topics ?topicsUrl
-WITH {
-  SELECT
-    (COUNT(DISTINCT ?work) as ?count)
-    ?venue
-    (GROUP_CONCAT(DISTINCT ?topic_label; separator=", ") AS ?topics)
-    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl)
-  WHERE {
-    ?work wdt:P50 wd:{{ q }} .
-    ?work wdt:P1433 ?venue .
-    OPTIONAL {
-      ?venue wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = 'en') }
-  }
-  GROUP BY ?venue
-} AS %result
-WHERE {
-  INCLUDE %result
-  OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }  
-} 
-GROUP BY ?count ?venue ?venueLabel ?topics ?topicsUrl
-ORDER BY DESC(?count)
- `
-
- topicsSparql = `
-#defaultView:Table
-SELECT ?count ?theme ?themeLabel ?example_work ?example_workLabel
-WITH {
-  SELECT (COUNT(?work) AS ?count) ?theme (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work wdt:P50 wd:{{ q }} .
-    ?work wdt:P921 ?theme .
-  }
-  GROUP BY ?theme
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
-}
-ORDER BY DESC(?count) 
-`
-
- mostCitedWorksSparql = `
-#defaultView:Table
-# Author's most cited works
-SELECT ?count ?work ?workLabel 
-WITH {
-  SELECT (count(?citing_work) as ?count) ?work WHERE {
-    ?work wdt:P50 wd:{{ q }} .
-    OPTIONAL { ?citing_work wdt:P2860 ?work . }
-  }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,jp". }        
-}  
-ORDER BY DESC(?count)
-LIMIT 500
-`
-
- citingAuthorsSparql = `
-#defaultView:Table
-SELECT
-  ?count
-  ?citing_author ?citing_authorLabel
-
-  # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
-  (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?citing_authorLabel))) AS ?orcid)
-WITH {
-  SELECT (COUNT(?citing_work) AS ?count) ?citing_author WHERE {
-    ?work wdt:P50 wd:{{ q }} .
-    ?citing_work wdt:P2860 ?work . 
-    MINUS { ?citing_work wdt:P50 wd:{{ q }} }
-    ?citing_work wdt:P50 ?citing_author .
-  }
-  GROUP BY ?citing_author 
-  ORDER BY DESC(?count)
-  LIMIT 500
-} AS %counts
-WITH {
-  # An author might have multiple ORCID iDs
-  SELECT
-    ?count
-    ?citing_author
-    (SAMPLE(?orcids) AS ?orcid_)
-  WHERE {
-    INCLUDE %counts
-    OPTIONAL { ?citing_author wdt:P496 ?orcids }
-  }
-  GROUP BY ?count ?citing_author
-} AS %result
-WHERE {
-  INCLUDE %result
-  
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-} 
-ORDER BY DESC(?count)
-`
-
- eventsSparql = `
-SELECT
-  (xsd:date(MIN(?start)) AS ?date)  
-  ?event
-  ?eventLabel
-  (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
-  (GROUP_CONCAT(DISTINCT ?location_label; separator=", ") AS ?locations)
-WHERE {
-    BIND(wd:{{ q }} AS ?person)
-    {  # speaker
-      ?event wdt:P823 ?person .
-      BIND("speaker" AS ?role)
-    } UNION {  # organizer
-      ?event wdt:P664 ?person .
-      BIND("organizer" AS ?role)
-    } UNION {  # participant
-      ?person wdt:P1344 | ^wdt:P710 ?event  .
-      BIND("participant" AS ?role)
-    } UNION {  # editor
-      ?person ^wdt:P98 / wdt:P4745 ?event  .
-      BIND("editor of proceedings" AS ?role)
-    } UNION {  # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event  .
-      BIND("author" AS ?role)
-    } UNION {  # program committee member
-      ?event wdt:P5804 ?person .
-      BIND("program committee member" AS ?role)
-    }
-    OPTIONAL { ?event wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
-    OPTIONAL { ?event wdt:P580 | wdt:P585 ?start }
- 
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
-}
-GROUP BY ?event ?eventLabel
-ORDER BY DESC(?date) 
-`;
- 
  function resize() {
      width = document.getElementById("topics-works-matrix").clientWidth;
      d3.select("#topics-works-matrix").attr("width", width);
@@ -194,20 +40,6 @@ ORDER BY DESC(?date)
      };
      return $.ajax(endpointUrl, settings).then(doneCallback);
  }
-
-
-
- $(document).ready(function() {
-     sparqlToDataTable(listOfPublicationsSparql, "#list-of-publications");
-     sparqlToDataTable(venueStatisticsSparql, "#venue-statistics");
-     sparqlToDataTable(topicsSparql, "#topics");
-     sparqlToDataTable(mostCitedWorksSparql, "#most-cited-works");
-     sparqlToDataTable(citingAuthorsSparql, "#citing-authors");
-     sparqlToDataTable(eventsSparql, "#events",{
-     linkPrefixes:{
-         "event": "../event/",
-     }
-     });
 
      window.onresize = resize;
 
@@ -372,11 +204,6 @@ ORDER BY ?publication_date
 
 </script>
 
-{% endblock %}
-
-
-{% block page_content %}
-
 <h1 id="h1">Author</h1>
 <script type="application/ld+json" id="bioschemas"></script>
 
@@ -386,9 +213,9 @@ ORDER BY ?publication_date
 
 <div id="details"></div>
 
-<h2>List of publications <a href="{{ url_for('app.show_author_index') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<h2 id="list-of-publications-header">List of publications <a href="{{ url_for('app.show_author_index') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
-<table class="table table-hover" id="list-of-publications"></table>
+<table class="table table-hover" id="list-of-publications-table"></table>
 
 
 <!--      SourceMD does currently not work
@@ -436,22 +263,22 @@ topics of authored works and topics of citing works.
 </div>
 
 
-<h3>Topics of authored works</h3>
+<h3 id="topics-header">Topics of authored works</h3>
 
-<table class="table table-hover" id="topics"></table>
+<table class="table table-hover" id="topics-table"></table>
 
 <h2 id="Topics-works matrix">Topics-works matrix</h2>
 
 <div id="topics-works-matrix"></div>
 
 
-<h2 id="Venue statistics">Venue statistics</h2>
+<h2 id="venue-statistics-header">Venue statistics</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fvenue%20%28SAMPLE%28%3Fvenue_label_%29%20AS%20%3Fvenue_label%29%20%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fwork%29%20as%20%3Fcount%29%20%3Fvenue%20WHERE%20%7B%0A%20%20%20%20%3Fwork%20wdt%3AP50%20wd%3A{{ q }}%20.%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20%3Fvenue%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fvenue%0A%7D%20AS%20%25counts%0AWHERE%20%7B%0A%20%20INCLUDE%20%25counts%0A%20%20%3Fvenue%20rdfs%3Alabel%20%3Flong_venue_label%20FILTER%28LANG%28%3Flong_venue_label%29%20%3D%20%27en%27%29%0A%20%20OPTIONAL%20%7B%20%3Fvenue%20wdt%3AP1813%20%3Fshort_name%20.%20%7D%0A%20%20BIND%28COALESCE%28%3Fshort_name%2C%20%3Flong_venue_label%29%20AS%20%3Fvenue_label_%29%0A%7D%0AGROUP%20BY%20%3Fvenue%20%3Fcount%0AORDER%20BY%20DESC%28%3Fcount%29%20%20"></iframe>
 </div>
 
-<table class="table table-hover" id="venue-statistics"></table>
+<table class="table table-hover" id="venue-statistics-table"></table>
 
 
 <h2 data-toogle="tooltip" title="Co-author graph for the author (up to 1000 links)">Co-author graph</h2>
@@ -507,11 +334,11 @@ Are co-authors missing here? You can help curate them via the <a href="{{ url_fo
 
 <h2>Citation statistics</h2>
 
-<h3>Most cited works</h3>
+<h3 id="most-cited-works-header">Most cited works</h3>
 
 Works of the author ordered according to number of citations received.
 
-<table class="table table-hover" id="most-cited-works"></table>
+<table class="table table-hover" id="most-cited-works-table"></table>
 
 
 <h3 id="Citations by year">Citations by year</h3>
@@ -521,11 +348,11 @@ Works of the author ordered according to number of citations received.
 </div>
 
 
-<h3>Citing authors</h3>
+<h3 id="most-citing-authors-header">Citing authors</h3>
 
 Authors that cite the author (excluding self citations).
 
-<table class="table table-hover" id="citing-authors"></table>
+<table class="table table-hover" id="most-citing-authors-table"></table>
 
 Are citing authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_index') }}{{ q }}/curation">curation</a> page.
 
@@ -536,11 +363,11 @@ Are citing authors missing here? You can help curate them via the <a href="{{ ur
 </div>
 
 
-<h2>Events</h2>
+<h2 id="events-header">Events</h2>
 
 Conferences, workshops and other events the author has attended or otherwise been associated with.
 
-<table class="table table-hover table-striped" id="events"></table>
+<table class="table table-hover table-striped" id="events-table"></table>
 
 {% endblock %}
 

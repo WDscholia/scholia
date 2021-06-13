@@ -1,0 +1,16 @@
+#defaultView:Table
+# Author's most cited works
+SELECT ?count ?work ?workLabel 
+WITH {
+  SELECT (count(?citing_work) as ?count) ?work WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    OPTIONAL { ?citing_work wdt:P2860 ?work . }
+  }
+  GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,jp". }        
+}  
+ORDER BY DESC(?count)
+LIMIT 500

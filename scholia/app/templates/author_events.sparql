@@ -1,0 +1,34 @@
+SELECT
+  (xsd:date(MIN(?start)) AS ?date)  
+  ?event
+  ?eventLabel
+  (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
+  (GROUP_CONCAT(DISTINCT ?location_label; separator=", ") AS ?locations)
+WHERE {
+    BIND(wd:{{ q }} AS ?person)
+    {  # speaker
+      ?event wdt:P823 ?person .
+      BIND("speaker" AS ?role)
+    } UNION {  # organizer
+      ?event wdt:P664 ?person .
+      BIND("organizer" AS ?role)
+    } UNION {  # participant
+      ?person wdt:P1344 | ^wdt:P710 ?event  .
+      BIND("participant" AS ?role)
+    } UNION {  # editor
+      ?person ^wdt:P98 / wdt:P4745 ?event  .
+      BIND("editor of proceedings" AS ?role)
+    } UNION {  # author
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event  .
+      BIND("author" AS ?role)
+    } UNION {  # program committee member
+      ?event wdt:P5804 ?person .
+      BIND("program committee member" AS ?role)
+    }
+    OPTIONAL { ?event wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
+    OPTIONAL { ?event wdt:P580 | wdt:P585 ?start }
+ 
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+}
+GROUP BY ?event ?eventLabel
+ORDER BY DESC(?date) 

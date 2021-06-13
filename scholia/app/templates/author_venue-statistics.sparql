@@ -1,0 +1,27 @@
+# Venue statistics for a specific author
+SELECT
+  ?count (SAMPLE(?short_name_) AS ?short_name)
+  ?venue ?venueLabel
+  ?topics ?topicsUrl
+WITH {
+  SELECT
+    (COUNT(DISTINCT ?work) as ?count)
+    ?venue
+    (GROUP_CONCAT(DISTINCT ?topic_label; separator=", ") AS ?topics)
+    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl)
+  WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P1433 ?venue .
+    OPTIONAL {
+      ?venue wdt:P921 ?topic .
+      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = 'en') }
+  }
+  GROUP BY ?venue
+} AS %result
+WHERE {
+  INCLUDE %result
+  OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }  
+} 
+GROUP BY ?count ?venue ?venueLabel ?topics ?topicsUrl
+ORDER BY DESC(?count)
