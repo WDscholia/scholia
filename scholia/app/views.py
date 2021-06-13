@@ -343,7 +343,7 @@ def show_author_curation(q):
         Rendered HTML.
 
     """
-    return render_template('author_curation.html', q=q)
+    return render_template('author-index-curation.html', q=q)
 
 
 @main.route('/author/')
