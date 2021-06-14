@@ -1122,6 +1122,10 @@ def q_to_class(q):
             ]):
         class_ = 'taxon'
     elif set(classes).intersection([
+            'Q1172284',  # data set
+            ]):
+        class_ = 'dataset'
+    elif set(classes).intersection([
             'Q46855',  # hackathon
             'Q625994',  # conference
             'Q2020153',  # scientific conference
@@ -1130,7 +1134,6 @@ def q_to_class(q):
         class_ = 'event'
     elif set(classes).intersection([
             'Q7397',  # software
-            'Q1172284',  # dataset
             'Q1639024',  # mathematical software
             'Q21127166',  # Java software library
             'Q21129801',  # natural language processing toolkit
@@ -1159,6 +1162,10 @@ def q_to_class(q):
                 'Q79529',  # chemical substance
                 ]):
             class_ = 'chemical_class'
+        elif set(parents).intersection([
+                'Q1172284',  # data set
+                ]):
+            class_ = 'dataset'
         else:
             class_ = 'topic'
 
