@@ -1,0 +1,73 @@
+#defaultView:Graph
+# Doctoral student/advisor network with a source from a spectific researcher
+PREFIX gas: <http://www.bigdata.com/rdf/gas#>
+
+SELECT DISTINCT ?student1 ?student1Label ?supervisor1 ?supervisor1Label
+WHERE {
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:{{ q }} ; 
+                gas:traversalDirection "Forward" ;
+                gas:out ?student1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?supervisor1 ;
+                gas:linkType wdt:P185 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      service gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:{{ q }} ; 
+                gas:traversalDirection "Forward" ;
+                gas:out ?supervisor1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?student1 ;
+                gas:linkType wdt:P184 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:{{ q }} ; 
+                gas:traversalDirection "Reverse" ;
+                gas:out ?student1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?supervisor1 ;
+                gas:linkType wdt:P184 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:{{ q }} ; 
+                gas:traversalDirection "Reverse" ;
+                gas:out ?supervisor1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?student1 ;
+                gas:linkType wdt:P185 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,sv,jp,zh,ru,fr,de" .  } 
+}
+

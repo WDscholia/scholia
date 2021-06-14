@@ -1,0 +1,96 @@
+#defaultView:Timeline
+# Timeline for an author
+SELECT ?label ?beginning ?ending ?education_degree_label
+WITH {
+  SELECT ?work (MIN(?publication_date) AS ?beginning) WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P577 ?publication_date . 
+  }
+  GROUP BY ?work
+} AS %works_with_publication_date
+WITH {
+  
+  SELECT ?work ?beginning (COUNT(?citing_article) AS ?number_of_citations) WHERE {
+    INCLUDE %works_with_publication_date
+    OPTIONAL { ?citing_article wdt:P2860 ?work . }
+  }
+  GROUP BY ?work ?beginning 
+} AS %works
+WHERE {
+  # { Birth wd:{{ q }} wdt:P569 ?beginning . BIND("Birth" AS ?label) } UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY DESC(?number_of_citations)
+      LIMIT 1        
+    }
+    BIND("📖 publication of most cited article" AS ?label)
+  }
+  UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY ?beginning
+      LIMIT 1        
+    }
+    BIND("📖 first publication" AS ?label)
+  }
+  UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY DESC(?beginning)
+      LIMIT 1        
+    }
+    BIND("📖 latest publication" AS ?label)
+  }
+  UNION
+  {
+    # Education
+    wd:{{ q }} p:P69 ?education_statement .
+    ?education_statement ps:P69 ?education .
+    ?education rdfs:label ?education_label . 
+    FILTER (lang(?education_label) = 'en')
+    BIND(CONCAT("🦉 ", ?education_label) AS ?label)
+    OPTIONAL { ?education_statement pq:P580 ?beginning . }
+    OPTIONAL { ?education_statement pq:P582 ?ending . }
+    OPTIONAL {
+      ?education_statement pq:P512 ?education_degree . 
+      ?education_degree rdfs:label ?education_degree_label .
+      FILTER (lang(?education_degree_label) = 'en')
+    }
+  }
+  UNION
+  {
+    # Affiliation
+    wd:{{ q }} p:P1416 | p:P108 ?affiliation_statement .
+    ?affiliation_statement ps:P1416 | ps:P108 ?affiliation .
+    ?affiliation rdfs:label ?affiliation_label .
+    FILTER (lang(?affiliation_label) = 'en')
+    BIND(CONCAT("🏠 ",?affiliation_label) AS ?label)
+    # OPTIONAL { ?affiliation wdt:P18 ?image }
+    OPTIONAL { ?affiliation_statement pq:P580 ?beginning . }
+    OPTIONAL { ?affiliation_statement pq:P582 ?ending . }
+    OPTIONAL {
+      ?affiliation_statement pq:P512 ?affiliation_degree . 
+      ?affiliation_degree rdfs:label ?affiliation_degree_label .
+      FILTER (lang(?affiliation_degree_label) = 'en')
+    }
+  }
+  UNION
+  {
+    wd:{{ q }} p:P166 ?award_statement . 
+    ?award_statement ps:P166 ?award .
+    ?award rdfs:label ?award_label .
+    FILTER (lang(?award_label) = 'en')
+    BIND(CONCAT("🏆 ",?award_label) AS ?label)
+    ?award_statement pq:P585 ?beginning .
+  }
+
+} 
