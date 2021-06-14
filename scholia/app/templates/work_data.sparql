@@ -121,7 +121,7 @@ WHERE {
     BIND(10 AS ?order)
     BIND("DOI" AS ?description)
     ?work wdt:P356 ?valueUrl_ .
-    BIND(CONCAT("https://dx.doi.org/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
+    BIND(CONCAT("https://doi.org/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
     BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
   }
   UNION

@@ -1,0 +1,23 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+#defaultView:Map
+SELECT ?organization ?organizationLabel ?geo ?count ?layer
+WITH {
+  SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+    ?work wdt:P50 target: ;
+          wdt:P50 ?author .
+    FILTER (?author != target: )
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
+    ?organization wdt:P625 ?geo .
+  }
+  GROUP BY ?organization ?geo ?count
+  ORDER BY DESC (?count)
+  LIMIT 2000
+} AS %organizations
+WHERE {
+  INCLUDE %organizations
+  BIND(IF( (?count < 1), "No results", IF((?count < 2), "1 result", IF((?count < 5), "1 < results ≤ 10", IF((?count < 101), "10 < results ≤ 100", IF((?count < 1001), "100 < results ≤ 1000", IF((?count < 10001), "1000 < results ≤ 10000", "10000 or more results") ) ) ) )) AS ?layer )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ }
+ORDER BY DESC (?count)
+

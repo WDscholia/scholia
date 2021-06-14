@@ -1,0 +1,15 @@
+#defaultView:Table
+SELECT ?count ?theme ?themeLabel ?example_work ?example_workLabel
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?theme (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P921 ?theme .
+  }
+  GROUP BY ?theme
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+ORDER BY DESC(?count) 
