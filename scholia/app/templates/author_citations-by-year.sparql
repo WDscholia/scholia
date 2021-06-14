@@ -1,0 +1,9 @@
+#defaultView:BarChart
+SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
+  ?work wdt:P50 wd:{{ q }} .
+  ?citing_work wdt:P2860 ?work .
+  bind(if (exists { ?citing_work wdt:P50 wd:{{ q }} }, "self-citations", "citations from others") as ?kind)
+  ?citing_work wdt:P577 ?date .
+  BIND(str(YEAR(?date)) AS ?year)
+} group by ?year ?kind
+order by desc(?year)

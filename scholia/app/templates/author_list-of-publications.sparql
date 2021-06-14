@@ -1,0 +1,25 @@
+#defaultView:Table
+SELECT
+  (MIN(?dates) AS ?date)
+  ?work ?workLabel
+  (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
+  (SAMPLE(?pages_) AS ?pages)
+  ?venue ?venueLabel
+  (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
+  (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
+WHERE {
+  ?work wdt:P50 wd:{{ q }} .
+  ?work wdt:P50 ?author .
+  OPTIONAL {
+    ?author rdfs:label ?author_label_ . FILTER (LANG(?author_label_) = 'en')
+  }
+  BIND(COALESCE(?author_label_, SUBSTR(STR(?author), 32)) AS ?author_label)
+  OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
+  ?work wdt:P577 ?datetimes .
+  BIND(xsd:date(?datetimes) AS ?dates)
+  OPTIONAL { ?work wdt:P1104 ?pages_ }
+  OPTIONAL { ?work wdt:P1433 ?venue }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh". }  
+}
+GROUP BY ?work ?workLabel ?venue ?venueLabel
+ORDER BY DESC(?date)  
