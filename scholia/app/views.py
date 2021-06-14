@@ -343,11 +343,11 @@ def show_author_curation(q):
         Rendered HTML.
 
     """
-    return render_template('author_curation.html', q=q)
+    return render_template('author-index-curation.html', q=q)
 
 
 @main.route('/author/')
-def show_author_empty():
+def show_author_index():
     """Return author index page.
 
     Returns
@@ -356,7 +356,7 @@ def show_author_empty():
         Rendered index page for author view.
 
     """
-    return render_template('author_empty.html')
+    return render_template('author-index.html')
 
 
 @main.route('/author/random')

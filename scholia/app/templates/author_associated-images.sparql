@@ -1,0 +1,23 @@
+#defaultView:ImageGrid
+SELECT DISTINCT ?image WHERE {
+  {
+    # Images of the person
+    wd:{{ q }} wdt:P18 ?image .
+  }
+  UNION {
+    # Images from whatever property value is linked.
+    
+    # Excluded "different from" property and take all other properties
+    wd:{{ q }} !wdt:P1889 ?item .
+
+    ?item wdt:P18 ?image . 
+    
+    # All people are humans, so these images are excluded.
+    FILTER (?item != wd:Q5)
+  }
+  UNION {
+    # Images associated with works of the author, both direct images,
+    # images of topics of the works and images of coauthors.
+    wd:{{ q }} ^wdt:P50 / (wdt:P921* | wdt:P50) / wdt:P18 ?image .
+  }
+}   

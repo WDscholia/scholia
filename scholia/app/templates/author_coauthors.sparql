@@ -1,0 +1,38 @@
+#defaultView:Graph
+# Egocentric co-author graph for an author
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?author1 ?author2 WHERE {
+    # Find co-authors
+    ?work wdt:P50 wd:{{ q }}, ?author1, ?author2 .
+
+    # Filtering 
+    # Only journal and conference articles, books, not (yet?) software
+    # VALUES ?publication_type { wd:Q13442814 wd:Q571 wd:Q26973022}  
+    # ?work wdt:P31 ?publication_type .
+  }
+  GROUP BY ?author1 ?author2
+  ORDER BY DESC(?count)
+                    
+  # Limit the size of the graph, to avoid overburdening the browser
+  LIMIT 1000
+} AS %authors
+WITH {
+  SELECT ?author1 ?author2 ?rgb WHERE {
+    INCLUDE %authors
+    
+    # Exclude self-links
+    FILTER (?author1 != ?author2)
+    
+    # Color according to gender
+    OPTIONAL {
+      ?author1 wdt:P21 ?gender1 . 
+      BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+    }
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  # Label the results 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp". }
+}

@@ -1,0 +1,32 @@
+#defaultView:BarChart
+select ?year ?number_of_pages ?work_label where {
+  {
+    select ?year (sample(?pages) as ?number_of_pages) ?work_label where {
+      {
+        select (str(?year_) as ?year) (0 as ?pages) ("_" as ?work_label) where {
+          ?year_item wdt:P31 wd:Q577 . 
+          ?year_item wdt:P585 ?date .
+          bind(year(?date) as ?year_)
+          {
+            select (min(?year_) as ?earliest_year) (max(?year_) as ?latest_year) where {
+              ?work wdt:P50 wd:{{ q }} .
+              ?work wdt:P577 ?publication_date . 
+              bind(year(?publication_date) as ?year_)
+            }
+          }
+          filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+        }
+      }
+      union {
+        ?work wdt:P50 wd:{{ q }} .
+        ?work wdt:P1104 ?pages .
+        ?work wdt:P577 ?date . 
+        ?work rdfs:label ?long_work_label . filter(lang(?long_work_label) = 'en')
+        bind(substr(?long_work_label, 1, 20) as ?work_label)
+        bind(str(year(?date)) as ?year) 
+      }
+	} 
+	group by ?year ?work ?work_label
+	order by ?year 
+  }
+}
