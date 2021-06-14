@@ -1,5 +1,14 @@
 {% extends "bootstrap-base.html" %}
 
+{% macro sparql_to_table_post(panel, options={}) -%}
+// {{ panel }} table
+sparqlToDataTablePost(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}
+`,
+"#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",
+options={{ options | tojson }});
+{%- endmacro %}
+
 {% macro sparql_to_table(panel, options={}) -%}
 // {{ panel }} table
 sparqlToDataTable2(`# tool: scholia

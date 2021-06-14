@@ -161,6 +161,53 @@ function sparqlToDataTable(sparql, element, options={}) {
 }
 
 
+function sparqlToDataTablePost(sparql, element, filename, options={}) {
+    // Options: linkPrefixes={}, paging=true
+    var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
+    var linkSuffixes = (typeof options.linkSuffixes === 'undefined') ? {} : options.linkSuffixes;
+    var paging = (typeof options.paging === 'undefined') ? true : options.paging;
+    var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
+    var url = "https://query.wikidata.org/sparql";
+
+    $.post(url, data={query: sparql}, function(response, textStatus) {
+        var simpleData = sparqlDataToSimpleData(response);
+
+        convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes=linkPrefixes, linkSuffixes=linkSuffixes);
+        columns = [];
+        for ( i = 0 ; i < convertedData.columns.length ; i++ ) {
+            var column = {
+                data: convertedData.columns[i],
+                title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
+                defaultContent: "",
+            }
+            columns.push(column)
+        }
+
+        var table = $(element).DataTable({
+            data: convertedData.data,
+            columns: columns,
+            lengthMenu: [[10, 25, 100, -1], [10, 25, 100, "All"]],
+            ordering: true,
+            order: [],
+            paging: paging,
+            sDom: sDom,
+        });
+
+        $(element).append(
+            '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
+                encodeURIComponent(sparql) +
+                '">Wikidata Query Service</a></span>' +
+                '<span style="float:right; font-size:smaller;"><a href="https://github.com/fnielsen/scholia/blob/master/scholia/app/templates/' +
+                filename + '">' +
+                filename.replace("_", ": ") +
+                '</a></span></caption>'
+        );
+    }, "json");
+};
+
+
+
+
 function sparqlToDataTable2(sparql, element, filename, options={}) {
     // Options: linkPrefixes={}, paging=true
     var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
