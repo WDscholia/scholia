@@ -1,13 +1,40 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+{{super()}}
+
+<script src="{{ url_for('static', filename='js/citation.js') }}"></script>
+<script>
+const c = require('citation-js')
+try {
+  let example = new c.Cite([ '{{ doi }}' ])
+  let output = example.format('quickstatements')
+  $( '#qs' ).append( output );
+  output = encodeURI(
+    output.replaceAll('\t', '|')
+          .replaceAll('\n', '||'))
+          .replaceAll('/','%2F')
+  htmlOutput = "<a href=\"https://quickstatements.toolforge.org/#/v1=" + output + "\">\n" +
+               "  <button class=\"btn btn-primary\">Submit to Quickstatements ↗</button>\n" +
+               "</a>\n"
+  $( '#qs' ).after( htmlOutput );
+} catch (error) {
+  if (error.message.includes("status code 404")) {
+    $( '#qs' ).append( "DOI does not exist" )
+  } else {
+    console.log(error)
+  }
+}
+</script>
+
+{% endblock %}
+
 {% block page_content %}
 
 There was no work found with DOI <a href="https://doi.org/{{ doi }}">{{ doi }}</a>.
 
-<script src="{{ url_for('static', filename='js/citation.js') }}"></script>
-
 <h2>QuickStatements</h2>
 
-<pre class="citation-js" data-input="{{ doi }}" data-output-format="quickstatements"></pre>
+<pre id="qs"></pre>
 
 {% endblock %}
