@@ -1,9 +1,9 @@
-# title: Recent works published in venue
+#title: Recent works published in venue
 SELECT
   (MIN(?publication_date_) AS ?publication_date)
   ?work ?workLabel
-  (GROUP_CONCAT(?author_label; separator=", ") AS ?authors)
-  (CONCAT("../authors/", GROUP_CONCAT(SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
+  (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
+  (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
 WHERE {
   ?work wdt:P1433 wd:{{ q }} .
   OPTIONAL {
