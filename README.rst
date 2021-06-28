@@ -34,6 +34,11 @@ The webapp displays scholarly profiles for individual researchers, research topi
     
 The information displayed on the page is only what is available in Wikidata.
 
+Run locally after installing with ``pip``:
+
+.. code-block:: sh
+
+    $ scholia run
 
 Script
 ------
