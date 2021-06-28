@@ -133,7 +133,12 @@ WHERE {
 ORDER BY DESC(?date)`
 
  $(document).ready(function() {
-     sparqlToDataTable(recentlyRetractedWorksSparql, "#recently-retracted-works");
+     sparqlToDataTable(recentlyRetractedWorksSparql, "#recently-retracted-works", {
+         linkPrefixes: {
+             retracted_work: "../work/",
+             retraction: "../work/",
+         }
+     });
  });
 
 </script>
