@@ -6,6 +6,7 @@
 
 {{ sparql_to_table('list-of-publications') }}
 {{ sparql_to_table('venue-statistics') }}
+{{ sparql_to_table('review-statistics') }}
 {{ sparql_to_table('topics') }}
 {{ sparql_to_table('most-cited-works') }}
 {{ sparql_to_table('most-citing-authors') }}
@@ -293,6 +294,9 @@ topics of authored works and topics of citing works.
 
 <table class="table table-hover" id="venue-statistics-table"></table>
 
+<h2 id="review-statistics-header">Review statistics</h2>
+<p>This author has reviewed for the following journals.</p>
+<table class="table table-hover" id="review-statistics-table"></table>
 
 <h2 id="coauthors-header" data-toogle="tooltip" title="Co-author graph for the author (up to 1000 links)">Co-author graph</h2>
 
