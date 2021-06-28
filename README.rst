@@ -5,6 +5,21 @@
 
 Scholia is a python package and webapp for interaction with scholarly information in Wikidata_.
 
+Installation
+------------
+Scholia can be installed directly from GitHub with:
+
+.. code-block:: shell
+
+    $ python3 -m pip install git+https://github.com/WDscholia/scholia
+
+It can be installed in development mode with:
+
+.. code-block:: shell
+
+    $ git clone https://github.com/WDscholia/scholia
+    $ cd scholia
+    $ pip install --editable .
 
 Webapp
 ------
