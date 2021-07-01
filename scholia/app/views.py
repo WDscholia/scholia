@@ -72,6 +72,9 @@ P_PATTERN = re.compile(r'P[1-9]\d*')
 # Wikidata item identifiers matcher
 qs_pattern = r'<regex(r"Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
 
+# https://www.crossref.org/blog/dois-and-matching-regular-expressions/
+DOI_PATTERN = re.compile(r'10\.\d{4,9}/[-._;()/:A-Z0-9]+', re.IGNORECASE)
+
 
 @main.route("/")
 def index():
@@ -1373,8 +1376,20 @@ def show_search():
     html : str
         Rendered index page for search view.
 
+    Notes
+    -----
+    If a DOI pattern is matched for the search query then the search page is
+    redirected to the DOI redirect page.
+
     """
     query = request.args.get('q', '')
+
+    # Redirect to DOI page if the search query looks like a DOI
+    dois = DOI_PATTERN.findall(query)
+    if len(dois) > 0:
+        doi = dois[0]
+        return redirect(url_for('app.redirect_doi', doi=doi), code=302)
+
     if query:
         search_results = search(query)
     else:
