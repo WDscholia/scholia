@@ -1122,6 +1122,11 @@ def q_to_class(q):
             ]):
         class_ = 'disease'
     elif set(classes).intersection([
+            'Q47461491', # JRC representative nanomaterial
+            'Q967847',   # nanomaterial
+            ]):
+        class_ = 'substance'
+    elif set(classes).intersection([
             'Q11173',  # chemical compound
             'Q36496',  # ion
             'Q79529',  # chemical substance
