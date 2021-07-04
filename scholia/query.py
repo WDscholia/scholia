@@ -809,6 +809,42 @@ def q_to_label(q, language='en'):
         return None
 
 
+def property_for_q(q, prop):
+    """Get the value for a property for Q item.
+
+    Parameters
+    ----------
+    q : str
+        String with Wikidata Q item.
+    prop : str
+        String with the property identifier (e.g. P235)
+
+    Returns
+    -------
+    label : str
+        String with value for the corresponding property.
+
+    Examples
+    --------
+    >>> property_for_q('Q80', "P1971")
+    2
+
+    """
+    query = """SELECT ?value WHERE {{ wd:{q} wdt:{prop} ?value . }}""".format(
+        q=q, prop=prop)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    results = data['results']['bindings']
+    if len(results) == 1:
+        return results[0]['value']['value']
+    else:
+        return None
+
+
 def search_article_titles(q, search_string=None):
     """Search articles with q item.
 

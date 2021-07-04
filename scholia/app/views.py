@@ -20,7 +20,8 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
-                     ncbi_gene_to_qs, uniprot_to_qs)
+                     ncbi_gene_to_qs, uniprot_to_qs, q_to_label,
+                     property_for_q)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -132,6 +133,110 @@ def redirect_q(q):
     class_ = q_to_class(q)
     method = 'app.show_' + class_
     return redirect(url_for(method, q=q), code=302)
+
+
+@main.route("/" + q_pattern + "/bioschemas")
+def bioschemas_for(q):
+    """Detect a Bioschemas API request and return Bioschemas for this item.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier
+
+    """
+    class_ = q_to_class(q)
+    label = q_to_label(q)
+
+    # get the aspect specific bits
+    typeLine = ""
+    if (class_ == "author"):
+        typeLine = """
+    "@type" : "Person",'
+    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/" },
+    "description" : "A person" ,"""
+    elif (class_ == "substance"):
+        typeLine = """
+    "@type" : "ChemicalSubstance" ,
+    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE/" },"""
+    elif (class_ == "taxon"):
+        typeLine = """
+    "@type" : "Taxon" ,
+    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Taxon/0.6-RELEASE/" },"""
+        taxonName = property_for_q(q, "P225")
+        if (taxonName):
+            typeLine = typeLine + """
+    "name" : "{taxonName}",""".format(taxonName=taxonName)
+        rank = property_for_q(q, "P105")
+        if (rank):
+            typeLine = typeLine + """
+    "taxonRank" : "{rank}",""".format(rank=rank)
+        taxonParent = property_for_q(q, "P171")
+        if (taxonParent):
+            typeLine = typeLine + """
+    "taxonParent" : "{taxonParent}",""".format(taxonParent=taxonParent)
+    elif (class_ == "chemical"):
+        typeLine = """
+    "@type" : "MolecularEntity" ,
+    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE/" },"""
+        inchiKey = property_for_q(q, "P235")
+        if (inchiKey):
+            typeLine = typeLine + """
+    "inChIKey" : "{inchiKey}",""".format(inchiKey=inchiKey)
+        inchi = property_for_q(q, "P234")
+        if (inchi):
+            typeLine = typeLine + """
+    "inChI" : "{inchi}",""".format(inchi=inchi)
+        molecularFormula = property_for_q(q, "P274")
+        if (molecularFormula):
+            typeLine = typeLine + """
+    "molecularFormula" : "{molecularFormula}",""".format(molecularFormula=molecularFormula)
+        isoSMILES = property_for_q(q, "P2017")
+        if (isoSMILES):
+            typeLine = typeLine + """
+    "smiles" : "{isoSMILES}",""".format(isoSMILES=isoSMILES)
+        else:
+            SMILES = property_for_q(q, "233")
+            if (SMILES):
+                typeLine = typeLine + """
+    "smiles" : "{SMILES}",""".format(SMILES=SMILES)
+    elif (class_ == "protein"):
+        typeLine = """
+    "@type" : "Protein" ,
+    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Protein/0.11-RELEASE/" },"""
+        uniprot = property_for_q(q, "P352")
+        if (uniprot):
+            typeLine = typeLine + """
+    "sameAs": "https://www.uniprot.org/uniprot/{uniprot}",""".format(uniprot=uniprot)
+    elif (class_ == "gene"):
+        typeLine = """
+    "@type" : "Gene" ,
+    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Gene/0.7-RELEASE/" },"""
+        counter = 0
+        sameAsLines = """
+    "sameAs": ["""
+        ncbi = property_for_q(q, "P351")
+        if (ncbi):
+            sameAsLines = sameAsLines + """
+        "https://www.ncbi.nlm.nih.gov/gene/{ncbi}",""".format(ncbi=ncbi)
+            counter = counter + 1
+        ensembl = property_for_q(q, "P594")
+        if (ensembl):
+            sameAsLines = sameAsLines + """
+        "http://identifiers.org/ensembl/{ensembl}",""".format(ensembl=ensembl)
+            counter = counter + 1
+        if (counter > 0):
+            typeLine = typeLine + sameAsLines + """
+    ],"""
+
+    # glue stuff together
+    content = """{{
+    "@context" : "https://schema.org",{typeLine}
+    "name" : "{label}",
+    "identifier" : "{q}",
+    "mainEntityOfPage" : "http://www.wikidata.org/entity/{q}"
+}}""".format(q=q, typeLine=typeLine, label=label)
+    return content
 
 
 @main.route('/property/')
