@@ -2,7 +2,7 @@
 
 import re
 
-from flask import (Blueprint, current_app, redirect, render_template, request,
+from flask import (Blueprint, current_app, jsonify, redirect, render_template, request,
                    Response, url_for)
 from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
@@ -143,100 +143,107 @@ def bioschemas_for(q):
     ----------
     q : str
         Wikidata item identifier
-
     """
-    class_ = q_to_class(q)
-    label = q_to_label(q)
+    entity_class = q_to_class(q)
 
     # get the aspect specific bits
-    typeLine = ""
-    if (class_ == "author"):
-        typeLine = """
-    "@type" : "Person",'
-    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/" },
-    "description" : "A person" ,"""
-    elif (class_ == "substance"):
-        typeLine = """
-    "@type" : "ChemicalSubstance" ,
-    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE/" },"""
-    elif (class_ == "taxon"):
-        typeLine = """
-    "@type" : "Taxon" ,
-    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Taxon/0.6-RELEASE/" },"""
-        taxonName = property_for_q(q, "P225")
-        if (taxonName):
-            typeLine = typeLine + """
-    "name" : "{taxonName}",""".format(taxonName=taxonName)
+    if entity_class == "author":
+        data = {
+            "@type": "Person",
+            "http://purl.org/dc/terms/conformsTo": {
+                "@type": "CreativeWork",
+                "@id": "https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/",
+            },
+            "description": "A person",
+        }
+    elif entity_class == "substance":
+        data = {
+            "@type": "ChemicalSubstance",
+            "http://purl.org/dc/terms/conformsTo": {
+                "@type": "CreativeWork",
+                "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE/",
+            },
+        }
+    elif entity_class == "taxon":
+        data = {
+            "@type": "Taxon",
+            "http://purl.org/dc/terms/conformsTo": {
+                "@type": "CreativeWork",
+                "@id": "https://bioschemas.org/profiles/Taxon/0.6-RELEASE/",
+            },
+        }
+        taxon_name = property_for_q(q, "P225")
+        if taxon_name:
+            data['name'] = taxon_name
         rank = property_for_q(q, "P105")
-        if (rank):
-            typeLine = typeLine + """
-    "taxonRank" : "{rank}",""".format(rank=rank)
-        taxonParent = property_for_q(q, "P171")
-        if (taxonParent):
-            typeLine = typeLine + """
-    "taxonParent" : "{taxonParent}",""".format(taxonParent=taxonParent)
-    elif (class_ == "chemical"):
-        typeLine = """
-    "@type" : "MolecularEntity" ,
-    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE/" },"""
-        inchiKey = property_for_q(q, "P235")
-        if (inchiKey):
-            typeLine = typeLine + """
-    "inChIKey" : "{inchiKey}",""".format(inchiKey=inchiKey)
-        inchi = property_for_q(q, "P234")
-        if (inchi):
-            typeLine = typeLine + """
-    "inChI" : "{inchi}",""".format(inchi=inchi)
-        molecularFormula = property_for_q(q, "P274")
-        if (molecularFormula):
-            typeLine = typeLine + """
-    "molecularFormula" : "{molecularFormula}",""".format(molecularFormula=molecularFormula)
-        isoSMILES = property_for_q(q, "P2017")
-        if (isoSMILES):
-            typeLine = typeLine + """
-    "smiles" : "{isoSMILES}",""".format(isoSMILES=isoSMILES)
+        if rank:
+            data['taxonRank']: rank
+        taxon_parent = property_for_q(q, "P171")
+        if taxon_parent:
+            data['taxonParent'] = taxon_parent
+    elif entity_class == "chemical":
+        data = {
+            "@type": "MolecularEntity",
+            "http://purl.org/dc/terms/conformsTo": {
+                "@type": "CreativeWork",
+                "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE/",
+            },
+        }
+        inchi_key = property_for_q(q, "P235")
+        if inchi_key:
+            data['inChIKey'] = inchi_key
+        if inchi:
+            data['inChI'] = inchi
+        molecular_formula = property_for_q(q, "P274")
+        if molecular_formula:
+            data['molecularFormula'] = molecular_formula
+        isomeric_smiles = property_for_q(q, "P2017")
+        if isomeric_smiles:
+            data['smiles'] = isomeric_smiles
         else:
-            SMILES = property_for_q(q, "233")
-            if (SMILES):
-                typeLine = typeLine + """
-    "smiles" : "{SMILES}",""".format(SMILES=SMILES)
-    elif (class_ == "protein"):
-        typeLine = """
-    "@type" : "Protein" ,
-    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Protein/0.11-RELEASE/" },"""
+            canonical_smiles = property_for_q(q, "P233")
+            if canonical_smiles:
+                data['smiles'] = canonical_smiles
+    elif entity_class == "protein":
+        data = {
+            "@type": "Protein",
+            "http://purl.org/dc/terms/conformsTo": {
+                "@type": "CreativeWork",
+                "@id": "https://bioschemas.org/profiles/Protein/0.11-RELEASE/",
+            }
+        }
         uniprot = property_for_q(q, "P352")
-        if (uniprot):
-            typeLine = typeLine + """
-    "sameAs": "https://www.uniprot.org/uniprot/{uniprot}",""".format(uniprot=uniprot)
-    elif (class_ == "gene"):
-        typeLine = """
-    "@type" : "Gene" ,
-    "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Gene/0.7-RELEASE/" },"""
-        counter = 0
-        sameAsLines = """
-    "sameAs": ["""
+        if uniprot:
+            data['sameAs'] = f"https://www.uniprot.org/uniprot/{uniprot}"
+    elif entity_class == "gene":
+        data = {
+            "@type": "Gene",
+            "http://purl.org/dc/terms/conformsTo": {
+                "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Gene/0.7-RELEASE/",
+            },
+        }
+        same_genes = []
         ncbi = property_for_q(q, "P351")
-        if (ncbi):
-            sameAsLines = sameAsLines + """
-        "https://www.ncbi.nlm.nih.gov/gene/{ncbi}",""".format(ncbi=ncbi)
-            counter = counter + 1
+        if ncbi:
+            same_genes.append(f"https://www.ncbi.nlm.nih.gov/gene/{ncbi}")
         ensembl = property_for_q(q, "P594")
-        if (ensembl):
-            sameAsLines = sameAsLines + """
-        "http://identifiers.org/ensembl/{ensembl}",""".format(ensembl=ensembl)
-            counter = counter + 1
-        if (counter > 0):
-            typeLine = typeLine + sameAsLines + """
-    ],"""
+        if ensembl:
+            same_genes.append(f"http://identifiers.org/ensembl/{ensembl}")
+        if same_genes:
+            data['sameAs'] = same_genes
+    else:
+        # No schema information inferred for this type
+        data = {}
 
     # glue stuff together
-    content = """{{
-    "@context" : "https://schema.org",{typeLine}
-    "name" : "{label}",
-    "identifier" : "{q}",
-    "mainEntityOfPage" : "http://www.wikidata.org/entity/{q}"
-}}""".format(q=q, typeLine=typeLine, label=label)
-    return content
+    content = {
+        "@context": "https://schema.org",
+        "name": q_to_label(q),
+        "identifier": q,
+        "mainEntityOfPage": f"http://www.wikidata.org/entity/{q}",
+        **data,
+    }
+    return jsonify(content)
 
 
 @main.route('/property/')
