@@ -5,8 +5,6 @@ ports:
 - port: 8100
   onOpen: open-preview
 tasks:
-- init: >
-    python -m pip install -r requirements.txt 
-  command: >
-    export FLASK_APP=runserver.py
-    flask run -h 0.0.0.0 -p 8100
+- init: python -m pip install -r requirements.txt 
+  command: export FLASK_APP=runserver.py
+  command: flask run -h 0.0.0.0 -p 8100
