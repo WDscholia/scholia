@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block metas %}
+{{super()}}
+<meta name="description" content="View scholarly profiles from Wikidata for topics, people, organizations, species, chemicals, etc.">
+{% endblock %}
+
 <!-- don't show nav search on index.html -->
 {% block nav_search %}{% endblock %}
 
