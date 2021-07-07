@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 
+{% set aspect = "work_empty" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('recently-retracted-works') }}
+
+{% endblock %}
+
+
+
 {% block page_content %}
 
 <h1>Work</h1>
@@ -88,9 +98,9 @@ Scientific articles, conference articles, books, ...
 
 <div class="container">
 
-    <h2>Recently retracted works</h2>
+    <h2 id="recently-retracted-works-header">Recently retracted works</h2>
 
-    <table class="table table-hover" id="recently-retracted-works"></table>
+    <table class="table table-hover" id="recently-retracted-works-table"></table>
     
 </div>    
 
@@ -98,7 +108,7 @@ Scientific articles, conference articles, books, ...
 
 {% endblock %}
 
-{% block scripts %}
+<!-- {% block scripts %}
 {{super()}}
 
 <script type="text/javascript">
@@ -142,7 +152,7 @@ ORDER BY DESC(?date)`
  });
 
 </script>
-
+ -->
 
 {% endblock %}
 
