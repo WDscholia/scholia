@@ -28,6 +28,7 @@ It is possible to use methods of the scholia package as a script:
     $ python -m scholia.query twitter-to-q fnielsen
     Q20980928
 
+View all methods in DOCUMENTATION.md_.
 
 Contributing
 ------------
@@ -43,6 +44,7 @@ See file `CONTRIBUTING.rst`_ for technical details on how to improve Scholia.
 .. _CONTRIBUTING.rst: https://github.com/fnielsen/scholia/blob/master/CONTRIBUTING.rst
 .. _requirements.txt: https://github.com/fnielsen/scholia/blob/master/requirements.txt
 .. _runserver.py: https://github.com/fnielsen/scholia/blob/master/runserver.py
+.. _DOCUMENTATION.md: DOCUMENTATION.md
 
 References
 ---------
