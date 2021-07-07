@@ -3,7 +3,7 @@
 
 from six import u
 
-from .utils import escape_string
+from utils import escape_string
 
 
 def paper_to_quickstatements(paper):

@@ -685,6 +685,45 @@ Functions
 :   Write Pajek network file from SPARQL query.
 
 
+Module qs
+=========
+Quickstatements.
+
+Functions
+---------
+
+    
+`paper_to_quickstatements(paper)`
+:   Convert paper to Quickstatements.
+    
+    Convert a paper represented as a dict in to Magnus Manske's
+    Quickstatement format for entry into Wikidata.
+    
+    Parameters
+    ----------
+    paper : dict
+        Scraped paper represented as a dict.
+    
+    Returns
+    -------
+    qs : str
+        Quickstatements as a string
+    
+    References
+    ----------
+    https://quickstatements.toolforge.org
+    
+    Notes
+    -----
+    title, authors (list), date, doi, year, language_q, volume, issue, pages,
+    number_of_pages, url, full_text_url, published_in_q are recognized.
+    
+    `date` takes precedence over `year`.
+    
+    The label is shortened to 250 characters due if the title is longer than
+    that due to a limitation in Wikidata.
+
+
 Module query
 ============
 query.
@@ -1614,6 +1653,172 @@ Functions
     -------
     rss : str
         RSS-formatted feed with latest work from venue.
+
+
+Module tex
+==========
+tex.
+
+Usage:
+  scholia.tex extract-qs-from-aux <file>
+  scholia.tex write-bbl-from-aux <file>
+  scholia.tex write-bib-from-aux <file>
+
+Description:
+  Work with latex and bibtex.
+
+  The functionality is not complete.
+
+Example latex document:
+
+\documentclass{article}
+\pdfoutput=1
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+Scientific citations \cite{Q26857876,Q21172284}.
+Semantic relatedness \cite{Q26973018}.
+\bibliographystyle{unsrt}
+\bibliography{}
+\end{document}
+
+Functions
+---------
+
+    
+`authors_to_bibtex_authors(authors)`
+:   Convert a Wikidata entity to an author in BibTeX.
+    
+    Parameters
+    ----------
+    authors : dict
+        Wikidata entity as hierarchical structure.
+    
+    Returns
+    -------
+    entry : str
+        Bibtex entry in Unicode string.
+
+    
+`entity_to_bibtex_entry(entity, key=None)`
+:   Convert Wikidata entity to bibtex-formatted entry.
+    
+    Parameters
+    ----------
+    entity : dict
+        Wikidata entity as hierarchical structure.
+    key : str
+        Bibtex key.
+    
+    Returns
+    -------
+    entry : str
+        Bibtex entry in Unicode string.
+
+    
+`escape_to_tex(string, escape_type='normal')`
+:   Escape a text to a tex/latex safe text.
+    
+    Parameters
+    ----------
+    string : str or None
+        Unicode string to be escaped.
+    escape_type : normal or url, default normal
+        Type of escaping.
+    
+    Returns
+    -------
+    escaped_string : str
+        Escaped unicode string. If the input is None then an empty string is
+        returned.
+    
+    Examples
+    --------
+    >>> escape_to_tex("^^") == r'\^{}\^{}'
+    True
+    
+    >>> escaped = escape_to_tex('10.1007/978-3-319-18111-0_26', 'url')
+    >>> escaped == '10.1007/978-3-319-18111-0\\_26'
+    True
+    
+    References
+    ----------
+    - https://en.wikibooks.org/wiki/LaTeX/Special_Characters
+    - http://stackoverflow.com/questions/16259923/
+
+    
+`extract_dois_from_aux_string(string)`
+:   Extract DOIs from string.
+    
+    Parameters
+    ----------
+    string : str
+        Extract Wikidata identifiers from citations.
+    
+    Returns
+    -------
+    dois : list of str
+        List of strings.
+    
+    Examples
+    --------
+    >>> string = "\\citation{10.1186/S13321-016-0161-3}"
+    >>> extract_dois_from_aux_string(string)
+    ['10.1186/S13321-016-0161-3']
+
+    
+`extract_qs_from_aux_string(string)`
+:   Extract qs from string.
+    
+    Parameters
+    ----------
+    string : str
+        Extract Wikidata identifiers from citations.
+    
+    Returns
+    -------
+    qs : list of str
+        List of strings.
+    
+    Examples
+    --------
+    >>> string = "\\citation{Q28042913}"
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913']
+    
+    >>> string = "\\citation{Q28042913,Q27615040}"
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913', 'Q27615040']
+    
+    >>> string = "\\citation{Q28042913,Q27615040,Q27615040}"
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913', 'Q27615040', 'Q27615040']
+    
+    >>> string = "\\citation{Q28042913,NielsenF2002Neuroinformatics,Q27615040}"
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913', 'Q27615040']
+    
+    >>> string = "\\citation{Q28042913,Q27615040.Q27615040}"
+    >>> extract_qs_from_aux_string(string)
+    ['Q28042913']
+
+    
+`guess_bibtex_entry_type(entity)`
+:   Guess Bibtex entry type.
+    
+    Parameters
+    ----------
+    entity : dict
+        Wikidata item.
+    
+    Returns
+    -------
+    entry_type : str
+        Entry type as a string: 'Article', 'InProceedings', etc.
+
+    
+`main()`
+:   Handle command-line arguments.
 
 
 Module text
