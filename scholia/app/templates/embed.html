@@ -1,0 +1,389 @@
+
+<div id="clinical-trial-index" class="embed-responsive-item">
+    <style>
+
+    #{{ parent_id }} .logo {
+        position: absolute;
+        top: 0px;
+        height: 100%;
+        width: 100%;
+        background-size: 80% 80%;
+        background-image: url(logo-embed.svg);
+        background-repeat: no-repeat;
+        background-position: center;
+        z-index: -1;
+    }
+
+    #{{ parent_id }} #error {
+        display: none;
+    }
+
+    #{{ parent_id }} #query-result {
+        height: 95%;
+    }
+
+    #{{ parent_id }} .action-bar {
+        height: 30px;
+        width: 100%;
+        line-height: 30px;
+        font-size: 18px;
+    }
+
+    #{{ parent_id }} .popover {
+        max-width: 100vw;
+        min-width: 300px;
+        white-space: nowrap;
+    }
+
+    #{{ parent_id }} .select2-container {
+        z-index: 2000;
+        min-width: 200px;
+    }
+
+    #{{ parent_id }} .tooltip {
+        z-index: 2001;
+    }
+
+    #{{ parent_id }} #result-browser-menu {
+        cursor: pointer;
+        list-style-type: none;
+        padding-left: 10px;
+    }
+
+    #{{ parent_id }} .result-browser-item {
+        padding: 0.5em 0 0.5em 0;
+    }
+
+    #{{ parent_id }} .result-browser {
+        color: #333;
+    }
+
+    #{{ parent_id }} .result-browser-inactive {
+        display: none;
+    }
+
+    #{{ parent_id }} .img-grid {
+        width: 95vw;
+    }
+
+    #{{ parent_id }} .wdqs-control-scroll-top {
+        display: none;
+    }
+
+    #{{ parent_id }} .bootstrap-table {
+        width: 100%;
+        height: auto;
+        padding: 20px 50px;
+    }
+
+    #{{ parent_id }} #query-result .jstree {
+        width: 100%;
+        height: auto;
+        padding: 25px 50px;
+    }
+
+    #{{ parent_id }} .expand-type {
+        left: 47%;
+        bottom: 3em;
+        opacity: 0.2;
+        position: absolute;
+        display: none;
+    }
+    #{{ parent_id }} .expand-type:hover {
+        opacity: 1;
+    }
+
+    #{{ parent_id }} #layout-options {
+        margin-top: 0px;
+        position: fixed;
+        z-index: 1001;
+        opacity: 0.2;
+        margin: auto;
+        width: 100%;
+    }
+    #{{ parent_id }} #layout-options:hover {
+        opacity: 1;
+    }
+
+    #{{ parent_id }} .layout-button {
+        border: none;
+        border-radius: 0;
+    }
+
+    #{{ parent_id }} .toolbar-visible {
+        opacity: 1!important;
+    }
+
+    #{{ parent_id }} .header-toolbar {
+        z-index: 1000;
+        position: absolute;
+        left: -97px;
+        top: 100px;
+        padding-top: 0.5em;
+        opacity: 0;
+        width: 150px;
+    }
+    #{{ parent_id }} .header-toolbar:hover {
+        transition: 0.4s;
+        opacity: 1;
+        background: #fff;
+        border: #ddd 1px solid;
+        left: 0;
+    }
+
+    #{{ parent_id }} .toolbar-label {
+        display: none;
+    }
+
+    #{{ parent_id }} .toolbar-right {
+        position: absolute;
+        right: -97px;
+        top: 100px;
+        z-index: 1000;
+        padding-top: 0.5em;
+        opacity: 0;
+        width: 150px;
+    }
+    #{{ parent_id }} .toolbar-right:hover, .hovered {
+        transition: 0.4s;
+        opacity: 1;
+        background: #fff;
+        border: #ddd 1px solid;
+        right: 0;
+        z-index: 1500; /* needs to be between 1000 (tiny map in map view) and 2000 (value dropdown of edit visually) */
+    }
+
+    #{{ parent_id }} .toolbar-right-item {
+        display: block;
+        width: 100%;
+        padding: 0.75em 0 0.75em 0;
+        position: relative;
+    }
+    #{{ parent_id }} .toolbar-right-item:focus {
+        outline: none;
+        text-decoration: none;
+    }
+    #{{ parent_id }} .toolbar-right-item:hover {
+        text-decoration: none;
+    }
+
+    #{{ parent_id }} .toolbar-right-icon {
+        position: relative;
+        left: -15px;
+    }
+
+    #{{ parent_id }} .toolbar-right-label {
+        position: absolute;
+        left: 15px;
+    }
+
+    #{{ parent_id }} .download-dropdown-menu {
+        left: -47px;
+        top: -11px;
+    }
+
+    #{{ parent_id }} .download-caret {
+        position: relative;
+        left: 60px;
+    }
+
+    #{{ parent_id }} #embed-right-menu {
+        list-style-type: none;
+        position: static;
+        padding-left: 38px;
+    }
+
+    #{{ parent_id }} .brand {
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        z-index: 10000;
+        background-color: rgba( 255,255,255, 0.7 );
+        padding: 0.2em;
+        font-size: 0.8em;
+    }
+
+    #{{ parent_id }} .brand img {
+        padding: 0.1em;
+    }
+
+    @media only screen and (max-height: 285px) {
+        #{{ parent_id }} .header-toolbar {
+            z-index: 1000;
+            position: fixed;
+            left: -97px;
+            top: 20vh;
+            padding-top: 0.5em;
+            opacity: 0.6;
+            width: 150px;
+            height: 65vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+    }
+
+    @media only screen and (max-height: 430px) {
+        #{{ parent_id }} #embed-right-menu {
+            list-style-type: none;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            height: 57vh;
+            position: static;
+        }
+    }
+
+    @media only screen and (max-height: 450px) {
+        #{{ parent_id }} .download-dropdown-menu {
+            left: -50px;
+            top: -40px;
+            height: 61vh;
+            overflow-y: scroll;
+        }
+    }
+
+    @media only screen and (max-width: 400px) {
+        #{{ parent_id }} .toolbar-right {
+            display: none;
+        }
+
+        #{{ parent_id }} .header-toolbar {
+            display: none;
+        }
+
+        #{{ parent_id }} .bootstrap-table {
+            width: 100%;
+            height: auto;
+            padding: 0px;
+        }
+
+        #{{ parent_id }} .jstree {
+            width: 100%;
+            height: auto;
+            padding: 0px;
+        }
+
+    }
+
+    </style>
+
+    <style id="MJX-CHTML-styles">/* placeholder for MathJax */</style>
+	<div class="logo"></div>
+		<noscript>
+			<div class="row action-bar" style="display: block">
+				<div class="message">
+					<div class="label label-warning">
+						Please enable JavaScript or use a browser that supports it.
+					</div>
+				</div>
+			</div>
+		</noscript>
+
+		<a class="edit-link brand" target="_blank" rel="noopener" href="./"><img width="24" height="15" src=""><span></span></a>
+		<div class="header-toolbar">
+			<ul id="result-browser-menu">
+			</ul>
+		</div>
+
+		<div class="toolbar-right">
+			<ul id="embed-right-menu">
+				<li>
+					<a href="#" target="_blank" rel="noopener" class="edit edit-link toolbar-right-item" data-toggle="popover">
+						<div data-toggle="tooltip" data-i18n="[title]wdqs-embed-button-edit-query-title">
+							<span class="glyphicon glyphicon-pencil toolbar-right-icon" aria-hidden="true"></span><span class="toolbar-right-label" data-i18n="wdqs-embed-button-edit-query"></span>
+						</div>
+					</a>
+				</li>
+				<li>
+					<a class="link edit-link toolbar-right-item" target="_blank" rel="noopener" data-i18n="[title]wdqs-embed-button-edit-code-title">
+						<span class="glyphicon glyphicon-edit toolbar-right-icon" aria-hidden="true"></span> <span class="toolbar-right-label" data-i18n="wdqs-embed-button-edit-code"></span>
+					</a>
+				</li>
+				<li>
+					<a href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:SPARQL_query_service/Wikidata_Query_Help" target="_blank" class="toolbar-right-item">
+						<span class="glyphicon glyphicon-question-sign toolbar-right-icon" aria-hidden="true"></span> <span class="toolbar-right-label" data-i18n="wdqs-app-button-help" id="help-label"></span>
+					</a>
+				</li>
+				<li>
+					<a class="toolbar-right-item" href="#" id="open-example" data-toggle="modal" data-target="#QueryExamples">
+						<span class="fa fa-folder-open-o toolbar-right-icon"></span> <span class="toolbar-right-label" data-i18n="wdqs-app-button-examples" id="examples-label"></span>
+					</a>
+				</li>
+				<li>
+					<a href="#" class="shareQuery shortUrlTrigger result toolbar-right-item" target="_blank" data-i18n="[title]wdqs-app-button-link-title" data-toggle="popover">
+						<span class="glyphicon glyphicon-link toolbar-right-icon" aria-hidden="true"> </span> <span class="toolbar-right-label" data-i18n="wdqs-app-button-link"></span>
+					</a>
+				</li>
+				<li class="download-dropdown">
+					<a id="download-button" href="#" class="toolbar-right-item" data-toggle="dropdown" class="dropdown-toggle" data-placement="top" data-i18n="[title]wdqs-app-button-download-title">
+						<span class="glyphicon glyphicon-download-alt toolbar-right-icon" aria-hidden="true"></span> <span data-i18n="wdqs-app-button-download" class="toolbar-right-label"></span>
+						<span class="dropup"><span class="caret download-caret"></span></span>
+					</a>
+					<ul class="dropdown-menu download-dropdown-menu" role="menu">
+							<li><a id="downloadJSON" href="#"><span class="fa fa-file-code-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-json"></span></a></li>
+							<li><a id="downloadFull-JSON" href="#"><span class="fa fa-file-code-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-json-verbose"></span></a></li>
+							<li role="separator" class="divider"></li>
+							<li><a id="downloadSimple-TSV" href="#"><span class="fa fa-file-excel-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-tsv"></span></a></li>
+							<li><a id="downloadTSV" href="#"><span class="fa fa-file-excel-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-tsv-verbose"></span></a></li>
+							<li role="separator" class="divider"></li>
+							<li><a id="downloadCSV" href="#"><span class="fa fa-file-excel-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-csv"></span></a></li>
+							<li role="separator" class="divider"></li>
+							<li><a id="downloadHTML" href="#"><span class="fa fa-file-code-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-html"></span></a></li>
+							<li role="separator" class="divider"></li>
+							<li><a id="downloadSVG" href="#"><span class="fa fa-file-image-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-svg"></span></a></li>
+					</ul>
+				</li>
+				<li>
+					<span class="query-total"><span class="label label-default" id="response-summary"></span></span>
+				</li>
+			</ul>
+		</div>
+		<div class="action-bar">
+			<div class="message"></div>
+		</div>
+		<div id="query-result">Test result</div>
+		<div id="query-error" class="panel-heading">Test error</div>
+
+		<div id="loading-spinner">
+			<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+			<span class="sr-only">Loading...</span>
+		</div>
+		<div id="explorer-dialogs">
+			<div class="explorer-dialog">
+				<div data-role="header" class="modal-header clearfix explorer-header">
+					<h3 data-role="title" class="modal-title pull-left explorer-title">Explorer</h3>
+					<button data-role="close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div data-role="body" class="explorer-body">
+				</div>
+			</div>
+		</div>
+
+	<div class="expand-type" data-toggle="tooltip" data-i18n="[title]wdqs-embed-explorer-button-outgoing">
+		<input id="expand-type-switch" type="checkbox" data-onstyle="primary" data-size="small">
+	</div>
+
+	<!-- Query Example Modal -->
+	<div class="modal fade QueryExamples" id="QueryExamples" tabindex="-1" role="dialog" aria-labelledby="QueryExamplesModalLabel">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="tagCloud"></div>
+					<div class="tagFilter"></div>
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span></span>
+						<input type="text" class="tableFilter form-control" placeholder="Type to filter"/>
+						<span class="input-group-addon"><span class="badge count"></span></span>
+					</div>
+					<div class="exampleTable">
+						<table class="table">
+						    <tbody class="searchable">
+						    </tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

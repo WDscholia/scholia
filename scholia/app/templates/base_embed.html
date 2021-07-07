@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/bootstrap/dist/css/bootstrap.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/font-awesome/css/font-awesome.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/codemirror/lib/codemirror.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/codemirror/addon/hint/show-hint.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/codemirror/addon/display/fullscreen.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/bootstrap/dist/css/bootstrap-theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/select2/dist/css/select2.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/vis/dist/vis.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/ekko-lightbox/dist/ekko-lightbox.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/bootstrap-table/dist/bootstrap-table.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/leaflet/dist/leaflet.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/leaflet-fullscreen/dist/leaflet.fullscreen.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/leaflet-zoombox/L.Control.ZoomBox.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/leaflet.markercluster/dist/MarkerCluster.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/leaflet.locatecontrol/dist/L.Control.Locate.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/leaflet-minimap/dist/Control.MiniMap.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/jstree/dist/themes/default/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/jqcloud2/dist/jqcloud.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/gijgo/css/gijgo.min.css" ') }}/>
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/vendor/bootstrap-tags/css/bootstrap-tags.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/node_modules/bootstrap-toggle/css/bootstrap-toggle.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='gui/style.css') }}">
+<!-- endbuild -->
+<!-- build:none -->
+<link rel="stylesheet/less" type="text/css" href="{{ url_for('static', filename='gui/style.less') }}">
+<script src="{{ url_for('static', filename='gui/node_modules/less/dist/less.js') }}" data-env="development"></script>
+<script>less.watch()</script>
+<!-- endbuild -->
+
+<!-- build:js js/shim.min.js -->
+<script src="{{ url_for('static', filename='gui/node_modules/es6-shim/es6-shim.js') }}"></script>
+<!-- endbuild -->
+
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+    <!-- JS files -->
+    <!-- build:js js/embed.vendor.min.js -->
+    <script src="{{ url_for('static', filename='gui/node_modules/jquery/dist/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/underscore/underscore.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/bootstrap/dist/js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/lib/codemirror.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/sparql/sparql.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/htmlmixed/htmlmixed.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/xml/xml.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/clike/clike.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/php/php.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/javascript/javascript.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/octave/octave.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/python/python.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/ruby/ruby.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/mode/r/r.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/addon/display/autorefresh.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/addon/hint/show-hint.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/addon/display/placeholder.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/addon/display/fullscreen.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/codemirror/addon/comment/comment.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/bootstrap-table/dist/bootstrap-table.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/bootstrap-table/dist/extensions/mobile/bootstrap-table-mobile.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/bootstrap-table/dist/extensions/key-events/bootstrap-table-key-events.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/bootstrap-table/dist/extensions/cookie/bootstrap-table-cookie.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/bootstrap-toggle/js/bootstrap-toggle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/ekko-lightbox/dist/ekko-lightbox.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/leaflet/dist/leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/leaflet-fullscreen/dist/Leaflet.fullscreen.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/leaflet-zoombox/L.Control.ZoomBox.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/leaflet.markercluster/dist/leaflet.markercluster.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/leaflet.locatecontrol/dist/L.Control.Locate.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/leaflet-minimap/dist/Control.MiniMap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/d3/d3.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/dimple-js/dist/dimple.latest.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/js-cookie/src/js.cookie.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/vis/dist/vis.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/select2/dist/js/select2.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/moment/min/moment-with-locales.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/wellknown/wellknown.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/downloadjs/download.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/jqcloud2/dist/jqcloud.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/gijgo/js/gijgo.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/vendor/sparqljs/dist/sparqljs-browser-min.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/vendor/bootstrapx-clickover/bootstrapx-clickover.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/jstree/dist/jstree.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/jquery.uls/src/jquery.uls.data.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/jquery.uls/src/jquery.uls.data.utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/jquery.uls/src/jquery.uls.lcd.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/jquery.uls/src/jquery.uls.languagefilter.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/jquery.uls/src/jquery.uls.core.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/cldrpluralruleparser/src/CLDRPluralRuleParser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.messagestore.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.fallbacks.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.parser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.emitter.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.language.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/node_modules/mathjax/es5/mml-chtml.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/vendor/bootstrap-tags/js/bootstrap-tags.min.js') }}"></script>
+
+    <!-- endbuild -->
+
+    <!-- build:js js/embed.wdqs.min.js -->
+    <script src="{{ url_for('static', filename='gui/wikibase/config.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/i18n/getMessage.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/dialog/QueryExampleDialog.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/ResultView.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/helper/FormatterHelper.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/helper/Options.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/AbstractResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/AbstractChartResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/AbstractDimpleChartResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/ImageResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/TableResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/CoordinateResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/TreeMapResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/TreeResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/BubbleChartResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/LineChartResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/BarChartResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/ScatterChartResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/AreaChartResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/TimelineResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/MultiDimensionResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/GraphResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/GraphResultBrowserNodeBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/resultBrowser/PolestarResultBrowser.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/api/Sparql.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/api/QuerySamples.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/api/Wikibase.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/api/Tracking.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/api/UrlShortener.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/RdfNamespaces.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/queryHelper/QueryHelper.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/queryHelper/SparqlQuery.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/queryHelper/SelectorBox.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/queryHelper/QueryTemplate.js') }}"></script>
+    <script src="{{ url_for('static', filename='gui/wikibase/queryService/ui/toolbar/ActionBar.js') }}"></script>
+    <script>
+        {% block spark_vars %}
+        {% endblock %}
+    </script>
+    <script>
+        ( function ( CONFIG ) {
+        'use strict';
+        $.when(
+            $.ready,
+            CONFIG.getConfig()
+        )
+        .then( function ( documentReady, config ) {
+            function renderEdit( qh, query, $editor, callback ) {
+                qh.setChangeListener( _.debounce( function( v ) {
+                    callback( v.getQuery() );
+                }, 1500 ) );
+                try {
+                    qh.setQuery( query );
+                    qh.draw( $editor );
+                } catch ( e ) {
+                    return;
+                }
+                if ( /^#TEMPLATE=/m.test( query ) ) {
+                    // expand query template popover after allowing some time for labels to load
+                    setTimeout( function() { $( '.edit' ).click(); }, 500 );
+                }
+            }
+
+            function setBrand() {
+                $( '.brand img' ).attr( 'src', config.brand.logo );
+                $( '.brand > span' ).text( config.brand.title );
+                document.title = config.brand.title;
+            }
+
+            function initToolbarVisibilityHandler() {
+                $( 'body' ).mousemove( function( event ) {
+                    var timer;
+
+                    clearTimeout( timer );
+                    $( '.toolbar-right' ).addClass( 'toolbar-visible' );
+                    $( '.header-toolbar' ).addClass( 'toolbar-visible' );
+
+                    timer = window.setTimeout( function() {
+                        $( '.toolbar-right' ).removeClass( 'toolbar-visible' );
+                        $( '.header-toolbar' ).removeClass( 'toolbar-visible' );
+                    }, 1000 );
+                } );
+            }
+            console.log("initiating: ", sparql)
+            var lang = Cookies.get( 'lang' ) ? Cookies.get( 'lang' ) : config.language,
+                api = new wikibase.queryService.api.Wikibase( config.api.wikibase.uri, lang ),
+                sparqlApi = new wikibase.queryService.api.Sparql( config.api.sparql.uri, lang ),
+                querySamplesApi = new wikibase.queryService.api.QuerySamples(
+                    lang,
+                    config.api.examples
+                ),
+                codeSamplesApi = null,
+                shortenApi = new wikibase.queryService.api.UrlShortener( config.api.urlShortener ),
+                resultView = new wikibase.queryService.ui.ResultView(
+                    sparqlApi,
+                    querySamplesApi,
+                    api,
+                    codeSamplesApi,
+                    shortenApi,
+                    null,
+                    config.api['query-builder'].server
+                ),
+                query = decodeURIComponent( sparql ),
+                qh = new wikibase.queryService.ui.queryHelper.QueryHelper( api, sparqlApi ),
+                $editor = $( '<div>' );
+
+            resultView.trackingNamespace = 'wikibase.queryService.ui.embed.';
+
+            setBrand();
+            $.i18n().locale = lang;
+            $.when(
+                config.i18nLoad( lang )
+            ).done( function() {
+                $( 'body' ).i18n();
+                $( 'html' ).attr( { lang: lang, dir: $.uls.data.getDir( lang ) } );
+
+                resultView.draw( query ).then( function() {
+                    $( '.logo' ).hide();
+                } );
+                renderEdit( qh, query, $editor, function( q ) {
+                    resultView.draw( q );
+                    window.location.hash = '#' + encodeURIComponent( q );
+                    $( '.edit-link' ).attr( 'href', config.location.index + sparql );
+                } );
+                $( '.edit-link' ).attr( 'href', config.location.index + sparql );
+
+            } );
+
+            $( '#display-button' ).closest( '.navbar' ).addClass( 'dropup' );
+
+            $( '#expand-type-switch' ).change( function() {
+                if ( $( this ).prop( 'checked' ) ) {
+                    $( '.expand-type' ).attr( 'title', $.i18n( 'wdqs-embed-explorer-button-incoming' ) );
+                } else {
+                    $( '.expand-type' ).attr( 'title', $.i18n( 'wdqs-embed-explorer-button-outgoing' ) );
+                }
+            } );
+
+            $( 'a.result-browser' ).click( function( e ) {
+                if ( $( this ).text() !== 'Graph' ) {
+                    $( '.expand-type' ).hide();
+                } else {
+                    $( '.expand-type' ).show();
+                }
+
+            } );
+
+            initToolbarVisibilityHandler();
+            $( '.header-toolbar' ).hover( function() {
+                $( '.header-toolbar' ).addClass( 'hovered' );
+                $( '.toolbar-label' ).css( 'display', 'block' );
+                }, function() {
+                    $( '.toolbar-label' ).css( 'display', 'none' );
+                    $( '.header-toolbar' ).removeClass( 'hovered' );
+            } );
+
+            $( window ).on( 'hashchange', function( e ) {
+                $( '.edit-link' ).attr( 'href', config.location.index + window.location.hash );
+                query = decodeURIComponent( window.location.hash.substr( 1 ) );
+                qh.setQuery( query );
+                qh.draw( $editor );
+            } );
+
+            $( '.edit' ).on( 'click', function( e ) {
+                e.preventDefault();
+                $( '.toolbar-right' ).toggleClass( 'hovered' );
+            } ).popover( {
+                    placement: 'bottom',
+                    'html': true,
+                    'content': $editor
+            } );
+
+            $( '.download-dropdown' ).on( 'show.bs.dropdown', function () {
+                $( '.toolbar-right' ).toggleClass( 'hovered' );
+            } );
+
+            $( '.download-dropdown' ).on( 'hide.bs.dropdown', function () {
+                $( '.toolbar-right' ).toggleClass( 'hovered' );
+            } );
+
+        } );
+    }( CONFIG ) );
+    </script>
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_embed.html" %}
 
 {% set aspect = "clinical-trial-index" %}
 
@@ -6,8 +6,6 @@
 {% block in_ready %}
 
 {{ sparql_to_table('recent-clinical-trials') }}
-
-{{ sparql_to_iframe('phases') }}
 
 {{ sparql_to_table('medical-conditions', options={'linkPrefixes': {'medical_condition': "../disease/"}}) }}
 
@@ -17,7 +15,10 @@
 
 {% endblock %}
 
+{% block spark_vars %}
 
+var sparql = {{sparql_query('phases')}}
+{% endblock %}
 {% block page_content %}
 
 <h1 id="clinical-trials-header">Clinical trials</h1>
@@ -29,8 +30,10 @@
 
 <h2 title="Clinical trial phases during the years" id="phases-header">Phases</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="phases-iframe"></iframe>
+<div class="embed-responsive embed-responsive-4by3 " >
+    {% with parent_id = "clinical-trial-index" %}
+        {% include "embed.html" %}
+    {% endwith %}
 </div>
 
 
