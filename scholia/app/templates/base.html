@@ -47,7 +47,8 @@ sparqlToIframe(`# tool: scholia
 
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='scholia.js') }}"></script>
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 
 <script type="text/javascript">
@@ -435,29 +436,43 @@ sparqlToIframe(`# tool: scholia
      });
  }
 
- $('#searchterm').keyup(function( e ) {
-     var q = $('#searchterm').val();
-     $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
-         search: q,
-         action: "wbsearchentities",
-         language: "en",
-         uselang: "en",
-         format: "json",
-         strictlanguage: true,
-     },
-               function(data) {
-		   $("#searchresult").empty();
-		   $.each(data.search, function(i, item) {
-		       $("#searchresult")
-			   .append("<div><a href='{{ url_for('app.index') }}" + item.title + "'>" + 
-				   escapeHTML(item.label) + 
-				   "</a> - " + escapeHTML(item.description) + "</div>");
-		   });
-	       });
- });
+ $(document).ready(function () {
+     $('#searchterm').select2({
+         placeholder: "Search...",
+         ajax: {
+             url: "https://www.wikidata.org/w/api.php?callback=?",
+             dataType: 'jsonp',
+             data: function (params) {
+                 var query = {
+                     search: params.term,
+                     action: "wbsearchentities",
+                     language: "en",
+                     uselang: "en",
+                     format: "json",
+                     strictlanguage: true
+                 }
+                 return query
+             },
+             processResults: function (data) {
+                 var results = [];
+                 $.each(data.search, function (index, item) {
+                     results.push({
+                         id: "{{ url_for('app.index') }}" + item.title,
+                         text: item.label + " - " + item.description
+                     });
+                 });
 
- $(document).ready(function() {
-     
+                 return {
+                     "results": results
+                 };
+             }
+         }
+     });
+
+     $("#searchterm").on("select2:select", function (e) {
+         window.location.href = e.params.data.id;
+     });
+
      {% block in_ready %}{% endblock %}
      
  });
