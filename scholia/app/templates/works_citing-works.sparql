@@ -1,0 +1,27 @@
+SELECT
+  ?count
+  (MIN(?dates) AS ?date)
+  ?citing_work ?citing_workLabel
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?citing_work 
+  WHERE {
+    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    ?citing_work wdt:P2860 ?work .
+  }
+  GROUP BY ?citing_work
+  ORDER BY DESC(?count)
+  LIMIT 200
+} AS %results
+WHERE {
+  INCLUDE %results
+  OPTIONAL {
+    ?citing_work wdt:P577 ?datetimes .
+    BIND(xsd:date(?datetimes) AS ?dates)
+  }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  }
+GROUP BY ?count ?citing_work ?citing_workLabel
+ORDER BY DESC(?count) DESC(?date)

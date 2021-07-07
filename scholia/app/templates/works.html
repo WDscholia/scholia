@@ -1,92 +1,12 @@
 {% extends "base.html" %}
 
+{% set aspect = "works" %}
 
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
- listOfWorksSparql = `
-SELECT ?work ?workLabel ?example_author ?example_authorLabel
-WITH {
-  SELECT ?work (SAMPLE(?author) AS ?example_author) WHERE {
-    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    OPTIONAL { ?work wdt:P50 ?author }
-  }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-`
-
- authorsSparql = `
-SELECT
-  ?count
-  ?author ?authorLabel
-  ?example_work ?example_workLabel
-WITH {
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?author
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    ?work wdt:P50 ?author .
-  }
-  GROUP BY ?author
-  ORDER BY DESC(?count)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-  }
-ORDER BY DESC(?count)
-`
-
-
- citingWorksSparql = `
-SELECT
-  ?count
-  (MIN(?dates) AS ?date)
-  ?citing_work ?citing_workLabel
-WITH {
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?citing_work 
-  WHERE {
-    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    ?citing_work wdt:P2860 ?work .
-  }
-  GROUP BY ?citing_work
-  ORDER BY DESC(?count)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  OPTIONAL {
-    ?citing_work wdt:P577 ?datetimes .
-    BIND(xsd:date(?datetimes) AS ?dates)
-  }
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-  }
-GROUP BY ?count ?citing_work ?citing_workLabel
-ORDER BY DESC(?count) DESC(?date)
-`
-
- $(document).ready(function() {
-     sparqlToDataTable(listOfWorksSparql, "#list-of-works");
-     sparqlToDataTable(authorsSparql, "#authors");
-     sparqlToDataTable(citingWorksSparql,
-		       "#citing-works");
- });
-
-
-</script>
+{% block in_ready %}
+ 
+{{ sparql_to_table('list-of-works') }}
+{{ sparql_to_table('authors') }}
+{{ sparql_to_table('citing-works') }}
 
 {% endblock %}
 
@@ -99,12 +19,12 @@ ORDER BY DESC(?count) DESC(?date)
 <div id="intro"></div>
 
 
-<table class="table table-hover" id="list-of-works"></table>
+<table class="table table-hover" id="list-of-works-table"></table>
 
 
-<h2>Authors</h2>
+<h2 id="authors-header">Authors</h2>
 
-<table class="table table-hover" id="authors"></table>
+<table class="table table-hover" id="authors-table"></table>
 
 
 <h2>Topics</h2>
@@ -116,9 +36,9 @@ ORDER BY DESC(?count) DESC(?date)
 
 <h2 id="Citations">Citations</h2>
 
-<h3>Citing works</h3>
+<h3 id="citing-works-header">Citing works</h3>
 
-<table class="table table-hover" id="citing-works"></table>
+<table class="table table-hover" id="citing-works-table"></table>
 
 
 <h3>Citations per year</h3>
