@@ -1,0 +1,32 @@
+{
+	"@metadata": {
+		"authors": [
+			"Ilja.mos",
+			"Likopiän tyttö"
+		]
+	},
+	"wdqs-app-button-examples": "Esimerkit",
+	"wdqs-app-button-prefixes": "Prefiksit",
+	"wdqs-app-button-help": "Kyšy apuo",
+	"wdqs-app-button-run": "Aja",
+	"wdqs-app-button-run-title": "Šuorita haku (<CTRL> + <ENTER>)",
+	"wdqs-app-button-clear": "Poista",
+	"wdqs-app-button-display": "Näytä",
+	"wdqs-app-button-download": "Tallenna",
+	"wdqs-app-button-link": "Linkki",
+	"wdqs-app-help-feedback": "Kirjuta palauteh!",
+	"wdqs-app-help-manual": "Käyttöohjiet",
+	"wdqs-app-help-examples": "Kyšymykšien esimerkit",
+	"wdqs-app-help-prefixes": "Prefiksien luvettelo",
+	"wdqs-app-result-shorturl": "Lyhyt URL tulokšella",
+	"wdqs-dialog-examples-preview-result": "Kačo tulokšet",
+	"wdqs-ve-show": "Näytä",
+	"wdqs-ve-with": "kera",
+	"wdqs-ve-anything": "minnih",
+	"wdqs-ve-any": "minnih vain",
+	"wdqs-ve-or": "tahi",
+	"wdqs-ve-subtype": "alatyyppi",
+	"wdqs-action-render": "Tulokšien käsittely",
+	"wdqs-action-error-display": "Tulošta ei voi näyttyä",
+	"wdqs-result-map-layers-all": "Kaikki tašot"
+}

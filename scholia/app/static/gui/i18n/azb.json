@@ -1,0 +1,35 @@
+{
+	"@metadata": {
+		"authors": [
+			"Alp Er Tunqa"
+		]
+	},
+	"wdqs-app-button-examples": "میثاللار",
+	"wdqs-app-button-prefixes": "پیشوند",
+	"wdqs-app-button-help": "کؤمک",
+	"wdqs-app-button-run": "چالیشدیر",
+	"wdqs-app-button-clear": "آریت",
+	"wdqs-app-button-display": "گؤستر",
+	"wdqs-app-button-download": "اندیر",
+	"wdqs-app-button-link": "باغلانتی",
+	"wdqs-app-help-feedback": "فیدبک گؤندر!",
+	"wdqs-app-help-request-query": "بیر نتیجه ایسته",
+	"wdqs-app-help-portal": "کؤمک پورتالی",
+	"wdqs-app-help-manual": "ایشلدن تعلیماتی",
+	"wdqs-app-help-examples": "نتیجه میثاللاری",
+	"wdqs-app-help-datamodel": "RDF دئیتا مودلی",
+	"wdqs-app-result-shorturl": "نتیجه یه قیسا لینک",
+	"wdqs-app-result-shorturl-title": "بو نتیجه یه قیسا لینک",
+	"wdqs-app-result-embed": "یئرلشدیریلمیش نتیجه",
+	"wdqs-app-shorturl-page-title": "بو صفحه یه قیسا لینک",
+	"wdqs-dialog-examples-preview-query": "نتیجه یه باخ",
+	"wdqs-ve-show": "گؤستر",
+	"wdqs-ve-with": "ایله",
+	"wdqs-ve-anything": "هر شئی",
+	"wdqs-ve-any": "هر",
+	"wdqs-ve-or": "یوْخسا",
+	"wdqs-ve-subtype": "آلت بؤلوم",
+	"wdqs-action-server-error": "سِروِر خطاسی",
+	"wdqs-action-unknow-error": "بیلینمه‌ین خطا",
+	"wdqs-result-map-layers-all": "بوتون قاتلار"
+}

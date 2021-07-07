@@ -1,0 +1,21 @@
+{
+	"@metadata": {
+		"authors": [
+			"GunChleoc"
+		]
+	},
+	"wdqs-app-button-examples": "Buill-eisimpleir",
+	"wdqs-app-button-prefixes": "Ro-leasachain",
+	"wdqs-app-button-help": "Cobhair",
+	"wdqs-app-button-run": "Ruith",
+	"wdqs-app-button-clear": "Falamhaich",
+	"wdqs-app-button-display": "Seall",
+	"wdqs-app-button-download": "Luchdaich a-nuas",
+	"wdqs-app-button-link": "Ceangail",
+	"wdqs-ve-show": "Seall",
+	"wdqs-ve-with": "le",
+	"wdqs-ve-anything": "rud sam bith",
+	"wdqs-ve-any": "gin dhe",
+	"wdqs-ve-or": "no",
+	"wdqs-ve-subtype": "fo-sheòrsa"
+}

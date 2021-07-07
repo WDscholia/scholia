@@ -1,0 +1,40 @@
+{
+	"@metadata": {
+		"authors": [
+			"פוילישער"
+		]
+	},
+	"wdqs-app-button-examples": "ביישפילן",
+	"wdqs-app-button-prefixes": "פרעפֿיקסן",
+	"wdqs-app-button-help": "הילף",
+	"wdqs-app-button-run": "אויספֿירן",
+	"wdqs-app-button-clear": "רייניקן",
+	"wdqs-app-button-display": "אויסשטעלונג",
+	"wdqs-app-button-download": "אראָפלאָדן",
+	"wdqs-app-button-link": "לינק",
+	"wdqs-app-button-code": "קאד",
+	"wdqs-app-help-portal": "הילף־פארטאל",
+	"wdqs-app-help-manual": "באניצער־האנטבוך",
+	"wdqs-app-result-json": "JSON טעקע",
+	"wdqs-app-result-csv": "CSV טעקע",
+	"wdqs-app-result-svg": "SVG בילד",
+	"wdqs-app-result-html": "HTML טאַבעלע",
+	"wdqs-app-resultbrowser-table": "טאַבעלע",
+	"wdqs-app-resultbrowser-map": "מאַפע",
+	"wdqs-app-resultbrowser-tree": "בוים",
+	"wdqs-app-resultbrowser-timeline": "צייטליניע",
+	"wdqs-app-resultbrowser-dimensions": "געמעסטן",
+	"wdqs-dialog-key-shortcut-close-button": "פֿארמאכן",
+	"wdqs-ve-filter": "פֿילטער",
+	"wdqs-ve-show": "ווייזן",
+	"wdqs-ve-limit": "לימיט",
+	"wdqs-ve-with": "מיט",
+	"wdqs-ve-anything": "אַלע",
+	"wdqs-ve-any": "אַלע",
+	"wdqs-ve-or": "אדער",
+	"wdqs-ve-subtype": "אונטערטיפ",
+	"wdqs-ve-sb-suggestions": "הצעות",
+	"wdqs-ve-sb-other": "אַנדער",
+	"wdqs-action-render": "רענדער רעזולטאַט",
+	"wdqs-result-map-layers-all": "אלע שיכטעס"
+}

@@ -1,0 +1,24 @@
+{
+	"@metadata": {
+		"authors": [
+			"SatyamMishra"
+		]
+	},
+	"wdqs-app-button-examples": "उदाहरण",
+	"wdqs-app-button-prefixes": "उपसर्ग",
+	"wdqs-app-button-help": "मदद",
+	"wdqs-app-button-run": "रन कराईं",
+	"wdqs-app-button-run-title": "क्वैरी चलाईं (<CTRL> + <ENTER>)",
+	"wdqs-app-button-clear": "साफ करीं",
+	"wdqs-app-button-display": "डिस्प्ले",
+	"wdqs-app-button-download": "डाउनलोड",
+	"wdqs-app-button-link": "कड़ी",
+	"wdqs-app-help-feedback": "फीडबैक देईं",
+	"wdqs-app-help-request-query": "कौनों क्वैरी खातिर अनुरोध करीं",
+	"wdqs-app-help-portal": "मदद पोर्टल",
+	"wdqs-app-help-manual": "प्रयोगकर्ता मैनुअल",
+	"wdqs-app-help-examples": "उदाहरण क्वैरीसब",
+	"wdqs-app-help-datamodel": "आरडीऍफ़ डेटा मॉडल",
+	"wdqs-app-help-prefixes": "उपसर्ग सभन के लिस्ट",
+	"wdqs-app-footer-help": "ऑटोमेटिक पूरा करे के एक्टिवेट करे खातिर <i>[CTRL-SPACE]</i> दबाई।"
+}

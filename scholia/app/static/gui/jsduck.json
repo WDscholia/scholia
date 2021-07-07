@@ -1,0 +1,15 @@
+{
+  "--title": "Wikidata Query Service UI - Documentation",
+  "--output": "docs",
+  "--processes": "0",
+  "--warnings-exit-nonzero": true,
+  "--builtin-classes": true,
+  "--external": "CodeMirror,File,HTMLDocument,jQuery,jQuery.Promise,KeyboardEvent,MouseEvent,Window",
+  "--warnings": [
+    "-nodoc(class,public)",
+    "-tag(license)"
+  ],
+  "--": [
+    "wikibase/queryService"
+  ]
+}

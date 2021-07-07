@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	<title>Wikidata Query Service - Dialog</title>
+	<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" href="../node_modules/jqcloud2/dist/jqcloud.css">
+	<link rel="stylesheet" href="../vendor/bootstrap-tags/css/bootstrap-tags.css">
+	<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+	<!-- JS vendor files -->
+	<script src="../node_modules/jquery/dist/jquery.js"></script>
+	<script src="../node_modules/underscore/underscore.js"></script>
+	<script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+	<script src="../node_modules/jqcloud2/dist/jqcloud.js"></script>
+	<script src="../vendor/bootstrap-tags/js/bootstrap-tags.min.js"></script>
+	<script src="../vendor/bootstrapx-clickover/bootstrapx-clickover.js"></script>
+
+	<!-- JS files -->
+	<script src="../wikibase/queryService/api/QuerySamples.js"></script>
+	<script src="../wikibase/queryService/api/Wikibase.js"></script>
+	<script src="../wikibase/queryService/api/Tracking.js"></script>
+	<script src="../wikibase/queryService/ui/i18n/getMessage.js"></script>
+	<script src="../wikibase/queryService/ui/dialog/QueryExampleDialog.js"></script>
+
+		<button type="button" class="btn btn navbar-btn" data-toggle="modal" data-target="#QueryExamples">Dialog</button>
+
+		<!-- Query Example Modal -->
+	<div class="modal fade QueryExamples" id="QueryExamples" tabindex="-1" role="dialog" aria-labelledby="QueryExamplesModalLabel">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-body">
+				<div class="tagCloud"></div>
+					 <div class="tagFilter"></div>
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span></span>
+						<input type="text" class="tableFilter form-control" placeholder="Type to filter"/>
+						<span class="input-group-addon"><span class="badge count"></span></span>
+					</div>
+					<div class="exampleTable">
+						<table class="table">
+						    <tbody class="searchable">
+						    </tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+
+	$( document ).ready( function() {
+		new wikibase.queryService.ui.dialog.QueryExampleDialog(
+				$( '#QueryExamples' ),
+				new wikibase.queryService.api.QuerySamples(
+					'en',
+					{
+						"server": "https://www.wikidata.org/",
+						"apiPath": "w/api.php",
+						"pageTitle": "Wikidata:SPARQL_query_service/queries/examples",
+						"pagePathElement": "wiki/"
+					}
+				),
+				function( query, title ) {
+					alert( title + '\n\n'  + query );
+				},
+				null,
+				'https://query.wikidata.org/embed.html');
+	} );
+	</script>
+</body>
+</html>

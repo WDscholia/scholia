@@ -1,0 +1,29 @@
+#gem install sparql
+#http://www.rubydoc.info/github/ruby-rdf/sparql/frames
+
+require 'sparql/client'
+
+endpoint = "http://sparql.example/endpoint"
+sparql = <<'SPARQL'.chop
+# cats
+SELECT ?cat ?catLabel WHERE {
+  ?cat wdt:P31 wd:Q146.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
+SPARQL
+
+client = SPARQL::Client.new(endpoint,
+                            :method => :get,
+                            # TODO adjust user agent; see https://w.wiki/CX6
+                            headers: {'User-Agent' => 'WDQS-example Ruby'})
+rows = client.query(sparql)
+
+puts "Number of rows: #{rows.size}"
+for row in rows
+  for key,val in row do
+    # print "#{key.to_s.ljust(10)}: #{val}\t"
+    print "#{key}: #{val}\t"
+  end
+  print "\n"
+end

@@ -1,0 +1,29 @@
+{
+	"@metadata": {
+		"authors": [
+			"Liridon"
+		]
+	},
+	"wdqs-app-button-examples": "Shembuj",
+	"wdqs-app-button-prefixes": "Parashtesa",
+	"wdqs-app-button-more-tools": "Më shumë mjete",
+	"wdqs-app-button-help": "Ndihmë",
+	"wdqs-app-button-run": "Llësho",
+	"wdqs-app-button-run-title": "Ekzekutoni pyetjen (<CTRL> + <ENTER>)",
+	"wdqs-app-button-clear": "Pastro",
+	"wdqs-app-button-clear-title": "Pastro pyetjen",
+	"wdqs-app-button-restore-title": "Rivendosni pyetjen e mëparshme",
+	"wdqs-app-button-format-title": "Formato pyetjen",
+	"wdqs-app-button-display": "Shfaq",
+	"wdqs-app-button-download": "Shkarko",
+	"wdqs-app-button-link": "Lidhje",
+	"wdqs-app-button-code": "Kodi",
+	"wdqs-app-help-feedback": "Jep mendimin!",
+	"wdqs-app-help-request-query": "Kërko një pyetje",
+	"wdqs-ve-show": "Trego",
+	"wdqs-ve-with": "me",
+	"wdqs-ve-anything": "gjithçka",
+	"wdqs-ve-any": "ndonjë",
+	"wdqs-ve-or": "ose",
+	"wdqs-ve-subtype": "nënlloj"
+}

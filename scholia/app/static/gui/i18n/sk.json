@@ -1,0 +1,37 @@
+{
+	"@metadata": {
+		"authors": [
+			"Hromoslav",
+			"Kusavica",
+			"Luky001",
+			"Yardom78"
+		]
+	},
+	"wdqs-app-button-examples": "Príklady",
+	"wdqs-app-button-prefixes": "Predpony",
+	"wdqs-app-button-more-tools": "Ďalšie nástroje",
+	"wdqs-app-button-help": "Pomoc",
+	"wdqs-app-button-run": "Spustiť",
+	"wdqs-app-button-run-title": "Spustiť požiadavku (<CTRL> + <ENTER>)",
+	"wdqs-app-button-clear": "Vyčistiť",
+	"wdqs-app-button-clear-title": "Vyčistiť požiadavku",
+	"wdqs-app-button-restore-title": "Obnoviť predchádzajúcu požiadavku",
+	"wdqs-app-button-format-title": "Formátovať požiadavku",
+	"wdqs-app-button-query-helper": "Zobraziť vysvetlenie požiadavky",
+	"wdqs-app-button-fullscreen-title": "Prepnúť do režimu celej obrazovky",
+	"wdqs-app-button-display": "Zobraziť",
+	"wdqs-app-button-display-title": "Zobraziť výsledok ako tabuľku, obrázok,...",
+	"wdqs-app-button-download": "Stiahnuť",
+	"wdqs-app-button-download-title": "Stiahnuť výsledok",
+	"wdqs-app-button-link": "Odkaz",
+	"wdqs-app-button-link-title": "Získať pre požiadavku odkaz",
+	"wdqs-app-button-code": "Kód",
+	"wdqs-app-button-code-title": "Zobraziť príklady kódu",
+	"wdqs-app-help-feedback": "Dať spätnú väzbu!",
+	"wdqs-app-help-request-query": "Zadať požiadavku",
+	"wdqs-app-help-portal": "Portál pomoci",
+	"wdqs-app-tools-visualize-data": "Vizualizácia dát",
+	"wdqs-ve-show": "Zobraziť",
+	"wdqs-ve-with": "s",
+	"wdqs-ve-or": "alebo"
+}

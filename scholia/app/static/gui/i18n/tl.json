@@ -1,0 +1,34 @@
+{
+	"@metadata": {
+		"authors": [
+			"Emem.calist",
+			"Ianlopez1115",
+			"Leeheonjin"
+		]
+	},
+	"wdqs-app-button-examples": "Mga halimbawa",
+	"wdqs-app-button-prefixes": "Mga prepiho",
+	"wdqs-app-button-help": "Tulong",
+	"wdqs-app-button-run": "Paandarin",
+	"wdqs-app-button-clear": "Hawiin (clear)",
+	"wdqs-app-button-display": "Palitawin (ipakita)",
+	"wdqs-app-button-download": "Ikargang-pakuha (download)",
+	"wdqs-app-button-link": "Kawing",
+	"wdqs-app-help-feedback": "Magbigay ng Katugunan!",
+	"wdqs-app-help-portal": "Portal pangtulong",
+	"wdqs-app-help-manual": "Manwal ng Tagagamit",
+	"wdqs-app-result-shorturl": "Maikling URL sa resulta",
+	"wdqs-app-result-shorturl-title": "Maikling URL sa resultang ito",
+	"wdqs-app-result-rawgraphs": "Buksan sa RAWGraphs.io",
+	"wdqs-app-result-rawgraphs-title": "Lumikha ng grapo kasama ang kasalukuyang resultang pang-datos gamit ang RAWGraphs.io",
+	"wdqs-app-result-embed": "Idikit (embed) ang resulta",
+	"wdqs-dialog-examples-preview-result": "Resulta ng unang tingin",
+	"wdqs-ve-show": "Ipakita",
+	"wdqs-ve-with": "kasama",
+	"wdqs-ve-anything": "kahit na ano pa man",
+	"wdqs-ve-any": "kahit na ano",
+	"wdqs-ve-or": "o",
+	"wdqs-ve-sb-other": "Iba pa",
+	"wdqs-action-error-display": "Hindi maipakita ang resulta",
+	"wdqs-action-unknow-error": "Hindi malamang pagkakamali"
+}

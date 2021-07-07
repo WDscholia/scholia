@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>QUnit Tests</title>
+  <link rel="stylesheet" href="../../node_modules/qunit/qunit/qunit.css">
+  <script src="../../node_modules/qunit/qunit/qunit.js"></script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+
+ <!-- Vendor -->
+	<script src="../../node_modules/es6-shim/es6-shim.js"></script>
+	<script src="../../node_modules/jquery/dist/jquery.js"></script>
+	<script src="../../node_modules/underscore/underscore.js"></script>
+	<script src="../../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+	<script src="../../node_modules/sinon/pkg/sinon.js"></script>
+
+	<script src="../../node_modules/bootstrap-table/dist/bootstrap-table.js"></script>
+	<script src="../../node_modules/select2/dist/js/select2.js"></script>
+	<script src="../../node_modules/jqcloud2/dist/jqcloud.js"></script>
+	<script src="../../vendor/sparqljs/dist/sparqljs-browser-min.js"></script>
+	<script src="../../vendor/bootstrapx-clickover/bootstrapx-clickover.js"></script>
+ <!-- wikibase -->
+	<script src="../queryService/RdfNamespaces.js"></script>
+ 	<script src="../queryService/api/Wikibase.js"></script>
+ 	<script src="../queryService/api/Sparql.js"></script>
+	<script src="../queryService/ui/i18n/getMessage.js"></script>
+	<script src="../queryService/ui/queryHelper/QueryHelper.js"></script>
+	<script src="../queryService/ui/queryHelper/SelectorBox.js"></script>
+	<script src="../queryService/ui/queryHelper/SparqlQuery.js"></script>
+	<script src="../queryService/ui/queryHelper/QueryTemplate.js"></script>
+<!-- Tests -->
+	<script src="queryService/ui/queryHelper/QueryHelper.test.js"></script>
+	<script src="queryService/ui/queryHelper/SparqlQuery.test.js"></script>
+	<script src="queryService/ui/queryHelper/QueryTemplate.test.js"></script>
+	
+</body>
+</html>

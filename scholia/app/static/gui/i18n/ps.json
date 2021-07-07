@@ -1,0 +1,38 @@
+{
+	"@metadata": {
+		"authors": [
+			"Ahmed-Najib-Biabani-Ibrahimkhel",
+			"Amjad Khan",
+			"Baloch Khan"
+		]
+	},
+	"wdqs-app-button-examples": "بېلگې",
+	"wdqs-app-button-prefixes": "مختاړي",
+	"wdqs-app-button-help": "لارښود",
+	"wdqs-app-button-run": "چلول",
+	"wdqs-app-button-clear": "سپينول",
+	"wdqs-app-button-display": "ښکارېدنه",
+	"wdqs-app-button-download": "ښکته کول",
+	"wdqs-app-button-link": "تړنه",
+	"wdqs-app-button-code": "کوډ",
+	"wdqs-app-help-portal": "مرستندویه ټولنه",
+	"wdqs-app-help-manual": "کارن لارښود",
+	"wdqs-app-help-examples": "بېلګه پوښتنې",
+	"wdqs-app-result-csv": "ثي اس وی دوتنه",
+	"wdqs-app-result-svg": "إس وی جی انځور",
+	"wdqs-app-resultbrowser-map": "نخشه",
+	"wdqs-dialog-key-shortcut-close-button": "تړل",
+	"wdqs-ve-filter": "فلټر",
+	"wdqs-ve-show": "ښکاره کول",
+	"wdqs-ve-limit": "محدودیت",
+	"wdqs-ve-with": "ورسره",
+	"wdqs-ve-anything": "هر څه",
+	"wdqs-ve-any": "هر يو",
+	"wdqs-ve-or": "يا",
+	"wdqs-ve-subtype": "څېرمه ډولونه",
+	"wdqs-ve-sb-other": "بل",
+	"wdqs-action-unknow-error": "نامعلومه ستونزه",
+	"wdqs-action-preview": "د پایلو کتنه",
+	"wdqs-result-map-layers-all": "ټول پرتونه",
+	"wdqs-result-map-progress": "د نخشې ډاټا رابرسېره کيږی: $1٪"
+}

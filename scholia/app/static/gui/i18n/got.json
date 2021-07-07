@@ -1,0 +1,21 @@
+{
+	"@metadata": {
+		"authors": [
+			"Gothicspeaker"
+		]
+	},
+	"wdqs-app-button-examples": "𐍆𐍂𐌹𐍃𐌰𐌷𐍄𐌴𐌹𐍃",
+	"wdqs-app-button-prefixes": "𐍆𐌰𐌿𐍂𐌰𐍃𐌰𐍄𐌴𐌹𐌽𐍉𐍃",
+	"wdqs-app-button-help": "𐌷𐌹𐌻𐍀𐌰",
+	"wdqs-app-button-run": "𐍄𐍉𐌴𐌹",
+	"wdqs-app-button-clear": "𐌷𐍂𐌰𐌹𐌽𐌴𐌹",
+	"wdqs-app-button-display": "𐌰𐍄𐌰𐌿𐌲𐌴𐌹",
+	"wdqs-app-button-download": "𐌿𐍆𐌰𐍂𐌱𐌰𐌹𐍂",
+	"wdqs-app-button-link": "𐌲𐌰𐍅𐌹𐍃𐍃",
+	"wdqs-ve-show": "𐌰𐍄𐌰𐌿𐌲𐌴𐌹",
+	"wdqs-ve-with": "𐌼𐌹𐌸",
+	"wdqs-ve-anything": "𐍈𐌰",
+	"wdqs-ve-any": "𐍈𐌰𐍂𐌾𐌰𐍄𐍉𐌷",
+	"wdqs-ve-or": "𐌰𐌹𐌸𐌸𐌰𐌿",
+	"wdqs-ve-subtype": "𐌿𐍆𐌺𐌿𐌽𐌹"
+}

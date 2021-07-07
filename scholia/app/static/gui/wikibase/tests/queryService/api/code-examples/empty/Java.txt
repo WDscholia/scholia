@@ -1,0 +1,41 @@
+// https://github.com/BorderCloud/SPARQL-JAVA
+import com.bordercloud.sparql.Endpoint;
+import com.bordercloud.sparql.EndpointException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Main {
+
+    public static void main(String[] args) {
+        String endpointUrl = "";
+
+        String querySelect = "";
+
+        try {
+            HashMap data = retrieveData(endpointUrl, querySelect);
+            printResult(data, 30);
+        } catch (EndpointException eex) {
+            eex.printStackTrace();
+        }
+    }
+
+    public static HashMap<String, HashMap> retrieveData(String endpointUrl, String query) throws EndpointException {
+        Endpoint sp = new Endpoint(endpointUrl, false);
+        sp.setUserAgentRequestHeader("WDQS-Example Java"); // TODO adjust this; see https://w.wiki/CX6
+        HashMap<String, HashMap> rs = sp.query(query);
+        return rs;
+    }
+
+    public static void printResult(HashMap<String, HashMap> rs , int size) {
+      for (String variable : (ArrayList<String>) rs.get("result").get("variables")) {
+        System.out.print(String.format("%-"+size+"."+size+"s", variable ) + " | ");
+      }
+      System.out.print("\n");
+      for (HashMap value : (ArrayList<HashMap>) rs.get("result").get("rows")) {
+        for (String variable : (ArrayList<String>) rs.get("result").get("variables")) {
+          System.out.print(String.format("%-"+size+"."+size+"s", value.get(variable)) + " | ");
+        }
+        System.out.print("\n");
+      }
+    }
+}

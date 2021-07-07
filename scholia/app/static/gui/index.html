@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+    <!-- build:css css/style.min.css -->
+	<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.css">
+	<link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.css">
+	<link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
+	<link rel="stylesheet" href="node_modules/codemirror/addon/hint/show-hint.css">
+	<link rel="stylesheet" href="node_modules/codemirror/addon/display/fullscreen.css">
+	<link rel="stylesheet" href="node_modules/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="node_modules/vis/dist/vis.css">
+	<link rel="stylesheet" href="node_modules/ekko-lightbox/dist/ekko-lightbox.css">
+	<link rel="stylesheet" href="node_modules/bootstrap-table/dist/bootstrap-table.css">
+	<link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css">
+	<link rel="stylesheet" href="node_modules/leaflet-fullscreen/dist/leaflet.fullscreen.css">
+	<link rel="stylesheet" href="node_modules/leaflet-zoombox/L.Control.ZoomBox.css">
+	<link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css">
+	<link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css">
+	<link rel="stylesheet" href="node_modules/leaflet.locatecontrol/dist/L.Control.Locate.css">
+	<link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css">
+	<link rel="stylesheet" href="node_modules/jqcloud2/dist/jqcloud.css">
+	<link rel="stylesheet" href="node_modules/jquery.uls/css/jquery.uls.css">
+	<link rel="stylesheet" href="node_modules/jquery.uls/css/jquery.uls.grid.css">
+	<link rel="stylesheet" href="node_modules/jquery.uls/css/jquery.uls.lcd.css">
+	<link rel="stylesheet" href="node_modules/jquery.uls/css/jquery.uls.mobile.css">
+	<link rel="stylesheet" href="node_modules/jstree/dist/themes/default/style.css" />
+	<link rel="stylesheet" href="node_modules/jquery-toast-plugin/src/jquery.toast.css" />
+	<link rel="stylesheet" href="node_modules/gijgo/css/gijgo.min.css" />
+	<link rel="stylesheet" href="vendor/bootstrap-tags/css/bootstrap-tags.css">
+	<link rel="stylesheet" href="style.css">
+	<!-- endbuild -->
+
+	<!-- build:none -->
+	<link rel="stylesheet/less" type="text/css" href="style.less">
+	<script src="node_modules/less/dist/less.js" data-env="development"></script>
+	<script>less.watch()</script>
+	<!-- endbuild -->
+
+	<link id="favicon" rel="shortcut icon" >
+	<!-- build:js js/shim.min.js -->
+	<script src="node_modules/es6-shim/es6-shim.js"></script>
+	<!-- endbuild -->
+
+	<style id="MJX-CHTML-styles">/* placeholder for MathJax */</style>
+</head>
+<body>
+	<div class="wikibase-queryservice container-fluid">
+		<div class="row">
+			<!-- Editor Navbar -->
+			<nav class="navbar navbar-default">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#header-navbar-collapse" aria-expanded="false">
+						<span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+					</button>
+					<div class="navbar-brand">
+						<a href="./"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="><span></span></a>
+					</div>
+				</div>
+				<div class="collapse navbar-collapse in" id="header-navbar-collapse">
+					<ul class="nav navbar-nav navbar-left" id="left-navbar">
+						<li>
+							<button type="button" class="btn navbar-btn btn-default" id="open-example" data-toggle="modal" data-target="#QueryExamples">
+							<span class="fa fa-folder-open-o"></span> <span data-i18n="wdqs-app-button-examples" id="examples-label"></span>
+							</button>
+						</li>
+						<li class="dropdown">
+							<div class="btn-group navbar-btn">
+								<a href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:SPARQL_query_service/Wikidata_Query_Help" target="_blank" class="btn btn-default">
+									<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> <span data-i18n="wdqs-app-button-help" id="help-label"></span>
+								</a>
+								<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" id="help-toggle">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li><a target="_blank" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:SPARQL_query_service/Wikidata_Query_Help" data-i18n="wdqs-app-help-portal"></a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.mediawiki.org/wiki/Special:MyLanguage/Wikidata_Query_Service/User_Manual" data-i18n="wdqs-app-help-manual"></a></li>
+									<li><a target="_blank" rel="noopener" id="examples-link" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:SPARQL_query_service/queries/examples" data-i18n="wdqs-app-help-examples"></a></li>
+									<li role="separator" class="divider"></li>
+									<li><a target="_blank" rel="noopener" href="https://www.w3.org/TR/sparql11-query/">SPARQL</a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.mediawiki.org/wiki/Special:MyLanguage/Wikibase/Indexing/RDF_Dump_Format" data-i18n="wdqs-app-help-datamodel"></a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.mediawiki.org/wiki/Special:MyLanguage/Wikibase/Indexing/RDF_Dump_Format#Full_list_of_prefixes" data-i18n="wdqs-app-help-prefixes"></a></li>
+									<li role="separator" class="divider"></li>
+									<li><a target="_blank" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:Request_a_query" data-i18n="wdqs-app-help-request-query"></a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.mediawiki.org/w/index.php?title=Talk:Wikidata_Query_Service&action=edit&section=new" data-i18n="wdqs-app-help-feedback"></a></li>
+									<li><a target="_blank" rel="noopener" id="copyright-link" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:SPARQL_query_service/Copyright" data-i18n="wdqs-app-help-copy"></a></li>
+								</ul>
+							</div>
+						</li>
+						<li class="dropdown">
+							<div class="btn-group navbar-btn">
+								<a href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:Tools" target="_blank" class="btn btn-default">
+									<span class="glyphicon glyphicon-cog" aria-hidden="true"></span> <span data-i18n="wdqs-app-button-more-tools" id="tools-label"></span>
+								</a>
+								<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" id="tools-toggle">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li><a target="_blank" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:Tools/Edit_items" data-i18n="wdqs-app-tools-edit-items"></a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:Tools/Query_data" data-i18n="wdqs-app-tools-query-data"></a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:Tools/Enhance_user_interface" data-i18n="wdqs-app-tools-enhance-ui"></a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:Tools/Visualize_data" data-i18n="wdqs-app-tools-visualize-data"></a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:List_of_properties" data-i18n="wdqs-app-tools-list-properties"></a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:Tools/Lexicographical_data" data-i18n="wdqs-app-tools-lexicographical-data"></a></li>
+									<li><a target="_blank" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:Tools/For_programmers" data-i18n="wdqs-app-tools-for-programmers"></a></li>
+									<li role="separator" class="divider"></li>
+									<li><a target="_blank" rel="noopener" href="https://tools.wmflabs.org/hay/directory/#/search/wikidata">Wikimedia Toolforge</a></li>
+								</ul>
+							</div>
+						</li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right" id="right-navbar">
+						<li>
+							<a href="#" class="uls-trigger" id="language-toggle" data-toggle="tooltip"></a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+
+			<div id="query-box">
+				<!-- The action URL is also set dynamically inside wikibase/init.js -->
+				<form id="query-form" action="https://query.wikidata.org/bigdata/namespace/wdq/sparql">
+					<div class="query-main">
+						<div class="toolbar">
+							<div class="toolbar-top">
+								<div>
+									<a href="#" class="btn query-helper-trigger" data-toggle="tooltip" data-placement="top" data-i18n="[title]wdqs-app-button-query-helper"> <span class="fa fa-info-circle" aria-hidden="true"></span></a>
+								</div>
+								<div>
+									<a href="#" class="btn fullscreen-toggle" data-toggle="tooltip" data-placement="top" data-i18n="[title]wdqs-app-button-fullscreen-title"> <span class="fa fa-arrows-alt" aria-hidden="true"></span>
+									</a>
+								</div>
+								<div class="dropdown">
+									<a href="#" class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" data-i18n="[title]wdqs-app-button-prefixes"> <span class="fa fa-thumb-tack"
+										aria-hidden="true"
+									></span><span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li><strong data-i18n="wdqs-app-button-prefixes"></strong></li>
+										<li role="separator" class="divider"></li>
+										<li><div class="namespace-shortcuts"></div></li>
+										<li role="separator" class="divider"></li>
+										<li><a class="addPrefixes" data-i18n="wdqs-app-editor-addprefixes"></a></li>
+									</ul>
+								</div>
+								<div>
+									<a href="#" class="btn" id="format-button" data-toggle="tooltip" data-placement="top" data-i18n="[title]wdqs-app-button-format-title"> <span class="fa fa-diamond" aria-hidden="true"></span>
+									</a>
+								</div>
+								<div>
+									<a href="#" class="btn" data-i18n="[title]wdqs-app-button-examples" data-toggle="modal" data-target="#QueryExamples"> <span class="fa fa-folder-open-o" aria-hidden="true"></span>
+									</a>
+								</div>
+								<div>
+									<a href="#" class="btn restore" id="restore-button" data-toggle="tooltip" data-placement="top" data-i18n="[title]wdqs-app-button-restore-title"> <span class="fa fa-history" aria-hidden="true"></span>
+									</a>
+								</div>
+								<div>
+									<a href="#" class="btn" id="clear-button" data-toggle="tooltip" data-placement="top" data-i18n="[title]wdqs-app-button-clear-title"> <span class="fa fa-trash-o" aria-hidden="true"></span>
+									</a>
+								</div>
+								<div>
+									<a href="#" class="btn shareQuery shortUrlTrigger query" target="_blank" data-i18n="[title]wdqs-app-shorturl-page-title" data-toggle="popover"> <span class="fa fa-link" aria-hidden="true"></span></a>
+								</div>
+							</div>
+							<div class="toolbar-bottom">
+								<button type="submit" class="btn btn-info" id="execute-button" data-toggle="tooltip" data-placement="top" data-i18n="[title]wdqs-app-button-run-title">
+									<span class="fa fa-play" aria-hidden="true"></span>
+								</button>
+							</div>
+						</div>
+						<div class="query-helper-and-editor">
+							<div class="query-helper query-helper-hidden">
+								<div class="panel panel-info">
+									<div class="panel-heading">
+										<strong data-i18n="wdqs-app-help-queryhelper"></strong> <a target="_blank" rel="noopener" id="query-helper-help" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:SPARQL_query_service/Query_Helper"><span
+											class="glyphicon glyphicon-question-sign"
+										></span></a>
+										<button type="button" class="close" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="panel-body"></div>
+								</div>
+							</div>
+							<div class="splitter"></div>
+							<div class="query-editor-container" dir="ltr">
+								<textarea class="queryEditor" name="query" data-i18n="[placeholder]wdqs-app-editor-placeholder" placeholder="(Input a SPARQL query or choose a query example)"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="navbar navbar-default query-helper-tag-cloud query-helper-hidden">
+					</div>
+					<div class="status navbar navbar-default toolbar">
+						<div class="navbar-right">
+							<span class="dataUpdated"> </span>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<noscript>
+			<div class="row action-bar" style="display: block">
+				<div class="message">
+					<div class="label label-warning">
+						For interactive query editing, a localized user interface, and other improvements,
+						please enable JavaScript or use a browser that supports it.
+					</div>
+				</div>
+			</div>
+		</noscript>
+		<div class="row">
+					<nav class="navbar navbar-default result">
+						<ul class="nav navbar-nav navbar-left">
+							<li><a id="display-button" href="#" data-toggle="dropdown" class="dropdown-toggle" data-placement="top" data-i18n="[title]wdqs-app-button-display-title"><span id="display-button-icon" class="glyphicon glyphicon-eye-open" aria-hidden="true"></span><span id="display-button-label"></span><span class="caret"></span>
+							</a>
+								<ul id="result-browser-menu" class="dropdown-menu" role="menu">
+								</ul></li>
+							<li>
+							<li>
+								<a target="_blank" class="help" rel="noopener" href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:SPARQL_query_service/Wikidata_Query_Help/Result_Views"><span class="fa fa-question-circle"></span></a>
+							</li>
+						</ul>
+						<ul class="nav navbar-nav navbar-right">
+							<li class="navbar-text">
+								<span class="query-total">
+									<span class="label label-default" id="response-summary"></span>
+								</span> &nbsp;
+							</li>
+							<li>
+								<a class="btn" data-toggle="modal" data-target="#CodeExamples" data-i18n="[title]wdqs-app-button-code-title">
+									<span class="fa fa-code"></span> <span data-i18n="wdqs-app-button-code"></span>
+								</a>
+							</li>
+							<li><a id="download-button" href="#" data-toggle="dropdown" class="dropdown-toggle" data-placement="top" data-i18n="[title]wdqs-app-button-download-title"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span><span data-i18n="wdqs-app-button-download"></span><span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu" role="menu">
+								<li><a id="downloadJSON" href="#"><span class="fa fa-file-code-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-json"></span></a></li>
+								<li><a id="downloadFull-JSON" href="#"><span class="fa fa-file-code-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-json-verbose"></span></a></li>
+								<li role="separator" class="divider"></li>
+								<li><a id="downloadSimple-TSV" href="#"><span class="fa fa-file-excel-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-tsv"></span></a></li>
+								<li><a id="downloadTSV" href="#"><span class="fa fa-file-excel-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-tsv-verbose"></span></a></li>
+								<li role="separator" class="divider"></li>
+								<li><a id="downloadCSV" href="#"><span class="fa fa-file-excel-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-csv"></span></a></li>
+								<li role="separator" class="divider"></li>
+								<li><a id="downloadHTML" href="#"><span class="fa fa-file-code-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-html"></span></a></li>
+								<li role="separator" class="divider"></li>
+								<li><a id="downloadSVG" href="#"><span class="fa fa-file-image-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-svg"></span></a></li>
+							</ul></li>
+							<li>
+							<a id="link-button" href="#" data-toggle="dropdown" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" data-placement="top" data-i18n="[title]wdqs-app-button-link-title">
+								    <span class="glyphicon glyphicon-link" aria-hidden="true"></span><span data-i18n="wdqs-app-button-link"></span><span class="caret"></span>
+								  </a>
+								  <ul class="dropdown-menu">
+									<li><a href="#" class="shortUrlTrigger result" target="_blank"  data-i18n="[title]wdqs-app-result-shorturl-title" data-toggle="popover"><span data-i18n="wdqs-app-result-shorturl"></span></a></li>
+									<li><a target="_blank" class="queryUri" data-i18n="[title]wdqs-app-result-endpoint-title"><span data-i18n="wdqs-app-result-endpoint"></span></a></li>
+									<li><a href="#" class="embed result" target="_blank" data-toggle="popover" data-i18n="wdqs-app-result-embed"></a></li>
+								  </ul>
+							</li>
+						</ul>
+					</nav>
+		</div>
+		<div class="row action-bar">
+			<div class="message"></div>
+		</div>
+		<div class="row">
+			<div id="query-result">Test result</div>
+		</div>
+		<div class="row">
+			<div id="query-error" class="panel-heading">
+			</div>
+		</div>
+		<div class="row">
+			<div id="empty-query-error" class="text-center">
+				<p data-i18n="wdqs-action-empty-query"></p>
+				<button type="button" class="btn navbar-btn btn-default" id="open-example" data-toggle="modal" data-target="#QueryExamples">
+					<span class="fa fa-folder-open-o"></span> <span data-i18n="wdqs-app-button-examples" id="examples-label"></span>
+				</button>
+			</div>
+		</div>
+		<div class="row">
+			<div id="loading-spinner">
+				<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+				<span class="sr-only">Loading...</span>
+			</div>
+		</div>
+
+		<div id="explorer-dialogs">
+			<div class="explorer-dialog">
+				<div data-role="header" class="modal-header clearfix explorer-header">
+					<h3 data-role="title" class="modal-title pull-left explorer-title">Explorer</h3>
+					<button data-role="close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div data-role="body" class="explorer-body">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Query Example Modal -->
+	<div class="modal fade QueryExamples" id="QueryExamples" tabindex="-1" role="dialog" aria-labelledby="QueryExamplesModalLabel">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-body">
+				<div class="tagCloud"></div>
+					 <div class="tagFilter"></div>
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span></span>
+						<input type="text" class="tableFilter form-control" placeholder="Type to filter"/>
+						<span class="input-group-addon"><span class="badge count"></span></span>
+					</div>
+					<div class="exampleTable">
+						<table class="table">
+						    <tbody class="searchable">
+						    </tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Keyboard Shortcut Help Modal -->
+	<div class="modal" id="keyboardShortcutHelpModal" tabindex="-1" role="dialog" aria-labelledby="keyboardShortcutHelpModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="keyboardShortcutHelpModalLabel" data-i18n="wdqs-dialog-key-shortcut-title"></h5>
+				</div>
+				<div class="modal-body">
+					<table class="keyboard-shortcut-help">
+						<tbody>
+							<tr>
+								<th scope="row">
+									<kbd><kbd>ctrl</kbd>+<kbd>enter</kbd></kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-run-query"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>esc</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-esc"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>?</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-show-shortcut-help"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>i</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-focus-textarea"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>r</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-jump-to-result"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>f</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-focus-filter"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>s</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-focus-show"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>m</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-focus-limit"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>e</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-show-example"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>h</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-help-menu"></td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<kbd>l</kbd>
+								</th>
+								<td data-i18n="wdqs-dialog-key-shortcut-show-language"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="wdqs-dialog-key-shortcut-close-button"></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Code Example Modal -->
+	<div class="modal fade CodeExamples" id="CodeExamples" tabindex="-1" role="dialog" aria-labelledby="CodeExamplesModalLabel">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div>
+					  <!-- Nav tabs -->
+					  <ul class="nav nav-tabs" role="tablist">
+					  </ul>
+					  <!-- Tab panes -->
+					  <div class="tab-content">
+					  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- JS files -->
+	<!-- build:js js/vendor.min.js -->
+	<script src="node_modules/jquery/dist/jquery.js"></script>
+	<script src="node_modules/jquery-toast-plugin/src/jquery.toast.js"></script>
+	<script src="node_modules/underscore/underscore.js"></script>
+	<script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+	<script src="node_modules/codemirror/lib/codemirror.js"></script>
+	<script src="node_modules/codemirror/mode/sparql/sparql.js"></script>
+	<script src="node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+	<script src="node_modules/codemirror/mode/xml/xml.js"></script>
+	<script src="node_modules/codemirror/mode/clike/clike.js"></script>
+	<script src="node_modules/codemirror/mode/php/php.js"></script>
+	<script src="node_modules/codemirror/mode/javascript/javascript.js"></script>
+	<script src="node_modules/codemirror/mode/octave/octave.js"></script>
+	<script src="node_modules/codemirror/mode/python/python.js"></script>
+	<script src="node_modules/codemirror/mode/ruby/ruby.js"></script>
+	<script src="node_modules/codemirror/mode/r/r.js"></script>
+	<script src="node_modules/codemirror/addon/display/autorefresh.js"></script>
+	<script src="node_modules/codemirror/addon/hint/show-hint.js"></script>
+	<script src="node_modules/codemirror/addon/display/placeholder.js"></script>
+	<script src="node_modules/codemirror/addon/display/fullscreen.js"></script>
+	<script src="node_modules/codemirror/addon/comment/comment.js"></script>
+	<script src="node_modules/bootstrap-table/dist/bootstrap-table.js"></script>
+	<script src="node_modules/bootstrap-table/dist/extensions/mobile/bootstrap-table-mobile.js"></script>
+	<script src="node_modules/bootstrap-table/dist/extensions/key-events/bootstrap-table-key-events.js"></script>
+	<script src="node_modules/bootstrap-table/dist/extensions/cookie/bootstrap-table-cookie.js"></script>
+	<script src="node_modules/select2/dist/js/select2.js"></script>
+	<script src="node_modules/ekko-lightbox/dist/ekko-lightbox.js"></script>
+	<script src="node_modules/leaflet/dist/leaflet.js"></script>
+	<script src="node_modules/leaflet-fullscreen/dist/Leaflet.fullscreen.js"></script>
+	<script src="node_modules/leaflet-zoombox/L.Control.ZoomBox.js"></script>
+	<script src="node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+	<script src="node_modules/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+	<script src="node_modules/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
+	<script src="node_modules/d3/d3.js"></script>
+	<script src="node_modules/dimple-js/dist/dimple.latest.js"></script>
+	<script src="node_modules/js-cookie/src/js.cookie.js"></script>
+	<script src="node_modules/vis/dist/vis.js"></script>
+	<script src="node_modules/moment/min/moment-with-locales.js"></script>
+	<script src="node_modules/jqcloud2/dist/jqcloud.js"></script>
+	<script src="node_modules/downloadjs/download.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.data.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.data.utils.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.lcd.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.languagefilter.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.core.js"></script>
+	<script src="node_modules/cldrpluralruleparser/src/CLDRPluralRuleParser.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.messagestore.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.fallbacks.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.parser.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.emitter.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.language.js"></script>
+	<script src="node_modules/jquery-resizable-dom/dist/jquery-resizable.js"></script>
+	<script src="node_modules/jstree/dist/jstree.js"></script>
+	<script src="node_modules/wellknown/wellknown.js"></script>
+	<script src="node_modules/gijgo/js/gijgo.min.js"></script>
+	<script src="node_modules/mathjax/es5/mml-chtml.js"></script>
+	<script src="vendor/bootstrap-tags/js/bootstrap-tags.min.js"></script>
+	<script src="vendor/sparqljs/dist/sparqljs-browser-min.js"></script>
+	<script src="vendor/bootstrapx-clickover/bootstrapx-clickover.js"></script>
+
+	<!-- endbuild -->
+
+	<!-- build:js js/wdqs.min.js -->
+	<script src="wikibase/config.js"></script>
+	<script src="wikibase/queryService/ui/App.js"></script>
+	<script src="wikibase/queryService/ui/toolbar/ActionBar.js"></script>
+	<script src="wikibase/queryService/ui/i18n/LanguageSelector.js"></script>
+	<script src="wikibase/queryService/ui/i18n/getMessage.js"></script>
+	<script src="wikibase/queryService/ui/editor/hint/Sparql.js"></script>
+	<script src="wikibase/queryService/ui/editor/hint/Rdf.js"></script>
+	<script src="wikibase/queryService/ui/editor/tooltip/Rdf.js"></script>
+	<script src="wikibase/queryService/ui/editor/Editor.js"></script>
+	<script src="wikibase/queryService/ui/queryHelper/QueryHelper.js"></script>
+	<script src="wikibase/queryService/ui/queryHelper/SparqlQuery.js"></script>
+	<script src="wikibase/queryService/ui/queryHelper/SelectorBox.js"></script>
+	<script src="wikibase/queryService/ui/queryHelper/QueryTemplate.js"></script>
+	<script src="wikibase/queryService/ui/dialog/CodeExample.js"></script>
+	<script src="wikibase/queryService/ui/dialog/QueryExampleDialog.js"></script>
+	<script src="wikibase/queryService/ui/ResultView.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/helper/FormatterHelper.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/helper/Options.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/AbstractResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/AbstractChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/AbstractDimpleChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/ImageResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/TableResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/CoordinateResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/TreeMapResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/TreeResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/BubbleChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/LineChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/BarChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/ScatterChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/AreaChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/TimelineResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/MultiDimensionResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/GraphResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/GraphResultBrowserNodeBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/PolestarResultBrowser.js"></script>
+	<script src="wikibase/queryService/api/Sparql.js"></script>
+	<script src="wikibase/queryService/api/CodeSamples.js"></script>
+	<script src="wikibase/queryService/api/QuerySamples.js"></script>
+	<script src="wikibase/queryService/api/Wikibase.js"></script>
+	<script src="wikibase/queryService/api/Tracking.js"></script>
+	<script src="wikibase/queryService/api/UrlShortener.js"></script>
+	<script src="wikibase/queryService/RdfNamespaces.js"></script>
+	<script src="wikibase/init.js"></script>
+	<!-- endbuild -->
+
+</body>
+</html>

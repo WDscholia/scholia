@@ -1,0 +1,16 @@
+function makeSPARQLQuery( endpointUrl, sparqlQuery, doneCallback ) {
+	var settings = {
+		headers: { Accept: 'application/sparql-results+json' },
+		data: { query: sparqlQuery }
+	};
+	return $.ajax( endpointUrl, settings ).then( doneCallback );
+}
+
+var endpointUrl = '',
+	sparqlQuery = "";
+
+makeSPARQLQuery( endpointUrl, sparqlQuery, function( data ) {
+		$( 'body' ).append( $( '<pre>' ).text( JSON.stringify( data ) ) );
+		console.log( data );
+	}
+);

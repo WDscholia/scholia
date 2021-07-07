@@ -1,0 +1,34 @@
+{
+	"@metadata": {
+		"authors": [
+			"Pupsik-ipa",
+			"Андрей"
+		]
+	},
+	"wdqs-app-button-examples": "Аҿырԥштәқәа",
+	"wdqs-app-button-prefixes": "Апрефиксқәа",
+	"wdqs-app-button-help": "Аилыркаага",
+	"wdqs-app-button-run": "Идәықәҵатәуп",
+	"wdqs-app-button-clear": "Ирыцқьатәуп",
+	"wdqs-app-button-display": "Аформат",
+	"wdqs-app-button-download": "Иҭагалатәуп",
+	"wdqs-app-button-download-title": "Иҭагалатәуп алҵшәа",
+	"wdqs-app-button-link": "Азхьарԥш",
+	"wdqs-app-button-code": "Акод",
+	"wdqs-app-button-code-title": "Иахәаԥштәуп акод аҿырԥштәқәа",
+	"wdqs-app-help-datamodel": "RDF Адырқәа Рмодель",
+	"wdqs-app-help-prefixes": "Апрефиксқәа рыхьӡынҵа",
+	"wdqs-app-help-copy": "Алицензиа иазку аинформациа",
+	"wdqs-app-result-rawgraphs": "Иаарттәуп RAWGraphs.io аҟны",
+	"wdqs-app-result-json": "JSON-афаил",
+	"wdqs-app-result-tsv": "TSV-афаил",
+	"wdqs-app-result-csv": "CSV-афаил",
+	"wdqs-dialog-examples-preview-result": "Иахәаԥштәуп алҵшәа",
+	"wdqs-dialog-key-shortcut-close-button": "Иарктәуп",
+	"wdqs-ve-filter": "Афильтр",
+	"wdqs-ve-show": "Иаарԥштәуп",
+	"wdqs-ve-or": "ма",
+	"wdqs-ve-sb-other": "Даҽакы",
+	"wdqs-action-server-error": "Асервер агха",
+	"wdqs-action-unknow-error": "Идырым агха"
+}

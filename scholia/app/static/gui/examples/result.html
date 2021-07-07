@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	<title>Wikidata Query Service - Result Views</title>
+
+    <!-- build:css css/style.min.css -->
+   	<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" href="../node_modules/ekko-lightbox/dist/ekko-lightbox.css">
+	<link rel="stylesheet" href="../node_modules/bootstrap-table/dist/bootstrap-table.css">
+	<link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css">
+	<link rel="stylesheet" href="../node_modules/leaflet-fullscreen/dist/leaflet.fullscreen.css">
+	<link rel="stylesheet" href="../node_modules/leaflet-zoombox/L.Control.ZoomBox.css">
+	<link rel="stylesheet" href="../node_modules/leaflet.markercluster/dist/MarkerCluster.css">
+	<link rel="stylesheet" href="../node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css">
+	<link rel="stylesheet" href="../style.css">
+ 	<!-- endbuild -->
+
+	<link rel="shortcut icon" href="//www.wikidata.org/static/favicon/testwikidata.ico">
+	<!-- build:js js/shim.min.js -->
+	<script src="../node_modules/es6-shim/es6-shim.js"></script>
+ 	<!-- endbuild -->
+</head>
+<body>
+
+
+	<!-- JS vendor files -->
+	<script src="../node_modules/jquery/dist/jquery.js"></script>
+	<script src="../node_modules/underscore/underscore.js"></script>
+	<script src="../node_modules/ekko-lightbox/dist/ekko-lightbox.js"></script>
+	<script src="../node_modules/leaflet/dist/leaflet.js"></script>
+	<script src="../node_modules/leaflet-fullscreen/dist/Leaflet.fullscreen.js"></script>
+	<script src="../node_modules/leaflet-zoombox/L.Control.ZoomBox.js"></script>
+	<script src="../node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+	<script src="../node_modules/moment/min/moment-with-locales.js"></script>
+	<script src="../node_modules/wellknown/wellknown.js"></script>
+	<script src="../node_modules/d3/d3.js"></script>
+
+	<!-- JS files -->	
+	<script src="../wikibase/queryService/api/Sparql.js"></script>
+	<script src="../wikibase/queryService/RdfNamespaces.js"></script>
+	<script src="../wikibase/queryService/ui/i18n/getMessage.js"></script>
+	<script src="../wikibase/queryService/ui/resultBrowser/helper/FormatterHelper.js"></script>
+	<script src="../wikibase/queryService/ui/resultBrowser/helper/Options.js"></script>
+	<script src="../wikibase/queryService/ui/resultBrowser/AbstractResultBrowser.js"></script>
+	<script src="../wikibase/queryService/ui/resultBrowser/CoordinateResultBrowser.js"></script>
+
+	<div id="result"></div>
+	<script type="text/javascript">
+	/*	SPARQL Query	*/
+	var query = '#Lighthouses in Norway\n' + 
+		'SELECT DISTINCT ?item ?itemLabel ?coor ?image\n' + 
+		'WHERE\n' + 
+		'{\n' + 
+		'	?item wdt:P31 wd:Q39715 . \n' + 
+		'	?item wdt:P17 wd:Q20 .' + 
+		'	OPTIONAL { ?item wdt:P625 ?coor }\n' + 
+		'	OPTIONAL { ?item wdt:P18 ?image }\n' + 
+		'	SERVICE wikibase:label { bd:serviceParam wikibase:language "nb,nn,en,fi"  }\n' +  
+		'}\n' + 
+		'ORDER BY ?itemLabel\n';
+
+	/*	JS Code	*/
+	$(document).ready(function() {
+	  var api = new wikibase.queryService.api.Sparql();
+	
+	  //modify formatter
+	  var formatter = new wikibase.queryService.ui.resultBrowser.helper.FormatterHelper();
+	  formatter.formatValue = function( data ){
+		  return 'This is my formatter:' + JSON.stringify( data );
+	  };
+	  
+	  api.query( query ).done(function() {
+	    var result = new wikibase.queryService.ui.resultBrowser.CoordinateResultBrowser()
+	    result.setFormatter( formatter );
+	    result.setResult(api.getResultRawData());
+	    result.draw( $('#result') );
+	  });
+	});
+	</script>
+</body>
+</html>

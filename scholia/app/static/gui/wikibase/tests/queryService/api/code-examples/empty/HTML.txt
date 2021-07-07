@@ -1,0 +1,1 @@
+<iframe style="width: 80vw; height: 50vh; border: none;" src="/embed.html#" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>

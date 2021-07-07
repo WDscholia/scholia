@@ -1,0 +1,41 @@
+{
+	"@metadata": {
+		"authors": [
+			"Jimidar",
+			"Tow",
+			"ਗੁਰਪ੍ਰੀਤ ਹੁੰਦਲ"
+		]
+	},
+	"wdqs-app-button-examples": "ਮਿਸਾਲਾਂ",
+	"wdqs-app-button-prefixes": "ਅਗੇਤਰ",
+	"wdqs-app-button-help": "ਮਦਦ",
+	"wdqs-app-button-run": "ਚਲਾਉ",
+	"wdqs-app-button-clear": "ਸਾਫ਼ ਕਰੋ",
+	"wdqs-app-button-display": "ਨੁਮਾਇਸ਼",
+	"wdqs-app-button-download": "ਡਾਊਨਲੋਡ",
+	"wdqs-app-button-link": "ਕੜੀ",
+	"wdqs-app-button-code": "ਕੋਡ",
+	"wdqs-app-help-feedback": "ਫੀਡਬੈਕ ਦਿਓ!",
+	"wdqs-app-help-portal": "ਮਦਦ ਪੋਰਟਲ",
+	"wdqs-app-help-manual": "ਉਪਯੋਗ ਪੁਸਤਕ",
+	"wdqs-app-tools-list-properties": "ਸੂਚੀ ਜਾਇਦਾਦਾਂ",
+	"wdqs-app-result-json": "JSON ਫਾਈਲ",
+	"wdqs-app-result-json-verbose": "JSON ਫਾਈਲ (ਵਿਸਥਾਰ)",
+	"wdqs-app-result-tsv": "TSV ਫਾਈਲ",
+	"wdqs-app-result-csv": "CSV ਫਾਈਲ",
+	"wdqs-app-result-svg": "SVG ਤਸਵੀਰ",
+	"wdqs-dialog-key-shortcut-show-example": "ਉਦਾਹਰਣ ਦਿਖਾਓ",
+	"wdqs-dialog-key-shortcut-close-button": "ਬੰਦ ਕਰੋ",
+	"wdqs-ve-filter": "ਛਾਨਣੀ",
+	"wdqs-ve-show": "ਵਿਖਾਉ",
+	"wdqs-ve-with": "ਨਾਲ",
+	"wdqs-ve-anything": "ਕੁੱਝ ਵੀ",
+	"wdqs-ve-any": "ਕੋਈ ਵੀ",
+	"wdqs-ve-or": "ਜਾਂ",
+	"wdqs-ve-subtype": "ਉਪ-ਕਿਸਮ",
+	"wdqs-ve-sb-suggestions": "ਸਲਾਹਾਂ",
+	"wdqs-ve-sb-other": "ਹੋਰ",
+	"wdqs-action-server-error": "ਸਰਵਰ ਵਿੱਚ ਗ਼ਲਤੀ",
+	"wdqs-action-unknow-error": "ਅਣਜਾਣ ਗਲਤੀ",
+	"wdqs-result-map-progress": "ਮੈਪ ਡਾਟਾ ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ: $1%"
+}

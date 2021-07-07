@@ -1,0 +1,21 @@
+function makeSPARQLQuery( endpointUrl, sparqlQuery, doneCallback ) {
+	var settings = {
+		headers: { Accept: 'application/sparql-results+json' },
+		data: { query: sparqlQuery }
+	};
+	return $.ajax( endpointUrl, settings ).then( doneCallback );
+}
+
+var endpointUrl = 'http://sparql.example/endpoint',
+	sparqlQuery = "# cats\n" +
+        "SELECT ?cat ?catLabel WHERE {\n" +
+        "  ?cat wdt:P31 wd:Q146.\n" +
+        "  SERVICE wikibase:label { bd:serviceParam wikibase:language \"[AUTO_LANGUAGE],en\". }\n" +
+        "}\n" +
+        "";
+
+makeSPARQLQuery( endpointUrl, sparqlQuery, function( data ) {
+		$( 'body' ).append( $( '<pre>' ).text( JSON.stringify( data ) ) );
+		console.log( data );
+	}
+);

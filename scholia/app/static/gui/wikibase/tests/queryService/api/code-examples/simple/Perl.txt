@@ -1,0 +1,31 @@
+use LWP::UserAgent;
+use Data::Dumper;
+use JSON::XS;
+
+sub wdSparqlQuery(@args) {
+  my $agent = shift;
+  my $query = shift;
+  my $format = shift;
+  my $endpointURL = "http://sparql.example/endpoint";
+  my $queryURL = "${endpointURL}?query=${query}&format=${format}";
+  my $ua = LWP::UserAgent -> new;
+  $ua -> agent($agent);
+  my $req = HTTP::Request -> new(GET => $queryURL);
+  my $res = $ua -> request($req);
+  my $str = $res -> content;
+  return $str;
+}
+
+$agent = "WDQS-example "; # TODO adjust this; see https://w.wiki/CX6
+$query = <<'_SPARQL_QUERY_';
+SELECT ?cat ?catLabel WHERE {
+  ?cat wdt:P31 wd:Q146.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
+_SPARQL_QUERY_
+$format = "json";
+$data = JSON::XS::decode_json(wdSparqlQuery($agent, $query, $format));
+
+print "Retrieved data:\n";
+print Dumper($data);

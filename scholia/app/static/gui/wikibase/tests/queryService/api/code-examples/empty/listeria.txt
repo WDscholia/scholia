@@ -1,0 +1,11 @@
+{{Wikidata list|sparql=
+|columns=label:Article,description,p131:Place,P580,P582,p625,P18
+|section=131
+|min_section=3
+|sort=label
+|links=text
+|thumb=128
+|autolist=fallback
+}}
+... (This will be overwritten by ListeriaBot) ...
+{{Wikidata list end}}

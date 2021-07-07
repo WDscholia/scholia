@@ -1,0 +1,42 @@
+{
+	"@metadata": {
+		"authors": [
+			"Awangba Mangang"
+		]
+	},
+	"wdqs-app-button-examples": "ꯈꯨꯗꯝꯁꯤꯡ",
+	"wdqs-app-button-prefixes": "ꯃꯃꯥꯡꯗꯥ ꯇꯞꯄꯥ",
+	"wdqs-app-button-more-tools": "ꯑꯍꯦꯟꯕ ꯈꯨꯠꯂꯥꯏꯁꯤꯡ",
+	"wdqs-app-button-help": "ꯃꯥꯇꯦꯡ",
+	"wdqs-app-button-run": "ꯆꯦꯟꯂꯨ",
+	"wdqs-app-button-run-title": "ꯑꯦꯛꯖꯤꯀꯨꯠ ꯀꯨꯦꯔꯤ (<CTRL> + <ENTER>)",
+	"wdqs-app-button-clear": "ꯃꯥꯡꯍꯟꯕꯥ",
+	"wdqs-app-button-clear-title": "ꯊꯤꯒꯠꯂꯨ ꯃꯥꯡꯍꯟꯕꯒꯤ",
+	"wdqs-app-button-restore-title": "Restore previous query",
+	"wdqs-app-button-fullscreen-title": "Toggle fullscreen mode of editor",
+	"wdqs-app-button-display": "Ootpa",
+	"wdqs-app-button-display-title": "Fol ootpa mathang manao naiba ,mami",
+	"wdqs-app-button-download": "ꯆꯤꯡꯊꯕꯥ",
+	"wdqs-app-button-download-title": "ꯆꯤꯡꯊꯕꯒꯤ ꯐꯣꯜ",
+	"wdqs-app-button-link": "ꯁꯝꯅꯐꯝ",
+	"wdqs-app-button-code": "ꯀꯣꯗ",
+	"wdqs-app-tools-edit-items": "ꯄꯣꯠꯂꯝ ꯁꯦꯝꯒꯠꯁꯤ",
+	"wdqs-app-resultbrowser-map": "ꯃꯦꯞ",
+	"wdqs-app-resultbrowser-tree": "ꯎ",
+	"wdqs-app-urlshortener-loading": "ꯍꯥꯞꯆꯤꯟꯂꯤ(ꯎꯨꯡꯂꯤ)",
+	"wdqs-dialog-key-shortcut-show-example": "ꯈꯨꯗꯝꯁꯤꯡ ꯎꯠꯄꯥ ꯫",
+	"wdqs-dialog-key-shortcut-show-language": "ꯂꯣꯟ ꯈꯟꯕꯝꯗꯨ ꯎꯠꯂꯨ",
+	"wdqs-dialog-key-shortcut-close-button": "ꯈꯨꯝꯖꯤꯟꯕ",
+	"wdqs-ve-show": "ꯎꯨꯠꯄꯥ",
+	"wdqs-ve-limit": "ꯇꯧꯕ ꯌꯥꯕꯒꯤ ꯆꯥꯡ",
+	"wdqs-ve-remove-row-title": "ꯃꯁꯤꯒꯤ ꯄꯔꯤꯡꯁꯤ ꯂꯧꯊꯣꯛꯎ",
+	"wdqs-ve-with": "ꯂꯣꯏꯅꯅ",
+	"wdqs-ve-anything": "ꯑꯃꯥꯍꯦꯛꯇꯥ",
+	"wdqs-ve-any": "ꯑꯃꯥ",
+	"wdqs-ve-or": "ꯅꯠꯇ꯭ꯔꯒ",
+	"wdqs-ve-subtype": "ꯄꯤꯛꯊꯕ ꯃꯈꯜ",
+	"wdqs-ve-sb-suggestions": "ꯅꯤꯡꯁꯤꯡꯕꯤꯕꯥ",
+	"wdqs-ve-sb-other": "ꯑꯇꯩ",
+	"wdqs-action-unknow-error": "ꯁꯛꯈꯪꯗꯕꯥ ꯑꯔꯥꯟꯕꯥ",
+	"wdqs-result-map-layers-all": "ꯃꯔꯣꯜ ꯄꯨꯂꯞ"
+}

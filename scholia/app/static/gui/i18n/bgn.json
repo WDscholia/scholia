@@ -1,0 +1,33 @@
+{
+	"@metadata": {
+		"authors": [
+			"Ibrahim khashrowdi"
+		]
+	},
+	"wdqs-app-button-examples": "مثال‌ئان",
+	"wdqs-app-button-prefixes": "دیم‌وند",
+	"wdqs-app-button-help": "کومک",
+	"wdqs-app-button-run": "عملي کورتین",
+	"wdqs-app-button-run-title": "کوئیرین عمل (<CTRL> + <ENTER>)",
+	"wdqs-app-button-clear": "پاک کورتین",
+	"wdqs-app-button-display": "نمایش داتین",
+	"wdqs-app-button-download": "ائیر کورتین",
+	"wdqs-app-button-link": "لینک",
+	"wdqs-app-help-feedback": "فیڈبکئ پدا گيپتین",
+	"wdqs-app-help-request-query": "یک کوئیریي لوٹي‌تین",
+	"wdqs-app-help-portal": "کومکئ پورتال",
+	"wdqs-app-help-manual": "کار زوروکئ مينوال",
+	"wdqs-app-help-examples": "مثالین کوئیریان",
+	"wdqs-app-help-datamodel": "RDF‌ئی رقمئ مالومات",
+	"wdqs-app-help-prefixes": "دیم‌ونداني لیست",
+	"wdqs-app-footer-help": "په وتکارین فعال کورتینا <i>[CTRL-SPACE]</i> ئانه بجه‌نيت.",
+	"wdqs-app-result-shorturl": "گونڈین URL په نتیجه‌ئان",
+	"wdqs-app-result-shorturl-title": "گونڈین URL په ای نتیجه‌ئان",
+	"wdqs-app-result-embed": "جاسازیي نتیجه",
+	"wdqs-ve-show": "نشان داتین",
+	"wdqs-ve-with": "گۆ",
+	"wdqs-ve-anything": "موچین چیز",
+	"wdqs-ve-any": "هر",
+	"wdqs-ve-or": "یا",
+	"wdqs-ve-subtype": "چیهر ڈۆل"
+}

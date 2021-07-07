@@ -1,0 +1,25 @@
+%https://github.com/cbdavis/MatlabSPARQL/blob/master/sparql.m
+
+endpointUrl = 'http://sparql.example/endpoint';
+sparqlQuery = '# cats\nSELECT ?cat ?catLabel WHERE {\n  ?cat wdt:P31 wd:Q146.\n  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }\n}\n';
+
+url_head = strcat(endpointUrl,'?query=');
+url_query = urlencode(sparqlQuery);
+format = 'text/tab-separated-values';
+url_tail = strcat('&format=', format);
+user_agent = 'WDQS-example MATLAB'; %TODO adjust this; see https://w.wiki/CX6
+
+url = strcat(url_head, url_query, url_tail);
+
+% get the data from the endpoint
+query_results = urlread(url,'UserAgent',user_agent);
+
+% write the data to a file so that tdfread can parse it
+fid = fopen('query_results.txt','w');
+if fid>=0
+    fprintf(fid, '%s\n', query_results)
+    fclose(fid)
+end
+
+% this reads the tsv file into a struct
+sparql_data = tdfread('query_results.txt')

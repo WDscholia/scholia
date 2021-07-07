@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Wikidata Query Service</title>
+
+<!-- build:css css/embed.style.min.css -->
+<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+<link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="node_modules/codemirror/addon/hint/show-hint.css">
+<link rel="stylesheet" href="node_modules/codemirror/addon/display/fullscreen.css">
+<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.css">
+<link rel="stylesheet" href="node_modules/select2/dist/css/select2.css">
+<link rel="stylesheet" href="node_modules/vis/dist/vis.css">
+<link rel="stylesheet" href="node_modules/ekko-lightbox/dist/ekko-lightbox.css">
+<link rel="stylesheet" href="node_modules/bootstrap-table/dist/bootstrap-table.css">
+<link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css">
+<link rel="stylesheet" href="node_modules/leaflet-fullscreen/dist/leaflet.fullscreen.css">
+<link rel="stylesheet" href="node_modules/leaflet-zoombox/L.Control.ZoomBox.css">
+<link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css">
+<link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css">
+<link rel="stylesheet" href="node_modules/leaflet.locatecontrol/dist/L.Control.Locate.css">
+<link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css">
+<link rel="stylesheet" href="node_modules/jstree/dist/themes/default/style.css">
+<link rel="stylesheet" href="node_modules/jqcloud2/dist/jqcloud.css">
+<link rel="stylesheet" href="node_modules/gijgo/css/gijgo.min.css" />
+<link rel="stylesheet" href="vendor/bootstrap-tags/css/bootstrap-tags.css">
+<link rel="stylesheet" href="node_modules/bootstrap-toggle/css/bootstrap-toggle.min.css">
+<link rel="stylesheet" href="style.css">
+<!-- endbuild -->
+<!-- build:none -->
+<link rel="stylesheet/less" type="text/css" href="style.less">
+<script src="node_modules/less/dist/less.js" data-env="development"></script>
+<script>less.watch()</script>
+<!-- endbuild -->
+
+<link rel="shortcut icon" href="favicon.ico">
+<!-- build:js js/shim.min.js -->
+<script src="node_modules/es6-shim/es6-shim.js"></script>
+<!-- endbuild -->
+</head>
+
+<style>
+body {
+	margin: 0;
+	padding: 0;
+	overflow-y: auto;
+}
+
+.logo {
+	position: absolute;
+	top: 0px;
+	height: 100%;
+	width: 100%;
+	background-size: 80% 80%;
+	background-image: url(logo-embed.svg);
+	background-repeat: no-repeat;
+	background-position: center;
+	z-index: -1;
+}
+
+#error {
+	display: none;
+}
+
+#query-result {
+	height: 97vh;
+}
+
+.action-bar {
+	height: 30px;
+	width: 100%;
+	line-height: 30px;
+	font-size: 18px;
+}
+
+.popover {
+	max-width: 100vw;
+	min-width: 300px;
+	white-space: nowrap;
+}
+
+.select2-container {
+	z-index: 2000;
+	min-width: 200px;
+}
+
+.tooltip {
+	z-index: 2001;
+}
+
+#result-browser-menu {
+	cursor: pointer;
+	list-style-type: none;
+	padding-left: 10px;
+}
+
+.result-browser-item {
+	padding: 0.5em 0 0.5em 0;
+}
+
+.result-browser {
+	color: #333;
+}
+
+.result-browser-inactive {
+	display: none;
+}
+
+.img-grid {
+	width: 95vw;
+}
+
+.wdqs-control-scroll-top {
+	display: none;
+}
+
+.bootstrap-table {
+	width: 100%;
+	height: auto;
+	padding: 20px 50px;
+}
+
+#query-result .jstree {
+	width: 100%;
+	height: auto;
+	padding: 25px 50px;
+}
+
+.expand-type {
+	left: 47%;
+	bottom: 3em;
+	opacity: 0.2;
+	position: fixed;
+	display: none;
+}
+.expand-type:hover {
+	opacity: 1;
+}
+
+#layout-options {
+	margin-top: 0px;
+	position: fixed;
+	z-index: 1001;
+	opacity: 0.2;
+	margin: auto;
+    width: 100%;
+}
+#layout-options:hover {
+	opacity: 1;
+}
+
+.layout-button {
+	border: none;
+	border-radius: 0;
+}
+
+.toolbar-visible {
+	opacity: 1!important;
+}
+
+.header-toolbar {
+	z-index: 1000;
+	position: fixed;
+	left: -97px;
+	top: 26vh;
+	padding-top: 0.5em;
+	opacity: 0;
+	width: 150px;
+}
+.header-toolbar:hover {
+	transition: 0.4s;
+	opacity: 1;
+	background: #fff;
+	border: #ddd 1px solid;
+	left: 0;
+}
+
+.toolbar-label {
+	display: none;
+}
+
+.toolbar-right {
+	position: fixed;
+	right: -97px;
+	top: 26vh;
+	z-index: 1000;
+	padding-top: 0.5em;
+	opacity: 0;
+	width: 150px;
+}
+.toolbar-right:hover, .hovered {
+	transition: 0.4s;
+	opacity: 1;
+	background: #fff;
+	border: #ddd 1px solid;
+	right: 0;
+	z-index: 1500; /* needs to be between 1000 (tiny map in map view) and 2000 (value dropdown of edit visually) */
+}
+
+.toolbar-right-item {
+	display: block;
+	width: 100%;
+	padding: 0.75em 0 0.75em 0;
+	position: relative;
+}
+.toolbar-right-item:focus {
+	outline: none;
+	text-decoration: none;
+}
+.toolbar-right-item:hover {
+	text-decoration: none;
+}
+
+.toolbar-right-icon {
+	position: relative;
+	left: -15px;
+}
+
+.toolbar-right-label {
+	position: absolute;
+	left: 15px;
+}
+
+.download-dropdown-menu {
+	left: -47px;
+    top: -11px;
+}
+
+.download-caret {
+	position: relative;
+	left: 60px;
+}
+
+#embed-right-menu {
+	list-style-type: none;
+	position: static;
+	padding-left: 38px;
+}
+
+.brand {
+	position: fixed;
+	bottom: 0px;
+	left: 0px;
+	z-index: 10000;
+	background-color: rgba( 255,255,255, 0.7 );
+	padding: 0.2em;
+	font-size: 0.8em;
+}
+
+.brand img {
+	padding: 0.1em;
+}
+
+@media only screen and (max-height: 285px) {
+	.header-toolbar {
+		z-index: 1000;
+		position: fixed;
+		left: -97px;
+		top: 20vh;
+		padding-top: 0.5em;
+		opacity: 0.6;
+		width: 150px;
+		height: 65vh;
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
+}
+
+@media only screen and (max-height: 430px) {
+	#embed-right-menu {
+		list-style-type: none;
+		overflow-y: scroll;
+		overflow-x: hidden;
+		height: 57vh;
+		position: static;
+	}
+}
+
+@media only screen and (max-height: 450px) {
+	.download-dropdown-menu {
+		left: -50px;
+		top: -40px;
+		height: 61vh;
+		overflow-y: scroll;
+	}
+}
+
+@media only screen and (max-width: 400px) {
+	.toolbar-right {
+		display: none;
+	}
+
+	.header-toolbar {
+		display: none;
+	}
+
+	.bootstrap-table {
+		width: 100%;
+		height: auto;
+		padding: 0px;
+	}
+
+	.jstree {
+		width: 100%;
+		height: auto;
+		padding: 0px;
+	}
+
+}
+
+</style>
+<style id="MJX-CHTML-styles">/* placeholder for MathJax */</style>
+<body>
+	<div class="logo"></div>
+		<noscript>
+			<div class="row action-bar" style="display: block">
+				<div class="message">
+					<div class="label label-warning">
+						Please enable JavaScript or use a browser that supports it.
+					</div>
+				</div>
+			</div>
+		</noscript>
+
+		<a class="edit-link brand" target="_blank" rel="noopener" href="./"><img width="24" height="15" src=""><span></span></a>
+		<div class="header-toolbar">
+			<ul id="result-browser-menu">
+			</ul>
+		</div>
+
+		<div class="toolbar-right">
+			<ul id="embed-right-menu">
+				<li>
+					<a href="#" target="_blank" rel="noopener" class="edit edit-link toolbar-right-item" data-toggle="popover">
+						<div data-toggle="tooltip" data-i18n="[title]wdqs-embed-button-edit-query-title">
+							<span class="glyphicon glyphicon-pencil toolbar-right-icon" aria-hidden="true"></span><span class="toolbar-right-label" data-i18n="wdqs-embed-button-edit-query"></span>
+						</div>
+					</a>
+				</li>
+				<li>
+					<a class="link edit-link toolbar-right-item" target="_blank" rel="noopener" data-i18n="[title]wdqs-embed-button-edit-code-title">
+						<span class="glyphicon glyphicon-edit toolbar-right-icon" aria-hidden="true"></span> <span class="toolbar-right-label" data-i18n="wdqs-embed-button-edit-code"></span>
+					</a>
+				</li>
+				<li>
+					<a href="https://www.wikidata.org/wiki/Special:MyLanguage/Wikidata:SPARQL_query_service/Wikidata_Query_Help" target="_blank" class="toolbar-right-item">
+						<span class="glyphicon glyphicon-question-sign toolbar-right-icon" aria-hidden="true"></span> <span class="toolbar-right-label" data-i18n="wdqs-app-button-help" id="help-label"></span>
+					</a>
+				</li>
+				<li>
+					<a class="toolbar-right-item" href="#" id="open-example" data-toggle="modal" data-target="#QueryExamples">
+						<span class="fa fa-folder-open-o toolbar-right-icon"></span> <span class="toolbar-right-label" data-i18n="wdqs-app-button-examples" id="examples-label"></span>
+					</a>
+				</li>
+				<li>
+					<a href="#" class="shareQuery shortUrlTrigger result toolbar-right-item" target="_blank" data-i18n="[title]wdqs-app-button-link-title" data-toggle="popover">
+						<span class="glyphicon glyphicon-link toolbar-right-icon" aria-hidden="true"> </span> <span class="toolbar-right-label" data-i18n="wdqs-app-button-link"></span>
+					</a>
+				</li>
+				<li class="download-dropdown">
+					<a id="download-button" href="#" class="toolbar-right-item" data-toggle="dropdown" class="dropdown-toggle" data-placement="top" data-i18n="[title]wdqs-app-button-download-title">
+						<span class="glyphicon glyphicon-download-alt toolbar-right-icon" aria-hidden="true"></span> <span data-i18n="wdqs-app-button-download" class="toolbar-right-label"></span>
+						<span class="dropup"><span class="caret download-caret"></span></span>
+					</a>
+					<ul class="dropdown-menu download-dropdown-menu" role="menu">
+							<li><a id="downloadJSON" href="#"><span class="fa fa-file-code-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-json"></span></a></li>
+							<li><a id="downloadFull-JSON" href="#"><span class="fa fa-file-code-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-json-verbose"></span></a></li>
+							<li role="separator" class="divider"></li>
+							<li><a id="downloadSimple-TSV" href="#"><span class="fa fa-file-excel-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-tsv"></span></a></li>
+							<li><a id="downloadTSV" href="#"><span class="fa fa-file-excel-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-tsv-verbose"></span></a></li>
+							<li role="separator" class="divider"></li>
+							<li><a id="downloadCSV" href="#"><span class="fa fa-file-excel-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-csv"></span></a></li>
+							<li role="separator" class="divider"></li>
+							<li><a id="downloadHTML" href="#"><span class="fa fa-file-code-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-html"></span></a></li>
+							<li role="separator" class="divider"></li>
+							<li><a id="downloadSVG" href="#"><span class="fa fa-file-image-o" aria-hidden="true"></span> <span data-i18n="wdqs-app-result-svg"></span></a></li>
+					</ul>
+				</li>
+				<li>
+					<span class="query-total"><span class="label label-default" id="response-summary"></span></span>
+				</li>
+			</ul>
+		</div>
+		<div class="action-bar">
+			<div class="message"></div>
+		</div>
+		<div id="query-result">Test result</div>
+		<div id="query-error" class="panel-heading">Test error</div>
+
+		<div id="loading-spinner">
+			<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+			<span class="sr-only">Loading...</span>
+		</div>
+		<div id="explorer-dialogs">
+			<div class="explorer-dialog">
+				<div data-role="header" class="modal-header clearfix explorer-header">
+					<h3 data-role="title" class="modal-title pull-left explorer-title">Explorer</h3>
+					<button data-role="close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div data-role="body" class="explorer-body">
+				</div>
+			</div>
+		</div>
+
+	<div class="expand-type" data-toggle="tooltip" data-i18n="[title]wdqs-embed-explorer-button-outgoing">
+		<input id="expand-type-switch" type="checkbox" data-onstyle="primary" data-size="small">
+	</div>
+
+	<!-- Query Example Modal -->
+	<div class="modal fade QueryExamples" id="QueryExamples" tabindex="-1" role="dialog" aria-labelledby="QueryExamplesModalLabel">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="tagCloud"></div>
+					<div class="tagFilter"></div>
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span></span>
+						<input type="text" class="tableFilter form-control" placeholder="Type to filter"/>
+						<span class="input-group-addon"><span class="badge count"></span></span>
+					</div>
+					<div class="exampleTable">
+						<table class="table">
+						    <tbody class="searchable">
+						    </tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+		<!-- JS files -->
+	<!-- build:js js/embed.vendor.min.js -->
+	<script src="node_modules/jquery/dist/jquery.js"></script>
+	<script src="node_modules/underscore/underscore.js"></script>
+	<script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+	<script src="node_modules/codemirror/lib/codemirror.js"></script>
+	<script src="node_modules/codemirror/mode/sparql/sparql.js"></script>
+	<script src="node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+	<script src="node_modules/codemirror/mode/xml/xml.js"></script>
+	<script src="node_modules/codemirror/mode/clike/clike.js"></script>
+	<script src="node_modules/codemirror/mode/php/php.js"></script>
+	<script src="node_modules/codemirror/mode/javascript/javascript.js"></script>
+	<script src="node_modules/codemirror/mode/octave/octave.js"></script>
+	<script src="node_modules/codemirror/mode/python/python.js"></script>
+	<script src="node_modules/codemirror/mode/ruby/ruby.js"></script>
+	<script src="node_modules/codemirror/mode/r/r.js"></script>
+	<script src="node_modules/codemirror/addon/display/autorefresh.js"></script>
+	<script src="node_modules/codemirror/addon/hint/show-hint.js"></script>
+	<script src="node_modules/codemirror/addon/display/placeholder.js"></script>
+	<script src="node_modules/codemirror/addon/display/fullscreen.js"></script>
+	<script src="node_modules/codemirror/addon/comment/comment.js"></script>
+	<script src="node_modules/bootstrap-table/dist/bootstrap-table.js"></script>
+	<script src="node_modules/bootstrap-table/dist/extensions/mobile/bootstrap-table-mobile.js"></script>
+	<script src="node_modules/bootstrap-table/dist/extensions/key-events/bootstrap-table-key-events.js"></script>
+	<script src="node_modules/bootstrap-table/dist/extensions/cookie/bootstrap-table-cookie.js"></script>
+	<script src="node_modules/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+	<script src="node_modules/ekko-lightbox/dist/ekko-lightbox.js"></script>
+	<script src="node_modules/leaflet/dist/leaflet.js"></script>
+	<script src="node_modules/leaflet-fullscreen/dist/Leaflet.fullscreen.js"></script>
+	<script src="node_modules/leaflet-zoombox/L.Control.ZoomBox.js"></script>
+	<script src="node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+	<script src="node_modules/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+	<script src="node_modules/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
+	<script src="node_modules/d3/d3.js"></script>
+	<script src="node_modules/dimple-js/dist/dimple.latest.js"></script>
+	<script src="node_modules/js-cookie/src/js.cookie.js"></script>
+	<script src="node_modules/vis/dist/vis.js"></script>
+	<script src="node_modules/select2/dist/js/select2.js"></script>
+	<script src="node_modules/moment/min/moment-with-locales.js"></script>
+	<script src="node_modules/wellknown/wellknown.js"></script>
+	<script src="node_modules/downloadjs/download.js"></script>
+	<script src="node_modules/jqcloud2/dist/jqcloud.js"></script>
+	<script src="node_modules/gijgo/js/gijgo.min.js"></script>
+	<script src="vendor/sparqljs/dist/sparqljs-browser-min.js"></script>
+	<script src="vendor/bootstrapx-clickover/bootstrapx-clickover.js"></script>
+	<script src="node_modules/jstree/dist/jstree.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.data.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.data.utils.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.lcd.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.languagefilter.js"></script>
+	<script src="node_modules/jquery.uls/src/jquery.uls.core.js"></script>
+	<script src="node_modules/cldrpluralruleparser/src/CLDRPluralRuleParser.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.messagestore.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.fallbacks.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.parser.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.emitter.js"></script>
+	<script src="node_modules/@wikimedia/jquery.i18n/src/jquery.i18n.language.js"></script>
+	<script src="node_modules/mathjax/es5/mml-chtml.js"></script>
+	<script src="vendor/bootstrap-tags/js/bootstrap-tags.min.js"></script>
+
+	<!-- endbuild -->
+
+	<!-- build:js js/embed.wdqs.min.js -->
+	<script src="wikibase/config.js"></script>
+	<script src="wikibase/queryService/ui/i18n/getMessage.js"></script>
+	<script src="wikibase/queryService/ui/dialog/QueryExampleDialog.js"></script>
+	<script src="wikibase/queryService/ui/ResultView.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/helper/FormatterHelper.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/helper/Options.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/AbstractResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/AbstractChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/AbstractDimpleChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/ImageResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/TableResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/CoordinateResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/TreeMapResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/TreeResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/BubbleChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/LineChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/BarChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/ScatterChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/AreaChartResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/TimelineResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/MultiDimensionResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/GraphResultBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/GraphResultBrowserNodeBrowser.js"></script>
+	<script src="wikibase/queryService/ui/resultBrowser/PolestarResultBrowser.js"></script>
+	<script src="wikibase/queryService/api/Sparql.js"></script>
+	<script src="wikibase/queryService/api/QuerySamples.js"></script>
+	<script src="wikibase/queryService/api/Wikibase.js"></script>
+	<script src="wikibase/queryService/api/Tracking.js"></script>
+	<script src="wikibase/queryService/api/UrlShortener.js"></script>
+	<script src="wikibase/queryService/RdfNamespaces.js"></script>
+	<script src="wikibase/queryService/ui/queryHelper/QueryHelper.js"></script>
+	<script src="wikibase/queryService/ui/queryHelper/SparqlQuery.js"></script>
+	<script src="wikibase/queryService/ui/queryHelper/SelectorBox.js"></script>
+	<script src="wikibase/queryService/ui/queryHelper/QueryTemplate.js"></script>
+	<script src="wikibase/queryService/ui/toolbar/ActionBar.js"></script>
+	<script src="wikibase/embedInit.js"></script>
+	<!-- endbuild -->
+</body>
+</html>
