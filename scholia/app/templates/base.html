@@ -29,7 +29,12 @@ sparqlToIframe(`# tool: scholia
 {% block head %}
 {{super()}}
 
+{% block metas %}
 <meta name="robots" content="index, nofollow">
+<meta name="og:url" content="{{ 'https://scholia.toolforge.org' + request.path }}" />
+<meta name="og:site_name" content="Scholia" />
+<meta name="og:image" content='https://scholia.toolforge.org/static/images/scholia_wordmark.svg' />
+{% endblock metas %}
 
 <link rel="canonical" href="{{ 'https://scholia.toolforge.org' + request.path }}">
 
