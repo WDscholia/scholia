@@ -103,6 +103,22 @@
 
 <table class="table table-hover" id="authors-table"></table>
 
+<h3 id="author-scores-header">Author score</h3>
+
+Authors scored according to field of work, publications within the topic
+and citing works within the topic.
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" id="author-scores-graph-iframe"></iframe>
+</div>
+
+<table class="table table-hover" id="author-scores-table"></table>
+
+Missing authors here?
+Then go to the
+<a href="{{ url_for('app.show_topic_empty') }}{{ q }}/curation">curation</a>
+page to resolve the author names.
+
 <h3 id="coauthor-graph-header">Co-author graph</h3>
 
 The 25 most prolific authors and some of their key co-authors.
@@ -110,6 +126,10 @@ The 25 most prolific authors and some of their key co-authors.
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="coauthor-graph-iframe"></iframe>
 </div>
+
+<h3 id="author-awards-header">Awards received by authors who published on the topic</h3>
+
+<table class="table table-hover" id="author-awards-table"></table>
 
 
 <h2 id="Topics">Topics</h2>
@@ -131,24 +151,6 @@ Only a maximum of the 400 most often occuring links are shown.
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="co-occurring-map-iframe"></iframe>
 </div>
-
-
-
-<h2 id="author-scores-header">Author score</h2>
-
-Authors scored according to field of work, publications within the topic
-and citing works within the topic.
-
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" id="author-scores-graph-iframe"></iframe>
-</div>
-
-<table class="table table-hover" id="author-scores-table"></table>
-
-Missing authors here?
-Then go to the
-<a href="{{ url_for('app.show_topic_empty') }}{{ q }}/curation">curation</a>
-page to resolve the author names.
 
 
 <h2 id="venues-header">Venues and series publishing works about the topic</h2>
@@ -183,11 +185,6 @@ The graph indicates the countries associated with organizations whose authors ha
     <iframe class="embed-responsive-item" id="country-citation-graph-iframe">
     </iframe>
 </div>
-
-
-<h3 id="author-awards-header">Awards received by authors who published on the topic</h3>
-
-<table class="table table-hover" id="author-awards-table"></table>
 
 {% endblock %}
     
