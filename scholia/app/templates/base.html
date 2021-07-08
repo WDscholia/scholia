@@ -436,12 +436,15 @@ sparqlToIframe(`# tool: scholia
  }
 
  $(document).ready(function () {
+     let search_text = ""
      $('#searchterm').select2({
+         allowClear: true,
          placeholder: "Search...",
          ajax: {
              url: "https://www.wikidata.org/w/api.php?callback=?",
              dataType: 'jsonp',
              data: function (params) {
+                 search_text = params.term
                  var query = {
                      search: params.term,
                      action: "wbsearchentities",
@@ -453,7 +456,7 @@ sparqlToIframe(`# tool: scholia
                  return query
              },
              processResults: function (data) {
-                 var results = [];
+                 var results = [{id: -1, text: "Advanced search"}];
                  $.each(data.search, function (index, item) {
                      results.push({
                          id: "{{ url_for('app.index') }}" + item.title,
@@ -469,8 +472,15 @@ sparqlToIframe(`# tool: scholia
      });
 
      $("#searchterm").on("select2:select", function (e) {
-         window.location.href = e.params.data.id;
+         const search_id = e.params.data.id
+         if (search_id === -1) {
+             if(search_text === undefined) search_text = ""
+             window.location.href = "/search?q=" + search_text;
+         } else {
+             window.location.href = e.params.data.id;
+         }
      });
+
 
      {% block in_ready %}{% endblock %}
      
@@ -598,12 +608,8 @@ sparqlToIframe(`# tool: scholia
     {% block nav_search %}
     <div class='nav nav-search'>
 	    <div class="input-group">
-        <input type="text" class="form-control"
-            placeholder="Search..." id="searchterm"/>
-
+        <input type="text" id="searchterm"/>
         </div>
-
-        <div id="searchresult"></div>
     </div>
     {% endblock %}
 </div>
