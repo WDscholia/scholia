@@ -1,0 +1,23 @@
+SELECT
+  ?coauthor_count
+  ?work ?workLabel
+  ?authors ?authorsUrl
+WITH {
+  SELECT 
+    (COUNT(?author) AS ?coauthor_count)
+    ?work 
+    (GROUP_CONCAT(?author_label; separator=", ") AS ?authors)
+    (GROUP_CONCAT(SUBSTR(STR(?author), 32); separator=",") AS ?authorsUrl)
+  {
+    VALUES ?author { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    ?work wdt:P50 ?author .
+    OPTIONAL { ?author rdfs:label ?author_label . FILTER(LANG(?author_label) = 'en') }
+  }
+  GROUP BY ?work
+  HAVING(?coauthor_count > 1)
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?coauthor_count)
