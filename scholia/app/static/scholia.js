@@ -197,7 +197,7 @@ function sparqlToDataTablePost(sparql, element, filename, options={}) {
             '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
                 encodeURIComponent(sparql) +
                 '">Wikidata Query Service</a></span>' +
-                '<span style="float:right; font-size:smaller;"><a href="https://github.com/fnielsen/scholia/blob/master/scholia/app/templates/' +
+                '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
                 filename + '">' +
                 filename.replace("_", ": ") +
                 '</a></span></caption>'
@@ -245,7 +245,7 @@ function sparqlToDataTable2(sparql, element, filename, options={}) {
             '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' + 
                 encodeURIComponent(sparql) +    
                 '">Wikidata Query Service</a></span>' +
-                '<span style="float:right; font-size:smaller;"><a href="https://github.com/fnielsen/scholia/blob/master/scholia/app/templates/' +
+                '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
                 filename + '">' +
                 filename.replace("_", ": ") +
                 '</a></span></caption>'
@@ -260,7 +260,7 @@ function sparqlToIframe(sparql, element, filename) {
     url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
     $(element).attr('src', url);
     $(element).parent().after(
-        '<span style="float:right; font-size:smaller"><a href="https://github.com/fnielsen/scholia/blob/master/scholia/app/templates/' + filename + '">' +
+        '<span style="float:right; font-size:smaller"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' + filename + '">' +
             filename.replace("_", ": ") +
             '</a></span>');
 };
