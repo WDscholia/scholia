@@ -25,10 +25,6 @@ sparqlToIframe(`# tool: scholia
 "#{{ panel }}-iframe", "{{ aspect }}_{{ panel }}.sparql");
 {%- endmacro %}
 
-
-{% block head %}
-{{super()}}
-
 {% block metas %}
 <meta charset="UTF-8">
 <meta name="robots" content="index, nofollow">
@@ -37,7 +33,11 @@ sparqlToIframe(`# tool: scholia
 <meta name="og:site_name" content="Scholia" />
 
 <meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@WDScholia" />
 {% endblock metas %}
+
+{% block head %}
+{{super()}}
 
 <link rel="canonical" href="{{ 'https://scholia.toolforge.org' + request.path }}">
 
@@ -70,8 +70,7 @@ sparqlToIframe(`# tool: scholia
 	 if ('en' in item.labels) {
        var title =  item.labels.en.value;
 	     $("#h1").text(title);
-       $("<meta name='og:title' content='" + title +"'/>").insertAfter("[name='og:site_name']");
-       $("<meta name='twitter:title' content='" + title + "'/>").insertAfter("[name='og:site_name']");
+       $("<meta name='og:title' content='" + title +" - Scholia'/>").insertAfter("[name='og:site_name']");
 	 }
 	 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 	 
