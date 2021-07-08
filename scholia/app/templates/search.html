@@ -19,15 +19,22 @@
 <div class="search-results">
     <h2>Search results</h2>
     <ul class="search-results">
-{% for search_result in search_results %}
-	<li class="search-result">
-	    <a href="{{ search_result['q'] }}">
-		<span id="label-{{ search_result['q'] }}"></span>
-		{{ search_result['q'] }}</a>
-	    <br/>
-	    {{ search_result['description'] }}</li>
-{% endfor %}
+    {% for search_result in search_results %}
+        <li class="search-result">
+            <a href="{{ search_result['q'] }}">
+            <span id="label-{{ search_result['q'] }}"></span>
+            {{ search_result['label']}} - {{ search_result['q'] }}</a>
+            <br/>
+            {{ search_result['description'] }}</li>
+    {% endfor %}
     </ul>
+
+    {% if prev_page >= 0 %}
+        <a href="/search?q={{ query }}&page={{ prev_page }}">Back</a>
+    {%  endif %}
+    {% if next_page >= 0 %}
+        | <a href="/search?q={{ query }}&page={{ next_page }}">Next</a>
+    {%  endif %}
 </div>
 
 
