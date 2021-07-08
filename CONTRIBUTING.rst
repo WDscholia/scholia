@@ -4,7 +4,7 @@ Contributing to Scholia
 Source code and issue tracker
 -----------------------------
 
-Scholia development is hosted at https://github.com/fnielsen/scholia.
+Scholia development is hosted at https://github.com/WDscholia/scholia.
 
 Technology stack
 ----------------
@@ -25,8 +25,8 @@ Getting started - set up a local Scholia server for testing purposes
 
    .. code:: shell
 
-       $ git clone https://github.com/fnielsen/scholia.git     # via HTTPS
-       $ git clone git@github.com:fnielsen/scholia.git         # or via SSH
+       $ git clone https://github.com/WDscholia/scholia.git     # via HTTPS
+       $ git clone git@github.com:WDscholia/scholia.git         # or via SSH
 
 2. Install required Python libraries:
 
@@ -87,7 +87,7 @@ Adding new SPARQL queries to Scholia:
 
 2. Write a new query and add it in a template file (e.g. in  ``/app/templates/sparql/author_awards.sparql``)
    where the file names starts with the aspect name. Note that ``{{ q }}`` will be formatted based on the page that renders the template.
-   See example at https://github.com/fnielsen/scholia/pull/848/files.
+   See example at https://github.com/WDscholia/scholia/pull/848/files.
 
 .. code:: sparql
 
@@ -124,5 +124,5 @@ And iframe formatting:
    </div>
 
 5. Add the whole thing to your version/fork of the file
-   https://github.com/fnielsen/scholia/tree/master/scholia/[…].
+   https://github.com/WDscholia/scholia/tree/master/scholia/[…].
    Pull request to master branch.
