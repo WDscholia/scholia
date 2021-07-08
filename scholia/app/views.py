@@ -1391,6 +1391,10 @@ def show_search():
         doi = dois[0]
         return redirect(url_for('app.redirect_doi', doi=doi), code=302)
 
+    arxiv = string_to_arxiv(query)
+    if arxiv:
+        return show_arxiv(arxiv)
+
     search_results = []
     next_page = -1
     prev_page = -1
