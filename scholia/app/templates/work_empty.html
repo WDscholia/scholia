@@ -4,7 +4,12 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('recently-retracted-works') }}
+{{ sparql_to_table('recently-retracted-works',
+    options={
+    "linkPrefixes": {
+        "retracted_work": "../work/",
+        "retraction": "../work/",
+      }})}}
 
 {% endblock %}
 
