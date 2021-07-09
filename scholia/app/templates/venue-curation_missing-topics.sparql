@@ -1,0 +1,28 @@
+SELECT
+  ?count
+  ?work ?workLabel
+  ?topics
+WITH {
+  # Count citations
+  SELECT
+    (COUNT(?citing_work) AS ?count)
+    ?work
+    (SAMPLE(?citing_work) AS ?example_citing_work)
+    (COUNT(DISTINCT ?topic) AS ?topics)
+  WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+    OPTIONAL { ?work wdt:P921 ?topic }
+    OPTIONAL { ?citing_work wdt:P2860 ?work. }
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?count)
+  LIMIT 1000  
+} AS %result
+WHERE {
+  # Label results
+  INCLUDE %result
+  FILTER (?topics < 2)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+ORDER BY DESC(?count) ?topics
