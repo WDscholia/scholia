@@ -41,7 +41,7 @@ h3 {
 }
 
 .navbar {
-    align-items: start;
+    height: 4rem;
     flex-wrap: nowrap;
     justify-content: flex-start;
 }
@@ -49,6 +49,7 @@ h3 {
 .nav {
     align-items: center;
     flex-wrap: wrap;
+    margin: 0 0.5rem;
 }
 
 .nav li {
