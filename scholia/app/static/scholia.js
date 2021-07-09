@@ -239,6 +239,10 @@ function sparqlToDataTable2(sparql, element, filename, options={}) {
             order: [], 
             paging: paging,
             sDom: sDom,
+            language: {
+              emptyTable: "This query yielded no results. ",
+              sZeroRecords: "This query yielded no results."
+            }
         });
 	
         $(element).append(
@@ -254,14 +258,31 @@ function sparqlToDataTable2(sparql, element, filename, options={}) {
 };
 
 
-
-
 function sparqlToIframe(sparql, element, filename) {
+    let $iframe = $(element)
     url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
-    $(element).attr('src', url);
-    $(element).parent().after(
-        '<span style="float:right; font-size:smaller"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' + filename + '">' +
-            filename.replace("_", ": ") +
-            '</a></span>');
+    $iframe.attr('src', url);
+
+    const wikidata_sparql = "https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparql)
+    const wikidata_query = "https://query.wikidata.org/#" + encodeURIComponent(sparql)
+
+    $.ajax({
+        url: wikidata_sparql,
+        success: function (data) {
+            let $xml = $(data);
+            let results = $xml.find('results')
+            if (results.text().trim().length === 0) {
+                $iframe.parent().css("display", "none")
+                $iframe.parent().after('<hr><p>This query yielded no results. You can still try to find something by ' +
+                    '<a href="' + wikidata_query + '" target="_blank">modifying it</a></p>')
+            }
+            $iframe.parent().after(
+                '<span style="float:right; font-size:smaller">' +
+                    '<a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' + filename + '">' +
+                        filename.replace("_", ": ") +
+                    '</a>' +
+                '</span>'
+            );
+        }
+    })
 };
- 
