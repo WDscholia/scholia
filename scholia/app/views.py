@@ -1406,7 +1406,8 @@ def show_search():
         prev_page = data.get("prev_page", -1)
 
     return render_template(
-        'search.html', query=query, search_results=search_results, next_page=next_page, prev_page=prev_page)
+        'search.html', query=query, search_results=search_results,
+        next_page=next_page, prev_page=prev_page)
 
 
 @main.route('/gene/' + q_pattern)
