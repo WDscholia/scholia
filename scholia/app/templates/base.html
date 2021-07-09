@@ -59,8 +59,9 @@ sparqlToIframe(`# tool: scholia
      
     $.getJSON(url, function (data) {
 	 var item = data.entities["{{ q }}"];
+   var title = item.labels.en.value
 	 if ('en' in item.labels) {
-	     $("#h1").text(item.labels.en.value);
+	     $("#h1").text(title);
 	 }
 	 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 	 
@@ -118,6 +119,15 @@ sparqlToIframe(`# tool: scholia
 	     $( '#details' ).append( detailsList.join( " | " ) );
 	 }
 	 catch(e) {}
+  
+  {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
+
+  var linkedToFrom = "<p><a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=1&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >Recent changes to items that link <em>to</em> " + title + "</a> and <a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=0&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >recent changes to items that link <em>from</em> " + title + "</a>.</p>";
+  console.log(linkedToFrom);
+
+  $(linkedToFrom).insertAfter('h1:first');
+
+  {% endif %}
 	 
 	 /* BioSchemas annotation */
 	 if (item.claims.P31 &&
