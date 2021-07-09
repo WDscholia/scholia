@@ -47,10 +47,6 @@ h2 {
     flex-wrap: wrap;
 }
 
-.nav> :first-child {
-    font-weight: bold;
-}
-
 .nav li {
     margin-right: 1em;
 }
@@ -62,17 +58,6 @@ h2 {
 
 .nav-search {
     max-width: 250px;
-}
-
-.nav-search #searchresult {
-    height: 0;
-    width: 100%;
-    z-index: 1;
-}
-
-.nav-search #searchresult div {
-    background: white;
-    width: 100%;
 }
 
 h3 {
