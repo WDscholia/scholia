@@ -28,6 +28,10 @@ h2 {
     margin-top: 0.7em;
 }
 
+h3 {
+    font-size: 1.65rem;
+}
+
 .dropdown-menu li {
     margin: 0.5em;
 }
@@ -58,8 +62,4 @@ h2 {
 
 .nav-search {
     max-width: 250px;
-}
-
-h3 {
-    font-size: 1.65rem;
 }
