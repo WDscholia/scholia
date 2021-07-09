@@ -530,43 +530,55 @@ def entity_to_year(entity):
     return None
 
 
-def search(query, limit=10):
+def search(query, page, limit=10):
     """Search Wikidata.
 
     Parameters
     ----------
     query : str
         Query string.
+    page : int
+        Number of current page.
     limit : int, optional
         Number of maximum search results to return.
 
     Returns
     -------
-    result : list of dicts
+    result : dict
 
     """
     # Query the Wikidata API
     response = requests.get(
         "https://www.wikidata.org/w/api.php",
         params={
-            'action': 'query',
-            'list': 'search',
-            'srlimit': limit,
-            'srsearch': query,
-            'srwhat': 'text',
+            'action': 'wbsearchentities',
+            'limit': limit,
             'format': 'json',
+            'language': "en",
+            'search': query,
+            'continue': page
         },
         headers=HEADERS)
-
     # Convert the response
     response_data = response.json()
-    items = response_data['query']['search']
+    items = response_data['search']
     results = [
-        {'q': item['title'],
-         'description': item['snippet']}
-        for item in items]
+        {
+            'q': item['title'],
+            'description': item.get('description', "No description provided"),
+            'label': item['label']
+        }
+        for item in items
+    ]
 
-    return results
+    data = {'results': results}
+
+    search_continue = response_data.get('search-continue', None)
+    if search_continue:
+        data['next_page'] = search_continue
+    if (int(page) - limit) >= 0:
+        data['prev_page'] = int(page) - limit
+    return data
 
 
 def main():

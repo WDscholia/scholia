@@ -1383,6 +1383,7 @@ def show_search():
 
     """
     query = request.args.get('q', '')
+    page = request.args.get('page', 0)
 
     # Redirect to DOI page if the search query looks like a DOI
     dois = DOI_PATTERN.findall(query)
@@ -1390,12 +1391,22 @@ def show_search():
         doi = dois[0]
         return redirect(url_for('app.redirect_doi', doi=doi), code=302)
 
+    arxiv = string_to_arxiv(query)
+    if arxiv:
+        return show_arxiv(arxiv)
+
+    search_results = []
+    next_page = -1
+    prev_page = -1
+
     if query:
-        search_results = search(query)
-    else:
-        search_results = []
-    return render_template('search.html',
-                           query=query, search_results=search_results)
+        data = search(query, page)
+        search_results = data["results"]
+        next_page = data.get("next_page", -1)
+        prev_page = data.get("prev_page", -1)
+
+    return render_template(
+        'search.html', query=query, search_results=search_results, next_page=next_page, prev_page=prev_page)
 
 
 @main.route('/gene/' + q_pattern)
