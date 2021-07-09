@@ -39,10 +39,10 @@ See file `CONTRIBUTING.rst`_ for technical details on how to improve Scholia.
 .. _Wikidata: https://www.wikidata.org
 .. _Wikimedia Foundation: https://wikimediafoundation.org
 .. _Wikimedia Toolforge: https://toolforge.org/
-.. _launch Scholia via Gitpod: https://gitpod.io/#https://github.com/fnielsen/scholia
-.. _CONTRIBUTING.rst: https://github.com/fnielsen/scholia/blob/master/CONTRIBUTING.rst
-.. _requirements.txt: https://github.com/fnielsen/scholia/blob/master/requirements.txt
-.. _runserver.py: https://github.com/fnielsen/scholia/blob/master/runserver.py
+.. _launch Scholia via Gitpod: https://gitpod.io/#https://github.com/WDscholia/scholia
+.. _CONTRIBUTING.rst: https://github.com/WDscholia/scholia/blob/master/CONTRIBUTING.rst
+.. _requirements.txt: https://github.com/WDscholia/scholia/blob/master/requirements.txt
+.. _runserver.py: https://github.com/WDscholia/scholia/blob/master/runserver.py
 
 References
 ---------
