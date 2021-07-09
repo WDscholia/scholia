@@ -616,13 +616,15 @@ sparqlToIframe(`# tool: scholia
 {% endblock %}
 
 {% block content %}
+<div class="content">
 <div class="container">
     <span id="aspect-chooser"></span>
 </div>
 <div class="container">
     {% block page_content %}{% endblock %}
 </div>
-<div class="container">
+</div>
+<div class="container footer">
     <hr>
     Data from <a href="https://www.wikidata.org">Wikidata</a> and
     <a href="https://en.wikipedia.org">English Wikipedia</a>
