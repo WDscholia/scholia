@@ -36,6 +36,8 @@ except ImportError:
 
 import requests
 
+from arxiv import Search
+
 
 USER_AGENT = 'Scholia'
 
@@ -79,45 +81,19 @@ def get_metadata(arxiv):
 
     """
     arxiv = arxiv.strip()
-    url = ARXIV_URL + '/abs/' + arxiv
-    headers = {'User-agent': USER_AGENT}
-    response = requests.get(url, headers=headers)
-    tree = etree.HTML(response.content)
 
-    submissions = tree.xpath('//div[@class="submission-history"]/text()')
-    submissions = [
-        submission
-        for submission in submissions
-        if len(submission.strip()) > 0
-    ]
-    datetime_as_string = submissions[-1][5:30]
-    isodatetime = parse_datetime(datetime_as_string).isoformat()
-
-    subjects = tree.xpath(
-        '//td[@class="tablecell subjects"]/span/text()'
-        '|'
-        '//td[@class="tablecell subjects"]/text()')
-    arxiv_classifications = [
-        match
-        for subject in subjects
-        for match in re.findall(r'\((.*?)\)', subject)
-    ]
+    search = Search(id_list=[arxiv])
+    result = next(search.results())
 
     metadata = {
         'arxiv': arxiv,
-        'authornames': tree.xpath('//div[@class="authors"]/a/text()'),
+        'authornames': [str(author) for author in result.authors],
         'full_text_url': 'https://arxiv.org/pdf/' + arxiv + '.pdf',
-        'publication_date': isodatetime[:10],
-        'title': re.sub(r'\s+', ' ', tree.xpath('//h1/text()')[-1].strip()),
-        'arxiv_classifications': arxiv_classifications,
+        'publication_date': result.published.date().isoformat(),
+        'title': result.title,
+        'arxiv_classifications': result.categories,
+        'doi': result.doi
     }
-
-    # Optional DOI
-    doi = tree.xpath('//td[@class="tablecell doi"]/a/text()')
-    if not doi:
-        doi = tree.xpath('//td[@class="tablecell msc_classes"]/a/text()')
-    if doi:
-        metadata['doi'] = doi[0]
 
     return metadata
 
