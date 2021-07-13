@@ -75,6 +75,18 @@ h2 {
     width: 100%;
 }
 
+.hlink {
+    visibility: hidden;
+    font-size: 1rem;
+    margin-left: -35px;
+    padding-right: 10px;
+}
+
+h2:hover .hlink,
+h3:hover .hlink {
+    visibility: visible;
+}
+
 h3 {
     font-size: 1.65rem;
 }
