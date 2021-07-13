@@ -488,7 +488,9 @@ sparqlToIframe(`# tool: scholia
      }
 
      function addAnchor(element) {
-       element.insertAdjacentHTML('afterbegin', `<a href="#${element.id}" class="hlink" ariaLabel="Anchor">🔗</a>`)
+       var title = element.innerText;
+       element.removeChild(element.childNodes[0])
+       element.insertAdjacentHTML('afterbegin', `<a href="#${element.id}" class="hlink" ariaLabel="Anchor">${title}</a>`)
      }
 
      {% block in_ready %}{% endblock %}
