@@ -75,13 +75,13 @@ h2 {
     width: 100%;
 }
 
-.hlink {
+.hlink,
+.hlink:hover {
     color: black;
 }
 
 .hlink:hover,
 .hlink:focus {
-    color: black;
     text-decoration: underline;
 }
 
