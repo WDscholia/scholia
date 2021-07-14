@@ -36,7 +36,7 @@ except ImportError:
 
 import requests
 
-from arxiv import Search
+from feedparser import parse as parse_api
 
 
 USER_AGENT = 'Scholia'
@@ -82,18 +82,24 @@ def get_metadata(arxiv):
     """
     arxiv = arxiv.strip()
 
-    search = Search(id_list=[arxiv])
-    result = next(search.results())
+    url = ARXIV_URL + "api/query?id_list=" + arxiv
+    response = requests.get(url)
+
+    feed = parse_api(response.content)
+    entry = feed.entries[0]
 
     metadata = {
         'arxiv': arxiv,
-        'authornames': [str(author) for author in result.authors],
+        'authornames': [author.name for author in entry.authors],
         'full_text_url': 'https://arxiv.org/pdf/' + arxiv + '.pdf',
-        'publication_date': result.published.date().isoformat(),
-        'title': result.title,
-        'arxiv_classifications': result.categories,
-        'doi': result.doi
+        'publication_date': entry.published[:10],
+        'title': entry.title,
+        'arxiv_classifications': [tag.term for tag in entry.tags],
     }
+
+    # Optional DOI
+    if "arxiv_doi" in entry:
+        metadata['doi'] = entry.arxiv_doi
 
     return metadata
 
