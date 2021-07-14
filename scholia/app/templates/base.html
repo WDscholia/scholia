@@ -39,6 +39,14 @@ sparqlToPathWayPageViewer(`# tool: scholia
 "{{ aspect }}_{{ panel }}.sparql" );
 {%- endmacro %}
 
+{% macro sparql_to_404shortinchikey(panel) -%}
+// {{ panel }} short_inchikey
+sparqlToShortInchiKey(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}`,
+"{{inchikey}}",
+"#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql" );
+{%- endmacro %}
+
 
 {% block head %}
 {{super()}}

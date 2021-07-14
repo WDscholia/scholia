@@ -535,3 +535,11 @@ function sparqlToPathWayPageViewer(sparql, filename){
       });
 
 }
+
+function sparqlToShortInchiKey(sparql, key,  element, filename) {
+    
+    shortkey = key.substring(0,14)
+    new_sparql = sparql.replace("_shortkey_",shortkey)
+    sparqlToDataTable2(new_sparql, element, filename);
+
+}
