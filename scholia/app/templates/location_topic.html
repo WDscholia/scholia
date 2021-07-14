@@ -4,6 +4,20 @@
 
 {% block in_ready %}
 
+if ("{{ q2 }}" != ""){
+     let url_topic = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+           '{{ q2 }}' +
+           '&format=json&callback=?';
+
+    $.getJSON(url_topic, function (data) {
+        let item = data.entities["{{ q2 }}"];
+        if ('en' in item.labels) {
+            $("#topic").append(" - topic: " + item.labels.en.value);
+        }
+        $("#topic").append('(<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
+    });
+}
+
 {{ sparql_to_table("nearby-researchers", {
 	     "linkPrefixes":{"author": "../../../author/",
 			   "example_work": "../../../work/"} }) }}
@@ -14,7 +28,10 @@
 
 {% block page_content %}
 
-<h1 id="h1">Location-topic</h1>
+<h1>
+    <span id="h1">Location-topic</span>
+    <span id="topic"></span>
+</h1>
 
 <div id="intro"></div>
 
