@@ -8,65 +8,10 @@
 {{ sparql_to_table('citing-articles') }}
 {{ sparql_to_table('recent-articles') }}
 {{ sparql_to_iframe('publications-per-year') }}
+{{ sparql_to_pathway_viewer('optional_data_values') }}
 
 {% endblock %}
 
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
-const optionalDataValuesSparql =`
-SELECT ?wpid ?organism ?organismLabel ?pathwayDescription
-WHERE {
-  VALUES ?pathway { wd:{{q}} }
-  OPTIONAL {
-    wd:{{ q }} wdt:P2410 ?wpid ;
-    wdt:P703 ?organism .
-  }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-`
-
-$(document).ready(function() {
-  // Hide optional sections until data values are confirmed and ready
-  var organismSection = document.getElementById("Organism")                                                                                         
-  organismSection.style.display = "none"; 
-
-  var pathwayViewerSection = document.getElementById("pathway-viewer")                                                                                
-  pathwayViewerSection.style.display = "none"; 
-
-  // Check for optional data values and then use them if available
-  const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + 
-    encodeURIComponent(optionalDataValuesSparql) + '&format=json';
-  $.getJSON(sparqlURL, function(response) {
-    const simpleData = sparqlDataToSimpleData(response);
-    const dataValues = simpleData.data[0];
-    if ("pathwayDescription" in dataValues) {
-      $("#description").text(dataValues.pathwayDescription);
-    }
-    if ("organism" in dataValues) {
-      organismScholia = dataValues.organism.replace("http://www.wikidata.org/entity/","https://scholia.toolforge.org/taxon/")
-      $("#Organism").after('<a href="' + organismScholia + '">' +
-			   escapeHTML(dataValues.organismLabel) +
-			   '</a>'); 
-      organismSection.style.display = "";
-    }
-    if ("wpid" in dataValues) {
-      const pathwayViewerIFrameResults = $.find("#pathway-viewer > iframe");
-      pathwayViewerIFrameResults.every(function(pathwayViewerIFrameResult) {
-        pathwayViewerIFrameResult.setAttribute("src", `https://pathway-viewer.toolforge.org/?id=${dataValues.wpid}`);
-      });
-      pathwayViewerSection.style.display = "";
-      $("#pathway-viewer").after('<p>This diagram is showing WikiPathways <a href="https://www.wikipathways.org/instance/' + dataValues.wpid + '">' +
-        dataValues.wpid + '</a> in an iframe with this <a href=' +
-        '"https://pathway-viewer.toolforge.org/?id=' + dataValues.wpid + '">pathway-viewer running on Toolforge</a>.</p>');
-    }
-  });
-});
-
-</script>
-
-{% endblock %}
 
 {% block page_content %}
 <h1 id="h1">Pathway</h1>

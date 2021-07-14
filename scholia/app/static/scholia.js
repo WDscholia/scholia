@@ -485,3 +485,53 @@ function sparqlToMatrix(sparql, element, filename){
             '</a></span>');
 
 }
+
+function sparqlToPathWayPageViewer(sparql, filename){
+
+    $(document).ready(function() {
+        // Hide optional sections until data values are confirmed and ready
+        var organismSection = document.getElementById("Organism")                                                                                         
+        organismSection.style.display = "none"; 
+      
+        var pathwayViewerSection = document.getElementById("pathway-viewer")                                                                                
+        pathwayViewerSection.style.display = "none"; 
+      
+        // Check for optional data values and then use them if available
+        const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + 
+          encodeURIComponent(sparql) + '&format=json';
+        $.getJSON(sparqlURL, function(response) {
+          const simpleData = sparqlDataToSimpleData(response);
+          const dataValues = simpleData.data[0];
+          if ("pathwayDescription" in dataValues) {
+            $("#description").text(dataValues.pathwayDescription);
+          }
+          if ("organism" in dataValues) {
+            organismScholia = dataValues.organism.replace("http://www.wikidata.org/entity/","https://scholia.toolforge.org/taxon/")
+            $("#Organism").after('<a href="' + organismScholia + '">' +
+                     escapeHTML(dataValues.organismLabel) +
+                     '</a>'); 
+            organismSection.style.display = "";
+          }
+          if ("wpid" in dataValues) {
+            const pathwayViewerIFrameResults = $.find("#pathway-viewer > iframe");
+            pathwayViewerIFrameResults.every(function(pathwayViewerIFrameResult) {
+              pathwayViewerIFrameResult.setAttribute("src", `https://pathway-viewer.toolforge.org/?id=${dataValues.wpid}`);
+            });
+            pathwayViewerSection.style.display = "";
+            $("#pathway-viewer").after(
+                '<p>This diagram is showing WikiPathways <a href="https://www.wikipathways.org/instance/' + 
+                dataValues.wpid + '">' + dataValues.wpid + 
+                '</a> in an iframe with this <a href=' +
+                '"https://pathway-viewer.toolforge.org/?id=' + 
+                dataValues.wpid + 
+                '">pathway-viewer running on Toolforge</a>.</p>' );
+            $("#pathway-viewer").after(
+                '<span style="float:right; font-size:smaller"><a href="https://github.com/fnielsen/scholia/blob/master/scholia/app/templates/' + filename + '">' +
+                filename.replace("_", ": ") +
+                '</a></span>');
+                       
+          }
+        });
+      });
+
+}

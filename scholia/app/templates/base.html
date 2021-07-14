@@ -32,6 +32,13 @@ sparqlToMatrix(`# tool: scholia
 "#{{ panel }}", "{{ aspect }}_{{ panel }}.sparql");
 {%- endmacro %}
 
+{% macro sparql_to_pathway_viewer(panel) -%}
+// {{ panel }} optional viewer
+sparqlToPathWayPageViewer(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}`,
+"{{ aspect }}_{{ panel }}.sparql" );
+{%- endmacro %}
+
 
 {% block head %}
 {{super()}}
