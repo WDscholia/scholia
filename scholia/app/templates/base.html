@@ -439,7 +439,11 @@ sparqlToIframe(`# tool: scholia
      let search_text = ""
      $('#searchterm').select2({
          allowClear: true,
+         {% if request.path.endswith("search") %}
+         placeholder: "Scientist, paper, topic, DOI, etc.",
+         {% else %}
          placeholder: "Search...",
+         {% endif %}
          ajax: {
              url: "https://www.wikidata.org/w/api.php?callback=?",
              dataType: 'jsonp',
