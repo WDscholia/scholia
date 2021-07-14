@@ -4,6 +4,7 @@ import re
 
 from flask import (Blueprint, current_app, redirect, render_template, request,
                    Response, url_for)
+from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
@@ -74,6 +75,9 @@ qs_pattern = r'<regex(r"Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
 
 # https://www.crossref.org/blog/dois-and-matching-regular-expressions/
 DOI_PATTERN = re.compile(r'10\.\d{4,9}/[-._;()/:A-Z0-9]+', re.IGNORECASE)
+
+# pattern for aspects
+aspect_pattern = '<regex("[a-zA-Z]+"):aspect>'
 
 
 @main.route("/")
@@ -313,42 +317,6 @@ def show_author_rss(q):
     return response
 
 
-@main.route('/author/' + q_pattern + '/missing')
-def show_author_missing(q):
-    """Redirects to the new HTML rendering for missing information.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Redirected HTML.
-
-    """
-    return redirect(url_for('app.show_author_curation', q=q), code=301)
-
-
-@main.route('/author/' + q_pattern + '/curation')
-def show_author_curation(q):
-    """Return HTML rendering for curation page about specific author.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML.
-
-    """
-    return render_template('author-index-curation.html', q=q)
-
-
 @main.route('/author/')
 def show_author_index():
     """Return author index page.
@@ -432,42 +400,6 @@ def show_award_empty():
 
     """
     return render_template('award_empty.html')
-
-
-@main.route('/award/' + q_pattern + '/missing')
-def show_award_missing(q):
-    """Redirects to the new HTML rendering for missing information.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Redirected HTML.
-
-    """
-    return redirect(url_for('app.show_award_curation', q=q), code=301)
-
-
-@main.route('/award/' + q_pattern + '/curation')
-def show_award_curation(q):
-    """Return HTML rendering for curation page about specific award.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML.
-
-    """
-    return render_template('award_curation.html', q=q)
 
 
 @main.route('/cas/<cas>')
@@ -1219,42 +1151,6 @@ def show_organization_topic(q1, q2):
     return render_template('organization_topic.html', q1=q1, q2=q2, q=q1)
 
 
-@main.route('/organization/' + q_pattern + '/missing')
-def show_organization_missing(q):
-    """Redirects to the new HTML rendering for missing information.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Redirected HTML.
-
-    """
-    return redirect(url_for('app.show_organization_curation', q=q), code=301)
-
-
-@main.route('/organization/' + q_pattern + '/curation')
-def show_organization_curation(q):
-    """Return HTML rendering for curation page about an organization.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier for an organization.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML.
-
-    """
-    return render_template('organization_curation.html', q=q)
-
-
 @main.route('/organizations/' + qs_pattern)
 def show_organizations(qs):
     """Return HTML rendering for specific organizations.
@@ -1645,42 +1541,6 @@ def show_topics(qs):
         return render_template('topics.html', qs=qs)
 
 
-@main.route('/topic/' + q_pattern + '/missing')
-def show_topic_missing(q):
-    """Redirects to the new HTML rendering for missing information.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Redirected HTML.
-
-    """
-    return redirect(url_for('app.show_topic_curation', q=q), code=301)
-
-
-@main.route('/topic/' + q_pattern + '/curation')
-def show_topic_curation(q):
-    """Return rendered HTML for curation page for topic.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifiers.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML index page for topic.
-
-    """
-    return render_template('topic_curation.html', q=q)
-
-
 @main.route('/chemical/' + q_pattern)
 def show_chemical(q):
     """Return html render page for specific chemical.
@@ -1719,18 +1579,6 @@ def show_chemical_index():
 
 
 @main.route('/chemical/missing')
-def show_chemical_missing(q):
-    """Redirects to the new HTML rendering for missing information.
-
-    Returns
-    -------
-    html : str
-        Redirected HTML.
-
-    """
-    return redirect(url_for('app.show_chemical_index_curation', q=q), code=301)
-
-
 @main.route('/chemical/curation')
 def show_chemical_index_curation():
     """Return rendered HTML index page for curation page for chemicals.
@@ -1840,42 +1688,6 @@ def show_venue(q):
 
     """
     return render_template('venue.html', q=q)
-
-
-@main.route('/venue/' + q_pattern + '/missing')
-def show_venue_missing(q):
-    """Redirects to the new HTML rendering for missing information.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Redirected HTML.
-
-    """
-    return redirect(url_for('app.show_venue_curation', q=q), code=301)
-
-
-@main.route('/venue/' + q_pattern + '/curation')
-def show_venue_curation(q):
-    """Return HTML rendering for curation page about specific venue.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML.
-
-    """
-    return render_template('venue_curation.html', q=q)
 
 
 @main.route('/venue/' + q_pattern + '/cito')
@@ -2310,3 +2122,29 @@ def show_about():
 def show_favicon():
     """Detect and redirect for the favicon.ico."""
     return redirect(url_for('static', filename='favicon/favicon.ico'))
+
+
+@main.route('/' + aspect_pattern + '/' + q_pattern + '/missing')
+@main.route('/' + aspect_pattern + '/' + q_pattern + '/curation')
+def show_aspect_missing(aspect, q):
+    """Redirects to the new HTML rendering for missing information.
+
+    Parameters
+    ----------
+    aspect: str
+        Aspect variable
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    if aspect == "author":
+        return render_template("author-index-curation.html", q=q)
+    try:
+        return render_template(f'{aspect}_curation.html', q=q)
+    except TemplateNotFound:
+        return render_template("404.html")
