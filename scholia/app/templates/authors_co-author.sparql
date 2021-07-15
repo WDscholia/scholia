@@ -1,0 +1,27 @@
+#defaultView:Graph
+PREFIX gas: <http://www.bigdata.com/rdf/gas#>
+
+SELECT ?author ?authorLabel ?work ?workLabel 
+WITH {
+ SELECT ?work ?author WHERE { 
+  { }
+  {% for q1 in qs %} {% for q2 in qs %} {% if q1 < q2 %} UNION {
+   SELECT ?work ?author WHERE {
+    SERVICE gas:service {
+     gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+           gas:in wd:{{ q1 }} ;
+           gas:target wd:{{ q2 }} ;
+           gas:traversalDirection "Undirected" ;
+           gas:out ?work ;
+           gas:linkType wdt:P50 ;
+          gas:maxVisited 5000 .
+    }
+    ?work wdt:P50 ?author
+   }
+  } # UNION END
+  {% endif %} {% endfor %}  {% endfor %}  } 
+} AS %result 
+WHERE {
+ INCLUDE %result 
+ SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,he,jp,nl,no,ru,sv,zh" . }
+}
