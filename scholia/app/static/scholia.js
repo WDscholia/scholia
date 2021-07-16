@@ -182,6 +182,10 @@ function sparqlToDataTablePost(sparql, element, filename, options={}) {
             }
             columns.push(column)
         }
+	
+        if (convertedData.data.length <= 10) {
+          paging = false;
+        }
 
         var table = $(element).DataTable({
             data: convertedData.data,
