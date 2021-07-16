@@ -29,10 +29,10 @@
 
     <div class="text-center">
     {% if prev_page >= 0 %}
-        <h5><a href="/search?q={{ query }}&page={{ prev_page }}">Back</a></h5> |
+        <h5 class="d-inline"><a href="/search?q={{ query }}&page={{ prev_page }}">Back</a> |</h5>
     {%  endif %}
     {% if next_page >= 0 %}
-        <h5><a href="/search?q={{ query }}&page={{ next_page }}">Next</a></h5>
+        <h5 class="d-inline"><a href="/search?q={{ query }}&page={{ next_page }}">Next</a></h5>
     {%  endif %}
     </span>
 </div>
