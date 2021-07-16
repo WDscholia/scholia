@@ -236,6 +236,12 @@ function sparqlToDataTable2(sparql, element, filename, options={}) {
                 title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
                 defaultContent: "",
             }
+            if (column['title'] == 'Count') {
+              column['render'] = $.fn.dataTable.render.number(',', '.');
+              if (i == 0) {
+                column['className'] = 'dt-right';
+              }
+            }
             columns.push(column)
         }
 	
