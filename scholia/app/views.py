@@ -77,7 +77,7 @@ qs_pattern = r'<regex(r"Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
 DOI_PATTERN = re.compile(r'10\.\d{4,9}/[-._;()/:A-Z0-9]+', re.IGNORECASE)
 
 # pattern for aspects
-aspect_pattern = '<regex("[a-zA-Z]+"):aspect>'
+ASPECT_PATTERN = '<regex("[a-zA-Z]+"):aspect>'
 
 
 @main.route("/")
@@ -2124,8 +2124,8 @@ def show_favicon():
     return redirect(url_for('static', filename='favicon/favicon.ico'))
 
 
-@main.route('/' + aspect_pattern + '/' + q_pattern + '/missing')
-@main.route('/' + aspect_pattern + '/' + q_pattern + '/curation')
+@main.route('/' + ASPECT_PATTERN + '/' + q_pattern + '/missing')
+@main.route('/' + ASPECT_PATTERN + '/' + q_pattern + '/curation')
 def show_aspect_missing(aspect, q):
     """Redirects to the new HTML rendering for missing information.
 
