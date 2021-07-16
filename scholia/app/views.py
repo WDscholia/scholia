@@ -2142,8 +2142,6 @@ def show_aspect_missing(aspect, q):
         Rendered HTML.
 
     """
-    if aspect == "author":
-        return render_template("author-index-curation.html", q=q)
     try:
         return render_template(f'{aspect}_curation.html', q=q)
     except TemplateNotFound:
