@@ -1393,7 +1393,11 @@ def show_search():
 
     arxiv = string_to_arxiv(query)
     if arxiv:
-        return show_arxiv(arxiv)
+        qs = arxiv_to_qs(arxiv)
+        if len(qs) > 0:
+            q = qs[0]
+            return redirect(url_for('app.show_work', q=q), code=302)
+        return redirect(url_for('app.show_arxiv_to_quickstatements', arxiv=arxiv), code=302)
 
     search_results = []
     next_page = -1
