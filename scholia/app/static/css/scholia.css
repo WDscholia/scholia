@@ -75,6 +75,10 @@ h2 {
     width: 100%;
 }
 
+.table-of-contents {
+    margin: 1rem;
+}
+
 h3 {
     font-size: 1.65rem;
 }
