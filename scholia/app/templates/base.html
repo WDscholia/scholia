@@ -51,8 +51,7 @@ sparqlToIframe(`# tool: scholia
 <script type="text/javascript" src="{{ url_for('static', filename='widgets/select2/js/select2.min.js')}}"></script>
 
 <script type="text/javascript">
- if ("{{ q }}" != "") {
-
+  {% if q %}
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
@@ -296,7 +295,7 @@ sparqlToIframe(`# tool: scholia
 
      });
 
-	if ("{{ q2 }}" != "") {
+	{% if q2 %}
 			
 		var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 				   '{{ q2 }}' + 
@@ -308,7 +307,7 @@ sparqlToIframe(`# tool: scholia
 			 }
 			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');	
 		});
-	}
+	{% endif %}
 	
      // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
@@ -433,7 +432,7 @@ sparqlToIframe(`# tool: scholia
 	     $( '#wembedder' ).append( '<hr>' );
 	 }
      });
- }
+  {% endif %}
 
  $(document).ready(function () {
      let search_text = ""
