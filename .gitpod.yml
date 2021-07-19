@@ -7,7 +7,7 @@ ports:
 tasks:
 - before: |
     export FLASK_APP=runserver.py
-- init: >
+  init: >
     python -m pip install -r requirements.txt 
   command: >
-    flask run
+    flask run -p 8100
