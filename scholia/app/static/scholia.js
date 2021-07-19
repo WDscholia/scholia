@@ -42,7 +42,11 @@ function convertDataTableData(data, columns, linkPrefixes={}, linkSuffixes={}) {
 	    if (key.substr(-11) == 'Description') {
 		convertedRow[key.substr(0, key.length - 11) + ' description'] = data[i][key];
 
-	    } else if (key + 'Label' in data[i]) {
+	    } else if (
+			key + 'Label' in data[i] &&
+			/^http/.test(data[i][key]) &&
+			data[i][key].length > 30
+	    ) {
 		convertedRow[key] = '<a href="' +
 		    (linkPrefixes[key] || "../") + 
 		    data[i][key].substr(31) +
@@ -182,6 +186,10 @@ function sparqlToDataTablePost(sparql, element, filename, options={}) {
             }
             columns.push(column)
         }
+	
+        if (convertedData.data.length <= 10) {
+          paging = false;
+        }
 
         var table = $(element).DataTable({
             data: convertedData.data,
@@ -228,9 +236,19 @@ function sparqlToDataTable2(sparql, element, filename, options={}) {
                 title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
                 defaultContent: "",
             }
+            if (column['title'] == 'Count') {
+              column['render'] = $.fn.dataTable.render.number(',', '.');
+              if (i == 0) {
+                column['className'] = 'dt-right';
+              }
+            }
             columns.push(column)
         }
 	
+        if (convertedData.data.length <= 10) {
+            paging = false;
+        }
+
         var table = $(element).DataTable({ 
             data: convertedData.data,
             columns: columns,
