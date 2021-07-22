@@ -241,7 +241,11 @@ function sparqlToDataTable2(sparql, element, filename, options={}) {
               if (i == 0) {
                 column['className'] = 'dt-right';
               }
-            } else if (column['title'] == 'Score' || /\Wper\W/.test(column['title'])) {
+            } else if (
+              column['title'] == 'Score' ||
+              column['title'] == 'Distance' ||
+              /\Wper\W/.test(column['title'])
+            ) {
               column['render'] = $.fn.dataTable.render.number(',', '.', 2);
             }
             columns.push(column);
