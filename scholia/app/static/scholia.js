@@ -886,3 +886,27 @@ function searchTerm(placeholder) {
 	
 	
 }
+
+function quickStatement404DOI(doi, element) {
+	const c = require('citation-js')
+
+	try {
+		let example = new c.Cite([doi])
+		let output = example.format('quickstatements')
+		$( element ).append( output );
+		output = encodeURIComponent(
+		output.replaceAll('\t', '|')
+			  .replaceAll('\n', '||'))
+	
+		htmlOutput = "<a href=\"https://quickstatements.toolforge.org/#/v1=" + output + "\">\n" +
+					"  <button class=\"btn btn-primary\">Submit to Quickstatements ↗</button>\n" +
+					"</a>\n"
+		$( element ).after( htmlOutput );
+	} catch (error) {
+		if (error.message.includes("status code 404")) {
+			$( element ).append( "DOI does not exist" )
+		} else {
+			console.log(error)
+		}
+	}
+}
