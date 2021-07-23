@@ -253,16 +253,13 @@ sparqlToIframe(`# tool: scholia
 	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {
 	     var title = item.sitelinks.enwiki.title;
-	     var wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?' +
-				   'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
-				   'explaintext=1&callback=?&format=json&titles=' +
+	     var wikipediaApiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' +
 				   encodeURIComponent(title);
 	     var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
 	     
 	     $.getJSON(wikipediaApiUrl, function(data) {
-		 var pages = data.query.pages;
-		 var text = pages[Object.keys(pages)[0]].extract + " ... "
-		 var html = "(from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
+		 var text = data.extract
+		 var html = " (<a href=\"" + wikipediaUrl + "\">Read more on English Wikipedia</a>)";
 		 $("#intro").text(text).append(html);
 	     }).fail(function(d, textStatus, error) {
 		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
