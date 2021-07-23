@@ -256,13 +256,16 @@ sparqlToIframe(`# tool: scholia
 	     var wikipediaApiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' +
 				   encodeURIComponent(title);
 	     var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
-	     
-	     $.getJSON(wikipediaApiUrl, function(data) {
-		 var text = data.extract
-		 var html = " (<a href=\"" + wikipediaUrl + "\">Read more on English Wikipedia</a>)";
-		 $("#intro").text(text).append(html);
-	     }).fail(function(d, textStatus, error) {
-		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+
+	     var headers = new Headers({"Api-User-Agent": "https://github.com/WDscholia/scholia"});
+
+	     fetch(wikipediaApiUrl, {method: 'GET', headers: headers})
+	     .then(response => response.json())
+	     .then(data => {
+	       var html = " (<a href=\"" + wikipediaUrl + "\">Read more on English Wikipedia</a>)";
+		 $("#intro").text(data.extract).append(html);
+	     }).catch(error => {
+		 console.error('Error:', error);
 	     });
 	 }
 
