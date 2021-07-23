@@ -143,7 +143,7 @@ Researcher with a published record.
         allowClear: true,
         placeholder: "Search author...",
         ajax: {
-            delay: 1000,
+            delay: 300,
             url: "https://query.wikidata.org/sparql",
             data: function (params) {
                 let search_text = params.term
@@ -191,7 +191,7 @@ Researcher with a published record.
         placeholder: "Compare authors...",
         multiple: true,
         ajax: {
-            delay: 1000,
+            delay: 300,
             url: "https://query.wikidata.org/sparql",
             data: function (params) {
                 let search_author = params.term
