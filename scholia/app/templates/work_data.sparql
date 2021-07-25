@@ -157,5 +157,23 @@ WHERE {
     BIND(COALESCE(?value_string, ?q) AS ?value)
     BIND(CONCAT("../work/", ?q) AS ?valueUrl)
   }
+  UNION
+  {
+    BIND(15 AS ?order)
+    BIND("⚠️ Preprint" AS ?description)
+    { ?work wdt:P31 wd:Q580922 . }
+  }
+  UNION
+  {
+    BIND(16 AS ?order)
+    BIND("⚠️ Published in" AS ?description)
+    { ?work p:P31 ?statement .
+      ?statement pq:P642 ?pub .
+    BIND(SUBSTR(STR(?pub), 32) AS ?pubqid) 
+    ?pub rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?pubqid) AS ?value)
+    BIND(CONCAT("../work/", ?pubqid) AS ?valueUrl)}
+  }
 } 
 ORDER BY ?order
