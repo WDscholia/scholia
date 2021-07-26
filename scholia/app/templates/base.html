@@ -51,7 +51,7 @@ sparqlToIframe(`# tool: scholia
 <script type="text/javascript" src="{{ url_for('static', filename='widgets/select2/js/select2.min.js')}}"></script>
 
 <script type="text/javascript">
-  {% if q %}
+    {% if q %}
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
@@ -62,7 +62,21 @@ sparqlToIframe(`# tool: scholia
 	     $("#h1").text(item.labels.en.value);
 	 }
 	 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
-	 
+
+    {% if q2 %}
+
+    var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+               '{{ q2 }}' +
+               '&format=json&callback=?';
+    $.getJSON(url2, function (data) {
+         var item = data.entities["{{ q2 }}"];
+         if ('en' in item.labels) {
+             $("#h1").append(' - '+item.labels.en.value);
+         }
+         $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
+    });
+    {% endif %}
+
 	 var detailsList = Array();
 	 try {
 	     var orcid = item.claims.P496[0].mainsnak.datavalue.value;
@@ -296,16 +310,16 @@ sparqlToIframe(`# tool: scholia
      });
 
 	{% if q2 %}
-			
+
 		var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-				   '{{ q2 }}' + 
+				   '{{ q2 }}' +
 				   '&format=json&callback=?';
 		$.getJSON(url2, function (data) {
 			 var item = data.entities["{{ q2 }}"];
 			 if ('en' in item.labels) {
 				 $("#h1").append(' - '+item.labels.en.value);
 			 }
-			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');	
+			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
 		});
 	{% endif %}
 	
