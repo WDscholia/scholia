@@ -147,6 +147,10 @@ function sparqlToDataTable(sparql, element, options={}) {
 	    columns.push(column)
 	}
 
+    if (convertedData.data.length <= 10) {
+        paging = false;
+    }
+
 	table = $(element).DataTable({ 
 	    data: convertedData.data,
 	    columns: columns,
