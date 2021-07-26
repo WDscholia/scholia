@@ -2,7 +2,7 @@
 # Doctoral student/advisor network with a source from a spectific researcher
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
 
-SELECT DISTINCT ?student1 ?student1Label ?supervisor1 ?supervisor1Label
+SELECT DISTINCT ?student1 ?student1Label ?rgb ?supervisor1 ?supervisor1Label
 WHERE {
   { 
     SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
@@ -68,6 +68,8 @@ WHERE {
     GROUP BY ?student1 ?supervisor1
   }
   
+  BIND( IF( ?student1 = wd:{{ q }}, "3080BB", "ffffff") AS ?rgb)  
+
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,sv,jp,zh,ru,fr,de" .  } 
 }
 
