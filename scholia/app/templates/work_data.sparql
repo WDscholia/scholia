@@ -166,7 +166,7 @@ WHERE {
   UNION
   {
     BIND(16 AS ?order)
-    BIND("⚠️ Published in" AS ?description)
+    BIND("⚠️ Preprint of" AS ?description)
     { ?work p:P31 ?statement .
       ?statement pq:P642 ?pub .
     BIND(SUBSTR(STR(?pub), 32) AS ?pubqid) 
