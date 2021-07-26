@@ -342,6 +342,8 @@ sparqlToIframe(`# tool: scholia
     UNION
     { wd:{{ q }} wdt:P235 [] . BIND("chemical" AS ?aspect) }
     UNION
+    { wd:{{ q }} wdt:P225 [] . BIND("taxon" AS ?aspect) }
+    UNION
     { wd:{{ q }} ^wdt:P31/wdt:P235 [] . BIND("chemical-class" AS ?aspect) }
     UNION
     { wd:{{ q }} wdt:P644 [] . BIND("gene" AS ?aspect) }
