@@ -2151,3 +2151,7 @@ def show_aspect_missing(aspect, q):
         return render_template(f'{aspect}_curation.html', q=q)
     except TemplateNotFound:
         return render_template("404.html")
+
+
+def page_not_found(e):
+    return render_template("404.html"), 404

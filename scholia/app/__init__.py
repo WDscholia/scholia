@@ -40,7 +40,9 @@ def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
     app.extensions['bootstrap']['cdns']['bootstrap'] = StaticCDN()
 
     from .views import main as main_blueprint
+    from .views import page_not_found
     app.register_blueprint(main_blueprint)
+    app.register_error_handler(404, page_not_found)
 
     app.text_to_topic_q_text_enabled = text_to_topic_q_text_enabled
     if text_to_topic_q_text_enabled:
