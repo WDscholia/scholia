@@ -1,0 +1,28 @@
+SELECT DISTINCT
+  ?retracted_work ?retracted_workLabel
+  ?date
+  ?retraction ?retractionLabel
+WITH {
+  # Find retracted papers indicated by instance of retracted paper, 
+  # by retraction notice property or by significant event
+  SELECT DISTINCT ?retracted_work WHERE {
+    { ?retracted_work wdt:P31 wd:Q45182324 }
+    UNION
+    { ?retracted_work wdt:P5824 [] }
+    UNION
+    { ?retracted_work wdt:P793 wd:Q45203135 }
+  }
+} AS %retracted_works
+WHERE {
+  INCLUDE %retracted_works
+  OPTIONAL {
+    ?retracted_work wdt:P5824 ?retraction .
+    ?retraction wdt:P577 ?retraction_datetime
+  }
+  OPTIONAL {
+    ?retracted_work p:P793 [ ps:P793 wd:Q45203135 ; pq:P585 ?keyevent_datetime ]
+  }
+  BIND(COALESCE(xsd:date(COALESCE(?retraction_datetime, ?keyevent_datetime)), "Unknown date") AS ?date)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?date)

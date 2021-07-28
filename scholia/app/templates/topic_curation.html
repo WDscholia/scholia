@@ -1,176 +1,28 @@
 {% extends "base.html" %}
 
+{% set aspect = "topic-curation" %}
 
-{% block scripts %}
-{{super()}}
+{% block in_ready %}
 
-<script type="text/javascript">
-    missingAuthorItemsSparql = `
-SELECT
-  # Number of works with the author
-  ?count
+{{ sparql_to_table('missing-author-items') }}
+{{ sparql_to_table('missing-pub-date',
+    options={
+      "linkPrefixes": {
+        "work": "../../work/",
+      }})}}
+{{ sparql_to_table('missing-pub-venue',
+    options={
+      "linkPrefixes": {
+        "work": "../../work/",
+      }})}}
+{{ sparql_to_table('missing-co-topic',
+    options={
+      "linkPrefixes": {
+        "work": "../../work/",
+      }})}}
 
-  # Author as a string
-  ?author
-
-  # Build URL to the Author disambiguator tool
-  (CONCAT(
-      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
-      ENCODE_FOR_URI(?author)) AS ?resolver_url)
-WITH {
-  SELECT DISTINCT ?work WHERE {
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
-  }
-} AS %works
-WITH {
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?author
-  WHERE {
-    INCLUDE %works
-    ?work wdt:P2093 ?author .
-  }
-  GROUP BY ?author
-} AS %result
-WHERE {
-  INCLUDE %result
-
-  # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-ORDER BY DESC(?count)
-LIMIT 500
-`
-
-    missingPubDateSparql = `
-SELECT
-?citations ?work ?workLabel (?work AS ?wikidata_url)
-WITH {
-  SELECT (COUNT(?work) as ?count) ?work WHERE {
-  # Works on the topic
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
-  # Works that do not have a publication date statement
-    FILTER NOT EXISTS { ?work wdt:P577 ?date . }
-  # Works that do not have an ISSN, i.e. that are not periodicals
-    FILTER NOT EXISTS { ?work wdt:P236 ?issn . }
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?count)
-  LIMIT 2000
-} AS %works
-WITH {
-  SELECT (COUNT(?work1) as ?citations) ?work WHERE {
-  INCLUDE %works
-  # Works cited
-    OPTIONAL { ?work1 wdt:P2860 ?work }.
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?citations)
-  LIMIT 200
-} AS %result
-WHERE {
-  INCLUDE %result
-  
-  # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-ORDER BY DESC(?citations)
-`
-
-
-    missingPubVenueSparql = `
-
-SELECT
-?citations ?work ?workLabel (?work AS ?wikidata_url)
-WITH {
-  SELECT (COUNT(?work) as ?count) ?work WHERE {
-  # Works on the topic
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
-  # Works that do not have a statement about where they were published
-    FILTER NOT EXISTS { ?work wdt:P1433 ?date . }
-  # Works that do not have an ISSN, i.e. that are not periodicals
-    FILTER NOT EXISTS { ?work wdt:P236 ?issn . }
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?count)
-  LIMIT 2000
-} AS %works
-WITH {
-  SELECT (COUNT(?work1) as ?citations) ?work WHERE {
-  INCLUDE %works
-  # Works cited
-    OPTIONAL { ?work1 wdt:P2860 ?work }.
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?citations)
-  LIMIT 200
-} AS %result
-WHERE {
-  INCLUDE %result
-  
-  # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-ORDER BY DESC(?citations)
-`
-
-        missingCoTopicSparql = `
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?count
-  ?work ?workLabel
-WITH {
-  # Count citations
-  SELECT
-    (COUNT(?citing_work) AS ?count)
-    ?work
-    (SAMPLE(?citing_work) AS ?example_citing_work)
-    (COUNT(DISTINCT ?topic) AS ?topics)
-  WHERE {
-    ?work wdt:P921 target: .
-    OPTIONAL { ?work wdt:P921 ?topic . FILTER (?topic != target: )}
-    OPTIONAL { ?citing_work wdt:P2860 ?work. }
-  }
-  GROUP BY ?work
-  HAVING (?topics < 1)
-  ORDER BY DESC(?count)
-  LIMIT 100
-} AS %result
-WHERE {
-  # Label results
-  INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
-}
-ORDER BY DESC(?count) ?topics
-`
-
-
- $(document).ready(function() {
-     sparqlToDataTable(missingAuthorItemsSparql, "#missing-author-items");
-     sparqlToDataTable(missingPubDateSparql, "#missing-pub-date", {
-	   linkPrefixes: {
-	       work: "../../work/",
-	   }
-    });
-     sparqlToDataTable(missingPubVenueSparql, "#missing-pub-venue", {
-	   linkPrefixes: {
-	       work: "../../work/",
-	   }
-    });
-     sparqlToDataTable(missingCoTopicSparql, "#missing-co-topic", {
-	   linkPrefixes: {
-	       work: "../../work/",
-	   }
-    });
-});
-
-
-</script>
 
 {% endblock %}
-
 
 {% block page_content %}
 
@@ -179,30 +31,30 @@ ORDER BY DESC(?count) ?topics
 Missing information with respect to the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}">{{ q }}</a>.
 
 
-<h2>Missing author items</h2>
+<h2 id="missing-author-items-header">Missing author items</h2>
 
 The authors listed below may only be represented as strings in Wikidata
 with no link to Wikidata items.
 Follow the link to use the Author disambiguator tool to try to resolve
 the authors.
 
-<table class="table table-hover" id="missing-author-items"></table>
+<table class="table table-hover" id="missing-author-items-table"></table>
 
-<h2>Missing publication date</h2>
+<h2 id="missing-pub-date-header">Missing publication date</h2>
 
 For the listed publications, Wikidata does not have publication dates.
-<table class="table table-hover" id="missing-pub-date"></table>
+<table class="table table-hover" id="missing-pub-date-table"></table>
 
 
-<h2>Missing publication venue</h2>
+<h2 id="missing-pub-venue-header">Missing publication venue</h2>
 
 For the listed publications, Wikidata does not have a statement as to where they were published.
-<table class="table table-hover" id="missing-pub-venue"></table>
+<table class="table table-hover" id="missing-pub-venue-table"></table>
 
 
-<h2>Works on the topic with missing additional topics</h2>
+<h2 id="missing-co-topic-header">Works on the topic with missing additional topics</h2>
 
 The following works have only been tagged with this one topic.
-<table class="table table-hover" id="missing-co-topic"></table>
+<table class="table table-hover" id="missing-co-topic-table"></table>
 
 {% endblock %}

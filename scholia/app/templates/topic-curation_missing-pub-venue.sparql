@@ -1,0 +1,33 @@
+
+SELECT
+?citations ?work ?workLabel (?work AS ?wikidata_url)
+WITH {
+  SELECT (COUNT(?work) as ?count) ?work WHERE {
+  # Works on the topic
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+  # Works that do not have a statement about where they were published
+    FILTER NOT EXISTS { ?work wdt:P1433 ?date . }
+  # Works that do not have an ISSN, i.e. that are not periodicals
+    FILTER NOT EXISTS { ?work wdt:P236 ?issn . }
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?count)
+  LIMIT 2000
+} AS %works
+WITH {
+  SELECT (COUNT(?work1) as ?citations) ?work WHERE {
+  INCLUDE %works
+  # Works cited
+    OPTIONAL { ?work1 wdt:P2860 ?work }.
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?citations)
+  LIMIT 200
+} AS %result
+WHERE {
+  INCLUDE %result
+  
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?citations)

@@ -1,0 +1,13 @@
+SELECT ?work ?workLabel ?example_author ?example_authorLabel
+WITH {
+  SELECT ?work (SAMPLE(?author) AS ?example_author) WHERE {
+    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    OPTIONAL { ?work wdt:P50 ?author }
+  }
+  GROUP BY ?work
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}

@@ -25,6 +25,28 @@ sparqlToIframe(`# tool: scholia
 "#{{ panel }}-iframe", "{{ aspect }}_{{ panel }}.sparql");
 {%- endmacro %}
 
+{% macro sparql_to_matrix(panel) -%}
+// {{ panel }} matrix
+sparqlToMatrix(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}`,
+"#{{ panel }}", "{{ aspect }}_{{ panel }}.sparql");
+{%- endmacro %}
+
+{% macro sparql_to_pathway_viewer(panel) -%}
+// {{ panel }} optional viewer
+sparqlToPathWayPageViewer(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}`,
+"{{ aspect }}_{{ panel }}.sparql" );
+{%- endmacro %}
+
+{% macro sparql_to_404shortinchikey(panel) -%}
+// {{ panel }} short_inchikey
+sparqlToShortInchiKey(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}`,
+"{{inchikey}}",
+"#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql" );
+{%- endmacro %}
+
 
 {% block head %}
 {{super()}}
@@ -45,6 +67,8 @@ sparqlToIframe(`# tool: scholia
 {% block scripts %}
 {{super()}}
 
+<script type="text/javascript" src="{{ url_for('static', filename='d3.v5.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='d3-scale-chromatic.v1.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='scholia.js') }}"></script>
 <link href="{{ url_for('static', filename='widgets/select2/css/select2.min.css') }}" rel="stylesheet" />

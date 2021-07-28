@@ -1,156 +1,24 @@
 {% extends "base.html" %}
 
+{% set aspect = "author-curation" %}
 
-{% block scripts %}
-{{super()}}
+{% block in_ready %}
 
-  <script type="text/javascript">
-    missingAuthorResolvingSparql = `
-SELECT 
-  (COUNT(?work) AS ?count) 
-  ?author_name 
-  (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", 
-          ENCODE_FOR_URI(?author_name)) AS ?author_resolver_url) 
-WHERE {
-  {
-    SELECT DISTINCT ?author_name WHERE {
-      {
-        { wd:{{ q }} skos:altLabel ?author_name_. }
-        UNION
-        { wd:{{ q }} rdfs:label ?author_name_. }
-        BIND(STR(?author_name_) AS ?author_name)
-      }
-      UNION
-      {
-        ?author_statement ps:P50 wd:{{ q }};
-          pq:P1932 ?author_name.
-      }
-    }
-  }
-  OPTIONAL { ?work wdt:P2093 ?author_name. }
-}
-GROUP BY ?author_name
-ORDER BY DESC (?count)
-`
-
- missingCoauthorItemsSparql = `
-SELECT
-  # Number of works with the coauthor
-  ?count
-
-  # The coauthor as a string, - rather than as an item
-  ?coauthor
-
-  # Build URL to the Author disambiguator tool
-  (CONCAT(
-      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
-      ENCODE_FOR_URI(?coauthor)) AS ?resolver_url)
-WITH {
-  SELECT (COUNT(?work) as ?count) ?coauthor WHERE {
-    ?work wdt:P50 wd:{{ q }} .
-    ?work wdt:P2093 ?coauthor .
-  }
-  GROUP BY ?coauthor
-} AS %result
-WHERE {
-  INCLUDE %result
-  # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-ORDER BY DESC(?count)
-`
-
-  missingCitingAuthorItemsSparql = `
-SELECT
-  # Number of works with the coauthor
-  ?count
-
-  # The citing author as a string, - rather than as an item
-  ?citing_author
-
-  # Build URL to the Author disambiguator tool
-  (CONCAT(
-      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
-      ENCODE_FOR_URI(?citing_author)) AS ?resolver_url)
-
-  ?example_citing_work ?example_citing_workLabel
-WITH {
-  SELECT
-    (COUNT(?work) as ?count)
-    ?citing_author
-    (SAMPLE(?citing_work) AS ?example_citing_work) 
-  WHERE {
-    ?work wdt:P50 wd:{{ q }} .
-    ?citing_work wdt:P2860 ?work .
-    ?citing_work wdt:P2093 ?citing_author .
-  }
-  GROUP BY ?citing_author
-} AS %result
-WHERE {
-  INCLUDE %result
-  # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-ORDER BY DESC(?count)
-LIMIT 1000
-`
-
-
-  missingTopicSparql = `
-
-SELECT
-?citations  ?work ?workLabel (?work AS ?wikidata_url)
-WITH {
-  SELECT (COUNT(?work) as ?count) ?work WHERE {
-  # Works by author
-    ?work wdt:P50 wd:{{ q }} .
-  # Work does not have a main subject statement
-    FILTER NOT EXISTS { ?work wdt:P921 ?topic . }
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?count)
-  LIMIT 2000
-} AS %works
-WITH {
-  SELECT (COUNT(?work1) as ?citations) ?work WHERE {
-  INCLUDE %works
-  # Works cited
-    OPTIONAL { ?work1 wdt:P2860 ?work }.
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?citations)
-  LIMIT 200
-} AS %result
-WHERE {
-  INCLUDE %result
-  
-  # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-}
-ORDER BY DESC(?citations)
-`
-
-
-
- $(document).ready(function() {
-     sparqlToDataTable(missingAuthorResolvingSparql, "#missing-author-resolving");
-     sparqlToDataTable(missingCoauthorItemsSparql, "#missing-coauthor-items");
-     sparqlToDataTable(missingCitingAuthorItemsSparql, "#missing-citing-author-items", {
-     linkPrefixes:{
-         "example_citing_work": "../../work/",
-     }
-     });
-     sparqlToDataTable(missingTopicSparql, "#missing-topic", {
-     linkPrefixes:{
-         "work": "../../work/",
-     }
-     });
- });
-
-
-</script>
+{{ sparql_to_table('missing-author-resolving') }}
+{{ sparql_to_table('missing-coauthor-items') }}
+{{ sparql_to_table('missing-citing-author-items',
+    options={
+      "linkPrefixes": {
+        "example_citing_work": "../../work/",
+    }})}}
+{{ sparql_to_table('missing-topic',
+    options={
+      "linkPrefixes": {
+        "work": "../../work/",
+    }})}}
 
 {% endblock %}
+
 
 
 {% block page_content %}
@@ -160,37 +28,37 @@ ORDER BY DESC(?citations)
 Missing information with respect to the author.
 
 
-<h2>Author name strings to be resolved</h2>
+<h2 id="missing-author-resolving-header">Author name strings to be resolved</h2>
 
 The authorship may be represented as an author name string rather than a Wikidata item.
 To try to resolve the author name strings, follow the links below to use the Author disambiguator tool, which also has a <a href="https://author-disambiguator.toolforge.org/author_item_oauth.php?id={{ q }}">dedicated page for this author</a>.
 
-<table class="table table-hover" id="missing-author-resolving"></table>
+<table class="table table-hover" id="missing-author-resolving-table"></table>
 
 
-<h2>Missing coauthor items</h2>
+<h2 id="missing-coauthor-items-header">Missing coauthor items</h2>
 
 The coauthors listed below may only be represented as strings in Wikidata
 with no link to Wikidata items.
 Follow the link to use the Author disambiguator tool to try to resolve
 the authors.
 
-<table class="table table-hover" id="missing-coauthor-items"></table>
+<table class="table table-hover" id="missing-coauthor-items-table"></table>
 
 
-<h2>Missing citing author items</h2>
+<h2 id="missing-citing-author-items-header">Missing citing author items</h2>
 
 The citing authors below are only represented as strings in Wikidata and not linked to
 Wikidata items.
 Follow the link to use the Author disambiguator tool to try to resolve
 the authors.
 
-<table class="table table-hover" id="missing-citing-author-items"></table>
+<table class="table table-hover" id="missing-citing-author-items-table"></table>
 
 
-<h2>Authored works with missing topics</h2>
+<h2 id="missing-topic-header">Authored works with missing topics</h2>
 
-<table class="table table-hover" id="missing-topic"></table>
+<table class="table table-hover" id="missing-topic-table"></table>
 
 
 
