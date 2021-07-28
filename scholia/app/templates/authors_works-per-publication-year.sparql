@@ -1,0 +1,23 @@
+#defaultView:BarChart
+SELECT ?year ?number_of_works ?author_label WHERE {
+  {
+    SELECT ?year ?number_of_works ?author ?author_label_
+    WHERE {
+      {
+        SELECT ?author ?year (COUNT(?work) AS ?number_of_works) WHERE {
+          hint:Query hint:optimizer "None".
+          VALUES ?author {   {% for q in qs %} wd:{{ q }} {% endfor %}   }
+          ?work wdt:P50 ?author .
+          ?work wdt:P577 ?publication_date .
+          BIND(STR(YEAR(?publication_date)) AS ?year)
+        }
+        GROUP BY ?author ?year 
+      } 
+      ?author rdfs:label ?author_label_ .
+      FILTER (LANG(?author_label_) = 'en')
+    }
+  }
+  # Represent the author by name and Q identifier
+  BIND (CONCAT(?author_label_, " (", SUBSTR(STR(?author), 32), ")") AS ?author_label)
+}
+ORDER BY ?year

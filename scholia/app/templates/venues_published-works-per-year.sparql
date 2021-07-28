@@ -1,0 +1,10 @@
+#defaultView:LineChart
+SELECT ?year (COUNT(?work) AS ?count) ?venue ?venueLabel WHERE {
+  VALUES ?venue { {% for q in qs %} wd:{{ q }} {% endfor %} }
+  ?work wdt:P1433 ?venue .
+  ?work wdt:P577 ?publication_datetime . 
+  BIND(STR(YEAR(?publication_datetime)) AS ?year)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+GROUP BY ?year ?venue ?venueLabel
+ORDER BY ?year
