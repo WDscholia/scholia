@@ -420,13 +420,36 @@ sparqlToShortInchiKey(`# tool: scholia
      };
 
      $.ajax( endpointUrl, settings ).then( function ( data ) {
-	 data.results.bindings.forEach(function(entry) {
-	     var aspect = entry.aspect.value;
-	     $( '#aspect-chooser' ).append(
-		 `<a role="button"
-		     class="btn btn-outline-dark btn-sm"
-                     href="{{ url_for('app.index') }}` + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
-	 });
+	     var aspectDropdown = document.createElement('button');
+	     aspectDropdown.classList = 'btn btn-outline-secondary dropdown-toggle';
+	     aspectDropdown.type = 'button' ;
+	     aspectDropdown.id = 'aspectMenuButton';
+	     aspectDropdown.setAttribute('data-toggle', 'dropdown');
+	     aspectDropdown.setAttribute('aria-haspopup', 'true');
+	     aspectDropdown.setAttribute('aria-expanded', 'false');
+	     var currentAspect = window.location.pathname.split("/")[1];
+	     aspectDropdown.innerText = currentAspect;
+	     document.getElementById("aspect-chooser").append(aspectDropdown);
+	
+	     var aspectDropdownMenu = document.createElement('div');
+	     aspectDropdownMenu.classList = 'dropdown-menu';
+	     aspectDropdownMenu.setAttribute('aria-labelledby', 'aspectMenuButton');
+	
+	    data.results.bindings.forEach(function(entry) {
+	        var aspect = entry.aspect.value;
+	        if (aspect != currentAspect) {
+	          var dropdownItem = document.createElement('a');
+	          dropdownItem.classList = 'dropdown-item';
+	          dropdownItem.href = "{{ url_for('app.index') }}" + aspect + '/{{ q }}';
+	          dropdownItem.innerText = aspect;
+	          aspectDropdownMenu.append(dropdownItem);
+	        }
+	    });
+	 
+	     document.getElementById("aspect-chooser").append(aspectDropdownMenu);
+	
+	     aspectDropdown.insertAdjacentHTML("afterend", 
+	     '<span id="aspect-chooser-label" style="color: #6C757D; vertical-align: middle;margin: 2px;"> / {{ q }}</span>')
      } );
 
      // this query opens a subpage for the Wikidata item, e.g. as cito subpage
@@ -736,8 +759,7 @@ sparqlToShortInchiKey(`# tool: scholia
 
 {% block content %}
 <div class="content">
-<div class="container">
-    <span id="aspect-chooser"></span>
+<div class="container dropdown" id="aspect-chooser">
 </div>
 <div class="container">
     {% block page_content %}{% endblock %}
