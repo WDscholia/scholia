@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% set aspect = "award-index" %}
+
+{% block in_ready %}
+
+{{ sparql_to_iframe('statistics') }}
+
+{% endblock %}
+
 {% block page_content %}
 
 <h1>Award</h1>
@@ -24,10 +32,10 @@ Awards, prizes.
 
 <h2>Aggregates</h2>
 
-<h3>Male-female statistics</h3>
+<h3 id="statistics-header">Male-female statistics</h3>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3AScatterChart%0A%23%20Statistics%20on%20number%20of%20recipients%20for%20award%20wrt.%20gender%0ASELECT%20%3Fmales%20%3Ffemales%20%3Faward%20%3FawardLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Frecipient_male%29%20AS%20%3Fmales%29%20%28COUNT%28%3Frecipient_female%29%20AS%20%3Ffemales%29%20%3Faward%20WHERE%20%7B%0A%20%20%20%20%3Faward%20wdt%3AP31%20wd%3AQ11448906%20.%0A%20%20%20%20%7B%20%0A%20%20%20%20%20%20%3Frecipient_male%20wdt%3AP166%20%3Faward%20.%0A%20%20%20%20%20%20%3Frecipient_male%20wdt%3AP21%20wd%3AQ6581097%20.%0A%20%20%20%20%7D%0A%20%20%20%20UNION%20%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%3Frecipient_female%20wdt%3AP166%20%3Faward%20.%0A%20%20%20%20%20%20%3Frecipient_female%20wdt%3AP21%20wd%3AQ6581072%20.%0A%20%20%20%20%7D%20%20%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Faward%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%20%0AORDER%20BY%20DESC%28%3Fmales%29%20DESC%28%3Ffemale%29%20"></iframe>
+    <iframe class="embed-responsive-item" id="statistics-iframe"></iframe>
 </div>
 
 

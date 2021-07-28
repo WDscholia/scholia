@@ -1,0 +1,22 @@
+#defaultView:BubbleChart
+SELECT
+  ?count
+  ?topic ?topicLabel
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?topic 
+  WHERE {
+    VALUES ?work {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
+    ?work wdt:P921 ?topic .
+  }
+  GROUP BY ?topic
+  ORDER BY ?count  
+  LIMIT 200
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh". }
+  }
+ORDER BY DESC(?count)
