@@ -525,10 +525,6 @@ function sparqlToPathWayPageViewer(sparql, filename){
                 '"https://pathway-viewer.toolforge.org/?id=' + 
                 dataValues.wpid + 
                 '">pathway-viewer running on Toolforge</a>.</p>' );
-            $("#pathway-viewer").after(
-                '<span style="float:right; font-size:smaller"><a href="https://github.com/fnielsen/scholia/blob/master/scholia/app/templates/' + filename + '">' +
-                filename.replace("_", ": ") +
-                '</a></span>');
                        
           }
         });
