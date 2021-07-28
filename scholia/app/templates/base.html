@@ -421,16 +421,21 @@ sparqlToShortInchiKey(`# tool: scholia
 
      $.ajax( endpointUrl, settings ).then( function ( data ) {
 	     var aspectDropdown = document.createElement('button');
-	     aspectDropdown.classList = 'btn btn-outline-secondary dropdown-toggle';
-	     aspectDropdown.type = 'button' ;
-	     aspectDropdown.id = 'aspectMenuButton';
-	     aspectDropdown.setAttribute('data-toggle', 'dropdown');
-	     aspectDropdown.setAttribute('aria-haspopup', 'true');
-	     aspectDropdown.setAttribute('aria-expanded', 'false');
+       aspectDropdown.type = 'button';
+       aspectDropdown.id = 'aspectMenuButton';
+	     aspectDropdown.classList = 'btn btn-outline-secondary';
+       if (data.results.bindings.length > 1) {
+         console.log(data.results.bindings)
+         aspectDropdown.classList.add('dropdown-toggle');
+         aspectDropdown.setAttribute('data-toggle', 'dropdown');
+         aspectDropdown.setAttribute('aria-haspopup', 'true');
+         aspectDropdown.setAttribute('aria-expanded', 'false');
+       }
 	     var currentAspect = window.location.pathname.split("/")[1];
 	     aspectDropdown.innerText = currentAspect;
 	     document.getElementById("aspect-chooser").append(aspectDropdown);
 	
+       if (data.results.bindings.length > 1) {
 	     var aspectDropdownMenu = document.createElement('div');
 	     aspectDropdownMenu.classList = 'dropdown-menu';
 	     aspectDropdownMenu.setAttribute('aria-labelledby', 'aspectMenuButton');
@@ -446,7 +451,9 @@ sparqlToShortInchiKey(`# tool: scholia
 	        }
 	    });
 	 
-	     document.getElementById("aspect-chooser").append(aspectDropdownMenu);
+        document.getElementById("aspect-chooser").append(aspectDropdownMenu);
+      }
+	     
 	
 	     aspectDropdown.insertAdjacentHTML("afterend", 
 	     '<span id="aspect-chooser-label" style="color: #6C757D; vertical-align: middle;margin: 2px;"> / {{ q }}</span>')
