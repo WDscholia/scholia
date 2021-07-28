@@ -448,6 +448,22 @@ sparqlToIframe(`# tool: scholia
      });
   {% endif %}
 
+  {% if p %} 
+  var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+      '{{ p }}' +
+      '&format=json&callback=?';
+     console.log("hello")
+    $.getJSON(url, function (data) {
+      var item = data.entities["{{ p }}"];
+      console.log(item)
+      if ('en' in item.labels) {
+        console.log(item.labels.en.value)
+        $("h1").text("Property: " + item.labels.en.value);
+      }
+      $("h1").append(' (<a href="https://www.wikidata.org/wiki/Property:{{ p }}">{{ p }}</a>)');
+    })
+  {% endif %}
+
  $(document).ready(function () {
      let search_text = ""
      $('#searchterm').select2({
