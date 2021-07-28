@@ -157,5 +157,27 @@ WHERE {
     BIND(COALESCE(?value_string, ?q) AS ?value)
     BIND(CONCAT("../work/", ?q) AS ?valueUrl)
   }
+  UNION
+  {
+    SELECT (COUNT(DISTINCT ?citationStatement) AS ?value) ?order ?description ?valueUrl WHERE {
+      VALUES ?work { wd:{{ q }} }
+      VALUES ?intention { wd:Q96472102 wd:Q101149476 }
+      ?work ^ps:P2860 ?citationStatement . ?citationStatement pq:P3712 ?intention .
+      BIND(15 AS ?order)
+      BIND("Reused by" AS ?description)
+      BIND("./{{ q }}/cito" AS ?valueUrl)
+    } GROUP BY ?order ?description ?valueUrl
+  }
+  UNION
+  {
+    SELECT (COUNT(DISTINCT ?citationStatement) AS ?value) ?order ?description ?valueUrl WHERE {
+      VALUES ?work { wd:{{ q }} }
+      VALUES ?intention { wd:Q107687829 }
+      ?work ^ps:P2860 ?citationStatement . ?citationStatement pq:P3712 ?intention .
+      BIND(17 AS ?order)
+      BIND("Disagreed with by" AS ?description)
+      BIND("./{{ q }}/cito" AS ?valueUrl)
+    } GROUP BY ?order ?description ?valueUrl
+  }
 } 
 ORDER BY ?order
