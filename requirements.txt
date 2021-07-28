@@ -8,3 +8,7 @@ requests
 simplejson
 werkzeug>=0.9
 urllib3>=1.25.1
+Sphinx==4.1.2
+Pallets-Sphinx-Themes==2.0.1
+sphinx-rtd-theme==0.5.2
+

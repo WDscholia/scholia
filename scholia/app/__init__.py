@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function
 from flask import Flask
 from flask_bootstrap import Bootstrap, StaticCDN
 
-from ..text import load_text_to_topic_q_text
+from scholia.text import load_text_to_topic_q_text
 
 
 def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
