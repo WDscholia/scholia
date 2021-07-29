@@ -48,10 +48,21 @@ sparqlToShortInchiKey(`# tool: scholia
 {%- endmacro %}
 
 
+{% block metas %}
+<meta charset="UTF-8">
+<meta name="robots" content="index, nofollow">
+
+<meta name="og:url" content="{{ 'https://scholia.toolforge.org' + request.path }}" />
+<meta name="og:site_name" content="Scholia" />
+<meta name="og:image" content="{{ url_for('static', filename='images/scholia_social_media.png') }}" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@WDScholia" />
+{% endblock metas %}
+
+
 {% block head %}
 {{super()}}
-
-<meta name="robots" content="index, nofollow">
 
 <link rel="canonical" href="{{ 'https://scholia.toolforge.org' + request.path }}">
 
