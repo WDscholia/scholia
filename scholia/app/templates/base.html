@@ -379,6 +379,17 @@ sparqlToShortInchiKey(`# tool: scholia
 
      });
 	
+    var currentURL  = window.location.pathname.split("/")
+    var currentAspect = currentURL[1];
+    var curation = document.getElementById("curation-link");
+    if (currentURL[3] == "curation") {
+      curation.innerText = "Back"
+      curation.href = "/" + currentAspect + "/{{ q }}";
+    } else {
+      curation.href = "/" + currentAspect + "/{{ q }}/curation";
+    }
+    curation.classList.remove("d-none");
+
      // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
     if ("{{q2}}".length) {
@@ -872,7 +883,10 @@ sparqlToShortInchiKey(`# tool: scholia
 
 {% block content %}
 <div class="content">
-<div class="container dropdown" id="aspect-chooser">
+<div class="container d-flex justify-content-between">
+    <div class="dropdown" id="aspect-chooser">
+    </div>
+    <a id='curation-link' role="button" class="btn btn-outline-secondary d-none">Add missing info</a>
 </div>
 <div class="container">
     {% block page_content %}{% endblock %}
