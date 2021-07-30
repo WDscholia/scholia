@@ -7,7 +7,7 @@
 <script type="text/javascript">
   citoIncomingSparql = `
 SELECT ?citingArticle ?citingArticleLabel ?intention ?intentionLabel WHERE {
-  VALUES ?CITEDARTICLE { wd:{{ q1 }} }
+  VALUES ?CITEDARTICLE { wd:{{ q }} }
   VALUES ?intention { wd:{{ q2 }} }
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?intention ;
