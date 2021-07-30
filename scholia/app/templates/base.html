@@ -87,6 +87,9 @@ sparqlToShortInchiKey(`# tool: scholia
 <script type="text/javascript" src="{{ url_for('static', filename='bootstrap-autocomplete.min.js')}}"></script>
 
 <script type="text/javascript">
+    var currentURL = window.location.pathname.split("/");
+    var currentAspect = currentURL[1];
+    
     {% if q %}
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
@@ -100,6 +103,7 @@ sparqlToShortInchiKey(`# tool: scholia
        $("title").text(title + " - Scholia");
 
 	     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
+	     $("#h1").text("Improve " + currentAspect + ": " + title);
 
 	     var linkedToFrom = "<p><a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=1&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
 	     linkedToFrom += "Recent changes to items that link <em>to</em> " + $('<div>').text(title).html() + "</a> and ";
@@ -381,19 +385,30 @@ sparqlToShortInchiKey(`# tool: scholia
 	
     var currentURL  = window.location.pathname.split("/")
     var currentAspect = currentURL[1];
-    var curation = document.getElementById("curation-link");
-    var validCurationPages = ["author", "award", "organization", "topic", "venue"]
 
-    // only show curation link if a curation page is defined
-    if (validCurationPages.indexOf(currentAspect) != -1) {
-      if (currentURL[3] == "curation") {
-        curation.innerText = "Back"
-        curation.href = "/" + currentAspect + "/{{ q }}";
-      } else {
-        curation.href = "/" + currentAspect + "/{{ q }}/curation";
-      }
-      curation.classList.remove("d-none");
+	{% if q2 %}
+
+		var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+				   '{{ q2 }}' +
+				   '&format=json&callback=?';
+		$.getJSON(url2, function (data) {
+			 var item = data.entities["{{ q2 }}"];
+			 if ('en' in item.labels) {
+				 $("#h1").append(' - '+item.labels.en.value);
+			 }
+			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
+		});
+	{% endif %}
+
+    var curation = document.getElementById("curation-link");
+
+    if (currentURL[3] == "curation") {
+      curation.innerText = "Back"
+      curation.href = "/" + currentAspect + "/{{ q }}";
+    } else {
+      curation.href = "/" + currentAspect + "/{{ q }}/curation";
     }
+    curation.classList.remove("d-none");
 
      // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
@@ -500,7 +515,8 @@ sparqlToShortInchiKey(`# tool: scholia
         aspectDropdown.id = id;
         aspectDropdown.classList = 'btn btn-outline-secondary';
 
-        // Only show aspects which have a valid curation page
+        // only show aspects which have a curation page with author-disambig or wikidata links
+        var validCurationPages = ["author", "award", "organization", "topic", "venue"]
         if (currentURL[3] == "curation") {
           data.results.bindings = data.results.bindings.filter(elem => {
             return validCurationPages.indexOf(elem.aspect.value) != -1
