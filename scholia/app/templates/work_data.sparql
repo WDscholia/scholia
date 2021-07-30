@@ -172,7 +172,7 @@ WHERE {
   {
     SELECT (COUNT(DISTINCT ?citationStatement) AS ?value) ?order ?description ?valueUrl WHERE {
       VALUES ?work { wd:{{ q }} }
-      VALUES ?intention { wd:Q107687829 }
+      VALUES ?intention { wd:Q107687829 wd:Q107710355 }
       ?work ^ps:P2860 ?citationStatement . ?citationStatement pq:P3712 ?intention .
       BIND(17 AS ?order)
       BIND("Disagreed with by" AS ?description)
