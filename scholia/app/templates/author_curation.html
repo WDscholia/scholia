@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "q_curation.html" %}
 
 {% set aspect = "author-curation" %}
 
@@ -20,13 +20,7 @@
 {% endblock %}
 
 
-
-{% block page_content %}
-
-<h1 id="h1">Author</h1>
-
-Missing information with respect to the author.
-
+{% block author_disambiguator %}
 
 <h2 id="missing-author-resolving-header">Author name strings to be resolved</h2>
 
@@ -55,11 +49,16 @@ the authors.
 
 <table class="table table-hover" id="missing-citing-author-items-table"></table>
 
+{% endblock %}
 
-<h2 id="missing-topic-header">Authored works with missing topics</h2>
+
+{% block wikidata %}
+
+<p>For example, here are authored works by {{q}} that do not have topics. You can improve the data by clicking the link
+  on the right, scrolling to "+ add statement" and adding a "main subject" if you know it:</p>
 
 <table class="table table-hover" id="missing-topic-table"></table>
 
-
+<hr>
 
 {% endblock %}

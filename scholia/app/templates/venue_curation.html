@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "q_curation.html" %}
 
 
 {% set aspect = "venue-curation" %}
@@ -15,8 +15,7 @@
 {% endblock %}
 
 
-{% block page_content %}
-<h1 id="h1">Venue</h1>
+{% block author_disambiguator %}
 
 <h2 id="missing-author-item-header">Missing author item</h2>
 
@@ -26,12 +25,14 @@ Follow the link to use the Author disambiguator tool to try to create links betw
 
 <table class="table table-hover" id="missing-author-item-table"></table>
 
-<h2 id="missing-topics-header">Missing topics</h2>
+{% endblock %}
 
-The following highly cited articles have few or no "main subject" statements.
+{% block wikidata %}
+
+<p>For example, here are authored works by {{q}} that have few or no main topics. You can improve the data by clicking the link
+  on the right and adding a "main subject" statement if you know it:</p>
 
 <table class="table table-hover" id="missing-topics-table"></table>
 
-
+<hr>
 {% endblock %}
-    

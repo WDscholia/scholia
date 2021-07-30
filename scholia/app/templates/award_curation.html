@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "q_curation.html" %}
 
 {% set aspect = "award-curation" %}
 
@@ -10,13 +10,7 @@
 
 {% endblock %}
 
-{% block page_content %}
-
-<h1 id="h1">Award</h1>
-
-Missing information with respect to the award.
-
-
+{% block author_disambiguator %}
 
   <h2 id="missing-author-items-header">Missing author items</h2>
 
@@ -37,12 +31,16 @@ the authors.
 
 <table class="table table-hover" id="missing-coauthor-items-table"></table>
 
-  <h2 id="missing-topics-header">Missing topics</h2>
+{% endblock %}
 
-The works listed below do not currently have statements about their main subjects.
+
+{% block wikidata %}
+
+<p>For example, here are authored works by {{q}} that do not have topics. You can improve the data by clicking the link
+  on the right, scrolling to "+ add statement" and adding a "main subject" if you know it:</p>
 
 <table class="table table-hover" id="missing-topics-table"></table>
 
-
+<hr>
 
 {% endblock %}
