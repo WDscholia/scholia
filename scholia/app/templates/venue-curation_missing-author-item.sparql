@@ -1,0 +1,27 @@
+SELECT
+  # Number of works with the author
+  ?count
+
+  # The author as a string, - rather than as an item
+  ?author
+
+  # Build URL to the Author disambiguator tool
+  (CONCAT(
+      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?author)) AS ?resolver_url)
+WITH {
+  SELECT (COUNT(?work) as ?count) ?author WHERE {
+    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P2093 ?author .
+  }
+  GROUP BY ?author
+
+  ORDER BY DESC(?count)
+  
+  # Limit the number of result as the query may time out
+  LIMIT 1000
+} AS %result
+WHERE {
+  INCLUDE %result
+}
+ORDER BY DESC(?count)

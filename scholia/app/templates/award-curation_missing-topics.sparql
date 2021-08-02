@@ -1,0 +1,32 @@
+SELECT
+?citations  ?work ?workLabel (?work AS ?wikidata_url)
+WITH {
+  SELECT (COUNT(?author) as ?count) ?work WHERE {
+  # Works by author
+    ?work wdt:P50 ?author .
+  # Author who received an award
+    ?author wdt:P166 wd:{{ q }} .
+  # Work does not have a main subject statement
+    FILTER NOT EXISTS { ?work wdt:P921 ?topic . }
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?count)
+  LIMIT 2000
+} AS %works
+WITH {
+  SELECT (COUNT(?work1) as ?citations) ?work WHERE {
+  INCLUDE %works
+  # Works cited
+    OPTIONAL { ?work1 wdt:P2860 ?work }.
+  }
+  GROUP BY ?work
+  ORDER BY DESC(?citations)
+  LIMIT 200
+} AS %result
+WHERE {
+  INCLUDE %result
+  
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?citations)

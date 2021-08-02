@@ -1,0 +1,25 @@
+SELECT 
+  (COUNT(?work) AS ?count) 
+  ?author_name 
+  (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", 
+          ENCODE_FOR_URI(?author_name)) AS ?author_resolver_url) 
+WHERE {
+  {
+    SELECT DISTINCT ?author_name WHERE {
+      {
+        { wd:{{ q }} skos:altLabel ?author_name_. }
+        UNION
+        { wd:{{ q }} rdfs:label ?author_name_. }
+        BIND(STR(?author_name_) AS ?author_name)
+      }
+      UNION
+      {
+        ?author_statement ps:P50 wd:{{ q }};
+          pq:P1932 ?author_name.
+      }
+    }
+  }
+  OPTIONAL { ?work wdt:P2093 ?author_name. }
+}
+GROUP BY ?author_name
+ORDER BY DESC (?count)
