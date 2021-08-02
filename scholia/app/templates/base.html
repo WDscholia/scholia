@@ -561,11 +561,11 @@ sparqlToShortInchiKey(`# tool: scholia
 			type="button" data-toggle="dropdown">Work
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_work_empty') }}">Work</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_venue_empty') }}">Venue</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_series_empty') }}">Series</a></li>
-                    <li role="presentation"><a href="{{ url_for('app.show_catalogue_empty') }}">Catalogue</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_work_index') }}">Work</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_venue_index') }}">Venue</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_series_index') }}">Series</a></li>
+                    <li role="presentation"><a href="{{ url_for('app.show_catalogue_index') }}">Catalogue</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_publisher_index') }}">Publisher</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_printer_index') }}">Printer</a></li>
 		</ul>
 	    </div>
@@ -576,10 +576,10 @@ sparqlToShortInchiKey(`# tool: scholia
 			type="button" data-toggle="dropdown">Organization
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_organization_empty') }}">Organization</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_organization_index') }}">Organization</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_publisher_index') }}">Publisher</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_printer_index') }}">Printer</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_sponsor_index') }}">Sponsor</a></li>
 		</ul>
 	    </div>
 	</li>
@@ -589,8 +589,8 @@ sparqlToShortInchiKey(`# tool: scholia
 			type="button" data-toggle="dropdown">Location
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_location_empty') }}">Location</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_country_empty') }}">Country</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_location_index') }}">Location</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_country_index') }}">Country</a></li>
 		</ul>
 	    </div>
 	</li>
@@ -600,8 +600,8 @@ sparqlToShortInchiKey(`# tool: scholia
 			type="button" data-toggle="dropdown">Event
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_event_empty') }}">Event</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_event_series_empty') }}">Event series</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_event_index') }}">Event</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_event_series_index') }}">Event series</a></li>
 		</ul>
 	    </div>
 	</li>
@@ -612,28 +612,28 @@ sparqlToShortInchiKey(`# tool: scholia
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ url_for('app.show_clinical_trial_index') }}">Clinical trial</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_project_empty') }}">Project</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_project_index') }}">Project</a></li>
 		</ul>
 	    </div>
 	</li>
-	<li role="presentation"><a href="{{ url_for('app.show_award_empty') }}">Award</a></li>
+	<li role="presentation"><a href="{{ url_for('app.show_award_index') }}">Award</a></li>
 	<li role="presentation">
 	    <div class="dropdown">
 		<button class="btn btn-link dropdown-toggle" 
 			type="button" data-toggle="dropdown">Topic
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_topic_empty') }}">General</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_disease_empty') }}">Disease</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_taxon_empty') }}">Taxon</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_gene_empty') }}">Gene</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_protein_empty') }}">Protein</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_pathway_empty') }}">Pathway</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_topic_index') }}">General</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_disease_index') }}">Disease</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_taxon_index') }}">Taxon</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_gene_index') }}">Gene</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_protein_index') }}">Protein</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_pathway_index') }}">Pathway</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_chemical_index') }}">Chemical</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_chemical_element_empty') }}">Chemical element</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_chemical_class_empty') }}">Chemical class</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_lexeme_empty') }}">Lexeme</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_use_empty') }}">Use</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_chemical_element_index') }}">Chemical element</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_chemical_class_index') }}">Chemical class</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_lexeme_index') }}">Lexeme</a></li>
+		    <li role="presentation"><a href="{{ url_for('app.show_use_index') }}">Use</a></li>
 		</ul>
 	    </div>
 	</li>
