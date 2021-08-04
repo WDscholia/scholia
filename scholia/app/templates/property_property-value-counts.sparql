@@ -1,0 +1,15 @@
+#defaultView:BubbleChart
+SELECT ?count ?o ?oLabel 
+WITH {
+  SELECT (COUNT(?s) AS ?count) ?o WHERE {
+    ?s wdt:{{ p }} ?o .
+  }
+  GROUP BY ?o
+  ORDER BY DESC(?count)
+  LIMIT 100
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language  "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
+}
+ORDER BY DESC(?count)

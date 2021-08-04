@@ -1,0 +1,29 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT
+  ?count
+  ?work ?workLabel
+WITH {
+  # Count citations
+  SELECT
+    (COUNT(?citing_work) AS ?count)
+    ?work
+    (SAMPLE(?citing_work) AS ?example_citing_work)
+    (COUNT(DISTINCT ?topic) AS ?topics)
+  WHERE {
+    ?work wdt:P921 target: .
+    OPTIONAL { ?work wdt:P921 ?topic . FILTER (?topic != target: )}
+    OPTIONAL { ?citing_work wdt:P2860 ?work. }
+  }
+  GROUP BY ?work
+  HAVING (?topics < 1)
+  ORDER BY DESC(?count)
+  LIMIT 100
+} AS %result
+WHERE {
+  # Label results
+  INCLUDE %result
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+ORDER BY DESC(?count) ?topics

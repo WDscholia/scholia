@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 
+{% set aspect = "pathway-index" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('statistics') }}
+
+{% endblock %}
+
+
 {% block page_content %}
 
 <h1>Biological pathways</h1>
@@ -53,60 +62,10 @@
 </div>
 
 <div class="container">
-  <h2>Statistics</h2>
+  <h2 id="statistics-header">Statistics</h2>
 
-  <table class="table table-hover" id="statistics"></table>
+  <table class="table table-hover" id="statistics-table"></table>
 
 </div>
 
-{% endblock %}
-
-
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
-
- statisticsSparql = `
-SELECT ?count ?description
-WITH {
-  SELECT (COUNT(DISTINCT ?article) AS ?count) WHERE {
-    VALUES ?database { wdt:P2410 wdt:P3937 }
-    [] ?database [] ; wdt:P2860 ?article .
-  }
-} AS %literature
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2410 []. }
-} AS %wikipathways
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3937 []. }
-} AS %reactome
-WHERE {
-  {
-    INCLUDE %wikipathways
-    BIND("Total number of WikiPathways pathways" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %literature
-    BIND("Total number of articles cited by pathways" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %reactome
-    BIND("Total number of Reactome pathways" AS ?description)
-  }
-}
-ORDER BY DESC(?count)
-`
-
- $(document).ready(function() {
-     sparqlToDataTable(statisticsSparql, "#statistics");
- });
-
-</script>
-
-
-{% endblock %}
-
-  
+{% endblock %}  

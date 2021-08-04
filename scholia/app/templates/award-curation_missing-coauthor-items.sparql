@@ -1,0 +1,26 @@
+SELECT
+  # Number of works with the coauthor
+  ?count
+
+  # The coauthor as a string, - rather than as an item
+  ?coauthor
+
+  # Build URL to the Author disambiguator tool
+  (CONCAT(
+      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?coauthor)) AS ?resolver_url)
+WITH {
+  SELECT (COUNT(?work) as ?count) ?coauthor WHERE {
+    ?work wdt:P50 ?author .
+	  ?author wdt:P166 wd:{{ q }} .
+    ?work wdt:P2093 ?coauthor .
+  }
+  GROUP BY ?coauthor
+  LIMIT 2000
+} AS %result
+WHERE {
+  INCLUDE %result
+  # Label the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)

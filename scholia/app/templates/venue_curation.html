@@ -1,102 +1,36 @@
 {% extends "base.html" %}
 
 
-{% block scripts %}
-{{super()}}
+{% set aspect = "venue-curation" %}
 
-<script type="text/javascript">
- missingAuthorItemSparql = `
-SELECT
-  # Number of works with the author
-  ?count
+{% block in_ready %}
 
-  # The author as a string, - rather than as an item
-  ?author
-
-  # Build URL to the Author disambiguator tool
-  (CONCAT(
-      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
-      ENCODE_FOR_URI(?author)) AS ?resolver_url)
-WITH {
-  SELECT (COUNT(?work) as ?count) ?author WHERE {
-    ?work wdt:P1433 wd:{{ q }} .
-    ?work wdt:P2093 ?author .
-  }
-  GROUP BY ?author
-
-  ORDER BY DESC(?count)
-  
-  # Limit the number of result as the query may time out
-  LIMIT 1000
-} AS %result
-WHERE {
-  INCLUDE %result
-}
-ORDER BY DESC(?count)
-`
-
- missingTopicsSparql = `
-SELECT
-  ?count
-  ?work ?workLabel
-  ?topics
-WITH {
-  # Count citations
-  SELECT
-    (COUNT(?citing_work) AS ?count)
-    ?work
-    (SAMPLE(?citing_work) AS ?example_citing_work)
-    (COUNT(DISTINCT ?topic) AS ?topics)
-  WHERE {
-    ?work wdt:P1433 wd:{{ q }} .
-    OPTIONAL { ?work wdt:P921 ?topic }
-    OPTIONAL { ?citing_work wdt:P2860 ?work. }
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?count)
-  LIMIT 1000  
-} AS %result
-WHERE {
-  # Label results
-  INCLUDE %result
-  FILTER (?topics < 2)
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
-}
-ORDER BY DESC(?count) ?topics
-`
-
-  $(document).ready(function() {
-      sparqlToDataTable(missingAuthorItemSparql, "#missing-author-item");
-      sparqlToDataTable(missingTopicsSparql, "#missing-topics", {
-	         linkPrefixes: {
-	             work: "../../work/",
-  	       }
-      });
-  });
-</script>
-
+{{ sparql_to_table('missing-author-item') }}
+{{ sparql_to_table('missing-topics',
+    options={
+      "linkPrefixes": {
+        "work": "../../work/",
+      }})}}
 
 {% endblock %}
-
 
 
 {% block page_content %}
 <h1 id="h1">Venue</h1>
 
-<h2>Missing author item</h2>
+<h2 id="missing-author-item-header">Missing author item</h2>
 
 If there are any author names listed below, it means that these name strings have not been matched to Wikidata items for at least some of the works published in the venue.
 
 Follow the link to use the Author disambiguator tool to try to create links between the work items and the respective author items.
 
-<table class="table table-hover" id="missing-author-item"></table>
+<table class="table table-hover" id="missing-author-item-table"></table>
 
-<h2>Missing topics</h2>
+<h2 id="missing-topics-header">Missing topics</h2>
 
 The following highly cited articles have few or no "main subject" statements.
 
-<table class="table table-hover" id="missing-topics"></table>
+<table class="table table-hover" id="missing-topics-table"></table>
 
 
 {% endblock %}

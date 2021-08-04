@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% set aspect = "chemical-index" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('statistics') }}
+
+{% endblock %}
+
 {% block page_content %}
 
 <h1>Chemical substances</h1>
@@ -97,74 +105,11 @@ Chemical substances.
 </div>
 
 <div class="container">
-  <h2>Statistics</h2>
+  <h2 id="statistics-header">Statistics</h2>
 
-  <table class="table table-hover" id="statistics"></table>
+  <table class="table table-hover" id="statistics-table"></table>
 
 </div>
-
-{% endblock %}
-
-
-
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
-
- statisticsSparql = `
-
-
-SELECT ?count ?description
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2102 []. }
-} AS %boilingpoints
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2101 []. }
-} AS %meltingpoints
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P1117 []. }
-} AS %pkas
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P231 []. }
-} AS %cas
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P235 []. }
-} AS %inchikeys
-WHERE {
-  {
-    INCLUDE %meltingpoints
-    BIND("Total number of chemicals with a melting point" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %boilingpoints
-    BIND("Total number of chemicals with a boiling point" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %pkas
-    BIND("Total number of chemicals with a pKa" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %cas
-    BIND("Total number of CAS registry numbers" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %inchikeys
-    BIND("Total number of InChIKeys" AS ?description)
-  }
-}
-ORDER BY DESC(?count)
-`
-
- $(document).ready(function() {
-     sparqlToDataTable(statisticsSparql, "#statistics");
- });
-
-</script>
 
 {% endblock %}
 

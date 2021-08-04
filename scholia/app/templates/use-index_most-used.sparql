@@ -1,0 +1,22 @@
+SELECT ?count ?use ?useLabel ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
+WITH {
+  SELECT
+    (COUNT(DISTINCT ?work) AS ?count)
+    ?use
+    (SAMPLE(?described_by) AS ?described_by_example)
+    (SAMPLE(?work) AS ?example_use)
+  WHERE {
+    ?work wdt:P2283 | wdt:P4510 ?use . 
+    ?use wdt:P31/wdt:P279* wd:Q7397 . 
+    # Restricting to work takes too long time :(    
+    # ?work wdt:P31/wdt:P279* wd:Q386724 .
+    OPTIONAL { ?use wdt:P1343 ?described_by . }
+  }
+  GROUP BY ?use
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?count)
+LIMIT 500
