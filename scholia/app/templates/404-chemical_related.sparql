@@ -1,0 +1,12 @@
+SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WITH {
+  SELECT ?mol ?InChIKey WHERE {
+    ?mol wdt:P235 ?InChIKey .
+    FILTER (regex(str(?InChIKey), "^_shortkey_"))
+  }
+} AS %MOLS {
+  INCLUDE %MOLS
+  OPTIONAL { ?mol wdt:P231 ?CAS }
+  OPTIONAL { ?mol wdt:P661 ?ChemSpider }
+  OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}

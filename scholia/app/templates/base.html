@@ -25,11 +25,44 @@ sparqlToIframe(`# tool: scholia
 "#{{ panel }}-iframe", "{{ aspect }}_{{ panel }}.sparql");
 {%- endmacro %}
 
+{% macro sparql_to_matrix(panel) -%}
+// {{ panel }} matrix
+sparqlToMatrix(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}`,
+"#{{ panel }}", "{{ aspect }}_{{ panel }}.sparql");
+{%- endmacro %}
+
+{% macro sparql_to_pathway_viewer(panel) -%}
+// {{ panel }} optional viewer
+sparqlToPathWayPageViewer(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}`,
+"{{ aspect }}_{{ panel }}.sparql" );
+{%- endmacro %}
+
+{% macro sparql_to_404shortinchikey(panel) -%}
+// {{ panel }} short_inchikey
+sparqlToShortInchiKey(`# tool: scholia
+{% include aspect + '_' + panel + '.sparql' %}`,
+"{{inchikey}}",
+"#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql" );
+{%- endmacro %}
+
+
+{% block metas %}
+<meta charset="UTF-8">
+<meta name="robots" content="index, nofollow">
+
+<meta name="og:url" content="{{ 'https://scholia.toolforge.org' + request.path }}" />
+<meta name="og:site_name" content="Scholia" />
+<meta name="og:image" content="{{ url_for('static', filename='images/scholia_social_media.png') }}" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@WDScholia" />
+{% endblock metas %}
+
 
 {% block head %}
 {{super()}}
-
-<meta name="robots" content="index, nofollow">
 
 <link rel="canonical" href="{{ 'https://scholia.toolforge.org' + request.path }}">
 
@@ -45,14 +78,15 @@ sparqlToIframe(`# tool: scholia
 {% block scripts %}
 {{super()}}
 
+<script type="text/javascript" src="{{ url_for('static', filename='d3.v5.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='d3-scale-chromatic.v1.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='scholia.js') }}"></script>
 <link href="{{ url_for('static', filename='widgets/select2/css/select2.min.css') }}" rel="stylesheet" />
 <script type="text/javascript" src="{{ url_for('static', filename='widgets/select2/js/select2.min.js')}}"></script>
 
 <script type="text/javascript">
- if ("{{ q }}" != "") {
-
+    {% if q %}
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
@@ -63,7 +97,21 @@ sparqlToIframe(`# tool: scholia
 	     $("#h1").text(item.labels.en.value);
 	 }
 	 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
-	 
+
+    {% if q2 %}
+
+    var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+               '{{ q2 }}' +
+               '&format=json&callback=?';
+    $.getJSON(url2, function (data) {
+         var item = data.entities["{{ q2 }}"];
+         if ('en' in item.labels) {
+             $("#h1").append(' - '+item.labels.en.value);
+         }
+         $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
+    });
+    {% endif %}
+
 	 var detailsList = Array();
 	 try {
 	     var orcid = item.claims.P496[0].mainsnak.datavalue.value;
@@ -253,19 +301,19 @@ sparqlToIframe(`# tool: scholia
 	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {
 	     var title = item.sitelinks.enwiki.title;
-	     var wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?' +
-				   'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
-				   'explaintext=1&callback=?&format=json&titles=' +
+	     var wikipediaApiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' +
 				   encodeURIComponent(title);
 	     var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
-	     
-	     $.getJSON(wikipediaApiUrl, function(data) {
-		 var pages = data.query.pages;
-		 var text = pages[Object.keys(pages)[0]].extract + " ... "
-		 var html = "(from the <a href=\"" + wikipediaUrl + "\">English Wikipedia</a>)";
-		 $("#intro").text(text).append(html);
-	     }).fail(function(d, textStatus, error) {
-		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+
+	     var headers = new Headers({"Api-User-Agent": "https://github.com/WDscholia/scholia"});
+
+	     fetch(wikipediaApiUrl, {method: 'GET', headers: headers})
+	     .then(response => response.json())
+	     .then(data => {
+	       var html = " (<a href=\"" + wikipediaUrl + "\">Read more on English Wikipedia</a>)";
+		 $("#intro").text(data.extract).append(html);
+	     }).catch(error => {
+		 console.error('Error:', error);
 	     });
 	 }
 
@@ -296,19 +344,19 @@ sparqlToIframe(`# tool: scholia
 
      });
 
-	if ("{{ q2 }}" != "") {
-			
+	{% if q2 %}
+
 		var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-				   '{{ q2 }}' + 
+				   '{{ q2 }}' +
 				   '&format=json&callback=?';
 		$.getJSON(url2, function (data) {
 			 var item = data.entities["{{ q2 }}"];
 			 if ('en' in item.labels) {
 				 $("#h1").append(' - '+item.labels.en.value);
 			 }
-			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');	
+			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
 		});
-	}
+	{% endif %}
 	
      // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
@@ -433,13 +481,17 @@ sparqlToIframe(`# tool: scholia
 	     $( '#wembedder' ).append( '<hr>' );
 	 }
      });
- }
+  {% endif %}
 
  $(document).ready(function () {
      let search_text = ""
      $('#searchterm').select2({
          allowClear: true,
+         {% if request.path.endswith("search") %}
+         placeholder: "Scientist, paper, topic, DOI, etc.",
+         {% else %}
          placeholder: "Search...",
+         {% endif %}
          ajax: {
              url: "https://www.wikidata.org/w/api.php?callback=?",
              dataType: 'jsonp',
@@ -658,13 +710,15 @@ sparqlToIframe(`# tool: scholia
 {% endblock %}
 
 {% block content %}
+<div class="content">
 <div class="container">
     <span id="aspect-chooser"></span>
 </div>
 <div class="container">
     {% block page_content %}{% endblock %}
 </div>
-<div class="container">
+</div>
+<div class="container footer">
     <hr>
     Data from <a href="https://www.wikidata.org">Wikidata</a> and
     <a href="https://en.wikipedia.org">English Wikipedia</a>

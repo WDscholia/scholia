@@ -1,92 +1,15 @@
 {% extends "base.html" %}
 
+{% set aspect = "works" %}
 
-{% block scripts %}
-{{super()}}
+{% block in_ready %}
+ 
+{{ sparql_to_table('list-of-works') }}
+{{ sparql_to_table('authors') }}
+{{ sparql_to_table('citing-works') }}
 
-<script type="text/javascript">
- listOfWorksSparql = `
-SELECT ?work ?workLabel ?example_author ?example_authorLabel
-WITH {
-  SELECT ?work (SAMPLE(?author) AS ?example_author) WHERE {
-    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    OPTIONAL { ?work wdt:P50 ?author }
-  }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-`
-
- authorsSparql = `
-SELECT
-  ?count
-  ?author ?authorLabel
-  ?example_work ?example_workLabel
-WITH {
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?author
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    ?work wdt:P50 ?author .
-  }
-  GROUP BY ?author
-  ORDER BY DESC(?count)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-  }
-ORDER BY DESC(?count)
-`
-
-
- citingWorksSparql = `
-SELECT
-  ?count
-  (MIN(?dates) AS ?date)
-  ?citing_work ?citing_workLabel
-WITH {
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?citing_work 
-  WHERE {
-    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    ?citing_work wdt:P2860 ?work .
-  }
-  GROUP BY ?citing_work
-  ORDER BY DESC(?count)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  OPTIONAL {
-    ?citing_work wdt:P577 ?datetimes .
-    BIND(xsd:date(?datetimes) AS ?dates)
-  }
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-  }
-GROUP BY ?count ?citing_work ?citing_workLabel
-ORDER BY DESC(?count) DESC(?date)
-`
-
- $(document).ready(function() {
-     sparqlToDataTable(listOfWorksSparql, "#list-of-works");
-     sparqlToDataTable(authorsSparql, "#authors");
-     sparqlToDataTable(citingWorksSparql,
-		       "#citing-works");
- });
-
-
-</script>
+{{ sparql_to_iframe('citations-per-year') }}
+{{ sparql_to_iframe('topics') }}
 
 {% endblock %}
 
@@ -99,33 +22,32 @@ ORDER BY DESC(?count) DESC(?date)
 <div id="intro"></div>
 
 
-<table class="table table-hover" id="list-of-works"></table>
+<table class="table table-hover" id="list-of-works-table"></table>
 
 
-<h2>Authors</h2>
+<h2 id="authors-header">Authors</h2>
 
-<table class="table table-hover" id="authors"></table>
+<table class="table table-hover" id="authors-table"></table>
 
 
-<h2>Topics</h2>
+<h2 id="topics-header">Topics</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%0A%20%20%3Fcount%0A%20%20%3Ftopic%20%3FtopicLabel%0AWITH%20%7B%0A%20%20SELECT%0A%20%20%20%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%0A%20%20%20%20%3Ftopic%20%0A%20%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Fwork%20%7B%20%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%20%7D%0A%20%20%20%20%3Fwork%20wdt%3AP921%20%3Ftopic%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Ftopic%0A%20%20ORDER%20BY%20%3Fcount%20%20%0A%20%20LIMIT%20200%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%20%20%7D%0AORDER%20BY%20DESC%28%3Fcount%29"></iframe>
+    <iframe class="embed-responsive-item" id="topics-iframe"></iframe>
 </div>
 
 
 <h2 id="Citations">Citations</h2>
 
-<h3>Citing works</h3>
+<h3 id="citing-works-header">Citing works</h3>
 
-<table class="table table-hover" id="citing-works"></table>
+<table class="table table-hover" id="citing-works-table"></table>
 
 
-<h3>Citations per year</h3>
+<h3 id="citations-per-year-header">Citations per year</h3>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%3Fyear%20%3Fnumber_of_citations%20%3Fwork%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%28COUNT%28DISTINCT%20%3Fciting_work%29%20AS%20%3Fnumber_of_citations%29%20%3Fwork1%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Fwork1%20%7B%20%20%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%20%20%7D%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork1%20.%0A%0A%20%20%20%20%23%20Year%20of%20citation%20%0A%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear%20%3Fwork1%0A%7D%20AS%20%25counts%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%3Fnumber_of_citations%20%3Fwork1%20%28SAMPLE%28%3Fwork1Labels%29%20AS%20%3Fwork1Label%29%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25counts%0A%20%20%20%20%3Fwork1%20rdfs%3Alabel%20%3Fwork1Labels%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear%20%3Fnumber_of_citations%20%3Fwork1%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20BIND%28CONCAT%28%3Fwork1Label%2C%20%22%20%28%22%2C%20SUBSTR%28STR%28%3Fwork1%29%2C%2032%29%2C%20%22%29%22%29%20AS%20%3Fwork%29%20%0A%7D%0A" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%3Fyear%20%3Fnumber_of_citations%20%3Fwork%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%28COUNT%28%3Fciting_work%29%20AS%20%3Fnumber_of_citations%29%20%3Fwork1%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Fwork1%20%7B%20%20%20%20%7D%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork1%20.%0A%0A%20%20%20%20%23%20Year%20of%20citation%20%0A%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fdate%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fdate%29%29%20AS%20%3Fyear%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear%20%3Fwork1%0A%7D%20AS%20%25counts%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%3Fnumber_of_citations%20%3Fwork1%20%3Fwork1Label%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25counts%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%2Cda%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear%20%3Fnumber_of_citations%20%3Fwork1%20%3Fwork1Label%0A%7D%20AS%20%25results%0AWHERE%20%7B%0A%20%20INCLUDE%20%25results%0A%20%20%3Fwork1%20rdfs%3Alabel%20%3Fwork1Label%20.%20%20%23%20Dummy%20line%20to%20get%20%3Fwork1Label%20evaluated%0A%20%20BIND%28CONCAT%28%3Fwork1Label%2C%20%22%20%28%22%2C%20SUBSTR%28STR%28%3Fwork1%29%2C%2032%29%2C%20%22%29%22%29%20AS%20%3Fwork%29%20%0A%7D%0A"></iframe>
+    <iframe class="embed-responsive-item" id="citations-per-year-iframe" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
 </div>
-
 
 {% endblock %}

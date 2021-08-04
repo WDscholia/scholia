@@ -1,39 +1,14 @@
 {% extends "base.html" %}
 
+{% set aspect = "venues" %}
 
-{% block scripts %}
-{{super()}}
+{% block in_ready %}
 
-<script type="text/javascript">
+{{ sparql_to_table("list-of-venues") }}
 
-  listOfVenuesSparql = `
-SELECT ?venue ?venueLabel ?publisher ?publisherLabel ?number_of_works ?number_of_citations
-WITH {
-  SELECT ?venue (COUNT(DISTINCT ?work) AS ?number_of_works) (COUNT(?citing_work) AS ?number_of_citations)
-  WHERE {
-    VALUES ?venue {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
-    OPTIONAL {
-      ?work wdt:P1433 ?venue .
-      OPTIONAL { ?citing_work wdt:P2860 ?work }
-    }
-  } 
-  GROUP BY ?venue
-} AS %result
-WHERE {
-  INCLUDE %result
-  OPTIONAL { ?venue wdt:P123 ?publisher }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-ORDER BY ?venueLabel
-`
-
-
-$(document).ready(function() {
-    sparqlToDataTable(listOfVenuesSparql, "#list-of-venues");
-});
-
-
-</script>
+{{ sparql_to_iframe('published-works-per-year') }}
+{{ sparql_to_iframe('citations-per-year') }}
+{{ sparql_to_iframe('citations-to-work-ratio') }}
 
 {% endblock %}
 
@@ -45,28 +20,28 @@ $(document).ready(function() {
 <div id="intro"></div>
 
 
-<table class="table table-hover" id="list-of-venues"></table>
+<table class="table table-hover" id="list-of-venues-table"></table>
 
 
 
-<h2 id="Published works per year">Published works per year</h2>
+<h2 id="published-works-per-year-header">Published works per year</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%3Fyear%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fvenue%20%3FvenueLabel%20WHERE%20%7B%0A%20%20VALUES%20%3Fvenue%20%7B%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%7D%0A%20%20%3Fwork%20wdt%3AP1433%20%3Fvenue%20.%0A%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_datetime%20.%20%0A%20%20BIND%28STR%28YEAR%28%3Fpublication_datetime%29%29%20AS%20%3Fyear%29%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22.%20%7D%0A%7D%0AGROUP%20BY%20%3Fyear%20%3Fvenue%20%3FvenueLabel%0AORDER%20BY%20%3Fyear%0A%0A"></iframe>
+    <iframe class="embed-responsive-item" id="published-works-per-year-iframe"></iframe>
 </div>
 
 
-<h2 id="Citations per year">Citations per year</h2>
+<h2 id="citations-per-year-header">Citations per year</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%3Fyear%20%3Fcount%20%3Fvenue%20%3FvenueLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%28COUNT%28%3Fwork%29%20AS%20%3Fcount%29%20%3Fvenue%20%0A%20%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Fvenue%20%7B%20%20%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%20%20%7D%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20%3Fvenue%20.%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fpublication_datetime%20.%0A%20%20BIND%28STR%28YEAR%28%3Fpublication_datetime%29%29%20AS%20%3Fyear%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear%20%3Fvenue%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22.%20%7D%0A%7D%0AORDER%20BY%20%3Fyear%0A%0A"></iframe>
+    <iframe class="embed-responsive-item" id="citations-per-year-iframe"></iframe>
 </div>
 
 
-<h2 id="Citations to work ratio">Citations to work ratio</h2>
+<h2 id="citations-to-work-ratio-header">Citations to work ratio</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%3Fyear%20%28%3Fcitation_count%20%2F%20%3Fwork_count%20AS%20%3Fcitations_to_works_ratio%29%20%3Fvenue%20%3FvenueLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%3Fwork%20%3Fvenue%0A%20%20WHERE%20%7B%0A%20%20%20%20VALUES%20%3Fvenue%20%7B%20%20%20%20{% for q in qs %} wd:{{ q }} {% endfor %}%20%20%20%20%7D%0A%20%20%20%20%3Fwork%20wdt%3AP1433%20%3Fvenue%20.%0A%20%20%7D%0A%7D%20AS%20%25works%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%28COUNT%28%3Fwork%29%20AS%20%3Fwork_count%29%20%3Fvenue%20%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fwork%20wdt%3AP577%20%3Fpublication_datetime%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fpublication_datetime%29%29%20AS%20%3Fyear%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear%20%3Fvenue%0A%7D%20AS%20%25work_counts%0AWITH%20%7B%0A%20%20SELECT%20%3Fyear%20%28COUNT%28%3Fwork%29%20AS%20%3Fcitation_count%29%20%3Fvenue%20%0A%20%20WHERE%20%7B%0A%20%20%20%20INCLUDE%20%25works%0A%20%20%20%20%3Fciting_work%20wdt%3AP2860%20%3Fwork%20.%0A%20%20%20%20%3Fciting_work%20wdt%3AP577%20%3Fpublication_datetime%20.%0A%20%20%20%20BIND%28STR%28YEAR%28%3Fpublication_datetime%29%29%20AS%20%3Fyear%29%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fyear%20%3Fvenue%0A%7D%20AS%20%25citation_counts%0AWHERE%20%7B%0A%20%20INCLUDE%20%25work_counts%0A%20%20INCLUDE%20%25citation_counts%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%2Cda%2Ces%2Cfr%2Cnl%2Cno%2Cru%2Csv%2Czh%22.%20%7D%0A%7D%0AORDER%20BY%20%3Fyear%0A%0A"></iframe>
+    <iframe class="embed-responsive-item" id="citations-to-work-ratio-iframe"></iframe>
 </div>
 
 

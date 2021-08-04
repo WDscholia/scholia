@@ -1,44 +1,12 @@
 {% extends "base.html" %}
 
+{% set aspect = "software-index" %}
 
-{% block scripts %}
-{{super()}}
+{% block in_ready %}
 
-<script type="text/javascript">
-    mostUsedSoftwareSparql = `
-SELECT ?count ?software ?softwareLabel ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
-WITH {
-  SELECT
-    (COUNT(DISTINCT ?work) AS ?count)
-    ?software
-    (SAMPLE(?described_by) AS ?described_by_example)
-    (SAMPLE(?work) AS ?example_use)
-  WHERE {
-    ?work wdt:P2283 ?software . 
-    ?software wdt:P31/wdt:P279* wd:Q7397 . 
-    # Restricting to work takes too long time :(    
-    # ?work wdt:P31/wdt:P279* wd:Q386724 .
-    OPTIONAL { ?software wdt:P1343 ?described_by . }
-  }
-  GROUP BY ?software
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-ORDER BY DESC(?count)
-LIMIT 500    
-`
-
-
- $(document).ready(function() {
-     sparqlToDataTable(mostUsedSoftwareSparql, "#most-used-software");
- });
-</script>
+{{ sparql_to_table('most-used-software') }}
 
 {% endblock %}
-
-
 
 {% block page_content %}
 
@@ -58,9 +26,9 @@ LIMIT 500
 
 <h2>Overview</h2>
 
-<h3 id="most used software">Most used software</h3>
+<h3 id="most-used-software-header">Most used software</h3>
 
-<table class="table table-hover" id="most-used-software"></table>
+<table class="table table-hover" id="most-used-software-table"></table>
 
 
 {% endblock %}
