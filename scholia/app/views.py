@@ -2148,6 +2148,7 @@ def show_aspect_missing(aspect, q):
 
     """
     try:
-        return render_template(f'{aspect}_curation.html', q=q)
+        return render_template('{aspect}_curation.html'.format(aspect=aspect),
+                               q=q)
     except TemplateNotFound:
         return render_template("404.html")

@@ -45,6 +45,10 @@ h2 {
     margin-top: 0.7em;
 }
 
+h3 {
+    font-size: 1.65rem;
+}
+
 .dropdown-menu li {
     margin: 0.5em;
 }
@@ -54,7 +58,7 @@ h2 {
 }
 
 .navbar {
-    align-items: start;
+    height: 4rem;
     flex-wrap: nowrap;
     justify-content: flex-start;
 }
@@ -62,10 +66,7 @@ h2 {
 .nav {
     align-items: center;
     flex-wrap: wrap;
-}
-
-.nav> :first-child {
-    font-weight: bold;
+    margin: 0 0.5rem;
 }
 
 .nav li {
@@ -79,19 +80,4 @@ h2 {
 
 .nav-search {
     max-width: 250px;
-}
-
-.nav-search #searchresult {
-    height: 0;
-    width: 100%;
-    z-index: 1;
-}
-
-.nav-search #searchresult div {
-    background: white;
-    width: 100%;
-}
-
-h3 {
-    font-size: 1.65rem;
 }

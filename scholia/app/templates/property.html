@@ -1,28 +1,18 @@
 {% extends "base.html" %}
 
+{% set aspect = "property" %}
 
-{% block scripts %}
-{{super()}}
+{% block in_ready %}
 
-<script type="text/javascript">
- useSparql = `
-SELECT ?item ?itemLabel ?property_value ?property_valueLabel WHERE {
-  ?item wdt:{{ p }} ?property_value .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
-}
-LIMIT 500
- `;
+{{ sparql_to_table('use',
+    options={
+    "linkPrefixes": {
+       "item": "./",
+	     "property_value": "./",
+     }})}}
 
- $(document).ready(function() {
-     sparqlToDataTable(useSparql, "#use", {
-	 linkPrefixes: {
-	     item: "./",
-	     property_value: "./",
-	 }
-	     
-     });
- });
-</script>
+{{ sparql_to_iframe('item-counts') }}
+{{ sparql_to_iframe('property-value-counts') }}
 
 {% endblock %}
 
@@ -30,22 +20,22 @@ LIMIT 500
 
 <h1>Property: {{ p }}</h1>
 
-<h2>Use</h2>
+<h2 id="use-header">Use</h2>
 
-<table class="table table-hover" id="use"></table>
+<table class="table table-hover" id="use-table"></table>
 
 
-<h2>Item counts</h2>
+<h2 id="item-counts-header">Item counts</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fs%20%3FsLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fo%29%20AS%20%3Fcount%29%20%3Fs%20WHERE%20%7B%0A%20%20%20%20%3Fs%20wdt%3A{{ p }}%20%3Fo%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fs%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%20100%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+  <iframe class="embed-responsive-item" id="item-counts-iframe"></iframe>
 </div>
     
 
-<h2>Property value counts</h2>
+<h2 id="property-value-counts-header">Property value counts</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" src="https://query.wikidata.org/embed.html#%23defaultView%3ABubbleChart%0ASELECT%20%3Fcount%20%3Fo%20%3FoLabel%20%0AWITH%20%7B%0A%20%20SELECT%20%28COUNT%28%3Fs%29%20AS%20%3Fcount%29%20%3Fo%20WHERE%20%7B%0A%20%20%20%20%3Fs%20wdt%3A{{ p }}%20%3Fo%20.%0A%20%20%7D%0A%20%20GROUP%20BY%20%3Fo%0A%20%20ORDER%20BY%20DESC%28%3Fcount%29%0A%20%20LIMIT%20100%0A%7D%20AS%20%25result%0AWHERE%20%7B%0A%20%20INCLUDE%20%25result%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%20%22en%2Cda%2Cde%2Ces%2Cfr%2Cjp%2Cnl%2Cno%2Cru%2Csv%2Czh%22%20.%20%7D%0A%7D%0AORDER%20BY%20DESC%28%3Fcount%29%0A"></iframe>
+  <iframe class="embed-responsive-item" id="property-value-counts-iframe"></iframe>
 </div>
 
 

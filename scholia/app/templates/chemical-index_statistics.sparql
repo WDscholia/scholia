@@ -1,0 +1,43 @@
+SELECT ?count ?description
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2102 []. }
+} AS %boilingpoints
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2101 []. }
+} AS %meltingpoints
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P1117 []. }
+} AS %pkas
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P231 []. }
+} AS %cas
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P235 []. }
+} AS %inchikeys
+WHERE {
+  {
+    INCLUDE %meltingpoints
+    BIND("Total number of chemicals with a melting point" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %boilingpoints
+    BIND("Total number of chemicals with a boiling point" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %pkas
+    BIND("Total number of chemicals with a pKa" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %cas
+    BIND("Total number of CAS registry numbers" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %inchikeys
+    BIND("Total number of InChIKeys" AS ?description)
+  }
+}
+ORDER BY DESC(?count)
