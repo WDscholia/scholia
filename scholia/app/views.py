@@ -1748,7 +1748,7 @@ def show_work_cito_intention(q, q2):
         Rendered HTML.
 
     """
-    return render_template('work_cito_intention.html', q=q, q2=q2)
+    return render_template('work-cito-intention.html', q=q, q2=q2)
 
 
 @main.route('/work/' + q_pattern + '/export')
