@@ -163,7 +163,7 @@ def show_biorxiv(biorxiv_id):
 
     """
     qs = biorxiv_to_qs(biorxiv_id)
-    return _render_work_qs(qs)
+    return _render_work_qs(qs, "bioRxiv")
 
 
 @main.route('/chemrxiv/<chemrxiv_id>')
@@ -182,7 +182,7 @@ def show_chemrxiv(chemrxiv_id):
 
     """
     qs = chemrxiv_to_qs(chemrxiv_id)
-    return _render_work_qs(qs)
+    return _render_work_qs(qs, "ChemRxiv")
 
 
 @main.route('/arxiv/<arxiv>')
@@ -205,14 +205,14 @@ def show_arxiv(arxiv):
 
     """
     qs = arxiv_to_qs(arxiv)
-    return _render_work_qs(qs)
+    return _render_work_qs(qs, "arXiv")
 
 
-def _render_work_qs(qs):
+def _render_work_qs(qs, name):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_work', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find(name + " ID"))
 
 
 @main.route('/arxiv-to-quickstatements')
@@ -416,7 +416,7 @@ def redirect_cas(cas):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("CAS registry number"))
 
 
 @main.route('/lipidmaps/<lmid>')
@@ -436,7 +436,7 @@ def redirect_lipidmaps(lmid):
             return redirect(url_for('app.show_chemical_class', q=q), code=302)
         else:
             return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("LIPID MAPS identifier"))
 
 
 @main.route('/atomic-symbol/<symbol>')
@@ -453,7 +453,7 @@ def redirect_atomic_symbol(symbol):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical_element', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("atomic symbol"))
 
 
 @main.route('/atomic-number/<atomic_number>')
@@ -470,7 +470,7 @@ def redirect_atomic_number(atomic_number):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical_element', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("atomic number"))
 
 
 @main.route('/cordis/<cordis>')
@@ -487,7 +487,7 @@ def redirect_cordis(cordis):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_project', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("EU CORDIS project ID"))
 
 
 @main.route('/catalogue/' + q_pattern)
@@ -790,7 +790,7 @@ def redirect_ncbi_gene(gene):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_gene', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("NCBI gene ID"))
 
 
 @main.route('/uniprot/<protein>')
@@ -807,7 +807,7 @@ def redirect_uniprot(protein):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_protein', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("UniProt ID"))
 
 
 @main.route('/github/<github>')
@@ -824,7 +824,7 @@ def redirect_github(github):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_author', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("GitHub username"))
 
 
 @main.route('/inchikey/<inchikey>')
@@ -858,7 +858,7 @@ def redirect_issn(issn):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_venue', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("ISSN serial ID"))
 
 
 @main.route('/lexeme/')
@@ -959,7 +959,7 @@ def redirect_mesh(meshid):
         class_ = q_to_class(q)
         method = 'app.show_' + class_
         return redirect(url_for(method, q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("MeSH ID"))
 
 
 @main.route('/orcid/<orcid>')
@@ -976,7 +976,7 @@ def redirect_orcid(orcid):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_author', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("ORCID iD"))
 
 
 @main.route('/pubchem/<cid>')
@@ -993,7 +993,7 @@ def redirect_pubchem(cid):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("compound identifier"))
 
 
 @main.route('/pubmed/<pmid>')
@@ -1007,7 +1007,7 @@ def redirect_pubmed(pmid):
 
     """
     qs = pubmed_to_qs(pmid)
-    return _render_work_qs(qs)
+    return _render_work_qs(qs, "PubMed")
 
 
 @main.route('/ncbi-taxon/<taxon>')
@@ -1024,7 +1024,7 @@ def redirect_ncbi_taxon(taxon):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_taxon', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("NCBI taxon ID"))
 
 
 @main.route('/wikipathways/<wpid>')
@@ -1041,7 +1041,7 @@ def redirect_wikipathways(wpid):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_pathway', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("WikiPathways ID"))
 
 
 @main.route('/ror/<rorid>')
@@ -1058,7 +1058,7 @@ def redirect_ror(rorid):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_organization', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("ROR ID"))
 
 
 @main.route('/viaf/<viaf>')
@@ -1075,7 +1075,7 @@ def redirect_viaf(viaf):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_author', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("VIAF ID"))
 
 
 @main.route('/organization/' + q_pattern)
@@ -1674,7 +1674,7 @@ def redirect_twitter(twitter):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.redirect_q', q=q), code=302)
-    return render_template('404.html')
+    return render_template('404.html', error=could_not_find("Twitter username"))
 
 
 @main.route('/venue/' + q_pattern)
@@ -2150,8 +2150,12 @@ def show_aspect_missing(aspect, q):
     try:
         return render_template(f'{aspect}_curation.html', q=q)
     except TemplateNotFound:
-        return render_template("404.html")
+        return render_template("404.html", error="No curation page defined for " +  aspect)
 
 
 def page_not_found(e):
-    return render_template("404.html"), 404
+    return render_template("404.html", error=""), 404
+
+
+def could_not_find(name):
+    return "Could not convert " + name + " into Q number."
