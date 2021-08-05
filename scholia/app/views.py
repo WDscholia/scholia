@@ -2,8 +2,8 @@
 
 import re
 
-from flask import (Blueprint, current_app, jsonify, redirect, render_template, request,
-                   Response, url_for)
+from flask import (Blueprint, current_app, jsonify, redirect, render_template,
+                   request, Response, url_for)
 from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
 
@@ -147,12 +147,13 @@ def bioschemas_for(q):
     entity_class = q_to_class(q)
 
     # get the aspect specific bits
+    bsProfile = "https://bioschemas.org/profiles/"
     if entity_class == "author":
         data = {
             "@type": "Person",
             "http://purl.org/dc/terms/conformsTo": {
                 "@type": "CreativeWork",
-                "@id": "https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/",
+                "@id": bsProfile + "Person/0.2-DRAFT-2019_07_19/",
             },
             "description": "A person",
         }
@@ -161,7 +162,7 @@ def bioschemas_for(q):
             "@type": "ChemicalSubstance",
             "http://purl.org/dc/terms/conformsTo": {
                 "@type": "CreativeWork",
-                "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE/",
+                "@id": bsProfile + "ChemicalSubstance/0.4-RELEASE/",
             },
         }
     elif entity_class == "taxon":
@@ -169,7 +170,7 @@ def bioschemas_for(q):
             "@type": "Taxon",
             "http://purl.org/dc/terms/conformsTo": {
                 "@type": "CreativeWork",
-                "@id": "https://bioschemas.org/profiles/Taxon/0.6-RELEASE/",
+                "@id": bsProfile + "Taxon/0.6-RELEASE/",
             },
         }
         taxon_name = property_for_q(q, "P225")
@@ -186,10 +187,11 @@ def bioschemas_for(q):
             "@type": "MolecularEntity",
             "http://purl.org/dc/terms/conformsTo": {
                 "@type": "CreativeWork",
-                "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE/",
+                "@id": bsProfile + "MolecularEntity/0.5-RELEASE/",
             },
         }
         inchi_key = property_for_q(q, "P235")
+        inchi = property_for_q(q, "P234")
         if inchi_key:
             data['inChIKey'] = inchi_key
         if inchi:
@@ -209,7 +211,7 @@ def bioschemas_for(q):
             "@type": "Protein",
             "http://purl.org/dc/terms/conformsTo": {
                 "@type": "CreativeWork",
-                "@id": "https://bioschemas.org/profiles/Protein/0.11-RELEASE/",
+                "@id": bsProfile + "Protein/0.11-RELEASE/",
             }
         }
         uniprot = property_for_q(q, "P352")
@@ -219,7 +221,8 @@ def bioschemas_for(q):
         data = {
             "@type": "Gene",
             "http://purl.org/dc/terms/conformsTo": {
-                "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Gene/0.7-RELEASE/",
+                "@type": "CreativeWork",
+                "@id": bsProfile + "Gene/0.7-RELEASE/",
             },
         }
         same_genes = []
@@ -1673,7 +1676,6 @@ def show_substance(q):
         Rendered HTML.
 
     """
-    entities = wb_get_entities([q])
     return render_template('chemical.html', q=q)
 
 
