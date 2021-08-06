@@ -1,0 +1,1 @@
+.. include:: ../ISSUE_TEMPLATE.md

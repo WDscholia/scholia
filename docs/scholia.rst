@@ -1,5 +1,5 @@
-scholia package
-===============
+Scholia packages
+================
 
 Submodules
 ----------
