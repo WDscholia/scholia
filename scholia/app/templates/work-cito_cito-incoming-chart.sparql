@@ -1,0 +1,10 @@
+#defaultView:BubbleChart
+SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
+  VALUES ?CITEDARTICLE { wd:{{q}} }
+  ?citingArticle p:P2860 ?citationStatement .
+  ?citationStatement pq:P3712 ?intention ;
+                     ps:P2860 ?CITEDARTICLE .
+  ?intention wdt:P31 wd:Q96471816 .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?intention ?intentionLabel
+  ORDER BY DESC(?count)

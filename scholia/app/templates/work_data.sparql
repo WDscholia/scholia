@@ -141,7 +141,7 @@ WHERE {
   UNION
   {
     BIND(13 AS ?order)
-    BIND("Retracted" AS ?description)
+    BIND("🛑 Retracted" AS ?description)
     { ?work wdt:P31 wd:Q45182324 . }
     UNION
     { ?work wdt:P793 wd:Q7316896 . }
@@ -149,7 +149,7 @@ WHERE {
   UNION
   {
     BIND(14 AS ?order)
-    BIND("Retracted by" AS ?description)
+    BIND("🛑 Retracted by" AS ?description)
     ?work wdt:P5824 ?iri .
     BIND(SUBSTR(STR(?iri), 32) AS ?q) 
     ?iri rdfs:label ?value_string . 

@@ -1,0 +1,17 @@
+cff-version: 1.1.0
+message: Please cite the following works when using this software.
+authors:
+  - family-names: Nielsen
+    given-names: Finn Årup
+  - family-names: Mietchen
+    given-names: Daniel
+  - family-names: Willighagen
+    given-names: Egon
+doi: 10.1007/978-3-319-70407-4_36
+identifiers:
+  - type: doi
+    value: 10.1007/978-3-319-70407-4_36
+  - type: url
+    value: http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/7010/pdf/imm7010.pdf
+title: Scholia, Scientometrics and Wikidata
+url: http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/7010/pdf/imm7010.pdf

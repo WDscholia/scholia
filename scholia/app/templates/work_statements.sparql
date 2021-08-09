@@ -1,6 +1,6 @@
 #defaultView:Table
 # Statements referencing this article
-SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel 
+SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel ?unit ?unitLabel
 WITH {
   SELECT ?statement WHERE { 
 	  ?statement prov:wasDerivedFrom/pr:P248 wd:{{ q }} .
@@ -8,13 +8,16 @@ WITH {
   LIMIT 2000
 } AS %statements 
 WITH {
-  SELECT distinct ?item ?property ?value
+  SELECT distinct ?item ?property ?value ?unit
   WHERE {
     INCLUDE %statements
     ?item ?p ?statement .
     ?property wikibase:claim ?p . 
     ?statement ?a ?value .
     ?item ?b ?value . 
+    OPTIONAL {?statement ?psv_statement_predicate ?psv_statement .
+    ?statement_predicate_property wikibase:statementValue ?psv_statement_predicate.
+    ?psv_statement wikibase:quantityUnit ?unit}
   }
 } AS %result
 WHERE {

@@ -1,32 +1,12 @@
 {% extends "base.html" %}
 
-{% block scripts %}
-{{super()}}
 
-<script type="text/javascript">
+{% set aspect = "404-chemical" %}
 
- shortkey = "{{ inchikey }}".substring(0,14)
 
- relatedChemicalsSparql = `
-SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WITH {
-  SELECT ?mol ?InChIKey WHERE {
-    ?mol wdt:P235 ?InChIKey .
-    FILTER (regex(str(?InChIKey), "^` + shortkey + `"))
-  }
-} AS %MOLS {
-  INCLUDE %MOLS
-  OPTIONAL { ?mol wdt:P231 ?CAS }
-  OPTIONAL { ?mol wdt:P661 ?ChemSpider }
-  OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-}
-`
+{% block in_ready %}
 
- $(document).ready(function() {
-     sparqlToDataTable(relatedChemicalsSparql, "#related");
- });
-
-</script>
+{{ sparql_to_404shortinchikey('related') }}
 
 {% endblock %}
 
@@ -34,6 +14,6 @@ SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WITH {
 
 There was no chemical found with InChIKey={{ inchikey }}. Maybe these related compounds are of interest (may take some time):
 
-<table class="table table-hover" id="related"></table>
+<table class="table table-hover" id="related-table"></table>
 
 {% endblock %}
