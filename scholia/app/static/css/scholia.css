@@ -105,5 +105,51 @@ h3 {
 
 .table-of-contents {
     margin: 1rem;
+}
 
+.loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader div {
+    display: inline-block;
+    box-sizing: border-box;
+    height: 40px;
+    width: 40px;
+    margin: 0 0.5rem;
+    border-width: 11px;
+    border-style: solid;
+    border-color: #09af8a;
+    animation-name: scholia;
+    animation-duration: 3s;
+    animation-timing-function: ease;
+    animation-iteration-count: infinite;
+}
+
+.loader div:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.loader div:nth-child(2) {
+    animation-delay: 1s;
+}
+
+.loader div:nth-child(3) {
+    animation-delay: 2s;
+}
+
+@keyframes scholia {
+    33% {
+        border-color: #de3030;
+    }
+
+    66% {
+        border-color: #506aa7;
+    }
+
+    99% {
+        border-color: #09af8a;
+    }
 }

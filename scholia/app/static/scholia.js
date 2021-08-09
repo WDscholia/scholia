@@ -200,6 +200,8 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
     var url = "https://query.wikidata.org/sparql?query=" +
         encodeURIComponent(sparql) + '&format=json';
 
+    $(element).html("<div class='loader'><div></div><div></div><div></div></div>")
+
     $.getJSON(url, function (response) {
         var simpleData = sparqlDataToSimpleData(response);
 
@@ -229,6 +231,8 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
         if (convertedData.data.length <= 10) {
             paging = false;
         }
+
+        $(element).html("");
 
         var table = $(element).DataTable({ 
             data: convertedData.data,
