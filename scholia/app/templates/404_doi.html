@@ -10,10 +10,9 @@ try {
   let example = new c.Cite([ '{{ doi }}' ])
   let output = example.format('quickstatements')
   $( '#qs' ).append( output );
-  output = encodeURI(
+  output = encodeURIComponent(
     output.replaceAll('\t', '|')
           .replaceAll('\n', '||'))
-          .replaceAll('/','%2F')
   htmlOutput = "<a href=\"https://quickstatements.toolforge.org/#/v1=" + output + "\">\n" +
                "  <button class=\"btn btn-primary\">Submit to QuickStatements ↗</button>\n" +
                "</a>\n"

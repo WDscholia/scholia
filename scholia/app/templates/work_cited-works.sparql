@@ -2,7 +2,7 @@
 # List of works that is cited by the specified work
 SELECT ?citations ?publication_date ?cited_work ?cited_workLabel 
 WITH {
-  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_cited_work) AS ?citations) ?cited_work 
+  SELECT (MIN(?date) AS ?publication_date) (COUNT(DISTINCT ?citing_cited_work) AS ?citations) ?cited_work 
   WHERE {
     wd:{{ q }} wdt:P2860 ?cited_work . 
     OPTIONAL {

@@ -1,0 +1,19 @@
+#defaultView:BarChart
+SELECT ?year (COUNT(?work) AS ?number_of_works) ?useLabel
+WITH{
+  SELECT
+    (MIN(?year_) AS ?year) ?work ?use
+  WHERE {
+    ?work (wdt:P2283 | wdt:P4510) ?use .
+    ?use wdt:P279* wd:{{ q }} .
+    ?work wdt:P577 ?publication_datetime .
+    BIND(STR(YEAR(?publication_datetime)) AS ?year_)
+  }
+  GROUP BY ?work ?use
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
+}
+GROUP BY ?year ?useLabel
+ORDER BY ?year

@@ -1,5 +1,20 @@
 {% extends "base.html" %}
 
+{% set aspect = "work-index" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('recently-retracted-works',
+    options={
+    "linkPrefixes": {
+        "retracted_work": "../work/",
+        "retraction": "../work/",
+      }})}}
+
+{% endblock %}
+
+
+
 {% block page_content %}
 
 <h1>Work</h1>
@@ -88,56 +103,11 @@ Scientific articles, conference articles, books, ...
 
 <div class="container">
 
-    <h2>Recently retracted works</h2>
+    <h2 id="recently-retracted-works-header">Recently retracted works</h2>
 
-    <table class="table table-hover" id="recently-retracted-works"></table>
+    <table class="table table-hover" id="recently-retracted-works-table"></table>
     
 </div>    
-
-
-
-{% endblock %}
-
-{% block scripts %}
-{{super()}}
-
-<script type="text/javascript">
-  recentlyRetractedWorksSparql = `
-SELECT DISTINCT
-  ?retracted_work ?retracted_workLabel
-  ?date
-  ?retraction ?retractionLabel
-WITH {
-  # Find retracted papers indicated by instance of retracted paper, 
-  # by retraction notice property or by significant event
-  SELECT DISTINCT ?retracted_work WHERE {
-    { ?retracted_work wdt:P31 wd:Q45182324 }
-    UNION
-    { ?retracted_work wdt:P5824 [] }
-    UNION
-    { ?retracted_work wdt:P793 wd:Q45203135 }
-  }
-} AS %retracted_works
-WHERE {
-  INCLUDE %retracted_works
-  OPTIONAL {
-    ?retracted_work wdt:P5824 ?retraction .
-    ?retraction wdt:P577 ?retraction_datetime
-  }
-  OPTIONAL {
-    ?retracted_work p:P793 [ ps:P793 wd:Q45203135 ; pq:P585 ?keyevent_datetime ]
-  }
-  BIND(COALESCE(xsd:date(COALESCE(?retraction_datetime, ?keyevent_datetime)), "Unknown date") AS ?date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-ORDER BY DESC(?date)`
-
- $(document).ready(function() {
-     sparqlToDataTable(recentlyRetractedWorksSparql, "#recently-retracted-works");
- });
-
-</script>
-
 
 {% endblock %}
 

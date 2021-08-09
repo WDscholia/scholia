@@ -1,0 +1,9 @@
+SELECT ?wpid ?organism ?organismLabel ?pathwayDescription
+WHERE {
+  VALUES ?pathway { wd:{{q}} }
+  OPTIONAL {
+    wd:{{ q }} wdt:P2410 ?wpid ;
+    wdt:P703 ?organism .
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}

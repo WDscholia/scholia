@@ -3,7 +3,7 @@ SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
 WITH {
   SELECT
-    (COUNT(?work) AS ?count) ?topic1 ?topic2
+    (COUNT(DISTINCT ?work) AS ?count) ?topic1 ?topic2
   WHERE {
     # Find works that are marked with main subject of the topic.
     ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:{{ q }} .

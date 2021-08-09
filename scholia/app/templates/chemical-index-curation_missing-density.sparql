@@ -1,0 +1,13 @@
+SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
+  SELECT ?wikis ?compound WHERE {
+    ?compound wdt:P31 wd:Q11173 ;
+              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+    FILTER(?wikis >= 40)
+    FILTER(NOT EXISTS {?compound wdt:P2054 []})
+  } ORDER BY DESC(?wikis)
+  LIMIT 100
+} AS %CHEMICALS WHERE {
+  INCLUDE %CHEMICALS
+  OPTIONAL { ?compound wdt:P274 ?formula }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?wikis)
