@@ -494,14 +494,13 @@ function sparqlToShortInchiKey(sparql, key,  element, filename) {
     new_sparql = sparql.replace("_shortkey_",shortkey)
     sparqlToDataTable(new_sparql, element, filename);
 }
-};
 
 
-function workWithQ(q) {
+function workWithQ(q,urlstatic) {
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	        q  + 
 	       '&format=json&callback=?';
-     
+
     $.getJSON(url, function (data) {
 	 var item = data.entities[q];
 	 if ('en' in item.labels) {
@@ -512,14 +511,14 @@ function workWithQ(q) {
 	 var detailsList = Array();
 	 try {
 	     var orcid = item.claims.P496[0].mainsnak.datavalue.value;
-	     detailsList.push( '<a href="https://orcid.org/"><img alt="' +
-			       'ORCID logo" src="{{ url_for(\'static\', filename=\'images/orcid_16x16.gif\') }}"' +
-			       'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
+	     detailsList.push( '<a href="https://orcid.org/">' + 
+                   `<img alt="ORCID logo" src="${urlstatic}/images/orcid_16x16.gif" width="16" height="16" hspace="4" />` + 
+                   '</a> <a href="https://orcid.org/' +
 			       encodeURI( orcid ) + '">https://orcid.org/' + escapeHTML( orcid ) + '</a>');
 	 }
 	 catch(e) {}
 
-	 try {s
+	 try {
 	     var mastodonAccount = item.claims.P4033[0].mainsnak.datavalue.value;
 	     var mastodonComponents = mastodonAccount.split("@");
 	     if (mastodonComponents.length == 2) {
@@ -573,8 +572,8 @@ function workWithQ(q) {
 	          "@type" : "Person" ,
 	          "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/" },
 	          "description" : "A person" ,
-	          "identifier" : "{{ q }}" ,
-	          "mainEntityOfPage" : "http://www.wikidata.org/entity/{{ q }}"
+	          "identifier" : q ,
+	          "mainEntityOfPage" : "http://www.wikidata.org/entity/" +  q
 	       }
 	       if ('en' in item.labels) {
 	         bioschemasAnnotation.name = item.labels.en.value;
@@ -589,8 +588,8 @@ function workWithQ(q) {
 	          "@context" : "https://schema.org",
 	          "@type" : "ChemicalSubstance" ,
 	          "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE/" },
-	          "identifier" : "{{ q }}" ,
-	          "url" : "http://www.wikidata.org/entity/{{ q }}"
+	          "identifier" : q,
+	          "url" : "http://www.wikidata.org/entity/" +  q
 	       }
 	       if ('en' in item.labels) {
 	         bioschemasAnnotation.name = item.labels.en.value;
@@ -605,7 +604,7 @@ function workWithQ(q) {
 	             "@type" : "Taxon" ,
 	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Taxon/0.6-RELEASE/" },
 	             "name" : taxonName ,
-	             "url" : "http://www.wikidata.org/entity/{{ q }}"
+	             "url" : "http://www.wikidata.org/entity/" + q
 		 }
 		 if (item.claims.P105) {
 	             var taxonRank = item.claims.P105[0].mainsnak.datavalue.value.id;
@@ -625,9 +624,9 @@ function workWithQ(q) {
 	             "@context" : "https://schema.org",
 	             "@type" : "MolecularEntity" ,
 	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE/" },
-	             "identifier" : "{{ q }}" ,
+	             "identifier" : q,
 	             "inChIKey" : inchiKey ,
-	             "url" : "http://www.wikidata.org/entity/{{ q }}"
+	             "url" : "http://www.wikidata.org/entity/" + q
 		 }
 		 if ('en' in item.labels) {
 	         bioschemasAnnotation.name = item.labels.en.value;
@@ -657,8 +656,8 @@ function workWithQ(q) {
 	             "@context" : "https://schema.org",
 	             "@type" : "Protein" ,
 	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Protein/0.11-RELEASE/" },
-	             "identifier" : "{{ q }}" ,
-	             "url" : "http://www.wikidata.org/entity/{{ q }}" ,
+	             "identifier" : q ,
+	             "url" : "http://www.wikidata.org/entity/" + q ,
 	             "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
 		 }
 		 if ('en' in item.labels) {
@@ -673,8 +672,8 @@ function workWithQ(q) {
 	             "@context" : "https://schema.org",
 	             "@type" : "Gene" ,
 	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Gene/0.7-RELEASE/" },
-	             "identifier" : "{{ q }}" ,
-	             "url" : "http://www.wikidata.org/entity/{{ q }}"
+	             "identifier" : q ,
+	             "url" : "http://www.wikidata.org/entity/" + q 
 		 }
 		 if ('en' in item.labels) {
 	       bioschemasAnnotation.name = item.labels.en.value;
@@ -837,9 +836,11 @@ function wembedder(q) {
     
 }
 
-function searchTerm(placeholder) {
+function searchTerm(placeholder, urlfor) {
 
 	let search_text = ""
+    
+    
 	$('#searchterm').select2({
 		allowClear: true,
 		placeholder: placeholder,
@@ -862,7 +863,7 @@ function searchTerm(placeholder) {
 				var results = [{id: -1, text: "Advanced search"}];
 				$.each(data.search, function (index, item) {
 					results.push({
-						id: "{{ url_for('app.index') }}" + item.title,
+						id: urlfor + item.title,
 						text: item.label + " - " + item.description
 					});
 				});

@@ -95,7 +95,7 @@ quickStatement404DOI( "{{ doi }}" ,"#{{ element }}")
 
   {% if q %}
     
-	workWithQ("{{ q }}")
+	workWithQ("{{ q }}", urlstatic="{{ url_for('static',filename='') }}")
 
 	{% if q2 %}
 	  workWithQ2("{{ q2 }}")
@@ -119,7 +119,8 @@ quickStatement404DOI( "{{ doi }}" ,"#{{ element }}")
  $(document).ready(function () {
 	 searchTerm(placeholder=`{{ 
 		 "Scientist, paper, topic, DOI, etc." if request.path.endswith("search") else "Search ..."
-		}}`)
+		}}`,
+		urlfor="{{ url_for('app.index') }}")
     
 	// Add anchor links to all headings
 	var headers = document.querySelectorAll('h2[id], h3[id]')
