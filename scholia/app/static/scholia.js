@@ -150,6 +150,8 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var url = "https://query.wikidata.org/sparql";
 
+    $(element).html("<div class='loader'><div></div><div></div><div></div></div>");
+
     $.post(url, data = { query: sparql }, function (response, textStatus) {
         var simpleData = sparqlDataToSimpleData(response);
 
@@ -167,6 +169,8 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
         if (convertedData.data.length <= 10) {
           paging = false;
         }
+
+        $(element).html('');
 
         var table = $(element).DataTable({
             data: convertedData.data,
