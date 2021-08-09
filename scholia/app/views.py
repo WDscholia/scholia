@@ -2,8 +2,13 @@
 
 import re
 
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
 from flask import (Blueprint, current_app, redirect, render_template, request,
-                   Response, url_for)
+                   Response, url_for, g, abort,session)
 from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
 
@@ -55,8 +60,32 @@ def add_app_url_map_converter(self, func, name=None):
 
 
 Blueprint.add_app_url_map_converter = add_app_url_map_converter
-main = Blueprint('app', __name__)
+# main = Blueprint('app', __name__, url_prefix='/<lang_code>')
+main = Blueprint('app', __name__) 
 main.add_app_url_map_converter(RegexConverter, 'regex')
+
+@main.before_request
+def ensure_lang_support():
+    lang_code = g.get('lang_code')
+    session['lang_code'] = lang_code
+    if lang_code and lang_code not in current_app.config['SUPPORTED_LANGUAGES'].keys():
+        ''' fix for unsupported lang inserted '''
+        session['lang_code'] = '/en/'
+        g.lang_code = 'en'
+        # request_path = request.path.strip('/')
+        # request_path_parts = urlparse(request_path).path.split('/')
+        # s = '/'.join([g.lang_code, *request_path_parts])
+        # print(s)
+        # redirect(s, code=302)
+
+# @main.url_defaults
+# def add_language_code(endpoint, values):
+#     values.setdefault('lang_code', g.lang_code)
+
+# @main.url_value_preprocessor
+# def pull_lang_code(endpoint, values):
+#     g.lang_code = values.pop('lang_code')
+
 
 # Wikidata item identifier matcher
 l_pattern = r'<regex(r"L[1-9]\d*"):lexeme>'
