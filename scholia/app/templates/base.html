@@ -395,6 +395,10 @@ sparqlToShortInchiKey(`# tool: scholia
     UNION
     { wd:{{ q }} wdt:P644 [] . BIND("gene" AS ?aspect) }
     UNION
+    { wd:{{ q }} p:P31/ps:P31 wd:Q22325163 . BIND("complex" AS ?aspect) }
+    UNION
+    { wd:{{ q }} p:P31/ps:P31 wd:Q8054 . BIND("protein" AS ?aspect) }
+    UNION
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
     `;
@@ -402,10 +406,12 @@ sparqlToShortInchiKey(`# tool: scholia
 	 headers: { Accept: 'application/sparql-results+json' },
 	 data: { query: query }
      };
-     
+     console.log(query)
+
      $.ajax( endpointUrl, settings ).then( function ( data ) {
 	 data.results.bindings.forEach(function(entry) {
 	     var aspect = entry.aspect.value;
+	     console.log(aspect)
 	     $( '#aspect-chooser' ).append(
 		 `<a role="button"
 		     class="btn btn-outline-dark btn-sm"
