@@ -533,11 +533,18 @@ sparqlToShortInchiKey(`# tool: scholia
          }
      });
 
+     // Add anchor links to all headings
+     var headers = document.querySelectorAll('h2[id], h3[id]')
+     if (headers) {
+       headers.forEach(element => {
+         var title = element.innerText;
+         element.removeChild(element.childNodes[0])
+         element.insertAdjacentHTML('afterbegin', `<a href="#${element.id}" class="hlink"  ariaLabel="Anchor">${title}</a>`)
+       })
+     }
 
      {% block in_ready %}{% endblock %}
-     
  });
-
 
 </script>
 
