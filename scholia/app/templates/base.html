@@ -11,7 +11,7 @@ options={{ options | tojson }});
 
 {% macro sparql_to_table(panel, options={}) -%}
 // {{ panel }} table
-sparqlToDataTable2(`# tool: scholia
+sparqlToDataTable(`# tool: scholia
 {% include aspect + '_' + panel + '.sparql' %}
 `,
 "#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",

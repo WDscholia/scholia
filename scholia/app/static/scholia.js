@@ -107,6 +107,7 @@ function entityToLabel(entity, language = 'en') {
     return entity['id']
 }
 
+
 function resize(element) {
     //width = document.getElementById("topics-works-matrix").clientWidth;
     width = $(element)[0].clientWidth;
@@ -138,51 +139,6 @@ function sparqlDataToSimpleData(response) {
         convertedData.push(convertedRow);
     }
     return { data: convertedData, columns: columns };
-}
-
-
-function sparqlToDataTable(sparql, element, options = {}) {
-    // Options: linkPrefixes={}, linkSuffixes={}, paging=true
-    var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
-    var linkSuffixes = (typeof options.linkSuffixes === 'undefined') ? {} : options.linkSuffixes;
-    var paging = (typeof options.paging === 'undefined') ? true : options.paging;
-    var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
-    var url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=" +
-        encodeURIComponent(sparql) + '&format=json';
-
-    $.getJSON(url, function (response) {
-        var simpleData = sparqlDataToSimpleData(response);
-
-        convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes = linkPrefixes, linkSuffixes = linkSuffixes);
-        columns = [];
-        for (i = 0; i < convertedData.columns.length; i++) {
-            var column = {
-                data: convertedData.columns[i],
-                title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
-                defaultContent: "",
-            }
-            columns.push(column)
-        }
-
-    if (convertedData.data.length <= 10) {
-        paging = false;
-    }
-
-	table = $(element).DataTable({ 
-	    data: convertedData.data,
-	    columns: columns,
-	    lengthMenu: [[10, 25, 100, -1], [10, 25, 100, "All"]],
-	    ordering: true,
-	    order: [], 
-	    paging: paging,
-	    sDom: sDom,
-	});
-
-	$(element).append(
-	    '<caption><a href="https://query.wikidata.org/#' + 
-		encodeURIComponent(sparql) +	
-		'">Edit on query.Wikidata.org</a></caption>');
-    });
 }
 
 
@@ -235,9 +191,7 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
 };
 
 
-
-
-function sparqlToDataTable2(sparql, element, filename, options = {}) {
+function sparqlToDataTable(sparql, element, filename, options = {}) {
     // Options: linkPrefixes={}, paging=true
     var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
     var linkSuffixes = (typeof options.linkSuffixes === 'undefined') ? {} : options.linkSuffixes;
@@ -331,6 +285,7 @@ function sparqlToIframe(sparql, element, filename) {
         }
     })
 };
+
 
 function sparqlToMatrix(sparql, element, filename){
     
@@ -486,6 +441,7 @@ function sparqlToMatrix(sparql, element, filename){
 
 }
 
+
 function sparqlToPathWayPageViewer(sparql, filename){
 
     $(document).ready(function() {
@@ -532,10 +488,9 @@ function sparqlToPathWayPageViewer(sparql, filename){
 
 }
 
+
 function sparqlToShortInchiKey(sparql, key,  element, filename) {
-    
     shortkey = key.substring(0,14)
     new_sparql = sparql.replace("_shortkey_",shortkey)
-    sparqlToDataTable2(new_sparql, element, filename);
-
+    sparqlToDataTable(new_sparql, element, filename);
 }
