@@ -96,3 +96,29 @@ h3 {
 .full-width {
     width: 100%;
 }
+
+.hlink,
+.hlink:hover {
+    color: black;
+}
+
+.hlink:hover,
+.hlink:focus {
+    text-decoration: underline;
+}
+
+.hlink:hover::before,
+.hlink:focus::before {
+    content: "🔗";
+    position: relative;
+    font-size: 1rem;
+    float: left;
+    padding-right: 5px;
+    margin-left: -27px;
+    top: 0.5rem;
+}
+
+.table-of-contents {
+    margin: 1rem;
+
+}
