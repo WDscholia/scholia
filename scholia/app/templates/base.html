@@ -100,9 +100,9 @@ sparqlToShortInchiKey(`# tool: scholia
 	     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
 
 	     var linkedToFrom = "<p><a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=1&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
-	     linkedToFrom += "Recent changes to items that link <em>to</em> " + title + "</a> and ";
+	     linkedToFrom += "Recent changes to items that link <em>to</em> " + $('<div>').text(title).html() + "</a> and ";
 	     linkedToFrom += "<a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=0&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
-	     linkedToFrom += "recent changes to items that link <em>from</em> " + title + "</a>.</p>";
+	     linkedToFrom += "recent changes to items that link <em>from</em> " + $('<div>').text(title).html() + "</a>.</p>";
 
 	     $(linkedToFrom).insertAfter('h1:first');
 
