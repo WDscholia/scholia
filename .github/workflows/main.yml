@@ -28,3 +28,5 @@ jobs:
         run: tox -e flake8
       - name: Lint Code Base
         uses: github/super-linter@v4
+        env:
+          FILTER_REGEX_EXCLUDE: .*(\.github|docs|notebooks|scholia\app\static).*
