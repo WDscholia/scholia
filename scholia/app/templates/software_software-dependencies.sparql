@@ -14,12 +14,12 @@ WITH {
       UNION
       {
         # dependencies, programming language, developer
-        wd:{{ q }} ( wdt:P1547 | wdt:P277 | wdt:P178 )+ ?resource1 .
+        wd:{{ q }} ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 )+ ?resource1 .
         OPTIONAL { ?resource1 wdt:P18 ?image1_ }
       }
-      wd:{{ q }} ( wdt:P1547 | wdt:P277 | wdt:P178 )+ ?resource2 .
+      wd:{{ q }} ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 )+ ?resource2 .
       OPTIONAL { ?resource2 wdt:P18 ?image2_ }
-      ?resource1 ( wdt:P1547 | wdt:P277 | wdt:P178 ) ?resource2 .
+      ?resource1 ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 ) ?resource2 .
     }
     GROUP BY ?resource1 ?resource2 ?rgb
 } AS %result
