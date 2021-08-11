@@ -23,7 +23,7 @@ def escape_string(string):
     'String with \\" in it'
 
     """
-    return string.replace('\\', '\\\\').replace('"', '\\"')
+    return string.replace("\\", "\\\\").replace('"', '\\"')
 
 
 class Work(dict):
@@ -62,41 +62,41 @@ class Work(dict):
         """
         qs = u("CREATE\n")
 
-        title = escape_string(self['title'])
+        title = escape_string(self["title"])
         qs += u('LAST\tLen\t"{}"\n').format(title)
 
         # Instance of scientific article
-        qs += 'LAST\tP31\tQ13442814\n'
+        qs += "LAST\tP31\tQ13442814\n"
 
         # Title
-        if 'title' in self:
+        if "title" in self:
             qs += u('LAST\tP1476\ten:"{}"\n').format(title)
 
         # Authors
-        for n, author in enumerate(self.get('authors', []), start=1):
+        for n, author in enumerate(self.get("authors", []), start=1):
             qs += u('LAST\tP2093\t"{}"\tP1545\t"{}"\n').format(author, n)
 
         # Published in
-        if 'year' in self:
-            qs += 'LAST\t577\t+{}-01-01T00:00:00Z/9\n'.format(self['year'])
+        if "year" in self:
+            qs += "LAST\t577\t+{}-01-01T00:00:00Z/9\n".format(self["year"])
 
         # Language
-        if 'language_q' in self:
-            qs += 'LAST\tP407\t{}\n'.format(self['language_q'])
+        if "language_q" in self:
+            qs += "LAST\tP407\t{}\n".format(self["language_q"])
 
         # Homepage
-        if 'homepage' in self:
-            qs += 'LAST\tP856\t"{}"\n'.format(self['homepage'])
-        elif 'url' in self:
-            qs += 'LAST\tP856\t"{}"\n'.format(self['url'])
+        if "homepage" in self:
+            qs += 'LAST\tP856\t"{}"\n'.format(self["homepage"])
+        elif "url" in self:
+            qs += 'LAST\tP856\t"{}"\n'.format(self["url"])
 
         # Fulltext URL
-        if 'full_text_url' in self:
-            qs += 'LAST\tP953\t"{}"\n'.format(self['full_text_url'])
+        if "full_text_url" in self:
+            qs += 'LAST\tP953\t"{}"\n'.format(self["full_text_url"])
 
         # Published in
-        if 'published_in_q' in self:
-            qs += 'LAST\tP1433\t{}\n'.format(self['published_in_q'])
+        if "published_in_q" in self:
+            qs += "LAST\tP1433\t{}\n".format(self["published_in_q"])
 
         return qs
 
@@ -106,5 +106,5 @@ def main():
     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -5,8 +5,9 @@ import json
 from six import text_type, u
 
 from scholia.tex import (
-    entity_to_bibtex_entry, escape_to_tex,
-    extract_dois_from_aux_string
+    entity_to_bibtex_entry,
+    escape_to_tex,
+    extract_dois_from_aux_string,
 )
 
 
@@ -955,7 +956,7 @@ def test_escape_to_tex():
     text = escape_to_tex(None)
     assert isinstance(text, text_type)
 
-    text = escape_to_tex(u(''))
+    text = escape_to_tex(u(""))
     assert isinstance(text, text_type)
 
 
@@ -963,7 +964,7 @@ def test_extract_dois_from_aux_string():
     """Test extract_dois_from_aux_string."""
     string = r"\citation{10.1186/S13321-016-0161-3}"
     dois = extract_dois_from_aux_string(string)
-    assert dois == ['10.1186/S13321-016-0161-3']
+    assert dois == ["10.1186/S13321-016-0161-3"]
 
 
 def test_entity_to_bibtex_entry():

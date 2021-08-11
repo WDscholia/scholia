@@ -36,10 +36,11 @@ def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
     Bootstrap(app)
 
     # Serve assets from wmflabs for privacy reasons
-    app.extensions['bootstrap']['cdns']['jquery'] = StaticCDN()
-    app.extensions['bootstrap']['cdns']['bootstrap'] = StaticCDN()
+    app.extensions["bootstrap"]["cdns"]["jquery"] = StaticCDN()
+    app.extensions["bootstrap"]["cdns"]["bootstrap"] = StaticCDN()
 
     from .views import main as main_blueprint
+
     app.register_blueprint(main_blueprint)
 
     app.text_to_topic_q_text_enabled = text_to_topic_q_text_enabled

@@ -50,14 +50,16 @@ from re import sub
 from six import u
 
 
-WORK_ITEM_RSS = u("""
+WORK_ITEM_RSS = u(
+    """
     <item>
       <title>{title}</title>
       <description>{description}</description>
       <link>{link}</link>
       <pubDate>{pub_date}</pubDate>
     </item>
-""")
+"""
+)
 
 
 AUTHOR_WORKS_SPARQL_QUERY = """
@@ -202,7 +204,7 @@ WHERE {{
 
 
 def _value(item, field):
-    return item[field]['value'] if field in item else ''
+    return item[field]["value"] if field in item else ""
 
 
 def entities_to_works_rss(entities):
@@ -223,11 +225,11 @@ def entities_to_works_rss(entities):
     Wikidata entities without a publication date are skipped.
 
     """
-    rss = u('')
+    rss = u("")
     for entity in entities:
-        qid = _value(entity, 'work')[31:]
-        url = 'https://scholia.toolforge.org/work/' + qid
-        date_value = _value(entity, 'date')
+        qid = _value(entity, "work")[31:]
+        url = "https://scholia.toolforge.org/work/" + qid
+        date_value = _value(entity, "date")
         if not date_value:
             # Skip items without a publication date
             continue
@@ -236,8 +238,8 @@ def entities_to_works_rss(entities):
         # Dirty hack to get around the problem with dates before 1900
         old_year = item_date.year
         if old_year < 1900:
-            datetime_string = _value(entity, 'date')
-            index = datetime_string.index('-')
+            datetime_string = _value(entity, "date")
+            index = datetime_string.index("-")
             datetime_string = "1900" + datetime_string[index:]
             item_date = parse_datetime(datetime_string)
 
@@ -250,15 +252,15 @@ def entities_to_works_rss(entities):
 
         # Continuing dirty hack with setting to old year
         if old_year < 1900:
-            publication_date = sub('1900', str(old_year),
-                                   publication_date)
+            publication_date = sub("1900", str(old_year), publication_date)
 
-        description = _value(entity, 'description')
+        description = _value(entity, "description")
         rss += WORK_ITEM_RSS.format(
-            title=escape(_value(entity, 'workLabel')),
+            title=escape(_value(entity, "workLabel")),
             description=escape(description),
             link=url,
-            pub_date=publication_date)
+            pub_date=publication_date,
+        )
     return rss
 
 
@@ -291,35 +293,38 @@ def wb_get_author_latest_works(q):
 
     """
     if not q:
-        return ''
+        return ""
 
     rss_body = u('<?xml version="1.0" encoding="UTF-8" ?>\n')
-    rss_body += '<rss version="2.0" ' + \
-                'xmlns:atom="http://www.w3.org/2005/Atom">\n'
-    rss_body += '  <channel>\n'
-    rss_body += '   <title>Scholia - Latest Articles by ' + q + '</title>\n'
-    rss_body += '   <description>The author''s most ' + \
-                'recent articles</description>\n'
-    rss_body += '   <link>https://scholia.toolforge.org/</link>\n'
-    rss_body += '   <atom:link ' + \
-                'href="https://scholia.toolforge.org/author/' \
-                + q + '/latest-works/rss" rel="self" ' + \
-                'type="application/rss+xml" />\n'
+    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    rss_body += "  <channel>\n"
+    rss_body += "   <title>Scholia - Latest Articles by " + q + "</title>\n"
+    rss_body += (
+        "   <description>The author" "s most " + "recent articles</description>\n"
+    )
+    rss_body += "   <link>https://scholia.toolforge.org/</link>\n"
+    rss_body += (
+        "   <atom:link "
+        + 'href="https://scholia.toolforge.org/author/'
+        + q
+        + '/latest-works/rss" rel="self" '
+        + 'type="application/rss+xml" />\n'
+    )
 
     query = AUTHOR_WORKS_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/sparql'
-    params = {'query': query, 'format': 'json'}
+    url = "https://query.wikidata.org/sparql"
+    params = {"query": query, "format": "json"}
     response = requests.get(url, params=params)
 
     if response.ok:
         data = response.json()
-        rss_body += entities_to_works_rss(data['results']['bindings'])
+        rss_body += entities_to_works_rss(data["results"]["bindings"])
     else:
         # If there are dates before BC then the SPARQL will fails
         pass
 
-    rss_body += '  </channel>\n'
-    rss_body += '</rss>'
+    rss_body += "  </channel>\n"
+    rss_body += "</rss>"
 
     return rss_body
 
@@ -339,32 +344,32 @@ def wb_get_venue_latest_works(q):
 
     """
     if not q:
-        return ''
+        return ""
 
     rss_body = '<?xml version="1.0" encoding="UTF-8" ?>\n'
-    rss_body += '<rss version="2.0" ' + \
-                'xmlns:atom="http://www.w3.org/2005/Atom">\n'
-    rss_body += '  <channel>\n'
-    rss_body += '    <title>Scholia - Latest articles published in ' + \
-                q + '</title>\n'
-    rss_body += "    <description>The venue's most " + \
-                "recent articles</description>\n"
-    rss_body += '    <link>https://scholia.toolforge.org/venue/</link>\n'
-    rss_body += '    <atom:link ' + \
-                'href="https://scholia.toolforge.org/venue/' + \
-                q + '/latest-works/rss" rel="self" ' + \
-                'type="application/rss+xml" />\n'
+    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    rss_body += "  <channel>\n"
+    rss_body += "    <title>Scholia - Latest articles published in " + q + "</title>\n"
+    rss_body += "    <description>The venue's most " + "recent articles</description>\n"
+    rss_body += "    <link>https://scholia.toolforge.org/venue/</link>\n"
+    rss_body += (
+        "    <atom:link "
+        + 'href="https://scholia.toolforge.org/venue/'
+        + q
+        + '/latest-works/rss" rel="self" '
+        + 'type="application/rss+xml" />\n'
+    )
 
     query = VENUE_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
-    params = {'query': query, 'format': 'json'}
+    url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
+    params = {"query": query, "format": "json"}
     response = requests.get(url, params=params)
     data = response.json()
 
-    rss_body += entities_to_works_rss(data['results']['bindings'])
+    rss_body += entities_to_works_rss(data["results"]["bindings"])
 
-    rss_body += '  </channel>\n'
-    rss_body += '</rss>'
+    rss_body += "  </channel>\n"
+    rss_body += "</rss>"
 
     return rss_body
 
@@ -384,31 +389,32 @@ def wb_get_topic_latest_works(q):
 
     """
     if not q:
-        return ''
+        return ""
 
     rss_body = '<?xml version="1.0" encoding="UTF-8" ?>\n'
-    rss_body += '<rss version="2.0" ' + \
-                'xmlns:atom="http://www.w3.org/2005/Atom">\n'
-    rss_body += '  <channel>\n'
-    rss_body += '    <title>Scholia - Latest Articles for ' + q + '</title>\n'
-    rss_body += "    <description>The topic's most " + \
-                "recent articles</description>\n"
-    rss_body += '    <link>https://scholia.toolforge.org/</link>\n'
-    rss_body += '    <atom:link ' + \
-                'href="https://scholia.toolforge.org/topic/' \
-                + q + '/latest-works/rss" rel="self" ' + \
-                'type="application/rss+xml" />\n'
+    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    rss_body += "  <channel>\n"
+    rss_body += "    <title>Scholia - Latest Articles for " + q + "</title>\n"
+    rss_body += "    <description>The topic's most " + "recent articles</description>\n"
+    rss_body += "    <link>https://scholia.toolforge.org/</link>\n"
+    rss_body += (
+        "    <atom:link "
+        + 'href="https://scholia.toolforge.org/topic/'
+        + q
+        + '/latest-works/rss" rel="self" '
+        + 'type="application/rss+xml" />\n'
+    )
 
     query = TOPIC_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
-    params = {'query': query, 'format': 'json'}
+    url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
+    params = {"query": query, "format": "json"}
     response = requests.get(url, params=params)
     data = response.json()
 
-    rss_body += entities_to_works_rss(data['results']['bindings'])
+    rss_body += entities_to_works_rss(data["results"]["bindings"])
 
-    rss_body += '</channel>\n'
-    rss_body += '</rss>'
+    rss_body += "</channel>\n"
+    rss_body += "</rss>"
 
     return rss_body
 
@@ -428,33 +434,34 @@ def wb_get_organization_latest_works(q):
 
     """
     if not q:
-        return ''
+        return ""
 
     rss_body = '<?xml version="1.0" encoding="UTF-8" ?>\n'
-    rss_body += '<rss version="2.0" ' + \
-                'xmlns:atom="http://www.w3.org/2005/Atom">\n'
-    rss_body += '  <channel>\n'
-    rss_body += '    <title>Scholia - Latest articles published by ' + \
-                q + '</title>\n'
-    rss_body += "    <description>The organization's most " + \
-                "recent articles</description>\n"
-    rss_body += ('    <link>https://scholia.toolforge.org/'
-                 'organization/</link>\n')
-    rss_body += '    <atom:link ' + \
-                'href="https://scholia.toolforge.org/organization/' + \
-                q + '/latest-works/rss" rel="self" ' + \
-                'type="application/rss+xml" />\n'
+    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    rss_body += "  <channel>\n"
+    rss_body += "    <title>Scholia - Latest articles published by " + q + "</title>\n"
+    rss_body += (
+        "    <description>The organization's most " + "recent articles</description>\n"
+    )
+    rss_body += "    <link>https://scholia.toolforge.org/" "organization/</link>\n"
+    rss_body += (
+        "    <atom:link "
+        + 'href="https://scholia.toolforge.org/organization/'
+        + q
+        + '/latest-works/rss" rel="self" '
+        + 'type="application/rss+xml" />\n'
+    )
 
     query = ORGANIZATION_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
-    params = {'query': query, 'format': 'json'}
+    url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
+    params = {"query": query, "format": "json"}
     response = requests.get(url, params=params)
     data = response.json()
 
-    rss_body += entities_to_works_rss(data['results']['bindings'])
+    rss_body += entities_to_works_rss(data["results"]["bindings"])
 
-    rss_body += '  </channel>\n'
-    rss_body += '</rss>'
+    rss_body += "  </channel>\n"
+    rss_body += "</rss>"
 
     return rss_body
 
@@ -474,33 +481,34 @@ def wb_get_sponsor_latest_works(q):
 
     """
     if not q:
-        return ''
+        return ""
 
     rss_body = '<?xml version="1.0" encoding="UTF-8" ?>\n'
-    rss_body += '<rss version="2.0" ' + \
-                'xmlns:atom="http://www.w3.org/2005/Atom">\n'
-    rss_body += '  <channel>\n'
-    rss_body += '    <title>Scholia - Latest articles sponsored by ' + \
-                q + '</title>\n'
-    rss_body += "    <description>The sponsor's most " + \
-                "recent articles</description>\n"
-    rss_body += ('    <link>https://scholia.toolforge.org/'
-                 'sponsor/</link>\n')
-    rss_body += '    <atom:link ' + \
-                'href="https://scholia.toolforge.org/sponsor/' + \
-                q + '/latest-works/rss" rel="self" ' + \
-                'type="application/rss+xml" />\n'
+    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    rss_body += "  <channel>\n"
+    rss_body += "    <title>Scholia - Latest articles sponsored by " + q + "</title>\n"
+    rss_body += (
+        "    <description>The sponsor's most " + "recent articles</description>\n"
+    )
+    rss_body += "    <link>https://scholia.toolforge.org/" "sponsor/</link>\n"
+    rss_body += (
+        "    <atom:link "
+        + 'href="https://scholia.toolforge.org/sponsor/'
+        + q
+        + '/latest-works/rss" rel="self" '
+        + 'type="application/rss+xml" />\n'
+    )
 
     query = SPONSOR_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
-    params = {'query': query, 'format': 'json'}
+    url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
+    params = {"query": query, "format": "json"}
     response = requests.get(url, params=params)
     data = response.json()
 
-    rss_body += entities_to_works_rss(data['results']['bindings'])
+    rss_body += entities_to_works_rss(data["results"]["bindings"])
 
-    rss_body += '  </channel>\n'
-    rss_body += '</rss>'
+    rss_body += "  </channel>\n"
+    rss_body += "</rss>"
 
     return rss_body
 
@@ -511,25 +519,25 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['author-latest-works']:
-        q = arguments['<q>']
+    if arguments["author-latest-works"]:
+        q = arguments["<q>"]
         # TODO: UTF-8 encoding for Python 2
         print(wb_get_author_latest_works(q))
-    elif arguments['topic-latest-works']:
-        q = arguments['<q>']
+    elif arguments["topic-latest-works"]:
+        q = arguments["<q>"]
         print(wb_get_topic_latest_works(q))
-    elif arguments['venue-latest-works']:
-        q = arguments['<q>']
+    elif arguments["venue-latest-works"]:
+        q = arguments["<q>"]
         print(wb_get_venue_latest_works(q))
-    elif arguments['organization-latest-works']:
-        q = arguments['<q>']
+    elif arguments["organization-latest-works"]:
+        q = arguments["<q>"]
         print(wb_get_organization_latest_works(q))
-    elif arguments['sponsor-latest-works']:
-        q = arguments['<q>']
+    elif arguments["sponsor-latest-works"]:
+        q = arguments["<q>"]
         print(wb_get_sponsor_latest_works(q))
     else:
         assert False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

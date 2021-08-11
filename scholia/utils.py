@@ -24,7 +24,7 @@ def escape_string(string):
     'String with \\" in it'
 
     """
-    return string.replace('\\', '\\\\').replace('"', '\\"')
+    return string.replace("\\", "\\\\").replace('"', '\\"')
 
 
 def sanitize_q(q):
@@ -56,12 +56,12 @@ def sanitize_q(q):
     """
     if type(q) == int:
         if q > 0:
-            return 'Q' + str(q)
+            return "Q" + str(q)
     else:
-        qs = findall(r'\d+', q)
+        qs = findall(r"\d+", q)
         if qs:
-            return 'Q' + qs[0]
-    return ''
+            return "Q" + qs[0]
+    return ""
 
 
 def string_to_type(string):
@@ -82,9 +82,9 @@ def string_to_type(string):
     'issn'
 
     """
-    if search(r'\d{4}-\d{4}', string):
-        return 'issn'
-    elif search(r'10\.\d{4}', string):
-        return 'doi'
+    if search(r"\d{4}-\d{4}", string):
+        return "issn"
+    elif search(r"10\.\d{4}", string):
+        return "doi"
     else:
-        return 'string'
+        return "string"
