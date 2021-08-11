@@ -94,8 +94,12 @@ sparqlToShortInchiKey(`# tool: scholia
      
     $.getJSON(url, function (data) {
 	 var item = data.entities["{{ q }}"];
-	 if ('en' in item.labels) {
-	     var title = item.labels.en.value
+
+	 if (langCode in item.labels) {
+	     $("#h1").text(item.labels[`${langCode}`].value);
+	 }
+	 else if ('en' in item.labels) {
+		 var title = item.labels.en.value
 	     $("#h1").text(title);
        $("title").text(title + " - Scholia");
 
@@ -110,6 +114,8 @@ sparqlToShortInchiKey(`# tool: scholia
 
 	     {% endif %}
 	 }
+
+
 	 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 
     {% if q2 %}
@@ -311,9 +317,27 @@ sparqlToShortInchiKey(`# tool: scholia
 	     } catch(e) { console.log("Exception: " + e)
 	     }
 	 }
-	 
+
+	 /* langCode Wikipedia */
+	 if (`${langCode}wiki` in item.sitelinks) {
+	     var title = item.sitelinks[`${langCode}wiki`].title;
+	     var wikipediaApiUrl = `https://${langCode}.wikipedia.org/w/api.php?` +
+				   'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+				   'explaintext=1&callback=?&format=json&titles=' +
+				   encodeURIComponent(title);
+	     var wikipediaUrl = `https://${langCode}.wikipedia.org/wiki/` + encodeURIComponent(title)
+	     
+	     $.getJSON(wikipediaApiUrl, function(data) {
+		 var pages = data.query.pages;
+		 var text = pages[Object.keys(pages)[0]].extract + " ... "
+		 var html = "(from the <a href=\"" + wikipediaUrl + "\">Wikipedia</a>)";
+		 $("#intro").text(text).append(html);
+	     }).fail(function(d, textStatus, error) {
+		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+	     });
+	 } 
 	 /* English Wikipedia */
-	 if ('enwiki' in item.sitelinks) {
+	 else if ('enwiki' in item.sitelinks) {
 	     var title = item.sitelinks.enwiki.title;
 	     var wikipediaApiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' +
 				   encodeURIComponent(title);
@@ -331,9 +355,31 @@ sparqlToShortInchiKey(`# tool: scholia
 	     });
 	 }
 
-	 
+	 /* langCode Wikiversity */
+	 if (`${langCode}wikiversity` in item.sitelinks) {
+	     var wikiversityTitle = item.sitelinks[`${langCode}wikiversity`].title;
+	     var wikiversityApiUrl = `https://${langCode}.wikiversity.org/w/api.php?` +
+				     'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+				     'explaintext=1&callback=?&format=json&titles=' +
+				     encodeURIComponent(wikiversityTitle);
+	     var wikiversityUrl = `https://${langCode}.wikiversity.org/wiki/` + encodeURIComponent(wikiversityTitle)
+
+	     $.getJSON(wikiversityApiUrl, function(data) {
+		 var pages = data.query.pages;
+		 var text = pages[Object.keys(pages)[0]].extract; 
+		 if (text) {
+		     var html = "... (from the <a href=\"" + wikiversityUrl + "\">Wikiversity</a>)";
+		 }
+		 else {
+		     var html = "Read on the <a href=\"" + wikiversityUrl + "\">Wikiversity</a>";
+		 }
+		 $("#wikiversity-extract").text(text).append(html);
+	     }).fail(function(d, textStatus, error) {
+		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+	     });
+	 } 
 	 /* English Wikiversity */
-	 if ('enwikiversity' in item.sitelinks) {
+	 else if ('enwikiversity' in item.sitelinks) {
 	     var enwikiversityTitle = item.sitelinks.enwikiversity.title;
 	     var wikiversityApiUrl = 'https://en.wikiversity.org/w/api.php?' +
 				     'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
@@ -458,7 +504,8 @@ sparqlToShortInchiKey(`# tool: scholia
 	     // Make list with results
 	     data.most_similar.forEach(function(entry, idx, array) {
 		 var listed_q = entry.item;
-		 var language = 'en';
+		 // var language = 'en';
+		 var language = langCode;
 
 		 if (idx !== 0) {
 		     $( '#wembedder' ).append( ' &middot; ');
