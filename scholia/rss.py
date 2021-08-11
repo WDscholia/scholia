@@ -296,11 +296,14 @@ def wb_get_author_latest_works(q):
         return ""
 
     rss_body = u('<?xml version="1.0" encoding="UTF-8" ?>\n')
-    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    rss_body += (
+        '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    )
     rss_body += "  <channel>\n"
     rss_body += "   <title>Scholia - Latest Articles by " + q + "</title>\n"
     rss_body += (
-        "   <description>The author" "s most " + "recent articles</description>\n"
+        "   <description>The author"
+        "s most " + "recent articles</description>\n"
     )
     rss_body += "   <link>https://scholia.toolforge.org/</link>\n"
     rss_body += (
@@ -347,10 +350,17 @@ def wb_get_venue_latest_works(q):
         return ""
 
     rss_body = '<?xml version="1.0" encoding="UTF-8" ?>\n'
-    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    rss_body += (
+        '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    )
     rss_body += "  <channel>\n"
-    rss_body += "    <title>Scholia - Latest articles published in " + q + "</title>\n"
-    rss_body += "    <description>The venue's most " + "recent articles</description>\n"
+    rss_body += (
+        "    <title>Scholia - Latest articles published in " + q + "</title>\n"
+    )
+    rss_body += (
+        "    <description>The venue's most "
+        + "recent articles</description>\n"
+    )
     rss_body += "    <link>https://scholia.toolforge.org/venue/</link>\n"
     rss_body += (
         "    <atom:link "
@@ -392,10 +402,15 @@ def wb_get_topic_latest_works(q):
         return ""
 
     rss_body = '<?xml version="1.0" encoding="UTF-8" ?>\n'
-    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    rss_body += (
+        '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    )
     rss_body += "  <channel>\n"
     rss_body += "    <title>Scholia - Latest Articles for " + q + "</title>\n"
-    rss_body += "    <description>The topic's most " + "recent articles</description>\n"
+    rss_body += (
+        "    <description>The topic's most "
+        + "recent articles</description>\n"
+    )
     rss_body += "    <link>https://scholia.toolforge.org/</link>\n"
     rss_body += (
         "    <atom:link "
@@ -437,13 +452,20 @@ def wb_get_organization_latest_works(q):
         return ""
 
     rss_body = '<?xml version="1.0" encoding="UTF-8" ?>\n'
-    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
-    rss_body += "  <channel>\n"
-    rss_body += "    <title>Scholia - Latest articles published by " + q + "</title>\n"
     rss_body += (
-        "    <description>The organization's most " + "recent articles</description>\n"
+        '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
     )
-    rss_body += "    <link>https://scholia.toolforge.org/" "organization/</link>\n"
+    rss_body += "  <channel>\n"
+    rss_body += (
+        "    <title>Scholia - Latest articles published by " + q + "</title>\n"
+    )
+    rss_body += (
+        "    <description>The organization's most "
+        + "recent articles</description>\n"
+    )
+    rss_body += (
+        "    <link>https://scholia.toolforge.org/" "organization/</link>\n"
+    )
     rss_body += (
         "    <atom:link "
         + 'href="https://scholia.toolforge.org/organization/'
@@ -484,11 +506,16 @@ def wb_get_sponsor_latest_works(q):
         return ""
 
     rss_body = '<?xml version="1.0" encoding="UTF-8" ?>\n'
-    rss_body += '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
-    rss_body += "  <channel>\n"
-    rss_body += "    <title>Scholia - Latest articles sponsored by " + q + "</title>\n"
     rss_body += (
-        "    <description>The sponsor's most " + "recent articles</description>\n"
+        '<rss version="2.0" ' + 'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+    )
+    rss_body += "  <channel>\n"
+    rss_body += (
+        "    <title>Scholia - Latest articles sponsored by " + q + "</title>\n"
+    )
+    rss_body += (
+        "    <description>The sponsor's most "
+        + "recent articles</description>\n"
     )
     rss_body += "    <link>https://scholia.toolforge.org/" "sponsor/</link>\n"
     rss_body += (

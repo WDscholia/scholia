@@ -522,7 +522,9 @@ def iso639_to_q(language):
     params = {"query": query, "format": "json"}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
-    qs = [item["language"]["value"][31:] for item in data["results"]["bindings"]]
+    qs = [
+        item["language"]["value"][31:] for item in data["results"]["bindings"]
+    ]
     if len(qs) == 1:
         return qs[0]
     elif len(qs) == 0:
@@ -530,7 +532,9 @@ def iso639_to_q(language):
     else:
         # There shouldn't be multiple matching items, so it is not clear
         # what we can do here.
-        raise QueryResultError("Multiple matching language found for " "ISO639 code")
+        raise QueryResultError(
+            "Multiple matching language found for " "ISO639 code"
+        )
 
 
 def pubchem_to_qs(cid):
@@ -554,14 +558,18 @@ def pubchem_to_qs(cid):
     True
 
     """
-    query = 'select ?chemical where {{ ?chemical wdt:P662 "{cid}" }}'.format(cid=cid)
+    query = 'select ?chemical where {{ ?chemical wdt:P662 "{cid}" }}'.format(
+        cid=cid
+    )
 
     url = "https://query.wikidata.org/sparql"
     params = {"query": query, "format": "json"}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
-    return [item["chemical"]["value"][31:] for item in data["results"]["bindings"]]
+    return [
+        item["chemical"]["value"][31:] for item in data["results"]["bindings"]
+    ]
 
 
 def pubmed_to_qs(pmid):
@@ -588,7 +596,9 @@ def pubmed_to_qs(pmid):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(pmid=pmid)
+    query = 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(
+        pmid=pmid
+    )
 
     url = "https://query.wikidata.org/sparql"
     params = {"query": query, "format": "json"}
@@ -619,7 +629,9 @@ def ror_to_qs(rorid):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P6782 "{rorid}" }}'.format(rorid=rorid)
+    query = 'select ?work where {{ ?work wdt:P6782 "{rorid}" }}'.format(
+        rorid=rorid
+    )
 
     url = "https://query.wikidata.org/sparql"
     params = {"query": query, "format": "json"}
@@ -662,7 +674,9 @@ def uniprot_to_qs(protein):
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
-    return [item["protein"]["value"][31:] for item in data["results"]["bindings"]]
+    return [
+        item["protein"]["value"][31:] for item in data["results"]["bindings"]
+    ]
 
 
 def ncbi_gene_to_qs(gene):
@@ -689,7 +703,9 @@ def ncbi_gene_to_qs(gene):
     True
 
     """
-    query = 'select ?gene where {{ ?gene wdt:P351 "{gene}" }}'.format(gene=gene)
+    query = 'select ?gene where {{ ?gene wdt:P351 "{gene}" }}'.format(
+        gene=gene
+    )
 
     url = "https://query.wikidata.org/sparql"
     params = {"query": query, "format": "json"}
@@ -723,7 +739,9 @@ def ncbi_taxon_to_qs(taxon):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P685 "{taxon}" }}'.format(taxon=taxon)
+    query = 'select ?work where {{ ?work wdt:P685 "{taxon}" }}'.format(
+        taxon=taxon
+    )
 
     url = "https://query.wikidata.org/sparql"
     params = {"query": query, "format": "json"}
@@ -755,7 +773,8 @@ def wikipathways_to_qs(wpid):
 
     """
     query = (
-        'select ?work where {{ VALUES ?wpid {{ "{wpid}" }} ' "?work wdt:P2410 ?wpid }}"
+        'select ?work where {{ VALUES ?wpid {{ "{wpid}" }} '
+        "?work wdt:P2410 ?wpid }}"
     ).format(wpid=wpid)
 
     url = "https://query.wikidata.org/sparql"
@@ -794,7 +813,9 @@ def issn_to_qs(issn):
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
-    return [item["author"]["value"][31:] for item in data["results"]["bindings"]]
+    return [
+        item["author"]["value"][31:] for item in data["results"]["bindings"]
+    ]
 
 
 def orcid_to_qs(orcid):
@@ -825,7 +846,9 @@ def orcid_to_qs(orcid):
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
-    return [item["author"]["value"][31:] for item in data["results"]["bindings"]]
+    return [
+        item["author"]["value"][31:] for item in data["results"]["bindings"]
+    ]
 
 
 def mesh_to_qs(meshid):
@@ -847,7 +870,9 @@ def mesh_to_qs(meshid):
     True
 
     """
-    query = 'select ?cmp where {{ ?cmp wdt:P486 "{meshid}" }}'.format(meshid=meshid)
+    query = 'select ?cmp where {{ ?cmp wdt:P486 "{meshid}" }}'.format(
+        meshid=meshid
+    )
 
     url = "https://query.wikidata.org/sparql"
     params = {"query": query, "format": "json"}
@@ -987,14 +1012,20 @@ def search_article_titles(q, search_string=None):
     for loop in range(loops):
         offset = loop * batch_size
         query = query_template.format(
-            batch_size=batch_size, offset=offset, label=search_string.lower(), q=q
+            batch_size=batch_size,
+            offset=offset,
+            label=search_string.lower(),
+            q=q,
         )
 
         params = {"query": query, "format": "json"}
         response = requests.get(url, params=params, headers=HEADERS)
         data = response.json()
         batch_results = [
-            {"title": item["title"]["value"], "q": item["article"]["value"][31:]}
+            {
+                "title": item["title"]["value"],
+                "q": item["article"]["value"][31:],
+            }
             for item in data["results"]["bindings"]
         ]
         results.extend(batch_results)
@@ -1020,9 +1051,9 @@ def search_article_titles_to_quickstatements(q, search_string=None):
     articles = search_article_titles(q, search_string=search_string)
     quickstatements = u("")
     for article in articles:
-        quickstatements += u("{article_q}\twdt:P921\t{topic_q} /* {title} */\n").format(
-            article_q=article["q"], topic_q=q, title=article["title"]
-        )
+        quickstatements += u(
+            "{article_q}\twdt:P921\t{topic_q} /* {title} */\n"
+        ).format(article_q=article["q"], topic_q=q, title=article["title"])
     return quickstatements
 
 
@@ -1054,7 +1085,9 @@ def viaf_to_qs(viaf):
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
 
-    return [item["author"]["value"][31:] for item in data["results"]["bindings"]]
+    return [
+        item["author"]["value"][31:] for item in data["results"]["bindings"]
+    ]
 
 
 def q_to_class(q):
@@ -1079,7 +1112,9 @@ def q_to_class(q):
     is compared against a set of hardcoded matches.
 
     """
-    query = "SELECT ?class {{ wd:{q} wdt:P31 ?class }}".format(q=escape_string(q))
+    query = "SELECT ?class {{ wd:{q} wdt:P31 ?class }}".format(
+        q=escape_string(q)
+    )
 
     url = "https://query.wikidata.org/sparql"
     params = {"query": query, "format": "json"}
@@ -1091,7 +1126,9 @@ def q_to_class(q):
         # response, then fallback on nothing.
         classes = []
     else:
-        classes = [item["class"]["value"][31:] for item in data["results"]["bindings"]]
+        classes = [
+            item["class"]["value"][31:] for item in data["results"]["bindings"]
+        ]
 
     # Hard-coded matching match
     if "Q5" in classes:  # human
@@ -1314,7 +1351,9 @@ def q_to_class(q):
         params = {"query": query, "format": "json"}
         response = requests.get(url, params=params, headers=HEADERS)
         data = response.json()
-        parents = [item["class"]["value"][31:] for item in data["results"]["bindings"]]
+        parents = [
+            item["class"]["value"][31:] for item in data["results"]["bindings"]
+        ]
 
         if set(parents).intersection(
             [
@@ -1621,7 +1660,9 @@ def website_to_qs(url):
     True
 
     """
-    query = "SELECT ?work WHERE {{ ?work wdt:P856 <{url}> }}".format(url=url.strip())
+    query = "SELECT ?work WHERE {{ ?work wdt:P856 <{url}> }}".format(
+        url=url.strip()
+    )
 
     url_ = "https://query.wikidata.org/sparql"
     params = {"query": query, "format": "json"}
@@ -1658,7 +1699,9 @@ def random_author():
     """
     # Generate 100 random Q-items and hope that one of them is a work with an
     # author
-    values = " ".join("wd:Q{}".format(randrange(1, 100000000)) for _ in range(100))
+    values = " ".join(
+        "wd:Q{}".format(randrange(1, 100000000)) for _ in range(100)
+    )
 
     query = """SELECT ?author {{
                  VALUES ?work {{ {values} }}

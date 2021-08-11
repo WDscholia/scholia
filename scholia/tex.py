@@ -235,7 +235,9 @@ def extract_dois_from_aux_string(string):
     ['10.1186/S13321-016-0161-3']
 
     """
-    matches = re.findall(r"^\\citation{(.+?)}", string, flags=re.MULTILINE | re.UNICODE)
+    matches = re.findall(
+        r"^\\citation{(.+?)}", string, flags=re.MULTILINE | re.UNICODE
+    )
     dois = []
     for submatches in matches:
         for doi in submatches.split(","):
@@ -280,7 +282,9 @@ def extract_qs_from_aux_string(string):
     ['Q28042913']
 
     """
-    matches = re.findall(r"^\\citation{(.+?)}", string, flags=re.MULTILINE | re.UNICODE)
+    matches = re.findall(
+        r"^\\citation{(.+?)}", string, flags=re.MULTILINE | re.UNICODE
+    )
     qs = []
     for submatches in matches:
         for q in submatches.split(","):
@@ -338,13 +342,17 @@ def entity_to_bibtex_entry(entity, key=None):
     )
     entry += "  author =   {%s},\n" % u" and ".join(authors)
     entry += "  title =    {{%s}},\n" % escape_to_tex(entity_to_title(entity))
-    entry += "  journal =  {%s},\n" % (escape_to_tex(entity_to_journal_title(entity)))
+    entry += "  journal =  {%s},\n" % (
+        escape_to_tex(entity_to_journal_title(entity))
+    )
     entry += "  year =     {%s},\n" % escape_to_tex(entity_to_year(entity))
     entry += "  volume =   {%s},\n" % escape_to_tex(entity_to_volume(entity))
     entry += "  number =   {},\n"
     entry += "  month =    {%s},\n" % escape_to_tex(entity_to_month(entity))
     entry += "  pages =    {%s},\n" % escape_to_tex(entity_to_pages(entity))
-    entry += "  DOI =      {%s},\n" % escape_to_tex(entity_to_doi(entity), "url")
+    entry += "  DOI =      {%s},\n" % escape_to_tex(
+        entity_to_doi(entity), "url"
+    )
     entry += "  URL =      {%s},\n" % escape_to_tex(
         entity_to_full_text_url(entity), "url"
     )
@@ -408,9 +416,10 @@ def main():
                 continue
             if len(qs_doi) > 1:
                 print(
-                    ("Multiple Wikidata items for {doi}: {qs}." "Using first.").format(
-                        doi=doi, qs=qs_doi
-                    )
+                    (
+                        "Multiple Wikidata items for {doi}: {qs}."
+                        "Using first."
+                    ).format(doi=doi, qs=qs_doi)
                 )
             q = qs_doi[0]
             qs.append(q)

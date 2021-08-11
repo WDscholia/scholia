@@ -97,7 +97,9 @@ def get_metadata(arxiv):
         '//td[@class="tablecell subjects"]/text()'
     )
     arxiv_classifications = [
-        match for subject in subjects for match in re.findall(r"\((.*?)\)", subject)
+        match
+        for subject in subjects
+        for match in re.findall(r"\((.*?)\)", subject)
     ]
 
     metadata = {
@@ -148,8 +150,12 @@ def metadata_to_quickstatements(metadata):
     qs += u"LAST\tP31\tQ13442814\n"
     qs += u'LAST\tLen\t"{}"\n'.format(metadata["title"].replace('"', '"'))
     qs += u'LAST\tP1476\ten:"{}"\n'.format(metadata["title"].replace('"', '"'))
-    qs += u"LAST\tP577\t+{}T00:00:00Z/11\n".format(metadata["publication_date"][:10])
-    qs += u'LAST\tP953\t"{}"\n'.format(metadata["full_text_url"].replace('"', '"'))
+    qs += u"LAST\tP577\t+{}T00:00:00Z/11\n".format(
+        metadata["publication_date"][:10]
+    )
+    qs += u'LAST\tP953\t"{}"\n'.format(
+        metadata["full_text_url"].replace('"', '"')
+    )
 
     # Optional DOI
     if "doi" in metadata:
