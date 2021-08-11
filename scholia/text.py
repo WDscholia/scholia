@@ -61,9 +61,7 @@ Q_PATTERN = re.compile(r"Q\d+", flags=re.UNICODE | re.DOTALL)
 
 SCHOLIA_DATA_DIRECTORY = join(expanduser("~"), ".scholia")
 
-TEXT_TO_TOPIC_Q_TEXT_FILENAME = join(
-    SCHOLIA_DATA_DIRECTORY, "text_to_topic_q_text.pck"
-)
+TEXT_TO_TOPIC_Q_TEXT_FILENAME = join(SCHOLIA_DATA_DIRECTORY, "text_to_topic_q_text.pck")
 
 
 class TextToTopicQText:
@@ -150,9 +148,7 @@ class TextToTopicQText:
 
         mapper = {}
         for datum in data:
-            mapper[datum["topic_label"]["value"]] = datum["topic"]["value"][
-                31:
-            ]
+            mapper[datum["topic_label"]["value"]] = datum["topic"]["value"][31:]
 
         return mapper
 

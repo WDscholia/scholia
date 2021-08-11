@@ -103,9 +103,7 @@ def is_human(entity):
     return "Q5" in classes
 
 
-def select_value_by_language_preferences(
-    choices, preferences=("en", "de", "fr")
-):
+def select_value_by_language_preferences(choices, preferences=("en", "de", "fr")):
     """Select value based on language preference.
 
     Parameters
