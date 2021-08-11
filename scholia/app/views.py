@@ -66,17 +66,37 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 
 @main.before_request
 def ensure_lang_support():
-    lang_code = g.get('lang_code')
-    session['lang_code'] = lang_code
-    if lang_code and lang_code not in current_app.config['SUPPORTED_LANGUAGES'].keys():
-        ''' fix for unsupported lang inserted '''
-        session['lang_code'] = '/en/'
-        g.lang_code = 'en'
-        # request_path = request.path.strip('/')
-        # request_path_parts = urlparse(request_path).path.split('/')
-        # s = '/'.join([g.lang_code, *request_path_parts])
-        # print(s)
-        # redirect(s, code=302)
+    lang_code = (
+        request.args.get('lc') or
+        request.cookies.get('lang_code') or    #g.get('lang_code')
+        request.accept_languages.best_match(current_app.config['SUPPORTED_LANGUAGES'].keys(),default='es')
+    )
+    print("lang_code: ",lang_code)
+    g.lang_code = lang_code
+    print("g.lang_code: ",lang_code)
+    # session['lang_code'] = lang_code
+    # if lang_code and lang_code not in current_app.config['SUPPORTED_LANGUAGES'].keys():
+    #     ''' fix for unsupported lang inserted '''
+    #     # session['lang_code'] = '/en/'
+    #     g.lang_code = 'en'
+    #     request_path = request.path.strip('/')
+    #     request_path_parts = urlparse(request_path).path.split('/')
+    #     s = '/'.join([g.lang_code, *request_path_parts])
+    #     print(s)
+    #     redirect(s, code=302)
+
+@main.after_request
+def set_language_cookie(response):
+    response.set_cookie('lang_code', value=g.lang_code)
+    return response
+
+
+@main.url_defaults
+def add_language_code(endpoint, values):
+    values.setdefault('lang_code', g.lang_code)
+
+
+    
 
 # @main.url_defaults
 # def add_language_code(endpoint, values):
