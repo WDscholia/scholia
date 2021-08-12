@@ -8,7 +8,7 @@
 {{ sparql_to_table('related-diseases') }}
 {{ sparql_to_iframe('publications-per-year') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 {% block page_content %}
@@ -38,5 +38,5 @@ ordered according to number of co-associated genes and symptoms.
     <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
 </div>
 
-{% endblock %}
+{% endblock page_content %}
     

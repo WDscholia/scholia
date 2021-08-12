@@ -8,7 +8,7 @@
 {{ sparql_to_table('missing-coauthor-items') }}
 {{ sparql_to_table('missing-topics') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 
@@ -45,4 +45,4 @@ The works listed below do not currently have statements about their main subject
 
 
 
-{% endblock %}
+{% endblock page_content %}

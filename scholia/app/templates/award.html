@@ -20,7 +20,7 @@
 
 {{ sparql_to_table('gender-distribution') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 
@@ -79,4 +79,4 @@ Count of the number of recipient wrt. gender.
 
 Any information missing here? You can help curate the information contained in this profile via its <a href="{{ url_for('app.show_award_empty') }}{{ q }}/curation">curation</a> page.
 
-{% endblock %}
+{% endblock page_content %}

@@ -75,9 +75,9 @@
           href="{{ url_for('static', filename='css/scholia.css') }}">
     {% include "favicon.html" %}
 
-{% endblock %}
+{% endblock head %}
 
-{% block title %}Scholia{% endblock %}
+{% block title %}Scholia{% endblock title %}
 
 {% block scripts %}
     {{ super() }}
@@ -620,12 +620,12 @@
             }
 
 
-            {% block in_ready %}{% endblock %}
+            {% block in_ready %}{% endblock in_ready %}
         });
 
     </script>
 
-{% endblock %}
+{% endblock scripts %}
 
 {% block navbar %}
     /* jscpd:ignore-start */
@@ -791,10 +791,10 @@
                     <input type="text" id="searchterm"/>
                 </div>
             </div>
-        {% endblock %}
+        {% endblock nav_search %}
     </div>
     /* jscpd:ignore-end */
-{% endblock %}
+{% endblock navbar %}
 
 {% block content %}
     <div class="content">
@@ -802,7 +802,7 @@
             <span id="aspect-chooser"></span>
         </div>
         <div class="container">
-            {% block page_content %}{% endblock %}
+            {% block page_content %}{% endblock page_content %}
         </div>
     </div>
     <div class="container footer">
@@ -824,7 +824,7 @@
         Follow us on <a href="https://twitter.com/wdscholia">Twitter</a>.
         <hr>
     </div>
-{% endblock %}
+{% endblock content %}
 
 <script type="text/javascript">
 

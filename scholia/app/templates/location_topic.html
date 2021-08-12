@@ -6,9 +6,9 @@
 
 {{ sparql_to_table("nearby-researchers", {
 	     "linkPrefixes":{"author": "../../../author/",
-			   "example_work": "../../../work/"} }) }}
+			   "example_work": "../../../work/"}})}}
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 
@@ -25,4 +25,4 @@
 <table class="table table-hover" id="nearby-researchers-table"></table>
 
 
-{% endblock %}
+{% endblock page_content %}

@@ -20,7 +20,7 @@
 }}
 {{ sparql_to_iframe('articles-by-year') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 {% block page_content %}
@@ -53,5 +53,5 @@ This table lists the articles that are most cited for this intention.
 <table class="table table-hover" id="articles-table"></table>
 
 
-{% endblock %}
+{% endblock page_content %}
     

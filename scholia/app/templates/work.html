@@ -18,7 +18,7 @@
 {{ sparql_to_iframe('citation-graph') }}
 {{ sparql_to_iframe('citations-per-year') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 {% block page_content %}
@@ -110,5 +110,5 @@ Only a maximum of around 2000 statements are shown.
 
 <table class="table table-hover" id="statements-table"></table>
   
-{% endblock %}
+{% endblock page_content %}
     

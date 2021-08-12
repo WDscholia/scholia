@@ -8,7 +8,7 @@
 
 {{ sparql_to_404shortinchikey('related') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 
@@ -16,4 +16,4 @@ There was no chemical found with InChIKey={{ inchikey }}. Maybe these related co
 
 <table class="table table-hover" id="related-table"></table>
 
-{% endblock %}
+{% endblock page_content %}

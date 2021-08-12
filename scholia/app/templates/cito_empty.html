@@ -22,7 +22,7 @@
 {{ sparql_to_table('statistics') }}
 {{ sparql_to_iframe('articles-by-year') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 {% block page_content %}
@@ -52,6 +52,6 @@ in the total number of citations and in a number of different articles.
 
 <table class="table table-hover" id="journal-counts-table"></table>
 
-{% endblock %}
+{% endblock page_content %}
 
   

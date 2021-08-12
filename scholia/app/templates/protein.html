@@ -8,7 +8,7 @@
 {{ sparql_to_table('cofunctional-proteins') }}
 {{ sparql_to_iframe('publications-per-year') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 <h1 id="h1">Protein</h1>
@@ -38,4 +38,4 @@ Proteins sharing molecular function(s).
     <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
 </div>
 
-{% endblock %}
+{% endblock page_content %}

@@ -5,10 +5,10 @@
 <meta name="description" content="View scholarly profiles from Wikidata for topics, people, organizations, species, chemicals, etc.">
 <meta property="og:title" content="Scholia">
 <meta property="og:description" content="Scholia is a service that creates visual scholarly profiles for topic, people, organizations, species, chemicals, etc using bibliographic and other information in Wikidata." />
-{% endblock %}
+{% endblock metas %}
 
 <!-- don't show nav search on index.html -->
-{% block nav_search %}{% endblock %}
+{% block nav_search %}{% endblock nav_search %}
 
 {% block page_content %}
 
@@ -183,6 +183,6 @@
     </div>
 </div>
 
-{% endblock %}
+{% endblock page_content %}
 
   

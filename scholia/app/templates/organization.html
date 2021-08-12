@@ -23,7 +23,7 @@
 {{ sparql_to_iframe('most-cited-papers') }}
 {{ sparql_to_iframe('co-author-normalized-citations') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 {% block page_content %}
@@ -87,13 +87,13 @@ has been set.
 
 <table class="table table-hover" id="recent-citations-table"></table>
 
-<h3 id="most-cited-papers-header">Most cited papers with affiliated first author</h2>
+<h3 id="most-cited-papers-header">Most cited papers with affiliated first author</h3>
 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" id="most-cited-papers-iframe"></iframe>
 </div>
 
-<h3 id="co-author-normalized-citations-header">Co-author-normalized citations per year</h2>
+<h3 id="co-author-normalized-citations-header">Co-author-normalized citations per year</h3>
 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" id="co-author-normalized-citations-iframe"></iframe>
@@ -113,4 +113,4 @@ Count of the number of researchers wrt. gender.
 
 Any information missing here? You can help curate the information contained in this profile via its <a href="{{ url_for('app.show_organization_empty') }}{{ q }}/curation">curation</a> page.
 
-{% endblock %}
+{% endblock page_content %}

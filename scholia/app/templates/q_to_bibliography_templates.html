@@ -39,7 +39,7 @@
 	<li role="presentation"><a href="./about">About</a></li>
     </ul>
 </div>
-{% endblock %}
+{% endblock navbar %}
 
 
 
@@ -71,13 +71,13 @@
     <div id="scholia-link">View item in Scholia: <a href="{{ q }}">{{ q }}</a></div>
 </p>
 
-{% endif %}
+{% endif q %}
 
 {% if wikitext %}
 
 <div id="wikitext"><pre>{{ wikitext }}</pre></div>
 
-{% endif %}
+{% endif wikitext %}
 
 
-{% endblock %}
+{% endblock page_content %}

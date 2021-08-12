@@ -9,7 +9,7 @@
 {{ sparql_to_table('orthologs') }}
 {{ sparql_to_table('variants') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 {% block page_content %}
@@ -42,4 +42,4 @@ Variants encoded by this gene.
 
 <table class="table table-hover" id="variants-table"></table>
 
-{% endblock %}
+{% endblock page_content %}

@@ -10,7 +10,7 @@
 
 {{ sparql_to_iframe('cocitations-graph') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 
@@ -39,4 +39,4 @@ Citations between authors of the country who published on the topic.
     <iframe class="embed-responsive-item" id="cocitations-graph-iframe"></iframe>
 </div>
     
-{% endblock %}
+{% endblock page_content %}

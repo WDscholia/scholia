@@ -9,7 +9,7 @@
 {{ sparql_to_iframe('topics') }}
 {{ sparql_to_iframe('authors') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 <h1 id="h1">Software</h1>
@@ -37,5 +37,5 @@
   <iframe class="embed-responsive-item" id="authors-iframe"></iframe>
 </div>
 
-{% endblock %}
+{% endblock page_content %}
     

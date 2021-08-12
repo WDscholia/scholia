@@ -9,7 +9,7 @@
 {{ sparql_to_table('authors-no-initials',options={ "linkPrefixes":{ "researcher": '../../author/' }}) }}
 {{ sparql_to_table('authors-with-initials') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 {% block page_content %}
@@ -45,4 +45,4 @@ This table shows author name strings that contain single-letter initials.
 <table class="table table-hover" id="authors-with-initials-table"></table> 
 
 
-{% endblock %}
+{% endblock page_content %}

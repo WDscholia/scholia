@@ -38,7 +38,7 @@
 {{ sparql_to_table('author-awards') }}
 
 
-{% endblock %}
+{% endblock in_ready %}
 
 
 
@@ -103,7 +103,7 @@ page to resolve the author names.
 <table class="table table-hover" id="most-cited-authors-table"></table>
 
 
-<h3 id="citation-distribution-header">Citation distribution</h2>
+<h3 id="citation-distribution-header">Citation distribution</h3>
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="citation-distribution-iframe"></iframe>
@@ -143,5 +143,5 @@ page to resolve the author names.
 <table class="table table-hover" id="author-awards-table"></table>
 
 
-{% endblock %}
+{% endblock page_content %}
     

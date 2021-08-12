@@ -11,7 +11,7 @@
 {{ sparql_to_table('proteome') }}
 {{ sparql_to_table('metabolome') }}
  
-{% endblock %}
+{% endblock in_ready %}
 
 
 {% block page_content %}
@@ -49,5 +49,5 @@
 <table class="table table-hover" id="metabolome-table"></table>
 
 
-{% endblock %}
+{% endblock page_content %}
     

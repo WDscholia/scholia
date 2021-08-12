@@ -62,7 +62,7 @@
 {{ sparql_to_iframe('author-scores-graph') }}
 {{ sparql_to_iframe('organization-map') }}
 {{ sparql_to_iframe('country-citation-graph') }}
-{% endblock %}
+{% endblock in_ready %}
 
 
 {% block page_content %}
@@ -186,5 +186,5 @@ The graph indicates the countries associated with organizations whose authors ha
     </iframe>
 </div>
 
-{% endblock %}
+{% endblock page_content %}
     
