@@ -41,9 +41,7 @@ def get(resource):
         "Accept": "application/vnd.github.v3+json",
         "User-Agent": USER_AGENT,
     }
-    response = requests.get(
-        "https://api.github.com" + resource, headers=headers
-    )
+    response = requests.get("https://api.github.com" + resource, headers=headers)
     data = response.json()
     return data
 

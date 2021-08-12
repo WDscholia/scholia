@@ -44,16 +44,10 @@ def write_pajek_from_sparql(filename, sparql):
     for datum in data:
         vertices.append(datum[column1]["value"])
         vertices.append(datum[column2]["value"])
-        vertex_labels[datum[column1]["value"]] = datum[column1 + "Label"][
-            "value"
-        ]
-        vertex_labels[datum[column2]["value"]] = datum[column2 + "Label"][
-            "value"
-        ]
+        vertex_labels[datum[column1]["value"]] = datum[column1 + "Label"]["value"]
+        vertex_labels[datum[column2]["value"]] = datum[column2 + "Label"]["value"]
     vertices = set(vertices)
-    vertices = OrderedDict(
-        ((vertex, n) for n, vertex in enumerate(list(vertices), 1))
-    )
+    vertices = OrderedDict(((vertex, n) for n, vertex in enumerate(list(vertices), 1)))
 
     with open(filename, "w") as f:
         f.write("*Vertices {}\n".format(len(vertices)))

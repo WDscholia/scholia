@@ -279,9 +279,7 @@ def show_arxiv_to_quickstatements():
     if len(qs) > 0:
         # The arxiv is already in Wikidata
         q = qs[0]
-        return render_template(
-            "arxiv_to_quickstatements.html", arxiv=arxiv, q=q
-        )
+        return render_template("arxiv_to_quickstatements.html", arxiv=arxiv, q=q)
 
     try:
         metadata = get_arxiv_metadata(arxiv)
@@ -1440,9 +1438,7 @@ def show_q_to_bibliography_templates():
 
     wikitext = q_to_bibliography_templates(q)
 
-    return render_template(
-        "q_to_bibliography_templates.html", q=q, wikitext=wikitext
-    )
+    return render_template("q_to_bibliography_templates.html", q=q, wikitext=wikitext)
 
 
 @main.route("/software/" + q_pattern)
@@ -2194,8 +2190,6 @@ def show_aspect_missing(aspect, q):
 
     """
     try:
-        return render_template(
-            "{aspect}_curation.html".format(aspect=aspect), q=q
-        )
+        return render_template("{aspect}_curation.html".format(aspect=aspect), q=q)
     except TemplateNotFound:
         return render_template("404.html")

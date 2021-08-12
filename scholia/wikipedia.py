@@ -114,17 +114,16 @@ def q_to_bibliography_templates(q):
     data = response.json()
 
     wikitext = (
-        "<!-- Generated with scholia.wikipedia "
-        "q-to-bibliography-templates {q}\n"
+        "<!-- Generated with scholia.wikipedia " "q-to-bibliography-templates {q}\n"
     ).format(q=q)
     wikitext += (
         "     or http://scholia.toolforge.org/"
         "q-to-bibliography-templates?q={q} -->\n"
     ).format(q=q)
     for item in data["results"]["bindings"]:
-        if _value(item, "type").endswith("Q5707594") or _value(
-            item, "type"
-        ).endswith("Q17928402"):
+        if _value(item, "type").endswith("Q5707594") or _value(item, "type").endswith(
+            "Q17928402"
+        ):
             # news article or blog post
             wikitext += CITE_NEWS_TEMPLATE.format(
                 title=_value(item, "title"),
