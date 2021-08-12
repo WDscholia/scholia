@@ -34,3 +34,4 @@ jobs:
         env:
           FILTER_REGEX_EXCLUDE: .*(\.github|docs/|notebooks/|scholia/app/static/).*
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_PYTHON_MYPY: false
