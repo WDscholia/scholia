@@ -202,10 +202,24 @@ WHERE {{
 }} ORDER BY DESC(?date)
 """
 
-URL_QUERY_WIKIDATA_BIGDATA_SPARQL = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
+URL_QUERY_WIKIDATA_BIGDATA_SPARQL = (
+    "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
+)
 
 
 def query_to_wikidata(query):
+    """Request for wikidata query service.
+
+    Parameters
+    ----------
+    query : str
+        SPARQL query
+
+    Returns
+    -------
+    data : dict
+        Query result from wikidata
+    """
     params = {"query": query, "format": "json"}
     response = requests.get(URL_QUERY_WIKIDATA_BIGDATA_SPARQL, params=params)
     data = response.json()
