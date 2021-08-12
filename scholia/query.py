@@ -53,9 +53,7 @@ from __future__ import absolute_import, division, print_function
 from random import randrange
 
 import requests
-
 from simplejson import JSONDecodeError
-
 from six import u
 
 USER_AGENT = "Scholia"

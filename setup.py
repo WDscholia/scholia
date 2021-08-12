@@ -1,7 +1,7 @@
 import os
-from setuptools import setup
-import versioneer
 
+import versioneer
+from setuptools import setup
 
 filename = os.path.join(os.path.dirname(__file__), "requirements.txt")
 requirements = open(filename).read().splitlines()

@@ -20,21 +20,16 @@ $ python -m scholia.scrape.ojs paper-url-to-quickstatements \
 
 
 import json
-
 import os
-
 import signal
 
-from six import b, print_, u
-
-from lxml import etree
-
 import requests
+from lxml import etree
+from six import b, print_, u
 
 from ..qs import paper_to_quickstatements
 from ..query import iso639_to_q, issn_to_qs
 from ..utils import escape_string
-
 
 USER_AGENT = "Scholia"
 

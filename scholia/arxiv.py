@@ -15,14 +15,12 @@ References
 
 from __future__ import absolute_import, division, print_function
 
-from dateutil.parser import parse as parse_datetime
-
 import json
-
 import os
+import re
 from os import write
 
-import re
+from dateutil.parser import parse as parse_datetime
 
 try:
     # lxml can only be loaded into one interpreter per process.
@@ -35,7 +33,6 @@ except ImportError:
     from xml import etree
 
 import requests
-
 
 USER_AGENT = "Scholia"
 

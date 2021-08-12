@@ -20,16 +20,12 @@ Examples
 from __future__ import absolute_import, print_function
 
 import logging
-
 import os
+import signal
 from os import write
 
-import signal
-
 import requests
-
 from six import b, u
-
 
 BIBLIOGRAPHY_SPARQL_QUERY = """
 select ?work ?title ?venueLabel ?date ?volume ?issue ?pages

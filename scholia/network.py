@@ -9,7 +9,6 @@ from collections import OrderedDict
 
 import requests
 
-
 EXAMPLE_SPARQL_QUERY = """
 SELECT ?item1 ?item1Label ?item2 ?item2Label ?weight
 WITH {

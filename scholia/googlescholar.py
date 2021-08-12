@@ -16,10 +16,8 @@ from __future__ import print_function
 
 import json
 
-from lxml.html import fromstring
-
 import requests
-
+from lxml.html import fromstring
 
 USER_URL = "https://scholar.google.dk/citations"
 

@@ -32,23 +32,17 @@ submitted to https://quickstatements.toolforge.org/.
 
 """
 
-from six import b, print_, u
-
 import json
-
 import os
-
 import signal
-
 from time import sleep
 
-from lxml import etree
-
 import requests
+from lxml import etree
+from six import b, print_, u
 
 from ..qs import paper_to_quickstatements
 from ..utils import escape_string
-
 
 PAPER_TO_Q_QUERY = u(
     """

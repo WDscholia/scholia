@@ -16,13 +16,10 @@ from __future__ import print_function, unicode_literals
 
 import json
 
-from six.moves.urllib.parse import urlparse
-
-from docopt import docopt
-
-from lxml import etree
-
 import requests
+from docopt import docopt
+from lxml import etree
+from six.moves.urllib.parse import urlparse
 
 from ..model import Work
 

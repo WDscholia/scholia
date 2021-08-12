@@ -2,14 +2,9 @@
 
 import json
 
+from scholia.tex import (entity_to_bibtex_entry, escape_to_tex,
+                         extract_dois_from_aux_string)
 from six import text_type, u
-
-from scholia.tex import (
-    entity_to_bibtex_entry,
-    escape_to_tex,
-    extract_dois_from_aux_string,
-)
-
 
 WORK_ENTITY_JSON = """
 {

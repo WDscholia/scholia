@@ -202,6 +202,15 @@ WHERE {{
 }} ORDER BY DESC(?date)
 """
 
+URL_QUERY_WIKIDATA_BIGDATA_SPARQL = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
+
+
+def query_to_wikidata(query):
+    params = {"query": query, "format": "json"}
+    response = requests.get(URL_QUERY_WIKIDATA_BIGDATA_SPARQL, params=params)
+    data = response.json()
+    return data
+
 
 def _value(item, field):
     return item[field]["value"] if field in item else ""
@@ -361,13 +370,9 @@ def wb_get_venue_latest_works(q):
     )
 
     query = VENUE_SPARQL_QUERY.format(q=q)
-    url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
-    params = {"query": query, "format": "json"}
-    response = requests.get(url, params=params)
-    data = response.json()
+    data = query_to_wikidata(query)
 
     rss_body += entities_to_works_rss(data["results"]["bindings"])
-
     rss_body += "  </channel>\n"
     rss_body += "</rss>"
 
@@ -406,13 +411,9 @@ def wb_get_topic_latest_works(q):
     )
 
     query = TOPIC_SPARQL_QUERY.format(q=q)
-    url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
-    params = {"query": query, "format": "json"}
-    response = requests.get(url, params=params)
-    data = response.json()
+    data = query_to_wikidata(query)
 
     rss_body += entities_to_works_rss(data["results"]["bindings"])
-
     rss_body += "</channel>\n"
     rss_body += "</rss>"
 
@@ -453,13 +454,9 @@ def wb_get_organization_latest_works(q):
     )
 
     query = ORGANIZATION_SPARQL_QUERY.format(q=q)
-    url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
-    params = {"query": query, "format": "json"}
-    response = requests.get(url, params=params)
-    data = response.json()
+    data = query_to_wikidata(query)
 
     rss_body += entities_to_works_rss(data["results"]["bindings"])
-
     rss_body += "  </channel>\n"
     rss_body += "</rss>"
 
@@ -500,13 +497,9 @@ def wb_get_sponsor_latest_works(q):
     )
 
     query = SPONSOR_SPARQL_QUERY.format(q=q)
-    url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"
-    params = {"query": query, "format": "json"}
-    response = requests.get(url, params=params)
-    data = response.json()
+    data = query_to_wikidata(query)
 
     rss_body += entities_to_works_rss(data["results"]["bindings"])
-
     rss_body += "  </channel>\n"
     rss_body += "</rss>"
 

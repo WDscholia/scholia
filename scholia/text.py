@@ -24,17 +24,13 @@ Description:
 
 from __future__ import print_function
 
+import re
 from os import makedirs
 from os.path import exists, expanduser, join
 
-from six.moves import cPickle as pickle
-
-import re
-
-from simplejson import JSONDecodeError
-
 import requests
-
+from simplejson import JSONDecodeError
+from six.moves import cPickle as pickle
 
 TOPIC_LABELS_SPARQL = """
 SELECT ?topic ?topic_label

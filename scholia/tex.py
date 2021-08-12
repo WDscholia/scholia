@@ -30,11 +30,10 @@ Semantic relatedness \cite{Q26973018}.
 from __future__ import print_function
 
 import os
-from os import write
-from os.path import splitext
-
 import re
 import unicodedata
+from os import write
+from os.path import splitext
 
 from six import u
 
@@ -44,21 +43,11 @@ except ImportError:
     # enture_text is not available in Python3.7 apparently
     ensure_text = str
 
-from .api import (
-    entity_to_authors,
-    entity_to_classes,
-    entity_to_doi,
-    entity_to_full_text_url,
-    entity_to_journal_title,
-    entity_to_month,
-    entity_to_pages,
-    entity_to_title,
-    entity_to_volume,
-    entity_to_year,
-    wb_get_entities,
-)
+from .api import (entity_to_authors, entity_to_classes, entity_to_doi,
+                  entity_to_full_text_url, entity_to_journal_title,
+                  entity_to_month, entity_to_pages, entity_to_title,
+                  entity_to_volume, entity_to_year, wb_get_entities)
 from .query import doi_to_qs
-
 
 STRING_TO_TEX = {
     u("\xc5"): r"{\AA}",
