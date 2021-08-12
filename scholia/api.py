@@ -621,7 +621,7 @@ def main():
     elif arguments["search"]:
         query = arguments["<query>"]
         limit = int(arguments["--limit"])
-        results = search(query, limit=limit)
+        results = search(query, 1, limit=limit)
         for item in results:
             print(u("{q} {description}").format(**item).encode("utf-8"))
 
