@@ -2,26 +2,56 @@
 
 import re
 
-from flask import (Blueprint, Response, current_app, redirect, render_template,
-                   request, url_for)
+from flask import (
+    Blueprint,
+    Response,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
 
 from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
-from ..query import (arxiv_to_qs, atomic_number_to_qs, atomic_symbol_to_qs,
-                     biorxiv_to_qs, cas_to_qs, chemrxiv_to_qs, cordis_to_qs,
-                     doi_to_qs, github_to_qs, inchikey_to_qs, issn_to_qs,
-                     lipidmaps_to_qs, mesh_to_qs, ncbi_gene_to_qs,
-                     ncbi_taxon_to_qs, orcid_to_qs, pubchem_to_qs,
-                     pubmed_to_qs, q_to_class, q_to_dois, random_author,
-                     ror_to_qs, twitter_to_qs, uniprot_to_qs, viaf_to_qs,
-                     wikipathways_to_qs)
-from ..rss import (wb_get_author_latest_works,
-                   wb_get_organization_latest_works,
-                   wb_get_sponsor_latest_works, wb_get_topic_latest_works,
-                   wb_get_venue_latest_works)
+from ..query import (
+    arxiv_to_qs,
+    atomic_number_to_qs,
+    atomic_symbol_to_qs,
+    biorxiv_to_qs,
+    cas_to_qs,
+    chemrxiv_to_qs,
+    cordis_to_qs,
+    doi_to_qs,
+    github_to_qs,
+    inchikey_to_qs,
+    issn_to_qs,
+    lipidmaps_to_qs,
+    mesh_to_qs,
+    ncbi_gene_to_qs,
+    ncbi_taxon_to_qs,
+    orcid_to_qs,
+    pubchem_to_qs,
+    pubmed_to_qs,
+    q_to_class,
+    q_to_dois,
+    random_author,
+    ror_to_qs,
+    twitter_to_qs,
+    uniprot_to_qs,
+    viaf_to_qs,
+    wikipathways_to_qs,
+)
+from ..rss import (
+    wb_get_author_latest_works,
+    wb_get_organization_latest_works,
+    wb_get_sponsor_latest_works,
+    wb_get_topic_latest_works,
+    wb_get_venue_latest_works,
+)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
