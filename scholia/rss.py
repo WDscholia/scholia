@@ -35,20 +35,14 @@ References
 
 from __future__ import print_function
 
-import requests
-
-from dateutil.parser import parse as parse_datetime
-
-from email.utils import formatdate
-
 from calendar import timegm
-
+from email.utils import formatdate
+from re import sub
 from xml.sax.saxutils import escape
 
-from re import sub
-
+import requests
+from dateutil.parser import parse as parse_datetime
 from six import u
-
 
 WORK_ITEM_RSS = u(
     """

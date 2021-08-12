@@ -15,7 +15,6 @@ import json
 
 import requests
 
-
 USER_AGENT = "Scholia, https://github.com/WDscholia/scholia"
 
 
