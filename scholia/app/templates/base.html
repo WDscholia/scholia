@@ -1,378 +1,395 @@
 {% extends "bootstrap-base.html" %}
 
 {% macro sparql_to_table_post(panel, options={}) -%}
-// {{ panel }} table
-sparqlToDataTablePost(`# tool: scholia
-{% include aspect + '_' + panel + '.sparql' %}
-`,
-"#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",
-options={{ options | tojson }});
+    // {{ panel }} table
+    sparqlToDataTablePost(`# tool: scholia
+    {% include aspect + '_' + panel + '.sparql' %}
+    `,
+    "#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",
+    options={{ options | tojson }});
 {%- endmacro %}
 
 {% macro sparql_to_table(panel, options={}) -%}
-// {{ panel }} table
-sparqlToDataTable(`# tool: scholia
-{% include aspect + '_' + panel + '.sparql' %}
-`,
-"#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",
-options={{ options | tojson }});
+    // {{ panel }} table
+    sparqlToDataTable(`# tool: scholia
+    {% include aspect + '_' + panel + '.sparql' %}
+    `,
+    "#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",
+    options={{ options | tojson }});
 {%- endmacro %}
 
 {% macro sparql_to_iframe(panel) -%}
-// {{ panel }} iframe
-sparqlToIframe(`# tool: scholia
-{% include aspect + '_' + panel + '.sparql' %}`,
-"#{{ panel }}-iframe", "{{ aspect }}_{{ panel }}.sparql");
+    // {{ panel }} iframe
+    sparqlToIframe(`# tool: scholia
+    {% include aspect + '_' + panel + '.sparql' %}`,
+    "#{{ panel }}-iframe", "{{ aspect }}_{{ panel }}.sparql");
 {%- endmacro %}
 
 {% macro sparql_to_matrix(panel) -%}
-// {{ panel }} matrix
-sparqlToMatrix(`# tool: scholia
-{% include aspect + '_' + panel + '.sparql' %}`,
-"#{{ panel }}", "{{ aspect }}_{{ panel }}.sparql");
+    // {{ panel }} matrix
+    sparqlToMatrix(`# tool: scholia
+    {% include aspect + '_' + panel + '.sparql' %}`,
+    "#{{ panel }}", "{{ aspect }}_{{ panel }}.sparql");
 {%- endmacro %}
 
 {% macro sparql_to_pathway_viewer(panel) -%}
-// {{ panel }} optional viewer
-sparqlToPathWayPageViewer(`# tool: scholia
-{% include aspect + '_' + panel + '.sparql' %}`,
-"{{ aspect }}_{{ panel }}.sparql" );
+    // {{ panel }} optional viewer
+    sparqlToPathWayPageViewer(`# tool: scholia
+    {% include aspect + '_' + panel + '.sparql' %}`,
+    "{{ aspect }}_{{ panel }}.sparql" );
 {%- endmacro %}
 
 {% macro sparql_to_404shortinchikey(panel) -%}
-// {{ panel }} short_inchikey
-sparqlToShortInchiKey(`# tool: scholia
-{% include aspect + '_' + panel + '.sparql' %}`,
-"{{inchikey}}",
-"#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql" );
+    // {{ panel }} short_inchikey
+    sparqlToShortInchiKey(`# tool: scholia
+    {% include aspect + '_' + panel + '.sparql' %}`,
+    "{{ inchikey }}",
+    "#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql" );
 {%- endmacro %}
 
 
 {% block metas %}
-<meta charset="UTF-8">
-<meta name="robots" content="index, nofollow">
+    <meta charset="UTF-8">
+    <meta name="robots" content="index, nofollow">
 
-<meta name="og:url" content="{{ 'https://scholia.toolforge.org' + request.path }}" />
-<meta name="og:site_name" content="Scholia" />
-<meta name="og:image" content="{{ url_for('static', filename='images/scholia_social_media.png') }}" />
+    <meta name="og:url" content="{{ 'https://scholia.toolforge.org' + request.path }}"/>
+    <meta name="og:site_name" content="Scholia"/>
+    <meta name="og:image"
+          content="{{ url_for('static', filename='images/scholia_social_media.png') }}"/>
 
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:site" content="@WDScholia" />
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:site" content="@WDScholia"/>
 {% endblock metas %}
 
 
 {% block head %}
-{{super()}}
+    {{ super() }}
 
-<link rel="canonical" href="{{ 'https://scholia.toolforge.org' + request.path }}">
+    <link rel="canonical" href="{{ 'https://scholia.toolforge.org' + request.path }}">
 
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jquery.dataTables.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/scholia.css') }}">
-{% include "favicon.html" %}
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', filename='jquery.dataTables.min.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', filename='css/scholia.css') }}">
+    {% include "favicon.html" %}
 
 {% endblock %}
 
 {% block title %}Scholia{% endblock %}
 
 {% block scripts %}
-{{super()}}
+    {{ super() }}
 
-<script type="text/javascript" src="{{ url_for('static', filename='d3.v5.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='d3-scale-chromatic.v1.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='scholia.js') }}"></script>
-<link href="{{ url_for('static', filename='widgets/select2/css/select2.min.css') }}" rel="stylesheet" />
-<script type="text/javascript" src="{{ url_for('static', filename='widgets/select2/js/select2.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='d3.v5.min.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='d3-scale-chromatic.v1.min.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='scholia.js') }}"></script>
+    <link href="{{ url_for('static', filename='widgets/select2/css/select2.min.css') }}"
+          rel="stylesheet"/>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='widgets/select2/js/select2.min.js') }}"></script>
 
-<script type="text/javascript">
-    {% if q %}
-    var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-	       '{{ q }}' + 
-	       '&format=json&callback=?';
-     
-    $.getJSON(url, function (data) {
-	 var item = data.entities["{{ q }}"];
-	 if ('en' in item.labels) {
-	     var title = item.labels.en.value
-	     $("#h1").text(title);
+    <script type="text/javascript">
+        {% if q %}
+            var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+                '{{ q }}' +
+                '&format=json&callback=?';
 
-	     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
+            $.getJSON(url, function (data) {
+                var item = data.entities["{{ q }}"];
+                if ('en' in item.labels) {
+                    var title = item.labels.en.value
+                    $("#h1").text(title);
 
-	     var linkedToFrom = "<p><a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=1&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
-	     linkedToFrom += "Recent changes to items that link <em>to</em> " + $('<div>').text(title).html() + "</a> and ";
-	     linkedToFrom += "<a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=0&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
-	     linkedToFrom += "recent changes to items that link <em>from</em> " + $('<div>').text(title).html() + "</a>.</p>";
+                    {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
 
-	     $(linkedToFrom).insertAfter('h1:first');
+                        var linkedToFrom = "<p><a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=1&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
+                        linkedToFrom += "Recent changes to items that link <em>to</em> " + $('<div>').text(title).html() + "</a> and ";
+                        linkedToFrom += "<a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=0&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
+                        linkedToFrom += "recent changes to items that link <em>from</em> " + $('<div>').text(title).html() + "</a>.</p>";
 
-	     {% endif %}
-	 }
-	 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
+                        $(linkedToFrom).insertAfter('h1:first');
 
-    {% if q2 %}
+                    {% endif %}
+                }
+                $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 
-    var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-               '{{ q2 }}' +
-               '&format=json&callback=?';
-    $.getJSON(url2, function (data) {
-         var item = data.entities["{{ q2 }}"];
-         if ('en' in item.labels) {
-             $("#h1").append(' - '+item.labels.en.value);
-         }
-         $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
-    });
-    {% endif %}
+                {% if q2 %}
 
-	 var detailsList = Array();
-	 try {
-	     var orcid = item.claims.P496[0].mainsnak.datavalue.value;
-	     detailsList.push( '<a href="https://orcid.org/"><img alt="' +
-			       'ORCID logo" src="{{ url_for('static', filename='images/orcid_16x16.gif') }}"' +
-			       'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
-			       encodeURI( orcid ) + '">https://orcid.org/' + escapeHTML( orcid ) + '</a>');
-	 }
-	 catch(e) {}
+                    var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+                        '{{ q2 }}' +
+                        '&format=json&callback=?';
+                    $.getJSON(url2, function (data) {
+                        var item = data.entities["{{ q2 }}"];
+                        if ('en' in item.labels) {
+                            $("#h1").append(' - ' + item.labels.en.value);
+                        }
+                        $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
+                    });
+                {% endif %}
 
-	 try {
-	     var mastodonAccount = item.claims.P4033[0].mainsnak.datavalue.value;
-	     var mastodonComponents = mastodonAccount.split("@");
-	     if (mastodonComponents.length == 2) {
-		 detailsList.push( '<img alt="Twitter t icon" src="' +
-				   'https://upload.wikimedia.org/wikipedia/commons/4/48/Mastodon_Logotype_%28Simple%29.svg' +
-				   '" width="16" height="16" hspace="4" /> <a href="https://' + mastodonComponents[1] + '/@' +
-				   encodeURI( mastodonComponents[0] ) + '">@' + escapeHTML( mastodonComponents[0] ) + '</a> ');
-	     }
-	 }
-	 catch(e) { }
+                var detailsList = Array();
+                try {
+                    var orcid = item.claims.P496[0].mainsnak.datavalue.value;
+                    detailsList.push('<a href="https://orcid.org/"><img alt="' +
+                        'ORCID logo" src="{{ url_for('static', filename='images/orcid_16x16.gif') }}"' +
+                        'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
+                        encodeURI(orcid) + '">https://orcid.org/' + escapeHTML(orcid) + '</a>');
+                } catch (e) {
+                }
 
-	 try {
-	     var twitterAccount = item.claims.P2002[0].mainsnak.datavalue.value;
-	     detailsList.push( '<img alt="Twitter t icon" src="' +
-			       'https://upload.wikimedia.org/wikipedia/commons/8/8b/Twitter_logo_initial.svg' +
-			       '" width="16" height="16" hspace="4" /> <a href="https://twitter.com/' +
-			       encodeURI( twitterAccount ) + '">@' + escapeHTML( twitterAccount ) + '</a> ');
-	 }
-	 catch(e) { }
+                try {
+                    var mastodonAccount = item.claims.P4033[0].mainsnak.datavalue.value;
+                    var mastodonComponents = mastodonAccount.split("@");
+                    if (mastodonComponents.length == 2) {
+                        detailsList.push('<img alt="Twitter t icon" src="' +
+                            'https://upload.wikimedia.org/wikipedia/commons/4/48/Mastodon_Logotype_%28Simple%29.svg' +
+                            '" width="16" height="16" hspace="4" /> <a href="https://' + mastodonComponents[1] + '/@' +
+                            encodeURI(mastodonComponents[0]) + '">@' + escapeHTML(mastodonComponents[0]) + '</a> ');
+                    }
+                } catch (e) {
+                }
 
-	 try {
-	     var rorID = item.claims.P6782[0].mainsnak.datavalue.value;
-	     detailsList.push( 'ROR <a href="https://ror.org/' + encodeURI( rorID ) + '">' + rorID + '</a> ');
-	 }
-	 catch(e) { }
+                try {
+                    var twitterAccount = item.claims.P2002[0].mainsnak.datavalue.value;
+                    detailsList.push('<img alt="Twitter t icon" src="' +
+                        'https://upload.wikimedia.org/wikipedia/commons/8/8b/Twitter_logo_initial.svg' +
+                        '" width="16" height="16" hspace="4" /> <a href="https://twitter.com/' +
+                        encodeURI(twitterAccount) + '">@' + escapeHTML(twitterAccount) + '</a> ');
+                } catch (e) {
+                }
 
-	 try {
-	     var hashtag = item.claims.P2572[0].mainsnak.datavalue.value;
-	     detailsList.push( '<a href="https://hashtags-hub.toolforge.org/' +
-			       encodeURI( hashtag ) + '">#' + escapeHTML( hashtag ) + '</a> ');
-	 }
-	 catch(e) {}
+                try {
+                    var rorID = item.claims.P6782[0].mainsnak.datavalue.value;
+                    detailsList.push('ROR <a href="https://ror.org/' + encodeURI(rorID) + '">' + rorID + '</a> ');
+                } catch (e) {
+                }
 
-	 try {
-	     var doi = item.claims.P356[0].mainsnak.datavalue.value;
-	     $("head").append( '<meta name="citation_doi" content="' + doi + '"/>' );
-	 }
-	 catch(e) {}
+                try {
+                    var hashtag = item.claims.P2572[0].mainsnak.datavalue.value;
+                    detailsList.push('<a href="https://hashtags-hub.toolforge.org/' +
+                        encodeURI(hashtag) + '">#' + escapeHTML(hashtag) + '</a> ');
+                } catch (e) {
+                }
 
-	 try {
-	     $( '#details' ).append( detailsList.join( " | " ) );
-	 }
-	 catch(e) {}
-	 
-	 /* BioSchemas annotation */
-	 if (item.claims.P31 &&
-	     ((item.claims.P31[0].mainsnak.datavalue.value.id == 'Q5'))) {
-	   try { /* Person */
-	       bioschemasAnnotation = {
-	          "@context" : "https://schema.org",
-	          "@type" : "Person" ,
-	          "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/" },
-	          "description" : "A person" ,
-	          "identifier" : "{{ q }}" ,
-	          "mainEntityOfPage" : "http://www.wikidata.org/entity/{{ q }}"
-	       }
-	       if ('en' in item.labels) {
-	         bioschemasAnnotation.name = item.labels.en.value;
-	       }
-	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	    } catch(e) {}
-	 } else if (item.claims.P31 &&
-	     ((item.claims.P31[0].mainsnak.datavalue.value.id == 'Q47461491') ||
-	      (item.claims.P31[0].mainsnak.datavalue.value.id == 'Q967847'))) {
-	   try { /* ChemicalSubstance */
-	       bioschemasAnnotation = {
-	          "@context" : "https://schema.org",
-	          "@type" : "ChemicalSubstance" ,
-	          "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE/" },
-	          "identifier" : "{{ q }}" ,
-	          "url" : "http://www.wikidata.org/entity/{{ q }}"
-	       }
-	       if ('en' in item.labels) {
-	         bioschemasAnnotation.name = item.labels.en.value;
-	       }
-	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	    } catch(e) {}
-	 } else if (item.claims.P225) {
-             try { /* Taxon */
-		 var taxonName = item.claims.P225[0].mainsnak.datavalue.value;
-		 bioschemasAnnotation = {
-	             "@context" : "https://schema.org",
-	             "@type" : "Taxon" ,
-	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Taxon/0.6-RELEASE/" },
-	             "name" : taxonName ,
-	             "url" : "http://www.wikidata.org/entity/{{ q }}"
-		 }
-		 if (item.claims.P105) {
-	             var taxonRank = item.claims.P105[0].mainsnak.datavalue.value.id;
-	             bioschemasAnnotation.taxonRank = "http://www.wikidata.org/entity/" + taxonRank ;
-		 }
-		 if (item.claims.P171) {
-	             var parent = item.claims.P171[0].mainsnak.datavalue.value.id;
-	             bioschemasAnnotation.parentTaxon = "http://www.wikidata.org/entity/" + parent ;
-		 }
-		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-		 // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
-	     } catch(e) {}
-	 } else if (item.claims.P235) {
-	     try { /* Chemical Compound */
-		 var inchiKey = item.claims.P235[0].mainsnak.datavalue.value;
-		 bioschemasAnnotation = {
-	             "@context" : "https://schema.org",
-	             "@type" : "MolecularEntity" ,
-	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE/" },
-	             "identifier" : "{{ q }}" ,
-	             "inChIKey" : inchiKey ,
-	             "url" : "http://www.wikidata.org/entity/{{ q }}"
-		 }
-		 if ('en' in item.labels) {
-	         bioschemasAnnotation.name = item.labels.en.value;
-         }
-		 if (item.claims.P234 && item.claims.P234[0].mainsnak.datavalue) {
-	             var inchi = item.claims.P234[0].mainsnak.datavalue.value;
-	             bioschemasAnnotation.inChI = inchi ;
-		 }
-		 if (item.claims.P274 && item.claims.P274[0].mainsnak.datavalue) {
-	             var chemformula = item.claims.P274[0].mainsnak.datavalue.value;
-	             bioschemasAnnotation.molecularFormula = chemformula ;
-		 }
-		 if (item.claims.P2017 && item.claims.P2017[0].mainsnak.datavalue) {
-	             var smiles = item.claims.P2017[0].mainsnak.datavalue.value;
-	             bioschemasAnnotation.molecularFormula = smiles.replace("\"", "\'\'") ;
-		 } else if (item.claims.P233 && item.claims.P233[0].mainsnak.datavalue) {
-	             var smiles = item.claims.P233[0].mainsnak.datavalue.value;
-	             bioschemasAnnotation.smiles = smiles.replace("\"", "\'\'") ;
-		 }
-		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	     } catch(e) { console.log("Exception: " + e)
-	     }
-	 } else if (item.claims.P352) { // UniProt ID
-	     try { /* Protein */
-		 var uniprot = item.claims.P352[0].mainsnak.datavalue.value;
-		 bioschemasAnnotation = {
-	             "@context" : "https://schema.org",
-	             "@type" : "Protein" ,
-	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Protein/0.11-RELEASE/" },
-	             "identifier" : "{{ q }}" ,
-	             "url" : "http://www.wikidata.org/entity/{{ q }}" ,
-	             "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
-		 }
-		 if ('en' in item.labels) {
-	       bioschemasAnnotation.name = item.labels.en.value;
-         }
-		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	     } catch(e) { console.log("Exception: " + e)
-	     }
-	 } else if (item.claims.P351 || item.claims.P594) { // NCBI Gene or Ensembl
-	     try { /* Gene */
-		 bioschemasAnnotation = {
-	             "@context" : "https://schema.org",
-	             "@type" : "Gene" ,
-	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Gene/0.7-RELEASE/" },
-	             "identifier" : "{{ q }}" ,
-	             "url" : "http://www.wikidata.org/entity/{{ q }}"
-		 }
-		 if ('en' in item.labels) {
-	       bioschemasAnnotation.name = item.labels.en.value;
-         }
-		 counter = 0
-		 bioschemasAnnotation.sameAs = []
-		 if (item.claims.P351 && item.claims.P351[0].mainsnak.datavalue) {
-	             var ncbi = item.claims.P351[0].mainsnak.datavalue.value;
-	             bioschemasAnnotation.sameAs[counter] = "https://www.ncbi.nlm.nih.gov/gene/" + ncbi;
-	             counter++
-		 }
-		 if (item.claims.P594 && item.claims.P594[0].mainsnak.datavalue) {
-	             var ensembl = item.claims.P594[0].mainsnak.datavalue.value;
-	             bioschemasAnnotation.sameAs[counter] = "http://identifiers.org/ensembl/" + ensembl;
-		 }
-		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	     } catch(e) { console.log("Exception: " + e)
-	     }
-	 }
-	 
-	 /* English Wikipedia */
-	 if ('enwiki' in item.sitelinks) {
-	     var title = item.sitelinks.enwiki.title;
-	     var wikipediaApiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' +
-				   encodeURIComponent(title);
-	     var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
+                try {
+                    var doi = item.claims.P356[0].mainsnak.datavalue.value;
+                    $("head").append('<meta name="citation_doi" content="' + doi + '"/>');
+                } catch (e) {
+                }
 
-	     var headers = new Headers({"Api-User-Agent": "https://github.com/WDscholia/scholia"});
+                try {
+                    $('#details').append(detailsList.join(" | "));
+                } catch (e) {
+                }
 
-	     fetch(wikipediaApiUrl, {method: 'GET', headers: headers})
-	     .then(response => response.json())
-	     .then(data => {
-	       var html = " (<a href=\"" + wikipediaUrl + "\">Read more on English Wikipedia</a>)";
-		 $("#intro").text(data.extract).append(html);
-	     }).catch(error => {
-		 console.error('Error:', error);
-	     });
-	 }
+                /* BioSchemas annotation */
+                if (item.claims.P31 &&
+                    ((item.claims.P31[0].mainsnak.datavalue.value.id == 'Q5'))) {
+                    try { /* Person */
+                        bioschemasAnnotation = {
+                            "@context": "https://schema.org",
+                            "@type": "Person",
+                            "http://purl.org/dc/terms/conformsTo": {
+                                "@type": "CreativeWork",
+                                "@id": "https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/"
+                            },
+                            "description": "A person",
+                            "identifier": "{{ q }}",
+                            "mainEntityOfPage": "http://www.wikidata.org/entity/{{ q }}"
+                        }
+                        if ('en' in item.labels) {
+                            bioschemasAnnotation.name = item.labels.en.value;
+                        }
+                        $('#bioschemas').append(JSON.stringify(bioschemasAnnotation));
+                    } catch (e) {
+                    }
+                } else if (item.claims.P31 &&
+                    ((item.claims.P31[0].mainsnak.datavalue.value.id == 'Q47461491') ||
+                        (item.claims.P31[0].mainsnak.datavalue.value.id == 'Q967847'))) {
+                    try { /* ChemicalSubstance */
+                        bioschemasAnnotation = {
+                            "@context": "https://schema.org",
+                            "@type": "ChemicalSubstance",
+                            "http://purl.org/dc/terms/conformsTo": {
+                                "@type": "CreativeWork",
+                                "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE/"
+                            },
+                            "identifier": "{{ q }}",
+                            "url": "http://www.wikidata.org/entity/{{ q }}"
+                        }
+                        if ('en' in item.labels) {
+                            bioschemasAnnotation.name = item.labels.en.value;
+                        }
+                        $('#bioschemas').append(JSON.stringify(bioschemasAnnotation));
+                    } catch (e) {
+                    }
+                } else if (item.claims.P225) {
+                    try { /* Taxon */
+                        var taxonName = item.claims.P225[0].mainsnak.datavalue.value;
+                        bioschemasAnnotation = {
+                            "@context": "https://schema.org",
+                            "@type": "Taxon",
+                            "http://purl.org/dc/terms/conformsTo": {
+                                "@type": "CreativeWork",
+                                "@id": "https://bioschemas.org/profiles/Taxon/0.6-RELEASE/"
+                            },
+                            "name": taxonName,
+                            "url": "http://www.wikidata.org/entity/{{ q }}"
+                        }
+                        if (item.claims.P105) {
+                            var taxonRank = item.claims.P105[0].mainsnak.datavalue.value.id;
+                            bioschemasAnnotation.taxonRank = "http://www.wikidata.org/entity/" + taxonRank;
+                        }
+                        if (item.claims.P171) {
+                            var parent = item.claims.P171[0].mainsnak.datavalue.value.id;
+                            bioschemasAnnotation.parentTaxon = "http://www.wikidata.org/entity/" + parent;
+                        }
+                        $('#bioschemas').append(JSON.stringify(bioschemasAnnotation));
+                        // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
+                    } catch (e) {
+                    }
+                } else if (item.claims.P235) {
+                    try { /* Chemical Compound */
+                        var inchiKey = item.claims.P235[0].mainsnak.datavalue.value;
+                        bioschemasAnnotation = {
+                            "@context": "https://schema.org",
+                            "@type": "MolecularEntity",
+                            "http://purl.org/dc/terms/conformsTo": {
+                                "@type": "CreativeWork",
+                                "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE/"
+                            },
+                            "identifier": "{{ q }}",
+                            "inChIKey": inchiKey,
+                            "url": "http://www.wikidata.org/entity/{{ q }}"
+                        }
+                        if ('en' in item.labels) {
+                            bioschemasAnnotation.name = item.labels.en.value;
+                        }
+                        if (item.claims.P234 && item.claims.P234[0].mainsnak.datavalue) {
+                            var inchi = item.claims.P234[0].mainsnak.datavalue.value;
+                            bioschemasAnnotation.inChI = inchi;
+                        }
+                        if (item.claims.P274 && item.claims.P274[0].mainsnak.datavalue) {
+                            var chemformula = item.claims.P274[0].mainsnak.datavalue.value;
+                            bioschemasAnnotation.molecularFormula = chemformula;
+                        }
+                        if (item.claims.P2017 && item.claims.P2017[0].mainsnak.datavalue) {
+                            var smiles = item.claims.P2017[0].mainsnak.datavalue.value;
+                            bioschemasAnnotation.molecularFormula = smiles.replace("\"", "\'\'");
+                        } else if (item.claims.P233 && item.claims.P233[0].mainsnak.datavalue) {
+                            var smiles = item.claims.P233[0].mainsnak.datavalue.value;
+                            bioschemasAnnotation.smiles = smiles.replace("\"", "\'\'");
+                        }
+                        $('#bioschemas').append(JSON.stringify(bioschemasAnnotation));
+                    } catch (e) {
+                        console.log("Exception: " + e)
+                    }
+                } else if (item.claims.P352) { // UniProt ID
+                    try { /* Protein */
+                        var uniprot = item.claims.P352[0].mainsnak.datavalue.value;
+                        bioschemasAnnotation = {
+                            "@context": "https://schema.org",
+                            "@type": "Protein",
+                            "http://purl.org/dc/terms/conformsTo": {
+                                "@type": "CreativeWork",
+                                "@id": "https://bioschemas.org/profiles/Protein/0.11-RELEASE/"
+                            },
+                            "identifier": "{{ q }}",
+                            "url": "http://www.wikidata.org/entity/{{ q }}",
+                            "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
+                        }
+                        if ('en' in item.labels) {
+                            bioschemasAnnotation.name = item.labels.en.value;
+                        }
+                        $('#bioschemas').append(JSON.stringify(bioschemasAnnotation));
+                    } catch (e) {
+                        console.log("Exception: " + e)
+                    }
+                } else if (item.claims.P351 || item.claims.P594) { // NCBI Gene or Ensembl
+                    try { /* Gene */
+                        bioschemasAnnotation = {
+                            "@context": "https://schema.org",
+                            "@type": "Gene",
+                            "http://purl.org/dc/terms/conformsTo": {
+                                "@type": "CreativeWork",
+                                "@id": "https://bioschemas.org/profiles/Gene/0.7-RELEASE/"
+                            },
+                            "identifier": "{{ q }}",
+                            "url": "http://www.wikidata.org/entity/{{ q }}"
+                        }
+                        if ('en' in item.labels) {
+                            bioschemasAnnotation.name = item.labels.en.value;
+                        }
+                        counter = 0
+                        bioschemasAnnotation.sameAs = []
+                        if (item.claims.P351 && item.claims.P351[0].mainsnak.datavalue) {
+                            var ncbi = item.claims.P351[0].mainsnak.datavalue.value;
+                            bioschemasAnnotation.sameAs[counter] = "https://www.ncbi.nlm.nih.gov/gene/" + ncbi;
+                            counter++
+                        }
+                        if (item.claims.P594 && item.claims.P594[0].mainsnak.datavalue) {
+                            var ensembl = item.claims.P594[0].mainsnak.datavalue.value;
+                            bioschemasAnnotation.sameAs[counter] = "http://identifiers.org/ensembl/" + ensembl;
+                        }
+                        $('#bioschemas').append(JSON.stringify(bioschemasAnnotation));
+                    } catch (e) {
+                        console.log("Exception: " + e)
+                    }
+                }
 
-	 
-	 /* English Wikiversity */
-	 if ('enwikiversity' in item.sitelinks) {
-	     var enwikiversityTitle = item.sitelinks.enwikiversity.title;
-	     var wikiversityApiUrl = 'https://en.wikiversity.org/w/api.php?' +
-				     'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
-				     'explaintext=1&callback=?&format=json&titles=' +
-				     encodeURIComponent(enwikiversityTitle);
-	     var wikiversityUrl = 'https://en.wikiversity.org/wiki/' + encodeURIComponent(enwikiversityTitle)
+                /* English Wikipedia */
+                if ('enwiki' in item.sitelinks) {
+                    var title = item.sitelinks.enwiki.title;
+                    var wikipediaApiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' +
+                        encodeURIComponent(title);
+                    var wikipediaUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title)
 
-	     $.getJSON(wikiversityApiUrl, function(data) {
-		 var pages = data.query.pages;
-		 var text = pages[Object.keys(pages)[0]].extract; 
-		 if (text) {
-		     var html = "... (from the <a href=\"" + wikiversityUrl + "\">English Wikiversity</a>)";
-		 }
-		 else {
-		     var html = "Read on the <a href=\"" + wikiversityUrl + "\">English Wikiversity</a>";
-		 }
-		 $("#wikiversity-extract").text(text).append(html);
-	     }).fail(function(d, textStatus, error) {
-		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
-	     });
-	 }
+                    var headers = new Headers({"Api-User-Agent": "https://github.com/WDscholia/scholia"});
 
-     });
+                    fetch(wikipediaApiUrl, {method: 'GET', headers: headers})
+                        .then(response => response.json())
+                        .then(data => {
+                            var html = " (<a href=\"" + wikipediaUrl + "\">Read more on English Wikipedia</a>)";
+                            $("#intro").text(data.extract).append(html);
+                        }).catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
 
-	{% if q2 %}
 
-		var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-				   '{{ q2 }}' +
-				   '&format=json&callback=?';
-		$.getJSON(url2, function (data) {
-			 var item = data.entities["{{ q2 }}"];
-			 if ('en' in item.labels) {
-				 $("#h1").append(' - '+item.labels.en.value);
-			 }
-			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
-		});
-	{% endif %}
-	
-     // this query opens the Wikidata item as a different aspect
-     var endpointUrl = 'https://query.wikidata.org/sparql';
-     var query = `
+                /* English Wikiversity */
+                if ('enwikiversity' in item.sitelinks) {
+                    var enwikiversityTitle = item.sitelinks.enwikiversity.title;
+                    var wikiversityApiUrl = 'https://en.wikiversity.org/w/api.php?' +
+                        'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' +
+                        'explaintext=1&callback=?&format=json&titles=' +
+                        encodeURIComponent(enwikiversityTitle);
+                    var wikiversityUrl = 'https://en.wikiversity.org/wiki/' + encodeURIComponent(enwikiversityTitle)
+
+                    $.getJSON(wikiversityApiUrl, function (data) {
+                        var pages = data.query.pages;
+                        var text = pages[Object.keys(pages)[0]].extract;
+                        if (text) {
+                            var html = "... (from the <a href=\"" + wikiversityUrl + "\">English Wikiversity</a>)";
+                        } else {
+                            var html = "Read on the <a href=\"" + wikiversityUrl + "\">English Wikiversity</a>";
+                        }
+                        $("#wikiversity-extract").text(text).append(html);
+                    }).fail(function (d, textStatus, error) {
+                        console.error("getJSON failed, status: " + textStatus + ", error: " + error)
+                    });
+                }
+
+            });
+
+            // this query opens the Wikidata item as a different aspect
+            var endpointUrl = 'https://query.wikidata.org/sparql';
+            var query = `
     SELECT DISTINCT ?aspect 
     WHERE {
     { [] wdt:P50 wd:{{ q }} . BIND("author" AS ?aspect) }
@@ -414,24 +431,24 @@ sparqlToShortInchiKey(`# tool: scholia
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
     `;
-     settings = {
-	 headers: { Accept: 'application/sparql-results+json' },
-	 data: { query: query }
-     };
+            settings = {
+                headers: {Accept: 'application/sparql-results+json'},
+                data: {query: query}
+            };
 
-     $.ajax( endpointUrl, settings ).then( function ( data ) {
-	 data.results.bindings.forEach(function(entry) {
-	     var aspect = entry.aspect.value;
-	     $( '#aspect-chooser' ).append(
-		 `<a role="button"
+            $.ajax(endpointUrl, settings).then(function (data) {
+                data.results.bindings.forEach(function (entry) {
+                    var aspect = entry.aspect.value;
+                    $('#aspect-chooser').append(
+                        `<a role="button"
 		     class="btn btn-outline-dark btn-sm"
-                     href="{{ url_for('app.index') }}` + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ' );
-	 });
-     } );
+                     href="{{ url_for('app.index') }}` + aspect + '/' + '{{ q }}' + '">' + aspect + '</a> ');
+                });
+            });
 
-     // this query opens a subpage for the Wikidata item, e.g. as cito subpage
-     var endpointUrl = 'https://query.wikidata.org/sparql';
-     var query = `
+            // this query opens a subpage for the Wikidata item, e.g. as cito subpage
+            var endpointUrl = 'https://query.wikidata.org/sparql';
+            var query = `
     SELECT DISTINCT ?aspectsubpage
     WHERE {
     { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 / wdt:P1433 wd:{{ q }} . BIND("venue-cito" AS ?aspectsubpage) }
@@ -439,331 +456,374 @@ sparqlToShortInchiKey(`# tool: scholia
     { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 wd:{{ q }} . BIND("work-cito" AS ?aspectsubpage) }
     }
     `;
-     settings = {
-	 headers: { Accept: 'application/sparql-results+json' },
-	 data: { query: query }
-     };
+            settings = {
+                headers: {Accept: 'application/sparql-results+json'},
+                data: {query: query}
+            };
 
-     $.ajax( endpointUrl, settings ).then( function ( data ) {
-	 data.results.bindings.forEach(function(entry) {
-	     var props = entry.aspectsubpage.value.split("-");
-	     var aspect = props[0];
-	     var subpage = props[1];
-	     $( '#aspect-chooser' ).append(
-		 `<a role="button"
+            $.ajax(endpointUrl, settings).then(function (data) {
+                data.results.bindings.forEach(function (entry) {
+                    var props = entry.aspectsubpage.value.split("-");
+                    var aspect = props[0];
+                    var subpage = props[1];
+                    $('#aspect-chooser').append(
+                        `<a role="button"
 		     class="btn btn-outline-dark btn-sm"
-                     href="{{ url_for('app.index') }}` + aspect + '/' + '{{ q }}' + '/' + subpage + '">' + subpage + '</a> ' );
-	 });
-     } );
+                     href="{{ url_for('app.index') }}` + aspect + '/' + '{{ q }}' + '/' + subpage + '">' + subpage + '</a> ');
+                });
+            });
 
 
-     /* Wembedder */
-     var wembedderUrl = "https://wembedder.toolforge.org/api/most-similar/{{ q }}";
-     $.ajax({
-	 url: wembedderUrl,
-	 success: function (data) {
-	     var html = `<hr><span data-toogle="tooltip" title="Related items from Wembedder knowledge graph embedding.">Related:</span> `; 
-	     $( '#wembedder' ).append(html);
+            /* Wembedder */
+            var wembedderUrl = "https://wembedder.toolforge.org/api/most-similar/{{ q }}";
+            $.ajax({
+                url: wembedderUrl,
+                success: function (data) {
+                    var html = `<hr><span data-toogle="tooltip" title="Related items from Wembedder knowledge graph embedding.">Related:</span> `;
+                    $('#wembedder').append(html);
 
-	     // Make list with results
-	     data.most_similar.forEach(function(entry, idx, array) {
-		 var listed_q = entry.item;
-		 var language = 'en';
+                    // Make list with results
+                    data.most_similar.forEach(function (entry, idx, array) {
+                        var listed_q = entry.item;
+                        var language = 'en';
 
-		 if (idx !== 0) {
-		     $( '#wembedder' ).append( ' &middot; ');
-		 }
+                        if (idx !== 0) {
+                            $('#wembedder').append(' &middot; ');
+                        }
 
-		 var html = '<a href="../' + listed_q + '"><span id="wembedder-result-' + listed_q + '">' + listed_q + '</span></a> '
-		 $( '#wembedder' ).append( html );
+                        var html = '<a href="../' + listed_q + '"><span id="wembedder-result-' + listed_q + '">' + listed_q + '</span></a> '
+                        $('#wembedder').append(html);
 
-		 // Convert Q identifier to labels
-                 $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
-                     action: "wbgetentities",
-                     ids: listed_q,
-                     language: language,
-                     uselang: language,
-                     format: "json",
-                     strictlanguage: true,
-                 }, function (data) {
-                     if (listed_q in data.entities) {
-                         label = entityToLabel(data.entities[listed_q],
-                                               language=language);
-                         $('#wembedder-result-' + listed_q).empty();
-                         $('#wembedder-result-' + listed_q).text(label);
-                     }
-		 });
-	     });
-	     $( '#wembedder' ).append( '<hr>' );
-	 }
-     });
-  {% endif %}
+                        // Convert Q identifier to labels
+                        $.getJSON("https://www.wikidata.org/w/api.php?callback=?", {
+                            action: "wbgetentities",
+                            ids: listed_q,
+                            language: language,
+                            uselang: language,
+                            format: "json",
+                            strictlanguage: true,
+                        }, function (data) {
+                            if (listed_q in data.entities) {
+                                label = entityToLabel(data.entities[listed_q],
+                                    language = language);
+                                $('#wembedder-result-' + listed_q).empty();
+                                $('#wembedder-result-' + listed_q).text(label);
+                            }
+                        });
+                    });
+                    $('#wembedder').append('<hr>');
+                }
+            });
+        {% endif %}
 
- $(document).ready(function () {
-     let search_text = ""
-     $('#searchterm').select2({
-         allowClear: true,
-         {% if request.path.endswith("search") %}
-         placeholder: "Scientist, paper, topic, DOI, etc.",
-         {% else %}
-         placeholder: "Search...",
-         {% endif %}
-         ajax: {
-             url: "https://www.wikidata.org/w/api.php?callback=?",
-             dataType: 'jsonp',
-             data: function (params) {
-                 search_text = params.term
-                 var query = {
-                     search: params.term,
-                     action: "wbsearchentities",
-                     language: "en",
-                     uselang: "en",
-                     format: "json",
-                     strictlanguage: true
-                 }
-                 return query
-             },
-             processResults: function (data) {
-                 var results = [{id: -1, text: "Advanced search"}];
-                 $.each(data.search, function (index, item) {
-                     results.push({
-                         id: "{{ url_for('app.index') }}" + item.title,
-                         text: item.label + " - " + item.description
-                     });
-                 });
+        $(document).ready(function () {
+            let search_text = ""
+            $('#searchterm').select2({
+                allowClear: true,
+                {% if request.path.endswith("search") %}
+                    placeholder: "Scientist, paper, topic, DOI, etc.",
+                {% else %}
+                    placeholder: "Search...",
+                {% endif %}
+                ajax: {
+                    url: "https://www.wikidata.org/w/api.php?callback=?",
+                    dataType: 'jsonp',
+                    data: function (params) {
+                        search_text = params.term
+                        var query = {
+                            search: params.term,
+                            action: "wbsearchentities",
+                            language: "en",
+                            uselang: "en",
+                            format: "json",
+                            strictlanguage: true
+                        }
+                        return query
+                    },
+                    processResults: function (data) {
+                        var results = [{id: -1, text: "Advanced search"}];
+                        $.each(data.search, function (index, item) {
+                            results.push({
+                                id: "{{ url_for('app.index') }}" + item.title,
+                                text: item.label + " - " + item.description
+                            });
+                        });
 
-                 return {
-                     "results": results
-                 };
-             }
-         }
-     });
+                        return {
+                            "results": results
+                        };
+                    }
+                }
+            });
 
-     $("#searchterm").on("select2:select", function (e) {
-         const search_id = e.params.data.id
-         if (search_id === -1) {
-             if(search_text === undefined) search_text = ""
-             window.location.href = "/search?q=" + search_text;
-         } else {
-             window.location.href = e.params.data.id;
-         }
-     });
+            $("#searchterm").on("select2:select", function (e) {
+                const search_id = e.params.data.id
+                if (search_id === -1) {
+                    if (search_text === undefined) search_text = ""
+                    window.location.href = "/search?q=" + search_text;
+                } else {
+                    window.location.href = e.params.data.id;
+                }
+            });
 
-     // Add anchor links to all headings
-     var headers = document.querySelectorAll('h2[id], h3[id]')
-     if (headers) {
-       headers.forEach(element => {
-         var title = element.innerText;
-         element.removeChild(element.childNodes[0])
-         element.insertAdjacentHTML('afterbegin', `<a href="#${element.id}" class="hlink"  ariaLabel="Anchor">${title}</a>`)
-       })
-     }
+            // Add anchor links to all headings
+            var headers = document.querySelectorAll('h2[id], h3[id]')
+            if (headers) {
+                headers.forEach(element => {
+                    var title = element.innerText;
+                    element.removeChild(element.childNodes[0])
+                    element.insertAdjacentHTML('afterbegin', `<a href="#${element.id}" class="hlink"  ariaLabel="Anchor">${title}</a>`)
+                })
+            }
 
-     // Add table of content
-  var headings = document.querySelectorAll("h2,h3");
-  if (headings.length >= 4) {
-    var toc = document.createElement("div");
-    toc.className = "table-of-contents"
+            // Add table of content
+            var headings = document.querySelectorAll("h2,h3");
+            if (headings.length >= 4) {
+                var toc = document.createElement("div");
+                toc.className = "table-of-contents"
 
-    tocTitle = document.createElement("b");
-    tocTitle.innerText = "Table of Contents"
-    toc.appendChild(tocTitle)
+                tocTitle = document.createElement("b");
+                tocTitle.innerText = "Table of Contents"
+                toc.appendChild(tocTitle)
 
-    var tocList = document.createElement("ul");
-    var sublist = "";
-    for (let i = 0; i < headings.length; i++) {
-      const element = headings[i];
-      if (!element.id) {
-        element.id = element.innerText.replace(" ", "-")
-      }
-      if (element.tagName === "H3" && !sublist) {
-        var sublist = document.createElement("ul");
-      }
-      tocListItem = document.createElement("li");
+                var tocList = document.createElement("ul");
+                var sublist = "";
+                for (let i = 0; i < headings.length; i++) {
+                    const element = headings[i];
+                    if (!element.id) {
+                        element.id = element.innerText.replace(" ", "-")
+                    }
+                    if (element.tagName === "H3" && !sublist) {
+                        var sublist = document.createElement("ul");
+                    }
+                    tocListItem = document.createElement("li");
 
-      tocEntry = document.createElement("a");
-      tocEntry.setAttribute("href", "#" + element.id);
-      tocEntry.innerText = headings[i].innerText;
+                    tocEntry = document.createElement("a");
+                    tocEntry.setAttribute("href", "#" + element.id);
+                    tocEntry.innerText = headings[i].innerText;
 
-      tocListItem.appendChild(tocEntry);
+                    tocListItem.appendChild(tocEntry);
 
-      if (element.tagName === "H3") {
-        sublist.appendChild(tocListItem);
-      } else {
-        if (sublist) {
-          tocList.appendChild(sublist);
-          sublist = "";
-        }
-        tocList.appendChild(tocListItem);
-      }
-    }
+                    if (element.tagName === "H3") {
+                        sublist.appendChild(tocListItem);
+                    } else {
+                        if (sublist) {
+                            tocList.appendChild(sublist);
+                            sublist = "";
+                        }
+                        tocList.appendChild(tocListItem);
+                    }
+                }
 
-    toc.appendChild(tocList)
-    document.querySelector("h2").insertAdjacentElement("beforebegin", toc)
-  }
+                toc.appendChild(tocList)
+                document.querySelector("h2").insertAdjacentElement("beforebegin", toc)
+            }
 
 
-     {% block in_ready %}{% endblock %}
- });
+            {% block in_ready %}{% endblock %}
+        });
 
-</script>
+    </script>
 
 {% endblock %}
 
 {% block navbar %}
-<div class="navbar navbar-static-top">
-    <ul class="nav nav-pills">
-	<li role="presentation"><a href="{{ url_for('app.index') }}"><img src="{{ url_for('static', filename='images/scholia_wordmark.svg') }}" width="112px" height="24px" alt="Scholia"></a></li>
-	<li role="presentation"><a href="{{ url_for('app.show_author_index') }}">Author</a></li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Work
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_work_empty') }}">Work</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_venue_empty') }}">Venue</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_series_empty') }}">Series</a></li>
-                    <li role="presentation"><a href="{{ url_for('app.show_catalogue_empty') }}">Catalogue</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_printer_index') }}">Printer</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Organization
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_organization_empty') }}">Organization</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_printer_index') }}">Printer</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Location
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_location_empty') }}">Location</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_country_empty') }}">Country</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Event
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_event_empty') }}">Event</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_event_series_empty') }}">Event series</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Project
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_clinical_trial_index') }}">Clinical trial</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_project_empty') }}">Project</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation"><a href="{{ url_for('app.show_award_empty') }}">Award</a></li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Topic
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_topic_empty') }}">General</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_disease_empty') }}">Disease</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_taxon_empty') }}">Taxon</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_gene_empty') }}">Gene</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_protein_empty') }}">Protein</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_pathway_empty') }}">Pathway</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_chemical_index') }}">Chemical</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_chemical_element_empty') }}">Chemical element</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_chemical_class_empty') }}">Chemical class</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_lexeme_empty') }}">Lexeme</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_use_empty') }}">Use</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Tools
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_arxiv_to_quickstatements') }}">Arxiv to Quickstatements</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_q_to_bibliography_templates') }}">Q to Bibliography templates</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_text_to_topics') }}">Text to topics</a></li>
-		</ul>
-	    </div>
-	</li>
+    <div class="navbar navbar-static-top">
+        <ul class="nav nav-pills">
+            <li role="presentation"><a href="{{ url_for('app.index') }}"><img
+                    src="{{ url_for('static', filename='images/scholia_wordmark.svg') }}"
+                    width="112px" height="24px" alt="Scholia"></a></li>
+            <li role="presentation"><a href="{{ url_for('app.show_author_index') }}">Author</a>
+            </li>
+            <li role="presentation">
+                <div class="dropdown">
+                    <button class="btn btn-link dropdown-toggle"
+                            type="button" data-toggle="dropdown">Work
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_work_empty') }}">Work</a></li>
+                        <li role="presentation"><a href="{{ url_for('app.show_venue_empty') }}">Venue</a>
+                        </li>
+                        <li role="presentation"><a href="{{ url_for('app.show_series_empty') }}">Series</a>
+                        </li>
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_catalogue_empty') }}">Catalogue</a></li>
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
+                        <li role="presentation"><a href="{{ url_for('app.show_printer_index') }}">Printer</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li role="presentation">
+                <div class="dropdown">
+                    <button class="btn btn-link dropdown-toggle"
+                            type="button" data-toggle="dropdown">Organization
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_organization_empty') }}">Organization</a>
+                        </li>
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
+                        <li role="presentation"><a href="{{ url_for('app.show_printer_index') }}">Printer</a>
+                        </li>
+                        <li role="presentation"><a href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li role="presentation">
+                <div class="dropdown">
+                    <button class="btn btn-link dropdown-toggle"
+                            type="button" data-toggle="dropdown">Location
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li role="presentation"><a href="{{ url_for('app.show_location_empty') }}">Location</a>
+                        </li>
+                        <li role="presentation"><a href="{{ url_for('app.show_country_empty') }}">Country</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li role="presentation">
+                <div class="dropdown">
+                    <button class="btn btn-link dropdown-toggle"
+                            type="button" data-toggle="dropdown">Event
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li role="presentation"><a href="{{ url_for('app.show_event_empty') }}">Event</a>
+                        </li>
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_event_series_empty') }}">Event
+                            series</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li role="presentation">
+                <div class="dropdown">
+                    <button class="btn btn-link dropdown-toggle"
+                            type="button" data-toggle="dropdown">Project
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_clinical_trial_index') }}">Clinical
+                            trial</a></li>
+                        <li role="presentation"><a href="{{ url_for('app.show_project_empty') }}">Project</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li role="presentation"><a href="{{ url_for('app.show_award_empty') }}">Award</a></li>
+            <li role="presentation">
+                <div class="dropdown">
+                    <button class="btn btn-link dropdown-toggle"
+                            type="button" data-toggle="dropdown">Topic
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li role="presentation"><a href="{{ url_for('app.show_topic_empty') }}">General</a>
+                        </li>
+                        <li role="presentation"><a href="{{ url_for('app.show_disease_empty') }}">Disease</a>
+                        </li>
+                        <li role="presentation"><a href="{{ url_for('app.show_taxon_empty') }}">Taxon</a>
+                        </li>
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_gene_empty') }}">Gene</a></li>
+                        <li role="presentation"><a href="{{ url_for('app.show_protein_empty') }}">Protein</a>
+                        </li>
+                        <li role="presentation"><a href="{{ url_for('app.show_pathway_empty') }}">Pathway</a>
+                        </li>
+                        <li role="presentation"><a href="{{ url_for('app.show_chemical_index') }}">Chemical</a>
+                        </li>
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_chemical_element_empty') }}">Chemical
+                            element</a></li>
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_chemical_class_empty') }}">Chemical
+                            class</a></li>
+                        <li role="presentation"><a href="{{ url_for('app.show_lexeme_empty') }}">Lexeme</a>
+                        </li>
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_use_empty') }}">Use</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li role="presentation">
+                <div class="dropdown">
+                    <button class="btn btn-link dropdown-toggle"
+                            type="button" data-toggle="dropdown">Tools
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_arxiv_to_quickstatements') }}">Arxiv to
+                            Quickstatements</a></li>
+                        <li role="presentation"><a
+                                href="{{ url_for('app.show_q_to_bibliography_templates') }}">Q to
+                            Bibliography templates</a></li>
+                        <li role="presentation"><a href="{{ url_for('app.show_text_to_topics') }}">Text
+                            to topics</a></li>
+                    </ul>
+                </div>
+            </li>
 
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Help
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.index_statistics') }}">Statistics</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_faq') }}">FAQ</a></li>
-		</ul>
-	    </div>
-	</li>
-    
-    </ul>
-    {% block nav_search %}
-    <div class='nav nav-search'>
-	    <div class="input-group">
-        <input type="text" id="searchterm"/>
-        </div>
+            <li role="presentation">
+                <div class="dropdown">
+                    <button class="btn btn-link dropdown-toggle"
+                            type="button" data-toggle="dropdown">Help
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a>
+                        </li>
+                        <li role="presentation"><a href="{{ url_for('app.index_statistics') }}">Statistics</a>
+                        </li>
+                        <li role="presentation"><a href="{{ url_for('app.show_faq') }}">FAQ</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+        </ul>
+        {% block nav_search %}
+            <div class='nav nav-search'>
+                <div class="input-group">
+                    <input type="text" id="searchterm"/>
+                </div>
+            </div>
+        {% endblock %}
     </div>
-    {% endblock %}
-</div>
 {% endblock %}
 
 {% block content %}
-<div class="content">
-<div class="container">
-    <span id="aspect-chooser"></span>
-</div>
-<div class="container">
-    {% block page_content %}{% endblock %}
-</div>
-</div>
-<div class="container footer">
-    <hr>
-    Data from <a href="https://www.wikidata.org">Wikidata</a> and
-    <a href="https://en.wikipedia.org">English Wikipedia</a>
-    |
-    Code from
-    <a href="https://github.com/WDscholia/scholia">GitHub repository</a>
-    |
-    Hosted on   <a href="https://toolforge.org/">Wikimedia Toolforge</a>,
-    a <a href="https://wikimediafoundation.org">Wikimedia Foundation</a> service
-    |
-    License for content: CC0 for data, CC-BY-SA for text and media
-    |
-    Report technical problems at Scholia's
-    <a href="https://github.com/WDscholia/scholia/issues">Issues</a> GitHub page.
-    |
-    Follow us on <a href="https://twitter.com/wdscholia">Twitter</a>.
-    <hr>
-  </div>
+    <div class="content">
+        <div class="container">
+            <span id="aspect-chooser"></span>
+        </div>
+        <div class="container">
+            {% block page_content %}{% endblock %}
+        </div>
+    </div>
+    <div class="container footer">
+        <hr>
+        Data from <a href="https://www.wikidata.org">Wikidata</a> and
+        <a href="https://en.wikipedia.org">English Wikipedia</a>
+        |
+        Code from
+        <a href="https://github.com/WDscholia/scholia">GitHub repository</a>
+        |
+        Hosted on <a href="https://toolforge.org/">Wikimedia Toolforge</a>,
+        a <a href="https://wikimediafoundation.org">Wikimedia Foundation</a> service
+        |
+        License for content: CC0 for data, CC-BY-SA for text and media
+        |
+        Report technical problems at Scholia's
+        <a href="https://github.com/WDscholia/scholia/issues">Issues</a> GitHub page.
+        |
+        Follow us on <a href="https://twitter.com/wdscholia">Twitter</a>.
+        <hr>
+    </div>
 {% endblock %}
 
 <script type="text/javascript">
-    
+
 </script>
