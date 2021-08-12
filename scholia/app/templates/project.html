@@ -2,67 +2,57 @@
 
 {% set aspect = "project" %}
 
-
 {% block in_ready %}
 
-{{ sparql_to_table('prolific-authors') }}
-
-{{ sparql_to_table('recent-articles') }}
-
-{{ sparql_to_iframe('partners') }}
-
-{{ sparql_to_iframe('timeline') }}
-
-{{ sparql_to_iframe('topic-scores') }}
-
-{{ sparql_to_iframe('publications-per-year') }}
+    {{ sparql_to_table('prolific-authors') }}
+    {{ sparql_to_table('recent-articles') }}
+    {{ sparql_to_iframe('partners') }}
+    {{ sparql_to_iframe('timeline') }}
+    {{ sparql_to_iframe('topic-scores') }}
+    {{ sparql_to_iframe('publications-per-year') }}
 
 {% endblock in_ready %}
 
-
 {% block page_content %}
-<h1 id="h1">Project</h1>
+    <h1 id="h1">Project</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<h2 id="partners-header">Project Partners</h2>
+    <h2 id="partners-header">Project Partners</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" id="partners-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="partners-iframe"></iframe>
+    </div>
 
+    <h2 id="timeline-header">Timeline</h2>
 
-<h2 id="timeline-header">Timeline</h2>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
-</div>
+    <h2 id="recent-articles-header">Recently published works about or funded by the project</h2>
 
+    <table class="table table-hover" id="recent-articles-table"></table>
 
-<h2 id="recent-articles-header">Recently published works about or funded by the project</h2>
+    <h2 id="topic-scores-header">Topic scores</h2>
 
-<table class="table table-hover" id="recent-articles-table"></table>
+    Topics based on a weighting between fields of work,
+    topics of research output and topics of citing works.
 
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="topic-scores-iframe"></iframe>
+    </div>
 
-<h2 id="topic-scores-header">Topic scores</h2>
+    <h2 id="authors-header">Authors</h2>
 
-Topics based on a weighting between fields of work,
-topics of research output and topics of citing works.  
+    <h3 id="prolific-authors-header">Prolific authors</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" id="topic-scores-iframe"></iframe>
-</div>
+    <table class="table table-hover" id="prolific-authors-table"></table>
 
-<h2 id="authors-header">Authors</h2>
+    <h2 id="publications-per-year-header">Publications per year</h2>
 
-<h3 id="prolific-authors-header">Prolific authors</h3>
-
-<table class="table table-hover" id="prolific-authors-table"></table>
-
-<h2 id="publications-per-year-header">Publications per year</h2>
-
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
+    </div>
 
 {% endblock page_content %}

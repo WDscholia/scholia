@@ -2,81 +2,65 @@
 
 {% set aspect = "award" %}
 
-
-
 {% block in_ready %}
 
-{{ sparql_to_table('list-of-recipients') }}
-
-{{ sparql_to_iframe('images-of-recipients') }}
-
-{{ sparql_to_table('recent-publications-by-recipients') }}
-
-{{ sparql_to_iframe('topics-of-works-by-recipients') }}
-
-{{ sparql_to_table('coawards') }}
-
-{{ sparql_to_iframe('locations-of-recipients') }}
-
-{{ sparql_to_table('gender-distribution') }}
+    {{ sparql_to_table('list-of-recipients') }}
+    {{ sparql_to_iframe('images-of-recipients') }}
+    {{ sparql_to_table('recent-publications-by-recipients') }}
+    {{ sparql_to_iframe('topics-of-works-by-recipients') }}
+    {{ sparql_to_table('coawards') }}
+    {{ sparql_to_iframe('locations-of-recipients') }}
+    {{ sparql_to_table('gender-distribution') }}
 
 {% endblock in_ready %}
 
-
-
 {% block page_content %}
 
-<h1 id="h1">Award</h1>
+    <h1 id="h1">Award</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="wembedder"></div>
+    <div id="wembedder"></div>
 
+    <h2 id="List-of-recipients">List of recipients</h2>
 
-<h2 id="List-of-recipients">List of recipients</h2>
+    <table class="table table-hover" id="list-of-recipients-table"></table>
 
-<table class="table table-hover" id="list-of-recipients-table"></table>
+    <h2 id="Images-of-recipients">Images of recipients</h2>
 
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="images-of-recipients-iframe"></iframe>
+    </div>
 
-<h2 id="Images-of-recipients">Images of recipients</h2>
+    <h2 id="Topics-of-works-by-recipients">Topics of works by recipients</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="images-of-recipients-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="topics-of-works-by-recipients-iframe"></iframe>
+    </div>
 
+    <h2 id="Recent-publications-by-recipients">Recent publications by recipients</h2>
 
-<h2 id="Topics-of-works-by-recipients">Topics of works by recipients</h2>
+    <table class="table table-hover" id="recent-publications-by-recipients-table"></table>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="topics-of-works-by-recipients-iframe"></iframe>
-</div>
+    <h2 id="Co-awards">Co-awards</h2>
 
+    Awards with co-recipients
 
-<h2 id="Recent-publications-by-recipients">Recent publications by recipients</h2>
+    <table class="table table-hover" id="coawards-table"></table>
 
-<table class="table table-hover" id="recent-publications-by-recipients-table"></table>
+    <h2 id="Locations-of-recipients">Locations of recipients</h2>
 
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="locations-of-recipients-iframe"></iframe>
+    </div>
 
-<h2 id="Co-awards">Co-awards</h2>
+    <h2 id="Gender-distribution">Gender distribution</h2>
 
-Awards with co-recipients 
+    Count of the number of recipient wrt. gender.
 
-<table class="table table-hover" id="coawards-table"></table>
+    <table class="table table-hover" id="gender-distribution-table"></table>
 
-
-<h2 id="Locations-of-recipients">Locations of recipients</h2>
-
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="locations-of-recipients-iframe"></iframe>
-</div>
-
-
-<h2 id="Gender-distribution">Gender distribution</h2>
-
-Count of the number of recipient wrt. gender.
-
-<table class="table table-hover" id="gender-distribution-table"></table>
-
-Any information missing here? You can help curate the information contained in this profile via its <a href="{{ url_for('app.show_award_empty') }}{{ q }}/curation">curation</a> page.
+    Any information missing here? You can help curate the information contained in this profile via
+    its <a href="{{ url_for('app.show_award_empty') }}{{ q }}/curation">curation</a> page.
 
 {% endblock page_content %}

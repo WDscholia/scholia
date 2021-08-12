@@ -1,58 +1,48 @@
 {% extends "base.html" %}
 
-
 {% set aspect = "series" %}
 
 {% block in_ready %}
 
-{{ sparql_to_table('in-series') }}
-{{ sparql_to_table('works') }}
-{{ sparql_to_table('authors') }}
-{{ sparql_to_iframe('topics') }}
-{{ sparql_to_iframe('organizations') }}
+    {{ sparql_to_table('in-series') }}
+    {{ sparql_to_table('works') }}
+    {{ sparql_to_table('authors') }}
+    {{ sparql_to_iframe('topics') }}
+    {{ sparql_to_iframe('organizations') }}
 
 {% endblock in_ready %}
 
-
-
 {% block page_content %}
-<h1 id="h1">Series</h1>
+    <h1 id="h1">Series</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="wembedder"></div>
+    <div id="wembedder"></div>
 
+    <h2 id="in-series-header">In series</h2>
 
-<h2 id="in-series-header">In series</h2>
+    <table class="table table-hover" id="in-series-table"></table>
 
-<table class="table table-hover" id="in-series-table"></table>
+    <h2 id="works-header">Published works</h2>
 
+    <table class="table table-hover" id="works-table"></table>
 
-<h2 id="works-header">Published works</h2>
+    <h2 id="topics-header">Topics</h2>
 
-<table class="table table-hover" id="works-table"></table>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="topics-iframe"></iframe>
+    </div>
 
+    <h2 id="authors-header">Authors</h2>
 
-<h2 id="topics-header">Topics</h2>
+    <table class="table table-hover" id="authors-table"></table>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="topics-iframe"></iframe>
-</div>
+    <h2 id="organizations-header">Organizations</h2>
 
-<h2 id="authors-header">Authors</h2>
+    Employment relationships per year.
 
-<table class="table table-hover" id="authors-table"></table>
-
-
-<h2 id="organizations-header">Organizations</h2>
-
-Employment relationships per year.
-
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="organizations-iframe"></iframe></iframe>
-</div>
-
-
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="organizations-iframe"></iframe>
+    </div>
 
 {% endblock page_content %}
-    

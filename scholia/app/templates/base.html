@@ -47,26 +47,21 @@
     "#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql" );
 {%- endmacro %}
 
-
 {% block metas %}
     <meta charset="UTF-8">
     <meta name="robots" content="index, nofollow">
-
     <meta name="og:url" content="{{ 'https://scholia.toolforge.org' + request.path }}"/>
     <meta name="og:site_name" content="Scholia"/>
     <meta name="og:image"
           content="{{ url_for('static', filename='images/scholia_social_media.png') }}"/>
-
     <meta name="twitter:card" content="summary"/>
     <meta name="twitter:site" content="@WDScholia"/>
 {% endblock metas %}
-
 
 {% block head %}
     {{ super() }}
 
     <link rel="canonical" href="{{ 'https://scholia.toolforge.org' + request.path }}">
-
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css"
@@ -473,7 +468,6 @@
                 });
             });
 
-
             /* Wembedder */
             var wembedderUrl = "https://wembedder.toolforge.org/api/most-similar/{{ q }}";
             $.ajax({
@@ -619,7 +613,6 @@
                 document.querySelector("h2").insertAdjacentElement("beforebegin", toc)
             }
 
-
             {% block in_ready %}{% endblock in_ready %}
         });
 
@@ -627,8 +620,8 @@
 
 {% endblock scripts %}
 
+/* jscpd:ignore-start */
 {% block navbar %}
-    /* jscpd:ignore-start */
     <div class="navbar navbar-static-top">
         <ul class="nav nav-pills">
             <li role="presentation"><a href="{{ url_for('app.index') }}"><img
@@ -786,15 +779,15 @@
 
         </ul>
         {% block nav_search %}
-            <div class='nav nav-search'>
+            <div class="nav nav-search">
                 <div class="input-group">
                     <input type="text" id="searchterm"/>
                 </div>
             </div>
         {% endblock nav_search %}
     </div>
-    /* jscpd:ignore-end */
 {% endblock navbar %}
+/* jscpd:ignore-end */
 
 {% block content %}
     <div class="content">
@@ -825,7 +818,3 @@
         <hr>
     </div>
 {% endblock content %}
-
-<script type="text/javascript">
-
-</script>

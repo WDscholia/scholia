@@ -2,30 +2,25 @@
 
 {% set aspect = "clinical-trial" %}
 
-
 {% block in_ready %}
 
-{{ sparql_to_table('data') }}
-
-{{ sparql_to_table('related-trials') }}
+    {{ sparql_to_table('data') }}
+    {{ sparql_to_table('related-trials') }}
 
 {% endblock in_ready %}
 
-
 {% block page_content %}
 
-<h1 id="clinical-trial-header">Clinical trial</h1>
+    <h1 id="clinical-trial-header">Clinical trial</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<h2 id="data-header">Data</h2>
+    <h2 id="data-header">Data</h2>
 
-<table class="table table-hover" id="data-table"></table>
+    <table class="table table-hover" id="data-table"></table>
 
+    <h2 id="related-trials-header">Related trials</h2>
 
-<h2 id="related-trials-header">Related trials</h2>
-
-<table class="table table-hover" id="related-trials-table"></table>
-
+    <table class="table table-hover" id="related-trials-table"></table>
 
 {% endblock page_content %}

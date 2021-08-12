@@ -4,78 +4,83 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('structural-identifiers') }}
-{{ sparql_to_table('identifiers') }}
-{{ sparql_to_table('physchem-properties') }}
-{{ sparql_to_table('related') }}
-{{ sparql_to_table('recent-literature') }}
-{{ sparql_to_iframe('publications-per-year') }}
-{{ sparql_to_table('found-in-taxon',
+    {{ sparql_to_table('structural-identifiers') }}
+    {{ sparql_to_table('identifiers') }}
+    {{ sparql_to_table('physchem-properties') }}
+    {{ sparql_to_table('related') }}
+    {{ sparql_to_table('recent-literature') }}
+    {{ sparql_to_iframe('publications-per-year') }}
+    {{ sparql_to_table('found-in-taxon',
      options={
          "linkPrefixes": { "taxon": "../taxon/", "source": "../work/" }
      }
-   )
-}}
+   ) }}
 
 {% endblock in_ready %}
 
 {% block page_content %}
-<h1 id="h1">Chemical</h1>
-<script type="application/ld+json" id="bioschemas"></script>
+    <h1 id="h1">Chemical</h1>
+    <script type="application/ld+json" id="bioschemas"></script>
 
-{% if third_parties_enabled %}
+    {% if third_parties_enabled %}
 
-<div class="card-deck mb-3">
-    <div class="card mb-4 box-shadow">
-	<div class="card-body">
-	    <div id="intro"></div>
-	</div>
+        <div class="card-deck mb-3">
+            <div class="card mb-4 box-shadow">
+                <div class="card-body">
+                    <div id="intro"></div>
+                </div>
+            </div>
+
+            <div class="card mb-4 box-shadow">
+                <div class="card-body">
+                    <img src="http://www.simolecule.com/cdkdepict/depict/bow/svg?smi={{ smiles }}&abbr=on&hdisp=bridgehead&showtitle=false&zoom=2&annotate=cip"/>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+
+        <div id="intro"></div>
+
+        <div id="wembedder"></div>
+
+    {% endif %}
+
+    <h2 id="structural-identifiers-header">Structural Information</h2>
+
+    <table class="table table-hover" id="structural-identifiers-table"></table>
+
+    <h2 id="Identifiers">Identifiers</h2>
+
+    <table class="table table-hover" id="identifiers-table"></table>
+
+    <h2 id="Related" >Related Compounds</h2>
+
+    <table class="table table-hover" id="related-table"></table>
+
+    <h2 id="PhysChem" >Physchem Properties</h2>
+
+    <table class="table table-hover" ></table>
+
+    <h2 id="recent-literature-header">Recently published works on the chemical
+        <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss">
+            <img height="24"
+                 width="48"
+                 src="{{ url_for('static', filename='images/rss-40674_320.png') }}"
+                 alt="RSS icon"/></a>
+    </h2>
+
+    <table class="table table-hover" id="recent-literature-table"></table>
+
+    <h2 id="publications-per-year">Publications per year</h2>
+
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
     </div>
 
-    <div class="card mb-4 box-shadow">
-	<div class="card-body">
-	    <img src="http://www.simolecule.com/cdkdepict/depict/bow/svg?smi={{ smiles }}&abbr=on&hdisp=bridgehead&showtitle=false&zoom=2&annotate=cip" />
-	</div>
-    </div>
-</div>
+    <h2 id="found-in-taxon-header">Taxa in which the chemical was found</h2>
 
-{% else %}
-
-<div id="intro"></div>
-
-<div id="wembedder"></div>
-
-{% endif %}
-
-<h2 id="structural-identifiers-header">Structural Information</h2>
-
-<table class="table table-hover" id="structural-identifiers-table"></table>
-
-<h2 id="Identifiers" id="identifiers-header">Identifiers</h2>
-
-<table class="table table-hover" id="identifiers-table"></table>
-
-<h2 id="Related" id="related-header">Related Compounds</h2>
-
-<table class="table table-hover" id="related-table"></table>
-
-<h2 id="PhysChem" id="physchem-properties-header">Physchem Properties</h2>
-
-<table class="table table-hover" id="physchem-properties-table"></table>
-
-<h2 id="recent-literature-header">Recently published works on the chemical <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
-
-<table class="table table-hover" id="recent-literature-table"></table>
-
-<h2 id="publications-per-year">Publications per year</h2>
-
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" id="publications-per-year-iframe" ></iframe>
-</div>
-
-<h2 id="found-in-taxon-header">Taxa in which the chemical was found</h2>
-
-<table class="table table-hover" id="found-in-taxon-table"></table>
+    <table class="table table-hover" id="found-in-taxon-table"></table>
 
 {% endblock page_content %}
     

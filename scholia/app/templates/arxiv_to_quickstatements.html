@@ -1,52 +1,55 @@
 {% extends "base.html" %}
 
-
 {% block page_content %}
 
-<h1>arXiv to QuickStatements</h1>
+    <h1>arXiv to QuickStatements</h1>
 
+    <h2>Input</h2>
 
-<h2>Input</h2>
+    <form action="" id="form" method="GET" class="form-horizontal">
+        <div class="input-group">
+            {% if arxiv %}
+                <input type="text" class="form-control" placeholder="Enter arXiv id"
+                       value="{{ arxiv | urlencode }}" id="searchterm" name="arxiv"/>
+            {% else %}
+                <input type="text" class="form-control" placeholder="Enter arXiv id"
+                       id="searchterm" name="arxiv"/>
+            {% endif %}
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="submit">
+                    Extract metadata
+                </button>
+            </span>
+        </div>
+    </form>
 
-<form action="" id="form" method="GET" class="form-horizontal">
-  <div class="input-group">
-    {% if arxiv %}
-    <input type="text" class="form-control" placeholder="Enter arXiv id" value="{{ arxiv | urlencode }}" id="searchterm" name="arxiv"/>
-    {% else %}
-    <input type="text" class="form-control" placeholder="Enter arXiv id" id="searchterm" name="arxiv"/>
+    <p>Copy and paste an ID from the <a href="https://arxiv.org">arXiv</a> preprint repository.
+        Bare IDs (such as "1703.06103") and URLs (such as "https://arxiv.org/abs/1703.06103") both
+        work.
+    </p>
+    <p>The input ID will be queried in Wikidata and Quickstatements will not be generated if the
+        input ID is found in Wikidata. However, note that new items may not be immediately found
+        because of caching.
+    </p>
+
+    <h2>Result</h2>
+
+    {% if q %}
+
+        <div id="searchresult">Already entered as <a href="work/{{ q }}">{{ q }}</a></div>
+
     {% endif %}
-    <span class="input-group-btn">
-      <button class="btn btn-primary" type="submit">
-        Extract metadata
-      </button>
-    </span>
-  </div>
-</form>
-    
-<p>Copy and paste an ID from the <a href="https://arxiv.org">arXiv</a> preprint repository.
-Bare IDs (such as "1703.06103") and URLs (such as "https://arxiv.org/abs/1703.06103") both work.
-</p>
-<p>The input ID will be queried in Wikidata and Quickstatements will not be generated if the input 
-ID is found in Wikidata. However, note that new items may not be immediately found because of caching.
 
+    {% if quickstatements %}
 
-<h2>Result</h2>
+        <div id="quickstatements">
+            <pre>{{ quickstatements }}</pre>
+        </div>
 
-{% if q %}
+        <a href="https://quickstatements.toolforge.org/#/v1={{ quickstatements | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}">
+            <button class="btn btn-primary">Submit to Quickstatements ↗</button>
+        </a>
 
-<div id="searchresult">Already entered as <a href="work/{{ q }}">{{ q }}</div>
-
-{% endif %}
-
-{% if quickstatements %}
-
-<div id="quickstatements"><pre>{{ quickstatements }}</pre></div>
-
-<a href="https://quickstatements.toolforge.org/#/v1={{ quickstatements | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}">
-  <button class="btn btn-primary">Submit to Quickstatements ↗</button>
-</a>
-  
-{% endif %}
-
+    {% endif %}
 
 {% endblock page_content %}

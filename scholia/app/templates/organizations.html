@@ -1,71 +1,63 @@
 {% extends "base.html" %}
 
-
 {% set aspect = "organizations" %}
 
 {% block in_ready %}
 
-{{ sparql_to_table('list') }}
-{{ sparql_to_table('coauthorships') }}
-{{ sparql_to_table('topic-tree') }}
-{{ sparql_to_iframe('works-per-year') }}
-{{ sparql_to_iframe('citations-per-year') }}
-{{ sparql_to_iframe('citations-to-works') }}
-{{ sparql_to_iframe('topic-tree-map') }}
+    {{ sparql_to_table('list') }}
+    {{ sparql_to_table('coauthorships') }}
+    {{ sparql_to_table('topic-tree') }}
+    {{ sparql_to_iframe('works-per-year') }}
+    {{ sparql_to_iframe('citations-per-year') }}
+    {{ sparql_to_iframe('citations-to-works') }}
+    {{ sparql_to_iframe('topic-tree-map') }}
 
 {% endblock in_ready %}
 
-
-
 {% block page_content %}
 
-<h1 id="list-header">Organizations</h1>
+    <h1 id="list-header">Organizations</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<table class="table table-hover" id="list-table"></table>
+    <table class="table table-hover" id="list-table"></table>
 
+    <h2 id="coauthorships-header">Co-authorships</h2>
 
-<h2 id="coauthorships-header">Co-authorships</h2>
+    <p>Past and present employees, affiliated, and members shared between organizations</p>
 
-<p>Past and present employees, affiliated, and members shared between organizations</p>
+    <table class="table table-hover" id="coauthorships-table"></table>
 
-<table class="table table-hover" id="coauthorships-table"></table>
+    <h2 id="works-per-year-header">Works per year</h2>
 
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="works-per-year-iframe"></iframe>
+    </div>
 
-<h2 id="works-per-year-header">Works per year</h2>
+    <h2 id="citations-per-year-header">Citations per year</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="works-per-year-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="citations-per-year-iframe"></iframe>
+    </div>
 
+    <h2 id="citations-to-works-header">Citations to works ratio</h2>
 
-<h2 id="citations-per-year-header">Citations per year</h2>
+    The ratio between the number of citations received and the works authored
+    per organization per year.
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="citations-per-year-iframe"></iframe></div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="citations-to-works-iframe"></iframe>
+    </div>
 
+    <h2 id="topic-tree-header">Topics</h2>
 
-<h2 id="citations-to-works-header">Citations to works ratio</h2>
+    Tree map of most common topics in works authored by people associated with the
+    organizations.
 
-The ratio between the number of citations received and the works authored
-per organization per year.
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="topic-tree-map-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="citations-to-works-iframe"></iframe></div>
-
-
-<h2 id="topic-tree-header">Topics</h2>
-
-Tree map of most common topics in works authored by people associated with the
-organizations. 
-
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" id="topic-tree-map-iframe"></iframe>
-</div>
-
-<table class="table table-hover" id="topic-tree-table"></table>
-
-
+    <table class="table table-hover" id="topic-tree-table"></table>
 
 {% endblock page_content %}

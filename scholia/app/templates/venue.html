@@ -2,146 +2,115 @@
 
 {% set aspect = "venue" %}
 
-
 {% block in_ready %}
 
-{{ sparql_to_table('recently-published-works') }}
-
-{{ sparql_to_table('topics') }}
-
-
-{{ sparql_to_iframe('author-images') }}
-
-{{ sparql_to_table('authors') }}
-
-{{ sparql_to_iframe('co-author-graph') }}
-
-
-{{ sparql_to_table('most-cited-articles') }}
-
-{{ sparql_to_table('most-cited-authors') }}
-
-{{ sparql_to_iframe('citation-distribution') }}
-
-{{ sparql_to_table('cited-venues') }}
-
-{{ sparql_to_table('citing-venues') }}
-
-{{ sparql_to_table('articles-citing-retracted-articles') }}
-
-
-{{ sparql_to_table('author-gender-distribution') }}
-
-{{ sparql_to_table('authorship-gender-distribution') }}
-
-
-{{ sparql_to_table('author-awards') }}
-
+    {{ sparql_to_table('recently-published-works') }}
+    {{ sparql_to_table('topics') }}
+    {{ sparql_to_iframe('author-images') }}
+    {{ sparql_to_table('authors') }}
+    {{ sparql_to_iframe('co-author-graph') }}
+    {{ sparql_to_table('most-cited-articles') }}
+    {{ sparql_to_table('most-cited-authors') }}
+    {{ sparql_to_iframe('citation-distribution') }}
+    {{ sparql_to_table('cited-venues') }}
+    {{ sparql_to_table('citing-venues') }}
+    {{ sparql_to_table('articles-citing-retracted-articles') }}
+    {{ sparql_to_table('author-gender-distribution') }}
+    {{ sparql_to_table('authorship-gender-distribution') }}
+    {{ sparql_to_table('author-awards') }}
 
 {% endblock in_ready %}
 
 
-
 {% block page_content %}
 
-<h1 id="h1">Venue</h1>
+    <h1 id="h1">Venue</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
+    -
+    <div id="wembedder"></div>
 
-<div id="wembedder"></div>
+    <h2 id="recently-published-works-header">Recently published works
+        <a href="{{ url_for('app.show_venue_empty') }}{{ q }}/latest-works/rss">
+            <img height="24"
+                 width="48"
+                 src="{{ url_for('static', filename='images/rss-40674_320.png') }}"
+                 alt="RSS icon"/></a>
+    </h2>
 
+    <table class="table table-hover" id="recently-published-works-table"></table>
 
-<h2 id="recently-published-works-header">Recently published works <a href="{{ url_for('app.show_venue_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+    <h2 id="topics-header">Topics</h2>
 
-<table class="table table-hover" id="recently-published-works-table"></table>
+    <table class="table table-hover" id="topics-table"></table>
 
+    <h3 id="Authors">Authors</h3>
 
-<h2 id="topics-header">Topics</h2>
+    <h3 id="author-images-header">Author images</h3>
 
-<table class="table table-hover" id="topics-table"></table>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="author-images-iframe"></iframe>
+    </div>
 
+    <h3 id="authors-header">Authors</h3>
 
-<h2 id="Authors">Authors</h3>
+    <table class="table table-hover" id="authors-table"></table>
 
+    Missing authors here?
+    Then go to the
+    <a href="{{ url_for('app.show_venue_empty') }}{{ q }}/curation">curation</a>
+    page to resolve the author names.
 
-<h3 id="author-images-header">Author images</h2>
+    <h3 id="co-author-graph-header">Co-author graph</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="author-images-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="co-author-graph-iframe"></iframe>
+    </div>
 
+    <h2 id="Citations">Citations</h2>
 
-<h3 id="authors-header">Authors</h3>
+    <h3 id="most-cited-articles-header"
+        title="Most cited articles published in the venue, where the citations may come from any venue">
+        Most cited articles</h3>
 
-<table class="table table-hover" id="authors-table"></table>
+    <table class="table table-hover" id="most-cited-articles-table"></table>
 
-Missing authors here?
-Then go to the
-<a href="{{ url_for('app.show_venue_empty') }}{{ q }}/curation">curation</a>
-page to resolve the author names.
+    <h3 id="most-cited-authors-header"
+        title="Most cited authors based on articles published in the venue and where citations may come from any venue">
+        Most cited authors</h3>
 
+    <table class="table table-hover" id="most-cited-authors-table"></table>
 
-<h3 id="co-author-graph-header">Co-author graph</h3>
+    <h3 id="citation-distribution-header">Citation distribution</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="co-author-graph-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="citation-distribution-iframe"></iframe>
+    </div>
 
+    <h3 id="cited-venues-header">Cited venues</h3>
 
+    <table class="table table-hover" id="cited-venues-table"></table>
 
-<h2 id="Citations">Citations</h2>
+    <h3 id="citing-venues-header">Citing venues</h3>
 
-<h3 id="most-cited-articles-header"
-    title="Most cited articles published in the venue, where the citations may come from any venue">Most cited articles</h3>
+    <table class="table table-hover" id="citing-venues-table"></table>
 
-<table class="table table-hover" id="most-cited-articles-table"></table>
+    <h2 id="articles-citing-retracted-articles-header">Articles citing retracted articles</h2>
 
+    <table class="table table-hover" id="articles-citing-retracted-articles-table"></table>
 
-<h3 id="most-cited-authors-header"
-    title="Most cited authors based on articles published in the venue and where citations may come from any venue">Most cited authors</h3>
+    <h2>Gender distribution</h2>
 
-<table class="table table-hover" id="most-cited-authors-table"></table>
+    <h3 id="author-gender-distribution-header">Authors</h3>
 
+    <table class="table table-hover" id="author-gender-distribution-table"></table>
 
-<h3 id="citation-distribution-header">Citation distribution</h3>
+    <h3 id="authorship-gender-distribution-header">Authorships</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="citation-distribution-iframe"></iframe>
-</div>
+    <table class="table table-hover" id="authorship-gender-distribution-table"></table>
 
+    <h2 id="author-awards-header">Author awards</h2>
 
-<h3 id="cited-venues-header">Cited venues</h3>
-
-<table class="table table-hover" id="cited-venues-table"></table>
-
-
-<h3 id="citing-venues-header">Citing venues</h3>
-
-<table class="table table-hover" id="citing-venues-table"></table>
-
-
-<h2 id="articles-citing-retracted-articles-header">Articles citing retracted articles</h2>
-
-<table class="table table-hover" id="articles-citing-retracted-articles-table"></table>
-
-
-<h2>Gender distribution</h2>
-
-
-<h3 id="author-gender-distribution-header">Authors</h3>
-
-<table class="table table-hover" id="author-gender-distribution-table"></table>
-
-
-<h3 id="authorship-gender-distribution-header">Authorships</h3>
-
-<table class="table table-hover" id="authorship-gender-distribution-table"></table>
-
-
-<h2 id="author-awards-header">Author awards</h2>
-
-<table class="table table-hover" id="author-awards-table"></table>
-
+    <table class="table table-hover" id="author-awards-table"></table>
 
 {% endblock page_content %}
-    

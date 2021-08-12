@@ -2,52 +2,43 @@
 
 {% set aspect = "location" %}
 
-
 {% block in_ready %}
 
-{{ sparql_to_table("nearby-organizations",
+    {{ sparql_to_table("nearby-organizations",
     options={
         "linkPrefixes": {
             "organization": "../organization/"
       }
     }
-  )
-}}
+  ) }}
 
-{{ sparql_to_table('nearby-locations-as-topics-in-works',
+    {{ sparql_to_table('nearby-locations-as-topics-in-works',
     options={
         "linkPrefixes": {
             "work": '../work/',
                 "location": '../topic/'
         }
     }
-  )
-}}
+  ) }}
 
 {% endblock in_ready %}
 
-
-
 {% block page_content %}
 
-<h1 id="h1">Location</h1>
+    <h1 id="h1">Location</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="wembedder"></div>
+    <div id="wembedder"></div>
 
+    <h2 title="Nearby academic organizations with distances in kilometers"
+        id="nearby-organizations-header">Nearby organizations</h2>
 
-<h2 title="Nearby academic organizations with distances in kilometers"
-    id="nearby-organizations-header">Nearby organizations</h2>
+    <table class="table table-hover" id="nearby-organizations-table"></table>
 
-<table class="table table-hover" id="nearby-organizations-table"></table>
+    <h2 title="Nearby locations as topics in works (may timeout)"
+        id="nearby-locations-as-topics-in-works-header">Nearby locations as topics in works</h2>
 
-
-<h2 title="Nearby locations as topics in works (may timeout)"
-    id="nearby-locations-as-topics-in-works-header">Nearby locations as topics in works</h2>
-
-<table class="table table-hover" id="nearby-locations-as-topics-in-works-table"></table>
-
-
+    <table class="table table-hover" id="nearby-locations-as-topics-in-works-table"></table>
 
 {% endblock page_content %}

@@ -1,63 +1,55 @@
 {% extends "base.html" %}
 
 {% set aspect = "event_series" %}
- 
+
 {% block in_ready %}
 
-{{ sparql_to_table('list',
+    {{ sparql_to_table('list',
      options={
        "linkPrefixes":{
          "event": "../event/"
        }
      }
    ) }}
- 
+
 {% endblock in_ready %}
-
-
 
 {% block page_content %}
 
-<h1 id="list">Event series</h1>
+    <h1 id="list">Event series</h1>
 
-<table class="table table-hover" id="list-table"></table>
+    <table class="table table-hover" id="list-table"></table>
 
+    <h2>Examples</h2>
 
+    <dl>
+        <dt><a href="Q1961016">NeurIPS/NIPS</a></dt>
+        <dd>
+            Neural Information Processing Systems (NeurIPS, formerly NIPS) is a
+            neural computation and <a href="../topic/Q2539">machine learning</a>
+            conference series usually taking place in December.
+        </dd>
 
+        <dt><a href="Q17012957">ESWC</a></dt>
+        <dd>
+            ESWC, at one point called European Semantic Web Conference, later Extended Semantic Web
+            Conference, is a scientific conference series usually taking
+            place at the Mediterranean coast in a European country during the summer.
+            The topic of the conference is, as the name suggests,
+            <a href="../topic/Q54837">Semantic Web</a>.
+        </dd>
 
-<h2>Examples</h2>
+        <dt><a href="Q3570023">WWW</a></dt>
+        <dd>
+            The Web Conference, formerly called International World Wide Web Conference,
+            abbreviated as WWW (sometimes pronounced dub-dub-dub)
+            is a conferences series about the <a href="../topic/Q466">web</a>.
+        </dd>
 
-<dl>
-
-    <dt><a href="Q1961016">NeurIPS/NIPS</a></dt>
-    <dd>
-	Neural Information Processing Systems (NeurIPS, formerly NIPS) is a  
-	neural computation and <a href="../topic/Q2539">machine learning</a>
-	conference series usually taking place in December. 
-    </dd>
-
-    <dt><a href="Q17012957">ESWC</a></dt>
-    <dd>
-	ESWC, at one point called European Semantic Web Conference, later Extended Semantic Web Conference, is a scientific conference series usually taking 
-	place at the Mediterranean coast in a European country during the summer.
-	The topic of the conference is, as the name suggests, 
-	<a href="../topic/Q54837">Semantic Web</a>.
-    </dd>
-
-    <dt><a href="Q3570023">WWW</a></dt>
-    <dd>
-	The Web Conference, formerly called International World Wide Web Conference, abbreviated as WWW (sometimes pronounced dub-dub-dub)
-	is a conferences series about the <a href="../topic/Q466">web</a>.
-    </dd>
-
-    <dt><a href="Q47501052">ICCS</a></dt>
-    <dd>
-	International Conference on Chemical Structures (ICCS).
-    </dd>
-
-</dl>
-
+        <dt><a href="Q47501052">ICCS</a></dt>
+        <dd>
+            International Conference on Chemical Structures (ICCS).
+        </dd>
+    </dl>
 
 {% endblock page_content %}
-
-  

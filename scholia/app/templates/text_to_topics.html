@@ -1,32 +1,28 @@
 {% extends "base.html" %}
 
-
 {% block page_content %}
 
-<h2>Text</h2>
+    <h2>Text</h2>
 
+    {% if enabled %}
 
-{% if enabled %}
+        Copy and paste an abstract to the text area and press submit to extract Wikidata labels
+        and query.
 
-Copy and paste an abstract to the text area and press submit to extract Wikidata labels
-and query.
-
-<form action="" id="form" method="POST" class="form-horizontal">
-  <div class="form-group">
-    <textarea rows=10 class="form-control" style="min-width: 100%" id="text" name="text">
+        <form action="" id="form" method="POST" class="form-horizontal">
+            <div class="form-group">
+    <textarea rows="10" class="form-control" style="min-width: 100%" id="text" name="text">
     </textarea>
-  </div>
-  <div class="form-group">
-      <button class="btn btn-primary" type="submit">Submit</button>
-  </div>
-</form>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+        </form>
 
-{% else %}
+    {% else %}
 
-This service is disabled.
+        This service is disabled.
 
-{% endif %}
-
-
+    {% endif %}
 
 {% endblock page_content %}

@@ -4,113 +4,120 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('statistics') }}
+    {{ sparql_to_table('statistics') }}
 
 {% endblock in_ready %}
 
 {% block page_content %}
 
-<h1>Chemical substances</h1>
+    <h1>Chemical substances</h1>
 
-Chemical substances.
+    Chemical substances.
 
+    <div class="container">
 
-<div class="container">
+        <h2>Examples</h2>
 
-    <h2>Examples</h2>
+        <div class="card-deck mb-3">
+            <div class="card mb-4 box-shadow">
 
-    <div class="card-deck mb-3">
-	<div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Single items</h4>
+                </div>
+                <div class="card-body">
+                    <dl>
+                        <dt><a href="Q18216">aspirin</a></dt>
+                        <dd>
+                            View information about the painkiller aspirin.
+                        </dd>
 
-            <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Single items</h4>
+                        <dt><a href="Q2270">benzene</a></dt>
+                        <dd>
+                            View information about the chemical benzene.
+                        </dd>
+
+                        <dt><a href="Q159683">citric acid</a></dt>
+                        <dd>
+                            View information about the chemical citric acid.
+                        </dd>
+
+                        <dt><a href="Q20035886">L-proline</a></dt>
+                        <dd>
+                            View information about the natural amino acid L-proline
+                        </dd>
+
+                        <dt><a href="Q23118">LSD</a></dt>
+                        <dd>
+                            View information about the drug LSD.
+                        </dd>
+                    </dl>
+                </div>
             </div>
-            <div class="card-body">
-		<dl>
-		    <dt><a href="Q18216">aspirin</a></dt>
-		    <dd>
-			View information about the painkiller aspirin.
-		    </dd>
 
-		    <dt><a href="Q2270">benzene</a></dt>
-		    <dd>
-			View information about the chemical benzene.
-		    </dd>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+                </div>
+                <div class="card-body">
+                    <p>If you know the identifier, then Scholia can make a lookup based on the
+                        identifier:</p>
 
-		    <dt><a href="Q159683">citric acid</a></dt>
-		    <dd>
-			View information about the chemical citric acid.
-		    </dd>
+                    <dl>
+                        <dt><a href="../pubchem/14123361">pubchem/14123361</a></dt>
+                        <dd>Look up PubChem CID 14123361. This will identify
+                            tetra-tert-butylmethane
+                            and redirect to its Scholia page.
+                        </dd>
 
-		    <dt><a href="Q20035886">L-proline</a></dt>
-		    <dd>
-			View information about the natural amino acid L-proline
-		    </dd>
+                        <dt><a href="../cas/50-00-0">cas/50-00-0</a></dt>
+                        <dd>Look up CAS 50-00-0. This will identify formaldehyde
+                            and redirect to its Scholia page.
+                        </dd>
 
-		    <dt><a href="Q23118">LSD</a></dt>
-		    <dd>
-			View information about the drug LSD.
-		    </dd>
-		</dl>
+                        <dt><a href="../inchikey/QTBSBXVTEAMEQO-UHFFFAOYSA-N">inchikey/QTBSBXVTEAMEQO-UHFFFAOYSA-N</a>
+                        </dt>
+                        <dd>Redirect also works for InChIKeys, here for acetic acid.</dd>
+
+                        <dt><a href="../lipidmaps/LMFA00000007">lipidmaps/LMFA00000007</a></dt>
+                        <dd>And for LIPID MAPS identifiers</dd>
+                    </dl>
+                </div>
             </div>
 
-	</div>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">ChemCuration</h4>
+                </div>
+                <div class="card-body">
+                    <p>There is always more information about chemicals that can be added. This
+                        section
+                        adds some useful resource for chemistry curation:</p>
 
-     <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
-	    </div>
-	    <div class="card-body">
-		<p>If you know the identifier, then Scholia can make a lookup based on the identifier:</p>
+                    <dl>
+                        <dt>
+                            <a href="https://www.wikidata.org/wiki/Wikidata:Database_reports/Constraint_violations/P662">PubChem
+                                CID violations</a></dt>
+                        <dd>This page shows CIDs linked to more than one Wikidata item (a "Unique
+                            value" violation) and
+                            Wikidata items with more than one CID ("Single value" violations).
+                        </dd>
+                    </dl>
 
-		<dl>
-		    <dt><a href="../pubchem/14123361">pubchem/14123361</a></dt>
-		    <dd>Look up PubChem CID 14123361. This will identify tetra-tert-butylmethane
-			and redirect to its Scholia page.</dd>
-
-		    <dt><a href="../cas/50-00-0">cas/50-00-0</a></dt>
-		    <dd>Look up CAS 50-00-0. This will identify formaldehyde
-			and redirect to its Scholia page.</dd>
-
-		    <dt><a href="../inchikey/QTBSBXVTEAMEQO-UHFFFAOYSA-N">inchikey/QTBSBXVTEAMEQO-UHFFFAOYSA-N</a></dt>
-		    <dd>Redirect also works for InChIKeys, here for acetic acid.</dd>
-
-		    <dt><a href="../lipidmaps/LMFA00000007">lipidmaps/LMFA00000007</a></dt>
-		    <dd>And for LIPID MAPS identifiers</dd>
-		</dl>
-	    </div>
-    </div>
-
-     <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		    <h4 class="my-0 font-weight-normal">ChemCuration</h4>
-	    </div>
-	    <div class="card-body">
-		<p>There is always more information about chemicals that can be added. This section
-		   adds some useful resource for chemistry curation:</p>
-
-		<dl>
-		    <dt><a href="https://www.wikidata.org/wiki/Wikidata:Database_reports/Constraint_violations/P662">PubChem CID violations</a></dt>
-		    <dd>This page shows CIDs linked to more than one Wikidata item (a "Unique value" violation) and
-		        Wikidata items with more than one CID ("Single value" violations).</dd>
-		</dl>
-
-		<dl>
-		    <dt><a href="./curation">Curation of physicochemical properties</a></dt>
-		    <dd>This page shows lists of compounds with missing or incomplete information regarding propephysicochemical properties, like boiling points.</dd>
-		</dl>
-	    </div>
+                    <dl>
+                        <dt><a href="./curation">Curation of physicochemical properties</a></dt>
+                        <dd>This page shows lists of compounds with missing or incomplete
+                            information regarding propephysicochemical properties, like boiling
+                            points.
+                        </dd>
+                    </dl>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="container">
-  <h2 id="statistics-header">Statistics</h2>
-
-  <table class="table table-hover" id="statistics-table"></table>
-
-</div>
+    <div class="container">
+        <h2 id="statistics-header">Statistics</h2>
+        <table class="table table-hover" id="statistics-table"></table>
+    </div>
 
 {% endblock page_content %}
-
-  

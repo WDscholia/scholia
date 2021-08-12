@@ -4,25 +4,23 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table("nearby-researchers", {
+    {{ sparql_to_table("nearby-researchers", {
 	     "linkPrefixes":{"author": "../../../author/",
-			   "example_work": "../../../work/"}})}}
+			   "example_work": "../../../work/",
+    }})}}
 
 {% endblock in_ready %}
 
 
-
 {% block page_content %}
 
-<h1 id="h1">Location-topic</h1>
+    <h1 id="h1">Location-topic</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
+    <h2 title="Nearby researchers"
+        id="nearby-researchers-header">Nearby researchers</h2>
 
-<h2 title="Nearby researchers"
-    id="nearby-researchers-header">Nearby researchers</h2>
-
-<table class="table table-hover" id="nearby-researchers-table"></table>
-
+    <table class="table table-hover" id="nearby-researchers-table"></table>
 
 {% endblock page_content %}

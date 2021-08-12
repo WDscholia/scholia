@@ -1,52 +1,49 @@
 {% extends "base.html" %}
 
 {% set aspect = "dataset" %}
- 
-{% block in_ready %}
- 
-{{ sparql_to_table('identifiers') }}
-{{ sparql_to_table('list-of-authors') }}
-{{ sparql_to_table('citations') }}
 
-{{ sparql_to_iframe('topic-scores') }}
+{% block in_ready %}
+
+    {{ sparql_to_table('identifiers') }}
+    {{ sparql_to_table('list-of-authors') }}
+    {{ sparql_to_table('citations') }}
+    {{ sparql_to_iframe('topic-scores') }}
 
 {% endblock in_ready %}
 
-
 {% block page_content %}
-<h1 id="h1">Taxon</h1>
-<script type="application/ld+json" id="bioschemas"></script>
+    <h1 id="h1">Taxon</h1>
+    <script type="application/ld+json" id="bioschemas"></script>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="wembedder"></div>
+    <div id="wembedder"></div>
 
-<h2 id="identifiers-header">Identifiers</h2>
+    <h2 id="identifiers-header">Identifiers</h2>
 
-<table class="table table-hover" id="identifiers-table"></table>
+    <table class="table table-hover" id="identifiers-table"></table>
 
-<div id="details"></div>
+    <div id="details"></div>
 
-<table class="table table-hover" id="data-table"></table>
+    <table class="table table-hover" id="data-table"></table>
 
-<h2 id="list-of-authors-header">List of authors</h2>
+    <h2 id="list-of-authors-header">List of authors</h2>
 
-<table class="table table-hover" id="list-of-authors-table"></table>
+    <table class="table table-hover" id="list-of-authors-table"></table>
 
-<h2 id="topic-scores-header">Topic scores</h2>
+    <h2 id="topic-scores-header">Topic scores</h2>
 
-Topics based on a weighting between main subject of work, cited and citing works.
+    Topics based on a weighting between main subject of work, cited and citing works.
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="topic-scores-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="topic-scores-iframe"></iframe>
+    </div>
 
-<h2 id="citations-header">Citations to the work</h2>
+    <h2 id="citations-header">Citations to the work</h2>
 
-Recent citations to the work
+    Recent citations to the work
 
-<table class="table table-hover" id="citations-table"></table>
-
+    <table class="table table-hover" id="citations-table"></table>
 
 {% endblock page_content %}
     

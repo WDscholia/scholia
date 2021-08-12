@@ -4,46 +4,37 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table("list-of-venues") }}
-
-{{ sparql_to_iframe('published-works-per-year') }}
-{{ sparql_to_iframe('citations-per-year') }}
-{{ sparql_to_iframe('citations-to-work-ratio') }}
+    {{ sparql_to_table("list-of-venues") }}
+    {{ sparql_to_iframe('published-works-per-year') }}
+    {{ sparql_to_iframe('citations-per-year') }}
+    {{ sparql_to_iframe('citations-to-work-ratio') }}
 
 {% endblock in_ready %}
 
-
 {% block page_content %}
 
-<h1 id="h1">Venues</h1>
+    <h1 id="h1">Venues</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
+    <table class="table table-hover" id="list-of-venues-table"></table>
 
-<table class="table table-hover" id="list-of-venues-table"></table>
+    <h2 id="published-works-per-year-header">Published works per year</h2>
 
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="published-works-per-year-iframe"></iframe>
+    </div>
 
+    <h2 id="citations-per-year-header">Citations per year</h2>
 
-<h2 id="published-works-per-year-header">Published works per year</h2>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="citations-per-year-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="published-works-per-year-iframe"></iframe>
-</div>
+    <h2 id="citations-to-work-ratio-header">Citations to work ratio</h2>
 
-
-<h2 id="citations-per-year-header">Citations per year</h2>
-
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="citations-per-year-iframe"></iframe>
-</div>
-
-
-<h2 id="citations-to-work-ratio-header">Citations to work ratio</h2>
-
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="citations-to-work-ratio-iframe"></iframe>
-</div>
-
-
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="citations-to-work-ratio-iframe"></iframe>
+    </div>
 
 {% endblock page_content %}

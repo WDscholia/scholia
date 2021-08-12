@@ -4,16 +4,16 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('list-of-countries') }}
+    {{ sparql_to_table('list-of-countries') }}
 
 {% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="list-of-countries-header">Countries</h1>
+    <h1 id="list-of-countries-header">Countries</h1>
 
-<div id="list-of-countries-intro"></div>
+    <div id="list-of-countries-intro"></div>
 
-<table class="table table-hover" id="list-of-countries-table"></table>
+    <table class="table table-hover" id="list-of-countries-table"></table>
 
 {% endblock page_content %}

@@ -4,50 +4,42 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('list-of-authors') }}
-{{ sparql_to_table('list-of-jointly-authored-works') }}
-
-{{ sparql_to_iframe('works-per-publication-year') }}
-{{ sparql_to_iframe('citations-per-publication-year') }}
-{{ sparql_to_iframe('co-author') }}
+    {{ sparql_to_table('list-of-authors') }}
+    {{ sparql_to_table('list-of-jointly-authored-works') }}
+    {{ sparql_to_iframe('works-per-publication-year') }}
+    {{ sparql_to_iframe('citations-per-publication-year') }}
+    {{ sparql_to_iframe('co-author') }}
 
 {% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="h1">Authors</h1>
+    <h1 id="h1">Authors</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
+    <table class="table table-hover" id="list-of-authors-table"></table>
 
-<table class="table table-hover" id="list-of-authors-table"></table>
+    <h2 id="list-of-jointly-authored-works-header">List of jointly authored works</h2>
 
+    <table class="table table-hover" id="list-of-jointly-authored-works-table"></table>
 
-<h2 id="list-of-jointly-authored-works-header">List of jointly authored works</h2>
+    <h2 id="works-per-publication-year-header">Number of works per publication year</h2>
 
-<table class="table table-hover" id="list-of-jointly-authored-works-table"></table>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="works-per-publication-year-iframe"></iframe>
+    </div>
 
-<h2 id="works-per-publication-year-header">Number of works per publication year</h2>
+    <h2 id="citations-per-publication-year-header">Number of citations per publication year</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="works-per-publication-year-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="citations-per-publication-year-iframe"></iframe>
+    </div>
 
+    <h2 id="co-author-header">Co-author graph</h2>
 
-
-<h2 id="citations-per-publication-year-header">Number of citations per publication year</h2>
-
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="citations-per-publication-year-iframe"></iframe>
-</div>
-
-
-<h2 id="co-author-header">Co-author graph</h2>
-
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="co-author-iframe"></iframe>
-</div>
-
-
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="co-author-iframe"></iframe>
+    </div>
 
 {% endblock page_content %}

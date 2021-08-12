@@ -1,190 +1,182 @@
 {% extends "base.html" %}
 
-
 {% set aspect = "topic" %}
-
 
 {% block in_ready %}
 
-{{ sparql_to_table('recently-published-works',
-    options={
+    {{ sparql_to_table('recently-published-works',options={
     "linkPrefixes": {
 	     "work": "../work/",
      }})}}
-{{ sparql_to_table('earliest-published-works',
-    options={
+    {{ sparql_to_table('earliest-published-works',options={
     "linkPrefixes": {
 	     "work": "../work/",
      }})}}
-{{ sparql_to_table('authors',
-    options={
+    {{ sparql_to_table('authors',options={
     "linkPrefixes": {
 	     "author": "../author/",
      }})}}
-{{ sparql_to_table('topics',
-    options={
+    {{ sparql_to_table('topics',options={
     "linkPrefixes": {
 	     "topic": "../topic/",
 	     "example_work": "../work/",
      }})}}
-{{ sparql_to_table('author-scores',
-    options={
+    {{ sparql_to_table('author-scores',options={
     "linkPrefixes": {
 	     "author": "../author/",
 	     "example_work": "../work/",
      }})}}
-{{ sparql_to_table('venues',
-    options={
+    {{ sparql_to_table('venues',options={
     "linkPrefixes": {
 	     "venue": "../venue/",
      }})}}
-{{ sparql_to_table('top-cited',
-    options={
+    {{ sparql_to_table('top-cited',options={
     "linkPrefixes": {
 	     "cited_work": "../work/",
      }})}}
-{{ sparql_to_table('most-cited-authors',
-    options={
+    {{ sparql_to_table('most-cited-authors',options={
     "linkPrefixes": {
 	     "author": "../author/",
 	     "cited_work_example": "../work/",
      }})}}
-{{ sparql_to_table('author-awards',
-    options={
+    {{ sparql_to_table('author-awards',options={
     "linkPrefixes": {
 	     "award": "../award/",
      }})}}
-{{ sparql_to_iframe('context') }}
-{{ sparql_to_iframe('publications-per-year') }}
-{{ sparql_to_iframe('coauthor-graph') }}
-{{ sparql_to_iframe('co-occurring') }}
-{{ sparql_to_iframe('co-occurring-map') }}
-{{ sparql_to_iframe('author-scores-graph') }}
-{{ sparql_to_iframe('organization-map') }}
-{{ sparql_to_iframe('country-citation-graph') }}
+    {{ sparql_to_iframe('context') }}
+    {{ sparql_to_iframe('publications-per-year') }}
+    {{ sparql_to_iframe('coauthor-graph') }}
+    {{ sparql_to_iframe('co-occurring') }}
+    {{ sparql_to_iframe('co-occurring-map') }}
+    {{ sparql_to_iframe('author-scores-graph') }}
+    {{ sparql_to_iframe('organization-map') }}
+    {{ sparql_to_iframe('country-citation-graph') }}
 {% endblock in_ready %}
-
 
 {% block page_content %}
 
-<h1 id=h1>Topic</h1>
+    <h1 id="h1">Topic</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="wembedder"></div>
+    <div id="wembedder"></div>
 
-<h2 id="context-header">The topic in context</h2>
+    <h2 id="context-header">The topic in context</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="context-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="context-iframe"></iframe>
+    </div>
 
-<h2 id="recently-published-works-header">Recently published works on the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+    <h2 id="recently-published-works-header">Recently published works on the topic
+        <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss">
+            <img height="24"
+                 width="48"
+                 src="{{ url_for('static', filename='images/rss-40674_320.png') }}"
+                 alt="RSS icon"/></a>
+    </h2>
 
-<table class="table table-hover" id="recently-published-works-table"></table>
+    <table class="table table-hover" id="recently-published-works-table"></table>
 
+    <h2 id="publications-per-year-header">Publications per year</h2>
 
-<h2 id="publications-per-year-header">Publications per year</h2>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
-</div>
+    <h2 id="earliest-published-works-header">Earliest published works on the topic</h2>
 
+    <table class="table table-hover" id="earliest-published-works-table"></table>
 
-<h2 id="earliest-published-works-header">Earliest published works on the topic</h2>
+    <h2 id="Authors">Authors</h2>
 
-<table class="table table-hover" id="earliest-published-works-table"></table>
+    <h3 id="authors-header">Authors publishing about the topic</h3>
 
+    <table class="table table-hover" id="authors-table"></table>
 
-<h2 id="Authors">Authors</h2>
+    <h3 id="author-scores-header">Author score</h3>
 
+    Authors scored according to field of work, publications within the topic
+    and citing works within the topic.
 
-<h3 id="authors-header">Authors publishing about the topic</h3>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="author-scores-graph-iframe"></iframe>
+    </div>
 
-<table class="table table-hover" id="authors-table"></table>
+    <table class="table table-hover" id="author-scores-table"></table>
 
-<h3 id="author-scores-header">Author score</h3>
+    Missing authors here?
+    Then go to the
+    <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/curation">curation</a>
+    page to resolve the author names.
 
-Authors scored according to field of work, publications within the topic
-and citing works within the topic.
+    <h3 id="coauthor-graph-header">Co-author graph</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" id="author-scores-graph-iframe"></iframe>
-</div>
+    The 25 most prolific authors and some of their key co-authors.
 
-<table class="table table-hover" id="author-scores-table"></table>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="coauthor-graph-iframe"></iframe>
+    </div>
 
-Missing authors here?
-Then go to the
-<a href="{{ url_for('app.show_topic_empty') }}{{ q }}/curation">curation</a>
-page to resolve the author names.
+    <h3 id="author-awards-header">Awards received by authors who published on the topic</h3>
 
-<h3 id="coauthor-graph-header">Co-author graph</h3>
+    <table class="table table-hover" id="author-awards-table"></table>
 
-The 25 most prolific authors and some of their key co-authors.
+    <h2 id="Topics">Topics</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="coauthor-graph-iframe"></iframe>
-</div>
+    <h3 id="topics-header">Co-occurring topics</h3>
 
-<h3 id="author-awards-header">Awards received by authors who published on the topic</h3>
+    <table class="table table-hover" id="topics-table"></table>
 
-<table class="table table-hover" id="author-awards-table"></table>
+    <h3 id="co-occurring-header">Co-occurring topics graph</h3>
 
+    Only a maximum of the 400 most often occuring links are shown.
 
-<h2 id="Topics">Topics</h2>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="co-occurring-iframe"></iframe>
+    </div>
 
-<h3 id="topics-header">Co-occurring topics</h3>
+    <h3 id="co-occurring-map-header">Co-occurring topics map</h3>
 
-<table class="table table-hover" id="topics-table"></table>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="co-occurring-map-iframe"></iframe>
+    </div>
 
-<h3 id="co-occurring-header">Co-occurring topics graph</h3>
+    <h2 id="venues-header">Venues and series publishing works about the topic</h2>
 
-Only a maximum of the 400 most often occuring links are shown.
+    <table class="table table-hover" id="venues-table"></table>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="co-occurring-iframe"></iframe>
-</div>
+    <h2 id="Citations">Citations</h2>
 
-<h3 id="co-occurring-map-header">Co-occurring topics map</h3>
+    <h3 id="top-cited-header">Works cited from works on the topic</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="co-occurring-map-iframe"></iframe>
-</div>
+    <table class="table table-hover" id="top-cited-table"></table>
 
+    <h3 id="most-cited-authors-header">Authors cited from works on the topic</h3>
 
-<h2 id="venues-header">Venues and series publishing works about the topic</h2>
+    <table class="table table-hover" id="most-cited-authors-table"></table>
 
-<table class="table table-hover" id="venues-table"></table>
+    <h3 id="organization-map-header">Map of organizations associated with works about the
+        topic</h3>
 
-<h2 id="Citations">Citations</h2>
+    The colours indicate how many publications on the topic are associated with organizations in
+    the given location, as detailed in the legend (top right).
 
-<h3 id="top-cited-header">Works cited from works on the topic</h3>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe
+                class="embed-responsive-item" id="organization-map-iframe">
+        </iframe>
+    </div>
 
-<table class="table table-hover" id="top-cited-table"></table>
+    <h3 id="country-citation-graph-header">Citation graph of works about the topic, aggregated by
+        country</h3>
 
-<h3 id="most-cited-authors-header">Authors cited from works on the topic</h3>
+    The graph indicates the countries associated with organizations whose authors have published
+    works on the topic, and indicates the most cited countries (arrowheads) as well as the
+    countries they are most frequently cited from.
 
-<table class="table table-hover" id="most-cited-authors-table"></table>
-
-<h3 id="organization-map-header">Map of organizations associated with works about the topic</h3>
-
-The colours indicate how many publications on the topic are associated with organizations in the given location, as detailed in the legend (top right).
-
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe 
-        class="embed-responsive-item" id="organization-map-iframe">
-    </iframe>
-</div>
-
-<h3 id="country-citation-graph-header">Citation graph of works about the topic, aggregated by country</h3>
-
-The graph indicates the countries associated with organizations whose authors have published works on the topic, and indicates the most cited countries (arrowheads) as well as the countries they are most frequently cited from.
-
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="country-citation-graph-iframe">
-    </iframe>
-</div>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="country-citation-graph-iframe">
+        </iframe>
+    </div>
 
 {% endblock page_content %}
-    

@@ -5,36 +5,38 @@
 
 {% block page_content %}
 
-<h1>Search</h1>
+    <h1>Search</h1>
 
-<form>
-    <div class="input-group">
-	<input type="text" class="form-control" name="q" id="searchterm" value="{{ query }}"
-	       placeholder="Search for scientist, paper, topic, etc."/>
+    <form>
+        <div class="input-group">
+            <input type="text" class="form-control" name="q" id="searchterm" value="{{ query }}"
+                   placeholder="Search for scientist, paper, topic, etc."/>
+        </div>
+    </form>
+
+    <div class="search-results">
+        <br>
+        <h5>Results</h5>
+        <ul class="search-results">
+            {% for search_result in search_results %}
+                <li class="search-result">
+                    <h5><a href="{{ search_result['q'] }}">
+                        <span id="label-{{ search_result['q'] }}"></span>
+                        {{ search_result['label'] }} - {{ search_result['q'] }}</a></h5>
+                    {{ search_result['description'] }}</li>
+            {% endfor %}
+        </ul>
+
+        <div class="text-center">
+            {% if prev_page >= 0 %}
+                <h5 class="d-inline"><a href="/search?q={{ query }}&page={{ prev_page }}">Back</a>
+                    |</h5>
+            {% endif %}
+            {% if next_page >= 0 %}
+                <h5 class="d-inline"><a href="/search?q={{ query }}&page={{ next_page }}">Next</a>
+                </h5>
+            {% endif %}
+        </div>
     </div>
-</form>
-
-<div class="search-results">
-    <br>
-    <h5>Results</h5>
-    <ul class="search-results">
-    {% for search_result in search_results %}
-        <li class="search-result">
-            <h5><a href="{{ search_result['q'] }}">
-            <span id="label-{{ search_result['q'] }}"></span>
-            {{ search_result['label']}} - {{ search_result['q'] }}</a></h5>
-            {{ search_result['description'] }}</li>
-    {% endfor %}
-    </ul>
-
-    <div class="text-center">
-    {% if prev_page >= 0 %}
-        <h5 class="d-inline"><a href="/search?q={{ query }}&page={{ prev_page }}">Back</a> |</h5>
-    {% endif %}
-    {% if next_page >= 0 %}
-        <h5 class="d-inline"><a href="/search?q={{ query }}&page={{ next_page }}">Next</a></h5>
-    {% endif %}
-    </div>
-</div>
 
 {% endblock page_content %}

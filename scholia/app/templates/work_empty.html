@@ -4,8 +4,7 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('recently-retracted-works',
-    options={
+    {{ sparql_to_table('recently-retracted-works',options={
     "linkPrefixes": {
         "retracted_work": "../work/",
         "retraction": "../work/",
@@ -13,101 +12,106 @@
 
 {% endblock in_ready %}
 
-
-
 {% block page_content %}
 
-<h1>Work</h1>
+    <h1>Work</h1>
 
-Scientific articles, conference articles, books, ...
+    Scientific articles, conference articles, books, ...
 
+    <div class="container">
 
-<div class="container">
+        <h2>Examples</h2>
 
-    <h2>Examples</h2>
+        <div class="card-deck mb-3">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Works</h4>
+                </div>
+                <div class="card-body">
 
-    <div class="card-deck mb-3">
-	<div class="card mb-4 box-shadow">
-            <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Works</h4>
+                    <ul>
+                        <li><a href="Q21090025">The Alzheimer's disease-associated amyloid
+                            beta-protein is an antimicrobial peptide</a></li>
+                        <li><a href="Q21146099">A new yeast poly(A) polymerase complex involved in
+                            RNA quality control</a></li>
+                        <li><a href="Q22253877">A novel family of mammalian taste receptors</a>
+                        </li>
+                        <li><a href="Q22344483">The Hirschsprung Collection of Works by Danish
+                            Artists</a></li>
+                        <li><a href="Q24299862">Hydroxylation of 5-methylcytosine by TET1 promotes
+                            active DNA demethylation in the adult brain</a></li>
+                        <li><a href="Q24302302">A human MAP kinase interactome</a></li>
+                        <li><a href="Q24310565">TRIM E3 ligases interfere with early and late
+                            stages of the retroviral life cycle</a></li>
+                        <li><a href="Q24314690">The Xenopus dorsalizing factor Gremlin identifies a
+                            novel family of secreted proteins that antagonize BMP activities</a>
+                        </li>
+                        <li><a href="Q24319057">No death without life: vital functions of apoptotic
+                            effectors</a></li>
+                        <li><a href="Q27932040">A screen for RNA-binding proteins in yeast
+                            indicates dual functions for many enzymes</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="card-body">
 
-	  <ul>
-	    <li><a href="Q21090025">The Alzheimer's disease-associated amyloid beta-protein is an antimicrobial peptide</a></li>
-	    <li><a href="Q21146099">A new yeast poly(A) polymerase complex involved in RNA quality control</a></li>
-	    <li><a href="Q22253877">A novel family of mammalian taste receptors</a></li>
-	    <li><a href="Q22344483">The Hirschsprung Collection of Works by Danish Artists</a></li>
-	    <li><a href="Q24299862">Hydroxylation of 5-methylcytosine by TET1 promotes active DNA demethylation in the adult brain</a></li>
-	    <li><a href="Q24302302">A human MAP kinase interactome</a></li>
-	    <li><a href="Q24310565">TRIM E3 ligases interfere with early and late stages of the retroviral life cycle</a></li>
-	    <li><a href="Q24314690">The Xenopus dorsalizing factor Gremlin identifies a novel family of secreted proteins that antagonize BMP activities</a></li>
-	    <li><a href="Q24319057">No death without life: vital functions of apoptotic effectors</a></li>
-	    <li><a href="Q27932040">A screen for RNA-binding proteins in yeast indicates dual functions for many enzymes</a></li>
-	  </ul>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Comparisons</h4>
+                </div>
+                <div class="card-body">
 
+                    <ul>
+                        <li><a href="../works/Q20900776,Q24564458">"Protein measurement with the
+                            Folin phenol reagent" and "Novel method for detection of
+                            beta-lactamases by using a chromogenic cephalosporin substrate"</a>
+                        </li>
+                        <li><a href="../works/Q24699014,Q27230311">"Efficient Estimation of Word
+                            Representations in Vector Space" and "A New ANEW: Evaluation of a Word
+                            List for Sentiment Analysis in Microblogs"</a></li>
+                        <li>
+                            <a href="../works/Q37323707,Q37329309,Q37365885,Q38428823,Q38622261,Q31118357,Q30234872,Q38952445,Q38959825,Q39134766,Q31134981,Q24658341,Q39212195,Q29654260,Q30399677,Q39308266,Q39310137,Q39294230,Q39431314,Q39434235,Q39503912,Q30223213,Q41113001,Q41358766,Q41352462,Q41839178,Q30277020,Q42013770,Q42014100,Q42014341,Q42013239,Q42015075,Q42015258,Q42023666,Q42147889,Q21683247,Q42308433,Q26699971,Q42183997">"When
+                                and Why Incentives (Don't) Work to Modify Behavior" and 38 other
+                                papers</a></li>
+                    </ul>
+                </div>
+            </div>
 
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Redirects</h4>
+                </div>
+                <div class="card-body">
+                    <dl>
+                        <dt>
+                            <a href="../doi/10.1186/S13321-016-0161-3">doi/10.1186/S13321-016-0161-3</a>
+                        </dt>
+                        <dd>Redirect based on a DOI.</dd>
+                        <dt>
+                            <a href="../pubmed/29029422">pubmed/29029422</a>
+                        </dt>
+                        <dd>Redirect based on a PubMed identifier.</dd>
+                        <dt>
+                            <a href="../arxiv/1507.04180">arxiv/1507.04180</a>
+                        </dt>
+                        <dd>Redirect based on an arXiv identifier.</dd>
+                        <dt>
+                            <a href="../biorxiv/028522">biorxiv/028522</a>
+                        </dt>
+                        <dd>Redirect based on a bioRxiv identifier.</dd>
+                        <dt>
+                            <a href="../chemrxiv/12791954">chemrxiv/12791954</a>
+                        </dt>
+                        <dd>Redirect based on a ChemRxiv identifier.</dd>
+                    </dl>
+                </div>
 
-	              </div>
-
-	</div>
-	    
-        <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Comparisons</h4>
-	    </div>
-	    <div class="card-body">
-
-<ul>
-  <li><a href="../works/Q20900776,Q24564458">"Protein measurement with the Folin phenol reagent" and "Novel method for detection of beta-lactamases by using a chromogenic cephalosporin substrate"</a></li>
-  <li><a href="../works/Q24699014,Q27230311">"Efficient Estimation of Word Representations in Vector Space" and "A New ANEW: Evaluation of a Word List for Sentiment Analysis in Microblogs"</a></li>
-  <li><a href="../works/Q37323707,Q37329309,Q37365885,Q38428823,Q38622261,Q31118357,Q30234872,Q38952445,Q38959825,Q39134766,Q31134981,Q24658341,Q39212195,Q29654260,Q30399677,Q39308266,Q39310137,Q39294230,Q39431314,Q39434235,Q39503912,Q30223213,Q41113001,Q41358766,Q41352462,Q41839178,Q30277020,Q42013770,Q42014100,Q42014341,Q42013239,Q42015075,Q42015258,Q42023666,Q42147889,Q21683247,Q42308433,Q26699971,Q42183997">"When and Why Incentives (Don't) Work to Modify Behavior" and 38 other papers</a></li>
-</ul>
-	    </div>
-	</div>
-
-        <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Redirects</h4>
-	    </div>
-	    <div class="card-body">
-	      <dl>
-              <dt>
-                <a href="../doi/10.1186/S13321-016-0161-3">doi/10.1186/S13321-016-0161-3</a>
-              </dt>
-              <dd>Redirect based on a DOI.</dd>
-              <dt>
-                <a href="../pubmed/29029422">pubmed/29029422</a>
-              </dt>
-              <dd>Redirect based on a PubMed identifier.</dd>
-              <dt>
-                  <a href="../arxiv/1507.04180">arxiv/1507.04180</a>
-              </dt>
-              <dd>Redirect based on an arXiv identifier.</dd>
-              <dt>
-                  <a href="../biorxiv/028522">biorxiv/028522</a>
-              </dt>
-              <dd>Redirect based on a bioRxiv identifier.</dd>
-              <dt>
-                  <a href="../chemrxiv/12791954">chemrxiv/12791954</a>
-              </dt>
-              <dd>Redirect based on a ChemRxiv identifier.</dd>
-	      </dl>
-	    </div>
-
+            </div>
         </div>
     </div>
-</div>
 
-
-
-<div class="container">
-
-    <h2 id="recently-retracted-works-header">Recently retracted works</h2>
-
-    <table class="table table-hover" id="recently-retracted-works-table"></table>
-    
-</div>    
+    <div class="container">
+        <h2 id="recently-retracted-works-header">Recently retracted works</h2>
+        <table class="table table-hover" id="recently-retracted-works-table"></table>
+    </div>
 
 {% endblock page_content %}
-

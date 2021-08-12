@@ -2,63 +2,55 @@
 
 {% set aspect = "country" %}
 
-
 {% block in_ready %}
 
-{{ sparql_to_table('organizations') }}
-{{ sparql_to_table('authors') }}
-
-{{ sparql_to_iframe('locations-as-topics') }}
-{{ sparql_to_iframe('narrative-locations') }}
-{{ sparql_to_iframe('co-organizations') }}
+    {{ sparql_to_table('organizations') }}
+    {{ sparql_to_table('authors') }}
+    {{ sparql_to_iframe('locations-as-topics') }}
+    {{ sparql_to_iframe('narrative-locations') }}
+    {{ sparql_to_iframe('co-organizations') }}
 
 {% endblock in_ready %}
 
-
-
 {% block page_content %}
 
-<h1 id="h1">Country</h1>
+    <h1 id="h1">Country</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="wembedder"></div>
-
-
-<h2 id="organizations-header">Organizations</h2>
-
-<table class="table table-hover" id="organizations-table"></table>
-
-<h2 id="authors-header">Authors</h2>
-
-<table class="table table-hover" id="authors-table"></table>
+    <div id="wembedder"></div>
 
 
-<h2 id="locations-as-topics-header">Locations as topics</h2>
+    <h2 id="organizations-header">Organizations</h2>
 
-Locations in the country that are the topic of a work.
+    <table class="table table-hover" id="organizations-table"></table>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="locations-as-topics-iframe"></iframe>
-</div>
+    <h2 id="authors-header">Authors</h2>
 
+    <table class="table table-hover" id="authors-table"></table>
 
-<h2 id="narrative-locations-header">Narrative locations</h2>
+    <h2 id="locations-as-topics-header">Locations as topics</h2>
 
-Locations used as narrative locations in works.
+    Locations in the country that are the topic of a work.
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="narrative-locations-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="locations-as-topics-iframe"></iframe>
+    </div>
 
+    <h2 id="narrative-locations-header">Narrative locations</h2>
 
-<h2 id="co-organizations-header">Co-organizations</h2>
+    Locations used as narrative locations in works.
 
-International organizations with co-authors.
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="narrative-locations-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="co-organizations-iframe"></iframe>
-</div>
+    <h2 id="co-organizations-header">Co-organizations</h2>
 
+    International organizations with co-authors.
+
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="co-organizations-iframe"></iframe>
+    </div>
 
 {% endblock page_content %}

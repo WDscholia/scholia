@@ -4,8 +4,7 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('lexemes',
-    options={
+    {{ sparql_to_table('lexemes',options={
     "linkPrefixes": {
        "lexeme": "../lexeme/",
 	     "example_work": "../work/",
@@ -13,12 +12,10 @@
 
 {% endblock in_ready %}
 
-
 {% block page_content %}
 
-<h1 id="lexemes-header">Lexeme</h1>
+    <h1 id="lexemes-header">Lexeme</h1>
 
-<table class="table table-hover" id="lexemes-table"></table>
-
+    <table class="table table-hover" id="lexemes-table"></table>
 
 {% endblock page_content %}

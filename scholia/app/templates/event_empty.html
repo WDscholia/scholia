@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% set aspect = "event" %}
- 
+
 {% block in_ready %}
 
-{{ sparql_to_table('upcoming-deadlines',
+    {{ sparql_to_table('upcoming-deadlines',
      options={
        "linkPrefixes":{
          "event": "../event/",
@@ -12,7 +12,7 @@
        }
      }
    ) }}
-{{ sparql_to_table('future-events',
+    {{ sparql_to_table('future-events',
      options={
        "linkPrefixes":{
          "event": "../event/",
@@ -20,7 +20,7 @@
        }
     }
   ) }}
-{{ sparql_to_table('past-events',
+    {{ sparql_to_table('past-events',
      options={
        "linkPrefixes":{
          "event": "../event/",
@@ -28,31 +28,23 @@
        }
     }
   ) }}
- 
-{% endblock in_ready %}
 
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1>Events</h1>
+    <h1>Events</h1>
 
-<h2 id="upcoming-deadlines">Coming deadlines</h2>
+    <h2 id="upcoming-deadlines">Coming deadlines</h2>
 
-<table class="table table-hover" id="upcoming-deadlines-table"></table>
+    <table class="table table-hover" id="upcoming-deadlines-table"></table>
 
+    <h2 id="future-events">Future events</h2>
 
-<h2 id="future-events">Future events</h2>
+    <table class="table table-hover" id="future-events-table"></table>
 
-<table class="table table-hover" id="future-events-table"></table>
+    <h2 id="past-events">Past events</h2>
 
-
-<h2 id="past-events">Past events</h2>
-
-<table class="table table-hover" id="past-events-table"></table>
-
-
-
+    <table class="table table-hover" id="past-events-table"></table>
 
 {% endblock page_content %}
-
-  
