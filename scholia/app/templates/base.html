@@ -11,7 +11,7 @@ options={{ options | tojson }});
 
 {% macro sparql_to_table(panel, options={}) -%}
 // {{ panel }} table
-sparqlToDataTable2(`# tool: scholia
+sparqlToDataTable(`# tool: scholia
 {% include aspect + '_' + panel + '.sparql' %}
 `,
 "#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",
@@ -94,7 +94,19 @@ sparqlToShortInchiKey(`# tool: scholia
     $.getJSON(url, function (data) {
 	 var item = data.entities["{{ q }}"];
 	 if ('en' in item.labels) {
-	     $("#h1").text(item.labels.en.value);
+	     var title = item.labels.en.value
+	     $("#h1").text(title);
+
+	     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
+
+	     var linkedToFrom = "<p><a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=1&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
+	     linkedToFrom += "Recent changes to items that link <em>to</em> " + $('<div>').text(title).html() + "</a> and ";
+	     linkedToFrom += "<a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=0&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
+	     linkedToFrom += "recent changes to items that link <em>from</em> " + $('<div>').text(title).html() + "</a>.</p>";
+
+	     $(linkedToFrom).insertAfter('h1:first');
+
+	     {% endif %}
 	 }
 	 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 
@@ -395,6 +407,10 @@ sparqlToShortInchiKey(`# tool: scholia
     UNION
     { wd:{{ q }} wdt:P644 [] . BIND("gene" AS ?aspect) }
     UNION
+    { wd:{{ q }} wdt:P31 / wdt:P279?  wd:Q22325163 . BIND("complex" AS ?aspect) }
+    UNION
+    { wd:{{ q }} wdt:P31 wd:Q8054 . BIND("protein" AS ?aspect) }
+    UNION
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
     `;
@@ -402,7 +418,7 @@ sparqlToShortInchiKey(`# tool: scholia
 	 headers: { Accept: 'application/sparql-results+json' },
 	 data: { query: query }
      };
-     
+
      $.ajax( endpointUrl, settings ).then( function ( data ) {
 	 data.results.bindings.forEach(function(entry) {
 	     var aspect = entry.aspect.value;
@@ -542,6 +558,50 @@ sparqlToShortInchiKey(`# tool: scholia
          element.insertAdjacentHTML('afterbegin', `<a href="#${element.id}" class="hlink"  ariaLabel="Anchor">${title}</a>`)
        })
      }
+
+     // Add table of content
+  var headings = document.querySelectorAll("h2,h3");
+  if (headings.length >= 4) {
+    var toc = document.createElement("div");
+    toc.className = "table-of-contents"
+
+    tocTitle = document.createElement("b");
+    tocTitle.innerText = "Table of Contents"
+    toc.appendChild(tocTitle)
+
+    var tocList = document.createElement("ul");
+    var sublist = "";
+    for (let i = 0; i < headings.length; i++) {
+      const element = headings[i];
+      if (!element.id) {
+        element.id = element.innerText.replace(" ", "-")
+      }
+      if (element.tagName === "H3" && !sublist) {
+        var sublist = document.createElement("ul");
+      }
+      tocListItem = document.createElement("li");
+
+      tocEntry = document.createElement("a");
+      tocEntry.setAttribute("href", "#" + element.id);
+      tocEntry.innerText = headings[i].innerText;
+
+      tocListItem.appendChild(tocEntry);
+
+      if (element.tagName === "H3") {
+        sublist.appendChild(tocListItem);
+      } else {
+        if (sublist) {
+          tocList.appendChild(sublist);
+          sublist = "";
+        }
+        tocList.appendChild(tocListItem);
+      }
+    }
+
+    toc.appendChild(tocList)
+    document.querySelector("h2").insertAdjacentElement("beforebegin", toc)
+  }
+
 
      {% block in_ready %}{% endblock %}
  });
