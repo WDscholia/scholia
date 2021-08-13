@@ -8,8 +8,9 @@
     {{ sparql_to_table('coused') }}
     {{ sparql_to_iframe('topics') }}
     {{ sparql_to_iframe('authors') }}
+    {{ sparql_to_iframe('software-dependencies') }}
 
-{% endblock in_ready %}
+{% endblock %}
 
 {% block page_content %}
     <h1 id="h1">Software</h1>
@@ -36,4 +37,14 @@
         <iframe class="embed-responsive-item" id="authors-iframe"></iframe>
     </div>
 
-{% endblock page_content %}
+
+    <h2 id="software-dependencies-header">Software dependencies</h2>
+
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="software-dependencies-iframe"></iframe>
+    </div>
+
+
+
+{% endblock %}
+    

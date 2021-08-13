@@ -419,9 +419,9 @@
     UNION
     { wd:{{ q }} wdt:P644 [] . BIND("gene" AS ?aspect) }
     UNION
-    { wd:{{ q }} p:P31/ps:P31 wd:Q22325163 . BIND("complex" AS ?aspect) }
+    { wd:{{ q }} wdt:P31 / wdt:P279?  wd:Q22325163 . BIND("complex" AS ?aspect) }
     UNION
-    { wd:{{ q }} p:P31/ps:P31 wd:Q8054 . BIND("protein" AS ?aspect) }
+    { wd:{{ q }} wdt:P31 wd:Q8054 . BIND("protein" AS ?aspect) }
     UNION
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
