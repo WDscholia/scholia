@@ -85,16 +85,34 @@ sparqlToShortInchiKey(`# tool: scholia
 <link href="{{ url_for('static', filename='widgets/select2/css/select2.min.css') }}" rel="stylesheet" />
 <script type="text/javascript" src="{{ url_for('static', filename='widgets/select2/js/select2.min.js')}}"></script>
 
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.emitter.bidi.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.emitter.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.fallbacks.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.language.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.messagestore.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.parser.js') }}"></script>
+
 <script type="text/javascript">
-	var langCode = "{{g.lang_code}}"
-	{% if q %}
+ var langCode = "{{ g.lang_code }}"
+ 
+ $.i18n().locale = langCode || "en"
+ var i18nlang = {
+	 [langCode]:`/static/i18n/${langCode}.json`
+	}
+ $.i18n().load(i18nlang).
+	 done( ()=>{
+		 $('body').i18n();
+		})
+		
+ {% if q %}
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
      
     $.getJSON(url, function (data) {
 	 var item = data.entities["{{ q }}"];
-
+	 
 	 if (langCode in item.labels) {
 	     $("#h1").text(item.labels[`${langCode}`].value);
 	 }
@@ -770,6 +788,8 @@ sparqlToShortInchiKey(`# tool: scholia
 		    <span class="caret"></span></button>
 		<ul class="dropdown-menu">
 		    <li role="presentation"><a href="{{ request.path }}?lc=es">ES</a></li>
+			<li role="presentation"><a href="{{ request.path }}?lc=en">EN</a></li>
+			<li role="presentation"><a href="{{ request.path }}?lc=fr">FR</a></li>
 
 		</ul>
 	    </div>

@@ -74,6 +74,7 @@ def ensure_lang_support():
     print("lang_code: ",lang_code)
     g.lang_code = lang_code
     print("g.lang_code: ",lang_code)
+    redirect(url_for("app.index"), code=302)
     # session['lang_code'] = lang_code
     # if lang_code and lang_code not in current_app.config['SUPPORTED_LANGUAGES'].keys():
     #     ''' fix for unsupported lang inserted '''
@@ -91,9 +92,9 @@ def set_language_cookie(response):
     return response
 
 
-@main.url_defaults
-def add_language_code(endpoint, values):
-    values.setdefault('lang_code', g.lang_code)
+# @main.url_defaults
+# def add_language_code(endpoint, values):
+#     values.setdefault('lang_code', g.lang_code)
 
 
     
