@@ -418,46 +418,53 @@ sparqlToShortInchiKey(`# tool: scholia
 	 headers: { Accept: 'application/sparql-results+json' },
 	 data: { query: query }
      };
+     
+      $.ajax(endpointUrl, settings).then(function (data) {
+        var currentAspect = window.location.pathname.split("/")[1];
+        createDropdownButton("aspect-chooser", 'aspectMenuButton', currentAspect, data)
 
-     $.ajax( endpointUrl, settings ).then( function ( data ) {
-	     var aspectDropdown = document.createElement('button');
-       aspectDropdown.type = 'button';
-       aspectDropdown.id = 'aspectMenuButton';
-	     aspectDropdown.classList = 'btn btn-outline-secondary';
-       if (data.results.bindings.length > 1) {
-         console.log(data.results.bindings)
-         aspectDropdown.classList.add('dropdown-toggle');
-         aspectDropdown.setAttribute('data-toggle', 'dropdown');
-         aspectDropdown.setAttribute('aria-haspopup', 'true');
-         aspectDropdown.setAttribute('aria-expanded', 'false');
-       }
-	     var currentAspect = window.location.pathname.split("/")[1];
-	     aspectDropdown.innerText = currentAspect;
-	     document.getElementById("aspect-chooser").append(aspectDropdown);
-	
-       if (data.results.bindings.length > 1) {
-	     var aspectDropdownMenu = document.createElement('div');
-	     aspectDropdownMenu.classList = 'dropdown-menu';
-	     aspectDropdownMenu.setAttribute('aria-labelledby', 'aspectMenuButton');
-	
-	    data.results.bindings.forEach(function(entry) {
-	        var aspect = entry.aspect.value;
-	        if (aspect != currentAspect) {
-	          var dropdownItem = document.createElement('a');
-	          dropdownItem.classList = 'dropdown-item';
-	          dropdownItem.href = "{{ url_for('app.index') }}" + aspect + '/{{ q }}';
-	          dropdownItem.innerText = aspect;
-	          aspectDropdownMenu.append(dropdownItem);
-	        }
-	    });
-	 
-        document.getElementById("aspect-chooser").append(aspectDropdownMenu);
+        if (data.results.bindings.length > 1) {
+          addDropdownList("aspect-chooser", 'aspectMenuList', currentAspect, data)
+        }
+      });
+
+      function createDropdownButton(parent, id, currentAspect, data) {        
+        var aspectDropdown = document.createElement('button');
+        aspectDropdown.type = 'button';
+        aspectDropdown.id = id;
+        aspectDropdown.classList = 'btn btn-outline-secondary';
+        if (data.results.bindings.length > 1) {
+          aspectDropdown.classList.add('dropdown-toggle');
+          aspectDropdown.setAttribute('data-toggle', 'dropdown');
+          aspectDropdown.setAttribute('aria-haspopup', 'true');
+          aspectDropdown.setAttribute('aria-expanded', 'false');
+        }
+        aspectDropdown.innerText = currentAspect;
+        document.getElementById(parent).append(aspectDropdown);
+
+        aspectDropdown.insertAdjacentHTML("afterend",
+          '<span id="aspect-chooser-label" style="color: #6C757D; vertical-align: middle;margin: 2px;"> / {{ q }}</span>')
       }
-	     
-	
-	     aspectDropdown.insertAdjacentHTML("afterend", 
-	     '<span id="aspect-chooser-label" style="color: #6C757D; vertical-align: middle;margin: 2px;"> / {{ q }}</span>')
-     } );
+
+      function addDropdownList(parent, id, currentAspect, data) {        
+        var aspectDropdownMenu = document.createElement('div');
+        aspectDropdownMenu.classList = 'dropdown-menu';
+        aspectDropdownMenu.setAttribute('aria-labelledby', 'aspectMenuButton');
+        aspectDropdownMenu.id = id
+
+        data.results.bindings.forEach(function (entry) {
+          var aspect = entry.aspect.value;
+          if (aspect != currentAspect) {
+            var dropdownItem = document.createElement('a');
+            dropdownItem.classList = 'dropdown-item';
+            dropdownItem.href = "{{ url_for('app.index') }}" + aspect + '/{{ q }}';
+            dropdownItem.innerText = aspect;
+            aspectDropdownMenu.append(dropdownItem);
+          }
+        });
+
+        document.getElementById(parent).append(aspectDropdownMenu);
+      }
 
      // this query opens a subpage for the Wikidata item, e.g. as cito subpage
      var endpointUrl = 'https://query.wikidata.org/sparql';
