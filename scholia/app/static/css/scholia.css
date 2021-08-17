@@ -105,5 +105,15 @@ h3 {
 
 .table-of-contents {
     margin: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
 
+#item-image {
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: right;
+    max-height: 100%;
+    max-width: 50vw;
+    width: 50%;
 }

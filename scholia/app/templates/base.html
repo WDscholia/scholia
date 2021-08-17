@@ -124,6 +124,23 @@ sparqlToShortInchiKey(`# tool: scholia
     });
     {% endif %}
 
+    if ("P18" in item.claims) {
+      console.log("in")
+      var imageName = item.claims.P18[0].mainsnak.datavalue.value;
+      // spaces must be replaced by underscores in the file name
+      imageName = imageName.replaceAll(" ", "_")
+      var imageNameMd5 = md5(imageName);
+      var imageURL = "https://upload.wikimedia.org/wikipedia/commons/" 
+      imageURL += imageNameMd5[0] + "/" + imageNameMd5.slice(0,2) + "/"
+      imageURL += imageName
+      console.log(imageURL)
+      var itemImage = document.getElementById("item-image");
+      if (itemImage) {
+        console.log("out")
+        itemImage.style = "background-image:url('" + encodeURI(imageURL) + "')";
+      }
+    }
+
 	 var detailsList = Array();
 	 try {
 	     var orcid = item.claims.P496[0].mainsnak.datavalue.value;
@@ -562,8 +579,10 @@ sparqlToShortInchiKey(`# tool: scholia
      // Add table of content
   var headings = document.querySelectorAll("h2,h3");
   if (headings.length >= 4) {
+    var tocParent = document.createElement("div");
+    tocParent.className = "table-of-contents"
+
     var toc = document.createElement("div");
-    toc.className = "table-of-contents"
 
     tocTitle = document.createElement("b");
     tocTitle.innerText = "Table of Contents"
@@ -599,7 +618,13 @@ sparqlToShortInchiKey(`# tool: scholia
     }
 
     toc.appendChild(tocList)
-    document.querySelector("h2").insertAdjacentElement("beforebegin", toc)
+
+    var itemImage = document.createElement("div");
+    itemImage.id = "item-image"
+
+    tocParent.appendChild(toc);
+    tocParent.appendChild(itemImage);
+    document.querySelector("h2").insertAdjacentElement("beforebegin", tocParent)
   }
 
 
