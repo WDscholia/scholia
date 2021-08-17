@@ -1,0 +1,14 @@
+SELECT ?type ?complex ?complexLabel
+WITH {
+  SELECT DISTINCT ?type ?complex WHERE {
+    VALUES ?part { wd:{{ q }} }
+    VALUES ?process { wd:Q2996394 wd:Q4915012 }
+    { ?part ^wdt:P527 ?complex . ?complex wdt:P31 wd:Q22325163 ; BIND ("complex" AS ?type ) }
+    UNION
+    { ?part ^wdt:P527 ?complex . ?complex wdt:P31 ?process ; BIND ("biological process" AS ?type ) }
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+} ORDER BY ASC(?partLabel)
