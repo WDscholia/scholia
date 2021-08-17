@@ -421,36 +421,36 @@ sparqlToShortInchiKey(`# tool: scholia
      
       $.ajax(endpointUrl, settings).then(function (data) {
         var currentAspect = window.location.pathname.split("/")[1];
-        createDropdownButton("aspect-chooser", 'aspectMenuButton', currentAspect, data)
+        createDropdownButton('aspectMenuButton', currentAspect, data)
 
         if (data.results.bindings.length > 1) {
-          addDropdownList("aspect-chooser", 'aspectMenuList', currentAspect, data)
+          addDropdownList('aspectMenuButton', currentAspect, data)
         }
       });
 
-      function createDropdownButton(parent, id, currentAspect, data) {        
+      function createDropdownButton(id, currentAspect, data) {        
         var aspectDropdown = document.createElement('button');
         aspectDropdown.type = 'button';
         aspectDropdown.id = id;
         aspectDropdown.classList = 'btn btn-outline-secondary';
+        // we only want a dropdown if there is more than one aspect
         if (data.results.bindings.length > 1) {
           aspectDropdown.classList.add('dropdown-toggle');
           aspectDropdown.setAttribute('data-toggle', 'dropdown');
           aspectDropdown.setAttribute('aria-haspopup', 'true');
           aspectDropdown.setAttribute('aria-expanded', 'false');
         }
-        aspectDropdown.innerText = currentAspect;
-        document.getElementById(parent).append(aspectDropdown);
-
-        aspectDropdown.insertAdjacentHTML("afterend",
-          '<span id="aspect-chooser-label" style="color: #6C757D; vertical-align: middle;margin: 2px;"> / {{ q }}</span>')
+        aspectDropdown.innerHTML = currentAspect;
+        document.getElementById('aspect-chooser').append(aspectDropdown);
+        
+        document.getElementById("aspect-chooser").insertAdjacentHTML("beforeend",
+          '<span id="aspect-chooser-label" style="color: #6C757D; vertical-align: middle;margin: 2px;"> / {{q}}</span>')
       }
 
-      function addDropdownList(parent, id, currentAspect, data) {        
+      function addDropdownList(id, currentAspect, data) {        
         var aspectDropdownMenu = document.createElement('div');
         aspectDropdownMenu.classList = 'dropdown-menu';
-        aspectDropdownMenu.setAttribute('aria-labelledby', 'aspectMenuButton');
-        aspectDropdownMenu.id = id
+        aspectDropdownMenu.setAttribute('aria-labelledby', id);
 
         data.results.bindings.forEach(function (entry) {
           var aspect = entry.aspect.value;
@@ -461,6 +461,38 @@ sparqlToShortInchiKey(`# tool: scholia
             dropdownItem.innerText = aspect;
             aspectDropdownMenu.append(dropdownItem);
           }
+        });
+
+        document.getElementById('aspect-chooser').append(aspectDropdownMenu);
+      }
+
+      function addCitoButton(id, data) {        
+        var aspectDropdown = document.createElement('button');
+        aspectDropdown.type = 'button';
+        aspectDropdown.id = id;
+        aspectDropdown.classList = 'btn btn-outline-secondary';
+        
+        aspectDropdown.classList.add('dropdown-toggle');
+        aspectDropdown.setAttribute('data-toggle', 'dropdown');
+        aspectDropdown.setAttribute('aria-haspopup', 'true');
+        aspectDropdown.setAttribute('aria-expanded', 'false');
+
+        aspectDropdown.innerHTML = "&emsp;";
+        document.getElementById('aspect-chooser').append(aspectDropdown);
+           
+        var aspectDropdownMenu = document.createElement('div');
+        aspectDropdownMenu.classList = 'dropdown-menu';
+        aspectDropdownMenu.setAttribute('aria-labelledby', id);
+
+        data.results.bindings.forEach(function (entry) {
+          var props = entry.aspectsubpage.value.split("-");
+          var aspect = props[0];
+          var subpage = props[1];
+          var dropdownItem = document.createElement('a');
+          dropdownItem.classList = 'dropdown-item';
+          dropdownItem.href = "{{ url_for('app.index') }}" + aspect + '/' + '{{ q }}' + '/' + subpage;
+          dropdownItem.innerText = subpage;
+          aspectDropdownMenu.append(dropdownItem);
         });
 
         document.getElementById(parent).append(aspectDropdownMenu);
@@ -482,17 +514,11 @@ sparqlToShortInchiKey(`# tool: scholia
      };
 
      $.ajax( endpointUrl, settings ).then( function ( data ) {
-	 data.results.bindings.forEach(function(entry) {
-	     var props = entry.aspectsubpage.value.split("-");
-	     var aspect = props[0];
-	     var subpage = props[1];
-	     $( '#aspect-chooser' ).append(
-		 `<a role="button"
-		     class="btn btn-outline-dark btn-sm"
-                     href="{{ url_for('app.index') }}` + aspect + '/' + '{{ q }}' + '/' + subpage + '">' + subpage + '</a> ' );
-	 });
-     } );
-
+       if (data.results.bindings.length > 1) {
+         document.getElementById("aspect-chooser-label").innerText += " / ";
+         addCitoButton('subAspectMenuButton', data);
+       }
+    } );
 
      /* Wembedder */
      var wembedderUrl = "https://wembedder.toolforge.org/api/most-similar/{{ q }}";
