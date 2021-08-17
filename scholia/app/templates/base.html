@@ -426,6 +426,29 @@ sparqlToShortInchiKey(`# tool: scholia
         if (data.results.bindings.length > 1) {
           addDropdownList('aspectMenuButton', currentAspect, data)
         }
+      }).then(() => {
+        // this query opens a subpage for the Wikidata item, e.g. as cito subpage
+        // this must follow the above query so that the cito button can be added
+        // after the aspect chooser
+        var endpointUrl = 'https://query.wikidata.org/sparql';
+        var query = `
+    SELECT DISTINCT ?aspectsubpage
+    WHERE {
+    { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 / wdt:P1433 wd:{{ q }} . BIND("venue-cito" AS ?aspectsubpage) }
+    UNION
+    { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 wd:{{ q }} . BIND("work-cito" AS ?aspectsubpage) }
+    }
+    `;
+        settings = {
+          headers: { Accept: 'application/sparql-results+json' },
+          data: { query: query }
+        };
+
+        $.ajax(endpointUrl, settings).then(function (data) {
+          if (data.results.bindings.length > 0) {
+            addCitoButton('subAspectMenuButton', data);
+          }
+        });
       });
 
       function createDropdownButton(id, currentAspect, data) {        
@@ -466,7 +489,12 @@ sparqlToShortInchiKey(`# tool: scholia
         document.getElementById('aspect-chooser').append(aspectDropdownMenu);
       }
 
-      function addCitoButton(id, data) {        
+      function addCitoButton(id, data) {
+        document.getElementById("aspect-chooser-label").innerText += " / ";
+
+        var buttonGroup = document.createElement('div');
+        buttonGroup.className = "btn-group";
+
         var aspectDropdown = document.createElement('button');
         aspectDropdown.type = 'button';
         aspectDropdown.id = id;
@@ -478,7 +506,7 @@ sparqlToShortInchiKey(`# tool: scholia
         aspectDropdown.setAttribute('aria-expanded', 'false');
 
         aspectDropdown.innerHTML = "&emsp;";
-        document.getElementById('aspect-chooser').append(aspectDropdown);
+        buttonGroup.append(aspectDropdown)
            
         var aspectDropdownMenu = document.createElement('div');
         aspectDropdownMenu.classList = 'dropdown-menu';
@@ -490,35 +518,15 @@ sparqlToShortInchiKey(`# tool: scholia
           var subpage = props[1];
           var dropdownItem = document.createElement('a');
           dropdownItem.classList = 'dropdown-item';
-          dropdownItem.href = "{{ url_for('app.index') }}" + aspect + '/' + '{{ q }}' + '/' + subpage;
+          dropdownItem.href = "{{ url_for('app.index') }}" + aspect + '/{{ q }}/' + subpage;
           dropdownItem.innerText = subpage;
           aspectDropdownMenu.append(dropdownItem);
         });
 
-        document.getElementById(parent).append(aspectDropdownMenu);
+        buttonGroup.append(aspectDropdownMenu);
+        
+        document.getElementById('aspect-chooser').append(buttonGroup);
       }
-
-     // this query opens a subpage for the Wikidata item, e.g. as cito subpage
-     var endpointUrl = 'https://query.wikidata.org/sparql';
-     var query = `
-    SELECT DISTINCT ?aspectsubpage
-    WHERE {
-    { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 / wdt:P1433 wd:{{ q }} . BIND("venue-cito" AS ?aspectsubpage) }
-    UNION
-    { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 wd:{{ q }} . BIND("work-cito" AS ?aspectsubpage) }
-    }
-    `;
-     settings = {
-	 headers: { Accept: 'application/sparql-results+json' },
-	 data: { query: query }
-     };
-
-     $.ajax( endpointUrl, settings ).then( function ( data ) {
-       if (data.results.bindings.length > 1) {
-         document.getElementById("aspect-chooser-label").innerText += " / ";
-         addCitoButton('subAspectMenuButton', data);
-       }
-    } );
 
      /* Wembedder */
      var wembedderUrl = "https://wembedder.toolforge.org/api/most-similar/{{ q }}";
