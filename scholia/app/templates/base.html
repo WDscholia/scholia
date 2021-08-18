@@ -372,6 +372,18 @@ sparqlToShortInchiKey(`# tool: scholia
 	
      // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
+    if ("{{q2}}".length) {
+        var query = `
+    SELECT DISTINCT ?aspect 
+    WHERE {
+    { [] wdt:P17 wd:{{ q }} . BIND("country" AS ?aspect) }
+    UNION
+    { wd:{{ q }} wdt:P159? / wdt:P625 [] . BIND("location" AS ?aspect) } 
+    UNION 
+    { [] wdt:P1416 | wdt:P108 wd:{{ q }} . BIND("organization" AS ?aspect) }
+    }
+    `;
+    } else {
      var query = `
     SELECT DISTINCT ?aspect 
     WHERE {
@@ -414,6 +426,7 @@ sparqlToShortInchiKey(`# tool: scholia
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
     `;
+  }
      settings = {
 	 headers: { Accept: 'application/sparql-results+json' },
 	 data: { query: query }
@@ -421,14 +434,36 @@ sparqlToShortInchiKey(`# tool: scholia
      
       $.ajax(endpointUrl, settings).then(function (data) {
         var currentAspect = window.location.pathname.split("/")[1];
-        createDropdownButton("aspect-chooser", 'aspectMenuButton', currentAspect, data)
+        createDropdownButton("aspect-chooser", 'aspectMenuButton', currentAspect, data, "{{q}}")
 
         if (data.results.bindings.length > 1) {
           addDropdownList("aspect-chooser", 'aspectMenuList', currentAspect, data)
         }
+      }).then(function () {
+        if ("{{q2}}".length) {
+          var endpointUrl = 'https://query.wikidata.org/sparql';
+          var query = "SELECT DISTINCT ?aspect WHERE {"
+          query += '{ [] wdt:P921 wd:{{ q }} . BIND("topic" AS ?aspect) }    }';
+
+          settings = {
+            headers: { Accept: 'application/sparql-results+json' },
+            data: { query: query }
+          };
+
+          $.ajax(endpointUrl, settings).then(function (data) {
+            document.getElementById("aspect-chooser-label").innerText += " / ";
+
+            var currentAspect = window.location.pathname.split("/")[3];
+            createDropdownButton("aspect-chooser", 'aspectMenuButton', currentAspect, data, "{{q2}}")
+
+            if (data.results.bindings.length > 1) {
+              addDropdownList("aspect-chooser", 'aspectMenuList', currentAspect, data)
+            }
+          })
+        }
       });
 
-      function createDropdownButton(parent, id, currentAspect, data) {        
+      function createDropdownButton(parent, id, currentAspect, data, q) {        
         var aspectDropdown = document.createElement('button');
         aspectDropdown.type = 'button';
         aspectDropdown.id = id;
@@ -443,7 +478,7 @@ sparqlToShortInchiKey(`# tool: scholia
         document.getElementById(parent).append(aspectDropdown);
 
         aspectDropdown.insertAdjacentHTML("afterend",
-          '<span id="aspect-chooser-label" style="color: #6C757D; vertical-align: middle;margin: 2px;"> / {{ q }}</span>')
+          '<span id="aspect-chooser-label" style="color: #6C757D; vertical-align: middle;margin: 2px;"> / '+ q + '</span>')
       }
 
       function addDropdownList(parent, id, currentAspect, data) {        
