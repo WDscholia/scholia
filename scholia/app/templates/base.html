@@ -451,13 +451,17 @@ sparqlToShortInchiKey(`# tool: scholia
           };
 
           $.ajax(endpointUrl, settings).then(function (data) {
-            document.getElementById("aspect-chooser-label").innerText += " / ";
+            var currentAspect = window.location.pathname.split("/")[1];
+            var aspectLabel = " / <a href='/" + currentAspect + "/{{q}}'>{{q}}</a> / "   
+            document.getElementById("aspect-chooser-label").innerHTML = aspectLabel;
 
-            var currentAspect = window.location.pathname.split("/")[3];
-            createDropdownButton("aspect-chooser", 'aspectMenuButton', currentAspect, data, "{{q2}}")
+            var currentSubAspect = window.location.pathname.split("/")[3];
+            document.querySelectorAll("#aspectMenuList a").forEach((link) => link.href += "/" + currentSubAspect + "/{{q2}}")
+
+            createDropdownButton("aspect-chooser", 'aspectMenuButton', currentSubAspect, data, "{{q2}}")
 
             if (data.results.bindings.length > 1) {
-              addDropdownList("aspect-chooser", 'aspectMenuList', currentAspect, data)
+              addDropdownList("aspect-chooser", 'aspectMenuList', currentSubAspect, data)
             }
           })
         }
