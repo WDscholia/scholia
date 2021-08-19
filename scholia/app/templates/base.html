@@ -125,7 +125,6 @@ sparqlToShortInchiKey(`# tool: scholia
     {% endif %}
 
     if ("P18" in item.claims) {
-      console.log("in")
       var imageName = item.claims.P18[0].mainsnak.datavalue.value;
       // spaces must be replaced by underscores in the file name
       imageName = imageName.replaceAll(" ", "_")
@@ -133,10 +132,8 @@ sparqlToShortInchiKey(`# tool: scholia
       var imageURL = "https://upload.wikimedia.org/wikipedia/commons/" 
       imageURL += imageNameMd5[0] + "/" + imageNameMd5.slice(0,2) + "/"
       imageURL += imageName
-      console.log(imageURL)
       var itemImage = document.getElementById("item-image");
       if (itemImage) {
-        console.log("out")
         itemImage.style = "background-image:url('" + encodeURI(imageURL) + "')";
       }
     }
