@@ -564,3 +564,27 @@ function sparqlToShortInchiKey(sparql, key,  element, filename) {
     new_sparql = sparql.replace("_shortkey_",shortkey)
     sparqlToDataTable(new_sparql, element, filename);
 }
+
+
+function askQuery(panel, askQuery, callback) {
+     var endpointUrl = 'https://query.wikidata.org/sparql';
+     
+     settings = {
+       headers: { Accept: 'application/sparql-results+json' },
+       data: { query: askQuery },
+     };
+
+     $.ajax(endpointUrl, settings).then((data) => {
+        if (data.boolean) {
+            // unhide panels
+            document.getElementById(panel).classList.remove("d-none");
+            callback();
+        } else {
+            // hide from table of contents
+            var headings = document.querySelectorAll("#" + panel + " h2, #" + panel + " h3");
+            for (var elem of headings) {
+                document.querySelector("li a[href='#" + elem.id + "']").parentElement.classList.add("d-none")
+            }
+        }
+    });
+}

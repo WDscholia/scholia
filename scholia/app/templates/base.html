@@ -47,6 +47,14 @@ sparqlToShortInchiKey(`# tool: scholia
 "#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql" );
 {%- endmacro %}
 
+{% macro ask_query_callback(panel) -%}
+// {{ panel }} ask query
+askQuery("{{ panel }}", `# tool: scholia
+{% include 'ask_' + aspect + '_' + panel + '.sparql' %}`, 
+() => {
+    {{ caller() }};
+});
+{%- endmacro %}
 
 {% block metas %}
 <meta charset="UTF-8">
