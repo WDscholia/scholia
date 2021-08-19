@@ -577,6 +577,9 @@ sparqlToShortInchiKey(`# tool: scholia
 
       if (element.tagName === "H3") {
         sublist.appendChild(tocListItem);
+        if (i == headings.length - 1) {
+          tocList.appendChild(sublist);
+        }
       } else {
         if (sublist) {
           tocList.appendChild(sublist);
