@@ -18,6 +18,19 @@
 {{ sparql_to_iframe('citation-graph') }}
 {{ sparql_to_iframe('citations-per-year') }}
 
+
+{% call ask_query_callback('cito') %}
+
+{{ sparql_to_table('cito-incoming',
+  options={
+    "linkPrefixes": {
+    "intention": "../../cito/",
+  }})}}
+
+{{ sparql_to_iframe('cito-incoming-chart') }}
+
+{% endcall %}
+
 {% endblock %}
 
 
@@ -72,6 +85,15 @@ Recent citations to the work
 
 <table class="table table-hover" id="citations-table"></table>
 
+<div id="cito" class="d-none">
+<h3 id="cito-incoming-header">Reasons why this article is cited</h3>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" id="cito-incoming-chart-iframe"></iframe>
+</div>
+
+<table class="table table-hover" id="cito-incoming-table"></table>
+</div>
 
 <h3 id="cited-works">Cited works</h3>
 

@@ -1759,44 +1759,6 @@ def show_venue(q):
     return render_template('venue.html', q=q)
 
 
-@main.route('/work/' + q_pattern + '/cito')
-def show_work_cito(q):
-    """Return HTML rendering for Citation Typing Ontology annotation of citations.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML.
-
-    """
-    return render_template('work-cito.html', q=q)
-
-
-@main.route('/work/' + q_pattern + '/cito/' + q2_pattern)
-def show_work_cito_intention(q, q2):
-    """Return HTML rendering for Citation Typing Ontology annotation of citations.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier for the work.
-    q2 : str
-        Wikidata item identifier for the citation intention.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML.
-
-    """
-    return render_template('work-cito-intention.html', q=q, q2=q2)
-
-
 @main.route('/work/' + q_pattern + '/export')
 def show_work_export(q):
     """Return HTML rendering for export formats for this work.

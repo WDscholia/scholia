@@ -1,0 +1,6 @@
+# title: Author awards for a specific venue
+ASK { {
+    SELECT DISTINCT ?aspectsubpage WHERE {
+        { [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 wd:{{q}} . BIND("work-cito" AS ?aspectsubpage) }
+    }
+} }
