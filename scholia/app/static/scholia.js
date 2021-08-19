@@ -36,6 +36,7 @@ function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {
             convertedColumns.push(column);
         }
     }
+
     for (var i = 0 ; i < data.length ; i++) {
 	var convertedRow = {};
 	for (var key in data[i]) {
@@ -48,7 +49,7 @@ function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {
 			data[i][key].length > 30
 	    ) {
 		convertedRow[key] = '<a href="' +
-		    (linkPrefixes[key] || "../") + 
+		    (linkPrefixes[key] || "/") +
 		    data[i][key].substr(31) +
             (linkSuffixes[key] || "") +
 		    '">' + data[i][key + 'Label'] + '</a>';
@@ -61,7 +62,6 @@ function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {
 		    '">' + data[i][key] + '</a>';
 	    } else if (key.substr(-3) == 'Url') {
 		// pass
-
 	    } else if (key.substr(-3) == 'url') {
 		// Convert URL to a link
 		convertedRow[key] = "<a href='" +
