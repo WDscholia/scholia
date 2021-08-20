@@ -2,43 +2,57 @@
 
 {% set aspect = "property" %}
 
-{% block in_ready %}
 
-{{ sparql_to_table('use',
-    options={
+{% block in_ready %}
+    {{ sparql_to_table('use',options={
     "linkPrefixes": {
        "item": "./",
 	     "property_value": "./",
      }})}}
 
-{{ sparql_to_iframe('item-counts') }}
-{{ sparql_to_iframe('property-value-counts') }}
+    {{ sparql_to_iframe('item-counts') }}
+    {{ sparql_to_iframe('property-value-counts') }}
 
-{% endblock %}
+    {% if p %}
+        var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+        '{{ p }}' +
+        '&format=json&callback=?';
+
+        $.getJSON(url, function (data) {
+        console.log(data)
+            var item = data.entities["{{ p }}"];
+            if ('en' in item.labels) {
+                var title = item.labels.en.value
+                $("#h1").text(title);
+                var description = item.descriptions.en.value
+                $("#intro").text(description);
+            }
+            $("#h1").append(' (<a href="https://www.wikidata.org/wiki/Property:{{ p }}">{{ p }}</a>)');
+        });
+    {% endif %}
+
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1>Property: {{ p }}</h1>
+    <h1 id="h1">Property</h1>
 
-<h2 id="use-header">Use</h2>
+    <div id="intro"></div>
 
-<table class="table table-hover" id="use-table"></table>
+    <h2 id="use-header">Use</h2>
 
+    <table class="table table-hover" id="use-table"></table>
 
-<h2 id="item-counts-header">Item counts</h2>
+    <h2 id="item-counts-header">Item counts</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" id="item-counts-iframe"></iframe>
-</div>
-    
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="item-counts-iframe"></iframe>
+    </div>
 
-<h2 id="property-value-counts-header">Property value counts</h2>
+    <h2 id="property-value-counts-header">Property value counts</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-  <iframe class="embed-responsive-item" id="property-value-counts-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="property-value-counts-iframe"></iframe>
+    </div>
 
-
-
-
-{% endblock %}
+{% endblock page_content %}
