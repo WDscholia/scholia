@@ -457,6 +457,9 @@ sparqlToIframe(`# tool: scholia
       if ('en' in item.labels) {
         $("h1").text("Property: " + item.labels.en.value);
       }
+      if ('en' in item.descriptions) {
+        $("#intro").text(item.descriptions.en.value);
+      }
       $("h1").append(' (<a href="https://www.wikidata.org/wiki/Property:{{ p }}">{{ p }}</a>)');
     })
   {% endif %}
