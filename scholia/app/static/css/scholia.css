@@ -110,10 +110,5 @@ h3 {
 }
 
 #item-image {
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: right;
-    max-height: 100%;
-    max-width: 50vw;
-    width: 50%;
+    max-width: 50%;
 }

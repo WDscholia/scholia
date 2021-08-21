@@ -134,7 +134,8 @@ sparqlToShortInchiKey(`# tool: scholia
       imageURL += imageName
       var itemImage = document.getElementById("item-image");
       if (itemImage) {
-        itemImage.style = "background-image:url('" + encodeURI(imageURL) + "')";
+        itemImage.src = encodeURI(imageURL);
+        itemImage.alt = imageName
       }
     }
 
@@ -616,12 +617,15 @@ sparqlToShortInchiKey(`# tool: scholia
 
     toc.appendChild(tocList)
 
-    var itemImage = document.createElement("div");
-    itemImage.id = "item-image"
+    var itemImage = document.createElement("img");
+    itemImage.id = "item-image";
+    itemImage.alt = "";
 
     tocParent.appendChild(toc);
     tocParent.appendChild(itemImage);
     document.querySelector("h2").insertAdjacentElement("beforebegin", tocParent)
+    
+    itemImage.height = toc.clientHeight
   }
 
 
