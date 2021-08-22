@@ -845,6 +845,67 @@ def property_for_q(q, prop):
         return None
 
 
+def properties_for_q(q, props, prefixes=None):
+    """Get the value for a property for Q item.
+
+    Parameters
+    ----------
+    q : str
+        String with Wikidata Q item.
+    props : dictionary
+        Dictionary object with the Wikidata property identifier as key and the
+        matching BioSchemas key as value
+    prefixes : dictionary
+        Dictionary object with the prefixes for the Bioschemas values, where the keys
+        are Wikidata properties and the prefix as value
+
+    Returns
+    -------
+    bioschemas : dictionary
+        Map with Bioschemas key-value pairs, matching the input.
+
+    Examples
+    --------
+    >>> property_for_q('Q47512', {"P235": "inChIKey"})
+    {"inChIKey": "QTBSBXVTEAMEQO-UHFFFAOYSA-N"}
+
+    """
+    optionals = str('\n'.join(list(
+        map(lambda s: f"  OPTIONAL {{ wd:{q} wdt:{s} ?{s} }}", props)
+    )))
+    variables = ' '.join(list(map(lambda s: f"?{s}", props.keys())))
+    query = f"SELECT {variables} WHERE {{\n{optionals}\n}}"
+    print(query)
+    print(prefixes)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    bioschemas = {}
+    # follow the Wikidata properties as found in the SPARQL results
+    for var in data['head']['vars']:
+        # check if the results have a value for this Wikidata property
+        if var in data['results']['bindings'][0].keys():
+            value = data['results']['bindings'][0][var]['value']
+            if prefixes is not None and prefixes[var]:
+                # add the given prefix for this Wikidata property
+                value = prefixes[var] + value
+            bskey = props[var]
+            # okay, some Bioschemas keys will have multiple values, in 
+            # which case the string type needs to be replaced by a list type
+            if bskey in bioschemas.keys():
+                if type(bioschemas[bskey]) == "list":
+                    bioschemas[bskey].append(value)
+                else:
+                    bioschemas[bskey] = [bioschemas[bskey], value]
+            else:
+                # if the Bioschemas field is new, assume there will be only one
+                bioschemas[bskey] = value
+    return bioschemas
+
+
 def search_article_titles(q, search_string=None):
     """Search articles with q item.
 
