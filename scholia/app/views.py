@@ -21,7 +21,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
                      ncbi_gene_to_qs, uniprot_to_qs, q_to_label,
-                     property_for_q)
+                     property_for_q, properties_for_q)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -173,15 +173,9 @@ def bioschemas_for(q):
                 "@id": bsProfile + "Taxon/0.6-RELEASE/",
             },
         }
-        taxon_name = property_for_q(q, "P225")
-        if taxon_name:
-            data['name'] = taxon_name
-        rank = property_for_q(q, "P105")
-        if rank:
-            data['taxonRank']: rank
-        taxon_parent = property_for_q(q, "P171")
-        if taxon_parent:
-            data['taxonParent'] = taxon_parent
+        data.update(properties_for_q(q,
+            {"P225":"name", "P105":"taxonRank", "P171":"taxonParent"}
+        ))
     elif entity_class == "chemical":
         data = {
             "@type": "MolecularEntity",
@@ -190,22 +184,12 @@ def bioschemas_for(q):
                 "@id": bsProfile + "MolecularEntity/0.5-RELEASE/",
             },
         }
-        inchi_key = property_for_q(q, "P235")
-        inchi = property_for_q(q, "P234")
-        if inchi_key:
-            data['inChIKey'] = inchi_key
-        if inchi:
-            data['inChI'] = inchi
-        molecular_formula = property_for_q(q, "P274")
-        if molecular_formula:
-            data['molecularFormula'] = molecular_formula
-        isomeric_smiles = property_for_q(q, "P2017")
-        if isomeric_smiles:
-            data['smiles'] = isomeric_smiles
-        else:
-            canonical_smiles = property_for_q(q, "P233")
-            if canonical_smiles:
-                data['smiles'] = canonical_smiles
+        data.update(
+            properties_for_q(q, {
+                "P235":"inChIKey", "P234":"inChI",
+                "P274":"molecularFormula", "P2017":"smiles", "P233":"smiles"
+            })
+        )
     elif entity_class == "protein":
         data = {
             "@type": "Protein",
@@ -214,9 +198,9 @@ def bioschemas_for(q):
                 "@id": bsProfile + "Protein/0.11-RELEASE/",
             }
         }
-        uniprot = property_for_q(q, "P352")
-        if uniprot:
-            data['sameAs'] = f"https://www.uniprot.org/uniprot/{uniprot}"
+        data.update(properties_for_q(q, {"P352":"sameAs"},
+            {"P352":"https://www.uniprot.org/uniprot/"})
+        )
     elif entity_class == "gene":
         data = {
             "@type": "Gene",
@@ -225,15 +209,13 @@ def bioschemas_for(q):
                 "@id": bsProfile + "Gene/0.7-RELEASE/",
             },
         }
-        same_genes = []
-        ncbi = property_for_q(q, "P351")
-        if ncbi:
-            same_genes.append(f"https://www.ncbi.nlm.nih.gov/gene/{ncbi}")
-        ensembl = property_for_q(q, "P594")
-        if ensembl:
-            same_genes.append(f"http://identifiers.org/ensembl/{ensembl}")
-        if same_genes:
-            data['sameAs'] = same_genes
+        data.update(
+            properties_for_q(q, {"P351":"sameAs", "P594":"sameAs"},
+                # and the prefixes:
+                {"P351":"https://www.ncbi.nlm.nih.gov/gene/",
+                 "P594":"http://identifiers.org/ensembl/"}
+            )
+        )
     else:
         # No schema information inferred for this type
         data = {}
