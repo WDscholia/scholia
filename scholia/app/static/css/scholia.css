@@ -111,4 +111,5 @@ h3 {
 
 #item-image {
     max-width: 50%;
+    object-fit: contain;
 }
