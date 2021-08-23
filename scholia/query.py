@@ -821,10 +821,9 @@ def q_to_label_and_description(q, language='en'):
 
     Returns
     -------
-    label : str
-        String with label corresponding to Wikidata item.
-    description : str
-        String with the description of the corresponding Wikidata item.
+    results : dictionary
+        Dictionary with label of and description for the corresponding
+        Wikidata item.
     """
     query = """SELECT ?label ?description WHERE {{
           wd:{q} rdfs:label ?label .
