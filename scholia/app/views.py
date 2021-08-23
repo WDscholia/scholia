@@ -135,22 +135,22 @@ def redirect_q(q):
     return redirect(url_for(method, q=q), code=302)
 
 
-def bioschemas_type(bioschemasType, conformsTo):
+def bioschemas_type(bioschemas_type, conforms_to):
     """Helper function to create the basic content of Bioschemas.
 
     Parameters
     ----------
-    bioschemasType : str
+    bioschemas_type : str
         Bioschemas type of the thing to be represented
-    conformsTo : str
+    conforms_to : str
         Profile specification for the given type
     """
-    bsProfile = "https://bioschemas.org/profiles/"
+    bs_profile = "https://bioschemas.org/profiles/"
     return {
-        "@type": bioschemasType,
+        "@type": bioschemas_type,
         "http://purl.org/dc/terms/conformsTo": {
             "@type": "CreativeWork",
-            "@id": bsProfile + conformsTo,
+            "@id": bs_profile + conforms_to,
         }
     }
 
