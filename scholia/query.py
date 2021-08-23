@@ -875,8 +875,6 @@ def properties_for_q(q, props, prefixes=None):
     )))
     variables = ' '.join(list(map(lambda s: f"?{s}", props.keys())))
     query = f"SELECT {variables} WHERE {{\n{optionals}\n}}"
-    print(query)
-    print(prefixes)
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
