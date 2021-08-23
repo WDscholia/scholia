@@ -135,6 +135,26 @@ def redirect_q(q):
     return redirect(url_for(method, q=q), code=302)
 
 
+def bioschemas_type(bioschemasType, conformsTo):
+    """Helper function to create the basic content of Bioschemas.
+
+    Parameters
+    ----------
+    bioschemasType : str
+        Bioschemas type of the thing to be represented
+    conformsTo : str
+        Profile specification for the given type
+    """
+    bsProfile = "https://bioschemas.org/profiles/"
+    return {
+        "@type": bioschemasType,
+        "http://purl.org/dc/terms/conformsTo": {
+            "@type": "CreativeWork",
+            "@id": bsProfile + conformsTo,
+        }
+    }
+
+
 @main.route("/" + q_pattern + "/bioschemas")
 def bioschemas_for(q):
     """Detect a Bioschemas API request and return Bioschemas for this item.
@@ -147,68 +167,39 @@ def bioschemas_for(q):
     entity_class = q_to_class(q)
 
     # get the aspect specific bits
-    bsProfile = "https://bioschemas.org/profiles/"
     if entity_class == "author":
-        data = {
-            "@type": "Person",
-            "http://purl.org/dc/terms/conformsTo": {
-                "@type": "CreativeWork",
-                "@id": bsProfile + "Person/0.2-DRAFT-2019_07_19/",
-            },
-            "description": "A person",
-        }
+        data = bioschemas_type("Person", "Person/0.2-DRAFT-2019_07_19/")
     elif entity_class == "substance":
-        data = {
-            "@type": "ChemicalSubstance",
-            "http://purl.org/dc/terms/conformsTo": {
-                "@type": "CreativeWork",
-                "@id": bsProfile + "ChemicalSubstance/0.4-RELEASE/",
-            },
-        }
+        data = bioschemas_type(
+            "ChemicalSubstance", "ChemicalSubstance/0.4-RELEASE/"
+        )
     elif entity_class == "taxon":
-        data = {
-            "@type": "Taxon",
-            "http://purl.org/dc/terms/conformsTo": {
-                "@type": "CreativeWork",
-                "@id": bsProfile + "Taxon/0.6-RELEASE/",
-            },
-        }
+        data = bioschemas_type("Taxon", "Taxon/0.6-RELEASE/")
         data.update(properties_for_q(
-                q, {"P225": "name", "P105": "taxonRank", "P171": "taxonParent"}
+                q,
+                {"P225": "name", "P105": "taxonRank", "P171": "taxonParent"}
         ))
     elif entity_class == "chemical":
-        data = {
-            "@type": "MolecularEntity",
-            "http://purl.org/dc/terms/conformsTo": {
-                "@type": "CreativeWork",
-                "@id": bsProfile + "MolecularEntity/0.5-RELEASE/",
-            },
-        }
+        data = bioschemas_type(
+            "MolecularEntity", "MolecularEntity/0.5-RELEASE/"
+        )
         data.update(
             properties_for_q(q, {
                 "P235": "inChIKey", "P234": "inChI",
-                "P274": "molecularFormula", "P2017": "smiles", "P233": "smiles"
+                "P274": "molecularFormula", "P2017": "smiles",
+                "P233": "smiles"
             })
         )
     elif entity_class == "protein":
-        data = {
-            "@type": "Protein",
-            "http://purl.org/dc/terms/conformsTo": {
-                "@type": "CreativeWork",
-                "@id": bsProfile + "Protein/0.11-RELEASE/",
-            }
-        }
+        data = bioschemas_type(
+            "Protein", "Protein/0.11-RELEASE/"
+        )
         data.update(properties_for_q(
-            q, {"P352": "sameAs"}, {"P352": "https://www.uniprot.org/uniprot/"}
+            q,
+            {"P352": "sameAs"}, {"P352": "https://www.uniprot.org/uniprot/"}
         ))
     elif entity_class == "gene":
-        data = {
-            "@type": "Gene",
-            "http://purl.org/dc/terms/conformsTo": {
-                "@type": "CreativeWork",
-                "@id": bsProfile + "Gene/0.7-RELEASE/",
-            },
-        }
+        data = bioschemas_type("Gene", "Gene/0.7-RELEASE/")
         data.update(
             properties_for_q(
                 q, {"P351": "sameAs", "P594": "sameAs"},
