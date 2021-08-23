@@ -20,8 +20,8 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
-                     ncbi_gene_to_qs, uniprot_to_qs, q_to_label_and_description,
-                     properties_for_q)
+                     ncbi_gene_to_qs, uniprot_to_qs,
+                     q_to_label_and_description, properties_for_q)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -136,7 +136,7 @@ def redirect_q(q):
 
 
 def bioschemas_type(bioschemas_type, conforms_to):
-    """Helper function to create the basic content of Bioschemas.
+    """Create the basic and common content of Bioschemas.
 
     Parameters
     ----------
