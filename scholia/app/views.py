@@ -20,7 +20,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
-                     ncbi_gene_to_qs, uniprot_to_qs, q_to_label,
+                     ncbi_gene_to_qs, uniprot_to_qs, q_to_label_and_description,
                      properties_for_q)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
@@ -215,11 +215,15 @@ def bioschemas_for(q):
     # glue stuff together
     content = {
         "@context": "https://schema.org",
-        "name": q_to_label(q),
         "identifier": q,
         "mainEntityOfPage": f"http://www.wikidata.org/entity/{q}",
         **data,
     }
+    label_and_description = q_to_label_and_description(q)
+    if label_and_description["label"]:
+        content["name"] = label_and_description["label"]
+    if label_and_description["description"]:
+        content["description"] = label_and_description["description"]
     return jsonify(content)
 
 

@@ -809,6 +809,45 @@ def q_to_label(q, language='en'):
         return None
 
 
+def q_to_label_and_description(q, language='en'):
+    """Get label and description for Q item.
+
+    Parameters
+    ----------
+    q : str
+        String with Wikidata Q item.
+    language : str
+        String with language identifier
+
+    Returns
+    -------
+    label : str
+        String with label corresponding to Wikidata item.
+    description : str
+        String with the description of the corresponding Wikidata item.
+    """
+    query = """SELECT ?label ?description WHERE {{
+          wd:{q} rdfs:label ?label .
+          wd:{q} schema:description ?description .
+          FILTER (LANG(?label) = "{language}")
+          FILTER (LANG(?description) = "{language}")
+        }}""".format(q=q, language=language)
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    results = data['results']['bindings']
+    if not results:
+        return {}
+    else:
+        return {
+            "label": results[0]['label']['value'],
+            "description": results[0]['description']['value']
+        }
+
+
 def properties_for_q(q, props, prefixes=None):
     """Get the value for a property for Q item.
 
