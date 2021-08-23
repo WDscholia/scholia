@@ -613,116 +613,115 @@ sparqlToShortInchiKey(`# tool: scholia
 {% endblock %}
 
 {% block navbar %}
-<div class="navbar navbar-static-top">
-    <ul class="nav nav-pills">
-	<li role="presentation"><a href="{{ url_for('app.index') }}"><img src="{{ url_for('static', filename='images/scholia_wordmark.svg') }}" width="112px" height="24px" alt="Scholia"></a></li>
-	<li role="presentation"><a href="{{ url_for('app.show_author_index') }}">Author</a></li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Work
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_work_empty') }}">Work</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_venue_empty') }}">Venue</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_series_empty') }}">Series</a></li>
-                    <li role="presentation"><a href="{{ url_for('app.show_catalogue_empty') }}">Catalogue</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_printer_index') }}">Printer</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Organization
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_organization_empty') }}">Organization</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_publisher_empty') }}">Publisher</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_printer_index') }}">Printer</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Location
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_location_empty') }}">Location</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_country_empty') }}">Country</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Event
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_event_empty') }}">Event</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_event_series_empty') }}">Event series</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Project
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_clinical_trial_index') }}">Clinical trial</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_project_empty') }}">Project</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation"><a href="{{ url_for('app.show_award_empty') }}">Award</a></li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Topic
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_topic_empty') }}">General</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_disease_empty') }}">Disease</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_taxon_empty') }}">Taxon</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_gene_empty') }}">Gene</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_protein_empty') }}">Protein</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_pathway_empty') }}">Pathway</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_chemical_index') }}">Chemical</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_chemical_element_empty') }}">Chemical element</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_chemical_class_empty') }}">Chemical class</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_lexeme_empty') }}">Lexeme</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_use_empty') }}">Use</a></li>
-		</ul>
-	    </div>
-	</li>
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Tools
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_arxiv_to_quickstatements') }}">Arxiv to Quickstatements</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_q_to_bibliography_templates') }}">Q to Bibliography templates</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_text_to_topics') }}">Text to topics</a></li>
-		</ul>
-	    </div>
-	</li>
+<nav class="navbar navbar-expand-lg" style="max-width: 1200px;">
+  <a class="navbar-brand" href="{{ url_for('app.index') }}"><img
+      src="{{ url_for('static', filename='images/scholia_wordmark.svg') }}" width="112px" height="24px"
+      alt="Scholia"></a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Help
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.index_statistics') }}">Statistics</a></li>
-		    <li role="presentation"><a href="{{ url_for('app.show_faq') }}">FAQ</a></li>
-		</ul>
-	    </div>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+	<li class="nav-item"><a class="nav-link" href="{{ url_for('app.show_author_index') }}">Author</a></li>
+	<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="workDropdown" role="button" data-toggle="dropdown"
+      aria-haspopup="true" aria-expanded="false">
+      Work
+    </a>
+    <div class="dropdown-menu" aria-labelledby="workDropdown">
+      <a class="dropdown-item" href="{{ url_for('app.show_work_empty') }}">Work</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_venue_empty') }}">Venue</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_series_empty') }}">Series</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_catalogue_empty') }}">Catalogue</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_publisher_empty') }}">Publisher</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_printer_index') }}">Printer</a>
+    </div>
+	</li>
+	<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="organisationDropdown" role="button" data-toggle="dropdown"
+      aria-haspopup="true" aria-expanded="false">
+      Organization
+    </a>
+    <div class="dropdown-menu" aria-labelledby="organisationDropdown">
+      <a class="dropdown-item" href="{{ url_for('app.show_organization_empty') }}">Organization</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_publisher_empty') }}">Publisher</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_printer_index') }}">Printer</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_sponsor_empty') }}">Sponsor</a>
+    </div>
+	</li>
+	<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="locationDropdown" role="button" data-toggle="dropdown"
+      aria-haspopup="true" aria-expanded="false">
+      Location
+    </a>
+    <div class="dropdown-menu" aria-labelledby="locationDropdown">
+      <a class="dropdown-item" href="{{ url_for('app.show_location_empty') }}">Location</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_country_empty') }}">Country</a>
+    </div>
+	</li>
+	<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="eventDropdown" role="button" data-toggle="dropdown"
+      aria-haspopup="true" aria-expanded="false">
+      Event
+    </a>
+    <div class="dropdown-menu" aria-labelledby="eventDropdown">
+      <a class="dropdown-item" href="{{ url_for('app.show_event_empty') }}">Event</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_event_series_empty') }}">Event series</a>
+    </div>
+	</li>
+	<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="projectDropdown" role="button" data-toggle="dropdown"
+      aria-haspopup="true" aria-expanded="false">
+      Project
+    </a>
+    <div class="dropdown-menu" aria-labelledby="projectDropdown">
+      <a class="dropdown-item" href="{{ url_for('app.show_clinical_trial_index') }}">Clinical trial</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_project_empty') }}">Project</a>
+    </div>
+	</li>
+	<li class="nav-item"><a class="nav-link" href="{{ url_for('app.show_award_empty') }}">Award</a></li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="topicDropdown" role="button" data-toggle="dropdown"
+      aria-haspopup="true" aria-expanded="false">
+      Topic
+    </a>
+    <div class="dropdown-menu" aria-labelledby="projectDropdown">
+      <a class="dropdown-item" href="{{ url_for('app.show_topic_empty') }}">General</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_disease_empty') }}">Disease</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_taxon_empty') }}">Taxon</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_gene_empty') }}">Gene</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_protein_empty') }}">Protein</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_pathway_empty') }}">Pathway</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_chemical_index') }}">Chemical</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_chemical_element_empty') }}">Chemical element</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_chemical_class_empty') }}">Chemical class</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_lexeme_empty') }}">Lexeme</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_use_empty') }}">Use</a>
+    </div>
+  </li>
+	<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown"
+      aria-haspopup="true" aria-expanded="false">
+      Tools
+    </a>
+    <div class="dropdown-menu" aria-labelledby="toolsDropdown">
+      <a class="dropdown-item" href="{{ url_for('app.show_arxiv_to_quickstatements') }}">Arxiv to Quickstatements</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_q_to_bibliography_templates') }}">Q to Bibliography templates</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_text_to_topics') }}">Text to topics</a>
+    </div>
+	</li>
+	<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="helpDropdown" role="button" data-toggle="dropdown"
+      aria-haspopup="true" aria-expanded="false">
+      Help
+    </a>
+    <div class="dropdown-menu" aria-labelledby="helpDropdown">
+      <a class="dropdown-item" href="{{ url_for('app.show_about') }}">About</a>
+      <a class="dropdown-item" href="{{ url_for('app.index_statistics') }}">Statistics</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_faq') }}">FAQ</a>
+    </div>
 	</li>
     
     </ul>
@@ -730,10 +729,11 @@ sparqlToShortInchiKey(`# tool: scholia
     <div class='nav nav-search'>
 	    <div class="input-group">
         <input type="text" id="searchterm"/>
-        </div>
+      </div>
     </div>
     {% endblock %}
-</div>
+  </div>
+</nav>
 {% endblock %}
 
 {% block content %}
