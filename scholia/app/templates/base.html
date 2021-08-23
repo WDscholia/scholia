@@ -51,6 +51,7 @@ sparqlToShortInchiKey(`# tool: scholia
 {% block metas %}
 <meta charset="UTF-8">
 <meta name="robots" content="index, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <meta name="og:url" content="{{ 'https://scholia.toolforge.org' + request.path }}" />
 <meta name="og:site_name" content="Scholia" />
@@ -617,7 +618,7 @@ sparqlToShortInchiKey(`# tool: scholia
   <a class="navbar-brand" href="{{ url_for('app.index') }}"><img
       src="{{ url_for('static', filename='images/scholia_wordmark.svg') }}" width="112px" height="24px"
       alt="Scholia"></a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+  <button class="navbar-light navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
