@@ -896,7 +896,7 @@ def properties_for_q(q, props, prefixes=None):
             # okay, some Bioschemas keys will have multiple values, in 
             # which case the string type needs to be replaced by a list type
             if bskey in bioschemas.keys():
-                if type(bioschemas[bskey]) == "list":
+                if isinstance(bioschemas[bskey], list):
                     bioschemas[bskey].append(value)
                 else:
                     bioschemas[bskey] = [bioschemas[bskey], value]
