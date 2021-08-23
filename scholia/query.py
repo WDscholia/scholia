@@ -856,8 +856,8 @@ def properties_for_q(q, props, prefixes=None):
         Dictionary object with the Wikidata property identifier as key and the
         matching BioSchemas key as value
     prefixes : dictionary
-        Dictionary object with the prefixes for the Bioschemas values, where the keys
-        are Wikidata properties and the prefix as value
+        Dictionary object with the prefixes for the Bioschemas values, where
+        the keys are Wikidata properties and the prefix as value
 
     Returns
     -------
@@ -891,7 +891,7 @@ def properties_for_q(q, props, prefixes=None):
                 # add the given prefix for this Wikidata property
                 value = prefixes[var] + value
             bskey = props[var]
-            # okay, some Bioschemas keys will have multiple values, in 
+            # okay, some Bioschemas keys will have multiple values, in
             # which case the string type needs to be replaced by a list type
             if bskey in bioschemas.keys():
                 if isinstance(bioschemas[bskey], list):
