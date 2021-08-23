@@ -21,7 +21,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
                      ncbi_gene_to_qs, uniprot_to_qs, q_to_label,
-                     property_for_q, properties_for_q)
+                     properties_for_q)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -173,8 +173,8 @@ def bioschemas_for(q):
                 "@id": bsProfile + "Taxon/0.6-RELEASE/",
             },
         }
-        data.update(properties_for_q(q,
-            {"P225":"name", "P105":"taxonRank", "P171":"taxonParent"}
+        data.update(properties_for_q(
+                q, {"P225": "name", "P105": "taxonRank", "P171": "taxonParent"}
         ))
     elif entity_class == "chemical":
         data = {
@@ -186,8 +186,8 @@ def bioschemas_for(q):
         }
         data.update(
             properties_for_q(q, {
-                "P235":"inChIKey", "P234":"inChI",
-                "P274":"molecularFormula", "P2017":"smiles", "P233":"smiles"
+                "P235": "inChIKey", "P234": "inChI",
+                "P274": "molecularFormula", "P2017": "smiles", "P233": "smiles"
             })
         )
     elif entity_class == "protein":
@@ -198,9 +198,9 @@ def bioschemas_for(q):
                 "@id": bsProfile + "Protein/0.11-RELEASE/",
             }
         }
-        data.update(properties_for_q(q, {"P352":"sameAs"},
-            {"P352":"https://www.uniprot.org/uniprot/"})
-        )
+        data.update(properties_for_q(
+            q, {"P352": "sameAs"}, {"P352": "https://www.uniprot.org/uniprot/"}
+        ))
     elif entity_class == "gene":
         data = {
             "@type": "Gene",
@@ -210,10 +210,11 @@ def bioschemas_for(q):
             },
         }
         data.update(
-            properties_for_q(q, {"P351":"sameAs", "P594":"sameAs"},
+            properties_for_q(
+                q, {"P351": "sameAs", "P594": "sameAs"},
                 # and the prefixes:
-                {"P351":"https://www.ncbi.nlm.nih.gov/gene/",
-                 "P594":"http://identifiers.org/ensembl/"}
+                {"P351": "https://www.ncbi.nlm.nih.gov/gene/",
+                 "P594": "http://identifiers.org/ensembl/"}
             )
         )
     else:
