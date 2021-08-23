@@ -873,10 +873,11 @@ def properties_for_q(q, props, prefixes=None):
     {"inChIKey": "QTBSBXVTEAMEQO-UHFFFAOYSA-N"}
 
     """
-    optionals = str('\n'.join(list(
-        map(lambda s: f"  OPTIONAL {{ ?item wdt:{s} ?{s} }}", props)
-    )))
-    variables = ' '.join(list(map(lambda s: f"?{s}", props.keys())))
+    optionals = str('\n'.join(
+        f"  OPTIONAL {{ ?item wdt:{key} ?{key} }}"
+        for key in props.keys()
+    ))
+    variables = ' '.join(f"?{key}" for key in props.keys())
     query = f"""SELECT {variables} WHERE {{
         VALUES ?item {{ wd:{q} }}
         {optionals}
