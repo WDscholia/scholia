@@ -45,7 +45,7 @@
 
 <div id="details"></div>
 
-<h2 id="list-of-publications-header" data-i18n="list-of-publications">List of publications <a href="{{ url_for('app.show_author_index') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<h2 id="list-of-publications-header" data-i18n="author-list-of-publications">List of publications <a href="{{ url_for('app.show_author_index') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
 <table class="table table-hover" id="list-of-publications-table"></table>
 
@@ -67,14 +67,14 @@ div>
 </div -->
 
 
-<h3 id="publications-per-year-header" data-i18n="publications-per-year">Number of publications per year</h3>
+<h3 id="publications-per-year-header" data-i18n="author-publications-per-year">Number of publications per year</h3>
 
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
 </div>
 
 
-<h3 id="pages-per-year-header" data-i18n="pages-per-year">Number of pages per year</h3>
+<h3 id="pages-per-year-header" data-i18n="author-pages-per-year">Number of pages per year</h3>
 
 (Only articles with number of pages set are displayed)
 
@@ -82,10 +82,10 @@ div>
     <iframe class="embed-responsive-item" id="pages-per-year-iframe"></iframe>
 </div>
 
-<h2 data-i18n="topics">Topics</h2>
+<h2 data-i18n="author-topics">Topics</h2>
 
 
-<h3 id="topic-scores-header" data-i18n="topic-scores">Topic scores</h3>
+<h3 id="topic-scores-header" data-i18n="author-topic-scores">Topic scores</h3>
 
 Topics based on a weighting between fields of work,
 topics of authored works and topics of citing works.  
@@ -95,16 +95,16 @@ topics of authored works and topics of citing works.
 </div>
 
 
-<h3 id="topics-header" data-i18n="topics">Topics of authored works</h3>
+<h3 id="topics-header" data-i18n="author-topics">Topics of authored works</h3>
 
 <table class="table table-hover" id="topics-table"></table>
 
-<h3 id="Topics-works matrix" data-i18n="Topics-works matrix">Topics-works matrix</h3>
+<h3 id="Topics-works matrix" data-i18n="author-topics-works matrix">Topics-works matrix</h3>
 
 <div id="topics-works-matrix"></div>
 
 
-<h2 id="venue-statistics-header" data-i18n="venue-statistics">Venue statistics</h2>
+<h2 id="venue-statistics-header" data-i18n="author-venue-statistics">Venue statistics</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="venue-statistics-chart-iframe"></iframe>
@@ -112,11 +112,11 @@ topics of authored works and topics of citing works.
 
 <table class="table table-hover" id="venue-statistics-table"></table>
 
-<h2 id="review-statistics-header" data-i18n="review-statistics">Review statistics</h2>
+<h2 id="review-statistics-header" data-i18n="author-review-statistics">Review statistics</h2>
 <p>This author has reviewed for the following journals.</p>
 <table class="table table-hover" id="review-statistics-table"></table>
 
-<h2 id="coauthors-header" data-toogle="tooltip" title="Co-author graph for the author (up to 1000 links)" data-i18n="coauthors">Co-author graph</h2>
+<h2 id="coauthors-header" data-toogle="tooltip" title="Co-author graph for the author (up to 1000 links)" data-i18n="author-coauthors">Co-author graph</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="coauthors-iframe"></iframe>
@@ -124,51 +124,51 @@ topics of authored works and topics of citing works.
 
 Are co-authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_index') }}{{ q }}/curation">curation</a> page.
 
-<h2 id="coauthor-map-header" data-i18n="coauthor-map">Co-author map</h2>
+<h2 id="coauthor-map-header" data-i18n="author-coauthor-map">Co-author map</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="coauthor-map-iframe"></iframe>
 </div>
 
 
-<h2 id="other-locations-header" data-i18n="other-locations">Other locations</h2>
+<h2 id="other-locations-header" data-i18n="author-other-locations">Other locations</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="other-locations-iframe"></iframe>
 </div>
 
 
-<h2 id="timeline-header" data-i18n="timeline">Timeline</h2>
+<h2 id="timeline-header" data-i18n="author-timeline">Timeline</h2>
 
 
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
 </div>
 
-<h2 id="academic-tree-header" data-i18n="academic-tree">Academic tree</h2>
+<h2 id="academic-tree-header" data-i18n="author-academic-tree">Academic tree</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="academic-tree-iframe"></iframe>
 </div>
 
 
-<h2 data-i18n="citation-statistics">Citation statistics</h2>
+<h2 data-i18n="author-citation-statistics">Citation statistics</h2>
 
-<h3 id="most-cited-works-header" data-i18n="most-cited-works">Most cited works</h3>
+<h3 id="most-cited-works-header" data-i18n="author-most-cited-works">Most cited works</h3>
 
 Works of the author ordered according to number of citations received.
 
 <table class="table table-hover" id="most-cited-works-table"></table>
 
 
-<h3 id="citations-by-year-header" data-i18n="citations-by-year">Citations by year</h3>
+<h3 id="citations-by-year-header" data-i18n="author-citations-by-year">Citations by year</h3>
 
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" id="citations-by-year-iframe"></iframe>
 </div>
 
 
-<h3 id="most-citing-authors-header" data-i18n="most-citing-authors">Citing authors</h3>
+<h3 id="most-citing-authors-header" data-i18n="author-most-citing-authors">Citing authors</h3>
 
 Authors that cite the author (excluding self citations).
 
@@ -176,14 +176,14 @@ Authors that cite the author (excluding self citations).
 
 Are citing authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_index') }}{{ q }}/curation">curation</a> page.
 
-<h2 id="associated-images-header" data-i18n="associated-images">Associated images</h2>
+<h2 id="associated-images-header" data-i18n="author-associated-images">Associated images</h2>
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="associated-images-iframe"></iframe>
 </div>
 
 
-<h2 id="events-header" data-i18n="events">Events</h2>
+<h2 id="events-header" data-i18n="author-events">Events</h2>
 
 Conferences, workshops and other events the author has attended or otherwise been associated with.
 
