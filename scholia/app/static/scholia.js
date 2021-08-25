@@ -47,11 +47,17 @@ function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {
 			/^http/.test(data[i][key]) &&
 			data[i][key].length > 30
 	    ) {
-		convertedRow[key] = '<a href="' +
-		    (linkPrefixes[key] || "../") + 
-		    data[i][key].substr(31) +
-            (linkSuffixes[key] || "") +
-		    '">' + data[i][key + 'Label'] + '</a>';
+	        if (key + 'Url' in data[i]){
+	            convertedRow[key] = '<a href="' +
+                data[i][key + 'Url'] +
+                '">' + data[i][key + 'Label'] + '</a>';
+            }else{
+	            convertedRow[key] = '<a href="' +
+                (linkPrefixes[key] || "../") +
+                data[i][key].substr(31) +
+                (linkSuffixes[key] || "") +
+                '">' + data[i][key + 'Label'] + '</a>';
+            }
 	    } else if (key.substr(-5) == 'Label') {
 		// pass
 		
