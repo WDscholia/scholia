@@ -84,5 +84,9 @@ h3 {
 
 .table-of-contents {
     margin: 1rem;
+}
 
+.dataTables_scrollHeadInner,
+table.dataTable {
+    min-width: 100%;
 }
