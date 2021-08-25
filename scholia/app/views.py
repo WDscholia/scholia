@@ -62,6 +62,11 @@ main.add_app_url_map_converter(RegexConverter, 'regex')
 
 @main.before_request
 def ensure_lang_support():
+    """Search cookie for the language
+    .
+    Search for the cookie used to set the language 
+
+    """
     lang_code = (
         request.args.get('lc') or
         request.cookies.get('lang_code') or
@@ -75,6 +80,20 @@ def ensure_lang_support():
 
 @main.after_request
 def set_language_cookie(response):
+    """Set the cookie for the language
+
+    Parameters
+    ----------
+    response : str
+        the response to the client request
+
+    Returns
+    -------
+    response : str
+        the response to the client request with
+        the cookie 'lang_code'
+
+    """
     response.set_cookie('lang_code', value=g.lang_code)
     return response
 
