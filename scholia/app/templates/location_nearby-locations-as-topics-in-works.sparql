@@ -32,6 +32,6 @@ WHERE {
   INCLUDE %results
           
   # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,cs,da,de,es,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,cs,da,de,es,jp,nl,no,ru,sv,zh". }
 }
 ORDER BY ?distance
