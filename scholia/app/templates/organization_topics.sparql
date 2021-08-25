@@ -25,7 +25,7 @@ WITH {
 } AS %works_and_number_of_researchers
 WHERE {
   INCLUDE %works_and_number_of_researchers
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,nl,no,ru,sv,zh" . } 
 }
 GROUP BY ?researchers ?topic ?topicLabel ?topicDescription ?samplework ?sampleworkLabel
 ORDER BY DESC(?researchers)
