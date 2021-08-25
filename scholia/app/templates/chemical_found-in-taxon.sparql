@@ -6,6 +6,6 @@ SELECT DISTINCT ?taxon ?taxonLabel ?source ?sourceLabel ?DOI WHERE {
       ?taxonStatement prov:wasDerivedFrom/pr:P248 ?source .
       OPTIONAL { ?source wdt:P356 ?DOI . }
     }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 } ORDER BY ASC(?taxonLabel)
   LIMIT 250

@@ -10,7 +10,7 @@ SELECT
     ?IDpred wdt:P1630 ?formatterurl .
   }
   BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrl).
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh" . }
 }
 ORDER BY ASC(?IDpredLabel)
 LIMIT 500

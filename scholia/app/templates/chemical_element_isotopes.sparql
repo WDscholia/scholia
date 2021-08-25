@@ -12,5 +12,5 @@ WHERE {
   ?halflifeStat psv:P2114 ?halflifeValNode .
   ?halflifeValNode wikibase:quantityAmount ?halflife ;
                    wikibase:quantityUnit ?halflifeUnit .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 } ORDER BY ?neutrons
