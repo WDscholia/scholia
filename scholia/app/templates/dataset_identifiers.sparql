@@ -24,7 +24,7 @@ WITH {
       BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrls).
     }
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 }
 GROUP BY ?Identifier ?IdentifierLabel ?IdentifierDescription ?id
 ORDER BY ASC(?IdentifierLabel)
