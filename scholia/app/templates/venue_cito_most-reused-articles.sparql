@@ -5,6 +5,6 @@ SELECT ?citedArticle ?citedArticleLabel (COUNT(DISTINCT ?citingArticle) AS ?coun
   ?citationStatement pq:P3712 ?INTENTION ;
                      ps:P2860 ?citedArticle .
   ?citedArticle wdt:P1433 ?JOURNAL .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 } GROUP BY ?citedArticle ?citedArticleLabel
   ORDER BY DESC(?count)

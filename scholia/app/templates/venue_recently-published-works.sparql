@@ -15,7 +15,7 @@ WHERE {
     ?author rdfs:label ?author_label .
     FILTER (LANG(?author_label) = 'en')
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . } 
 }
 GROUP BY ?work ?workLabel
 ORDER BY DESC(?publication_date)

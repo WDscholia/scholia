@@ -14,7 +14,7 @@ WHERE {
     { ?award_statement pq:P580 ?time }
     BIND(YEAR(?time) AS ?year)
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . }  
 }
 ORDER BY DESC(?year)
 LIMIT 500
