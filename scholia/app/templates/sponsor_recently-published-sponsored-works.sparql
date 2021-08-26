@@ -15,7 +15,7 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" }
 } 
 ORDER BY DESC(?publication_date) DESC(?number_of_citations)
 LIMIT 1000
