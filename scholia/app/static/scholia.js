@@ -496,11 +496,11 @@ function sparqlToShortInchiKey(sparql, key,  element, filename) {
 }
 
 
-function workWithQ(q,urlstatic) {
+function workWithQ(q, q2, urlstatic) {
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	        q  + 
 	       '&format=json&callback=?';
-
+    
     $.getJSON(url, function (data) {
 	 var item = data.entities[q];
 	 if ('en' in item.labels) {
@@ -755,7 +755,7 @@ function workWithQ2(q2) {
     
 }
 
-function wikiItemAsDifferentAspect(query, q, urlfor) {
+function wikiItemAsDifferentAspect(query, q, q2, urlfor) {
     
     var endpointUrl = 'https://query.wikidata.org/sparql';
     settings = {
@@ -773,7 +773,7 @@ function wikiItemAsDifferentAspect(query, q, urlfor) {
     } );
 }
 
-function wikiItemSubpage(query, q, urlfor) {
+function wikiItemSubpage(query, q, q2, urlfor) {
     var endpointUrl = 'https://query.wikidata.org/sparql';
     settings = {
     headers: { Accept: 'application/sparql-results+json' },

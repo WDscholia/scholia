@@ -95,7 +95,7 @@ quickStatement404DOI( "{{ doi }}" ,"#{{ element }}")
 
   {% if q %}
     
-	workWithQ("{{ q }}", urlstatic="{{ url_for('static',filename='') }}")
+	workWithQ("{{ q }}", "{{ q2 }}" , urlstatic="{{ url_for('static',filename='') }}")
 
 	{% if q2 %}
 	  workWithQ2("{{ q2 }}")
@@ -104,11 +104,13 @@ quickStatement404DOI( "{{ doi }}" ,"#{{ element }}")
 	// this query opens the Wikidata item as a different aspect
 	wikiItemAsDifferentAspect(`{% include 'base_different-aspect.sparql' %}`, 
 							  "{{ q }}", 
+							  "{{ q2 }}", 
 							  "{{ url_for('app.index') }}")
 
     // this query opens a subpage for the Wikidata item, e.g. as cito subpage
 	wikiItemSubpage(`{% include 'base_aspect-subpage.sparql' %}`, 
 	 			     "{{ q }}", 
+	 			     "{{ q2 }}", 
 				   	 "{{ url_for('app.index') }}")
 
     /* Wembedder */
