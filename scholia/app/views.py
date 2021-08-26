@@ -21,7 +21,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
                      ncbi_gene_to_qs, uniprot_to_qs)
-from ..utils import sanitize_q
+from ..utils import sanitize_q, remove_special_characters_url
 from ..wikipedia import q_to_bibliography_templates
 
 
@@ -694,7 +694,8 @@ def redirect_doi(doi):
         DOI identifier.
 
     """
-    qs = doi_to_qs(doi)
+    normalize_doi = remove_special_characters_url(doi)
+    qs = doi_to_qs(normalize_doi)
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_work', q=q), code=302)
