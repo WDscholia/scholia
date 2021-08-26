@@ -32,6 +32,6 @@ SELECT
   # Aggregate count
   BIND((COALESCE(?symptom_count, 0) + COALESCE(?gene_count, 0)) AS ?count)
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)
