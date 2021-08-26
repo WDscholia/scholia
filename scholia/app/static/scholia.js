@@ -911,3 +911,60 @@ function quickStatement404DOI(doi, element) {
 		}
 	}
 }
+
+function addAnchorLinks(elements) {
+    var headers = document.querySelectorAll(elements)
+     if (headers) {
+       headers.forEach(element => {
+         var title = element.innerText;
+         element.removeChild(element.childNodes[0])
+         element.insertAdjacentHTML('afterbegin', `<a href="#${element.id}" class="hlink"  ariaLabel="Anchor">${title}</a>`)
+       })
+     }
+    
+}
+
+function addTableOfContent(elements) {
+    var headings = document.querySelectorAll(elements);
+    if (headings.length >= 4) {
+      var toc = document.createElement("div");
+      toc.className = "table-of-contents"
+  
+      tocTitle = document.createElement("b");
+      tocTitle.innerText = "Table of Contents"
+      toc.appendChild(tocTitle)
+  
+      var tocList = document.createElement("ul");
+      var sublist = "";
+      for (let i = 0; i < headings.length; i++) {
+        const element = headings[i];
+        if (!element.id) {
+          element.id = element.innerText.replace(" ", "-")
+        }
+        if (element.tagName === "H3" && !sublist) {
+          var sublist = document.createElement("ul");
+        }
+        tocListItem = document.createElement("li");
+  
+        tocEntry = document.createElement("a");
+        tocEntry.setAttribute("href", "#" + element.id);
+        tocEntry.innerText = headings[i].innerText;
+  
+        tocListItem.appendChild(tocEntry);
+  
+        if (element.tagName === "H3") {
+          sublist.appendChild(tocListItem);
+        } else {
+          if (sublist) {
+            tocList.appendChild(sublist);
+            sublist = "";
+          }
+          tocList.appendChild(tocListItem);
+        }
+      }
+  
+      toc.appendChild(tocList)
+      document.querySelector("h2").insertAdjacentElement("beforebegin", toc)
+    }
+    
+}
