@@ -14,7 +14,7 @@ WITH {
 WHERE {
   INCLUDE %result
   OPTIONAL { ?protein wdt:P703 ?species . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . }
 }
 ORDER BY DESC(?count)
 LIMIT 500
