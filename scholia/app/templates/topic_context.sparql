@@ -51,5 +51,5 @@ WHERE {
     ?childNode ?childNodeclaim ?childNodeImage. 
   }
   
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }        
 }

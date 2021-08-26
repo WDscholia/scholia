@@ -30,5 +30,5 @@ WHERE {
   INCLUDE %results
   ?cited_country wdt:P41 ?cited_flag . 
   ?citing_country wdt:P41 ?citing_flag . 
- SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }        
  }
