@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 import versioneer
 
 
@@ -15,7 +15,7 @@ setup(
     license='GPL',
     keywords='wikidata',
     url='https://github.com/WDscholia/scholia',
-    packages=['scholia'],
+    packages=find_packages(),
     package_data={},
     install_requires=requirements,
     long_description='',
