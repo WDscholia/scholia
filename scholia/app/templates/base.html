@@ -501,55 +501,105 @@ sparqlToShortInchiKey(`# tool: scholia
      });
   {% endif %}
 
- $(document).ready(function () {
-     let search_text = ""
-     $('#searchterm').select2({
-         allowClear: true,
-         {% if request.path.endswith("search") %}
-         placeholder: "Scientist, paper, topic, DOI, etc.",
-         {% else %}
-         placeholder: "Search...",
-         {% endif %}
-         ajax: {
-             url: "https://www.wikidata.org/w/api.php?callback=?",
-             dataType: 'jsonp',
-             data: function (params) {
-                 search_text = params.term
-                 var query = {
-                     search: params.term,
-                     action: "wbsearchentities",
-                     language: "en",
-                     uselang: "en",
-                     format: "json",
-                     strictlanguage: true
-                 }
-                 return query
-             },
-             processResults: function (data) {
-                 var results = [{id: -1, text: "Advanced search"}];
-                 $.each(data.search, function (index, item) {
-                     results.push({
-                         id: "{{ url_for('app.index') }}" + item.title,
-                         text: item.label + " - " + item.description
-                     });
-                 });
+  $(document).ready(function () {
+    var input = document.getElementById("searchterm");
 
-                 return {
-                     "results": results
-                 };
-             }
-         }
-     });
+    var urlQuery = param("s");
+    if (urlQuery) {
+      input.value = urlQuery;
+    }
+    input.focus();
 
-     $("#searchterm").on("select2:select", function (e) {
-         const search_id = e.params.data.id
-         if (search_id === -1) {
-             if(search_text === undefined) search_text = ""
-             window.location.href = "/search?q=" + search_text;
-         } else {
-             window.location.href = e.params.data.id;
-         }
-     });
+    document.getElementById("searchButton").addEventListener("click", () => {
+      handleSubmit(document.getElementById("searchterm").value);
+    });
+
+    input.addEventListener("keyup", debounce(() => {
+      var searchTerm = input.value;
+      if (searchTerm && searchTerm.length > 1) {
+        queryFindFacts(searchTerm).then((results) =>
+          filterAutocomplete(results)
+        );
+      }
+    }, 300));
+
+    function param(name) {
+      return decodeURIComponent(
+        (location.search.split(name + "=")[1] || "").split("&")[0]
+      ).replace(/\+/g, " ");
+    }
+
+    function debounce(callback, wait) {
+      let timeout;
+      return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(function () {
+          callback.apply(this, args);
+        }, wait);
+      };
+    }
+
+    async function queryFindFacts(searchTerm) {
+      var url = "https://www.wikidata.org/w/api.php?callback=?";
+      var settings = {
+        dataType: 'jsonp',
+        data: {
+          search: searchTerm,
+          action: "wbsearchentities",
+          language: "en",
+          uselang: "en",
+          format: "json",
+          strictlanguage: true
+        }
+      };
+
+      $.ajax(url, settings).then(function (data) {
+        filterAutocomplete(data)
+      });
+    }
+
+    function filterAutocomplete(values) {
+      const list = document.getElementById("autocomplete");
+      if (list) {
+        if (values) {
+          let elem = document.createElement("option");
+          elem.value = "Advanced search"
+          list.appendChild(elem);
+
+          let i = 1;
+          for (let item of values.search) {
+            let elem = document.createElement("option");
+            elem.value = item.label + " - " + item.description
+            elem.id = "{{ url_for('app.index') }}" + item.title;
+            if (i < list.childNodes.length) {
+              list.childNodes[i].replaceWith(elem);
+              i++;
+            } else {
+              list.appendChild(elem);
+            }
+          }
+          if (values.search.length < list.childNodes.length) {
+            for (let j = 0; j < list.childNodes.length - values.length; j++) {
+              list.removeChild(list.lastChild);
+            }
+          }
+        } else {
+          while (list.firstChild) {
+            list.removeChild(list.lastChild);
+          }
+        }
+      }
+    }
+
+    function handleSubmit(e) {
+      const search_id = e.params.data.id
+      if (search_id === "-1") {
+        if (search_text === undefined) search_text = ""
+        window.location.href = "/search?q=" + search_text;
+      } else {
+        window.location.href = e.params.data.id;
+      }
+    }
 
      // Add anchor links to all headings
      var headers = document.querySelectorAll('h2[id], h3[id]')

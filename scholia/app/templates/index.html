@@ -36,16 +36,15 @@
 <div class="container">
     <h2>Search</h2>
     
-    <div class="input-group">
-	<input type="text" class="form-control"
-	       placeholder="Search for a scientist, topic, publication, organization, award, event, etc." id="searchterm"/>
-	<!-- span class="input-group-btn">
-	    <button class="btn btn-primary" type="submit">Search</button>
-	</span -->
-    </div>
-
-    <div id="searchresult"></div>
-
+    <form action="search/">
+      <div class="input-group">
+        <input id="searchterm" type="search" class="form-control" value="" aria-label="Search Scholia" list="autocomplete">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" id="searchButton" type="button">Search</button>
+        </div>
+      </div>
+      <datalist id="autocomplete"></datalist>
+    </form>
 </div>
 
 
