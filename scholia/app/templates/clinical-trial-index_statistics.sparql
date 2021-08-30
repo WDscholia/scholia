@@ -13,6 +13,11 @@ WHERE {
   {
     { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6099 [] . } }
     BIND("Number of clinical trial phases links" AS ?description)
-  } 
+  }
+  UNION
+  {
+    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6220 [] . } }
+    BIND("Links to OpenTrials" AS ?description)
+  }
 }
 ORDER BY DESC(?count)

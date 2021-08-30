@@ -2,6 +2,8 @@
 
 {% set aspect = "printer-index" %}
 
+{% block title %}Printer - Scholia{% endblock %}
+
 {% block in_ready %}
 
     {{ sparql_to_table('printed-works-per-publisher',

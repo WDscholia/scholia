@@ -4,6 +4,7 @@ Usage:
   scholia arxiv-to-quickstatements [options] <arxiv>
   scholia orcid-to-q <orcid>
   scholia string-to-type <string>
+  scholia run
 
 Options:
   -o --output=file  Output filename, default output to stdout
@@ -59,6 +60,15 @@ def main():
     elif arguments["string-to-type"]:
         type = string_to_type(arguments["<string>"])
         print(type)
+
+    elif arguments['run']:
+        from .app import create_app
+        app = create_app(
+            text_to_topic_q_text_enabled=False,
+            third_parties_enabled=True,
+        )
+        app.config['APPLICATION_ROOT'] = '/'
+        app.run(debug=True, port=8100)
 
 
 if __name__ == "__main__":

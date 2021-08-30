@@ -1,7 +1,7 @@
 import os
 
 import versioneer
-from setuptools import setup
+from setuptools import find_packages, setup
 
 filename = os.path.join(os.path.dirname(__file__), "requirements.txt")
 requirements = open(filename).read().splitlines()
@@ -15,8 +15,21 @@ setup(
     license="GPL",
     keywords="wikidata",
     url="https://github.com/WDscholia/scholia",
-    packages=["scholia"],
-    package_data={},
+    packages=find_packages(),
+    package_data={
+        "scholia": [
+            "data/*",
+            "app/templates/*",
+            "app/static/*",
+            "app/static/css/*",
+            "app/static/favicon/*",
+            "app/static/fonts/*",
+            "app/static/images/*",
+            "app/static/js/*",
+            "app/static/widgets/select2/css/*",
+            "app/static/widgets/select2/js/*",
+        ]
+    },
     install_requires=requirements,
     long_description="",
     classifiers=[

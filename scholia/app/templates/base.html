@@ -99,6 +99,7 @@
                 if ('en' in item.labels) {
                     var title = item.labels.en.value
                     $("#h1").text(title);
+                    $("title").text(title + " - Scholia");
 
                     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
 
@@ -415,6 +416,8 @@
     UNION
     { wd:{{ q }} wdt:P235 [] . BIND("chemical" AS ?aspect) }
     UNION
+    { wd:{{ q }} wdt:P225 [] . BIND("taxon" AS ?aspect) }
+    UNION
     { wd:{{ q }} ^wdt:P31/wdt:P235 [] . BIND("chemical-class" AS ?aspect) }
     UNION
     { wd:{{ q }} wdt:P644 [] . BIND("gene" AS ?aspect) }
@@ -600,6 +603,9 @@
 
                     if (element.tagName === "H3") {
                         sublist.appendChild(tocListItem);
+                        if (i == headings.length - 1) {
+                            tocList.appendChild(sublist);
+                        }
                     } else {
                         if (sublist) {
                             tocList.appendChild(sublist);

@@ -2,7 +2,7 @@
 SELECT ?count ?topic ?topicLabel
 WITH{
   SELECT (COUNT(?work) AS ?count) ?topic WHERE {
-    ?work wdt:P2283/wdt:P279* wd:{{q}} .
+    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* wd:{{q}} .
     ?work wdt:P921 ?topic .
   }
   GROUP BY ?topic

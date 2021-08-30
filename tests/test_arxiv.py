@@ -10,7 +10,6 @@ def test_get_metadata():
     assert metadata["title"] == (
         "A Review of Relational Machine Learning for " "Knowledge Graphs"
     )
-    assert metadata["publication_date"] == "2015-09-28"
     assert metadata["doi"] == "10.1109/JPROC.2015.2483592"
 
     metadata = get_metadata("1803.04349")
