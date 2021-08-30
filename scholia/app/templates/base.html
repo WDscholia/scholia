@@ -514,14 +514,47 @@ sparqlToShortInchiKey(`# tool: scholia
       handleSubmit(document.getElementById("searchterm").value);
     });
 
-    input.addEventListener("keyup", debounce(() => {
-      var searchTerm = input.value;
-      if (searchTerm && searchTerm.length > 1) {
-        queryFindFacts(searchTerm).then((results) =>
-          filterAutocomplete(results)
-        );
+    input.addEventListener("keyup", debounce((event) => {
+      switch (event.key) {
+        case "Up":
+        case "ArrowUp":
+        case "Down":
+        case "ArrowDown":
+        case "Left":
+        case "ArrowLeft":
+        case "Right":
+        case "ArrowRight":
+        case "Escape":
+          console.log("fine")
+          break;
+        default:
+          console.log('debouce')
+          var searchTerm = input.value;
+          if (searchTerm && searchTerm.length > 1) {
+            queryWikidata(searchTerm).then((results) =>
+              filterAutocomplete(results)
+            );
+          }
       }
-    }, 300));
+    }, 200));
+
+    input.addEventListener("keydown", function (event) {
+      // When user presses enter to submit search
+      switch (event.key) {
+        case "Enter":
+          event.preventDefault(); // prevent the form from being submitted
+          handleSubmit(this.value);
+          break;
+        default:
+      }
+    });
+
+    input.addEventListener("change", function (event) {
+      // When user presses enter on the autocomplete
+      console.log(event)
+      console.log(this)
+      // handleSubmit(this.value);
+    });
 
     function param(name) {
       return decodeURIComponent(
@@ -539,7 +572,7 @@ sparqlToShortInchiKey(`# tool: scholia
       };
     }
 
-    async function queryFindFacts(searchTerm) {
+    async function queryWikidata(searchTerm) {
       var url = "https://www.wikidata.org/w/api.php?callback=?";
       var settings = {
         dataType: 'jsonp',
@@ -559,22 +592,29 @@ sparqlToShortInchiKey(`# tool: scholia
     }
 
     function filterAutocomplete(values) {
+      console.log(values)
       const list = document.getElementById("autocomplete");
       if (list) {
         if (values) {
-          let elem = document.createElement("option");
-          elem.value = "Advanced search"
-          list.appendChild(elem);
+          let listLength = list.childNodes.length
+          if (listLength < 1) {
+            let elem = document.createElement("option");
+            elem.value = "Advanced search"
+            list.appendChild(elem);
+          }
 
           let i = 1;
           for (let item of values.search) {
+            console.log(item.label)
             let elem = document.createElement("option");
-            elem.value = item.label + " - " + item.description
-            elem.id = "{{ url_for('app.index') }}" + item.title;
-            if (i < list.childNodes.length) {
+            elem.text = item.label + " - " + item.description
+            elem.value = item.title;
+            console.log(i, listLength)
+            if (i < listLength) {
               list.childNodes[i].replaceWith(elem);
               i++;
             } else {
+              console.log('append')
               list.appendChild(elem);
             }
           }
@@ -591,13 +631,15 @@ sparqlToShortInchiKey(`# tool: scholia
       }
     }
 
-    function handleSubmit(e) {
-      const search_id = e.params.data.id
-      if (search_id === "-1") {
-        if (search_text === undefined) search_text = ""
+    function handleSubmit(value) {
+      console.log(value)
+      if (value === "-1") {
+        if (search_text === undefined) {
+          search_text = ""
+        }
         window.location.href = "/search?q=" + search_text;
       } else {
-        window.location.href = e.params.data.id;
+        window.location.href = "{{ url_for('app.index') }}" + value;
       }
     }
 
