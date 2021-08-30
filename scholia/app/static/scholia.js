@@ -273,7 +273,7 @@ function sparqlToIframe(sparql, element, filename) {
             if (results.text().trim().length === 0) {
                 $iframe.parent().css("display", "none")
                 $iframe.parent().after('<hr><p>This query yielded no results. You can still try to find something by ' +
-                    '<a href="' + wikidata_query + '" target="_blank">modifying it</a></p>')
+                    '<a href="' + wikidata_query + '" target="_blank">modifying it</a>.</p>')
             }
             $iframe.parent().after(
                 '<span style="float:right; font-size:smaller">' +
