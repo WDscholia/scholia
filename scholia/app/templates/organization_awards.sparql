@@ -1,4 +1,7 @@
 #defaultView:Table
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?count
   ?award ?awardLabel
@@ -13,8 +16,8 @@ WITH {
     hint:Query hint:optimizer "None" .
     {
       SELECT DISTINCT ?researcher WHERE {
-        ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
-      }
+        ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
+      } 
     }
     ?researcher wdt:P166 ?award .
     ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')

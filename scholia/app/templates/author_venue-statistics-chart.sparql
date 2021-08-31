@@ -1,8 +1,10 @@
 #defaultView:BubbleChart
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?count ?venue (SAMPLE(?venue_label_) AS ?venue_label) 
 WITH {
   SELECT (COUNT(?work) as ?count) ?venue WHERE {
-    ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P50 target: .
     ?work wdt:P1433 ?venue .
   }
   GROUP BY ?venue

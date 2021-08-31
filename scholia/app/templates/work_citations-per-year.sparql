@@ -1,4 +1,7 @@
 #defaultView:BarChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (STR(?year_) AS ?year)
   (SUM(?count_) AS ?count)
@@ -17,10 +20,10 @@ WHERE {
       (COUNT(DISTINCT ?citing_work) AS ?count_)
       ?kind
     WHERE {
-      ?citing_work wdt:P2860 wd:{{q}} .
+      ?citing_work wdt:P2860 target: .
   
       # Detect self-citations
-      BIND(IF(EXISTS { wd:{{q}} wdt:P50 ?selfauthor . ?citing_work  wdt:P50 ?selfauthor } ,
+      BIND(IF(EXISTS { target: wdt:P50 ?selfauthor . ?citing_work  wdt:P50 ?selfauthor } ,
         "detected incoming self-citations",
         "citations from others or non-detected self-citations") AS ?kind)
 
@@ -37,10 +40,10 @@ WHERE {
       (COUNT(DISTINCT ?cited_work) AS ?count_)
       ?kind
     WHERE {
-      wd:{{q}} wdt:P2860 ?cited_work .
+      target: wdt:P2860 ?cited_work .
   
       # Detect self-citations
-      BIND(IF(EXISTS { ?cited_work wdt:P50 ?selfauthor . wd:{{q}} wdt:P50 ?selfauthor },
+      BIND(IF(EXISTS { ?cited_work wdt:P50 ?selfauthor . target: wdt:P50 ?selfauthor },
         "detected outgoing self-citations",
         "outgoing citations to others or non-detected self-citations") AS ?kind)
 

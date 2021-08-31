@@ -1,4 +1,7 @@
 # Recent publications by people associated with event
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?publication_date
   ?work ?workLabel
@@ -9,22 +12,22 @@ WITH {
   WHERE {
     {
       # speaker, organizer, program committe member 
-      wd:{{ q }} wdt:P823 | wdt:P664 | wdt:P5804 ?person .
+      target: wdt:P823 | wdt:P664 | wdt:P5804 ?person .
     }
     UNION
     {
       # participant
-      ?person wdt:P1344 | ^wdt:P710 wd:{{ q }} .
+      ?person wdt:P1344 | ^wdt:P710 target: .
     }
     UNION
     {
       # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 wd:{{ q }} .
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 target: .
     }
     UNION
     {
       # editor of proceedings
-      ?person ^wdt:P98 / wdt:P4745 wd:{{ q }} .
+      ?person ^wdt:P98 / wdt:P4745 target: .
     }
   }
 } AS %people  

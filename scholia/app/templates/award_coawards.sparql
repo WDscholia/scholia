@@ -1,11 +1,13 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?number_of_corecipients
   ?award ?awardLabel ?awardDescription
 WITH {
      SELECT DISTINCT ?award (COUNT(?recipient) AS ?number_of_corecipients) WHERE {
-    ?recipient wdt:P166 wd:{{ q }} .
+    ?recipient wdt:P166 target: .
 	?recipient wdt:P166 ?award .
-			       FILTER (?award != wd:{{ q }})
+			       FILTER (?award != target:)
      }
      GROUP BY ?award
 } AS %result

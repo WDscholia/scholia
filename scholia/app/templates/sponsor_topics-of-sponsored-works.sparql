@@ -1,10 +1,13 @@
 #defaultView:BubbleChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?count ?topic ?topicLabel
 WITH {
   SELECT (COUNT(?work) AS ?count) ?topic
   WHERE {
-    ?work wdt:P859+ wd:{{ q }} .
+    ?work wdt:P859+ target: .
     ?work wdt:P921 ?topic .
   } 
   GROUP BY ?topic

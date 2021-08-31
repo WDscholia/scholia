@@ -1,13 +1,15 @@
 #defaultView:Graph
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?class ?classLabel ?otherclass ?otherclassLabel ?rgb WITH {
   SELECT DISTINCT ?class ?otherclass ?rgb WHERE {
-    { VALUES ?class { wd:{{ q }} }
+    { VALUES ?class { target: }
       { ?otherclass wdt:P279 ?class . BIND( "3182BD" AS ?rgb) }
       UNION
       { ?otherclass wdt:P31 ?class . BIND( "E6550D" AS ?rgb) }
     }
     UNION
-    { VALUES ?otherclass { wd:{{ q }} }
+    { VALUES ?otherclass { target: }
       ?otherclass wdt:P279 ?class .
     }
   } LIMIT 500

@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   # Number of works with the author
   ?count
@@ -11,7 +13,7 @@ SELECT
       ENCODE_FOR_URI(?author)) AS ?resolver_url)
 WITH {
   SELECT (COUNT(?work) as ?count) ?author WHERE {
-    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P1433 target: .
     ?work wdt:P2093 ?author .
   }
   GROUP BY ?author

@@ -1,9 +1,12 @@
 #defaultView:Table
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # Statements referencing this article
 SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel ?unit ?unitLabel
 WITH {
   SELECT ?statement WHERE { 
-	  ?statement prov:wasDerivedFrom/pr:P248 wd:{{ q }} .
+	  ?statement prov:wasDerivedFrom/pr:P248 target: .
   }
   LIMIT 2000
 } AS %statements 

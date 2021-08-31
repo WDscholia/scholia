@@ -1,11 +1,14 @@
 #defaultView:Table
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # List of works that is cited by the specified work
 SELECT ?citations ?publication_date ?citing_work ?citing_workLabel 
 WITH {
   SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work 
   WHERE {
     # Find works that cite the queried work
-    ?citing_work wdt:P2860 wd:{{ q }} .
+    ?citing_work wdt:P2860 target: .
 
     OPTIONAL {
       ?citing_work wdt:P577 ?datetime .

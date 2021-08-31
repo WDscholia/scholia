@@ -1,10 +1,13 @@
 #defaultView:Graph
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?citing_work ?citing_workLabel ?rgb 
   ?cited_work ?cited_workLabel
 WITH { 
   SELECT (COUNT(*) AS ?count) ?citing_work WHERE {
-    wd:{{q}} (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?citing_work .
+    target: (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?citing_work .
   }
   GROUP BY ?citing_work
   ORDER BY DESC(?count)
@@ -12,7 +15,7 @@ WITH {
 } AS %citing_works
 WITH { 
   SELECT (COUNT(*) AS ?count_) ?cited_work WHERE {
-    wd:{{q}} (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?cited_work .
+    target: (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?cited_work .
   }
   GROUP BY ?cited_work
   ORDER BY DESC(?count_)

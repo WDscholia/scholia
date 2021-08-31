@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (?number_of_publications AS ?works)
   ?person ?personLabel ?personDescription
@@ -9,39 +11,39 @@ WITH {
   WHERE {
     {
       # speaker
-      wd:{{ q }} wdt:P823 ?person .
+      target: wdt:P823 ?person .
       # BIND(wd:Q9379869 AS ?role)
       BIND("speaker" AS ?role)
     }
     UNION
     {
       # organizer
-      wd:{{ q }} wdt:P664 ?person .
+      target: wdt:P664 ?person .
       #BIND(wd:Q2029941 AS ?role)
       BIND("organizer" AS ?role)
     }
     UNION
     {
       # participant
-      ?person wdt:P1344 | ^wdt:P710 wd:{{ q }} .
+      ?person wdt:P1344 | ^wdt:P710 target: .
       BIND("participant" AS ?role)
     }
     UNION
     {
       # editor
-      ?person ^wdt:P98 / wdt:P4745 wd:{{ q }} .
+      ?person ^wdt:P98 / wdt:P4745 target: .
       BIND("editor of proceedings" AS ?role)
     }
     UNION
     {
       # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 wd:{{ q }} .
+      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 target: .
       BIND("author" AS ?role)
     }
     UNION
     {
       # program committee member
-      wd:{{ q }} wdt:P5804 ?person .
+      target: wdt:P5804 ?person .
       BIND("program committee member" AS ?role)
     }
   }

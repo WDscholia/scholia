@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # title: structural identifiers for this chemical structure
 SELECT
   ?Structural_identifier ?Structural_identifierLabel
@@ -5,7 +7,7 @@ SELECT
 WITH {
   SELECT ?Structural_identifier ?idLit ?formatterurl WHERE {
     VALUES ?Structural_identifier { wd:P233 wd:P234 wd:P2017 }
-    wd:{{ q }} ?IDdir ?idLit .
+    target: ?IDdir ?idLit .
     ?Structural_identifier wikibase:directClaim ?IDdir ;
             wdt:P31 wd:Q19833835 .
     OPTIONAL {

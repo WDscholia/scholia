@@ -1,10 +1,12 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?transcript_ID
   ?reference ?referenceLabel ?referenceDescription
 WITH {
   SELECT ?transcript_ID ?reference
   WHERE {
-      wd:{{ q }} wdt:P31 wd:Q7187;
+      target: wdt:P31 wd:Q7187;
                  p:P704 ?transcriptid_statement .
     ?transcriptid_statement ps:P704 ?transcript_ID ;
                             prov:wasDerivedFrom/pr:P248 ?reference .

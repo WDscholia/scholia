@@ -1,8 +1,10 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?quantity ?part ?partLabel ?partDescription ?type
 WITH {
   SELECT ?part ?quantity (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
   WHERE {
-    VALUES ?complex { wd:{{ q }} }
+    VALUES ?complex { target: }
     ?complex p:P527 ?partStatement .
     ?partStatement ps:P527 ?part .
     OPTIONAL { ?partStatement pq:P1114 ?quantity }

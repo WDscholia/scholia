@@ -1,4 +1,7 @@
 # title: Venues citing articles from this specific journal
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 #defaultView:Table
 SELECT
   ?count
@@ -10,7 +13,7 @@ WITH {
     ?citing_journal
     (SAMPLE(?short_name_) AS ?short_name)
   WHERE {
-    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P1433 target: .
     ?citing_work wdt:P2860 ?work .
     ?citing_work wdt:P1433 ?citing_journal .
     OPTIONAL { ?citing_journal wdt:P1813 ?short_name_ . }

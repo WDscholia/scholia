@@ -1,7 +1,10 @@
 #defaultView:BubbleChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?cito ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
   ?citingArticle p:P2860 ?citationStatement ;
-                 wdt:P1433 wd:{{ q }} .
+                 wdt:P1433 target: .
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?citedArticle .
   ?intention wdt:P31 wd:Q96471816 ;
