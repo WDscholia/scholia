@@ -1,39 +1,45 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-{{super()}}
+    {{ super() }}
 
-<script src="{{ url_for('static', filename='js/citation.js') }}"></script>
-<script>
-const c = require('citation-js')
-try {
-  let example = new c.Cite([ '{{ doi }}' ])
-  let output = example.format('quickstatements')
-  $( '#qs' ).append( output );
-  output = encodeURIComponent(
-    output.replaceAll('\t', '|')
-          .replaceAll('\n', '||'))
-  htmlOutput = "<a href=\"https://quickstatements.toolforge.org/#/v1=" + output + "\">\n" +
-               "  <button class=\"btn btn-primary\">Submit to QuickStatements ↗</button>\n" +
-               "</a>\n"
-  $( '#qs' ).after( htmlOutput );
-} catch (error) {
-  if (error.message.includes("status code 404")) {
-    $( '#qs' ).append( "DOI does not exist" )
-  } else {
-    console.log(error)
-  }
-}
-</script>
+    <script src="{{ url_for('static', filename='js/citation.js') }}"></script>
+    <script>
+        const c = require('citation-js')
+        try {
+            let example = new c.Cite(['{{ doi }}'])
+            let output = example.format('quickstatements')
+            $('#qs').append(output);
+            output = encodeURIComponent(
+                output.replaceAll('\t', '|')
+                    .replaceAll('\n', '||'))
+            htmlOutput = "<a href=\"https://quickstatements.toolforge.org/#/v1=" + output + "\">\n" +
+                "  <button class=\"btn btn-primary\">Submit to QuickStatements ↗</button>\n" +
+                "</a>\n"
+            $('#qs').after(htmlOutput);
+        } catch (error) {
+            if (error.message.includes("status code 404")) {
+                $('#qs').append("DOI does not exist")
+            } else {
+                console.log(error)
+            }
+        }
+    </script>
 
-{% endblock %}
+{% endblock scripts %}
 
 {% block page_content %}
 
-We found no work in Wikidata with the DOI <a href="https://doi.org/{{ doi | urlencode }}">{{ doi }}</a>. If you would like to create the item for this work, you can use the <a href="https://www.wikidata.org/wiki/Help:QuickStatements">QuickStatements</a> tool by clicking the "Submit to QuickStatements" button (this requires authentication via <a href="https://www.mediawiki.org/wiki/Help:OAuth">OAuth 2.0</a>). Thank you for helping to curate this information.
+    We found no work in Wikidata with the DOI
+    <a href="https://doi.org/{{ doi | urlencode }}">{{ doi }}</a>. If you would like to create the
+    item for this work, you can use the
+    <a href="https://www.wikidata.org/wiki/Help:QuickStatements">QuickStatements</a> tool by
+    clicking the "Submit to QuickStatements" button (this requires authentication via
+    <a href="https://www.mediawiki.org/wiki/Help:OAuth">OAuth 2.0</a>). Thank you for helping to
+    curate this information.
 
-<h2>QuickStatements</h2>
+    <h2>QuickStatements</h2>
 
-<pre id="qs"></pre>
+    <pre id="qs"></pre>
 
-{% endblock %}
+{% endblock page_content %}

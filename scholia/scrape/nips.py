@@ -32,25 +32,20 @@ submitted to https://quickstatements.toolforge.org/.
 
 """
 
-from six import b, print_, u
-
 import json
-
 import os
-
 import signal
-
 from time import sleep
 
-from lxml import etree
-
 import requests
+from lxml import etree
+from six import b, print_, u
 
 from ..qs import paper_to_quickstatements
 from ..utils import escape_string
 
-
-PAPER_TO_Q_QUERY = u("""
+PAPER_TO_Q_QUERY = u(
+    """
 SELECT ?paper WHERE {{
   OPTIONAL {{ ?label rdfs:label "{label}"@en . }}
   OPTIONAL {{ ?title wdt:P1476 "{title}"@en . }}
@@ -58,13 +53,14 @@ SELECT ?paper WHERE {{
   OPTIONAL {{ ?url wdt:P953 <{url}> . }}
   BIND(COALESCE(?full_text_url, ?url, ?label, ?title) AS ?paper)
 }}
-""")
+"""
+)
 
 URL_BASE = "https://papers.nips.cc"
 
 USER_AGENT = "Scholia"
 
-WDQS_URL = 'https://query.wikidata.org/sparql'
+WDQS_URL = "https://query.wikidata.org/sparql"
 
 # Year should be the nominal year, - not the year of publication
 YEAR_TO_Q = {
@@ -139,25 +135,26 @@ def paper_to_q(paper):
     'Q39502551'
 
     """
-    title = escape_string(paper['title'])
+    title = escape_string(paper["title"])
     query = PAPER_TO_Q_QUERY.format(
-        label=title, title=title,
-        url=paper['url'], full_text_url=paper['full_text_url'])
+        label=title, title=title, url=paper["url"], full_text_url=paper["full_text_url"]
+    )
 
     response = requests.get(
-        WDQS_URL, params={'query': query, 'format': 'json'},
-        headers={'User-Agent': USER_AGENT})
+        WDQS_URL,
+        params={"query": query, "format": "json"},
+        headers={"User-Agent": USER_AGENT},
+    )
     if not response.ok:
-        raise Exception("Wikidata API response error: {}".format(
-            response.status_code))
+        raise Exception("Wikidata API response error: {}".format(response.status_code))
 
-    data = response.json()['results']['bindings']
+    data = response.json()["results"]["bindings"]
 
     if len(data) == 0 or not data[0]:
         # Not found
         return None
 
-    return str(data[0]['paper']['value'][31:])
+    return str(data[0]["paper"]["value"][31:])
 
 
 def paper_url_to_q(url):
@@ -264,37 +261,40 @@ def scrape_paper_from_url(url):
     True
 
     """
-    if (not url.startswith("https://proceedings.neurips.cc/paper/") and
-            not url.startswith("https://papers.nips.cc/paper/")):
-        raise ValueError((
-            "url should start with https://proceedings.neurips.cc/paper/"
-            " or https://papers.nips.cc/paper/. It was {}.").format(
-            url))
+    if not url.startswith(
+        "https://proceedings.neurips.cc/paper/"
+    ) and not url.startswith("https://papers.nips.cc/paper/"):
+        raise ValueError(
+            (
+                "url should start with https://proceedings.neurips.cc/paper/"
+                " or https://papers.nips.cc/paper/. It was {}."
+            ).format(url)
+        )
 
-    if not url.endswith('.html'):
-        raise ValueError("url should end with '.html'. It was {}.".format(
-            url))
+    if not url.endswith(".html"):
+        raise ValueError("url should end with '.html'. It was {}.".format(url))
 
-    entry = {'url': url}
+    entry = {"url": url}
 
     response = requests.get(url)
     tree = etree.HTML(response.content)
 
-    entry['title'] = "".join(
-        text for text in
-        tree.xpath("//meta[@name='citation_title']/@content"))
+    entry["title"] = "".join(
+        text for text in tree.xpath("//meta[@name='citation_title']/@content")
+    )
 
-    entry['authors'] = [
-        text.split(', ')[-1] + ' ' + ", ".join(text.split(', ')[0:-1])
-        for text in tree.xpath("//meta[@name='citation_author']/@content")]
+    entry["authors"] = [
+        text.split(", ")[-1] + " " + ", ".join(text.split(", ")[0:-1])
+        for text in tree.xpath("//meta[@name='citation_author']/@content")
+    ]
 
     urls = tree.xpath("//meta[@name='citation_pdf_url']/@content")
     if len(urls) > 0:
-        entry['full_text_url'] = urls[0]
+        entry["full_text_url"] = urls[0]
 
     abstracts = tree.xpath("//h4[text()='Abstract']/following::p/text()")
     if len(abstracts) > 0:
-        entry['abstract'] = abstracts[0]
+        entry["abstract"] = abstracts[0]
 
     dates = tree.xpath("//meta[@name='citation_publication_date']/@content")
     if len(dates) > 0:
@@ -302,12 +302,12 @@ def scrape_paper_from_url(url):
         year = int(nominal_year)
         if year < 2009:
             year += 1
-        entry['year'] = str(year)
+        entry["year"] = str(year)
 
-        entry['published_in_q'] = YEAR_TO_Q.get(nominal_year, None)
+        entry["published_in_q"] = YEAR_TO_Q.get(nominal_year, None)
 
     # All NIPS papers are in English
-    entry['language_q'] = "Q1860"
+    entry["language_q"] = "Q1860"
 
     return entry
 
@@ -347,14 +347,15 @@ def scrape_paper_from_old_url(url):
 
     """
     url_paper_base = URL_BASE + "/paper/"
-    if url[:len(url_paper_base)] != url_paper_base:
-        raise ValueError("url should start with {}. It was {}.".format(
-            url_paper_base, url))
+    if url[: len(url_paper_base)] != url_paper_base:
+        raise ValueError(
+            "url should start with {}. It was {}.".format(url_paper_base, url)
+        )
 
-    if url.endswith('.pdf'):
-        url = url[:-4] + '.html'
+    if url.endswith(".pdf"):
+        url = url[:-4] + ".html"
 
-    entry = {'url': url}
+    entry = {"url": url}
 
     response = requests.get(url)
     tree = etree.HTML(response.content)
@@ -364,32 +365,31 @@ def scrape_paper_from_old_url(url):
     # So this is not sufficient:
     # entry['title'] = tree.xpath("//h2[@class='subtitle']")[0].text
     title_element = tree.xpath("//h2[@class='subtitle']")[0]
-    entry['title'] = "".join(text for text in title_element.itertext())
+    entry["title"] = "".join(text for text in title_element.itertext())
 
     authors_element = tree.xpath("//ul[@class='authors']")[0]
-    entry['authors'] = [element.text
-                        for element in authors_element.xpath('li/a')]
+    entry["authors"] = [element.text for element in authors_element.xpath("li/a")]
 
-    full_text_url = tree.xpath("//a[text()='[PDF]']")[0].attrib['href']
-    entry['full_text_url'] = 'https://papers.nips.cc' + full_text_url
+    full_text_url = tree.xpath("//a[text()='[PDF]']")[0].attrib["href"]
+    entry["full_text_url"] = "https://papers.nips.cc" + full_text_url
 
     abstract = tree.xpath("//p[@class='abstract']")[0].text
     if abstract != "Abstract Missing":
-        entry['abstract'] = abstract
+        entry["abstract"] = abstract
 
     book_element = tree.xpath("//p[contains(text(), 'Part of:')]")[0]
-    book_url = URL_BASE + book_element.xpath('a')[0].attrib['href']
+    book_url = URL_BASE + book_element.xpath("a")[0].attrib["href"]
 
     nominal_year = book_url[-4:]
     year = int(nominal_year)
     if year < 2009:
         year += 1
-    entry['year'] = str(year)
+    entry["year"] = str(year)
 
-    entry['published_in_q'] = YEAR_TO_Q.get(nominal_year, None)
+    entry["published_in_q"] = YEAR_TO_Q.get(nominal_year, None)
 
     # All NIPS papers are in English
-    entry['language_q'] = "Q1860"
+    entry["language_q"] = "Q1860"
 
     return entry
 
@@ -409,10 +409,11 @@ def scrape_paper_urls_from_proceedings_url(url):
 
     """
     # Check URL
-    url_proceedings_base = URL_BASE + '/book/'
-    if url[:len(url_proceedings_base)] != url_proceedings_base:
-        raise ValueError('url should begin with {}. It was {}'.format(
-            url_proceedings_base, url))
+    url_proceedings_base = URL_BASE + "/book/"
+    if url[: len(url_proceedings_base)] != url_proceedings_base:
+        raise ValueError(
+            "url should begin with {}. It was {}".format(url_proceedings_base, url)
+        )
 
     # Download proceedings HTML
     response = requests.get(url)
@@ -420,9 +421,8 @@ def scrape_paper_urls_from_proceedings_url(url):
 
     # Extract paper URLs
     main_element = tree.xpath("(//div[@class='main-container'])[1]")[0]
-    paper_elements = main_element.xpath('div/ul/li')
-    paper_urls = [URL_BASE + element.xpath('a/@href')[0]
-                  for element in paper_elements]
+    paper_elements = main_element.xpath("div/ul/li")
+    paper_urls = [URL_BASE + element.xpath("a/@href")[0] for element in paper_elements]
 
     return paper_urls
 
@@ -458,29 +458,29 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['--output']:
-        output_filename = arguments['--output']
+    if arguments["--output"]:
+        output_filename = arguments["--output"]
         output_file = os.open(output_filename, os.O_RDWR | os.O_CREAT)
     else:
         # stdout
         output_file = 1
-    output_encoding = arguments['--oe']
+    output_encoding = arguments["--oe"]
 
     # Ignore broken pipe errors
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
-    if arguments['paper-url-to-q']:
-        url = arguments['<url>']
+    if arguments["paper-url-to-q"]:
+        url = arguments["<url>"]
         entry = paper_url_to_q(url)
         print_(entry)
 
-    elif arguments['paper-url-to-quickstatements']:
-        url = arguments['<url>']
+    elif arguments["paper-url-to-quickstatements"]:
+        url = arguments["<url>"]
         qs = paper_url_to_quickstatements(url)
-        os.write(output_file, qs.encode(output_encoding) + b('\n'))
+        os.write(output_file, qs.encode(output_encoding) + b("\n"))
 
-    elif arguments['paper-urls-to-quickstatements']:
-        filename = arguments['<filename>']
+    elif arguments["paper-urls-to-quickstatements"]:
+        filename = arguments["<filename>"]
 
         # Number of seconds to pause between downloads
         pause = 2
@@ -488,22 +488,22 @@ def main():
         with open(filename) as fid:
             for index, url in enumerate(fid):
                 qs = paper_url_to_quickstatements(url.strip())
-                os.write(output_file, qs.encode(output_encoding) + b('\n'))
+                os.write(output_file, qs.encode(output_encoding) + b("\n"))
                 sleep(pause)
 
-    elif arguments['scrape-paper-from-url']:
-        url = arguments['<url>']
+    elif arguments["scrape-paper-from-url"]:
+        url = arguments["<url>"]
         entry = scrape_paper_from_url(url)
         print_(json.dumps(entry))
 
-    elif arguments['scrape-paper-urls-from-proceedings-url']:
-        url = arguments['<url>']
+    elif arguments["scrape-paper-urls-from-proceedings-url"]:
+        url = arguments["<url>"]
         entries = scrape_paper_urls_from_proceedings_url(url)
         for entry in entries:
-            os.write(output_file, entry.encode(output_encoding) + b('\n'))
+            os.write(output_file, entry.encode(output_encoding) + b("\n"))
 
-    elif arguments['scrape-proceedings-from-url']:
-        url = arguments['<url>']
+    elif arguments["scrape-proceedings-from-url"]:
+        url = arguments["<url>"]
         entry = scrape_proceedings_from_url(url)
         print_(json.dumps(entry))
 

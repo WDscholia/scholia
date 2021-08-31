@@ -20,27 +20,23 @@ $ python -m scholia.scrape.ojs paper-url-to-quickstatements \
 
 
 import json
-
 import os
-
 import signal
 
-from six import b, print_, u
-
-from lxml import etree
-
 import requests
+from lxml import etree
+from six import b, print_, u
 
 from ..qs import paper_to_quickstatements
 from ..query import iso639_to_q, issn_to_qs
 from ..utils import escape_string
 
+USER_AGENT = "Scholia"
 
-USER_AGENT = 'Scholia'
+HEADERS = {"User-Agent": USER_AGENT}
 
-HEADERS = {'User-Agent': USER_AGENT}
-
-PAPER_TO_Q_QUERY = u("""
+PAPER_TO_Q_QUERY = u(
+    """
 SELECT ?paper WHERE {{
   OPTIONAL {{ ?label rdfs:label "{label}"@en . }}
   OPTIONAL {{ ?title wdt:P1476 "{title}"@en . }}
@@ -48,19 +44,22 @@ SELECT ?paper WHERE {{
   OPTIONAL {{ ?url wdt:P856 <{url}> . }}
   BIND(COALESCE(?full_text_url, ?url, ?label, ?title, ?doi) AS ?paper)
 }}
-""")
+"""
+)
 
-SHORT_TITLED_PAPER_TO_Q_QUERY = u("""
+SHORT_TITLED_PAPER_TO_Q_QUERY = u(
+    """
 SELECT ?paper WHERE {{
   OPTIONAL {{ ?full_text_url wdt:P953 <{url}> . }}
   OPTIONAL {{ ?url wdt:P856 <{url}> . }}
   BIND(COALESCE(?full_text_url, ?url) AS ?paper)
 }}
-""")
+"""
+)
 
 
 # SPARQL Endpoint for Wikidata Query Service
-WDQS_URL = 'https://query.wikidata.org/sparql'
+WDQS_URL = "https://query.wikidata.org/sparql"
 
 
 def issue_url_to_paper_urls(url):
@@ -111,7 +110,7 @@ def issue_url_to_quickstatements(url, iso639=None):
 
     """
     paper_urls = issue_url_to_paper_urls(url)
-    qs = ''
+    qs = ""
     for paper_url in paper_urls:
         qs += paper_url_to_quickstatements(paper_url, iso639=iso639) + "\n"
     return qs
@@ -138,7 +137,7 @@ def pages_to_number_of_pages(pages):
 
     """
     number_of_pages = None
-    page_elements = pages.split('-')
+    page_elements = pages.split("-")
     if len(page_elements) == 2:
         try:
             number_of_pages = int(page_elements[1]) - int(page_elements[0]) + 1
@@ -179,27 +178,24 @@ def paper_to_q(paper):
     'Q61708017'
 
     """
-    if 'title' in paper and len(paper['title']) > 20:
-        title = escape_string(paper['title'])
+    if "title" in paper and len(paper["title"]) > 20:
+        title = escape_string(paper["title"])
 
-        query = PAPER_TO_Q_QUERY.format(
-            label=title, title=title,
-            url=paper['url'])
+        query = PAPER_TO_Q_QUERY.format(label=title, title=title, url=paper["url"])
     else:
         # The title is too short to match. Too many wrong matches.
-        query = SHORT_TITLED_PAPER_TO_Q_QUERY.format(
-            url=paper['url'])
+        query = SHORT_TITLED_PAPER_TO_Q_QUERY.format(url=paper["url"])
 
-    response = requests.get(WDQS_URL,
-                            params={'query': query, 'format': 'json'},
-                            headers=HEADERS)
-    data = response.json()['results']['bindings']
+    response = requests.get(
+        WDQS_URL, params={"query": query, "format": "json"}, headers=HEADERS
+    )
+    data = response.json()["results"]["bindings"]
 
     if len(data) == 0 or not data[0]:
         # Not found
         return None
 
-    return str(data[0]['paper']['value'][31:])
+    return str(data[0]["paper"]["value"][31:])
 
 
 def paper_url_to_q(url):
@@ -259,15 +255,15 @@ def paper_url_to_quickstatements(url, iso639=None):
     https://quickstatements.toolforge.org.
 
     """
-    if url.endswith('/'):
+    if url.endswith("/"):
         # remove trailing '/' from the URL
         url = url[:-1]
 
     paper = scrape_paper_from_url(url)
 
     if iso639 is not None:
-        paper['iso639'] = iso639
-        paper['language_q'] = iso639_to_q(iso639)
+        paper["iso639"] = iso639
+        paper["language_q"] = iso639_to_q(iso639)
 
     q = paper_to_q(paper)
     if q:
@@ -298,114 +294,111 @@ def scrape_paper_from_url(url):
     True
 
     """
+
     def _field_to_content(field):
         elements = tree.xpath("//meta[@name='{}']".format(field))
         if len(elements) == 0:
             return None
-        content = elements[0].attrib['content']
+        content = elements[0].attrib["content"]
         return content
 
     def _fields_to_content(fields):
         for field in fields:
             content = _field_to_content(field)
-            if content is not None and content != '':
+            if content is not None and content != "":
                 return content
         else:
             return None
 
-    entry = {'url': url}
+    entry = {"url": url}
 
     response = requests.get(url)
     tree = etree.HTML(response.content)
 
     authors = [
-        author_element.attrib['content']
+        author_element.attrib["content"]
         for author_element in tree.xpath("//meta[@name='citation_author']")
     ]
     if len(authors) > 0:
-        entry['authors'] = authors
+        entry["authors"] = authors
     else:
         authors = [
-            author_element.attrib['content']
-            for author_element in
-            tree.xpath("//meta[@name='DC.Creator.PersonalName']")
+            author_element.attrib["content"]
+            for author_element in tree.xpath("//meta[@name='DC.Creator.PersonalName']")
         ]
         if len(authors) > 0:
-            entry['authors'] = authors
+            entry["authors"] = authors
 
-    title = _fields_to_content(['citation_title', 'DC.Title',
-                                'DC.Title.Alternative'])
+    title = _fields_to_content(["citation_title", "DC.Title", "DC.Title.Alternative"])
     if title is not None:
-        entry['title'] = title
+        entry["title"] = title
 
-    citation_date = _fields_to_content(['citation_date', 'DC.Date.issued'])
+    citation_date = _fields_to_content(["citation_date", "DC.Date.issued"])
     if citation_date is not None:
-        entry['date'] = citation_date.replace('/', '-')
+        entry["date"] = citation_date.replace("/", "-")
 
-    doi = _fields_to_content(['citation_doi', 'DC.Identifier.DOI'])
+    doi = _fields_to_content(["citation_doi", "DC.Identifier.DOI"])
     if doi is not None:
-        entry['doi'] = doi.upper()
+        entry["doi"] = doi.upper()
 
-    volume = _fields_to_content(['citation_volume', 'DC.Source.Volume'])
+    volume = _fields_to_content(["citation_volume", "DC.Source.Volume"])
     if volume is not None:
-        entry['volume'] = volume
+        entry["volume"] = volume
 
-    issue = _fields_to_content(['citation_issue', 'DC.Source.Issue'])
+    issue = _fields_to_content(["citation_issue", "DC.Source.Issue"])
     if issue is not None:
-        entry['issue'] = issue
+        entry["issue"] = issue
 
     # Handle page information
     pages = None
-    first_page = _field_to_content('citation_firstpage')
-    last_page = _field_to_content('citation_lastpage')
+    first_page = _field_to_content("citation_firstpage")
+    last_page = _field_to_content("citation_lastpage")
     if first_page is not None and last_page is not None:
         pages = "{}-{}".format(first_page, last_page)
     else:
-        pages = _field_to_content('DC.Identifier.pageNumber')
+        pages = _field_to_content("DC.Identifier.pageNumber")
     if pages is not None:
-        entry['pages'] = pages
+        entry["pages"] = pages
 
         number_of_pages = pages_to_number_of_pages(pages)
         if number_of_pages is not None:
-            entry['number_of_pages'] = number_of_pages
+            entry["number_of_pages"] = number_of_pages
 
-    pdf_url = _field_to_content('citation_pdf_url')
+    pdf_url = _field_to_content("citation_pdf_url")
     if pdf_url is not None:
-        entry['full_text_url'] = pdf_url
+        entry["full_text_url"] = pdf_url
     else:
         pdf_urls = [
-            element.attrib['href']
+            element.attrib["href"]
             for element in tree.xpath("//a[@class='obj_galley_link pdf']")
         ]
         if len(pdf_urls) > 0:
-            entry['full_text_url'] = pdf_urls[0]
+            entry["full_text_url"] = pdf_urls[0]
 
     # There may be inconsistent metadata for the language.
     # For for instance, https://tidsskrift.dk/sygdomogsamfund/article/view/579
     # "DC.Language" is correct, while "citation_language" is wrong.
-    language_as_iso639 = _fields_to_content(
-        ['DC.Language', 'citation_language'])
+    language_as_iso639 = _fields_to_content(["DC.Language", "citation_language"])
     if language_as_iso639 is not None:
-        entry['iso639'] = language_as_iso639
+        entry["iso639"] = language_as_iso639
         language_q = iso639_to_q(language_as_iso639)
         if language_q:
-            entry['language_q'] = language_q
+            entry["language_q"] = language_q
 
-    published_in_title = _fields_to_content(
-        ['citation_journal_title', 'DC.Source'])
+    published_in_title = _fields_to_content(["citation_journal_title", "DC.Source"])
     if published_in_title is not None:
-        entry['published_in_title'] = published_in_title
+        entry["published_in_title"] = published_in_title
 
     # Find journal/venue based on ISSN information
-    issn = _fields_to_content(['citation_issn', 'DC.Source.ISSN'])
+    issn = _fields_to_content(["citation_issn", "DC.Source.ISSN"])
     if issn is not None:
         if len(issn) == 8:
             # Oslo Studies in Language OJS does not have a dash between the
             # numbers
-            issn = issn[:4] + '-' + issn[4:]
+            issn = issn[:4] + "-" + issn[4:]
         qs = issn_to_qs(issn)
         if len(qs) == 1:
-            entry['published_in_q'] = qs[0]
+            entry["published_in_q"] = qs[0]
 
     return entry
 
@@ -416,39 +409,39 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['--iso639']:
-        iso639 = arguments['--iso639']
+    if arguments["--iso639"]:
+        iso639 = arguments["--iso639"]
     else:
         iso639 = None
 
-    if arguments['--output']:
-        output_filename = arguments['--output']
+    if arguments["--output"]:
+        output_filename = arguments["--output"]
         output_file = os.open(output_filename, os.O_RDWR | os.O_CREAT)
     else:
         # stdout
         output_file = 1
-    output_encoding = arguments['--oe']
+    output_encoding = arguments["--oe"]
 
     # Ignore broken pipe errors
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
-    if arguments['issue-url-to-quickstatements']:
-        url = arguments['<url>']
+    if arguments["issue-url-to-quickstatements"]:
+        url = arguments["<url>"]
         qs = issue_url_to_quickstatements(url, iso639=iso639)
-        os.write(output_file, qs.encode(output_encoding) + b('\n'))
+        os.write(output_file, qs.encode(output_encoding) + b("\n"))
 
-    elif arguments['paper-url-to-q']:
-        url = arguments['<url>']
+    elif arguments["paper-url-to-q"]:
+        url = arguments["<url>"]
         entry = paper_url_to_q(url)
         print_(entry)
 
-    elif arguments['paper-url-to-quickstatements']:
-        url = arguments['<url>']
+    elif arguments["paper-url-to-quickstatements"]:
+        url = arguments["<url>"]
         qs = paper_url_to_quickstatements(url, iso639=iso639)
-        os.write(output_file, qs.encode(output_encoding) + b('\n'))
+        os.write(output_file, qs.encode(output_encoding) + b("\n"))
 
-    elif arguments['scrape-paper-from-url']:
-        url = arguments['<url>']
+    elif arguments["scrape-paper-from-url"]:
+        url = arguments["<url>"]
         entry = scrape_paper_from_url(url)
         print_(json.dumps(entry))
 

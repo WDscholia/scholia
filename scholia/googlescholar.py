@@ -16,16 +16,14 @@ from __future__ import print_function
 
 import json
 
-from lxml.html import fromstring
-
 import requests
-
+from lxml.html import fromstring
 
 USER_URL = "https://scholar.google.dk/citations"
 
-USER_AGENT = 'Scholia'
+USER_AGENT = "Scholia"
 
-HEADERS = {'User-Agent': USER_AGENT}
+HEADERS = {"User-Agent": USER_AGENT}
 
 
 def get_user_data(user):
@@ -64,7 +62,7 @@ def get_user_data(user):
     True
 
     """
-    response = requests.get(USER_URL, params={'user': user}, headers=HEADERS)
+    response = requests.get(USER_URL, params={"user": user}, headers=HEADERS)
     tree = fromstring(response.content)
 
     citation_data = tree.xpath('//td[@class="gsc_rsb_std"]/text()')
@@ -74,29 +72,29 @@ def get_user_data(user):
     works = []
     for element in work_elements:
         items = list(element.itertext())
-        work = {'title': items[0]}
+        work = {"title": items[0]}
 
         # If the title contains a '*' then this will result in an extra
         # field in the list.
         offset = 0
-        if items[1] == '*':
+        if items[1] == "*":
             offset = 1
 
-        work['authors'] = items[1 + offset].split(', ')
+        work["authors"] = items[1 + offset].split(", ")
         if len(items) >= 3 + offset:
-            work['citation'] = items[2 + offset]
+            work["citation"] = items[2 + offset]
         if len(items) >= 4 + offset:
-            work['year'] = int(items[3 + offset][2:])
+            work["year"] = int(items[3 + offset][2:])
         works.append(work)
 
     data = {
-        'citations': int(citation_data[0]),
-        'citations5': int(citation_data[1]),
-        'h-index': int(citation_data[2]),
-        'h-index5': int(citation_data[3]),
-        'i10-index': int(citation_data[4]),
-        'i10-index5': int(citation_data[5]),
-        'works': works,
+        "citations": int(citation_data[0]),
+        "citations5": int(citation_data[1]),
+        "h-index": int(citation_data[2]),
+        "h-index5": int(citation_data[3]),
+        "i10-index": int(citation_data[4]),
+        "i10-index5": int(citation_data[5]),
+        "works": works,
     }
     return data
 
@@ -107,8 +105,8 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['get-user-data']:
-        user = arguments['<user>']
+    if arguments["get-user-data"]:
+        user = arguments["<user>"]
 
         data = get_user_data(user)
         print(json.dumps(data))
@@ -117,5 +115,5 @@ def main():
         assert False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

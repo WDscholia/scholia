@@ -4,60 +4,60 @@
 
 {% block page_content %}
 
-<h1>Chemical classes</h1>
+    <h1>Chemical classes</h1>
 
-Chemical classes are categories of chemicals with one or more specific chemicals.
+    Chemical classes are categories of chemicals with one or more specific chemicals.
 
-<div class="container">
+    <div class="container">
 
-    <h2>Examples</h2>
+        <h2>Examples</h2>
 
-    <div class="card-deck mb-3">
-	<div class="card mb-4 box-shadow">
+        <div class="card-deck mb-3">
+            <div class="card mb-4 box-shadow">
 
-            <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Single items</h4>
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Single items</h4>
+                </div>
+                <div class="card-body">
+                    <dl>
+                        <dt><a href="Q41581">alkane</a></dt>
+                        <dd>
+                            View information about alkanes.
+                        </dd>
+
+                        <dt><a href="Q61476">fatty acid</a></dt>
+                        <dd>
+                            View information about fatty acids.
+                        </dd>
+
+                        <dt><a href="Q46995757">phoratoxin</a></dt>
+                        <dd>
+                            View information about phoratoxins.
+                        </dd>
+                    </dl>
+                </div>
             </div>
-            <div class="card-body">
-		<dl>
-		    <dt><a href="Q41581">alkane</a></dt>
-		    <dd>
-			View information about alkanes.
-		    </dd>
 
-		    <dt><a href="Q61476">fatty acid</a></dt>
-		    <dd>
-			View information about fatty acids.
-		    </dd>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+                </div>
+                <div class="card-body">
+                    <p>If you know the identifier then Scholia can make a lookup based on the
+                        identifier:</p>
 
-		    <dt><a href="Q46995757">phoratoxin</a></dt>
-		    <dd>
-			View information about phoratoxins.
-		    </dd>
-		</dl>
+                    <dl>
+                        <dt><a href="../mesh/D028441">mesh/D028441</a></dt>
+                        <dd>Lookup the MeSH identifier D028441. This will identify F2-isoprostane
+                            and redirect to its Scholia page.
+                        </dd>
+
+                        <dt><a href="../lipidmaps/LMFA">lipidmaps/LMFA</a></dt>
+                        <dd>Lookup of the LIPID MAPS class identifier LMFA.</dd>
+                    </dl>
+                </div>
             </div>
-	</div>
-
-	<div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
-	    </div>
-	    <div class="card-body">
-		<p>If you know the identifier then Scholia can make a lookup based on the identifier:</p>
-
-		<dl>
-		    <dt><a href="../mesh/D028441">mesh/D028441</a></dt>
-		    <dd>Lookup the MeSH identifier D028441. This will identify F2-isoprostane
-			and redirect to its Scholia page.</dd>
-
-		    <dt><a href="../lipidmaps/LMFA">lipidmaps/LMFA</a></dt>
-		    <dd>Lookup of the LIPID MAPS class identifier LMFA.</dd>
-			</dl>
-	    </div>
         </div>
     </div>
-</div>
 
-{% endblock %}
-
-  
+{% endblock page_content %}

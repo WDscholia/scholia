@@ -4,57 +4,53 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('missing-author-items') }}
-{{ sparql_to_table('missing-pub-date',
-    options={
+    {{ sparql_to_table('missing-author-items') }}
+    {{ sparql_to_table('missing-pub-date',options={
       "linkPrefixes": {
         "work": "../../work/",
       }})}}
-{{ sparql_to_table('missing-pub-venue',
-    options={
+    {{ sparql_to_table('missing-pub-venue',options={
       "linkPrefixes": {
         "work": "../../work/",
       }})}}
-{{ sparql_to_table('missing-co-topic',
-    options={
+    {{ sparql_to_table('missing-co-topic',options={
       "linkPrefixes": {
         "work": "../../work/",
       }})}}
 
-
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="h1">Topic </h1>
+    <h1 id="h1">Topic </h1>
 
-Missing information with respect to the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}">{{ q }}</a>.
+    Missing information with respect to the topic
+    <a href="{{ url_for('app.show_topic_empty') }}{{ q }}">{{ q }}</a>.
+
+    <h2 id="missing-author-items-header">Missing author items</h2>
+
+    The authors listed below may only be represented as strings in Wikidata
+    with no link to Wikidata items.
+    Follow the link to use the Author disambiguator tool to try to resolve
+    the authors.
+
+    <table class="table table-hover" id="missing-author-items-table"></table>
+
+    <h2 id="missing-pub-date-header">Missing publication date</h2>
+
+    For the listed publications, Wikidata does not have publication dates.
+    <table class="table table-hover" id="missing-pub-date-table"></table>
+
+    <h2 id="missing-pub-venue-header">Missing publication venue</h2>
+
+    For the listed publications, Wikidata does not have a statement as to where they were
+    published.
+    <table class="table table-hover" id="missing-pub-venue-table"></table>
 
 
-<h2 id="missing-author-items-header">Missing author items</h2>
+    <h2 id="missing-co-topic-header">Works on the topic with missing additional topics</h2>
 
-The authors listed below may only be represented as strings in Wikidata
-with no link to Wikidata items.
-Follow the link to use the Author disambiguator tool to try to resolve
-the authors.
+    The following works have only been tagged with this one topic.
+    <table class="table table-hover" id="missing-co-topic-table"></table>
 
-<table class="table table-hover" id="missing-author-items-table"></table>
-
-<h2 id="missing-pub-date-header">Missing publication date</h2>
-
-For the listed publications, Wikidata does not have publication dates.
-<table class="table table-hover" id="missing-pub-date-table"></table>
-
-
-<h2 id="missing-pub-venue-header">Missing publication venue</h2>
-
-For the listed publications, Wikidata does not have a statement as to where they were published.
-<table class="table table-hover" id="missing-pub-venue-table"></table>
-
-
-<h2 id="missing-co-topic-header">Works on the topic with missing additional topics</h2>
-
-The following works have only been tagged with this one topic.
-<table class="table table-hover" id="missing-co-topic-table"></table>
-
-{% endblock %}
+{% endblock page_content %}

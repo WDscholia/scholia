@@ -16,13 +16,10 @@ from __future__ import print_function, unicode_literals
 
 import json
 
-from six.moves.urllib.parse import urlparse
-
-from docopt import docopt
-
-from lxml import etree
-
 import requests
+from docopt import docopt
+from lxml import etree
+from six.moves.urllib.parse import urlparse
 
 from ..model import Work
 
@@ -75,69 +72,65 @@ class Jmlr(object):
 
         """
         parsed_url = urlparse(url)
-        if parsed_url.netloc != 'www.jmlr.org':
-            message = (
-                "URL should contain the 'www.jmlr.org' host: {}"
-            ).format(url)
+        if parsed_url.netloc != "www.jmlr.org":
+            message = ("URL should contain the 'www.jmlr.org' host: {}").format(url)
             raise ValueError(message)
 
-        url_directories = urlparse(url).path.split('/')
+        url_directories = urlparse(url).path.split("/")
 
-        if url.endswith('.html'):
+        if url.endswith(".html"):
             if len(url_directories) != 4:
                 message = "Could not interpret URL: {}".format(url)
                 raise ValueError(message)
-        elif url.endswith('.pdf'):
+        elif url.endswith(".pdf"):
             if len(url_directories) != 5:
                 message = "Could not interpret URL: {}".format(url)
                 raise ValueError(message)
             volume = url_directories[2][6:]
             paper_id = url_directories[3]
-            url = 'http://www.jmlr.org/papers/v{}/{}.html'.format(
-                volume, paper_id)
+            url = "http://www.jmlr.org/papers/v{}/{}.html".format(volume, paper_id)
         else:
             message = "URL should end with html or pdf: {}".format(url)
             raise ValueError(message)
 
-        paper = {'homepage': url}
-        paper['volume'] = url.split('/')[4][1:]
+        paper = {"homepage": url}
+        paper["volume"] = url.split("/")[4][1:]
 
         response = requests.get(url)
         tree = etree.HTML(response.content)
 
         def _get_content(name):
             match = "//meta[@name='citation_{}']".format(name)
-            return tree.xpath(match)[0].attrib['content']
+            return tree.xpath(match)[0].attrib["content"]
 
-        paper['title'] = _get_content('title')
-        paper['year'] = _get_content('publication_date')
-        paper['published_in_q'] = "Q1660383"
+        paper["title"] = _get_content("title")
+        paper["year"] = _get_content("publication_date")
+        paper["published_in_q"] = "Q1660383"
 
         # ISSN information may apparently be missing for some articles.
         # For instance http://www.jmlr.org/papers/v18/16-365.html
         # For other it is present, e.g.,
         # http://www.jmlr.org/papers/v8/garcia-pedrajas07a.html
         try:
-            paper['issn'] = _get_content('issn')[5:]
+            paper["issn"] = _get_content("issn")[5:]
         except IndexError:
             pass
 
-        paper['month_string'] = _get_content('issue')
-        paper['pages'] = (_get_content('firstpage') + "-" +
-                          _get_content('lastpage'))
-        paper['full_text_url'] = _get_content('pdf_url')
-        paper['language_q'] = "Q1860"  # English
+        paper["month_string"] = _get_content("issue")
+        paper["pages"] = _get_content("firstpage") + "-" + _get_content("lastpage")
+        paper["full_text_url"] = _get_content("pdf_url")
+        paper["language_q"] = "Q1860"  # English
 
         authors = []
         match = "//meta[@name='citation_author']"
         for element in tree.xpath(match):
-            author = element.attrib['content']
+            author = element.attrib["content"]
             if "," in author:
-                name_parts = author.split(', ')
+                name_parts = author.split(", ")
                 authors.append(name_parts[1] + " " + name_parts[0])
             else:
                 authors.append(author)
-        paper['authors'] = authors
+        paper["authors"] = authors
 
         return Work(paper)
 
@@ -152,14 +145,14 @@ class Jmlr(object):
         """
         entries = []
         for volume in range(1, 2):
-            url = 'http://jmlr.org/papers/v{}'.format(volume)
+            url = "http://jmlr.org/papers/v{}".format(volume)
             response = requests.get(url)
             tree = etree.HTML(response.content)
 
-            elements = tree.xpath('//a')
+            elements = tree.xpath("//a")
             for element in elements:
-                if element.text == '[abs]':
-                    paper_url = url + '/' + element.attrib['href']
+                if element.text == "[abs]":
+                    paper_url = url + "/" + element.attrib["href"]
                     entry = self.scrape_paper_from_url(paper_url)
                     entries.append(entry)
         return entries
@@ -171,19 +164,19 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['scrape']:
+    if arguments["scrape"]:
         print(json.dumps(jmlr.scrape_papers()))
 
-    elif arguments['scrape-paper-from-url']:
-        url = arguments['<url>']
+    elif arguments["scrape-paper-from-url"]:
+        url = arguments["<url>"]
         work = jmlr.scrape_paper_from_url(url)
         print(json.dumps(work))
 
-    elif arguments['paper-url-to-quickstatements']:
-        url = arguments['<url>']
+    elif arguments["paper-url-to-quickstatements"]:
+        url = arguments["<url>"]
         work = jmlr.scrape_paper_from_url(url)
         print(work.to_quickstatements())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

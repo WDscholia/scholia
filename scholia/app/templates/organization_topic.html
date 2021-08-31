@@ -4,29 +4,25 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('recent-literature',
+    {{ sparql_to_table('recent-literature',
      options={
        "linkPrefixes":{
         "author": "../../../author/",
         "work": "../../../work/"
        }
      }
-   )
-}}
+   ) }}
 
-{% endblock %}
-
-
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="h1">Organization-topic</h1>
+    <h1 id="h1">Organization-topic</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<h2 class="headline" id="recent-literature-header">Recent publications</h2>
+    <h2 class="headline" id="recent-literature-header">Recent publications</h2>
 
-<table class="table table-hover" id="recent-literature-table"></table>
+    <table class="table table-hover" id="recent-literature-table"></table>
 
-
-{% endblock %}
+{% endblock page_content %}

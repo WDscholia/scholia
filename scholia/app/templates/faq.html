@@ -2,125 +2,114 @@
 
 {% block page_content %}
 
-<h1 id="h1">Frequently asked questions</h1>
+    <h1 id="h1">Frequently asked questions</h1>
 
+    <dl>
+        <dt>How can I add information to Scholia?</dt>
+        <dd>
+            Scholia's information comes from <a href="https://www.wikidata.org/wiki/">Wikidata</a>
+            and the English Wikipedia,
+            so you should add data there.
+            Use the
+            <a href="https://www.wikidata.org/wiki/Special:Search">search page in Wikidata</a> to
+            examine if the data item you want to add is already in Wikidata.
+            If not, add a new data item with the
+            <a href="https://www.wikidata.org/wiki/Special:NewItem">new item page</a> on the
+            Wikidata site.
+            <br/><br/>
+            There are a number of tools to ease editing Wikidata,
+            e.g. the <a href="https://author-disambiguator.toolforge.org/">Author Disambiguator</a>
+            (by Arthur Smith, based on an initial version by Magnus Manske)
+            that can help identify specific authors based on author name strings.
+        </dd>
 
-<dl>
-    <dt>How can I add information to Scholia?</dt>
-    <dd>
-	Scholia's information comes from <a href="https://www.wikidata.org/wiki/">Wikidata</a>
-	and the English Wikipedia,
-	so you should add data there. 
-	Use the
-	<a href="https://www.wikidata.org/wiki/Special:Search">search page in Wikidata</a> to examine if the data item you want to add is already in Wikidata. 
-	If not, add a new data item with the
-	<a href="https://www.wikidata.org/wiki/Special:NewItem">new item page</a> on the Wikidata site.
-	<br/><br/>
-	There are a number of tools to ease editing Wikidata,
-	<!--
+        <dt>Why is Scholia so biased and incomplete?</dt>
+        <dd>Scholia's data comes mostly from Wikidata, and that data is not
+            complete with respect to scientific articles, their authors, their
+            citations or their annotations.
+            Any scientometrics interpretation needs to keep in mind that the
+            statistics might be severely biased.
+            <br/><br/>
+            The data entered in Wikidata are mostly incorporated from other
+            databases, such as Pubmed Central and CrossRef. Works without
+            DOI are less likely to be added to Wikidata because it is more
+            difficult to automate the data entry. Most citations are also incorporated from other
+            databases. Articles from publishers that do not release their
+            citations (which can be avoided by participating in the initiative
+            <a href="https://i4oc.org/">I4OC</a>) are less likely to have
+            their citations entered in Wikidata. Researchers without an <a
+                    href="https://orcid.org/">ORCID</a>
+            and their works are not publicly available with DOI on the ORCID website are
+            probably also less likely to be linked with their works on
+            Wikidata.
+            There are quite likely other serious biases in Wikidata.
+            Scholia can help highlight some of the biases and facilitate user actions to help
+            address them.
+        </dd>
 
-	    sourcemd is currently disabled.
-	
-	If you want to include a scientific document in Wikidata and it has a DOI, PMID or PMCID identifier
-	then you can use Magnus Manske's <a href="https://sourcemd.toolforge.org/">sourcemd tool</a>
-	(you need a Wikidata account and authorize Manske's tool to edit in Wikidata).
-	If you want to update some information about an author and the
-	author has an ORCID profile with public works, 
-	Magnus Manske's sourcemd tool also 
-	efficiently adds papers and authorships to Wikidata. There are a number of other tools, 
-	-->
-	e.g. the <a href="https://author-disambiguator.toolforge.org/">Author Disambiguator</a> 
-	(by Arthur Smith, based on an initial version by Magnus Manske) 
-	that can help identify specific authors based on author name strings.
-    </dd>
+        <dt>How do I report a problem</dt>
+        <dd>
+            Technical problems and similar are curated at
+            <a href="https://github.com/WDscholia/scholia/issues">Scholia's GitHub issue list</a>.
+            Use the search field to see if your problem is already listed or press
+            "New issue" to make a new issue (you need to have an account on GitHub).
+            <br/><br/>
+            Content-related problems, e.g., wrong data, may be addressed by
+            editing the underlying data in <a href="https://www.wikidata.org/wiki/">Wikidata</a>
+            or leaving a message on the <a
+                href="https://www.wikidata.org/wiki/Wikidata:Project_chat">Wikidata project
+            chat</a>.
+        </dd>
 
-    <dt>Why is Scholia so biased and incomplete?</dt>
-    <dd>Scholia's data comes mostly from Wikidata, and that data is not
-      complete with respect to scientific articles, their authors, their
-      citations or their annotations.
-      Any scientometrics interpretation needs to keep in mind that the
-      statistics might be severely biased.
-      <br/><br/>
-      The data entered in Wikidata are mostly incorporated from other
-      databases, such as Pubmed Central and CrossRef. Works without
-      DOI are less likely to be added to Wikidata because it is more
-      difficult to automate the data entry. Most citations are also incorporated from other
-      databases. Articles from publishers that do not release their
-      citations (which can be avoided by participating in the initiative
-      <a href="https://i4oc.org/">I4OC</a>) are less likely to have
-      their citations entered in Wikidata. Researchers without an <a href="https://orcid.org/">ORCID</a> 
-      and their works are not publicly available with DOI on the ORCID website are
-      probably also less likely to be linked with their works on
-      Wikidata.
-      There are quite likely other serious biases in Wikidata.
-      Scholia can help highlight some of the biases and facilitate user actions to help address them.
-    </dd>
-    
-    <dt>How do I report a problem</dt>
-    <dd>
-	Technical problems and similar are curated at
-	<a href="https://github.com/WDscholia/scholia/issues">Scholia's GitHub issue list</a>. 
-	Use the search field to see if your problem is already listed or press 
-	"New issue" to make a new issue (you need to have an account on GitHub).
-	<br/><br/>
-	Content-related problems, e.g., wrong data, may be addressed by
-	editing the underlying data in <a href="https://www.wikidata.org/wiki/">Wikidata</a>
-	or leaving a message on the <a href="https://www.wikidata.org/wiki/Wikidata:Project_chat">Wikidata project chat</a>. 
-    </dd>
+        <dt>Where can I read more about Scholia</dt>
+        <dd>
+            The <a href="https://www.wikidata.org/wiki/Wikidata:Scholia">Wikidata:Scholia</a> page
+            on Wikidata presents
+            Scholia briefly.
 
-    <dt>Where can I read more about Scholia</dt>
-    <dd>
-	The <a href="https://www.wikidata.org/wiki/Wikidata:Scholia">Wikidata:Scholia</a> page on Wikidata presents
-	Scholia briefly. 
-	
-	<a href="http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/7010/pdf/imm7010.pdf"><em>Scholia, Scientometrics and Wikidata</em></a> is our canonical scientific article about Scholia. 
-	It is based on the shorter article <a href="http://ceur-ws.org/Vol-1878/article-03.pdf"><em>Scholia and scientometrics with Wikidata</em></a>.
-	The article <a href="https://zenodo.org/record/1202256/files/geospatial-data-scholia.pdf"><em>Geospatial data and Scholia</em></a> focuses on the geospatial aspects
-	of Scholia.
+            <a href="http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/7010/pdf/imm7010.pdf"><em>Scholia,
+                Scientometrics and Wikidata</em></a> is our canonical scientific article about
+            Scholia.
+            It is based on the shorter article <a
+                href="http://ceur-ws.org/Vol-1878/article-03.pdf"><em>Scholia and scientometrics
+            with Wikidata</em></a>.
+            The article <a
+                href="https://zenodo.org/record/1202256/files/geospatial-data-scholia.pdf"><em>Geospatial
+            data and Scholia</em></a> focuses on the geospatial aspects
+            of Scholia.
 
-	<br/><br/>
-	
-	<a href="https://commons.wikimedia.org/wiki/File:OSR103_Scholia_%E2%80%93_Profiles_based_on_Wikidata.ogg"><em>Profiles
-	based on Wikidata</em></a> is an 8 minute Open Science Radio
-	podcast interviewing <a href="author/Q20895785">Daniel Mietchen</a>, where he gives an
-	introduction to Scholia.
-	
-	
-	<br/><br/>
+            <br/><br/>
 
-	The <a href="https://commons.wikimedia.org/wiki/File:WikidataCon_2017_-_Scholia.webm"><em>Scholia</em></a>
-	video is a <a href="event/Q37807682">WikidataCon 2017</a> presentation by 
-	<a href="author/Q20980928">Finn Årup Nielsen</a> which 
-	introduces Scholia and demonstrates some parts of the website. 
-	
-    </dd>
+            <a href="https://commons.wikimedia.org/wiki/File:OSR103_Scholia_%E2%80%93_Profiles_based_on_Wikidata.ogg"><em>Profiles
+                based on Wikidata</em></a> is an 8 minute Open Science Radio
+            podcast interviewing <a href="author/Q20895785">Daniel Mietchen</a>, where he gives an
+            introduction to Scholia.
 
-    <dt>How is Scholia funded?</dt>
-    <dd>
-	Scholia has received funding from the <a href="http://sloan.org/">Alfred P. Sloan Foundation</a> under grant number <em>G-2019-11458</em>, as per the grant proposal <a href="https://www.wikidata.org/wiki/Q63433973">Robustifying Scholia: paving the way for knowledge discovery and research assessment through Wikidata</a>.
-    </dd>
+            <br/><br/>
 
+            The <a
+                href="https://commons.wikimedia.org/wiki/File:WikidataCon_2017_-_Scholia.webm"><em>Scholia</em></a>
+            video is a <a href="event/Q37807682">WikidataCon 2017</a> presentation by
+            <a href="author/Q20980928">Finn Årup Nielsen</a> which
+            introduces Scholia and demonstrates some parts of the website.
 
-    <dt>How do I cite Scholia?</dt>
-    <dd>
-	We suggest citing
-        <a href="https://www.wikidata.org/wiki/Q41799194"><em>Scholia, Scientometrics and Wikidata</em></a>,
-	in LaTeX \cite{Q41799194} (if you use Scholia BibTeX).
-    </dd>
+        </dd>
 
-    <!-- dt>How can I contribute to Scholia</dt>
-    <dd>
-	
-    </dd -->
+        <dt>How is Scholia funded?</dt>
+        <dd>
+            Scholia has received funding from the <a href="http://sloan.org/">Alfred P. Sloan
+            Foundation</a> under grant number <em>G-2019-11458</em>, as per the grant proposal <a
+                href="https://www.wikidata.org/wiki/Q63433973">Robustifying Scholia: paving the way
+            for knowledge discovery and research assessment through Wikidata</a>.
+        </dd>
 
-    <!-- dt>Privacy</dt>
-	 <dd>
-	 
-	 </dd -->
+        <dt>How do I cite Scholia?</dt>
+        <dd>
+            We suggest citing
+            <a href="https://www.wikidata.org/wiki/Q41799194"><em>Scholia, Scientometrics and
+                Wikidata</em></a>,
+            in LaTeX \cite{Q41799194} (if you use Scholia BibTeX).
+        </dd>
+    </dl>
 
-
-</dl>
-
-
-{% endblock %}
-    
+{% endblock page_content %}

@@ -1,6 +1,6 @@
 name: Python package
 
-on: [push]
+on: [push, workflow_dispatch]
 
 jobs:
   build:
@@ -8,10 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [2.7, 3.5, 3.7]
+        python: [3.7, 3.8, 3.9]
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
       - name: Install lxml dependencies
         run: sudo apt install libxml2-dev libxslt-dev
       - name: Setup Python
@@ -26,3 +29,13 @@ jobs:
         run: tox -e py  # Run tox using the version of Python in `PATH`
       - name: Run flake8
         run: tox -e flake8
+      - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          FILTER_REGEX_EXCLUDE: .*(\.github|docs/|notebooks/|scholia/app/static/).*
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_PYTHON_MYPY: false
+          VALIDATE_HTML: false
+          VALIDATE_DOCKERFILE: false
+          VALIDATE_DOCKERFILE_HADOLINT: false
+          VALIDATE_JSCPD: false

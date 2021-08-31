@@ -16,20 +16,17 @@ References
 from __future__ import absolute_import, division, print_function
 
 import json
-
 import os
-from os import write
-
 import re
+from os import write
 
 import requests
 
 from feedparser import parse as parse_api
 
+USER_AGENT = "Scholia"
 
-USER_AGENT = 'Scholia'
-
-ARXIV_URL = 'https://export.arxiv.org/'
+ARXIV_URL = "https://export.arxiv.org/"
 
 
 def get_metadata(arxiv):
@@ -77,17 +74,17 @@ def get_metadata(arxiv):
     entry = feed.entries[0]
 
     metadata = {
-        'arxiv': arxiv,
-        'authornames': [author.name for author in entry.authors],
-        'full_text_url': 'https://arxiv.org/pdf/' + arxiv + '.pdf',
-        'publication_date': entry.published[:10],
-        'title': entry.title,
-        'arxiv_classifications': [tag.term for tag in entry.tags],
+        "arxiv": arxiv,
+        "authornames": [author.name for author in entry.authors],
+        "full_text_url": "https://arxiv.org/pdf/" + arxiv + ".pdf",
+        "publication_date": entry.published[:10],
+        "title": entry.title,
+        "arxiv_classifications": [tag.term for tag in entry.tags],
     }
 
     # Optional DOI
     if "arxiv_doi" in entry:
-        metadata['doi'] = entry.arxiv_doi
+        metadata["doi"] = entry.arxiv_doi
 
     return metadata
 
@@ -117,29 +114,25 @@ def metadata_to_quickstatements(metadata):
 
     """
     qs = u"CREATE\n"
-    qs += u'LAST\tP818\t"{}"\n'.format(metadata['arxiv'])
-    qs += u'LAST\tP31\tQ13442814\n'
-    qs += u'LAST\tLen\t"{}"\n'.format(metadata['title'].replace('"', '\"'))
-    qs += u'LAST\tP1476\ten:"{}"\n'.format(
-        metadata['title'].replace('"', '\"'))
-    qs += u'LAST\tP577\t+{}T00:00:00Z/11\n'.format(
-        metadata['publication_date'][:10])
-    qs += u'LAST\tP953\t"{}"\n'.format(
-        metadata['full_text_url'].replace('"', '\"'))
+    qs += u'LAST\tP818\t"{}"\n'.format(metadata["arxiv"])
+    qs += u"LAST\tP31\tQ13442814\n"
+    qs += u'LAST\tLen\t"{}"\n'.format(metadata["title"].replace('"', '"'))
+    qs += u'LAST\tP1476\ten:"{}"\n'.format(metadata["title"].replace('"', '"'))
+    qs += u"LAST\tP577\t+{}T00:00:00Z/11\n".format(metadata["publication_date"][:10])
+    qs += u'LAST\tP953\t"{}"\n'.format(metadata["full_text_url"].replace('"', '"'))
 
     # Optional DOI
-    if 'doi' in metadata:
-        qs += u'LAST\tP356\t"{}"\n'.format(
-            metadata['doi'].replace('"', '\"'))
+    if "doi" in metadata:
+        qs += u'LAST\tP356\t"{}"\n'.format(metadata["doi"].replace('"', '"'))
 
     # arXiv classifications such as "cs.LG"
-    for classification in metadata['arxiv_classifications']:
-        qs += u'LAST\tP820\t"{}"\n'.format(
-            classification.replace('"', '\"'))
+    for classification in metadata["arxiv_classifications"]:
+        qs += u'LAST\tP820\t"{}"\n'.format(classification.replace('"', '"'))
 
-    for n, authorname in enumerate(metadata['authornames'], start=1):
+    for n, authorname in enumerate(metadata["authornames"], start=1):
         qs += u'LAST\tP2093\t"{}"\tP1545\t"{}"\n'.format(
-            authorname.replace('"', '\"'), n)
+            authorname.replace('"', '"'), n
+        )
     return qs
 
 
@@ -170,7 +163,7 @@ def string_to_arxiv(string):
     True
 
     """
-    PATTERN = re.compile(r'\d+\.\d+', flags=re.DOTALL | re.UNICODE)
+    PATTERN = re.compile(r"\d+\.\d+", flags=re.DOTALL | re.UNICODE)
     arxivs = PATTERN.findall(string)
     if len(arxivs) > 0:
         return arxivs[0]
@@ -183,22 +176,22 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['--output']:
-        output_filename = arguments['--output']
+    if arguments["--output"]:
+        output_filename = arguments["--output"]
         output_file = os.open(output_filename, os.O_RDWR | os.O_CREAT)
     else:
         # stdout
         output_file = 1
 
-    output_encoding = 'utf-8'
+    output_encoding = "utf-8"
 
-    if arguments['get-metadata']:
-        arxiv = arguments['<arxiv>']
+    if arguments["get-metadata"]:
+        arxiv = arguments["<arxiv>"]
         metadata = get_metadata(arxiv)
         print(json.dumps(metadata))
 
-    elif arguments['get-quickstatements']:
-        arxiv = arguments['<arxiv>']
+    elif arguments["get-quickstatements"]:
+        arxiv = arguments["<arxiv>"]
         metadata = get_metadata(arxiv)
         quickstatements = metadata_to_quickstatements(metadata)
         write(output_file, quickstatements.encode(output_encoding))
@@ -207,5 +200,5 @@ def main():
         assert False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

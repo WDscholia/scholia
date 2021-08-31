@@ -6,14 +6,15 @@
 
 {% block in_ready %}
 
-{{ sparql_to_404shortinchikey('related') }}
+    {{ sparql_to_404shortinchikey('related') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 
-There was no chemical found with InChIKey={{ inchikey }}. Maybe these related compounds are of interest (may take some time):
+    There was no chemical found with InChIKey={{ inchikey }}. Maybe these related compounds are of
+    interest (may take some time):
 
-<table class="table table-hover" id="related-table"></table>
+    <table class="table table-hover" id="related-table"></table>
 
-{% endblock %}
+{% endblock page_content %}

@@ -4,60 +4,58 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('list-of-publications') }}
-{{ sparql_to_table('venue-statistics') }}
-{{ sparql_to_table('review-statistics') }}
-{{ sparql_to_table('topics') }}
-{{ sparql_to_table('most-cited-works') }}
-{{ sparql_to_table('most-citing-authors') }}
-{{ sparql_to_table('events',
-     options={
-         "linkPrefixes": { "event": "../event/" }
-     }
-   )
-}}
-{{ sparql_to_iframe('publications-per-year') }}
-{{ sparql_to_iframe('pages-per-year') }}
-{{ sparql_to_iframe('topic-scores') }}
-{{ sparql_to_iframe('venue-statistics-chart') }}
-{{ sparql_to_iframe('coauthors') }}
-{{ sparql_to_iframe('coauthor-map') }}
-{{ sparql_to_iframe('other-locations') }}
-{{ sparql_to_iframe('timeline') }}
-{{ sparql_to_iframe('academic-tree') }}
-{{ sparql_to_iframe('citations-by-year') }}
-{{ sparql_to_iframe('associated-images') }}
+    {{ sparql_to_table('list-of-publications') }}
+    {{ sparql_to_table('venue-statistics') }}
+    {{ sparql_to_table('review-statistics') }}
+    {{ sparql_to_table('topics') }}
+    {{ sparql_to_table('most-cited-works') }}
+    {{ sparql_to_table('most-citing-authors') }}
+    {{ sparql_to_table('events', options={"linkPrefixes": { "event": "../event/" }})}}
+    {{ sparql_to_iframe('publications-per-year') }}
+    {{ sparql_to_iframe('pages-per-year') }}
+    {{ sparql_to_iframe('topic-scores') }}
+    {{ sparql_to_iframe('venue-statistics-chart') }}
+    {{ sparql_to_iframe('coauthors') }}
+    {{ sparql_to_iframe('coauthor-map') }}
+    {{ sparql_to_iframe('other-locations') }}
+    {{ sparql_to_iframe('timeline') }}
+    {{ sparql_to_iframe('academic-tree') }}
+    {{ sparql_to_iframe('citations-by-year') }}
+    {{ sparql_to_iframe('associated-images') }}
+    {{ sparql_to_matrix('topics-works-matrix') }}
 
-{{ sparql_to_matrix('topics-works-matrix') }}
-
-
-{% endblock %}
-
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="h1">Author</h1>
-<script type="application/ld+json" id="bioschemas"></script>
+    <h1 id="h1">Author</h1>
+    <script type="application/ld+json" id="bioschemas"></script>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="wembedder"></div>
+    <div id="wembedder"></div>
 
-<div id="details"></div>
+    <div id="details"></div>
 
-<h2 id="list-of-publications-header">List of publications <a href="{{ url_for('app.show_author_index') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+    <h2 id="list-of-publications-header">List of publications
+        <a href="{{ url_for('app.show_author_index') }}{{ q }}/latest-works/rss">
+            <img height="24"
+                 width="48"
+                 src="{{ url_for('static', filename='images/rss-40674_320.png') }}"
+                 alt="RSS icon"/></a>
+    </h2>
 
-<table class="table table-hover" id="list-of-publications-table"></table>
+    <table class="table table-hover" id="list-of-publications-table"></table>
 
-
-<!--      SourceMD does currently not work
+    <!--      SourceMD does currently not work
 
 div>
 
 
     Missing publications? 
     {% if first_initial and last_name %}
-    <a href="https://query.wikidata.org/#select%20%2a%20where%20%7B%20%3Fwork%20wdt%3AP2093%20%3Fauthorname%20.%20filter%28regex%28%3Fauthorname%2C%20%27%5E{{ first_initial | urlencode }}.%2b{{ last_name | urlencode }}%24%27%29%29%20%7D%20limit%201">Search for unlinked works on Wikidata</a>
+    <a href="https://query.wikidata.org/#select%20%2a%20where%20%7B%20%3Fwork%20wdt%3AP2093%20%3Fauthorname%20.%20filter%28regex%28%3Fauthorname%2C%20%27%5E
+        {{ first_initial | urlencode }}.%2b{{ last_name | urlencode }}%24%27%29%29%20%7D%20limit%201">Search for unlinked works on Wikidata</a>
     or
     add new ones with <a href="https://sourcemd.toolforge.org/">sourcemd</a>.
     {% else %}
@@ -66,128 +64,119 @@ div>
     
 </div -->
 
+    <h3 id="publications-per-year-header">Number of publications per year</h3>
 
-<h3 id="publications-per-year-header">Number of publications per year</h3>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
-</div>
+    <h3 id="pages-per-year-header">Number of pages per year</h3>
 
+    (Only articles with number of pages set are displayed)
 
-<h3 id="pages-per-year-header">Number of pages per year</h3>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="pages-per-year-iframe"></iframe>
+    </div>
 
-(Only articles with number of pages set are displayed)
+    <h2>Topics</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="pages-per-year-iframe"></iframe>
-</div>
+    <h3 id="topic-scores-header">Topic scores</h3>
 
-<h2>Topics</h2>
+    Topics based on a weighting between fields of work,
+    topics of authored works and topics of citing works.
 
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="topic-scores-iframe"></iframe>
+    </div>
 
-<h3 id="topic-scores-header">Topic scores</h3>
+    <h3 id="topics-header">Topics of authored works</h3>
 
-Topics based on a weighting between fields of work,
-topics of authored works and topics of citing works.  
+    <table class="table table-hover" id="topics-table"></table>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="topic-scores-iframe"></iframe>
-</div>
+    <h3 id="Topics-works matrix">Topics-works matrix</h3>
 
+    <div id="topics-works-matrix"></div>
 
-<h3 id="topics-header">Topics of authored works</h3>
+    <h2 id="venue-statistics-header">Venue statistics</h2>
 
-<table class="table table-hover" id="topics-table"></table>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="venue-statistics-chart-iframe"></iframe>
+    </div>
 
-<h3 id="Topics-works matrix">Topics-works matrix</h3>
+    <table class="table table-hover" id="venue-statistics-table"></table>
 
-<div id="topics-works-matrix"></div>
+    <h2 id="review-statistics-header">Review statistics</h2>
+    <p>This author has reviewed for the following journals.</p>
+    <table class="table table-hover" id="review-statistics-table"></table>
 
+    <h2 id="coauthors-header" data-toogle="tooltip"
+        title="Co-author graph for the author (up to 1000 links)">Co-author graph</h2>
 
-<h2 id="venue-statistics-header">Venue statistics</h2>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="coauthors-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="venue-statistics-chart-iframe"></iframe>
-</div>
+    Are co-authors missing here? You can help curate them via the
+    <a href="{{ url_for('app.show_author_index') }}{{ q }}/curation">curation</a> page.
 
-<table class="table table-hover" id="venue-statistics-table"></table>
+    <h2 id="coauthor-map-header">Co-author map</h2>
 
-<h2 id="review-statistics-header">Review statistics</h2>
-<p>This author has reviewed for the following journals.</p>
-<table class="table table-hover" id="review-statistics-table"></table>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="coauthor-map-iframe"></iframe>
+    </div>
 
-<h2 id="coauthors-header" data-toogle="tooltip" title="Co-author graph for the author (up to 1000 links)">Co-author graph</h2>
+    <h2 id="other-locations-header">Other locations</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="coauthors-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="other-locations-iframe"></iframe>
+    </div>
 
-Are co-authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_index') }}{{ q }}/curation">curation</a> page.
+    <h2 id="timeline-header">Timeline</h2>
 
-<h2 id="coauthor-map-header">Co-author map</h2>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="coauthor-map-iframe"></iframe>
-</div>
+    <h2 id="academic-tree-header">Academic tree</h2>
 
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="academic-tree-iframe"></iframe>
+    </div>
 
-<h2 id="other-locations-header">Other locations</h2>
+    <h2>Citation statistics</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="other-locations-iframe"></iframe>
-</div>
+    <h3 id="most-cited-works-header">Most cited works</h3>
 
+    Works of the author ordered according to number of citations received.
 
-<h2 id="timeline-header">Timeline</h2>
+    <table class="table table-hover" id="most-cited-works-table"></table>
 
+    <h3 id="citations-by-year-header">Citations by year</h3>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="citations-by-year-iframe"></iframe>
+    </div>
 
-<h2 id="academic-tree-header">Academic tree</h2>
+    <h3 id="most-citing-authors-header">Citing authors</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="academic-tree-iframe"></iframe>
-</div>
+    Authors that cite the author (excluding self citations).
 
+    <table class="table table-hover" id="most-citing-authors-table"></table>
 
-<h2>Citation statistics</h2>
+    Are citing authors missing here? You can help curate them via the
+    <a href="{{ url_for('app.show_author_index') }}{{ q }}/curation">curation</a> page.
 
-<h3 id="most-cited-works-header">Most cited works</h3>
+    <h2 id="associated-images-header">Associated images</h2>
 
-Works of the author ordered according to number of citations received.
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="associated-images-iframe"></iframe>
+    </div>
 
-<table class="table table-hover" id="most-cited-works-table"></table>
+    <h2 id="events-header">Events</h2>
 
+    Conferences, workshops and other events the author has attended or otherwise been associated
+    with.
 
-<h3 id="citations-by-year-header">Citations by year</h3>
+    <table class="table table-hover table-striped" id="events-table"></table>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="citations-by-year-iframe"></iframe>
-</div>
-
-
-<h3 id="most-citing-authors-header">Citing authors</h3>
-
-Authors that cite the author (excluding self citations).
-
-<table class="table table-hover" id="most-citing-authors-table"></table>
-
-Are citing authors missing here? You can help curate them via the <a href="{{ url_for('app.show_author_index') }}{{ q }}/curation">curation</a> page.
-
-<h2 id="associated-images-header">Associated images</h2>
-
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="associated-images-iframe"></iframe>
-</div>
-
-
-<h2 id="events-header">Events</h2>
-
-Conferences, workshops and other events the author has attended or otherwise been associated with.
-
-<table class="table table-hover table-striped" id="events-table"></table>
-
-{% endblock %}
-
+{% endblock page_content %}

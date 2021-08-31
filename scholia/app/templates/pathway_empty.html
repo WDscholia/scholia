@@ -5,68 +5,68 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('statistics') }}
+    {{ sparql_to_table('statistics') }}
 
-{% endblock %}
-
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1>Biological pathways</h1>
+    <h1>Biological pathways</h1>
 
-<div class="container">
+    <div class="container">
 
-    <h2>Examples</h2>
+        <h2>Examples</h2>
 
-    <div class="card-deck mb-3">
-	<div class="card mb-4 box-shadow">
+        <div class="card-deck mb-3">
+            <div class="card mb-4 box-shadow">
 
-            <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Single items</h4>
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Single items</h4>
+                </div>
+                <div class="card-body">
+                    <dl>
+                        <dt><a href="Q30225516">Aryl Hydrocarbon Receptor Pathway</a></dt>
+                        <dd>
+                            A pathway from WikiPathways.
+                        </dd>
+
+                        <dt><a href="Q30225468">TNF related weak inducer of apoptosis (TWEAK)
+                            Signaling Pathway</a></dt>
+                        <dd>
+                            A pathway from WikiPathways.
+                        </dd>
+
+                        <dt><a href="Q50294491">Acetyl-CoA + H2O + Oxaloacetate => Citrate +
+                            CoA</a></dt>
+                        <dd>
+                            A pathway from Reactome.
+                        </dd>
+                    </dl>
+                </div>
             </div>
-            <div class="card-body">
-		<dl>
-		    <dt><a href="Q30225516">Aryl Hydrocarbon Receptor Pathway</a></dt>
-		    <dd>
-			A pathway from WikiPathways.
-		    </dd>
 
-		    <dt><a href="Q30225468">TNF related weak inducer of apoptosis (TWEAK) Signaling Pathway</a></dt>
-		    <dd>
-			A pathway from WikiPathways.
-		    </dd>
-
-		    <dt><a href="Q50294491">Acetyl-CoA + H2O + Oxaloacetate => Citrate + CoA</a></dt>
-		    <dd>
-			A pathway from Reactome.
-		    </dd>
-		</dl>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+                </div>
+                <div class="card-body">
+                    <p>If you know the identifier then Scholia can make a lookup based on the
+                        identifier:</p>
+                    <dl>
+                        <dt><a href="../wikipathways/WP111">wikipathways/WP111</a></dt>
+                        <dd>Lookup WikiPathways identifier WP111, <i>Electron Transport Chain
+                            (OXPHOS system in mitochondria)</i></dd>
+                    </dl>
+                </div>
             </div>
-
-	</div>
-
-
-     <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
-	    </div>
-	    <div class="card-body">
-		<p>If you know the identifier then Scholia can make a lookup based on the identifier:</p>
-
-		<dl>
-		    <dt><a href="../wikipathways/WP111">wikipathways/WP111</a></dt>
-		    <dd>Lookup WikiPathways identifier  WP111, <i>Electron Transport Chain (OXPHOS system in mitochondria)</i></dd>
-		</dl>
-	    </div>
         </div>
     </div>
-</div>
 
-<div class="container">
-  <h2 id="statistics-header">Statistics</h2>
+    <div class="container">
+        <h2 id="statistics-header">Statistics</h2>
 
-  <table class="table table-hover" id="statistics-table"></table>
+        <table class="table table-hover" id="statistics-table"></table>
 
-</div>
+    </div>
 
-{% endblock %}  
+{% endblock page_content %}

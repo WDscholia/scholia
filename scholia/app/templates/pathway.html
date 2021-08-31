@@ -4,45 +4,49 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('participants') }}
-{{ sparql_to_table('citing-articles') }}
-{{ sparql_to_table('recent-articles') }}
-{{ sparql_to_iframe('publications-per-year') }}
-{{ sparql_to_pathway_viewer('optional_data_values') }}
+    {{ sparql_to_table('participants') }}
+    {{ sparql_to_table('citing-articles') }}
+    {{ sparql_to_table('recent-articles') }}
+    {{ sparql_to_iframe('publications-per-year') }}
+    {{ sparql_to_pathway_viewer('optional_data_values') }}
 
-{% endblock %}
-
+{% endblock in_ready %}
 
 {% block page_content %}
-<h1 id="h1">Pathway</h1>
+    <h1 id="h1">Pathway</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="description"></div><br />
+    <div id="description"></div><br/>
 
-<div id="pathway-viewer" class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="" style="border-width: 1px; border-color: rgb(222,226,230); border-style: solid;" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
-</div>
+    <div id="pathway-viewer" class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" src=""
+                style="border-width: 1px; border-color: rgb(222,226,230); border-style: solid;"
+                referrerpolicy="origin"
+                sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+    </div>
 
-<h2 id="Organism">Organism</h2>
+    <h2 id="Organism">Organism</h2>
 
-<h2 id="participants-header">Participants</h2>
+    <h2 id="participants-header">Participants</h2>
 
-<table class="table table-hover" id="participants-table"></table>
+    <table class="table table-hover" id="participants-table"></table>
 
-<h2 id="recent-articles-header">Published works related to the pathway</h2>
+    <h2 id="recent-articles-header">Published works related to the pathway</h2>
 
-<table class="table table-hover" id="recent-articles-table"></table>
+    <table class="table table-hover" id="recent-articles-table"></table>
 
 
-<h2 id="citing-articles-header">Works citing this pathway</h2>
+    <h2 id="citing-articles-header">Works citing this pathway</h2>
 
-<table class="table table-hover" id="citing-articles-table"></table>
+    <table class="table table-hover" id="citing-articles-table"></table>
 
-<h2 id="publications-per-year-header">Publications per year</h2>
+    <h2 id="publications-per-year-header">Publications per year</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" id="publications-per-year-iframe" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="publications-per-year-iframe"
+                referrerpolicy="origin"
+                sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+    </div>
 
-{% endblock %}
+{% endblock page_content %}

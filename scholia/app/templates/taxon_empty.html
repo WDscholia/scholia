@@ -4,63 +4,58 @@
 
 {% block page_content %}
 
-<h1>Taxa</h1>
+    <h1>Taxa</h1>
 
-<div class="container">
+    <div class="container">
 
-    <h2>Examples</h2>
+        <h2>Examples</h2>
 
-    <div class="card-deck mb-3">
-	<div class="card mb-4 box-shadow">
+        <div class="card-deck mb-3">
+            <div class="card mb-4 box-shadow">
 
-            <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Single items</h4>
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Single items</h4>
+                </div>
+                <div class="card-body">
+                    <dl>
+                        <dt><a href="Q15978631">Human</a></dt>
+                        <dd>
+                            View information about Homo sapiens.
+                        </dd>
+
+                        <dt><a href="Q12024">Pine</a></dt>
+                        <dd>
+                            Information about the Pinus family.
+                        </dd>
+
+                        <dt><a href="Q25485">Parus major</a></dt>
+                        <dd>
+                            Great tit.
+                        </dd>
+
+                        <dt><a href="Q91703">Caenorhabditis elegans</a></dt>
+                        <dd>
+                            The C. elegans roundworm
+                        </dd>
+                    </dl>
+                </div>
             </div>
-            <div class="card-body">
-		<dl>
-		    <dt><a href="Q15978631">Human</a></dt>
-		    <dd>
-			View information about Homo sapiens.
-		    </dd>
 
-		    <dt><a href="Q12024">Pine</a></dt>
-		    <dd>
-			Information about the Pinus family.
-		    </dd>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+                </div>
+                <div class="card-body">
+                    <p>If you know the identifier then Scholia can make a lookup based on the
+                        identifier:</p>
 
-		    <dt><a href="Q25485">Parus major</a></dt>
-		    <dd>
-			Great tit.
-		    </dd>
-
-		    <dt><a href="Q91703">Caenorhabditis elegans</a></dt>
-		    <dd>
-			The C. elegans roundworm
-		    </dd>
-		</dl>
+                    <dl>
+                        <dt><a href="../ncbi-taxon/694009">ncbi-taxon/694009</a></dt>
+                        <dd>Information on SARSr-CoV.</dd>
+                    </dl>
+                </div>
             </div>
-
-	</div>
-
-     <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
-	    </div>
-	    <div class="card-body">
-		<p>If you know the identifier then Scholia can make a lookup based on the identifier:</p>
-
-		<dl>
-		    <dt><a href="../ncbi-taxon/694009">ncbi-taxon/694009</a></dt>
-		    <dd>Information on SARSr-CoV.</dd>
-		</dl>
-	    </div>
         </div>
     </div>
-</div>
 
-</div>
-
-
-{% endblock %}
-
-  
+{% endblock page_content %}

@@ -3,51 +3,46 @@
 {% set aspect = "works" %}
 
 {% block in_ready %}
- 
-{{ sparql_to_table('list-of-works') }}
-{{ sparql_to_table('authors') }}
-{{ sparql_to_table('citing-works') }}
 
-{{ sparql_to_iframe('citations-per-year') }}
-{{ sparql_to_iframe('topics') }}
+    {{ sparql_to_table('list-of-works') }}
+    {{ sparql_to_table('authors') }}
+    {{ sparql_to_table('citing-works') }}
+    {{ sparql_to_iframe('citations-per-year') }}
+    {{ sparql_to_iframe('topics') }}
 
-{% endblock %}
-
-
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="h1">Works</h1>
+    <h1 id="h1">Works</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
+    <table class="table table-hover" id="list-of-works-table"></table>
 
-<table class="table table-hover" id="list-of-works-table"></table>
+    <h2 id="authors-header">Authors</h2>
 
-
-<h2 id="authors-header">Authors</h2>
-
-<table class="table table-hover" id="authors-table"></table>
+    <table class="table table-hover" id="authors-table"></table>
 
 
-<h2 id="topics-header">Topics</h2>
+    <h2 id="topics-header">Topics</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="topics-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="topics-iframe"></iframe>
+    </div>
 
+    <h2 id="Citations">Citations</h2>
 
-<h2 id="Citations">Citations</h2>
+    <h3 id="citing-works-header">Citing works</h3>
 
-<h3 id="citing-works-header">Citing works</h3>
+    <table class="table table-hover" id="citing-works-table"></table>
 
-<table class="table table-hover" id="citing-works-table"></table>
+    <h3 id="citations-per-year-header">Citations per year</h3>
 
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="citations-per-year-iframe"
+                referrerpolicy="origin"
+                sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+    </div>
 
-<h3 id="citations-per-year-header">Citations per year</h3>
-
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="citations-per-year-iframe" referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-popups" ></iframe>
-</div>
-
-{% endblock %}
+{% endblock page_content %}

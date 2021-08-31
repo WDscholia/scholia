@@ -37,28 +37,28 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['--output']:
-        output_filename = arguments['--output']
+    if arguments["--output"]:
+        output_filename = arguments["--output"]
         output_file = os.open(output_filename, os.O_RDWR | os.O_CREAT)
     else:
         # stdout
         output_file = 1
 
-    output_encoding = 'utf-8'
+    output_encoding = "utf-8"
 
-    if arguments['arxiv-to-quickstatements']:
-        arxiv_id = arguments['<arxiv>']
+    if arguments["arxiv-to-quickstatements"]:
+        arxiv_id = arguments["<arxiv>"]
         metadata = arxiv.get_metadata(arxiv_id)
         quickstatements = arxiv.metadata_to_quickstatements(metadata)
         write(output_file, quickstatements.encode(output_encoding))
 
-    elif arguments['orcid-to-q']:
-        qs = orcid_to_qs(arguments['<orcid>'])
+    elif arguments["orcid-to-q"]:
+        qs = orcid_to_qs(arguments["<orcid>"])
         if len(qs) > 0:
             print(qs[0])
 
-    elif arguments['string-to-type']:
-        type = string_to_type(arguments['<string>'])
+    elif arguments["string-to-type"]:
+        type = string_to_type(arguments["<string>"])
         print(type)
 
     elif arguments['run']:
@@ -71,5 +71,5 @@ def main():
         app.run(debug=True, port=8100)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

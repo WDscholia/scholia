@@ -4,111 +4,103 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table_post('data') }}
-{{ sparql_to_table('list-of-authors') }}
-{{ sparql_to_table('related-works') }}
-{{ sparql_to_table('citations') }}
-{{ sparql_to_table('cited-works') }}
-{{ sparql_to_table('cited-work-authors') }}
-{{ sparql_to_table('wikipedia-mentions') }}
-{{ sparql_to_table('statements') }}
+    {{ sparql_to_table_post('data') }}
+    {{ sparql_to_table('list-of-authors') }}
+    {{ sparql_to_table('related-works') }}
+    {{ sparql_to_table('citations') }}
+    {{ sparql_to_table('cited-works') }}
+    {{ sparql_to_table('cited-work-authors') }}
+    {{ sparql_to_table('wikipedia-mentions') }}
+    {{ sparql_to_table('statements') }}
+    {{ sparql_to_iframe('topic-scores') }}
+    {{ sparql_to_iframe('timeline') }}
+    {{ sparql_to_iframe('citation-graph') }}
+    {{ sparql_to_iframe('citations-per-year') }}
 
-{{ sparql_to_iframe('topic-scores') }}
-{{ sparql_to_iframe('timeline') }}
-{{ sparql_to_iframe('citation-graph') }}
-{{ sparql_to_iframe('citations-per-year') }}
-
-{% endblock %}
-
+{% endblock in_ready %}
 
 {% block page_content %}
-<h1 id="h1">Work</h1>
+    <h1 id="h1">Work</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="details"></div>
+    <div id="details"></div>
 
-<table class="table table-hover" id="data-table"></table>
+    <table class="table table-hover" id="data-table"></table>
 
-<h2 id="list-of-authors-header">List of authors</h2>
+    <h2 id="list-of-authors-header">List of authors</h2>
 
-<table class="table table-hover" id="list-of-authors-table"></table>
+    <table class="table table-hover" id="list-of-authors-table"></table>
 
-Are authors missing here? You can help curate them via the <a href="https://author-disambiguator.toolforge.org/work_item_oauth.php?id={{ q }}&doit=Get+author+links+for+work">Author Disambiguator page for this work</a>.
+    Are authors missing here? You can help curate them via the
+    <a href="https://author-disambiguator.toolforge.org/work_item_oauth.php?id={{ q }}&doit=Get+author+links+for+work">Author
+        Disambiguator page for this work</a>.
 
-<h2 id="topic-scores-header">Topic scores</h2>
+    <h2 id="topic-scores-header">Topic scores</h2>
 
-Topics based on a weighting between main subject of work, cited and citing works.
+    Topics based on a weighting between main subject of work, cited and citing works.
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="topic-scores-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="topic-scores-iframe"></iframe>
+    </div>
 
+    <h2 id="timeline-header">Timeline</h2>
 
-<h2 id="timeline-header">Timeline</h2>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
-</div>
+    <h2>Related works</h2>
 
-<h2>Related works</h2>
+    <h3 title="related-works-header">Related works from co-citation analysis</h3>
 
-<h3 title="related-works-header">Related works from co-citation analysis</h3>
+    <table class="table table-hover" id="related-works-table"></table>
 
-<table class="table table-hover" id="related-works-table"></table>
+    <h3 title="Wembedder knowledge graph embedding related works">Related works from knowledge
+        graph embedding</h3>
 
+    <div id="wembedder"></div>
 
-<h3 title="Wembedder knowledge graph embedding related works">Related works from knowledge graph embedding</h3>
+    <h2>Citations</h2>
 
-<div id="wembedder"></div>
+    <h3 id="citations-header">Citations to the work</h3>
 
+    Recent citations to the work
 
-<h2>Citations</h2>
+    <table class="table table-hover" id="citations-table"></table>
 
+    <h3 id="cited-works-header">Cited works</h3>
 
-<h3 id="citations-header">Citations to the work</h3>
+    <table class="table table-hover" id="cited-works-table"></table>
 
-Recent citations to the work
+    <h3 id="cited-work-authors-header">Authors of cited works</h3>
 
-<table class="table table-hover" id="citations-table"></table>
+    <table class="table table-hover" id="cited-work-authors-table"></table>
 
+    <h3 id="citation-graph-header"
+        title="Partial citation graph around the work with the up to 40 most important works displayed">
+        Citation graph</h3>
 
-<h3 id="cited-works-header">Cited works</h3>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="citation-graph-iframe"></iframe>
+    </div>
 
-<table class="table table-hover" id="cited-works-table"></table>
+    <h3 id="citations-per-year-header"
+        title="Number of citations to the work per year">Citations per year</h3>
 
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="citations-per-year-iframe"></iframe>
+    </div>
 
-<h3 id="cited-work-authors-header">Authors of cited works</h3>
+    <h2 id="wikipedia-mentions-header">Wikipedia mentions</h2>
 
-<table class="table table-hover" id="cited-work-authors-table"></table>
+    <table class="table table-hover" id="wikipedia-mentions-table"></table>
 
+    <h2 id="statements-header">Supports the following statement(s)</h2>
 
-<h3 id="citation-graph-header" title="Partial citation graph around the work with the up to 40 most important works displayed">Citation graph</h3>
+    Statements in Wikidata supported by references to this work.
+    Only a maximum of around 2000 statements are shown.
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="citation-graph-iframe"></iframe>
-</div>
+    <table class="table table-hover" id="statements-table"></table>
 
-<h3 id="citations-per-year-header"
-    title="Number of citations to the work per year">Citations per year</h3>
-
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="citations-per-year-iframe"></iframe>
-</div>
-
-
-<h2 id="wikipedia-mentions-header">Wikipedia mentions</h2>
-
-<table class="table table-hover" id="wikipedia-mentions-table"></table>
-
-
-
-<h2 id="statements-header">Supports the following statement(s)</h2>
-
-Statements in Wikidata supported by references to this work.
-Only a maximum of around 2000 statements are shown.
-
-<table class="table table-hover" id="statements-table"></table>
-  
-{% endblock %}
-    
+{% endblock page_content %}

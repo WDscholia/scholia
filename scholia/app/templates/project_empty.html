@@ -4,107 +4,110 @@
 
 {% block title %}Project - Scholia{% endblock %}
 
-
 {% block in_ready %}
 
-{{ sparql_to_table('statistics') }}
+    {{ sparql_to_table('statistics') }}
+    {{ sparql_to_table('citations-per-budget') }}
 
-{{ sparql_to_table('citations-per-budget') }}
-
-{% endblock %}
-
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="project-header">Project</h1>
+    <h1 id="project-header">Project</h1>
 
-Research projects.
+    Research projects.
 
 
-<div class="container">
+    <div class="container">
 
-<h2 id="examples-header">Examples</h2>
+        <h2 id="examples-header">Examples</h2>
 
-<div class="card-deck mb-3">
-	<div class="card mb-4 box-shadow">
+        <div class="card-deck mb-3">
+            <div class="card mb-4 box-shadow">
 
-		<div class="card-header">
-			<h4 class="my-0 font-weight-normal">Individual Projects</h4>
-		</div>
-		<div class="card-body">
-			<dl>
-				<dt><a href="Q27990087">eNanoMapper</a></dt>
-				<dd>
-					View information about the eNanoMapper project.
-				</dd>
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Individual Projects</h4>
+                </div>
+                <div class="card-body">
+                    <dl>
+                        <dt><a href="Q27990087">eNanoMapper</a></dt>
+                        <dd>
+                            View information about the eNanoMapper project.
+                        </dd>
 
-				<dt><a href="Q52268104">AMYTOX</a></dt>
-				<dd>
-					View information about the ERC Advanced Grant
-					Amyloid fibril cytotoxicity: new insights from novel approaches (AMYTOX).
-				</dd>
+                        <dt><a href="Q52268104">AMYTOX</a></dt>
+                        <dd>
+                            View information about the ERC Advanced Grant
+                            Amyloid fibril cytotoxicity: new insights from novel approaches
+                            (AMYTOX).
+                        </dd>
 
-				<dt><a href="Q54514942">MAPAWAMO</a></dt>
-				<dd>
-					View information about the Mapping visual cortical regions in awake, behaving monkey using functional MRI (MAPAWAMO) project.
-				</dd>
+                        <dt><a href="Q54514942">MAPAWAMO</a></dt>
+                        <dd>
+                            View information about the Mapping visual cortical regions in awake,
+                            behaving monkey using functional MRI (MAPAWAMO) project.
+                        </dd>
 
-				<dt><a href="Q54826536">Measuring with no tape</a></dt>
-				<dd>
-					View information about the ERC Starting Grant
-					Measuring with no tape.
-				</dd>
+                        <dt><a href="Q54826536">Measuring with no tape</a></dt>
+                        <dd>
+                            View information about the ERC Starting Grant
+                            Measuring with no tape.
+                        </dd>
 
-				<dt><a href="Q55089213">High-Definition Tomography</a></dt>
-				<dd>
-					View information about the ERC Advanced Grant
-					High-Definition Tomography.
-				</dd>
-			</dl>
-		</div>
-	</div>
+                        <dt><a href="Q55089213">High-Definition Tomography</a></dt>
+                        <dd>
+                            View information about the ERC Advanced Grant
+                            High-Definition Tomography.
+                        </dd>
+                    </dl>
+                </div>
+            </div>
 
-     <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		    <h4 class="my-0 font-weight-normal">Clusters</h4>
-	    </div>
-	    <div class="card-body">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Clusters</h4>
+                </div>
+                <div class="card-body">
 
-			<dl>
-				<dt><a href="Q27949537">EU NanoSafety Cluster</a></dt>
-				<dd>A long running European Commission funded cluster of
-					research projects that are working together.</dd>
-			</dl>
-	    </div>
-	</div>
+                    <dl>
+                        <dt><a href="Q27949537">EU NanoSafety Cluster</a></dt>
+                        <dd>A long running European Commission funded cluster of
+                            research projects that are working together.
+                        </dd>
+                    </dl>
+                </div>
+            </div>
 
-    <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
-	    </div>
-	    <div class="card-body">
-			<p>If you know the identifier then Scholia can make a lookup based on the identifier:</p>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+                </div>
+                <div class="card-body">
+                    <p>If you know the identifier then Scholia can make a lookup based on the
+                        identifier:</p>
 
-			<dl>
-				<dt><a href="../cordis/310584">cordis/310584</a></dt>
-				<dd>Lookup CORDIS 310584. This will identify NANoREG
-				and redirect to its Scholia page.</dd>
-			</dl>
-	    </div>
-	</div>
+                    <dl>
+                        <dt><a href="../cordis/310584">cordis/310584</a></dt>
+                        <dd>Lookup CORDIS 310584. This will identify NANoREG
+                            and redirect to its Scholia page.
+                        </dd>
+                    </dl>
+                </div>
+            </div>
 
-</div>
+        </div>
 
-<div class="container">
+        <div class="container">
 
-<h2 id="statistics-header">Statistics</h2>
+            <h2 id="statistics-header">Statistics</h2>
 
-<table class="table table-hover" id="statistics-table"></table>
+            <table class="table table-hover" id="statistics-table"></table>
 
-<h3 id="citations-per-budget-header">Citations per budget</h3>
+            <h3 id="citations-per-budget-header">Citations per budget</h3>
 
-<table class="table table-hover" id="citations-per-budget-table"></table>
+            <table class="table table-hover" id="citations-per-budget-table"></table>
 
-</div>
+        </div>
+    </div>
 
-{% endblock %}
+{% endblock page_content %}

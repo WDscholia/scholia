@@ -5,43 +5,39 @@
 
 {% block in_ready %}
 
-{{ sparql_to_iframe('statistics') }}
+    {{ sparql_to_iframe('statistics') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1>Award</h1>
+    <h1>Award</h1>
 
-Awards, prizes.
+    Awards, prizes.
 
-<h2>Examples</h2>
+    <h2>Examples</h2>
 
-<ul>
-    <li><a href="Q35637">Nobel Peace Prize</a></li>
-    <li><a href="Q37922">Nobel Prize in Literature</a></li>
-    <li><a href="Q38104">Nobel Prize in Physics</a></li>
-    <li><a href="Q44585">Nobel Prize in Chemistry</a></li>
-    <li><a href="Q47170">Sveriges Riksbank Prize in Economic Sciences in Memory of Alfred Nobel</a>
-    <li><a href="Q80061">Nobel Prize in Physiology or Medicine</a></li>
-    <li><a href="Q185667">Turing Award</a></li>
-    <li><a href="Q583069">Crafoord Prize</a></li>
-    <li><a href="Q18357422">Brain Prize</a></li>
-    <li><a href="Q27864180">Jorck's Prize</a></li>
-    <li><a href="Q263735">Jean Nicod Prize</a></li>
-</ul>
+    <ul>
+        <li><a href="Q35637">Nobel Peace Prize</a></li>
+        <li><a href="Q37922">Nobel Prize in Literature</a></li>
+        <li><a href="Q38104">Nobel Prize in Physics</a></li>
+        <li><a href="Q44585">Nobel Prize in Chemistry</a></li>
+        <li><a href="Q47170">Sveriges Riksbank Prize in Economic Sciences in Memory of Alfred
+            Nobel</a></li>
+        <li><a href="Q80061">Nobel Prize in Physiology or Medicine</a></li>
+        <li><a href="Q185667">Turing Award</a></li>
+        <li><a href="Q583069">Crafoord Prize</a></li>
+        <li><a href="Q18357422">Brain Prize</a></li>
+        <li><a href="Q27864180">Jorck's Prize</a></li>
+        <li><a href="Q263735">Jean Nicod Prize</a></li>
+    </ul>
 
-<h2>Aggregates</h2>
+    <h2>Aggregates</h2>
 
-<h3 id="statistics-header">Male-female statistics</h3>
+    <h3 id="statistics-header">Male-female statistics</h3>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="statistics-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="statistics-iframe"></iframe>
+    </div>
 
-
-
-
-{% endblock %}
-
-  
+{% endblock page_content %}

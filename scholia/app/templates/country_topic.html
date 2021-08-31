@@ -4,39 +4,35 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('authors') }}
+    {{ sparql_to_table('authors') }}
+    {{ sparql_to_iframe('coauthors-graph') }}
+    {{ sparql_to_iframe('cocitations-graph') }}
 
-{{ sparql_to_iframe('coauthors-graph') }}
-
-{{ sparql_to_iframe('cocitations-graph') }}
-
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="h1">Country-topic</h1>
+    <h1 id="h1">Country-topic</h1>
 
-<div id="intro"></div>
-
-
-<h2 id="authors-header">Authors of the country who published on the topics</h2>
-
-<table class="table table-hover" id="authors-table"></table>
+    <div id="intro"></div>
 
 
-<h2 id="coauthors-graph-header">Co-author graph</h2>
+    <h2 id="authors-header">Authors of the country who published on the topics</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="coauthors-graph-iframe"></iframe>
-</div>
+    <table class="table table-hover" id="authors-table"></table>
 
+    <h2 id="coauthors-graph-header">Co-author graph</h2>
 
-<h2 id="cocitations-graph-header">Co-citation graph</h2>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="coauthors-graph-iframe"></iframe>
+    </div>
 
-Citations between authors of the country who published on the topic.
+    <h2 id="cocitations-graph-header">Co-citation graph</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="cocitations-graph-iframe"></iframe>
-</div>
-    
-{% endblock %}
+    Citations between authors of the country who published on the topic.
+
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="cocitations-graph-iframe"></iframe>
+    </div>
+
+{% endblock page_content %}

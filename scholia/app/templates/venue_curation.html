@@ -1,37 +1,34 @@
 {% extends "base.html" %}
 
-
 {% set aspect = "venue-curation" %}
 
 {% block in_ready %}
 
-{{ sparql_to_table('missing-author-item') }}
-{{ sparql_to_table('missing-topics',
-    options={
+    {{ sparql_to_table('missing-author-item') }}
+    {{ sparql_to_table('missing-topics',options={
       "linkPrefixes": {
         "work": "../../work/",
       }})}}
 
-{% endblock %}
-
+{% endblock in_ready %}
 
 {% block page_content %}
-<h1 id="h1">Venue</h1>
+    <h1 id="h1">Venue</h1>
 
-<h2 id="missing-author-item-header">Missing author item</h2>
+    <h2 id="missing-author-item-header">Missing author item</h2>
 
-If there are any author names listed below, it means that these name strings have not been matched to Wikidata items for at least some of the works published in the venue.
+    If there are any author names listed below, it means that these name strings have not been
+    matched to Wikidata items for at least some of the works published in the venue.
 
-Follow the link to use the Author disambiguator tool to try to create links between the work items and the respective author items.
+    Follow the link to use the Author disambiguator tool to try to create links between the work
+    items and the respective author items.
 
-<table class="table table-hover" id="missing-author-item-table"></table>
+    <table class="table table-hover" id="missing-author-item-table"></table>
 
-<h2 id="missing-topics-header">Missing topics</h2>
+    <h2 id="missing-topics-header">Missing topics</h2>
 
-The following highly cited articles have few or no "main subject" statements.
+    The following highly cited articles have few or no "main subject" statements.
 
-<table class="table table-hover" id="missing-topics-table"></table>
+    <table class="table table-hover" id="missing-topics-table"></table>
 
-
-{% endblock %}
-    
+{% endblock page_content %}

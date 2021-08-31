@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 
-
 {% set aspect = "event_series" %}
- 
+
 {% block in_ready %}
 
-{{ sparql_to_table('events',
+    {{ sparql_to_table('events',
      options={
        "linkPrefixes":{
          "event": "../event/",
@@ -13,91 +12,83 @@
        }
      }
    ) }}
-{{ sparql_to_table('topics',
+    {{ sparql_to_table('topics',
      options={
        "linkPrefixes":{
          "topic": "../topic/",
        }
      }
    ) }}
-{{ sparql_to_table('people',
+    {{ sparql_to_table('people',
      options={
        "linkPrefixes":{
          "person": "../author/",
        }
      }
    ) }}
-{{ sparql_to_table('recent-publications',
+    {{ sparql_to_table('recent-publications',
      options={
        "linkPrefixes":{
          "work": "../work/",
        }
      }
    ) }}
-{{ sparql_to_table('proceedings-publications',
+    {{ sparql_to_table('proceedings-publications',
      options={
        "linkPrefixes":{
          "work": "../work/",
        }
      }
    ) }}
-{{ sparql_to_iframe('timeline') }}
-{{ sparql_to_iframe('map') }}
- 
-{% endblock %}
+    {{ sparql_to_iframe('timeline') }}
+    {{ sparql_to_iframe('map') }}
 
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="h1">Event</h1>
+    <h1 id="h1">Event</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="details"></div>
+    <div id="details"></div>
 
+    <h2 id="events">List of events</h2>
 
-<h2 id="events">List of events</h2>
+    <table class="table table-hover" id="events-table"></table>
 
-<table class="table table-hover" id="events-table"></table>
+    <h2 id="timeline">Timeline</h2>
 
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe loading="lazy" class="embed-responsive-item" id="timeline-iframe"></iframe>
+    </div>
 
-<h2 id="timeline">Timeline</h2>
+    <h2 id="map">Map</h2>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe loading="lazy" class="embed-responsive-item" id="timeline-iframe"></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe loading="lazy" class="embed-responsive-item" id="map-iframe"></iframe>
+    </div>
 
+    <h2 id="topics">Topic scores</h2>
 
-<h2 id="map">Map</h2>
+    <table class="table table-hover" id="topics-table"></table>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe loading="lazy" class="embed-responsive-item" id="map-iframe"></iframe>
-</div>
+    <h2 id="people">Persons</h2>
 
+    <table class="table table-hover" id="people-table"></table>
 
-<h2 id="topics">Topic scores</h2>
+    <h2>Works</h2>
 
-<table class="table table-hover" id="topics-table"></table>
+    <h3 id="recent-publications">Recent publications</h3>
 
+    Recent publications by organizers, speakers or participants of the events in the series.
 
-<h2 id="people">Persons</h2>
+    <table class="table table-hover" id="recent-publications-table"></table>
 
-<table class="table table-hover" id="people-table"></table>
+    <h3 id="proceedings-publications">Proceedings publications</h3>
 
+    Works published in the proceedings related to the events in the series.
 
-<h2>Works</h2>
+    <table class="table table-hover" id="proceedings-publications-table"></table>
 
-<h3 id="recent-publications">Recent publications</h3>
-
-Recent publications by organizers, speakers or participants of the events in the series.
-
-<table class="table table-hover" id="recent-publications-table"></table>
-
-<h3 id="proceedings-publications">Proceedings publications</h3>
-
-Works published in the proceedings related to the events in the series.
-
-<table class="table table-hover" id="proceedings-publications-table"></table>
-
-
-{% endblock %}
+{% endblock page_content %}

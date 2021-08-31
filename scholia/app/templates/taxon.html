@@ -1,53 +1,48 @@
 {% extends "base.html" %}
 
 {% set aspect = "taxon" %}
- 
-{% block in_ready %}
- 
-{{ sparql_to_table('identifiers') }}
-{{ sparql_to_table('parent-taxa') }}
-{{ sparql_to_iframe('tree') }}
-{{ sparql_to_table('genome') }}
-{{ sparql_to_table('proteome') }}
-{{ sparql_to_table('metabolome') }}
- 
-{% endblock %}
 
+{% block in_ready %}
+
+    {{ sparql_to_table('identifiers') }}
+    {{ sparql_to_table('parent-taxa') }}
+    {{ sparql_to_iframe('tree') }}
+    {{ sparql_to_table('genome') }}
+    {{ sparql_to_table('proteome') }}
+    {{ sparql_to_table('metabolome') }}
+
+{% endblock in_ready %}
 
 {% block page_content %}
-<h1 id="h1">Taxon</h1>
-<script type="application/ld+json" id="bioschemas"></script>
+    <h1 id="h1">Taxon</h1>
+    <script type="application/ld+json" id="bioschemas"></script>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="wembedder"></div>
+    <div id="wembedder"></div>
 
-<h2 id="identifiers-header">Identifiers</h2>
+    <h2 id="identifiers-header">Identifiers</h2>
 
-<table class="table table-hover" id="identifiers-table"></table>
+    <table class="table table-hover" id="identifiers-table"></table>
 
-<h2 id="parent-taxa-header">Parent Taxa</h2>
+    <h2 id="parent-taxa-header">Parent Taxa</h2>
 
-<table class="table table-hover" id="parent-taxa-table"></table>
+    <table class="table table-hover" id="parent-taxa-table"></table>
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" id="tree-iframe" ></iframe>
-</div>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="tree-iframe"></iframe>
+    </div>
 
-<h2 id="genome-header">Genome</h2>
+    <h2 id="genome-header">Genome</h2>
 
-<table class="table table-hover" id="genome-table"></table>
+    <table class="table table-hover" id="genome-table"></table>
 
+    <h2 id="proteome-header">Proteome</h2>
 
-<h2 id="proteome-header">Proteome</h2>
+    <table class="table table-hover" id="proteome-table"></table>
 
-<table class="table table-hover" id="proteome-table"></table>
+    <h2 id="metabolome-header">Metabolome</h2>
 
+    <table class="table table-hover" id="metabolome-table"></table>
 
-<h2 id="metabolome-header">Metabolome</h2>
-
-<table class="table table-hover" id="metabolome-table"></table>
-
-
-{% endblock %}
-    
+{% endblock page_content %}

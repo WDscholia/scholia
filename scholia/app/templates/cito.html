@@ -4,54 +4,49 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('journals',
+    {{ sparql_to_table('journals',
      options={
          "linkPrefixes": { "journal": "../../venue/" },
          "linkSuffixes": { "journal": "/cito" }
      }
-   )
-}}
-{{ sparql_to_table('articles',
+   ) }}
+    {{ sparql_to_table('articles',
      options={
          "linkPrefixes": { "citedArticle": "../../work/", },
          "linkSuffixes": { "citedArticle": "/cito", }
      }
-   )
-}}
-{{ sparql_to_iframe('articles-by-year') }}
+   ) }}
+    {{ sparql_to_iframe('articles-by-year') }}
 
-{% endblock %}
-
+{% endblock in_ready %}
 
 {% block page_content %}
-<h1 id="h1">Citation Typing Ontology (CiTO) Intention</h1>
+    <h1 id="h1">Citation Typing Ontology (CiTO) Intention</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="wembedder"></div>
+    <div id="wembedder"></div>
 
+    <h2 id="journals-header">Journals using this intention</h2>
 
-<h2 id="journals-header">Journals using this intention</h2>
+    This table lists the journals with CiTO-annotated citations, sorted by decreasing number of
+    articles
+    making an citation for this intention.
 
-This table lists the journals with CiTO-annotated citations, sorted by decreasing number of articles
-making an citation for this intention.
+    <table class="table table-hover" id="journals-table"></table>
 
-<table class="table table-hover" id="journals-table"></table>
+    <h2 id="articles-by-year-header">Articles by year</h2>
 
-<h2 id="articles-by-year-header">Articles by year</h2>
+    This plot shows the number of articles each year that use this citation intention.
 
-This plot shows the number of articles each year that use this citation intention.
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="articles-by-year-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="articles-by-year-iframe"></iframe>
-</div>
+    <h2 id="articles-header">Articles most cited for this intention</h2>
 
-<h2 id="articles-header">Articles most cited for this intention</h2>
+    This table lists the articles that are most cited for this intention.
 
-This table lists the articles that are most cited for this intention.
+    <table class="table table-hover" id="articles-table"></table>
 
-<table class="table table-hover" id="articles-table"></table>
-
-
-{% endblock %}
-    
+{% endblock page_content %}

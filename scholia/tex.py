@@ -30,13 +30,13 @@ Semantic relatedness \cite{Q26973018}.
 from __future__ import print_function
 
 import os
+import re
+import unicodedata
 from os import write
 from os.path import splitext
 
-import re
-import unicodedata
-
 from six import u
+
 try:
     from six import ensure_text
 except ImportError:
@@ -44,75 +44,83 @@ except ImportError:
     ensure_text = str
 
 from .api import (
-    entity_to_authors, entity_to_classes, entity_to_doi,
+    entity_to_authors,
+    entity_to_classes,
+    entity_to_doi,
     entity_to_full_text_url,
-    entity_to_journal_title, entity_to_month,
-    entity_to_pages, entity_to_title, entity_to_volume, entity_to_year,
-    wb_get_entities)
+    entity_to_journal_title,
+    entity_to_month,
+    entity_to_pages,
+    entity_to_title,
+    entity_to_volume,
+    entity_to_year,
+    wb_get_entities,
+)
 from .query import doi_to_qs
 
-
 STRING_TO_TEX = {
-    u('\xc5'): r'{\AA}',
-    u('\xc1'): r"{\'A}",
-    '<': r'\textless{}',
-    '>': r'\textgreater{}',
-    '~': r'\~{}',
-    '{': r'\{',
-    '}': r'\}',
-    '_': r'\_',
-    '\\': r'\textbackslash{}',
-    '#': r'\#',
-    '&': r'\&',
-    '^': r'\^{}',
-    '%': r'\%',
-    '$': r'\$',
+    u("\xc5"): r"{\AA}",
+    u("\xc1"): r"{\'A}",
+    "<": r"\textless{}",
+    ">": r"\textgreater{}",
+    "~": r"\~{}",
+    "{": r"\{",
+    "}": r"\}",
+    "_": r"\_",
+    "\\": r"\textbackslash{}",
+    "#": r"\#",
+    "&": r"\&",
+    "^": r"\^{}",
+    "%": r"\%",
+    "$": r"\$",
 }
 
 STRING_TO_TEX_URL = {
-    '{': u(r'\{'),
-    '}': u(r'\}'),
-    '#': u(r'\#'),
-    '&': u(r'\&'),
-    '^': u(r'\^{}'),
-    '%': u(r'\%'),
-    '$': u(r'\$'),
-    '_': u(r'\_'),
+    "{": u(r"\{"),
+    "}": u(r"\}"),
+    "#": u(r"\#"),
+    "&": u(r"\&"),
+    "^": u(r"\^{}"),
+    "%": u(r"\%"),
+    "$": u(r"\$"),
+    "_": u(r"\_"),
 }
 
 COMBINING_DIACRITIC_TO_TEX = {
-    u'\u0300': r'\`',
-    u'\u0301': r"\'",
-    u'\u0302': r'\^',
-    u'\u0303': r'\~',
-    u'\u0304': r'\=',
-    u'\u0308': r'\"',
-    u'\u0327': r'\c',
-    u'\u0331': r'\b',
-    u'\u0306': r'\u',
-    u'\u030C': r'\v',
-    u'\u0307': r'\.',
-    u'\u0323': r'\d',
-    u'\u030A': r'\r',
-    u'\u030B': r'\H',
-    u'\u0328': r'\k'
+    u"\u0300": r"\`",
+    u"\u0301": r"\'",
+    u"\u0302": r"\^",
+    u"\u0303": r"\~",
+    u"\u0304": r"\=",
+    u"\u0308": r"\"",
+    u"\u0327": r"\c",
+    u"\u0331": r"\b",
+    u"\u0306": r"\u",
+    u"\u030C": r"\v",
+    u"\u0307": r"\.",
+    u"\u0323": r"\d",
+    u"\u030A": r"\r",
+    u"\u030B": r"\H",
+    u"\u0328": r"\k",
 }
 
 STRING_TO_TEX_PATTERN = re.compile(
-    u('|').join(re.escape(key) for key in STRING_TO_TEX),
-    flags=re.UNICODE)
+    u("|").join(re.escape(key) for key in STRING_TO_TEX), flags=re.UNICODE
+)
 
 STRING_TO_TEX_URL_PATTERN = re.compile(
-    u('|').join(re.escape(key) for key in STRING_TO_TEX_URL),
-    flags=re.UNICODE)
+    u("|").join(re.escape(key) for key in STRING_TO_TEX_URL), flags=re.UNICODE
+)
 
 COMBINING_DIACRITIC_TO_TEX_PATTERN = re.compile(
-    u('(.)({})').format(
-        u'|'.join(re.escape(key)for key in COMBINING_DIACRITIC_TO_TEX)),
-    flags=re.UNICODE)
+    u("(.)({})").format(
+        u"|".join(re.escape(key) for key in COMBINING_DIACRITIC_TO_TEX)
+    ),
+    flags=re.UNICODE,
+)
 
 
-def escape_to_tex(string, escape_type='normal'):
+def escape_to_tex(string, escape_type="normal"):
     r"""Escape a text to a tex/latex safe text.
 
     Parameters
@@ -144,25 +152,29 @@ def escape_to_tex(string, escape_type='normal'):
 
     """
     if string is None:
-        return u('')
+        return u("")
 
     string = ensure_text(string)
 
-    if escape_type == 'normal':
+    if escape_type == "normal":
         escaped_string = STRING_TO_TEX_PATTERN.sub(
-            lambda match: STRING_TO_TEX[match.group()], string)
-    elif escape_type == 'url':
+            lambda match: STRING_TO_TEX[match.group()], string
+        )
+    elif escape_type == "url":
         escaped_string = STRING_TO_TEX_URL_PATTERN.sub(
-            lambda match: STRING_TO_TEX_URL[match.group()], string)
+            lambda match: STRING_TO_TEX_URL[match.group()], string
+        )
     else:
-        raise ValueError('Wrong value for parameter "escape_type": {}'.format(
-            escape_type))
+        raise ValueError(
+            'Wrong value for parameter "escape_type": {}'.format(escape_type)
+        )
 
     escaped_string = COMBINING_DIACRITIC_TO_TEX_PATTERN.sub(
-        lambda match: u('{{{} {}}}').format(
-            COMBINING_DIACRITIC_TO_TEX[match.group(2)],
-            match.group(1)),
-        unicodedata.normalize('NFD', escaped_string))
+        lambda match: u("{{{} {}}}").format(
+            COMBINING_DIACRITIC_TO_TEX[match.group(2)], match.group(1)
+        ),
+        unicodedata.normalize("NFD", escaped_string),
+    )
     return escaped_string
 
 
@@ -184,16 +196,16 @@ def guess_bibtex_entry_type(entity):
     if "Q13442814" in classes:
         # TODO
         # Scientific article: Article, InProceedings, Misc, ...
-        entry_type = 'Article'
+        entry_type = "Article"
 
-    elif 'Q1143604' in classes:
-        entry_type = 'Proceedings'
+    elif "Q1143604" in classes:
+        entry_type = "Proceedings"
 
-    elif 'Q26995865' in classes:
-        entry_type = 'PhdThesis'
+    elif "Q26995865" in classes:
+        entry_type = "PhdThesis"
 
-    elif 'Q571' in classes:
-        entry_type = 'Book'
+    elif "Q571" in classes:
+        entry_type = "Book"
 
     else:
         pass
@@ -221,12 +233,11 @@ def extract_dois_from_aux_string(string):
     ['10.1186/S13321-016-0161-3']
 
     """
-    matches = re.findall(r'^\\citation{(.+?)}', string,
-                         flags=re.MULTILINE | re.UNICODE)
+    matches = re.findall(r"^\\citation{(.+?)}", string, flags=re.MULTILINE | re.UNICODE)
     dois = []
     for submatches in matches:
-        for doi in submatches.split(','):
-            if re.match(r'10\.\d{4}/.+', doi):
+        for doi in submatches.split(","):
+            if re.match(r"10\.\d{4}/.+", doi):
                 dois.append(doi)
     return dois
 
@@ -267,12 +278,11 @@ def extract_qs_from_aux_string(string):
     ['Q28042913']
 
     """
-    matches = re.findall(r'^\\citation{(.+?)}', string,
-                         flags=re.MULTILINE | re.UNICODE)
+    matches = re.findall(r"^\\citation{(.+?)}", string, flags=re.MULTILINE | re.UNICODE)
     qs = []
     for submatches in matches:
-        for q in submatches.split(','):
-            if re.match(r'^Q\d+$', q):
+        for q in submatches.split(","):
+            if re.match(r"^Q\d+$", q):
                 qs.append(q)
 
     return qs
@@ -297,7 +307,7 @@ def authors_to_bibtex_authors(authors):
         if humanness:
             bibtex_authors.append(escape_to_tex(author))
         else:
-            bibtex_authors.append(u('{') + escape_to_tex(author) + '}')
+            bibtex_authors.append(u("{") + escape_to_tex(author) + "}")
     return bibtex_authors
 
 
@@ -318,26 +328,26 @@ def entity_to_bibtex_entry(entity, key=None):
 
     """
     if key is None:
-        entry = u("@Article{%s,\n") % entity['id']
+        entry = u("@Article{%s,\n") % entity["id"]
     else:
         entry = u("@Article{%s,\n") % key
     authors = authors_to_bibtex_authors(
-        entity_to_authors(entity, return_humanness=True))
+        entity_to_authors(entity, return_humanness=True)
+    )
     entry += "  author =   {%s},\n" % u" and ".join(authors)
     entry += "  title =    {{%s}},\n" % escape_to_tex(entity_to_title(entity))
-    entry += "  journal =  {%s},\n" % (
-        escape_to_tex(entity_to_journal_title(entity)))
+    entry += "  journal =  {%s},\n" % (escape_to_tex(entity_to_journal_title(entity)))
     entry += "  year =     {%s},\n" % escape_to_tex(entity_to_year(entity))
     entry += "  volume =   {%s},\n" % escape_to_tex(entity_to_volume(entity))
     entry += "  number =   {},\n"
     entry += "  month =    {%s},\n" % escape_to_tex(entity_to_month(entity))
     entry += "  pages =    {%s},\n" % escape_to_tex(entity_to_pages(entity))
-    entry += "  DOI =      {%s},\n" % escape_to_tex(
-        entity_to_doi(entity), 'url')
+    entry += "  DOI =      {%s},\n" % escape_to_tex(entity_to_doi(entity), "url")
     entry += "  URL =      {%s},\n" % escape_to_tex(
-        entity_to_full_text_url(entity), 'url')
-    entry += "  wikidata = {%s}\n" % escape_to_tex(entity['id'])
-    entry += '}\n'
+        entity_to_full_text_url(entity), "url"
+    )
+    entry += "  wikidata = {%s}\n" % escape_to_tex(entity["id"])
+    entry += "}\n"
     return entry
 
 
@@ -347,43 +357,43 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['extract-qs-from-aux']:
-        string = open(arguments['<file>']).read()
+    if arguments["extract-qs-from-aux"]:
+        string = open(arguments["<file>"]).read()
         print(" ".join(extract_qs_from_aux_string(string)))
 
-    elif arguments['write-bbl-from-aux']:
-        aux_filename = arguments['<file>']
+    elif arguments["write-bbl-from-aux"]:
+        aux_filename = arguments["<file>"]
         base_filename, _ = splitext(aux_filename)
-        bbl_filename = base_filename + '.bbl'
+        bbl_filename = base_filename + ".bbl"
 
         string = open(aux_filename).read()
         qs = extract_qs_from_aux_string(string)
         entities = wb_get_entities(qs)
 
         widest_label = max([len(q) for q in qs])
-        bbl = u'\\begin{thebibliography}{%d}\n\n' % widest_label
+        bbl = u"\\begin{thebibliography}{%d}\n\n" % widest_label
 
         for q in qs:
             entity = entities[q]
-            bbl += '\\bibitem{%s}\n' % q
-            bbl += u", ".join(entity_to_authors(entity)) + '.\n'
-            bbl += entity_to_title(entity) + '.\n'
+            bbl += "\\bibitem{%s}\n" % q
+            bbl += u", ".join(entity_to_authors(entity)) + ".\n"
+            bbl += entity_to_title(entity) + ".\n"
 
-            bbl += '\n'
+            bbl += "\n"
 
-        bbl += '\\end{thebibliography}\n'
+        bbl += "\\end{thebibliography}\n"
 
-        with open(bbl_filename, 'w') as f:
-            f.write(bbl.encode('utf-8'))
+        with open(bbl_filename, "w") as f:
+            f.write(bbl.encode("utf-8"))
 
-        with open(aux_filename, 'a') as f:
+        with open(aux_filename, "a") as f:
             for n, q in enumerate(qs, 1):
-                f.write('\\bibcite{%s}{%d}\n' % (q, n))
+                f.write("\\bibcite{%s}{%d}\n" % (q, n))
 
-    elif arguments['write-bib-from-aux']:
-        aux_filename = arguments['<file>']
+    elif arguments["write-bib-from-aux"]:
+        aux_filename = arguments["<file>"]
         base_filename, _ = splitext(aux_filename)
-        bib_filename = base_filename + '.bib'
+        bib_filename = base_filename + ".bib"
 
         string = open(aux_filename).read()
         qs = list(set(extract_qs_from_aux_string(string)))
@@ -392,11 +402,14 @@ def main():
         for doi in dois:
             qs_doi = doi_to_qs(doi)
             if len(qs_doi) == 0:
-                print('Could not find Wikidata item for {doi}'.format(doi=doi))
+                print("Could not find Wikidata item for {doi}".format(doi=doi))
                 continue
             if len(qs_doi) > 1:
-                print(('Multiple Wikidata items for {doi}: {qs}.'
-                       'Using first.').format(doi=doi, qs=qs_doi))
+                print(
+                    ("Multiple Wikidata items for {doi}: {qs}." "Using first.").format(
+                        doi=doi, qs=qs_doi
+                    )
+                )
             q = qs_doi[0]
             qs.append(q)
             keys.append(doi)
@@ -407,7 +420,7 @@ def main():
         for q, key in zip(qs, keys):
             entity = entities[q]
             bib += entity_to_bibtex_entry(entity, key=key)
-            bib += '\n'
+            bib += "\n"
 
         # Write BibTeX-formatted string to file
         output_file = os.open(bib_filename, os.O_RDWR | os.O_CREAT)
@@ -415,5 +428,5 @@ def main():
         write(output_file, bib.encode(output_encoding))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

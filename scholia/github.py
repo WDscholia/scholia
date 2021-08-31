@@ -15,8 +15,7 @@ import json
 
 import requests
 
-
-USER_AGENT = 'Scholia, https://github.com/WDscholia/scholia'
+USER_AGENT = "Scholia, https://github.com/WDscholia/scholia"
 
 
 def get(resource):
@@ -38,12 +37,10 @@ def get(resource):
 
     """
     headers = {
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': USER_AGENT,
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": USER_AGENT,
     }
-    response = requests.get(
-        "https://api.github.com" + resource,
-        headers=headers)
+    response = requests.get("https://api.github.com" + resource, headers=headers)
     data = response.json()
     return data
 
@@ -68,7 +65,7 @@ def get_user(username):
     True
 
     """
-    return get('/users/' + username)
+    return get("/users/" + username)
 
 
 def get_user_followers(username):
@@ -85,7 +82,7 @@ def get_user_followers(username):
         List of users.
 
     """
-    return get('/users/' + username + '/followers')
+    return get("/users/" + username + "/followers")
 
 
 def get_user_repos(username):
@@ -102,7 +99,7 @@ def get_user_repos(username):
         List of repos.
 
     """
-    return get('/users/' + username + '/repos')
+    return get("/users/" + username + "/repos")
 
 
 def main():
@@ -112,19 +109,19 @@ def main():
     arguments = docopt(__doc__)
 
     # TODO UTF-8
-    if arguments['get-user']:
-        print(json.dumps(get_user(arguments['<username>'])))
+    if arguments["get-user"]:
+        print(json.dumps(get_user(arguments["<username>"])))
 
-    elif arguments['get-user-followers']:
-        print(json.dumps(get_user_followers(arguments['<username>'])))
+    elif arguments["get-user-followers"]:
+        print(json.dumps(get_user_followers(arguments["<username>"])))
 
-    elif arguments['get-user-number-of-followers']:
-        user = get_user(arguments['<username>'])
-        print(user.get('followers'))
+    elif arguments["get-user-number-of-followers"]:
+        user = get_user(arguments["<username>"])
+        print(user.get("followers"))
 
-    elif arguments['get-user-repos']:
-        print(json.dumps(get_user_repos(arguments['<username>'])))
+    elif arguments["get-user-repos"]:
+        print(json.dumps(get_user_repos(arguments["<username>"])))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

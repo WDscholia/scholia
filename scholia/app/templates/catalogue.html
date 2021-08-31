@@ -1,33 +1,28 @@
 {% extends "base.html" %}
 
 {% set aspect = "catalogue" %}
- 
+
 {% block in_ready %}
 
-{{ sparql_to_table('items') }}
-{{ sparql_to_iframe('images') }}
- 
-{% endblock %}
+    {{ sparql_to_table('items') }}
+    {{ sparql_to_iframe('images') }}
 
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="h1">Catalogue</h1>
+    <h1 id="h1">Catalogue</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
+    <h2 id="items-header">Items in catalogue</h2>
 
-<h2 id="items-header">Items in catalogue</h2>
+    <table class="table table-hover" id="items-table"></table>
 
-<table class="table table-hover" id="items-table"></table>
+    <h2 id="images-header">Images</h2>
 
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="images-iframe"></iframe>
+    </div>
 
-<h2 id="images-header">Images</h2>
-
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="images-iframe"></iframe>
-</div>
-
-
-{% endblock %}
-    
+{% endblock page_content %}

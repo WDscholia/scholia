@@ -4,31 +4,31 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('works') }}
+    {{ sparql_to_table('works') }}
 
-{% endblock %}
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<p>
-    <a title="Lexeme index"
-       role="button"
-       class="btn btn-outline-dark btn-sm"
-       href="../lexeme">←</a>
-    <a title="View and edit lexeme in Wikidata"
-       role="button"
-       class="btn btn-outline-dark btn-sm"
-       href="https://www.wikidata.org/wiki/Lexeme:{{ lexeme }}">Wikidata 🔗</a>
-    <a title="View lexeme in Ordia"
-       role="button"
-       class="btn btn-outline-dark btn-sm"
-       href="https://ordia.toolforge.org/{{ lexeme }}">Ordia 🔗</a>
-</p>
+    <p>
+        <a title="Lexeme index"
+           role="button"
+           class="btn btn-outline-dark btn-sm"
+           href="../lexeme">←</a>
+        <a title="View and edit lexeme in Wikidata"
+           role="button"
+           class="btn btn-outline-dark btn-sm"
+           href="https://www.wikidata.org/wiki/Lexeme:{{ lexeme }}">Wikidata 🔗</a>
+        <a title="View lexeme in Ordia"
+           role="button"
+           class="btn btn-outline-dark btn-sm"
+           href="https://ordia.toolforge.org/{{ lexeme }}">Ordia 🔗</a>
+    </p>
 
-<h1 id="h1">Lexeme</h1>
+    <h1 id="h1">Lexeme</h1>
 
-<h2 id="works-header">Works</h2>
+    <h2 id="works-header">Works</h2>
 
-<table class="table table-hover" id="works-table"></table>
+    <table class="table table-hover" id="works-table"></table>
 
-{% endblock %}
+{% endblock page_content %}

@@ -1,83 +1,74 @@
 {% extends "base.html" %}
 
-
 {% set aspect = "event" %}
- 
+
 {% block in_ready %}
 
-{{ sparql_to_table('people') }}
-{{ sparql_to_table('proceedings') }}
-{{ sparql_to_table('recent-publications') }}
-{{ sparql_to_table('related-events-people') }}
-{{ sparql_to_table('related-events-timelocation') }}
-{{ sparql_to_table('topic') }}
-{{ sparql_to_iframe('co-authors') }}
-{{ sparql_to_iframe('timeline') }}
- 
-{% endblock %}
+    {{ sparql_to_table('people') }}
+    {{ sparql_to_table('proceedings') }}
+    {{ sparql_to_table('recent-publications') }}
+    {{ sparql_to_table('related-events-people') }}
+    {{ sparql_to_table('related-events-timelocation') }}
+    {{ sparql_to_table('topic') }}
+    {{ sparql_to_iframe('co-authors') }}
+    {{ sparql_to_iframe('timeline') }}
 
+{% endblock in_ready %}
 
 {% block page_content %}
 
-<h1 id="h1">Event</h1>
+    <h1 id="h1">Event</h1>
 
-<div id="intro"></div>
+    <div id="intro"></div>
 
-<div id="details"></div>
-
-
-<h2 id="people">People</h2>
-
-<table class="table table-hover" id="people-table"></table>
+    <div id="details"></div>
 
 
-<h3 id="co-authors">Co-author graph</h3>
+    <h2 id="people">People</h2>
 
-<div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="co-authors-iframe"></iframe>
-</div>
+    <table class="table table-hover" id="people-table"></table>
 
+    <h3 id="co-authors">Co-author graph</h3>
 
-<h2 id="timeline">Timeline</h2>
+    <div class="embed-responsive embed-responsive-4by3">
+        <iframe class="embed-responsive-item" id="co-authors-iframe"></iframe>
+    </div>
 
-<div class="embed-responsive embed-responsive-16by9">
-    <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
-</div>
+    <h2 id="timeline">Timeline</h2>
 
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
+    </div>
 
-<h2 id="table">Topic scores</h2>
+    <h2 id="table">Topic scores</h2>
 
-<table class="table table-hover" id="topic-table"></table>
+    <table class="table table-hover" id="topic-table"></table>
 
+    <h2>Works</h2>
 
-<h2>Works</h2>
+    <h3 id="recent-publications">Recent publications</h3>
 
-<h3 id="recent-publications">Recent publications</h3>
+    Recent publications by organizers, speakers or participants of the event.
 
-Recent publications by organizers, speakers or participants of the event.
+    <table class="table table-hover" id="recent-publications-table"></table>
 
-<table class="table table-hover" id="recent-publications-table"></table>
+    <h3 id="proceedings">Proceedings publications</h3>
 
-<h3 id="proceedings">Proceedings publications</h3>
+    Works published in the proceedings related to the event.
 
-Works published in the proceedings related to the event.
+    <table class="table table-hover" id="proceedings-table"></table>
 
-<table class="table table-hover" id="proceedings-table"></table>
+    <h2>Related events</h2>
 
+    <h3 id="related-events-timelocation">Related based on time and location</h3>
 
-<h2>Related events</h2>
+    <table class="table table-hover" id="related-events-timelocation-table"></table>
 
-<h3 id="related-events-timelocation">Related based on time and location</h3>
+    <h3 id="related-events-people">Related based on people</h3>
 
-<table class="table table-hover" id="related-events-timelocation-table"></table>
+    Related event based on overlap among participants, organizers, editors,
+    authors and program committee members.
 
+    <table class="table table-hover" id="related-events-people-table"></table>
 
-<h3 id="related-events-people">Related based on people</h3>
-
-Related event based on overlap among participants, organizers, editors,
-authors and program committee members. 
-
-<table class="table table-hover" id="related-events-people-table"></table>
-
-
-{% endblock %}
+{% endblock page_content %}

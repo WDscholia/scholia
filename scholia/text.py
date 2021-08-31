@@ -24,17 +24,13 @@ Description:
 
 from __future__ import print_function
 
+import re
 from os import makedirs
 from os.path import exists, expanduser, join
 
-from six.moves import cPickle as pickle
-
-import re
-
-from simplejson import JSONDecodeError
-
 import requests
-
+from simplejson import JSONDecodeError
+from six.moves import cPickle as pickle
 
 TOPIC_LABELS_SPARQL = """
 SELECT ?topic ?topic_label
@@ -57,15 +53,14 @@ WHERE {
 """
 
 
-Q_PATTERN = re.compile(r'Q\d+', flags=re.UNICODE | re.DOTALL)
+Q_PATTERN = re.compile(r"Q\d+", flags=re.UNICODE | re.DOTALL)
 
-SCHOLIA_DATA_DIRECTORY = join(expanduser('~'), '.scholia')
+SCHOLIA_DATA_DIRECTORY = join(expanduser("~"), ".scholia")
 
-TEXT_TO_TOPIC_Q_TEXT_FILENAME = join(
-    SCHOLIA_DATA_DIRECTORY, 'text_to_topic_q_text.pck')
+TEXT_TO_TOPIC_Q_TEXT_FILENAME = join(SCHOLIA_DATA_DIRECTORY, "text_to_topic_q_text.pck")
 
 
-class TextToTopicQText():
+class TextToTopicQText:
     """Converter of text to Wikidata Q identifier data.
 
     Attributes
@@ -79,7 +74,7 @@ class TextToTopicQText():
 
     def __init__(self):
         """Set up attributes."""
-        self.headers = {'User-Agent': 'Scholia'}
+        self.headers = {"User-Agent": "Scholia"}
 
         directory = SCHOLIA_DATA_DIRECTORY
         if not exists(directory):
@@ -92,9 +87,9 @@ class TextToTopicQText():
         tokens = sorted(tokens, key=len, reverse=True)
         tokens = [re.escape(token) for token in tokens if len(token) > 3]
 
-        regex = '(?:' + "|".join(tokens) + ')'
+        regex = "(?:" + "|".join(tokens) + ")"
         regex = r"\b" + regex + r"\b"
-        regex = '(' + regex + ')'
+        regex = "(" + regex + ")"
 
         self.pattern = re.compile(regex, flags=re.UNICODE | re.DOTALL)
 
@@ -122,9 +117,10 @@ class TextToTopicQText():
 
         """
         response = requests.get(
-            'https://query.wikidata.org/sparql',
-            params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'},
-            headers=self.headers)
+            "https://query.wikidata.org/sparql",
+            params={"query": TOPIC_LABELS_SPARQL, "format": "json"},
+            headers=self.headers,
+        )
 
         try:
             response_data = response.json()
@@ -132,23 +128,23 @@ class TextToTopicQText():
             # In some cases a timeout may occur in the middle of a response,
             # making the JSON returned invalid.
             response = requests.get(
-                'https://query.wikidata.org/sparql',
-                params={'query': TOPIC_LABELS_SPARQL, 'format': 'json'},
-                headers=self.headers)
+                "https://query.wikidata.org/sparql",
+                params={"query": TOPIC_LABELS_SPARQL, "format": "json"},
+                headers=self.headers,
+            )
             try:
                 response_data = response.json()
             except JSONDecodeError:
                 # TODO: We may end here due to timeout or (perhaps?) invalid
                 # JSON in the cache. It is unclear what we can do to escape
                 # this problem other than wait. Here is made an empty response.
-                response_data = {'results': {'bindings': []}}
+                response_data = {"results": {"bindings": []}}
 
-        data = response_data['results']['bindings']
+        data = response_data["results"]["bindings"]
 
         mapper = {}
         for datum in data:
-            mapper[datum['topic_label']['value']] \
-                = datum['topic']['value'][31:]
+            mapper[datum["topic_label"]["value"]] = datum["topic"]["value"][31:]
 
         return mapper
 
@@ -161,7 +157,7 @@ class TextToTopicQText():
         if not filename:
             filename = self.filename
 
-        pickle.dump(self, open(filename, 'w'))
+        pickle.dump(self, open(filename, "w"))
 
     def text_to_topic_q_text(self, text):
         """Convert text to q-text.
@@ -210,7 +206,7 @@ def load_text_to_topic_q_text():
 
     """
     try:
-        return pickle.load(open(TEXT_TO_TOPIC_Q_TEXT_FILENAME, 'rb'))
+        return pickle.load(open(TEXT_TO_TOPIC_Q_TEXT_FILENAME, "rb"))
     except IOError:
         return TextToTopicQText()
 
@@ -221,21 +217,21 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['text-to-topic-qs']:
+    if arguments["text-to-topic-qs"]:
         text_to_topic_q_text = load_text_to_topic_q_text()
-        qs = text_to_topic_q_text.text_to_topic_qs(arguments['<text>'])
+        qs = text_to_topic_q_text.text_to_topic_qs(arguments["<text>"])
         print(",".join(qs))
 
-    elif arguments['text-to-topic-q-text-setup']:
+    elif arguments["text-to-topic-q-text-setup"]:
         text_to_topic_q_text = TextToTopicQText()
 
         # http://stefaanlippens.net/python-pickling-and-dealing-
         # with-attributeerror-module-object-has-no-attribute-thing.html
-        TextToTopicQText.__module__ = 'scholia.text'
+        TextToTopicQText.__module__ = "scholia.text"
 
         text_to_topic_q_text.save()
-        print('{} saved'.format(TEXT_TO_TOPIC_Q_TEXT_FILENAME))
+        print("{} saved".format(TEXT_TO_TOPIC_Q_TEXT_FILENAME))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

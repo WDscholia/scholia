@@ -26,18 +26,28 @@ Examples
 from __future__ import print_function
 
 import requests
-
 from six import u
 
-
 HEADERS = {
-    'User-Agent': 'Scholia',
+    "User-Agent": "Scholia",
 }
 
 # Must be indexed from zero
 MONTH_NUMBER_TO_MONTH = {
-    'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July',
-           'August', 'September', 'October', 'November', 'December']
+    "en": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
 }
 
 
@@ -62,15 +72,15 @@ def entity_to_smiles(entity):
     True
 
     """
-    for statement in entity['claims'].get('P2017', []):
-        smiles = statement['mainsnak']['datavalue']['value']
+    for statement in entity["claims"].get("P2017", []):
+        smiles = statement["mainsnak"]["datavalue"]["value"]
         return smiles
     else:
-        for statement in entity['claims'].get('P233', []):
-            smiles = statement['mainsnak']['datavalue']['value']
+        for statement in entity["claims"].get("P233", []):
+            smiles = statement["mainsnak"]["datavalue"]["value"]
             return smiles
         else:
-            return ''
+            return ""
 
 
 def is_human(entity):
@@ -88,11 +98,10 @@ def is_human(entity):
 
     """
     classes = entity_to_classes(entity)
-    return 'Q5' in classes
+    return "Q5" in classes
 
 
-def select_value_by_language_preferences(
-        choices, preferences=('en', 'de', 'fr')):
+def select_value_by_language_preferences(choices, preferences=("en", "de", "fr")):
     """Select value based on language preference.
 
     Parameters
@@ -115,7 +124,7 @@ def select_value_by_language_preferences(
 
     """
     if not choices:
-        return ''
+        return ""
     for preference in preferences:
         if preference in choices:
             return choices[preference]
@@ -149,27 +158,27 @@ def wb_get_entities(qs):
 
     ids = "|".join(qs)
     params = {
-        'action': 'wbgetentities',
-        'ids': ids,
-        'format': 'json',
+        "action": "wbgetentities",
+        "ids": ids,
+        "format": "json",
     }
     headers = {
-        'User-Agent': 'Scholia',
+        "User-Agent": "Scholia",
     }
     response_data = requests.get(
-        'https://www.wikidata.org/w/api.php',
-        headers=headers, params=params).json()
-    if 'entities' in response_data:
-        return response_data['entities']
+        "https://www.wikidata.org/w/api.php", headers=headers, params=params
+    ).json()
+    if "entities" in response_data:
+        return response_data["entities"]
 
     # TODO: Make informative/better error handling
-    if 'error' in response_data:
-        message = response_data['error'].get('info', '')
-        message += ", id=" + response_data['error'].get('id', '')
+    if "error" in response_data:
+        message = response_data["error"].get("info", "")
+        message += ", id=" + response_data["error"].get("id", "")
         raise Exception(message)
 
     # Last resort
-    raise Exception('API error')
+    raise Exception("API error")
 
 
 def entity_to_authors(entity, return_humanness=False):
@@ -193,29 +202,30 @@ def entity_to_authors(entity, return_humanness=False):
         a boolean indicating humanness of the author.
 
     """
+
     def statement_to_order(statement):
         LARGE = 10000000
-        if 'P1545' in statement.get('qualifiers', []):
-            for qualifier in statement['qualifiers']['P1545']:
+        if "P1545" in statement.get("qualifiers", []):
+            for qualifier in statement["qualifiers"]["P1545"]:
                 # The data value is a string type
                 # TODO: handle exceptions?
-                return int(qualifier['datavalue']['value'])
+                return int(qualifier["datavalue"]["value"])
         else:
             return LARGE
 
     qs = []
     orders = []
-    claims = entity['claims']
-    if 'P50' in claims:
-        for statement in claims['P50']:
-            qs.append(statement['mainsnak']['datavalue']['value']['id'])
+    claims = entity["claims"]
+    if "P50" in claims:
+        for statement in claims["P50"]:
+            qs.append(statement["mainsnak"]["datavalue"]["value"]["id"])
             orders.append(statement_to_order(statement))
     entities = wb_get_entities(qs)
 
     authornames = []
-    if 'P2093' in claims:
-        for statement in claims['P2093']:
-            value = statement['mainsnak']['datavalue']['value']
+    if "P2093" in claims:
+        for statement in claims["P2093"]:
+            value = statement["mainsnak"]["datavalue"]["value"]
             authornames.append((statement_to_order(statement), value, True))
 
     authors = []
@@ -255,8 +265,8 @@ def entity_to_classes(entity):
 
     """
     classes = []
-    for statement in entity['claims'].get('P31', []):
-        classes.append(statement['mainsnak']['datavalue']['value']['id'])
+    for statement in entity["claims"].get("P31", []):
+        classes.append(statement["mainsnak"]["datavalue"]["value"]["id"])
     return classes
 
 
@@ -281,11 +291,11 @@ def entity_to_doi(entity):
     True
 
     """
-    for statement in entity['claims'].get('P356', []):
-        doi = statement['mainsnak']['datavalue']['value']
+    for statement in entity["claims"].get("P356", []):
+        doi = statement["mainsnak"]["datavalue"]["value"]
         return doi
     else:
-        return ''
+        return ""
 
 
 def entity_to_full_text_url(entity):
@@ -310,11 +320,11 @@ def entity_to_full_text_url(entity):
     True
 
     """
-    for statement in entity['claims'].get('P953', []):
-        url = statement['mainsnak']['datavalue']['value']
+    for statement in entity["claims"].get("P953", []):
+        url = statement["mainsnak"]["datavalue"]["value"]
         return url
     else:
-        return ''
+        return ""
 
 
 def entity_to_journal_title(entity):
@@ -338,17 +348,17 @@ def entity_to_journal_title(entity):
     True
 
     """
-    for statement in entity['claims'].get('P1433', []):
-        journal_item = statement['mainsnak']['datavalue']['value']['id']
+    for statement in entity["claims"].get("P1433", []):
+        journal_item = statement["mainsnak"]["datavalue"]["value"]["id"]
         journal_entities = wb_get_entities([journal_item])
-        claims = journal_entities[journal_item]['claims']
+        claims = journal_entities[journal_item]["claims"]
         titles = {}
-        for journal_statement in claims.get('P1476', []):
-            value = journal_statement['mainsnak']['datavalue']['value']
-            titles[value['language']] = value['text']
+        for journal_statement in claims.get("P1476", []):
+            value = journal_statement["mainsnak"]["datavalue"]["value"]
+            titles[value["language"]] = value["text"]
         return select_value_by_language_preferences(titles)
 
-    return ''
+    return ""
 
 
 def entity_to_label(entity):
@@ -365,13 +375,13 @@ def entity_to_label(entity):
         String with label.
 
     """
-    for language in ['en', 'de', 'da', 'fr', 'es']:
-        if language in entity['labels']:
-            return entity['labels'][language]['value']
-    return ''
+    for language in ["en", "de", "da", "fr", "es"]:
+        if language in entity["labels"]:
+            return entity["labels"][language]["value"]
+    return ""
 
 
-def entity_to_month(entity, language='en'):
+def entity_to_month(entity, language="en"):
     """Extract month of publication from entity.
 
     Parameters
@@ -388,15 +398,15 @@ def entity_to_month(entity, language='en'):
         then `None` is return.
 
     """
-    for statement in entity['claims'].get('P577', []):
-        date = statement['mainsnak']['datavalue']['value']['time']
+    for statement in entity["claims"].get("P577", []):
+        date = statement["mainsnak"]["datavalue"]["value"]["time"]
         month = date[6:8]
         if language is None:
             return month
-        elif month == '00':
+        elif month == "00":
             return None
-        elif language == 'en':
-            return MONTH_NUMBER_TO_MONTH['en'][int(month) - 1]
+        elif language == "en":
+            return MONTH_NUMBER_TO_MONTH["en"][int(month) - 1]
         else:
             raise ValueError('language "{}" not support'.format(language))
     return None
@@ -423,13 +433,13 @@ def entity_to_name(entity):
     True
 
     """
-    if 'labels' in entity:
-        labels = entity['labels']
-        if 'en' in labels:
-            return labels['en']['value']
+    if "labels" in entity:
+        labels = entity["labels"]
+        if "en" in labels:
+            return labels["en"]["value"]
         else:
             for label in labels.values():
-                return label['value']
+                return label["value"]
     return None
 
 
@@ -454,11 +464,11 @@ def entity_to_pages(entity):
     True
 
     """
-    for statement in entity['claims'].get('P304', []):
-        pages = statement['mainsnak']['datavalue']['value']
+    for statement in entity["claims"].get("P304", []):
+        pages = statement["mainsnak"]["datavalue"]["value"]
         return pages
     else:
-        return ''
+        return ""
 
 
 def entity_to_title(entity):
@@ -475,8 +485,8 @@ def entity_to_title(entity):
         Title as string. If the title is not set then None is returned.
 
     """
-    for statement in entity['claims'].get('P1476', []):
-        title = statement['mainsnak']['datavalue']['value']['text']
+    for statement in entity["claims"].get("P1476", []):
+        title = statement["mainsnak"]["datavalue"]["value"]["text"]
         return title
     return None
 
@@ -502,11 +512,11 @@ def entity_to_volume(entity):
     True
 
     """
-    for statement in entity['claims'].get('P478', []):
-        volume = statement['mainsnak']['datavalue']['value']
+    for statement in entity["claims"].get("P478", []):
+        volume = statement["mainsnak"]["datavalue"]["value"]
         return volume
     else:
-        return ''
+        return ""
 
 
 def entity_to_year(entity):
@@ -523,8 +533,8 @@ def entity_to_year(entity):
         Year as string.
 
     """
-    for statement in entity['claims'].get('P577', []):
-        date = statement['mainsnak']['datavalue']['value']['time']
+    for statement in entity["claims"].get("P577", []):
+        date = statement["mainsnak"]["datavalue"]["value"]["time"]
         year = date[1:5]
         return year
     return None
@@ -551,33 +561,34 @@ def search(query, page, limit=10):
     response = requests.get(
         "https://www.wikidata.org/w/api.php",
         params={
-            'action': 'wbsearchentities',
-            'limit': limit,
-            'format': 'json',
-            'language': "en",
-            'search': query,
-            'continue': page
+            "action": "wbsearchentities",
+            "limit": limit,
+            "format": "json",
+            "language": "en",
+            "search": query,
+            "continue": page,
         },
-        headers=HEADERS)
+        headers=HEADERS,
+    )
     # Convert the response
     response_data = response.json()
-    items = response_data['search']
+    items = response_data["search"]
     results = [
         {
-            'q': item['title'],
-            'description': item.get('description', "No description provided"),
-            'label': item['label']
+            "q": item["title"],
+            "description": item.get("description", "No description provided"),
+            "label": item["label"],
         }
         for item in items
     ]
 
-    data = {'results': results}
+    data = {"results": results}
 
-    search_continue = response_data.get('search-continue', None)
+    search_continue = response_data.get("search-continue", None)
     if search_continue:
-        data['next_page'] = search_continue
+        data["next_page"] = search_continue
     if (int(page) - limit) >= 0:
-        data['prev_page'] = int(page) - limit
+        data["prev_page"] = int(page) - limit
     return data
 
 
@@ -587,31 +598,31 @@ def main():
 
     arguments = docopt(__doc__)
 
-    if arguments['get']:
-        qs = arguments['<qs>']
+    if arguments["get"]:
+        qs = arguments["<qs>"]
         entities = wb_get_entities(qs)
         for q in qs:
             print(entities[q])
 
-    elif arguments['q-to-classes']:
-        q = arguments['<q>']
+    elif arguments["q-to-classes"]:
+        q = arguments["<q>"]
         entities = wb_get_entities([q])
         classes = entity_to_classes(entities[q])
         for class_ in classes:
             print(class_)
 
-    elif arguments['q-to-name']:
-        q = arguments['<q>']
+    elif arguments["q-to-name"]:
+        q = arguments["<q>"]
         entities = wb_get_entities([q])
         print(entity_to_name(entities[q]))
 
-    elif arguments['search']:
-        query = arguments['<query>']
-        limit = int(arguments['--limit'])
-        results = search(query, limit=limit)
+    elif arguments["search"]:
+        query = arguments["<query>"]
+        limit = int(arguments["--limit"])
+        results = search(query, 1, limit=limit)
         for item in results:
-            print(u("{q} {description}").format(**item).encode('utf-8'))
+            print(u("{q} {description}").format(**item).encode("utf-8"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

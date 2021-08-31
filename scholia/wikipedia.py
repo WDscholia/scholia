@@ -20,16 +20,12 @@ Examples
 from __future__ import absolute_import, print_function
 
 import logging
-
 import os
+import signal
 from os import write
 
-import signal
-
 import requests
-
 from six import b, u
-
 
 BIBLIOGRAPHY_SPARQL_QUERY = """
 select ?work ?title ?venueLabel ?date ?volume ?issue ?pages
@@ -53,7 +49,8 @@ select ?work ?title ?venueLabel ?date ?volume ?issue ?pages
 order by desc(?date)
 """
 
-CITE_JOURNAL_TEMPLATE = u("""
+CITE_JOURNAL_TEMPLATE = u(
+    """
 * {{{{Cite journal
   | title = {title}
   | journal = {journal}
@@ -63,20 +60,23 @@ CITE_JOURNAL_TEMPLATE = u("""
   | pages = {pages}
   | doi = {doi}
   | url = {url}
-}}}}""")
+}}}}"""
+)
 
 
-CITE_NEWS_TEMPLATE = u("""
+CITE_NEWS_TEMPLATE = u(
+    """
 * {{{{Cite news
   | title = {title}
   | work = {work}
   | date = {date}
   | url = {url}
-}}}}""")
+}}}}"""
+)
 
 
 def _value(item, field):
-    return item[field]['value'] if field in item else ''
+    return item[field]["value"] if field in item else ""
 
 
 def q_to_bibliography_templates(q):
@@ -104,36 +104,40 @@ def q_to_bibliography_templates(q):
 
     """
     query = BIBLIOGRAPHY_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/sparql'
-    params = {'query': query, 'format': 'json'}
+    url = "https://query.wikidata.org/sparql"
+    params = {"query": query, "format": "json"}
     response = requests.get(url, params=params)
     data = response.json()
 
-    wikitext = ('<!-- Generated with scholia.wikipedia '
-                'q-to-bibliography-templates {q}\n').format(q=q)
-    wikitext += ('     or http://scholia.toolforge.org/'
-                 'q-to-bibliography-templates?q={q} -->\n').format(q=q)
-    for item in data['results']['bindings']:
-        if (_value(item, 'type').endswith('Q5707594') or
-                _value(item, 'type').endswith('Q17928402')):
+    wikitext = (
+        "<!-- Generated with scholia.wikipedia " "q-to-bibliography-templates {q}\n"
+    ).format(q=q)
+    wikitext += (
+        "     or http://scholia.toolforge.org/"
+        "q-to-bibliography-templates?q={q} -->\n"
+    ).format(q=q)
+    for item in data["results"]["bindings"]:
+        if _value(item, "type").endswith("Q5707594") or _value(item, "type").endswith(
+            "Q17928402"
+        ):
             # news article or blog post
             wikitext += CITE_NEWS_TEMPLATE.format(
-                title=_value(item, 'title'),
-                work=_value(item, 'venueLabel'),
-                date=_value(item, 'date').split('T')[0],
-                url=_value(item, 'url'),
+                title=_value(item, "title"),
+                work=_value(item, "venueLabel"),
+                date=_value(item, "date").split("T")[0],
+                url=_value(item, "url"),
             )
         else:
             wikitext += CITE_JOURNAL_TEMPLATE.format(
-                title=_value(item, 'title'),
-                journal=_value(item, 'venueLabel'),
-                volume=_value(item, 'volume'),
-                issue=_value(item, 'issue'),
-                date=_value(item, 'date').split('T')[0],
-                pages=_value(item, 'pages'),
-                license=_value(item, 'license'),
-                doi=_value(item, 'doi'),
-                url=_value(item, 'url'),
+                title=_value(item, "title"),
+                journal=_value(item, "venueLabel"),
+                volume=_value(item, "volume"),
+                issue=_value(item, "issue"),
+                date=_value(item, "date").split("T")[0],
+                pages=_value(item, "pages"),
+                license=_value(item, "license"),
+                doi=_value(item, "doi"),
+                url=_value(item, "url"),
             )
 
     return wikitext
@@ -146,9 +150,9 @@ def main():
     arguments = docopt(__doc__)
 
     logging_level = logging.WARN
-    if arguments['--debug']:
+    if arguments["--debug"]:
         logging_level = logging.DEBUG
-    elif arguments['--verbose']:
+    elif arguments["--verbose"]:
         logging_level = logging.INFO
 
     logger = logging.getLogger()
@@ -156,25 +160,26 @@ def main():
     logging_handler = logging.StreamHandler()
     logging_handler.setLevel(logging_level)
     logging_formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
     logging_handler.setFormatter(logging_formatter)
     logger.addHandler(logging_handler)
 
     # Ignore broken pipe errors
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
-    if arguments['--output']:
-        output_filename = arguments['--output']
+    if arguments["--output"]:
+        output_filename = arguments["--output"]
         output_file = os.open(output_filename, os.O_RDWR | os.O_CREAT)
     else:
         # stdout
         output_file = 1
-    output_encoding = arguments['--oe']
+    output_encoding = arguments["--oe"]
 
-    if arguments['q-to-bibliography-templates']:
-        q = arguments['<q>']
+    if arguments["q-to-bibliography-templates"]:
+        q = arguments["<q>"]
         wikitext = q_to_bibliography_templates(q)
-        write(output_file, wikitext.encode(output_encoding) + b('\n'))
+        write(output_file, wikitext.encode(output_encoding) + b("\n"))
 
 
 if __name__ == "__main__":
