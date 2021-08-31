@@ -15,8 +15,6 @@ References
 
 from __future__ import absolute_import, division, print_function
 
-from dateutil.parser import parse as parse_datetime
-
 import json
 
 import os
@@ -24,17 +22,9 @@ from os import write
 
 import re
 
-try:
-    # lxml can only be loaded into one interpreter per process.
-    # A webservice running uwsgi with multiple interpreters may fail to load
-    # the lxml library.
-    # Workarounds exists https://stackoverflow.com/questions/54092324/ but
-    # it may not be possible to implement.
-    from lxml import etree
-except ImportError:
-    from xml import etree
-
 import requests
+
+from feedparser import parse as parse_api
 
 
 USER_AGENT = 'Scholia'
@@ -79,45 +69,25 @@ def get_metadata(arxiv):
 
     """
     arxiv = arxiv.strip()
-    url = ARXIV_URL + '/abs/' + arxiv
-    headers = {'User-agent': USER_AGENT}
-    response = requests.get(url, headers=headers)
-    tree = etree.HTML(response.content)
 
-    submissions = tree.xpath('//div[@class="submission-history"]/text()')
-    submissions = [
-        submission
-        for submission in submissions
-        if len(submission.strip()) > 0
-    ]
-    datetime_as_string = submissions[-1][5:30]
-    isodatetime = parse_datetime(datetime_as_string).isoformat()
+    url = ARXIV_URL + "api/query?id_list=" + arxiv
+    response = requests.get(url)
 
-    subjects = tree.xpath(
-        '//td[@class="tablecell subjects"]/span/text()'
-        '|'
-        '//td[@class="tablecell subjects"]/text()')
-    arxiv_classifications = [
-        match
-        for subject in subjects
-        for match in re.findall(r'\((.*?)\)', subject)
-    ]
+    feed = parse_api(response.content)
+    entry = feed.entries[0]
 
     metadata = {
         'arxiv': arxiv,
-        'authornames': tree.xpath('//div[@class="authors"]/a/text()'),
+        'authornames': [author.name for author in entry.authors],
         'full_text_url': 'https://arxiv.org/pdf/' + arxiv + '.pdf',
-        'publication_date': isodatetime[:10],
-        'title': re.sub(r'\s+', ' ', tree.xpath('//h1/text()')[-1].strip()),
-        'arxiv_classifications': arxiv_classifications,
+        'publication_date': entry.published[:10],
+        'title': entry.title,
+        'arxiv_classifications': [tag.term for tag in entry.tags],
     }
 
     # Optional DOI
-    doi = tree.xpath('//td[@class="tablecell doi"]/a/text()')
-    if not doi:
-        doi = tree.xpath('//td[@class="tablecell msc_classes"]/a/text()')
-    if doi:
-        metadata['doi'] = doi[0]
+    if "arxiv_doi" in entry:
+        metadata['doi'] = entry.arxiv_doi
 
     return metadata
 
