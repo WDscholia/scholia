@@ -1,0 +1,29 @@
+#description: Show software library, programming language and developer dependencies 
+#defaultView:Graph
+SELECT ?resource1 ?resource1Label ?image1 ?rgb ?resource2 ?resource2Label ?image2
+WITH {
+  SELECT
+    ?resource1 (SAMPLE(?image1_) AS ?image1) ?rgb
+    ?resource2 (SAMPLE(?image2_) AS ?image2)
+    {
+      {
+        # root node with coloring
+        BIND(wd:{{ q }} AS ?resource1)
+        BIND("3080BB" AS ?rgb)
+      }
+      UNION
+      {
+        # dependencies, programming language, developer
+        wd:{{ q }} ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275 )+ ?resource1 .
+        OPTIONAL { ?resource1 wdt:P18 ?image1_ }
+      }
+      wd:{{ q }} ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275 )+ ?resource2 .
+      OPTIONAL { ?resource2 wdt:P18 ?image2_ }
+      ?resource1 ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275 ) ?resource2 .
+    }
+    GROUP BY ?resource1 ?resource2 ?rgb
+} AS %result
+{
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
