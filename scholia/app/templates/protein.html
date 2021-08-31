@@ -6,6 +6,7 @@
 
 {{ sparql_to_table('similar-proteins') }}
 {{ sparql_to_table('cofunctional-proteins') }}
+{{ sparql_to_table('participates-in') }}
 {{ sparql_to_iframe('publications-per-year') }}
 
 {% endblock %}
@@ -30,6 +31,13 @@
 Proteins sharing molecular function(s).
 
 <table class="table table-hover" id="cofunctional-proteins-table"></table>
+
+
+<h2 id="participates-in-header">Participates in</h2>
+
+This protein participates in the following protein complexes and biological processes:
+
+<table class="table table-hover" id="participates-in-table"></table>
 
 
 <h2 id="publications-per-year-header">Publications per year</h2>

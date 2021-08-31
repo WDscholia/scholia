@@ -96,6 +96,7 @@ sparqlToShortInchiKey(`# tool: scholia
 	 if ('en' in item.labels) {
 	     var title = item.labels.en.value
 	     $("#h1").text(title);
+       $("title").text(title + " - Scholia");
 
 	     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
 
@@ -355,20 +356,6 @@ sparqlToShortInchiKey(`# tool: scholia
 	 }
 
      });
-
-	{% if q2 %}
-
-		var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-				   '{{ q2 }}' +
-				   '&format=json&callback=?';
-		$.getJSON(url2, function (data) {
-			 var item = data.entities["{{ q2 }}"];
-			 if ('en' in item.labels) {
-				 $("#h1").append(' - '+item.labels.en.value);
-			 }
-			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
-		});
-	{% endif %}
 	
      // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
@@ -402,6 +389,8 @@ sparqlToShortInchiKey(`# tool: scholia
     { [] wdt:P1433 wd:{{ q }} . BIND("venue" AS ?aspect) } 
     UNION
     { wd:{{ q }} wdt:P235 [] . BIND("chemical" AS ?aspect) }
+    UNION
+    { wd:{{ q }} wdt:P225 [] . BIND("taxon" AS ?aspect) }
     UNION
     { wd:{{ q }} ^wdt:P31/wdt:P235 [] . BIND("chemical-class" AS ?aspect) }
     UNION
@@ -589,6 +578,9 @@ sparqlToShortInchiKey(`# tool: scholia
 
       if (element.tagName === "H3") {
         sublist.appendChild(tocListItem);
+        if (i == headings.length - 1) {
+          tocList.appendChild(sublist);
+        }
       } else {
         if (sublist) {
           tocList.appendChild(sublist);
