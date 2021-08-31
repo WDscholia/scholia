@@ -809,107 +809,6 @@ def q_to_label(q, language='en'):
         return None
 
 
-def q_to_label_and_description(q, language='en'):
-    """Get label and description for Q item.
-
-    Parameters
-    ----------
-    q : str
-        String with Wikidata Q item.
-    language : str
-        String with language identifier
-
-    Returns
-    -------
-    results : dictionary
-        Dictionary with label of and description for the corresponding
-        Wikidata item.
-    """
-    query = """SELECT ?label ?description WHERE {{
-          wd:{q} rdfs:label ?label .
-          wd:{q} schema:description ?description .
-          FILTER (LANG(?label) = "{language}")
-          FILTER (LANG(?description) = "{language}")
-        }}""".format(q=q, language=language)
-
-    url = 'https://query.wikidata.org/sparql'
-    params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
-    data = response.json()
-
-    results = data['results']['bindings']
-    if not results:
-        return {}
-    else:
-        return {
-            "label": results[0]['label']['value'],
-            "description": results[0]['description']['value']
-        }
-
-
-def properties_for_q(q, props, prefixes=None):
-    """Get the value for a property for Q item.
-
-    Parameters
-    ----------
-    q : str
-        String with Wikidata Q item.
-    props : dictionary
-        Dictionary object with the Wikidata property identifier as key and the
-        matching BioSchemas key as value
-    prefixes : dictionary
-        Dictionary object with the prefixes for the Bioschemas values, where
-        the keys are Wikidata properties and the prefix as value
-
-    Returns
-    -------
-    bioschemas : dictionary
-        Map with Bioschemas key-value pairs, matching the input.
-
-    Examples
-    --------
-    >>> property_for_q('Q47512', {"P235": "inChIKey"})
-    {"inChIKey": "QTBSBXVTEAMEQO-UHFFFAOYSA-N"}
-
-    """
-    optionals = str('\n'.join(
-        f"  OPTIONAL {{ ?item wdt:{key} ?{key} }}"
-        for key in props.keys()
-    ))
-    variables = ' '.join(f"?{key}" for key in props.keys())
-    query = f"""SELECT {variables} WHERE {{
-        VALUES ?item {{ wd:{q} }}
-        {optionals}
-    }}"""
-
-    url = 'https://query.wikidata.org/sparql'
-    params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
-    data = response.json()
-
-    bioschemas = {}
-    # follow the Wikidata properties as found in the SPARQL results
-    for var in data['head']['vars']:
-        # check if the results have a value for this Wikidata property
-        if var in data['results']['bindings'][0].keys():
-            value = data['results']['bindings'][0][var]['value']
-            if prefixes is not None and prefixes[var]:
-                # add the given prefix for this Wikidata property
-                value = prefixes[var] + value
-            bskey = props[var]
-            # okay, some Bioschemas keys will have multiple values, in
-            # which case the string type needs to be replaced by a list type
-            if bskey in bioschemas.keys():
-                if isinstance(bioschemas[bskey], list):
-                    bioschemas[bskey].append(value)
-                else:
-                    bioschemas[bskey] = [bioschemas[bskey], value]
-            else:
-                # if the Bioschemas field is new, assume there will be only one
-                bioschemas[bskey] = value
-    return bioschemas
-
-
 def search_article_titles(q, search_string=None):
     """Search articles with q item.
 
@@ -1186,11 +1085,6 @@ def q_to_class(q):
             'Q18965518',  # artery disease
             ]):
         class_ = 'disease'
-    elif set(classes).intersection([
-            'Q47461491',  # JRC representative nanomaterial
-            'Q967847',   # nanomaterial
-            ]):
-        class_ = 'substance'
     elif set(classes).intersection([
             'Q11173',  # chemical compound
             'Q36496',  # ion

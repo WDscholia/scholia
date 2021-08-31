@@ -87,13 +87,6 @@ sparqlToShortInchiKey(`# tool: scholia
 
 <script type="text/javascript">
     {% if q %}
-    if ( $( "#bioschemas" ).length ) {
-      var bioschemasurl = "{{ url_for('app.bioschemas_for', q=q) }}";
-      $.get(bioschemasurl, function(data) {
-          $( '#bioschemas' ).text( JSON.stringify(data, undefined, 2))
-      } )
-    }
-
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
@@ -186,6 +179,137 @@ sparqlToShortInchiKey(`# tool: scholia
 	     $( '#details' ).append( detailsList.join( " | " ) );
 	 }
 	 catch(e) {}
+	 
+	 /* BioSchemas annotation */
+	 if (item.claims.P31 &&
+	     ((item.claims.P31[0].mainsnak.datavalue.value.id == 'Q5'))) {
+	   try { /* Person */
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "Person" ,
+	          "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/" },
+	          "description" : "A person" ,
+	          "identifier" : "{{ q }}" ,
+	          "mainEntityOfPage" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       if ('en' in item.labels) {
+	         bioschemasAnnotation.name = item.labels.en.value;
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	    } catch(e) {}
+	 } else if (item.claims.P31 &&
+	     ((item.claims.P31[0].mainsnak.datavalue.value.id == 'Q47461491') ||
+	      (item.claims.P31[0].mainsnak.datavalue.value.id == 'Q967847'))) {
+	   try { /* ChemicalSubstance */
+	       bioschemasAnnotation = {
+	          "@context" : "https://schema.org",
+	          "@type" : "ChemicalSubstance" ,
+	          "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE/" },
+	          "identifier" : "{{ q }}" ,
+	          "url" : "http://www.wikidata.org/entity/{{ q }}"
+	       }
+	       if ('en' in item.labels) {
+	         bioschemasAnnotation.name = item.labels.en.value;
+	       }
+	       $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	    } catch(e) {}
+	 } else if (item.claims.P225) {
+             try { /* Taxon */
+		 var taxonName = item.claims.P225[0].mainsnak.datavalue.value;
+		 bioschemasAnnotation = {
+	             "@context" : "https://schema.org",
+	             "@type" : "Taxon" ,
+	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Taxon/0.6-RELEASE/" },
+	             "name" : taxonName ,
+	             "url" : "http://www.wikidata.org/entity/{{ q }}"
+		 }
+		 if (item.claims.P105) {
+	             var taxonRank = item.claims.P105[0].mainsnak.datavalue.value.id;
+	             bioschemasAnnotation.taxonRank = "http://www.wikidata.org/entity/" + taxonRank ;
+		 }
+		 if (item.claims.P171) {
+	             var parent = item.claims.P171[0].mainsnak.datavalue.value.id;
+	             bioschemasAnnotation.parentTaxon = "http://www.wikidata.org/entity/" + parent ;
+		 }
+		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+		 // console.log(JSON.stringify(bioschemasAnnotation, "", 2))
+	     } catch(e) {}
+	 } else if (item.claims.P235) {
+	     try { /* Chemical Compound */
+		 var inchiKey = item.claims.P235[0].mainsnak.datavalue.value;
+		 bioschemasAnnotation = {
+	             "@context" : "https://schema.org",
+	             "@type" : "MolecularEntity" ,
+	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE/" },
+	             "identifier" : "{{ q }}" ,
+	             "inChIKey" : inchiKey ,
+	             "url" : "http://www.wikidata.org/entity/{{ q }}"
+		 }
+		 if ('en' in item.labels) {
+	         bioschemasAnnotation.name = item.labels.en.value;
+         }
+		 if (item.claims.P234 && item.claims.P234[0].mainsnak.datavalue) {
+	             var inchi = item.claims.P234[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.inChI = inchi ;
+		 }
+		 if (item.claims.P274 && item.claims.P274[0].mainsnak.datavalue) {
+	             var chemformula = item.claims.P274[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.molecularFormula = chemformula ;
+		 }
+		 if (item.claims.P2017 && item.claims.P2017[0].mainsnak.datavalue) {
+	             var smiles = item.claims.P2017[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.molecularFormula = smiles.replace("\"", "\'\'") ;
+		 } else if (item.claims.P233 && item.claims.P233[0].mainsnak.datavalue) {
+	             var smiles = item.claims.P233[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.smiles = smiles.replace("\"", "\'\'") ;
+		 }
+		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	     } catch(e) { console.log("Exception: " + e)
+	     }
+	 } else if (item.claims.P352) { // UniProt ID
+	     try { /* Protein */
+		 var uniprot = item.claims.P352[0].mainsnak.datavalue.value;
+		 bioschemasAnnotation = {
+	             "@context" : "https://schema.org",
+	             "@type" : "Protein" ,
+	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Protein/0.11-RELEASE/" },
+	             "identifier" : "{{ q }}" ,
+	             "url" : "http://www.wikidata.org/entity/{{ q }}" ,
+	             "sameAs": "https://www.uniprot.org/uniprot/" + uniprot
+		 }
+		 if ('en' in item.labels) {
+	       bioschemasAnnotation.name = item.labels.en.value;
+         }
+		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	     } catch(e) { console.log("Exception: " + e)
+	     }
+	 } else if (item.claims.P351 || item.claims.P594) { // NCBI Gene or Ensembl
+	     try { /* Gene */
+		 bioschemasAnnotation = {
+	             "@context" : "https://schema.org",
+	             "@type" : "Gene" ,
+	             "http://purl.org/dc/terms/conformsTo": { "@type": "CreativeWork", "@id": "https://bioschemas.org/profiles/Gene/0.7-RELEASE/" },
+	             "identifier" : "{{ q }}" ,
+	             "url" : "http://www.wikidata.org/entity/{{ q }}"
+		 }
+		 if ('en' in item.labels) {
+	       bioschemasAnnotation.name = item.labels.en.value;
+         }
+		 counter = 0
+		 bioschemasAnnotation.sameAs = []
+		 if (item.claims.P351 && item.claims.P351[0].mainsnak.datavalue) {
+	             var ncbi = item.claims.P351[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.sameAs[counter] = "https://www.ncbi.nlm.nih.gov/gene/" + ncbi;
+	             counter++
+		 }
+		 if (item.claims.P594 && item.claims.P594[0].mainsnak.datavalue) {
+	             var ensembl = item.claims.P594[0].mainsnak.datavalue.value;
+	             bioschemasAnnotation.sameAs[counter] = "http://identifiers.org/ensembl/" + ensembl;
+		 }
+		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
+	     } catch(e) { console.log("Exception: " + e)
+	     }
+	 }
 	 
 	 /* English Wikipedia */
 	 if ('enwiki' in item.sitelinks) {
