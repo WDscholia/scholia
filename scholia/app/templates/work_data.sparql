@@ -42,6 +42,15 @@ WHERE {
   }
   UNION
   {
+    BIND(2.5 AS ?order)
+    BIND("Language" AS ?description)
+    ?work wdt:P407 ?iri .
+    ?iri rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(STR(?value_string) AS ?value)
+  }
+  UNION
+  {
     SELECT
       (3 AS ?order)
       ("Reviewers" AS ?description)
