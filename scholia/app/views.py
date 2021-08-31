@@ -2,8 +2,8 @@
 
 import re
 
-from flask import (Blueprint, current_app, jsonify, redirect, render_template,
-                   request, Response, url_for)
+from flask import (Blueprint, current_app, redirect, render_template, request,
+                   Response, url_for)
 from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
 
@@ -20,8 +20,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
-                     ncbi_gene_to_qs, uniprot_to_qs,
-                     q_to_label_and_description, properties_for_q)
+                     ncbi_gene_to_qs, uniprot_to_qs)
 from ..utils import sanitize_q
 from ..wikipedia import q_to_bibliography_templates
 
@@ -133,98 +132,6 @@ def redirect_q(q):
     class_ = q_to_class(q)
     method = 'app.show_' + class_
     return redirect(url_for(method, q=q), code=302)
-
-
-def bioschemas_type(bioschemas_type, conforms_to):
-    """Create the basic and common content of Bioschemas.
-
-    Parameters
-    ----------
-    bioschemas_type : str
-        Bioschemas type of the thing to be represented
-    conforms_to : str
-        Profile specification for the given type
-    """
-    bs_profile = "https://bioschemas.org/profiles/"
-    return {
-        "@type": bioschemas_type,
-        "http://purl.org/dc/terms/conformsTo": {
-            "@type": "CreativeWork",
-            "@id": bs_profile + conforms_to,
-        }
-    }
-
-
-@main.route("/" + q_pattern + "/bioschemas")
-def bioschemas_for(q):
-    """Detect a Bioschemas API request and return Bioschemas for this item.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier
-    """
-    entity_class = q_to_class(q)
-
-    # get the aspect specific bits
-    if entity_class == "author":
-        data = bioschemas_type("Person", "Person/0.2-DRAFT-2019_07_19/")
-    elif entity_class == "substance":
-        data = bioschemas_type(
-            "ChemicalSubstance", "ChemicalSubstance/0.4-RELEASE/"
-        )
-    elif entity_class == "taxon":
-        data = bioschemas_type("Taxon", "Taxon/0.6-RELEASE/")
-        data.update(properties_for_q(
-                q,
-                {"P225": "name", "P105": "taxonRank", "P171": "taxonParent"}
-        ))
-    elif entity_class == "chemical":
-        data = bioschemas_type(
-            "MolecularEntity", "MolecularEntity/0.5-RELEASE/"
-        )
-        data.update(
-            properties_for_q(q, {
-                "P235": "inChIKey", "P234": "inChI",
-                "P274": "molecularFormula", "P2017": "smiles",
-                "P233": "smiles"
-            })
-        )
-    elif entity_class == "protein":
-        data = bioschemas_type(
-            "Protein", "Protein/0.11-RELEASE/"
-        )
-        data.update(properties_for_q(
-            q,
-            {"P352": "sameAs"}, {"P352": "https://www.uniprot.org/uniprot/"}
-        ))
-    elif entity_class == "gene":
-        data = bioschemas_type("Gene", "Gene/0.7-RELEASE/")
-        data.update(
-            properties_for_q(
-                q, {"P351": "sameAs", "P594": "sameAs"},
-                # and the prefixes:
-                {"P351": "https://www.ncbi.nlm.nih.gov/gene/",
-                 "P594": "http://identifiers.org/ensembl/"}
-            )
-        )
-    else:
-        # No schema information inferred for this type
-        data = {}
-
-    # glue stuff together
-    content = {
-        "@context": "https://schema.org",
-        "identifier": q,
-        "mainEntityOfPage": f"http://www.wikidata.org/entity/{q}",
-        **data,
-    }
-    label_and_description = q_to_label_and_description(q)
-    if label_and_description["label"]:
-        content["name"] = label_and_description["label"]
-    if label_and_description["description"]:
-        content["description"] = label_and_description["description"]
-    return jsonify(content)
 
 
 @main.route("/" + p_pattern)
@@ -1637,37 +1544,6 @@ def show_topics(qs):
         return redirect(url_for('app.show_topic', q=qs[0]), code=301)
     else:
         return render_template('topics.html', qs=qs)
-
-
-@main.route('/substance/' + q_pattern)
-def show_substance(q):
-    """Return html render page for specific chemical substance.
-
-    Parameters
-    ----------
-    q : str
-        Wikidata item identifier.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML.
-
-    """
-    return render_template('chemical.html', q=q)
-
-
-@main.route('/substance/')
-def show_substance_index():
-    """Return rendered HTML index page for chemical substance.
-
-    Returns
-    -------
-    html : str
-        Rendered HTML index page for chemical.
-
-    """
-    return render_template('chemical-index.html')
 
 
 @main.route('/chemical/' + q_pattern)
