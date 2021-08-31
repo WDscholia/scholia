@@ -1,4 +1,6 @@
 #defaultView:Graph
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # Doctoral student/advisor network with a source from a spectific researcher
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
 
@@ -9,7 +11,7 @@ WHERE {
     WHERE {
       SERVICE gas:service {
         gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                gas:in wd:{{ q }} ; 
+                gas:in target: ;
                 gas:traversalDirection "Forward" ;
                 gas:out ?student1 ;
                 gas:out1 ?depth1 ;
@@ -25,7 +27,7 @@ WHERE {
     WHERE {
       service gas:service {
         gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                gas:in wd:{{ q }} ; 
+                gas:in target: ;
                 gas:traversalDirection "Forward" ;
                 gas:out ?supervisor1 ;
                 gas:out1 ?depth1 ;
@@ -41,7 +43,7 @@ WHERE {
     WHERE {
       SERVICE gas:service {
         gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                gas:in wd:{{ q }} ; 
+                gas:in target: ;
                 gas:traversalDirection "Reverse" ;
                 gas:out ?student1 ;
                 gas:out1 ?depth1 ;
@@ -57,7 +59,7 @@ WHERE {
     WHERE {
       SERVICE gas:service {
         gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                gas:in wd:{{ q }} ; 
+                gas:in target: ;
                 gas:traversalDirection "Reverse" ;
                 gas:out ?supervisor1 ;
                 gas:out1 ?depth1 ;
@@ -68,7 +70,7 @@ WHERE {
     GROUP BY ?student1 ?supervisor1
   }
   
-  BIND( IF( ?student1 = wd:{{ q }}, "3080BB", "ffffff") AS ?rgb)  
+  BIND( IF( ?student1 = target:, "3080BB", "ffffff") AS ?rgb)
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,sv,jp,zh,ru,fr,de" .  } 
 }

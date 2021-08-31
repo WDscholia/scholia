@@ -1,8 +1,10 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?number_of_citations ?author ?authorLabel ?cited_work_example ?cited_work_exampleLabel
 WITH {
   # Find works about the topic
   SELECT DISTINCT ?work WHERE {
-	  ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+	  ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
   }
 } AS %works
 WITH {

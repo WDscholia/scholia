@@ -1,9 +1,12 @@
 #defaultView:BarChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?year (SUM(?citations_per_author_) AS ?citations_per_author) ?researcherLabel
 WITH {
   # Find researchers affiliated with the organization
   SELECT DISTINCT ?researcher WHERE {
-    ?researcher wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* wd:{{ q }} .
+    ?researcher wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* target: .
   }
 } AS %researchers 
 WITH {

@@ -1,4 +1,7 @@
 # title: Prolific authors for a specific journal
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?count ?author ?authorLabel ?orcid ?example_work ?example_workLabel
 WITH {
   # Count the number of works author by the author publishing in the journal
@@ -8,7 +11,7 @@ WITH {
     (SAMPLE(?work) AS ?example_work)
   WHERE {
     ?work wdt:P50 ?author ;
-          wdt:P1433 wd:{{ q }} .
+          wdt:P1433 target: .
   }
   GROUP BY ?author
 } AS %result

@@ -1,4 +1,7 @@
 #defaultView:Graph
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT 
   ?author1 ?author1Label (SAMPLE(?image1_) AS ?image1) ?rgb
   ?author2 ?author2Label (SAMPLE(?image2_) AS ?image2)
@@ -10,13 +13,13 @@ WITH {
   WHERE {
     # Find people at the event
     { 
-      wd:{{ q }} (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710) ?author1 . 
+      target: (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710) ?author1 .
       BIND ("EEEEEE" AS ?dark_rgb_)
     }
     UNION 
     {
       # author of article in proceedings, or program committee member
-      wd:{{ q }}  (^wdt:P4745 / ^wdt:P1433 / wdt:P50) | wdt:P5804 ?author1 .  
+      target:  (^wdt:P4745 / ^wdt:P1433 / wdt:P50) | wdt:P5804 ?author1 .
       BIND ("FFFFFF" AS ?light_rgb_)
     }
   }
@@ -25,7 +28,7 @@ WITH {
 WITH {
   SELECT DISTINCT ?author1 ?author2 ?rgb WHERE {
     INCLUDE %authors
-    wd:{{ q }} (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710 | ^wdt:P4745 / ^wdt:P1433 / wdt:P50)  ?author2 . 
+    target: (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710 | ^wdt:P4745 / ^wdt:P1433 / wdt:P50)  ?author2 .
             
     # Find co-authors
     ?work wdt:P50 ?author1 , ?author2 .

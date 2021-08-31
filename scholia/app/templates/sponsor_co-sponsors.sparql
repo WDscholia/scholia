@@ -1,11 +1,13 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # title: Co-funders to a specific funder including an example funded work
 SELECT ?count ?sponsor ?sponsorLabel ?example_work ?example_workLabel
 WITH {
   SELECT (COUNT(?work) AS ?count) ?sponsor (SAMPLE(?work) AS ?example_work)
   WHERE {
-    ?work wdt:P859+ wd:{{ q }} .
+    ?work wdt:P859+ target: .
     ?work wdt:P859+ ?sponsor .
-    FILTER (wd:{{ q }} != ?sponsor)
+    FILTER (target: != ?sponsor)
   }
   GROUP BY ?sponsor
 } AS %result

@@ -1,8 +1,10 @@
 #defaultView:Map
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT DISTINCT ?recipient ?recipientLabel ?image ?item ?itemLabel ?geo ?layer
 WITH {
   SELECT DISTINCT ?recipient ?image ?item ?geo (?property_item_label AS ?layer) WHERE {
-    ?recipient wdt:P166 wd:{{ q }} .
+    ?recipient wdt:P166 target: .
     ?recipient ?property ?item . 
     ?item wdt:P625 ?geo .
     ?property_item wikibase:directClaim ?property .

@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # List of authors for a work
 SELECT DISTINCT
   # Author order
@@ -11,7 +13,7 @@ SELECT DISTINCT
   ?orcid
 WHERE {
   {
-    wd:{{ q }} p:P50 ?author_statement .
+    target: p:P50 ?author_statement .
     ?author_statement ps:P50 ?author_ .
     ?author_ rdfs:label ?author .
     FILTER (LANG(?author) = 'en')
@@ -30,7 +32,7 @@ WHERE {
   }
   UNION
   {
-    wd:{{ q }} p:P2093 ?authorstring_statement .
+    target: p:P2093 ?authorstring_statement .
     ?authorstring_statement ps:P2093 ?author_
     BIND(CONCAT("UNRESOLVED: ", ?author_) AS ?author)
     OPTIONAL {
@@ -41,7 +43,7 @@ WHERE {
   }
   OPTIONAL {
     SELECT ?author_ (MAX(?academic_age_) AS ?academic_age) {
-      wd:{{ q }} wdt:P50 ?author_ ;
+      target: wdt:P50 ?author_ ;
                  wdt:P577 ?publication_date .
       [] wdt:P31 wd:Q13442814 ;
          wdt:P50 ?author_ ;

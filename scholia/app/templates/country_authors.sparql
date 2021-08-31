@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?number_of_citing_works
   ?author ?authorLabel
@@ -5,7 +7,7 @@ SELECT
   ?example_work ?example_workLabel
 WITH {
   SELECT DISTINCT ?author WHERE {
-    ?author wdt:P27 | wdt:P1416/wdt:P17 | wdt:P108/wdt:P17 wd:{{ q }} .
+    ?author wdt:P27 | wdt:P1416/wdt:P17 | wdt:P108/wdt:P17 target: .
   }
 } AS %authors
 WITH {
@@ -20,7 +22,7 @@ WITH {
     OPTIONAL { ?citing_work wdt:P2860 ?work . }
     OPTIONAL {
       ?author wdt:P1416 | wdt:P108 ?organization_ .
-      ?organization_ wdt:P17 wd:{{ q }}
+      ?organization_ wdt:P17 target:
     }
   }
   GROUP BY ?author 

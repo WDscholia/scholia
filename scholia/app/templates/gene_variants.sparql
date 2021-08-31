@@ -1,10 +1,12 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?variant ?variantLabel ?variantDescription
   ?types
 WITH {
   SELECT ?variant ?type
   WHERE {
-    ?variant wdt:P3433 wd:{{ q }}
+    ?variant wdt:P3433 target:
   }
 } AS %variants
 WITH {

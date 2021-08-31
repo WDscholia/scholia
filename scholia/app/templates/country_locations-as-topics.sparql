@@ -1,4 +1,6 @@
 # title: Locations as topics for a specific country
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 #defaultView:Map{"markercluster":true}.
 SELECT 
   ?location ?locationLabel 
@@ -7,7 +9,7 @@ SELECT
   ?layer
 WITH {
   SELECT ?location ?work ?geo ?type WHERE {
-    ?location wdt:P17 wd:{{ q }} .
+    ?location wdt:P17 target: .
     
     # Geocoordinates may possible be under a headquarter property
     ?location wdt:P159? / wdt:P625 ?geo.

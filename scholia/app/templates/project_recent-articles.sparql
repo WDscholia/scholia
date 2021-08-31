@@ -1,21 +1,23 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?date ?work ?workLabel ?type ?topics
 WITH {
   SELECT DISTINCT ?work WHERE {
     {
-      ?work wdt:P921 / (wdt:P527+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+      ?work wdt:P921 / (wdt:P527+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
     }
     UNION
     {
       # Works funded by the project, - recursively
-      ?work wdt:P859+ wd:{{ q }} .
+      ?work wdt:P859+ target: .
     }
     UNION
     {
       # Works funded by the project, - recursively
-      ?work wdt:P859/(wdt:P1344|^wdt:P710)* wd:{{ q }} .
+      ?work wdt:P859/(wdt:P1344|^wdt:P710)* target: .
     }
     UNION {
-      wd:{{ q }} ?propp ?statement .
+      target: ?propp ?statement .
       ?statement a wikibase:BestRank ;
                  prov:wasDerivedFrom/pr:P248 ?work .
     }

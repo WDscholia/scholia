@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (xsd:date(MIN(?start)) AS ?date)  
   ?event
@@ -5,7 +7,7 @@ SELECT
   (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
   (GROUP_CONCAT(DISTINCT ?location_label; separator=", ") AS ?locations)
 WHERE {
-    BIND(wd:{{ q }} AS ?person)
+    BIND(target: AS ?person)
     {  # speaker
       ?event wdt:P823 ?person .
       BIND("speaker" AS ?role)

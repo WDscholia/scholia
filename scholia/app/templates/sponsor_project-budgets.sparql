@@ -1,7 +1,10 @@
 # title: Scatterplot of project budgets associated with a funder
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 #defaultView:ScatterChart
 SELECT ?start_time ?budget ?project ?projectLabel WHERE {
-  ?project wdt:P859+ wd:{{ q }} .
+  ?project wdt:P859+ target: .
   ?project wdt:P2769 ?budget .
   ?project (wdt:P580 | wdt:P571) ?start_time .
   SERVICE wikibase:label {

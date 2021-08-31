@@ -1,9 +1,12 @@
 #defaultView:BubbleChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?citedArticle .
-  ?citedArticle wdt:P1433 wd:{{ q }} .
+  ?citedArticle wdt:P1433 target: .
   ?intention wdt:P31 wd:Q96471816 ;
              wdt:P2888 ?cito .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }

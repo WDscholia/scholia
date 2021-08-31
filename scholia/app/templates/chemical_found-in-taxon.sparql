@@ -1,5 +1,7 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT DISTINCT ?taxon ?taxonLabel ?source ?sourceLabel ?DOI WHERE {
-  VALUES ?chemical { wd:{{ q }} }
+  VALUES ?chemical { target: }
   ?chemical p:P703 ?taxonStatement .
   ?taxonStatement ps:P703 ?taxon .
   OPTIONAL {

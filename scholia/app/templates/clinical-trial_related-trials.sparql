@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?score
   ?trial ?trialLabel
@@ -7,7 +9,7 @@ WHERE {
       (SUM(?score_) AS ?score)
       ?trial
     WHERE {
-      BIND(wd:{{ q }} AS ?query_trial) 
+      BIND(target: AS ?query_trial)
       ?trial wdt:P31 wd:Q30612 .
       { 
         ?query_trial wdt:P1050 / ^wdt:P1050 ?trial .
@@ -28,7 +30,7 @@ WHERE {
     ORDER BY DESC(?score)
     LIMIT 500
   }
-  FILTER (wd:{{ q }} != ?trial)
+  FILTER (target: != ?trial)
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
 }
 ORDER BY DESC(?score)

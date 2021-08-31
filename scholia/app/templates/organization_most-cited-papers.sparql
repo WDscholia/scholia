@@ -1,4 +1,7 @@
 #defaultView:BubbleChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # Bubble chart of most cited works of first author associated
 # with an organization
 SELECT
@@ -10,7 +13,7 @@ WITH {
     (COUNT(DISTINCT ?citing_work) AS ?count)
     ?work
   WHERE {
-    ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) wd:{{ q }} .
+    ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) target: .
     ?work p:P50 ?researcher_statement .
     ?researcher_statement ps:P50 ?researcher .
     ?researcher_statement pq:P1545 "1" .

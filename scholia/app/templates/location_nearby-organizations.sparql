@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # title: Nearby academic institutions around a specified geographic entity.
 SELECT
   ?distance ?unit ?unitLabel
@@ -20,7 +22,7 @@ WITH {
   # Compute distance.
   SELECT ?organization ?distance ?unit WHERE {
     INCLUDE %organizations
-    wd:{{ q }} wdt:P159* / wdt:P625 ?geo .
+    target: wdt:P159* / wdt:P625 ?geo .
     BIND(geof:distance(?other_geo, ?geo) AS ?distance)
     BIND(wd:Q828224 AS ?unit)
     FILTER(?distance < 250)

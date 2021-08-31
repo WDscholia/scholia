@@ -1,5 +1,7 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
-  VALUES ?JOURNAL { wd:{{q}} }
+  VALUES ?JOURNAL { target: }
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?citedArticle .

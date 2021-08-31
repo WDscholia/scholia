@@ -1,4 +1,7 @@
 # title: Most cited articles published in specific venue
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 #defaultView:Table
 SELECT
   ?count
@@ -11,7 +14,7 @@ WITH {
     ?work
     (SAMPLE(?citing_work) AS ?example_citing_work)
   WHERE {
-    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P1433 target: .
     ?citing_work wdt:P2860 ?work.
   }
   GROUP BY ?work
