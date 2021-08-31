@@ -1,9 +1,12 @@
 # title: Author images for a specific venue
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 #defaultView:ImageGrid
 SELECT (SAMPLE(?image_) AS ?image) ?author ?authorLabel ?count
 WITH {
   SELECT ?author (COUNT(?work) AS ?count) WHERE {
-    ?work wdt:P1433 wd:{{ q }};
+    ?work wdt:P1433 target:;
           wdt:P50 ?author .
   }
   GROUP BY ?author

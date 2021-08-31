@@ -1,4 +1,6 @@
 #defaultView:Table
+Q202864
+
 SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
 WITH {
   SELECT
@@ -6,7 +8,7 @@ WITH {
     (COUNT(?citing_citing_work) AS ?citations)
     ?citing_work
   WHERE {
-    ?citing_work wdt:P2860 wd:{{ q }} .
+    ?citing_work wdt:P2860 target: .
     OPTIONAL {
       ?citing_work wdt:P577 ?datetime .
       BIND(xsd:date(?datetime) AS ?date)

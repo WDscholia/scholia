@@ -1,4 +1,6 @@
 #defaultView:BarChart
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # title: publications per year for this chemical
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -11,10 +13,10 @@ select ?year (count(?work) as ?number_of_publications) where {
       bind(year(?date) as ?year_)
       {
         select (min(?year_) as ?earliest_year) where {
-          { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
-          union { ?work wdt:P921/(^wdt:P361)+ wd:{{ q }} . }
-          union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
-          union { wd:{{ q }} ?propp ?statement .
+          { ?work wdt:P921/wdt:P31*/wdt:P279* target: . }
+          union { ?work wdt:P921/(^wdt:P361)+ target: . }
+          union { ?work wdt:P921/wdt:P1269+ target: . }
+          union { target: ?propp ?statement .
                   ?statement a wikibase:BestRank ;
                              prov:wasDerivedFrom/pr:P248 ?work . }
           ?work wdt:P577 ?publication_date . 
@@ -27,10 +29,10 @@ select ?year (count(?work) as ?number_of_publications) where {
   }
   union {
     select ?work (min(?years) as ?year) where {
-      { ?work wdt:P921/wdt:P31*/wdt:P279* wd:{{ q }} . }
-      union { ?work wdt:P921/wdt:P527+ wd:{{ q }} . }
-      union { ?work wdt:P921/wdt:P1269+ wd:{{ q }} . }
-      union { wd:{{ q }} ?propp ?statement .
+      { ?work wdt:P921/wdt:P31*/wdt:P279* target: . }
+      union { ?work wdt:P921/wdt:P527+ target: . }
+      union { ?work wdt:P921/wdt:P1269+ target: . }
+      union { target: ?propp ?statement .
               ?statement a wikibase:BestRank ;
                          prov:wasDerivedFrom/pr:P248 ?work . }
       ?work wdt:P577 ?dates .

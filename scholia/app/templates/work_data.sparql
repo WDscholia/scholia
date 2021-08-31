@@ -1,6 +1,8 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?description ?value ?valueUrl
 WHERE {
-  BIND(wd:{{ q }} AS ?work)
+  BIND(target: AS ?work)
   {
     BIND(1 AS ?order)
     BIND("Title" AS ?description)
@@ -15,7 +17,7 @@ WHERE {
       (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
     {
       BIND(1 AS ?dummy)
-      wd:{{ q }} wdt:P50 ?iri .
+      target: wdt:P50 ?iri .
       BIND(SUBSTR(STR(?iri), 32) AS ?q) 
       ?iri rdfs:label ?value_string . 
       FILTER (LANG(?value_string) = 'en')
@@ -32,7 +34,7 @@ WHERE {
       (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
     {
       BIND(1 AS ?dummy)
-      wd:{{ q }} wdt:P98 ?iri .
+      target: wdt:P98 ?iri .
       BIND(SUBSTR(STR(?iri), 32) AS ?q) 
       ?iri rdfs:label ?value_string . 
       FILTER (LANG(?value_string) = 'en')
@@ -49,7 +51,7 @@ WHERE {
       (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
     {
       BIND(1 AS ?dummy)
-      wd:{{ q }} wdt:P4032 ?iri .
+      target: wdt:P4032 ?iri .
       BIND(SUBSTR(STR(?iri), 32) AS ?q) 
       ?iri rdfs:label ?value_string . 
       FILTER (LANG(?value_string) = 'en')
@@ -108,7 +110,7 @@ WHERE {
       (CONCAT("../topics/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
     {
       BIND(1 AS ?dummy)
-      wd:{{ q }} wdt:P921 ?iri .
+      target: wdt:P921 ?iri .
       BIND(SUBSTR(STR(?iri), 32) AS ?q) 
       ?iri rdfs:label ?value_string . 
       FILTER (LANG(?value_string) = 'en')

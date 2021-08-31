@@ -1,4 +1,6 @@
-SELECT 
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT
   (COUNT(?work) AS ?count) 
   ?author_name 
   (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", 
@@ -7,14 +9,14 @@ WHERE {
   {
     SELECT DISTINCT ?author_name WHERE {
       {
-        { wd:{{ q }} skos:altLabel ?author_name_. }
+        { target: skos:altLabel ?author_name_. }
         UNION
-        { wd:{{ q }} rdfs:label ?author_name_. }
+        { target: rdfs:label ?author_name_. }
         BIND(STR(?author_name_) AS ?author_name)
       }
       UNION
       {
-        ?author_statement ps:P50 wd:{{ q }};
+        ?author_statement ps:P50 target:;
           pq:P1932 ?author_name.
       }
     }

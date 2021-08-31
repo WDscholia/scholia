@@ -1,9 +1,11 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
 ?citations  ?work ?workLabel (?work AS ?wikidata_url)
 WITH {
   SELECT (COUNT(?work) as ?count) ?work WHERE {
   # Works by author
-    ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P50 target: .
   # Work does not have a main subject statement
     FILTER NOT EXISTS { ?work wdt:P921 ?topic . }
   }

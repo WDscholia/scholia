@@ -1,4 +1,6 @@
 #defaultView:BarChart
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
 select ?year (count(?work) as ?number_of_publications) ?role where {
@@ -10,7 +12,7 @@ select ?year (count(?work) as ?number_of_publications) ?role where {
       bind(year(?date) as ?year_)
       {
         select (min(?year_) as ?earliest_year)  (max(?year_) as ?latest_year) where {
-          ?work wdt:P50 wd:{{ q }} .
+          ?work wdt:P50 target: .
           ?work wdt:P577 ?publication_date . 
           bind(year(?publication_date) as ?year_)
         }
@@ -23,7 +25,7 @@ select ?year (count(?work) as ?number_of_publications) ?role where {
   {
     select ?work (min(?years) as ?year) (count(?coauthors) as ?number_of_authors) ?author_number where {
       ?work (p:P50|p:P2093) ?author_statement . 
-      ?author_statement ps:P50 wd:{{ q }} .
+      ?author_statement ps:P50 target: .
       optional { ?author_statement pq:P1545 ?author_number . }
       ?work (wdt:P50|wdt:P2093) ?coauthors . 
       ?work wdt:P577 ?dates .

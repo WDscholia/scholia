@@ -1,11 +1,13 @@
 # tool: scholia
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?Identifier ?IdentifierLabel
   ?id (SAMPLE(?idUrls) as ?idUrl)
   ?IdentifierDescription
 WITH {
   SELECT ?Identifier ?id ?formatterurl WHERE {
-    VALUES ?complex { wd:{{ q }} }
+    VALUES ?complex { target: }
     ?complex ?IDdir ?id .
     ?Identifier wikibase:directClaim ?IDdir ;
             wdt:P31/wdt:P279* wd:Q19847637 .

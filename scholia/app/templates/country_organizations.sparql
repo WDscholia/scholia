@@ -1,4 +1,6 @@
 # title: Organizations for a specific country
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?number_of_authors
   ?number_of_works
@@ -9,7 +11,7 @@ WITH {
     (COUNT(DISTINCT ?author) AS ?number_of_authors)
     (COUNT(DISTINCT ?work) AS ?number_of_works)
   WHERE {
-    ?organization wdt:P17 wd:{{ q }} .
+    ?organization wdt:P17 target: .
     ?author wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?organization .
     ?work wdt:P50 ?author .
   }

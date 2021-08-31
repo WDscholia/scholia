@@ -1,9 +1,11 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?score ?topic ?topicLabel ?topicDescription
 WITH {
   SELECT
     DISTINCT ?person
   WHERE {
-    ?event (wdt:P179 | wdt:P31) wd:{{ q }} .
+    ?event (wdt:P179 | wdt:P31) target: .
     {
       # speaker
       ?event wdt:P823 ?person .
@@ -31,9 +33,9 @@ WITH {
   WHERE {
 
     # For some reason a path query does not work here.
-    { ?event wdt:P179 wd:{{ q }} . }
+    { ?event wdt:P179 target: . }
     UNION
-    { ?event wdt:P31 wd:{{ q }} . }
+    { ?event wdt:P31 target: . }
 
     {
       ?event wdt:P921 ?topic .

@@ -1,9 +1,11 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?protein ?proteinLabel ?proteinDescription
 WITH {
   SELECT ?protein
   WHERE {
-    wd:{{ q }} wdt:P31 wd:Q7187 ;
+    target: wdt:P31 wd:Q7187 ;
       wdt:P688 ?protein .
   }
 } AS %result 

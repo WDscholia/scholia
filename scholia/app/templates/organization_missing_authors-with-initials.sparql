@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # Find frequent unresolved author names that are coauthors with
 # people associated with an organization.
 SELECT
@@ -10,7 +12,7 @@ SELECT
 
 WITH {
   SELECT DISTINCT ?researcher_ WHERE {
-    ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{q}} . 
+    ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
   } 
 } AS %researchers
 WITH {

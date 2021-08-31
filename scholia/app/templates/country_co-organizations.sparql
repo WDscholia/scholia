@@ -1,4 +1,6 @@
 # title: Co-organizations for a specific country
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 #defaultView:Map
 SELECT ?coorganization ?coorganizationLabel ?geocoordinates ?example_coauthor ?example_coauthorLabel ?example_work ?example_workLabel
 WITH {  
@@ -8,11 +10,11 @@ WITH {
     (SAMPLE(?coauthor) AS ?example_coauthor)
     (SAMPLE(?work) AS ?example_work)
   WHERE {
-    ?organization wdt:P17 wd:{{ q }} .
+    ?organization wdt:P17 target: .
     ?author wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?organization .
     ?work wdt:P50 ?author, ?coauthor .
     ?coauthor wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?coorganization .
-    FILTER NOT EXISTS { ?coorganization wdt:P17 wd:{{ q }} }
+    FILTER NOT EXISTS { ?coorganization wdt:P17 target: }
     ?coorganization wdt:P625 ?geocoordinates_ .
   }
   GROUP BY ?coorganization 

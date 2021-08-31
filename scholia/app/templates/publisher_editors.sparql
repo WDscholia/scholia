@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?number_of_editorships
   ?editor ?editorLabel 
@@ -10,7 +12,7 @@ WITH {
     # (GROUP_CONCAT(?journal_label; separator=" // ") AS ?venues)
   WHERE {
     # Find editors for a work published by publisher
-    ?venue_ wdt:P123 wd:{{ q }} .
+    ?venue_ wdt:P123 target: .
     ?venue_ wdt:P98 | wdt:P5769 ?editor .
     # ?venue_ rdfs:label ?venue_label . FILTER(LANG(?venue_label) = 'en')
   } 

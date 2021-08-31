@@ -1,4 +1,7 @@
 #defaultView:Table
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?publication_date
   ?work ?workLabel
@@ -9,7 +12,7 @@ WITH {
     (GROUP_CONCAT(DISTINCT ?researcher_label; separator=', ') AS ?researchers)
     (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?researchersUrl)
   WHERE {                                                         
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
     ?work wdt:P50 ?researcher .
     ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
     OPTIONAL {

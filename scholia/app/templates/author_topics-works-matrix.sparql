@@ -1,5 +1,7 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?work ?workLabel ?topic ?topicLabel WHERE {
-?work wdt:P50 wd:{{ q }} .
+?work wdt:P50 target: .
 ?work wdt:P921 ?topic .
 OPTIONAL { ?work wdt:P577 ?publication_date }
 SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,cz,da,de,es,fr,hi,jp,nl,nn,ru,sv,zh". }

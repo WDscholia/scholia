@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (SAMPLE(?number_of_works_) AS ?number_of_works)
   (MAX(?bfi) AS ?BFI)
@@ -8,7 +10,7 @@ WITH {
     ?journal
     (COUNT(?work) AS ?number_of_works_)
   WHERE {
-    ?journal wdt:P123 wd:{{ q }} .
+    ?journal wdt:P123 target: .
     OPTIONAL { ?work wdt:P1433 ?journal . }
   }
   GROUP BY ?journal 

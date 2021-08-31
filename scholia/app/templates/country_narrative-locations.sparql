@@ -1,4 +1,6 @@
 # title: Narrative locations for a specific country
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 #defaultView:Map{"markercluster":true}.
 SELECT 
   ?location ?locationLabel 
@@ -7,7 +9,7 @@ SELECT
   ?layer
 WITH {
   SELECT DISTINCT ?location ?work ?geo ?layer WHERE {
-    ?location wdt:P17 wd:{{ q }} .
+    ?location wdt:P17 target: .
     
     # Geocoordinates may possible be under a headquarter property
     ?location wdt:P159? / wdt:P625 ?geo.
@@ -23,4 +25,4 @@ WHERE {
   INCLUDE %results 
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-} 
+}

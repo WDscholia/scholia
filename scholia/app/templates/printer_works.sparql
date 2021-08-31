@@ -1,4 +1,7 @@
 # List of printed works by date
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?date
   ?work ?workLabel
@@ -10,7 +13,7 @@ WHERE {
       ?work
       (SAMPLE(?author) AS ?example_author)
     WHERE {
-      ?work wdt:P872 wd:{{ q }} .
+      ?work wdt:P872 target: .
       OPTIONAL { ?work wdt:P577 ?datetime . BIND(xsd:date(?datetime) AS ?date_) }
       OPTIONAL { ?work wdt:P50 ?author }
     }

@@ -1,8 +1,10 @@
 #defaultView:BarChart
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
-  ?work wdt:P50 wd:{{ q }} .
+  ?work wdt:P50 target: .
   ?citing_work wdt:P2860 ?work .
-  bind(if (exists { ?citing_work wdt:P50 wd:{{ q }} }, "self-citations", "citations from others") as ?kind)
+  bind(if (exists { ?citing_work wdt:P50 target: }, "self-citations", "citations from others") as ?kind)
   ?citing_work wdt:P577 ?date .
   BIND(str(YEAR(?date)) AS ?year)
 } group by ?year ?kind

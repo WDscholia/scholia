@@ -1,10 +1,13 @@
 # title: Co-author graph for a specific venue
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 #defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
   # Find works published in the given venue
   SELECT ?work WHERE {
-    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P1433 target: .
   }
 } AS %works
 WITH {

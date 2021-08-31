@@ -1,4 +1,6 @@
 #defaultView:ImageGrid
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?year
   ?recipient ?recipientLabel 
@@ -6,7 +8,7 @@ SELECT
 WITH {
   SELECT ?recipient ?year (SAMPLE(?image_) AS ?image) WHERE {
     ?recipient p:P166 ?award_statement . 
-    ?award_statement ps:P166 wd:{{ q }} .
+    ?award_statement ps:P166 target: .
     OPTIONAL {
       ?award_statement pq:P585 ?time .
 	  BIND(YEAR(?time) AS ?year)

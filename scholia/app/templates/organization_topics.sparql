@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?researchers
   ?topic ?topicLabel
@@ -7,7 +9,7 @@ SELECT
   ?samplework ?sampleworkLabel
 WITH {
   SELECT DISTINCT ?researcher WHERE {
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
   } 
 } AS %researchers
 WITH {

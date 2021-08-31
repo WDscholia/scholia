@@ -1,10 +1,12 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?Identifier ?IdentifierLabel
   ?id (SAMPLE(?idUrls) as ?idUrl)
   ?IdentifierDescription
 WITH {
   SELECT ?Identifier ?id ?formatterurl WHERE {
-    wd:{{ q }} ?IDdir ?id .
+    target: ?IDdir ?id .
     ?Identifier wikibase:directClaim ?IDdir ;
             wdt:P31/wdt:P279* wd:Q42396390 .
     OPTIONAL {

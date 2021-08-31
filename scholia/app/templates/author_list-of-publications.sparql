@@ -1,4 +1,6 @@
 #defaultView:Table
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (MIN(?dates) AS ?date)
   ?work ?workLabel
@@ -8,7 +10,7 @@ SELECT
   (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
   (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
 WHERE {
-  ?work wdt:P50 wd:{{ q }} .
+  ?work wdt:P50 target: .
   ?work wdt:P50 ?author .
   OPTIONAL {
     ?author rdfs:label ?author_label_ . FILTER (LANG(?author_label_) = 'en')

@@ -1,4 +1,7 @@
 #defaultView:Graph
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
 WITH {
@@ -6,13 +9,13 @@ WITH {
     (COUNT(DISTINCT ?work) AS ?count) ?topic1 ?topic2
   WHERE {
     # Find works that are marked with main subject of the topic.
-    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:{{ q }} .
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) target: .
     
     # Identify co-occuring topics. 
     ?work wdt:P921 ?topic1, ?topic2 . 
 
     # Exclude the topic it self
-    FILTER (wd:{{ q }} != ?topic1 && wd:{{ q }} != ?topic2 && ?topic1 != ?topic2)
+    FILTER (target: != ?topic1 && target: != ?topic2 && ?topic1 != ?topic2)
   }
   GROUP BY ?topic1 ?topic2
   ORDER BY DESC(?count)
