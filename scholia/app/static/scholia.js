@@ -261,6 +261,7 @@ function sparqlToIframe(sparql, element, filename) {
     let $iframe = $(element)
     url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
     $iframe.attr('src', url);
+    $iframe.attr('loading', 'lazy');
 
     const wikidata_sparql = "https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparql)
     const wikidata_query = "https://query.wikidata.org/#" + encodeURIComponent(sparql)
