@@ -57,6 +57,10 @@ h3 {
     box-shadow: 2px 2px;
 }
 
+a.dropdown-item.active {
+    color: white;
+}
+
 .navbar {
     height: 4rem;
     flex-wrap: nowrap;
