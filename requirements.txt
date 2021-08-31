@@ -9,3 +9,4 @@ simplejson
 werkzeug>=0.9
 urllib3>=1.25.1
 mock
+feedparser

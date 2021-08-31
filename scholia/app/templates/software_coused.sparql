@@ -3,8 +3,8 @@ WITH{
   # Find works that are using a specific software,
   # and find other software used in the found works
   SELECT ?coused (COUNT(?work) as ?count) (SAMPLE(?work) AS ?example_work) WHERE {
-    ?work wdt:P2283/(wdt:P279*) wd:{{ q }} .
-    ?work wdt:P2283 ?coused .
+    ?work (wdt:P2283 | wdt:P4510) / (wdt:P279*) wd:{{ q }} .
+    ?work (wdt:P2283 | wdt:P4510) ?coused .
     FILTER (?coused != wd:{{ q }})
   }
   GROUP BY ?coused
