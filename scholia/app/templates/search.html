@@ -5,7 +5,7 @@
 
 {% block page_content %}
 
-<h1>Search</h1>
+<h1 data-i18n="search-search">Search</h1>
 
 <form>
     <div class="input-group">
@@ -17,9 +17,9 @@
 <div class="search-results">
     <br>
     {% if search_results %}
-    <h5>Results</h5>
+    <h5 data-i18n="search-results">Results</h5>
     {% else %}
-    <h5>No results for "{{ query }}"</h5>
+    <h5 data-i18n="search-no-results">No results for "{{ query }}"</h5>
     {% endif %}
     <ul class="search-results">
     {% for search_result in search_results %}
@@ -33,10 +33,10 @@
 
     <div class="text-center">
     {% if prev_page >= 0 %}
-        <h5 class="d-inline"><a href="/search?q={{ query }}&page={{ prev_page }}">Back</a> |</h5>
+        <h5 class="d-inline" data-i18n="search-back"><a href="/search?q={{ query }}&page={{ prev_page }}">Back</a> |</h5>
     {%  endif %}
     {% if next_page >= 0 %}
-        <h5 class="d-inline"><a href="/search?q={{ query }}&page={{ next_page }}">Next</a></h5>
+        <h5 class="d-inline" data-i18n="search-next"><a href="/search?q={{ query }}&page={{ next_page }}">Next</a></h5>
     {%  endif %}
     </div>
 </div>
