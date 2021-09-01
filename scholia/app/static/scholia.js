@@ -255,7 +255,8 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
         );
     }).fail(function () {
         $(element).append(
-            '<p>This query has timed out, we encourage you to modify next query on Wikidata to be less intensive </p> <caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
+            '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> ' +
+            '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
                 encodeURIComponent(sparql) +
                 '">Wikidata Query Service</a></span>' +
                 '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
