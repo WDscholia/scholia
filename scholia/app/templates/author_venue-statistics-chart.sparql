@@ -9,7 +9,7 @@ WITH {
 } AS %counts
 WHERE {
   INCLUDE %counts
-  ?venue rdfs:label ?long_venue_label FILTER(LANG(?long_venue_label) = 'en')
+  ?venue rdfs:label ?long_venue_label FILTER(LANG(?long_venue_label) = '{{ g.lang_code }}')
   OPTIONAL { ?venue wdt:P1813 ?short_name . }
   BIND(COALESCE(?short_name, ?long_venue_label) AS ?venue_label_)
 }

@@ -14,7 +14,7 @@ WITH {
     ?work wdt:P1433 ?venue .
     OPTIONAL {
       ?venue wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = 'en') }
+      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = '{{ g.lang_code }}') }
   }
   GROUP BY ?venue
 } AS %result

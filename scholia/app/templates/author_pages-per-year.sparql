@@ -21,7 +21,7 @@ select ?year ?number_of_pages ?work_label where {
         ?work wdt:P50 wd:{{ q }} .
         ?work wdt:P1104 ?pages .
         ?work wdt:P577 ?date . 
-        ?work rdfs:label ?long_work_label . filter(lang(?long_work_label) = 'en')
+        ?work rdfs:label ?long_work_label . filter(lang(?long_work_label) = '{{ g.lang_code }}')
         bind(substr(?long_work_label, 1, 20) as ?work_label)
         bind(str(year(?date)) as ?year) 
       }
