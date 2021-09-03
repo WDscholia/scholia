@@ -37,7 +37,7 @@ WITH {
 WHERE {
   {
     INCLUDE %works
-    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+    ?article_type rdfs:label ?type . FILTER (LANG(?type) = '{{ g.lang_code }}')
   }
   UNION
   {

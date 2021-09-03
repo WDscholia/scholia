@@ -9,7 +9,7 @@ WITH {
     OPTIONAL { 
       ?part wdt:P31 ?type_ .
       ?type_ rdfs:label ?type_label .
-      FILTER (LANG(?type_label) = 'en')
+      FILTER (LANG(?type_label) = '{{ g.lang_code }}')
     }
   } GROUP BY ?part ?quantity 
 } AS %result
