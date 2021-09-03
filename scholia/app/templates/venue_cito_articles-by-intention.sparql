@@ -27,7 +27,7 @@ select ?year (count(?work) as ?number_of_publications) ?intention where {
             p:P2860 / pq:P3712 / rdfs:label ?intention ;
             wdt:P1433 ?JOURNAL .
       bind(str(year(?dates)) as ?years) .
-      FILTER (LANG(?intention) = "en")
+      FILTER (LANG(?intention) = '{{ g.lang_code }}')
     }
     group by ?work ?intention
   }
