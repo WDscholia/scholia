@@ -41,7 +41,7 @@ WHERE {
       ?citing_author_statement pq:P1545 "1" .
       ?citing_author_statement ps:P50 ?citing_author .
       ?citing_author rdfs:label ?citing_author_name .
-      filter(lang(?citing_author_name) = 'en')
+      filter(lang(?citing_author_name) = '{{ g.lang_code }}')
     }
     union 
   	{ 
@@ -55,7 +55,7 @@ WHERE {
       ?cited_author_statement pq:P1545 "1" .
       ?cited_author_statement ps:P50 ?cited_author .
       ?cited_author rdfs:label ?cited_author_name .
-      filter(lang(?cited_author_name) = 'en')
+      filter(lang(?cited_author_name) = '{{ g.lang_code }}')
     }
     union 
   	{ 

@@ -18,7 +18,7 @@ WHERE {
       wd:{{ q }} wdt:P50 ?iri .
       BIND(SUBSTR(STR(?iri), 32) AS ?q) 
       ?iri rdfs:label ?value_string . 
-      FILTER (LANG(?value_string) = 'en')
+      FILTER (LANG(?value_string) = '{{ g.lang_code }}')
       BIND(COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
@@ -35,7 +35,7 @@ WHERE {
       wd:{{ q }} wdt:P98 ?iri .
       BIND(SUBSTR(STR(?iri), 32) AS ?q) 
       ?iri rdfs:label ?value_string . 
-      FILTER (LANG(?value_string) = 'en')
+      FILTER (LANG(?value_string) = '{{ g.lang_code }}')
       BIND(COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
@@ -61,7 +61,7 @@ WHERE {
       wd:{{ q }} wdt:P4032 ?iri .
       BIND(SUBSTR(STR(?iri), 32) AS ?q) 
       ?iri rdfs:label ?value_string . 
-      FILTER (LANG(?value_string) = 'en')
+      FILTER (LANG(?value_string) = '{{ g.lang_code }}')
       BIND(COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
@@ -73,7 +73,7 @@ WHERE {
     ?work wdt:P1433 ?iri .
     BIND(SUBSTR(STR(?iri), 32) AS ?q) 
     ?iri rdfs:label ?value_string . 
-    FILTER (LANG(?value_string) = 'en')
+    FILTER (LANG(?value_string) = '{{ g.lang_code }}')
     BIND(COALESCE(?value_string, ?q) AS ?value)
     BIND(CONCAT("../venue/", ?q) AS ?valueUrl)
   }
@@ -84,7 +84,7 @@ WHERE {
     ?work wdt:P179 ?iri .
     BIND(SUBSTR(STR(?iri), 32) AS ?q) 
     ?iri rdfs:label ?value_string . 
-    FILTER (LANG(?value_string) = 'en')
+    FILTER (LANG(?value_string) = '{{ g.lang_code }}')
     BIND(COALESCE(?value_string, ?q) AS ?value)
     BIND(CONCAT("../series/", ?q) AS ?valueUrl)
   }
@@ -104,7 +104,7 @@ WHERE {
     ?work wdt:P123 ?iri .
     BIND(SUBSTR(STR(?iri), 32) AS ?q) 
     ?iri rdfs:label ?value_string . 
-    FILTER (LANG(?value_string) = 'en')
+    FILTER (LANG(?value_string) = '{{ g.lang_code }}')
     BIND(COALESCE(?value_string, ?q) AS ?value)
     BIND(CONCAT("../publisher/", ?q) AS ?valueUrl)
   }
@@ -120,7 +120,7 @@ WHERE {
       wd:{{ q }} wdt:P921 ?iri .
       BIND(SUBSTR(STR(?iri), 32) AS ?q) 
       ?iri rdfs:label ?value_string . 
-      FILTER (LANG(?value_string) = 'en')
+      FILTER (LANG(?value_string) = '{{ g.lang_code }}')
       BIND(COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
@@ -162,7 +162,7 @@ WHERE {
     ?work wdt:P5824 ?iri .
     BIND(SUBSTR(STR(?iri), 32) AS ?q) 
     ?iri rdfs:label ?value_string . 
-    FILTER (LANG(?value_string) = 'en')
+    FILTER (LANG(?value_string) = '{{ g.lang_code }}')
     BIND(COALESCE(?value_string, ?q) AS ?value)
     BIND(CONCAT("../work/", ?q) AS ?valueUrl)
   }
@@ -180,7 +180,7 @@ WHERE {
       ?statement pq:P642 ?pub .
     BIND(SUBSTR(STR(?pub), 32) AS ?pubqid) 
     ?pub rdfs:label ?value_string . 
-    FILTER (LANG(?value_string) = 'en')
+    FILTER (LANG(?value_string) = '{{ g.lang_code }}')
     BIND(COALESCE(?value_string, ?pubqid) AS ?value)
     BIND(CONCAT("../work/", ?pubqid) AS ?valueUrl)}
   }

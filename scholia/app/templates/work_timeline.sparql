@@ -20,7 +20,7 @@ SELECT DISTINCT ?datetime ?description WHERE {
     ?event_statement ps:P793 ?event_type .
     ?event_type rdfs:label ?description_ .
     ?event_statement pq:P585 ?datetime .
-    FILTER (LANG(?description_) = "en")
+    FILTER (LANG(?description_) = '{{ g.lang_code }}')
     
     # Warning icon for retraction
     BIND(
