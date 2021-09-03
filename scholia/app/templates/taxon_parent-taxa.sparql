@@ -5,7 +5,7 @@ SELECT
   wd:{{ q }} wdt:P171+ ?parent .
   ?parent wdt:P105 ?rank .
   OPTIONAL {
-    ?rank rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
+    ?rank rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = '{{ g.lang_code }}')
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 }
