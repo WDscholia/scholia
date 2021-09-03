@@ -11,7 +11,7 @@ WITH {
   WHERE {                                                         
     ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
     ?work wdt:P50 ?researcher .
-    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
+    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = '{{ g.lang_code }}')
     OPTIONAL {
       ?work wdt:P577 ?publication_datetimes .
     }

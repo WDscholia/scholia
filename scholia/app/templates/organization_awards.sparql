@@ -8,7 +8,7 @@ WITH {
       } 
     }
     ?researcher wdt:P166 ?award .
-    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
+    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = '{{ g.lang_code }}')
   }
   GROUP BY ?award 
 } AS %result

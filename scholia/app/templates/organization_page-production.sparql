@@ -22,7 +22,7 @@ WHERE {
       ?work wdt:P1104 ?pages .
       ?work wdt:P577 ?date . 
       BIND(STR(YEAR(?date)) AS ?year) 
-      ?researcher rdfs:label ?researcher_label . FILTER(LANG(?researcher_label) = 'en')
+      ?researcher rdfs:label ?researcher_label . FILTER(LANG(?researcher_label) = '{{ g.lang_code }}')
     } 
     GROUP BY ?work ?researcher_label ?year
   }
