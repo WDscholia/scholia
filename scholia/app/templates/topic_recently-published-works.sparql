@@ -12,7 +12,7 @@ WITH {
     INCLUDE %works
     ?work wdt:P921 ?topic . 
     OPTIONAL { ?work wdt:P577 ?dates . }
-    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
+    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = '{{ g.lang_code }}')
   }
   GROUP BY ?work
 } AS %result

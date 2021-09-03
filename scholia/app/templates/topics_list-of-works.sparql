@@ -15,7 +15,7 @@ WITH {
     # long time and time out.
     ?work wdt:P921 ?topic  .
     ?topic rdfs:label ?topic_label .
-    FILTER(LANG(?topic_label) = 'en')
+    FILTER(LANG(?topic_label) = '{{ g.lang_code }}')
   }
   GROUP BY ?work ?topics
   HAVING(?count > 1)
