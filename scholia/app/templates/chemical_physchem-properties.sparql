@@ -19,16 +19,16 @@ WITH {
     OPTIONAL {
       {
         ?qualifierProp wikibase:qualifier ?qualifier ;
-                       rdfs:label ?qProplabel; FILTER (lang(?qProplabel) = "en") .
+                       rdfs:label ?qProplabel; FILTER (lang(?qProplabel) = '{{ g.lang_code }}') .
         ?qualifier a owl:DatatypeProperty .
         ?statement ?qualifier ?qualifierVal .
         BIND (CONCAT(str(?qProplabel), ": ", str(?qualifierVal)) AS ?qualifierStr)
       } UNION {
         ?qualifierProp wikibase:qualifier ?qualifier ;
-                       rdfs:label ?qProplabel; FILTER (lang(?qProplabel) = "en") .
+                       rdfs:label ?qProplabel; FILTER (lang(?qProplabel) = '{{ g.lang_code }}') .
         ?qualifier a owl:ObjectProperty .
         ?statement ?qualifier ?qualifierVal .
-        ?qualifierVal rdfs:label ?qVallabel; FILTER (lang(?qVallabel) = "en") .
+        ?qualifierVal rdfs:label ?qVallabel; FILTER (lang(?qVallabel) = '{{ g.lang_code }}') .
         BIND (CONCAT(str(?qProplabel), ": ", str(?qVallabel)) AS ?qualifierStr)
       }
     }
