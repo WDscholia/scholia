@@ -7,7 +7,7 @@ WITH {
     ?query_protein wdt:P680 ?function .
     FILTER (?query_protein != ?protein)
     ?protein wdt:P680 ?function . 
-    ?function rdfs:label ?function_label FILTER(lang(?function_label) = "en")
+    ?function rdfs:label ?function_label FILTER(lang(?function_label) = '{{ g.lang_code }}')
   }
   GROUP BY ?protein
 } AS %result 
