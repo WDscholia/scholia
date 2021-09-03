@@ -23,7 +23,7 @@ WHERE {
   # Move here for speed of query
   OPTIONAL {
     ?work wdt:P31 / rdfs:label ?layer . 
-    FILTER (LANG(?layer) = 'en')
+    FILTER (LANG(?layer) = '{{ g.lang_code }}')
   }
   
   SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
