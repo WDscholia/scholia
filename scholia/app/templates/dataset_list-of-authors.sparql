@@ -14,7 +14,7 @@ WHERE {
     wd:{{ q }} p:P50 ?author_statement .
     ?author_statement ps:P50 ?author_ .
     ?author_ rdfs:label ?author .
-    FILTER (LANG(?author) = 'en')
+    FILTER (LANG(?author) = '{{ g.lang_code }}')
     BIND(CONCAT("../author/", SUBSTR(STR(?author_), 32)) AS ?authorUrl)
     OPTIONAL {
       ?author_statement pq:P1545 ?order_ .
@@ -25,7 +25,7 @@ WHERE {
     BIND(COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?author))) AS ?orcid)
     OPTIONAL {
       ?author_ schema:description ?authorDescription .
-      FILTER (LANG(?authorDescription) = "en")
+      FILTER (LANG(?authorDescription) = '{{ g.lang_code }}')
     }
   }
   UNION
