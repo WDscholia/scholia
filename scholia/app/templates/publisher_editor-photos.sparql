@@ -14,7 +14,7 @@ WITH {
     ?venue_ wdt:P98 | wdt:P5769 ?editor .
     ?editor wdt:P18 ?image_ .
     OPTIONAL {
-      ?venue_ rdfs:label ?venue_label . FILTER(LANG(?venue_label) = 'en')
+      ?venue_ rdfs:label ?venue_label . FILTER(LANG(?venue_label) = '{{ g.lang_code }}')
     }
   }
   GROUP BY ?editor
