@@ -701,17 +701,7 @@ sparqlToShortInchiKey(`# tool: scholia
 		</ul>
 	    </div>
 	</li>
-
-	<li role="presentation">
-	    <div class="dropdown">
-		<button class="btn btn-link dropdown-toggle" 
-			type="button" data-toggle="dropdown">Help
-		    <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		    <li role="presentation"><a href="{{ url_for('app.index_statistics') }}">Statistics</a></li>
-		</ul>
-	    </div>
-	</li>
+    <li role="presentation"><a href="{{ url_for('app.index_statistics') }}">Statistics</a></li>
     <li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a></li>
     <li role="presentation"><a href="{{ url_for('app.show_faq') }}">FAQ</a></li>
     
