@@ -29,7 +29,7 @@ WITH {
     ?event p:P793 [ ps:P793 ?item ; pq:P585 ?time ] .
     OPTIONAL {
       ?item rdfs:label ?description .
-      FILTER (LANG(?description) = "en")
+      FILTER (LANG(?description) = '{{ g.lang_code }}')
     }
   }
 } AS %events2

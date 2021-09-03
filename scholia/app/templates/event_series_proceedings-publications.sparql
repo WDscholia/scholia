@@ -19,11 +19,11 @@ WITH {
     }
     OPTIONAL {
       ?work wdt:P50 ?author .
-      ?author rdfs:label ?author_label . FILTER(LANG(?author_label) = "en")
+      ?author rdfs:label ?author_label . FILTER(LANG(?author_label) = '{{ g.lang_code }}')
     }
     OPTIONAL {
       ?work wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = "en")
+      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = '{{ g.lang_code }}')
     }
   }
   GROUP BY ?work
