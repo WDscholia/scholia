@@ -11,7 +11,7 @@ SELECT DISTINCT ?start_time ?end_time ?description WHERE {
     ?project (wdt:P571 | wdt:P580) ?start_time ;
              (wdt:P576 | wdt:P582) ?end_time .
     ?project rdfs:label ?projectName .
-    FILTER (lang(?projectName) = "en")
+    FILTER (lang(?projectName) = '{{ g.lang_code }}')
     BIND(?projectName AS ?description)
   }   
   UNION 

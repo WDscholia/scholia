@@ -31,12 +31,12 @@ WITH {
     INCLUDE %works
     OPTIONAL {
        ?work wdt:P31 ?type_ .
-       ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en')
+       ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = '{{ g.lang_code }}')
     }
     OPTIONAL { ?work wdt:P577 ?dates . }
     OPTIONAL {
       ?work wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label . FILTER (lang(?topic_label) = 'en')
+      ?topic rdfs:label ?topic_label . FILTER (lang(?topic_label) = '{{ g.lang_code }}')
     }
   }
   GROUP BY ?work
