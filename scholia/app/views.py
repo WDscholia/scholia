@@ -134,6 +134,19 @@ def redirect_q(q):
     return redirect(url_for(method, q=q), code=302)
 
 
+@main.route('/property/')
+def show_property_index():
+    """Return property index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for property view.
+
+    """
+    return render_template('property-index.html')
+
+
 @main.route("/" + p_pattern)
 def show_p(p):
     """Detect and redirect to Scholia class page.
