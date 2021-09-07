@@ -88,7 +88,7 @@ sparqlToShortInchiKey(`# tool: scholia
 <script type="text/javascript">
     {% if q %}
     if ( $( "#bioschemas" ).length ) {
-      var bioschemasurl = "{{ url_for('app.bioschemas_for', q=q) }}";
+      var bioschemasurl = "{{ url_for('app.show_bioschemas_json', q=q) }}";
       $.get(bioschemasurl, function(data) {
           $( '#bioschemas' ).text( JSON.stringify(data, undefined, 2))
       } )

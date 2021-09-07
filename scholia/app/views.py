@@ -156,7 +156,7 @@ def bioschemas_type(bioschemas_type, conforms_to):
 
 
 @main.route("/" + q_pattern + "/bioschemas")
-def bioschemas_for(q):
+def show_bioschemas_json(q):
     """Detect a Bioschemas API request and return Bioschemas for this item.
 
     Parameters
