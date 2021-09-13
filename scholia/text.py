@@ -1,8 +1,9 @@
 """scholia.text.
 
 Usage:
-  scholia.text text-to-topic-qs <text>
   scholia.text text-to-topic-q-text-setup
+  scholia.text text-to-topic-qs <text>
+  scholia.text text-to-topics-url <text>
 
 Options:
   -h --help  Help
@@ -31,12 +32,42 @@ from six.moves import cPickle as pickle
 
 import re
 
-from simplejson import JSONDecodeError
+import json
 
 import requests
 
 
 TOPIC_LABELS_SPARQL = """
+SELECT ?topic ?topic_label
+WITH {
+  # Find works with a topic
+  SELECT ?work {
+    # Search only over scientific articles: This is probably
+    # most relevant
+    ?work wdt:P31 wd:Q13442814 ;
+          wdt:P921 [] .
+  }
+  # The arbitratry limit here is to avoid timeout
+  LIMIT 200000
+} AS %works
+WITH {
+  SELECT DISTINCT ?topic WHERE {
+    INCLUDE %works
+    ?work wdt:P921 ?topic .
+  }
+} AS %topics
+WHERE {
+  INCLUDE %topics
+  ?topic rdfs:label ?topic_label_ .
+  # The aliases could also be added: better retrieval, poorer precision?
+  # | skos:altLabel
+  FILTER(LANG(?topic_label_) = 'en')
+  BIND(LCASE(?topic_label_) AS ?topic_label)
+}
+"""
+
+# Unfortunately we cannot use this - for the moment
+TOPIC_LABELS_SPARQL_THAT_TIMES_OUT = """
 SELECT ?topic ?topic_label
 WITH {
   SELECT DISTINCT ?topic WHERE {
@@ -61,8 +92,11 @@ Q_PATTERN = re.compile(r'Q\d+', flags=re.UNICODE | re.DOTALL)
 
 SCHOLIA_DATA_DIRECTORY = join(expanduser('~'), '.scholia')
 
-TEXT_TO_TOPIC_Q_TEXT_FILENAME = join(
+TEXT_TO_TOPIC_Q_TEXT_PICKLE_FILENAME = join(
     SCHOLIA_DATA_DIRECTORY, 'text_to_topic_q_text.pck')
+
+TEXT_TO_TOPIC_Q_TEXT_JSON_FILENAME = join(
+    SCHOLIA_DATA_DIRECTORY, 'text_to_topic_q_text.json')
 
 
 class TextToTopicQText():
@@ -84,9 +118,13 @@ class TextToTopicQText():
         directory = SCHOLIA_DATA_DIRECTORY
         if not exists(directory):
             makedirs(directory)
-        self.filename = TEXT_TO_TOPIC_Q_TEXT_FILENAME
+        self.pickle_filename = TEXT_TO_TOPIC_Q_TEXT_PICKLE_FILENAME
+        self.json_filename = TEXT_TO_TOPIC_Q_TEXT_JSON_FILENAME
 
-        self.mapper = self.get_mapper()
+        try:
+            self.load_mapper_from_json()
+        except Exception:
+            self.mapper = self.get_mapper()
 
         tokens = self.mapper.keys()
         tokens = sorted(tokens, key=len, reverse=True)
@@ -128,7 +166,7 @@ class TextToTopicQText():
 
         try:
             response_data = response.json()
-        except JSONDecodeError:
+        except json.JSONDecodeError:
             # In some cases a timeout may occur in the middle of a response,
             # making the JSON returned invalid.
             response = requests.get(
@@ -137,7 +175,7 @@ class TextToTopicQText():
                 headers=self.headers)
             try:
                 response_data = response.json()
-            except JSONDecodeError:
+            except json.JSONDecodeError:
                 # TODO: We may end here due to timeout or (perhaps?) invalid
                 # JSON in the cache. It is unclear what we can do to escape
                 # this problem other than wait. Here is made an empty response.
@@ -156,12 +194,40 @@ class TextToTopicQText():
         """Convert match object to mapped value."""
         return self.mapper[match_object.group(0)]
 
-    def save(self, filename=None):
+    def load_mapper_from_json(self, filename=None):
+        """Load map from JSON.
+
+        Parameters
+        ----------
+        filename : str
+            Filename for JSON file.
+
+        """
+        if not filename:
+            filename = self.json_filename
+        with open(filename) as fp:
+            self.mapper = json.load(fp)
+
+    def save_mapper_as_json(self, filename=None):
+        """Save mapper as JSON file.
+
+        Parameters
+        ----------
+        filename : str
+            Filename for JSON file to be written.
+
+        """
+        if not filename:
+            filename = self.json_filename
+        with open(filename, 'w') as fp:
+            json.dump(self.mapper, fp)
+
+    def save_object_as_pickle(self, filename=None):
         """Save object."""
         if not filename:
-            filename = self.filename
+            filename = self.pickle_filename
 
-        pickle.dump(self, open(filename, 'w'))
+        pickle.dump(self, file=open(filename, 'wb'), protocol=2)
 
     def text_to_topic_q_text(self, text):
         """Convert text to q-text.
@@ -198,6 +264,20 @@ class TextToTopicQText():
 
 
 def load_text_to_topic_q_text():
+    """Set up an object.
+
+    Set up TextToTopicQText.
+
+    Returns
+    -------
+    text_to_topic_q_text : TextToTopicQText
+        Text-to-topic-q-text object that is set up and ready to use.
+
+    """
+    return TextToTopicQText()
+
+
+def load_pickle_text_to_topic_q_text():
     """Load an object that is already set up.
 
     Load the TextToTopicQText object from a pickle file and if it is not
@@ -210,7 +290,7 @@ def load_text_to_topic_q_text():
 
     """
     try:
-        return pickle.load(open(TEXT_TO_TOPIC_Q_TEXT_FILENAME, 'rb'))
+        return pickle.load(open(TEXT_TO_TOPIC_Q_TEXT_PICKLE_FILENAME, 'rb'))
     except IOError:
         return TextToTopicQText()
 
@@ -222,11 +302,21 @@ def main():
     arguments = docopt(__doc__)
 
     if arguments['text-to-topic-qs']:
-        text_to_topic_q_text = load_text_to_topic_q_text()
+        text_to_topic_q_text = TextToTopicQText()
         qs = text_to_topic_q_text.text_to_topic_qs(arguments['<text>'])
         print(",".join(qs))
 
+    if arguments['text-to-topics-url']:
+        text_to_topic_q_text = TextToTopicQText()
+        qs = text_to_topic_q_text.text_to_topic_qs(arguments['<text>'])
+        print("https://scholia.toolforge.org/topics/" + ",".join(qs))
+
     elif arguments['text-to-topic-q-text-setup']:
+        text_to_topic_q_text = TextToTopicQText()
+        text_to_topic_q_text.save_mapper_as_json()
+        print('{} saved'.format(TEXT_TO_TOPIC_Q_TEXT_JSON_FILENAME))
+
+    elif arguments['text-to-topic-q-text-pickle-setup']:
         text_to_topic_q_text = TextToTopicQText()
 
         # http://stefaanlippens.net/python-pickling-and-dealing-
@@ -234,7 +324,7 @@ def main():
         TextToTopicQText.__module__ = 'scholia.text'
 
         text_to_topic_q_text.save()
-        print('{} saved'.format(TEXT_TO_TOPIC_Q_TEXT_FILENAME))
+        print('{} saved'.format(TEXT_TO_TOPIC_Q_TEXT_PICKLE_FILENAME))
 
 
 if __name__ == '__main__':
