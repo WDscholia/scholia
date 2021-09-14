@@ -29,7 +29,7 @@ WITH {
     ?event p:P793 [ ps:P793 ?item ; pq:P585 ?time ] .
     OPTIONAL {
       ?item rdfs:label ?description .
-      FILTER (LANG(?description) = "en")
+      FILTER (LANG(?description) = '{{ g.lang_code }}')
     }
   }
 } AS %events2
@@ -40,6 +40,6 @@ WHERE {
           
   OPTIONAL { ?event wdt:P18 ?image . }
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+    bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh".
   }
 }

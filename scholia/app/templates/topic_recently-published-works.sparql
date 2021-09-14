@@ -12,7 +12,7 @@ WITH {
     INCLUDE %works
     ?work wdt:P921 ?topic . 
     OPTIONAL { ?work wdt:P577 ?dates . }
-    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
+    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = '{{ g.lang_code }}')
   }
   GROUP BY ?work
 } AS %result
@@ -23,7 +23,7 @@ WHERE {
   # BIND(xsd:date(?datetime) AS ?date)
   BIND(REPLACE(STR(?datetime), 'T.*', '') AS ?date)
     
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }
 GROUP BY ?date ?work ?workLabel ?topicsUrl ?topics
 ORDER BY DESC(?date)

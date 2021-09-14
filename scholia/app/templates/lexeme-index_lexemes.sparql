@@ -21,6 +21,6 @@ WHERE {
     LIMIT 500
   }
   ?lexeme wikibase:lemma ?lexeme_label
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],cz,da,de,en,es,fr,jp,nl,no,pl,ru,sv,zh" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,cz,da,de,es,fr,jp,nl,no,pl,ru,sv,zh" . }
 }
 ORDER BY DESC(?count)

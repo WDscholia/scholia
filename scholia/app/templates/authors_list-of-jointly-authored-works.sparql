@@ -11,13 +11,13 @@ WITH {
   {
     VALUES ?author { {% for q in qs %} wd:{{ q }} {% endfor %} }
     ?work wdt:P50 ?author .
-    OPTIONAL { ?author rdfs:label ?author_label . FILTER(LANG(?author_label) = 'en') }
+    OPTIONAL { ?author rdfs:label ?author_label . FILTER(LANG(?author_label) = '{{ g.lang_code }}') }
   }
   GROUP BY ?work
   HAVING(?coauthor_count > 1)
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,es,fr,nl,no,ru,sv,zh". }
 }
 ORDER BY DESC(?coauthor_count)

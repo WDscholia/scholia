@@ -38,13 +38,13 @@ WITH {
   WHERE {
     INCLUDE %people .
     ?work wdt:P50 ?person ; wdt:P577 ?publication_datetime .
-    ?person rdfs:label ?person_label . FILTER(LANG(?person_label) = 'en')
+    ?person rdfs:label ?person_label . FILTER(LANG(?person_label) = '{{ g.lang_code }}')
   }
   GROUP BY ?work
 } AS %results
 WHERE {
   INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
 ORDER BY DESC(?publication_date)
 LIMIT 500

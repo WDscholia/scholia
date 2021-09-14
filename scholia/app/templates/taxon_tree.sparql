@@ -38,13 +38,13 @@ WITH {
 WHERE {
   INCLUDE %results 
           
-  ?child rdfs:label ?child_label . FILTER(LANG(?child_label) = 'en')
-  ?parent rdfs:label ?parent_label . FILTER(LANG(?parent_label) = 'en')
+  ?child rdfs:label ?child_label . FILTER(LANG(?child_label) = '{{ g.lang_code }}')
+  ?parent rdfs:label ?parent_label . FILTER(LANG(?parent_label) = '{{ g.lang_code }}')
   OPTIONAL {
-    ?child wdt:P105 / rdfs:label ?child_rank_label . FILTER (LANG(?child_rank_label) = 'en')
+    ?child wdt:P105 / rdfs:label ?child_rank_label . FILTER (LANG(?child_rank_label) = '{{ g.lang_code }}')
   }
   OPTIONAL {
-    ?parent wdt:P105 / rdfs:label ?parent_rank_label . FILTER (LANG(?parent_rank_label) = 'en')
+    ?parent wdt:P105 / rdfs:label ?parent_rank_label . FILTER (LANG(?parent_rank_label) = '{{ g.lang_code }}')
   }
   BIND(CONCAT(?child_label, " - ", COALESCE(?child_rank_label, "???")) AS ?childLabel)
   BIND(CONCAT(?parent_label, " - ", COALESCE(?parent_rank_label, "???")) AS ?parentLabel)

@@ -85,16 +85,39 @@ sparqlToShortInchiKey(`# tool: scholia
 <link href="{{ url_for('static', filename='widgets/select2/css/select2.min.css') }}" rel="stylesheet" />
 <script type="text/javascript" src="{{ url_for('static', filename='widgets/select2/js/select2.min.js')}}"></script>
 
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.emitter.bidi.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.emitter.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.fallbacks.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.language.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.messagestore.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.i18n.parser.js') }}"></script>
+
 <script type="text/javascript">
-    {% if q %}
+ var langCode = "{{ g.lang_code }}"
+ 
+ $.i18n().locale = langCode || "en"
+ var i18nlang = {
+	 [langCode]:`/static/i18n/${langCode}.json`
+	}
+ $.i18n().load(i18nlang).
+	 done( ()=>{
+		 $('body').i18n();
+		})
+		
+ {% if q %}
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
      
     $.getJSON(url, function (data) {
 	 var item = data.entities["{{ q }}"];
-	 if ('en' in item.labels) {
-	     var title = item.labels.en.value
+	 
+	 if (langCode in item.labels) {
+	     $("#h1").text(item.labels[`${langCode}`].value);
+	 }
+	 else if ('en' in item.labels) {
+		 var title = item.labels.en.value
 	     $("#h1").text(title);
        $("title").text(title + " - Scholia");
 
@@ -109,6 +132,8 @@ sparqlToShortInchiKey(`# tool: scholia
 
 	     {% endif %}
 	 }
+
+
 	 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q }}">{{ q }}</a>)');
 
     {% if q2 %}
@@ -310,9 +335,27 @@ sparqlToShortInchiKey(`# tool: scholia
 	     } catch(e) { console.log("Exception: " + e)
 	     }
 	 }
-	 
+
+	 /* langCode Wikipedia */
+	 if (`${langCode}wiki` in item.sitelinks) {
+	     var title = item.sitelinks[`${langCode}wiki`].title;
+	     var wikipediaApiUrl = `https://${langCode}.wikipedia.org/w/api.php?` +
+				   'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+				   'explaintext=1&callback=?&format=json&titles=' +
+				   encodeURIComponent(title);
+	     var wikipediaUrl = `https://${langCode}.wikipedia.org/wiki/` + encodeURIComponent(title)
+	     
+	     $.getJSON(wikipediaApiUrl, function(data) {
+		 var pages = data.query.pages;
+		 var text = pages[Object.keys(pages)[0]].extract + " ... "
+		 var html = "(from the <a href=\"" + wikipediaUrl + "\">Wikipedia</a>)";
+		 $("#intro").text(text).append(html);
+	     }).fail(function(d, textStatus, error) {
+		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+	     });
+	 } 
 	 /* English Wikipedia */
-	 if ('enwiki' in item.sitelinks) {
+	 else if ('enwiki' in item.sitelinks) {
 	     var title = item.sitelinks.enwiki.title;
 	     var wikipediaApiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' +
 				   encodeURIComponent(title);
@@ -330,9 +373,31 @@ sparqlToShortInchiKey(`# tool: scholia
 	     });
 	 }
 
-	 
+	 /* langCode Wikiversity */
+	 if (`${langCode}wikiversity` in item.sitelinks) {
+	     var wikiversityTitle = item.sitelinks[`${langCode}wikiversity`].title;
+	     var wikiversityApiUrl = `https://${langCode}.wikiversity.org/w/api.php?` +
+				     'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
+				     'explaintext=1&callback=?&format=json&titles=' +
+				     encodeURIComponent(wikiversityTitle);
+	     var wikiversityUrl = `https://${langCode}.wikiversity.org/wiki/` + encodeURIComponent(wikiversityTitle)
+
+	     $.getJSON(wikiversityApiUrl, function(data) {
+		 var pages = data.query.pages;
+		 var text = pages[Object.keys(pages)[0]].extract; 
+		 if (text) {
+		     var html = "... (from the <a href=\"" + wikiversityUrl + "\">Wikiversity</a>)";
+		 }
+		 else {
+		     var html = "Read on the <a href=\"" + wikiversityUrl + "\">Wikiversity</a>";
+		 }
+		 $("#wikiversity-extract").text(text).append(html);
+	     }).fail(function(d, textStatus, error) {
+		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
+	     });
+	 } 
 	 /* English Wikiversity */
-	 if ('enwikiversity' in item.sitelinks) {
+	 else if ('enwikiversity' in item.sitelinks) {
 	     var enwikiversityTitle = item.sitelinks.enwikiversity.title;
 	     var wikiversityApiUrl = 'https://en.wikiversity.org/w/api.php?' +
 				     'action=query&prop=extracts&exsentences=3&exlimit=1&exintro=1&' + 
@@ -457,7 +522,8 @@ sparqlToShortInchiKey(`# tool: scholia
 	     // Make list with results
 	     data.most_similar.forEach(function(entry, idx, array) {
 		 var listed_q = entry.item;
-		 var language = 'en';
+		 // var language = 'en';
+		 var language = langCode;
 
 		 if (idx !== 0) {
 		     $( '#wembedder' ).append( ' &middot; ');
@@ -711,6 +777,20 @@ sparqlToShortInchiKey(`# tool: scholia
 		    <li role="presentation"><a href="{{ url_for('app.show_about') }}">About</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.index_statistics') }}">Statistics</a></li>
 		    <li role="presentation"><a href="{{ url_for('app.show_faq') }}">FAQ</a></li>
+		</ul>
+	    </div>
+	</li>
+
+	<li role="presentation">
+	    <div class="dropdown">
+		<button class="btn btn-link dropdown-toggle" 
+			type="button" data-toggle="dropdown">Language
+		    <span class="caret"></span></button>
+		<ul class="dropdown-menu">
+			<li role="presentation"><a href="{{ request.path }}?lc=en">EN</a></li>
+		    <li role="presentation"><a href="{{ request.path }}?lc=es">ES</a></li>
+			<li role="presentation"><a href="{{ request.path }}?lc=fr">FR</a></li>
+
 		</ul>
 	    </div>
 	</li>

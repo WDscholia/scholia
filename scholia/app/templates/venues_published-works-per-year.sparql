@@ -4,7 +4,7 @@ SELECT ?year (COUNT(?work) AS ?count) ?venue ?venueLabel WHERE {
   ?work wdt:P1433 ?venue .
   ?work wdt:P577 ?publication_datetime . 
   BIND(STR(YEAR(?publication_datetime)) AS ?year)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 }
 GROUP BY ?year ?venue ?venueLabel
 ORDER BY ?year

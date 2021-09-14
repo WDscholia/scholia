@@ -22,6 +22,6 @@ WITH {
 WHERE {
   INCLUDE %organizations
   BIND(IF( (?count < 1), "No results", IF((?count < 2), "1 result", IF((?count < 11), "1 < results ≤ 10", IF((?count < 101), "10 < results ≤ 100", IF((?count < 1001), "100 < results ≤ 1000", IF((?count < 10001), "1000 < results ≤ 10000", "10000 or more results") ) ) ) )) AS ?layer )
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }        
  }
 ORDER BY DESC (?count)

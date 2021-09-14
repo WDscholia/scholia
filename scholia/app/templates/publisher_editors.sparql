@@ -12,12 +12,12 @@ WITH {
     # Find editors for a work published by publisher
     ?venue_ wdt:P123 wd:{{ q }} .
     ?venue_ wdt:P98 | wdt:P5769 ?editor .
-    # ?venue_ rdfs:label ?venue_label . FILTER(LANG(?venue_label) = 'en')
+    # ?venue_ rdfs:label ?venue_label . FILTER(LANG(?venue_label) = '{{ g.lang_code }}')
   } 
   GROUP BY ?editor
 } AS %result
 WHERE {
   # Label the result
   INCLUDE %result 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . } 
 }

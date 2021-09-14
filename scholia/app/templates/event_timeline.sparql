@@ -14,6 +14,6 @@ WHERE {
   }
   UNION 
   { wd:{{ q }} p:P793 [ ps:P793 ?item ; pq:P585 ?time ] . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 }
 

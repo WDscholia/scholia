@@ -13,13 +13,13 @@ WITH {
       } 
       LIMIT 100
     }
-    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
+    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = '{{ g.lang_code }}')
   }
   GROUP BY ?award 
 } AS %result
 WHERE {
   INCLUDE %result
-    ?award rdfs:label ?awardLabel . FILTER (LANG(?awardLabel) = 'en')
+    ?award rdfs:label ?awardLabel . FILTER (LANG(?awardLabel) = '{{ g.lang_code }}')
 }
 GROUP BY ?count ?award ?awardLabel ?recipients ?recipientsUrl
 ORDER BY DESC(?count)

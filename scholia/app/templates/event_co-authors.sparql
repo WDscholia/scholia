@@ -39,7 +39,7 @@ WHERE {
     
   OPTIONAL { ?author1 wdt:P18 ?image1_ . }
   OPTIONAL { ?author2 wdt:P18 ?image2_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,sv,ru,zh".
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,sv,ru,zh".
   }
 }
 GROUP BY ?author1 ?author1Label ?rgb ?author2 ?author2Label  

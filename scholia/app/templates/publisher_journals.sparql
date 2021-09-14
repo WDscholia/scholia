@@ -18,10 +18,10 @@ WHERE {
   OPTIONAL {
     ?journal wdt:P921 ?themes .
     ?themes rdfs:label ?themes_labels .
-    FILTER (LANG(?themes_labels) = 'en')
+    FILTER (LANG(?themes_labels) = '{{ g.lang_code }}')
   }
   OPTIONAL { ?journal wdt:P1240 ?bfi . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . } 
 } 
 GROUP BY ?journal ?journalLabel
 ORDER BY DESC(?number_of_works)

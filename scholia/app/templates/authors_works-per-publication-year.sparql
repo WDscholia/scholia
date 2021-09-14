@@ -14,7 +14,7 @@ SELECT ?year ?number_of_works ?author_label WHERE {
         GROUP BY ?author ?year 
       } 
       ?author rdfs:label ?author_label_ .
-      FILTER (LANG(?author_label_) = 'en')
+      FILTER (LANG(?author_label_) = '{{ g.lang_code }}')
     }
   }
   # Represent the author by name and Q identifier

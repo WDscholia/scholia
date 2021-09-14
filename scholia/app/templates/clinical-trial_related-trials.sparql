@@ -29,6 +29,6 @@ WHERE {
     LIMIT 500
   }
   FILTER (wd:{{ q }} != ?trial)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
 }
 ORDER BY DESC(?score)

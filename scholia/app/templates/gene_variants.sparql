@@ -12,12 +12,12 @@ WITH {
     INCLUDE %variants
     OPTIONAL {
       ?variant wdt:P279 ?variantType . 
-      ?variantType rdfs:label ?type_label .  FILTER (lang(?type_label) = 'en')
+      ?variantType rdfs:label ?type_label .  FILTER (lang(?type_label) = '{{ g.lang_code }}')
     }
   }
   GROUP BY ?variant
 } AS %result 
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 }

@@ -35,6 +35,6 @@ WHERE {
   OPTIONAL { ?author1 wdt:P21 ?gender1 . }
   BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+    bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,fr,de,ru,es,zh,jp".
   }
 }

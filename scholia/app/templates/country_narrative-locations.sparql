@@ -16,11 +16,11 @@ WITH {
     # Filter encyclopedic articles - that may not be so relevant
     FILTER NOT EXISTS { ?work wdt:P31 wd:Q17329259 }
 
-    OPTIONAL { ?work wdt:P31 / rdfs:label ?layer . FILTER (LANG(?layer) = 'en') }
+    OPTIONAL { ?work wdt:P31 / rdfs:label ?layer . FILTER (LANG(?layer) = '{{ g.lang_code }}') }
   }
 } AS %results
 WHERE {
   INCLUDE %results 
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 } 

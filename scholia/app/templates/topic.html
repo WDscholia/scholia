@@ -73,37 +73,37 @@
 
 <div id="wembedder"></div>
 
-<h2 id="context-header">The topic in context</h2>
+<h2 id="context-header" data-i18n="topic-context">The topic in context</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" id="context-iframe"></iframe>
 </div>
 
-<h2 id="recently-published-works-header">Recently published works on the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<h2 id="recently-published-works-header" data-i18n="topic-recently-published-works">Recently published works on the topic <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
 <table class="table table-hover" id="recently-published-works-table"></table>
 
 
-<h2 id="publications-per-year-header">Publications per year</h2>
+<h2 id="publications-per-year-header" data-i18n="topic-publications-per-year">Publications per year</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
 </div>
 
 
-<h2 id="earliest-published-works-header">Earliest published works on the topic</h2>
+<h2 id="earliest-published-works-header" data-i18n="topic-earliest-published-works">Earliest published works on the topic</h2>
 
 <table class="table table-hover" id="earliest-published-works-table"></table>
 
 
-<h2 id="Authors">Authors</h2>
+<h2 id="Authors" data-i18n="topic-authors-w0">Authors</h2>
 
 
-<h3 id="authors-header">Authors publishing about the topic</h3>
+<h3 id="authors-header" data-i18n="topic-authors-w1">Authors publishing about the topic</h3>
 
 <table class="table table-hover" id="authors-table"></table>
 
-<h3 id="author-scores-header">Author score</h3>
+<h3 id="author-scores-header" data-i18n="topic-author-scores">Author score</h3>
 
 Authors scored according to field of work, publications within the topic
 and citing works within the topic.
@@ -119,7 +119,7 @@ Then go to the
 <a href="{{ url_for('app.show_topic_empty') }}{{ q }}/curation">curation</a>
 page to resolve the author names.
 
-<h3 id="coauthor-graph-header">Co-author graph</h3>
+<h3 id="coauthor-graph-header" data-i18n="topic-coauthor-graph">Co-author graph</h3>
 
 The 25 most prolific authors and some of their key co-authors.
 
@@ -127,18 +127,18 @@ The 25 most prolific authors and some of their key co-authors.
     <iframe class="embed-responsive-item" id="coauthor-graph-iframe"></iframe>
 </div>
 
-<h3 id="author-awards-header">Awards received by authors who published on the topic</h3>
+<h3 id="author-awards-header" data-i18n="topic-author-awards">Awards received by authors who published on the topic</h3>
 
 <table class="table table-hover" id="author-awards-table"></table>
 
 
-<h2 id="Topics">Topics</h2>
+<h2 id="Topics" data-i18n="topic-topics-w0">Topics</h2>
 
-<h3 id="topics-header">Co-occurring topics</h3>
+<h3 id="topics-header" data-i18n="topic-topics-w1">Co-occurring topics</h3>
 
 <table class="table table-hover" id="topics-table"></table>
 
-<h3 id="co-occurring-header">Co-occurring topics graph</h3>
+<h3 id="co-occurring-header" data-i18n="topic-co-occurring">Co-occurring topics graph</h3>
 
 Only a maximum of the 400 most often occuring links are shown.
 
@@ -146,28 +146,28 @@ Only a maximum of the 400 most often occuring links are shown.
     <iframe class="embed-responsive-item" id="co-occurring-iframe"></iframe>
 </div>
 
-<h3 id="co-occurring-map-header">Co-occurring topics map</h3>
+<h3 id="co-occurring-map-header" data-i18n="topic-co-occurring-map">Co-occurring topics map</h3>
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="co-occurring-map-iframe"></iframe>
 </div>
 
 
-<h2 id="venues-header">Venues and series publishing works about the topic</h2>
+<h2 id="venues-header" data-i18n="topic-venues">Venues and series publishing works about the topic</h2>
 
 <table class="table table-hover" id="venues-table"></table>
 
-<h2 id="Citations">Citations</h2>
+<h2 id="Citations" data-i18n="topic-citations">Citations</h2>
 
-<h3 id="top-cited-header">Works cited from works on the topic</h3>
+<h3 id="top-cited-header" data-i18n="topic-top-cited">Works cited from works on the topic</h3>
 
 <table class="table table-hover" id="top-cited-table"></table>
 
-<h3 id="most-cited-authors-header">Authors cited from works on the topic</h3>
+<h3 id="most-cited-authors-header" data-i18n="topic-most-cited-authors">Authors cited from works on the topic</h3>
 
 <table class="table table-hover" id="most-cited-authors-table"></table>
 
-<h3 id="organization-map-header">Map of organizations associated with works about the topic</h3>
+<h3 id="organization-map-header" data-i18n="topic-organization-map">Map of organizations associated with works about the topic</h3>
 
 The colours indicate how many publications on the topic are associated with organizations in the given location, as detailed in the legend (top right).
 
@@ -177,7 +177,7 @@ The colours indicate how many publications on the topic are associated with orga
     </iframe>
 </div>
 
-<h3 id="country-citation-graph-header">Citation graph of works about the topic, aggregated by country</h3>
+<h3 id="country-citation-graph-header" data-i18n="topic-country-citation-graph">Citation graph of works about the topic, aggregated by country</h3>
 
 The graph indicates the countries associated with organizations whose authors have published works on the topic, and indicates the most cited countries (arrowheads) as well as the countries they are most frequently cited from.
 

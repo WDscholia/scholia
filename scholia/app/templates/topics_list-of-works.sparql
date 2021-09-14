@@ -15,7 +15,7 @@ WITH {
     # long time and time out.
     ?work wdt:P921 ?topic  .
     ?topic rdfs:label ?topic_label .
-    FILTER(LANG(?topic_label) = 'en')
+    FILTER(LANG(?topic_label) = '{{ g.lang_code }}')
   }
   GROUP BY ?work ?topics
   HAVING(?count > 1)
@@ -28,7 +28,7 @@ WHERE {
     ?work wdt:P577 ?publication_datetime .
     BIND(xsd:date(?publication_datetime) AS ?publication_date_)
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . }
 }
 GROUP BY ?count ?work ?workLabel ?topics ?topicsUrl
 ORDER BY DESC(?count) DESC(?publication_date)

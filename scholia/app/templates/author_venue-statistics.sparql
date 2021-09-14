@@ -14,14 +14,14 @@ WITH {
     ?work wdt:P1433 ?venue .
     OPTIONAL {
       ?venue wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = 'en') }
+      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = '{{ g.lang_code }}') }
   }
   GROUP BY ?venue
 } AS %result
 WHERE {
   INCLUDE %result
   OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }  
 } 
 GROUP BY ?count ?venue ?venueLabel ?topics ?topicsUrl
 ORDER BY DESC(?count)

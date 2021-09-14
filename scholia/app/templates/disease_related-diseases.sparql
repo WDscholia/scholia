@@ -12,7 +12,7 @@ SELECT
       ?gene wdt:P2293 ?disease . 
       FILTER (wd:{{ q }} != ?disease)
       ?gene rdfs:label ?gene_label
-      FILTER(lang(?gene_label) = "en")
+      FILTER(lang(?gene_label) = '{{ g.lang_code }}')
     }
     GROUP BY ?disease
   }
@@ -24,7 +24,7 @@ SELECT
       wd:{{ q }} wdt:P780 ?symptom .
       ?disease wdt:P780 ?symptom . 
       FILTER (wd:{{ q }} != ?disease)
-      ?symptom rdfs:label ?symptom_label . FILTER(lang(?symptom_label) = "en")
+      ?symptom rdfs:label ?symptom_label . FILTER(lang(?symptom_label) = '{{ g.lang_code }}')
     }
     GROUP BY ?disease
   }
@@ -32,6 +32,6 @@ SELECT
   # Aggregate count
   BIND((COALESCE(?symptom_count, 0) + COALESCE(?gene_count, 0)) AS ?count)
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)

@@ -56,14 +56,14 @@ WHERE {
     wd:{{ q }} p:P69 ?education_statement .
     ?education_statement ps:P69 ?education .
     ?education rdfs:label ?education_label . 
-    FILTER (lang(?education_label) = 'en')
+    FILTER (lang(?education_label) = '{{ g.lang_code }}')
     BIND(CONCAT("🦉 ", ?education_label) AS ?label)
     OPTIONAL { ?education_statement pq:P580 ?beginning . }
     OPTIONAL { ?education_statement pq:P582 ?ending . }
     OPTIONAL {
       ?education_statement pq:P512 ?education_degree . 
       ?education_degree rdfs:label ?education_degree_label .
-      FILTER (lang(?education_degree_label) = 'en')
+      FILTER (lang(?education_degree_label) = '{{ g.lang_code }}')
     }
   }
   UNION
@@ -72,7 +72,7 @@ WHERE {
     wd:{{ q }} p:P1416 | p:P108 ?affiliation_statement .
     ?affiliation_statement ps:P1416 | ps:P108 ?affiliation .
     ?affiliation rdfs:label ?affiliation_label .
-    FILTER (lang(?affiliation_label) = 'en')
+    FILTER (lang(?affiliation_label) = '{{ g.lang_code }}')
     BIND(CONCAT("🏠 ",?affiliation_label) AS ?label)
     # OPTIONAL { ?affiliation wdt:P18 ?image }
     OPTIONAL { ?affiliation_statement pq:P580 ?beginning . }
@@ -80,7 +80,7 @@ WHERE {
     OPTIONAL {
       ?affiliation_statement pq:P512 ?affiliation_degree . 
       ?affiliation_degree rdfs:label ?affiliation_degree_label .
-      FILTER (lang(?affiliation_degree_label) = 'en')
+      FILTER (lang(?affiliation_degree_label) = '{{ g.lang_code }}')
     }
   }
   UNION
@@ -88,7 +88,7 @@ WHERE {
     wd:{{ q }} p:P166 ?award_statement . 
     ?award_statement ps:P166 ?award .
     ?award rdfs:label ?award_label .
-    FILTER (lang(?award_label) = 'en')
+    FILTER (lang(?award_label) = '{{ g.lang_code }}')
     BIND(CONCAT("🏆 ",?award_label) AS ?label)
     ?award_statement pq:P585 ?beginning .
   }

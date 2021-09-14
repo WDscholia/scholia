@@ -4,6 +4,6 @@ SELECT ?journal ?journalLabel (COUNT(DISTINCT ?citationStatement) AS ?citations)
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?citedArticle .
   ?intention wdt:P31 wd:Q96471816 .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en". }
 } GROUP BY ?journal ?journalLabel
   ORDER BY DESC(?citations)

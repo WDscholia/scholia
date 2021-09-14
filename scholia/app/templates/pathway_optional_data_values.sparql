@@ -5,5 +5,5 @@ WHERE {
     wd:{{ q }} wdt:P2410 ?wpid ;
     wdt:P703 ?organism .
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . }
 }

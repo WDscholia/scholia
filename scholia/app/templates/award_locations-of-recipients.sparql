@@ -6,11 +6,11 @@ WITH {
     ?recipient ?property ?item . 
     ?item wdt:P625 ?geo .
     ?property_item wikibase:directClaim ?property .
-    ?property_item rdfs:label ?property_item_label . FILTER (LANG(?property_item_label) = 'en')
+    ?property_item rdfs:label ?property_item_label . FILTER (LANG(?property_item_label) = '{{ g.lang_code }}')
     OPTIONAL { ?item wdt:P18 ?image . }
   }
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }

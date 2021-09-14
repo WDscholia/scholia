@@ -7,11 +7,11 @@ WITH {
     OPTIONAL { 
       ?part wdt:P31 ?type_ .
       ?type_ rdfs:label ?type_label .
-      FILTER (LANG(?type_label) = 'en')
+      FILTER (LANG(?type_label) = '{{ g.lang_code }}')
     }
   } GROUP BY ?part
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . }
 } ORDER BY ASC(?partLabel)

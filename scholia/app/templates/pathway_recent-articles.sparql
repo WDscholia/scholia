@@ -17,12 +17,12 @@ WITH {
     OPTIONAL {
       ?work wdt:P921 ?topic .
       ?topic rdfs:label ?topic_label .
-      FILTER (lang(?topic_label) = 'en')
+      FILTER (lang(?topic_label) = '{{ g.lang_code }}')
     }
     OPTIONAL { 
       ?work wdt:P31 ?type_ .
       ?type_ rdfs:label ?type_label .
-      FILTER (LANG(?type_label) = 'en') 
+      FILTER (LANG(?type_label) = '{{ g.lang_code }}') 
     }
     OPTIONAL { ?work wdt:P577 ?dates . }
   }
@@ -31,7 +31,7 @@ WITH {
 WHERE {
   INCLUDE %result
   BIND(xsd:date(?datetime) AS ?date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . }
 }
 ORDER BY DESC(?date)
 LIMIT 500

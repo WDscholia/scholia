@@ -1,5 +1,5 @@
 SELECT ?item ?itemLabel ?property_value ?property_valueLabel WHERE {
   ?item wdt:{{ p }} ?property_value .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . }
 }
 LIMIT 500

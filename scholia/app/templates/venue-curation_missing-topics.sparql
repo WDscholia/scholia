@@ -23,6 +23,6 @@ WHERE {
   INCLUDE %result
   FILTER (?topics < 2)
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+    bd:serviceParam wikibase:language "{{ g.lang_code }},[AUTO_LANGUAGE],en" . } 
 }
 ORDER BY DESC(?count) ?topics
