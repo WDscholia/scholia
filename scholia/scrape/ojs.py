@@ -79,6 +79,10 @@ def issue_url_to_paper_urls(url):
     urls : list of strs
         List of URLs to papers.
 
+    Based on the URL the HTML issue webpage will be fetched and the returned
+    HTML parse. Different matching approached are tried to extract the article
+    URLs.
+
     """
     response = requests.get(url, headers=HEADERS)
     tree = etree.HTML(response.content)
@@ -86,6 +90,10 @@ def issue_url_to_paper_urls(url):
     if len(urls) == 0:
         # This scheme seems to be used for version 3.2.1.4 of OJS
         urls = tree.xpath("//h3[@class='title']/a/@href")
+    if len(urls) == 0:
+        # This scheme is also used in version 3.2.1.4 of OJS
+        # For instance, for https://tidsskrift.dk/bras/issue/view/9150
+        urls = tree.xpath("//h3[@class='media-heading']/a/@href")
     return urls
 
 
