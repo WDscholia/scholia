@@ -139,7 +139,7 @@ sparqlToShortInchiKey(`# tool: scholia
 	     var mastodonAccount = item.claims.P4033[0].mainsnak.datavalue.value;
 	     var mastodonComponents = mastodonAccount.split("@");
 	     if (mastodonComponents.length == 2) {
-		 detailsList.push( '<img alt="Twitter t icon" src="' +
+		 detailsList.push( '<img alt="Mastodon" src="' +
 				   'https://upload.wikimedia.org/wikipedia/commons/4/48/Mastodon_Logotype_%28Simple%29.svg' +
 				   '" width="16" height="16" hspace="4" /> <a href="https://' + mastodonComponents[1] + '/@' +
 				   encodeURI( mastodonComponents[0] ) + '">@' + escapeHTML( mastodonComponents[0] ) + '</a> ');
