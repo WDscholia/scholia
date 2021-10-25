@@ -33,8 +33,9 @@ setup(
     install_requires=requirements,
     long_description='',
     classifiers=[
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.7',
         ],
     tests_require=['pytest', 'flake8'],
     version=versioneer.get_version(),
