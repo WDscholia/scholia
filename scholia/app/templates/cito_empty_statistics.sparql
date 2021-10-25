@@ -1,3 +1,4 @@
+# tool: scholia
 SELECT ?count ?description
 WITH {
   SELECT (COUNT(DISTINCT ?citationStatement) AS ?count) WHERE { [] p:P2860 ?citationStatement . ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 . }
@@ -29,6 +30,17 @@ WITH {
     ?citedArticle wdt:P1433 ?venue .
   }
 } AS %citedJournals
+WITH {
+  SELECT (COUNT(DISTINCT ?citoArticle) AS ?count) WHERE {
+    ?citoArticle wdt:P31 wd:Q109229154 .
+  }
+} AS %citoArticles
+WITH {
+  SELECT (COUNT(DISTINCT ?venue) AS ?count) WHERE {
+    ?citoArticle wdt:P31 wd:Q109229154 ;
+                 wdt:P1433 ?venue .
+  }
+} AS %citoJournalsExplicit
 WHERE {
   {
     INCLUDE %annotions
@@ -58,6 +70,16 @@ WHERE {
   {
     INCLUDE %citedJournals
     BIND("Number of cited venues with annotated citations" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %citoArticles
+    BIND("Number of article with explicit CiTO annotation" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %citoJournalsExplicit
+    BIND("Number of journals with explicit CiTO annotation" AS ?description)
   }
 }
 ORDER BY DESC(?count)
