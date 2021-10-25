@@ -1,4 +1,3 @@
-# tool: scholia
 SELECT ?count ?description
 WITH {
   SELECT (COUNT(DISTINCT ?citationStatement) AS ?count) WHERE { [] p:P2860 ?citationStatement . ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 . }
