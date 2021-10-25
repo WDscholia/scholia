@@ -125,58 +125,64 @@ sparqlToShortInchiKey(`# tool: scholia
     });
     {% endif %}
 
-	 var detailsList = Array();
-	 try {
-	     var orcid = item.claims.P496[0].mainsnak.datavalue.value;
-	     detailsList.push( '<a href="https://orcid.org/"><img alt="' +
-			       'ORCID logo" src="{{ url_for('static', filename='images/orcid_16x16.gif') }}"' +
-			       'width="16" height="16" hspace="4" /></a> <a href="https://orcid.org/' +
-			       encodeURI( orcid ) + '">https://orcid.org/' + escapeHTML( orcid ) + '</a>');
+	 function socialMediaLink(detailsList, user, site, logo = '') {
+	     var html = '';
+	     if (logo) {
+	        html += '<a href="' + site.url + '"><img alt="' + site.name + ' logo" src="';
+	        html += logo.src + '" width="16" height="16" hspace="4" /></a> ';
+	     }
+	     html += '<a href="' + site.url + encodeURI(user.name) + '">';
+	     html += user.prefix + escapeHTML(user.name) + '</a>';
+	     detailsList.push(html);
 	 }
-	 catch(e) {}
+	 
+	 var detailsList = Array();
+	 if ("P496" in item.claims) {
+	     var user = {name: item.claims.P496[0].mainsnak.datavalue.value, prefix: 'https://orcid.org/'};
+		   var site = {name: "ORCID", url: "https://orcid.org/"};
+		   var logo = {src: "{{ url_for('static', filename='images/orcid.svg') }}"};
+		   socialMediaLink(detailsList, user, site, logo);
+	 }
 
-	 try {
-	     var mastodonAccount = item.claims.P4033[0].mainsnak.datavalue.value;
-	     var mastodonComponents = mastodonAccount.split("@");
-	     if (mastodonComponents.length == 2) {
-		 detailsList.push( '<img alt="Mastodon" src="' +
-				   'https://upload.wikimedia.org/wikipedia/commons/4/48/Mastodon_Logotype_%28Simple%29.svg' +
-				   '" width="16" height="16" hspace="4" /> <a href="https://' + mastodonComponents[1] + '/@' +
-				   encodeURI( mastodonComponents[0] ) + '">@' + escapeHTML( mastodonComponents[0] ) + '</a> ');
+	 if ("P4033" in item.claims) {
+	      var mastodonAccount = item.claims.P4033[0].mainsnak.datavalue.value;
+	      var mastodonComponents = mastodonAccount.split("@");
+	      if (mastodonComponents.length == 2) {
+	        // Mastodon user URLs start with @
+	        var user = { name: '@' + mastodonComponents[0], prefix: '' };
+	        var site = { name: "Mastodon", url: 'https://' + mastodonComponents[1] + '/' };
+	        var logo = { src: "{{ url_for('static', filename='images/mastodon.svg') }}" };
+	        socialMediaLink(detailsList, user, site, logo);
 	     }
 	 }
-	 catch(e) { }
 
-	 try {
-	     var twitterAccount = item.claims.P2002[0].mainsnak.datavalue.value;
-	     detailsList.push( '<img alt="Twitter t icon" src="' +
-			       'https://upload.wikimedia.org/wikipedia/commons/8/8b/Twitter_logo_initial.svg' +
-			       '" width="16" height="16" hspace="4" /> <a href="https://twitter.com/' +
-			       encodeURI( twitterAccount ) + '">@' + escapeHTML( twitterAccount ) + '</a> ');
+	 if ("P2002" in item.claims) {
+	     var user = {name: item.claims.P2002[0].mainsnak.datavalue.value, prefix: "@"};
+	     var site = { name: "Twitter", url: "https://twitter.com/" };
+	     var logo = { src: "{{ url_for('static', filename='images/twitter.svg') }}" };
+	     socialMediaLink(detailsList, user, site, logo);
 	 }
-	 catch(e) { }
 
-	 try {
-	     var rorID = item.claims.P6782[0].mainsnak.datavalue.value;
-	     detailsList.push( 'ROR <a href="https://ror.org/' + encodeURI( rorID ) + '">' + rorID + '</a> ');
+	 if ("P6782" in item.claims) {
+	     var user = { name: item.claims.P6782[0].mainsnak.datavalue.value, prefix: 'https://ror.org/' };
+	     var site = { name: "Research Organization Registry", url: 'https://ror.org/' };
+	     var logo = { src: "{{ url_for('static', filename='images/ror.svg') }}" };
+	     socialMediaLink(detailsList, user, site, logo);
 	 }
-	 catch(e) { }
 
-	 try {
-	     var hashtag = item.claims.P2572[0].mainsnak.datavalue.value;
-	     detailsList.push( '<a href="https://hashtags-hub.toolforge.org/' +
-			       encodeURI( hashtag ) + '">#' + escapeHTML( hashtag ) + '</a> ');
+	 if ("P2572" in item.claims) {
+	     var user = { name: item.claims.P2572[0].mainsnak.datavalue.value, prefix: '#' };
+	     var site = { name: "Hashtag hub", url: 'https://hashtags-hub.toolforge.org/' };
+	     socialMediaLink(detailsList, user, site);
 	 }
-	 catch(e) {}
+
+	 if (detailsList.length > 0) {
+	     $('#details').append(detailsList.join(" | "));
+	 }
 
 	 try {
 	     var doi = item.claims.P356[0].mainsnak.datavalue.value;
 	     $("head").append( '<meta name="citation_doi" content="' + doi + '"/>' );
-	 }
-	 catch(e) {}
-
-	 try {
-	     $( '#details' ).append( detailsList.join( " | " ) );
 	 }
 	 catch(e) {}
 	 
