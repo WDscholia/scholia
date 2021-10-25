@@ -416,7 +416,9 @@ def redirect_cas(cas):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404.html', error=could_not_find("CAS registry number"))
+    return render_template(
+        '404.html',
+        error=could_not_find("CAS registry number"))
 
 
 @main.route('/lipidmaps/<lmid>')
@@ -436,7 +438,9 @@ def redirect_lipidmaps(lmid):
             return redirect(url_for('app.show_chemical_class', q=q), code=302)
         else:
             return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404.html', error=could_not_find("LIPID MAPS identifier"))
+    return render_template(
+        '404.html',
+        error=could_not_find("LIPID MAPS identifier"))
 
 
 @main.route('/atomic-symbol/<symbol>')
@@ -487,7 +491,9 @@ def redirect_cordis(cordis):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_project', q=q), code=302)
-    return render_template('404.html', error=could_not_find("EU CORDIS project ID"))
+    return render_template(
+        '404.html',
+        error=could_not_find("EU CORDIS project ID"))
 
 
 @main.route('/catalogue/' + q_pattern)
@@ -993,7 +999,9 @@ def redirect_pubchem(cid):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404.html', error=could_not_find("compound identifier"))
+    return render_template(
+        '404.html',
+        error=could_not_find("compound identifier"))
 
 
 @main.route('/pubmed/<pmid>')
@@ -1674,7 +1682,9 @@ def redirect_twitter(twitter):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.redirect_q', q=q), code=302)
-    return render_template('404.html', error=could_not_find("Twitter username"))
+    return render_template(
+        '404.html',
+        error=could_not_find("Twitter username"))
 
 
 @main.route('/venue/' + q_pattern)
@@ -2151,12 +2161,42 @@ def show_aspect_missing(aspect, q):
         return render_template('{aspect}_curation.html'.format(aspect=aspect),
                                q=q)
     except TemplateNotFound:
-        return render_template("404.html", error="No curation page defined for " +  aspect)
+        return render_template(
+            "404.html",
+            error="No curation page defined for " + aspect)
 
 
 def page_not_found(e):
+    """Show 404 page.
+
+    Render and return a page for a not found URL.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    Notes
+    -----
+    This function can be used as 404 error handler.
+
+    """
     return render_template("404.html", error=""), 404
 
 
 def could_not_find(name):
+    """Make sentence of something missing.
+
+    Parameters
+    ----------
+    name : str
+        Name for an identifier.
+
+    Returns
+    -------
+    sentence : str
+        Sentence with statement that identifier could not be converted to a Q
+        number.
+
+    """
     return "Could not convert " + name + " into Q number."
