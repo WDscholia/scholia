@@ -4,6 +4,15 @@
 
 {% block page_content %}
 
-Not found.
+<h1>Page not found</h1>
+
+<div class="text-center">
+  {% if not error %}
+  <a href="/search?q={{ request.path[1:] }}"
+    class="btn btn-primary">Search for "{{ request.path[1:] }}"</a>
+  {% else %}
+    <p>{{error}}</p>
+  {% endif %}
+</div>
 
 {% endblock %}
