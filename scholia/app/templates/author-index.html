@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+    {{super()}}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/author-index.css') }}">
+{% endblock %}
+
 {% block title %}Author - Scholia{% endblock %}
 
 {% block page_content %}
@@ -64,7 +69,9 @@ Researcher with a published record.
 		    </dd>
 
 		</dl>
-            </div>
+            <hr>
+            <input class="full-width" id="search-author" type="text">
+        </div>
 
 	</div>
 
@@ -91,8 +98,11 @@ Researcher with a published record.
 		    <dt><a href="../authors/Q71522746,Q28468766,Q28468763,Q24532211,Q24244119,Q24727868,Q78549817">Teheipuaura Mariteragi-Helle, Maite Aubry, Jean-Claude Manuguerra, Van-Mai Cao-Lormeau, Didier Musso, Anita Teissier, Mike Kama</a></dt>
 		    <dd>Seven researchers studying infectious diseases in the Pacific region</dd>
 		</dl>
-
-
+            <hr>
+            <div>
+                <select class="full-width" id="compare-authors" type="text" multiple="multiple" name="compare-authors[]"></select>
+                <button class="btn btn-primary" id="compare-btn">Compare</button>
+            </div>
 
 	    </div>
         </div>
@@ -129,4 +139,98 @@ Researcher with a published record.
 
 {% endblock %}
 
-  
+{% block in_ready %}
+    let search_author = ""
+    $('#search-author').select2({
+        allowClear: true,
+        placeholder: "Search author...",
+        ajax: {
+            delay: 300,
+            url: "https://query.wikidata.org/sparql",
+            data: function (params) {
+                let search_text = params.term
+                return {
+                    query: `
+                      SELECT  DISTINCT ?author ?authorLabel WHERE {
+                      SERVICE wikibase:mwapi {
+                          bd:serviceParam wikibase:endpoint "www.wikidata.org";
+                                          wikibase:api "EntitySearch";
+                                          mwapi:search "${search_text}";
+                                          mwapi:language "en".
+                          ?author wikibase:apiOutputItem mwapi:item.
+                          ?num wikibase:apiOrdinal true.
+                      }
+                      ?item wdt:P50 ?author
+                      SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,jp". }
+                    } ORDER BY ASC(?num)
+                    `,
+                    format: 'json'
+                }
+            },
+            processResults: function (data) {
+                var results = [];
+                $.each(data.results.bindings, function (index, item) {
+                    results.push({
+                        id: item.author.value.replace("http://www.wikidata.org/entity/", "/author/"),
+                        text: item.authorLabel.value
+                    });
+                });
+
+                return {
+                    "results": results
+                };
+            }
+        }
+    });
+
+    $("#search-author").on("select2:select", function (e) {
+        window.location.href = e.params.data.id
+    });
+
+    $('#compare-authors').select2({
+        allowClear: true,
+        placeholder: "Compare authors...",
+        multiple: true,
+        ajax: {
+            delay: 300,
+            url: "https://query.wikidata.org/sparql",
+            data: function (params) {
+                let search_author = params.term
+                return {
+                    query: `
+                      SELECT  DISTINCT ?author ?authorLabel WHERE {
+                      SERVICE wikibase:mwapi {
+                          bd:serviceParam wikibase:endpoint "www.wikidata.org";
+                                          wikibase:api "EntitySearch";
+                                          mwapi:search "${search_author}";
+                                          mwapi:language "en".
+                          ?author wikibase:apiOutputItem mwapi:item.
+                          ?num wikibase:apiOrdinal true.
+                      }
+                      ?item wdt:P50 ?author
+                      SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,jp". }
+                    } ORDER BY ASC(?num)
+                    `,
+                    format: 'json'
+                }
+            },
+            processResults: function (data) {
+                var results = [];
+                $.each(data.results.bindings, function (index, item) {
+                    results.push({
+                        id: item.author.value.replace("http://www.wikidata.org/entity/", ""),
+                        text: item.authorLabel.value
+                    });
+                });
+
+                return {
+                    "results": results
+                };
+            }
+        }
+    });
+
+    $('#compare-btn').on("click", function () {
+        window.location.href = "/authors/" + $("#compare-authors").val().toString()
+    })
+{% endblock  %}

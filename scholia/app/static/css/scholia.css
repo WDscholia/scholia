@@ -82,6 +82,21 @@ h3 {
     max-width: 250px;
 }
 
+.nav-search #searchresult {
+    height: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+.nav-search #searchresult div {
+    background: white;
+    width: 100%;
+}
+
+.full-width {
+    width: 100%;
+}
+
 .hlink,
 .hlink:hover {
     color: black;
