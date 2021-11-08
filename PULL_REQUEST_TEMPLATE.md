@@ -15,7 +15,7 @@ Check any of the following which apply:
 
 *If you make changes to the Python code*
   
-* [ ]  my code passes [tox](https://tox.readthedocs.io/en/latest/) check, I can receive warnings about tests, documentation or both
+* [ ]  My code passes the [tox](https://tox.readthedocs.io/en/latest/) check, I can receive warnings about tests, documentation or both
 
 ### Testing
 Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.
