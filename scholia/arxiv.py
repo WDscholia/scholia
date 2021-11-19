@@ -81,7 +81,11 @@ def get_metadata(arxiv):
         'authornames': [author.name for author in entry.authors],
         'full_text_url': 'https://arxiv.org/pdf/' + arxiv + '.pdf',
         'publication_date': entry.published[:10],
-        'title': entry.title,
+
+        # Some titles may have a newline in them. This should be converted to
+        # an ordinary space character
+        'title': re.sub(r'\s+', ' ', entry.title),
+
         'arxiv_classifications': [tag.term for tag in entry.tags],
     }
 
