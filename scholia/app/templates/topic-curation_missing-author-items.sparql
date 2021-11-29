@@ -2,6 +2,9 @@ SELECT
   # Number of works with the author
   ?count
 
+  # Author score - 3 points for authoring a work, 1 for being cited
+  ?score
+
   # Author as a string
   ?author
 
@@ -24,11 +27,37 @@ WITH {
   }
   GROUP BY ?author
 } AS %result
+
+# Generate a score for each author
+WITH {
+  SELECT (SUM(?score_) AS ?score) ?author
+  WHERE {
+    {
+      # Assign them 3 points if they are an author of a work on the subject
+      SELECT (3 AS ?score_) ?author ?work WHERE {
+        ?work wdt:P2093 ?author .
+        ?work wdt:P921/wdt:P279* wd:{{ q }} .
+      }
+    }
+    UNION
+    {
+      # Assign them 1 point if they are the author of a work that is cited by a work on the subject
+      SELECT (1 AS ?score_) ?author ?work WHERE {
+        ?work wdt:P2093 ?author .
+        ?citing_work wdt:P2860 ?work .
+        ?citing_work wdt:P921/wdt:P279* wd:{{ q }} .
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %scores
+
 WHERE {
   INCLUDE %result
+  INCLUDE %scores
 
   # Label the result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
-ORDER BY DESC(?count)
+ORDER BY DESC(?count) DESC(?score)
 LIMIT 500
