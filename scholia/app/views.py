@@ -1984,14 +1984,34 @@ def show_publisher_empty():
 def show_robots_txt():
     """Return robots.txt file.
 
+    A robots.txt file is returned that allows bots to index Scholia.
+
     Returns
     -------
     response : flask.Response
-        Rendered HTML for publisher index page.
+        Rendered plain text with robots.txt content.
+
+    Notes
+    -----
+    The default robots.txt for Toolforge hosted tools is
+
+    User-agent: *
+    Disallow: /
+
+    Scholia's function returns a robots.txt with 'Allow' for all. We would like
+    bots to index, but not crawl Scholia. Crawling is also controlled by the
+    HTML meta tag 'robots' thatis set to the content: noindex, nofollow on all
+    pages. So Scholia's robots.txt is:
+
+    User-agent: *
+    Allow: /
+
+    If this results in too much crawling or load on the Toolforge
+    infrastructure then it should be changed.
 
     """
     ROBOTS_TXT = ('User-agent: *\n'
-                  'Disallow: /scholia/\n')
+                  'Allow: /\n')
     return Response(ROBOTS_TXT, mimetype="text/plain")
 
 
