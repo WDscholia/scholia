@@ -2,7 +2,7 @@
 ---
 name: Bug report
 about: Report a bug unrelated to any particular site or extractor
-label: Bug, also check relevant labels to the issue
+labels: bug
 ---
 
 [provide general introduction to the issue logging and why it is relevant to this repository]
