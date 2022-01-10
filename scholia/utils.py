@@ -92,16 +92,18 @@ def string_to_type(string):
 
 
 def remove_special_characters_url(url):
-    """Remove url encoded characters and normalize non-ascii characters
+    """Remove url encoded characters and normalize non-ascii characters.
+
     Parameters
     ----------
     url : str
-        url encoded string
+        URL-encoded string
 
     Returns
     -------
     formatted_string : str
         Normalized string without non-ascii characters or spaces
+
     """
     decoded_url = urllib.parse.unquote(url)
     encode_string = decoded_url.encode("ascii", "ignore")
