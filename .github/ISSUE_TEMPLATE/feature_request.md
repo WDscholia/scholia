@@ -3,6 +3,7 @@
 name: Feature request
 about: Request a feature related to any particular site or extractor
 title: 'new feature'
+labels: enhancement
 ---
 
 
