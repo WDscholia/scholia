@@ -1,36 +1,38 @@
-
 ---
 name: Bug report
-about: Report a bug unrelated to any particular site or extractor
-labels: bug
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
+
 ---
 
-[provide general introduction to the issue logging and why it is relevant to this repository]
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-## Context
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-[provide more detailed introduction to the issue itself and why it is relevant]
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-## Process
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-[ordered list the process to finding and recreating the issue, example below]
+**Desktop (please complete the following information):**
+ - OS: [e.g. iOS]
+ - Browser [e.g. chrome, safari]
+ - Version [e.g. 22]
 
-1. go to this url https://scholia.toolforge.org/author/
-2. click the random author button
-3. the error is raised
+**Smartphone (please complete the following information):**
+ - Device: [e.g. iPhone6]
+ - OS: [e.g. iOS8.1]
+ - Browser [e.g. stock browser, safari]
+ - Version [e.g. 22]
 
-## Expected result
-
-[describe what you would expect to have resulted from this process, include a screenshot if possible]
-
-## Current result
-
-[describe what you you currently experience from this process, and thereby explain the bug]
-
-## Possible Fix
-
-[not obligatory, but suggest fixes or reasons for the bug]
-
-## `name of issue` screenshot
-
-[if relevant, include a screenshot]
+**Additional context**
+Add any other context about the problem here.

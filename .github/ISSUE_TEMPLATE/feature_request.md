@@ -1,21 +1,20 @@
-
 ---
 name: Feature request
-about: Request a feature related to any particular site or extractor
-title: 'new feature'
-labels: enhancement
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
+
 ---
 
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-## Context
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
 
-[provide more detailed introduction to the feature itself and why it is relevant]
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
 
-## Process
-
-[ordered list process for new functionality (optional)]
-
-
-## Expected result
-
-[describe what you would expect to have resulted from this process]
+**Additional context**
+Add any other context or screenshots about the feature request here.

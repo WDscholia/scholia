@@ -2,9 +2,10 @@
 name: Ask question
 about: Ask Scholia related question
 title: ''
-labels: 'question'
----
+labels: question
+assignees: ''
 
+---
 
 ## Context
 
@@ -12,4 +13,3 @@ labels: 'question'
 
 ## Question
 [write question here]
-
