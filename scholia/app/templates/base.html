@@ -636,16 +636,6 @@ sparqlToShortInchiKey(`# tool: scholia
          }
      });
 
-     // Add anchor links to all headings
-     var headers = document.querySelectorAll('h2[id], h3[id]')
-     if (headers) {
-       headers.forEach(element => {
-         var title = element.innerText;
-         element.removeChild(element.childNodes[0])
-         element.insertAdjacentHTML('afterbegin', `<a href="#${element.id}" class="hlink"  ariaLabel="Anchor">${title}</a>`)
-       })
-     }
-
      // Add table of content
   var headings = document.querySelectorAll("h2,h3");
   if (headings.length >= 4) {
@@ -661,7 +651,7 @@ sparqlToShortInchiKey(`# tool: scholia
     for (let i = 0; i < headings.length; i++) {
       const element = headings[i];
       if (!element.id) {
-        element.id = element.innerText.replace(" ", "-")
+        element.id = element.innerText.replaceAll(" ", "-");
       }
       if (element.tagName === "H3" && !sublist) {
         var sublist = document.createElement("ul");
@@ -692,6 +682,15 @@ sparqlToShortInchiKey(`# tool: scholia
     document.querySelector("h2").insertAdjacentElement("beforebegin", toc)
   }
 
+    // Add anchor links to all headings
+    var headers = document.querySelectorAll('h2[id], h3[id]')
+    if (headers) {
+      headers.forEach(element => {
+        var title = element.innerText;
+        element.removeChild(element.childNodes[0])
+        element.insertAdjacentHTML('afterbegin', `<a href="#${element.id}" class="hlink"  ariaLabel="Anchor">${title}</a>`)
+      })
+    }
 
      {% block in_ready %}{% endblock %}
  });
