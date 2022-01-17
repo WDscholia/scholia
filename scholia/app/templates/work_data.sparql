@@ -1,4 +1,4 @@
-SELECT ?description ?value ?valueUrl
+SELECT DISTINCT ?description ?value ?valueUrl
 WHERE {
   BIND(wd:{{ q }} AS ?work)
   {
