@@ -8,8 +8,7 @@ assignees: ''
 ---
 
 ## Context
-
-[provide more detailed introduction to the feature itself and why it is relevant (optional)]
+[provide some background that helps understand your question (optional)]
 
 ## Question
 [write question here]
