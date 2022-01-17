@@ -63,7 +63,7 @@ Topics of publications by past and present employees, affiliates, and members, r
 
 <table class="table table-hover" id="topics-table"></table>
 
-<h2 id="recent-literature">Recent publications <a href="{{ url_for('app.show_organization_empty') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
+<h2 id="recent-literature">Recent publications <a href="{{ url_for('app.show_organization_index') }}{{ q }}/latest-works/rss"><img height="24" width="48" src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h2>
 
 <table class="table table-hover" id="recent-literature-table"></table>
 
@@ -111,6 +111,6 @@ Count of the number of researchers wrt. gender.
 
 <table class="table table-hover" id="gender-distribution-table"></table>
 
-Any information missing here? You can help curate the information contained in this profile via its <a href="{{ url_for('app.show_organization_empty') }}{{ q }}/curation">curation</a> page.
+Any information missing here? You can help curate the information contained in this profile via its <a href="{{ url_for('app.show_organization_index') }}{{ q }}/curation">curation</a> page.
 
 {% endblock %}

@@ -247,26 +247,26 @@ def show_arxiv_to_quickstatements():
     query = request.args.get('arxiv')
 
     if not query:
-        return render_template('arxiv_to_quickstatements.html')
+        return render_template('arxiv-to-quickstatements.html')
 
     current_app.logger.debug("query: {}".format(query))
 
     arxiv = string_to_arxiv(query)
     if not arxiv:
         # Could not identify an arxiv identifier
-        return render_template('arxiv_to_quickstatements.html')
+        return render_template('arxiv-to-quickstatements.html')
 
     qs = arxiv_to_qs(arxiv)
     if len(qs) > 0:
         # The arxiv is already in Wikidata
         q = qs[0]
-        return render_template('arxiv_to_quickstatements.html',
+        return render_template('arxiv-to-quickstatements.html',
                                arxiv=arxiv, q=q)
 
     try:
         metadata = get_arxiv_metadata(arxiv)
     except Exception:
-        return render_template('arxiv_to_quickstatements.html',
+        return render_template('arxiv-to-quickstatements.html',
                                arxiv=arxiv)
 
     quickstatements = metadata_to_quickstatements(metadata)
@@ -279,7 +279,7 @@ def show_arxiv_to_quickstatements():
     # https://github.com/pallets/jinja/issues/515
     # Here, we let jinja2 handle the encoding rather than adding an extra
     # parameter
-    return render_template('arxiv_to_quickstatements.html',
+    return render_template('arxiv-to-quickstatements.html',
                            arxiv=arxiv, quickstatements=quickstatements)
 
 
@@ -403,7 +403,7 @@ def show_award(q):
 
 
 @main.route('/award/')
-def show_award_empty():
+def show_award_index():
     """Return award index page.
 
     Returns
@@ -412,7 +412,7 @@ def show_award_empty():
         Rendered index page for author view.
 
     """
-    return render_template('award_empty.html')
+    return render_template('award-index.html')
 
 
 @main.route('/cas/<cas>')
@@ -528,7 +528,7 @@ def show_catalogue(q):
 
 
 @main.route('/catalogue/')
-def show_catalogue_empty():
+def show_catalogue_index():
     """Return rendered HTML index page for catalogue.
 
     Returns
@@ -537,7 +537,7 @@ def show_catalogue_empty():
         Rendered HTML index page for catalogue.
 
     """
-    return render_template('catalogue_empty.html')
+    return render_template('catalogue-index.html')
 
 
 @main.route('/dataset/' + q_pattern)
@@ -559,7 +559,7 @@ def show_dataset(q):
 
 
 @main.route('/dataset/')
-def show_dataset_empty():
+def show_dataset_index():
     """Return rendered HTML index page for a dataset.
 
     Returns
@@ -622,7 +622,7 @@ def show_countries(qs):
 
 
 @main.route('/country/')
-def show_country_empty():
+def show_country_index():
     """Return country index page.
 
     Returns
@@ -631,7 +631,7 @@ def show_country_empty():
         Rendered index page for country view.
 
     """
-    return render_template('country_empty.html')
+    return render_template('country-index.html')
 
 
 @main.route('/country/' + q_pattern)
@@ -669,7 +669,7 @@ def show_country_topic(q1, q2):
         Rendered HTML for a specific country and topic.
 
     """
-    return render_template('country_topic.html', q1=q1, q2=q2, q=q1)
+    return render_template('country-topic.html', q1=q1, q2=q2, q=q1)
 
 
 @main.route('/disease/' + q_pattern)
@@ -691,7 +691,7 @@ def show_disease(q):
 
 
 @main.route('/disease/')
-def show_disease_empty():
+def show_disease_index():
     """Return disease index page.
 
     Returns
@@ -700,7 +700,7 @@ def show_disease_empty():
         Rendered index page for author view.
 
     """
-    return render_template('disease_empty.html')
+    return render_template('disease-index.html')
 
 
 @main.route('/doi/<path:doi>')
@@ -718,7 +718,7 @@ def redirect_doi(doi):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_work', q=q), code=302)
-    return render_template('404_doi.html', doi=doi)
+    return render_template('404-doi.html', doi=doi)
 
 
 @main.route('/event/' + q_pattern)
@@ -740,7 +740,7 @@ def show_event(q):
 
 
 @main.route('/event/')
-def show_event_empty():
+def show_event_index():
     """Return event index page.
 
     Returns
@@ -749,7 +749,7 @@ def show_event_empty():
         Rendered index page for event view.
 
     """
-    return render_template('event_empty.html')
+    return render_template('event-index.html')
 
 
 @main.route('/event-series/' + q_pattern)
@@ -767,11 +767,11 @@ def show_event_series(q):
         Rendered HTML.
 
     """
-    return render_template('event_series.html', q=q)
+    return render_template('event-series.html', q=q)
 
 
 @main.route('/event-series/')
-def show_event_series_empty():
+def show_event_series_index():
     """Return event series index page.
 
     Returns
@@ -780,7 +780,7 @@ def show_event_series_empty():
         Rendered index page for event series view.
 
     """
-    return render_template('event_series_empty.html')
+    return render_template('event-series-index.html')
 
 
 @main.route('/faq')
@@ -861,7 +861,7 @@ def redirect_inchikey(inchikey):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
-    return render_template('404_chemical.html', inchikey=inchikey)
+    return render_template('404-chemical.html', inchikey=inchikey)
 
 
 @main.route('/issn/<issn>')
@@ -882,7 +882,7 @@ def redirect_issn(issn):
 
 
 @main.route('/lexeme/')
-def show_lexeme_empty():
+def show_lexeme_index():
     """Return lexeme index page.
 
     Returns
@@ -891,7 +891,7 @@ def show_lexeme_empty():
         Rendered index page for lexeme view.
 
     """
-    return render_template('lexeme_empty.html')
+    return render_template('lexeme-index.html')
 
 
 @main.route('/lexeme/' + l_pattern)
@@ -913,7 +913,7 @@ def show_lexeme(lexeme):
 
 
 @main.route('/location/')
-def show_location_empty():
+def show_location_index():
     """Return location index page.
 
     Returns
@@ -922,7 +922,7 @@ def show_location_empty():
         Rendered index page for location view.
 
     """
-    return render_template('location_empty.html')
+    return render_template('location-index.html')
 
 
 @main.route('/location/' + q_pattern)
@@ -960,7 +960,7 @@ def show_location_topic(q1, q2):
         Rendered HTML for a specific location and topic.
 
     """
-    return render_template('location_topic.html', q1=q1, q2=q2, q=q1)
+    return render_template('location-topic.html', q1=q1, q2=q2, q=q1)
 
 
 @main.route('/mesh/<meshid>')
@@ -1119,7 +1119,7 @@ def show_organization(q):
 
 
 @main.route('/organization/')
-def show_organization_empty():
+def show_organization_index():
     """Return rendered HTML index page for organization.
 
     Returns
@@ -1128,7 +1128,7 @@ def show_organization_empty():
         Rendered HTML for for organization.
 
     """
-    return render_template('organization_empty.html')
+    return render_template('organization-index.html')
 
 
 @main.route('/organization/' + q_pattern + '/latest-works/rss')
@@ -1170,7 +1170,7 @@ def show_organization_topic(q1, q2):
         Rendered HTML for a specific organization and topic.
 
     """
-    return render_template('organization_topic.html', q1=q1, q2=q2, q=q1)
+    return render_template('organization-topic.html', q1=q1, q2=q2, q=q1)
 
 
 @main.route('/organizations/' + qs_pattern)
@@ -1242,7 +1242,7 @@ def show_protein(q):
 
 
 @main.route('/protein/')
-def show_protein_empty():
+def show_protein_index():
     """Return protein index page.
 
     Returns
@@ -1251,7 +1251,7 @@ def show_protein_empty():
         Rendered index page for protein view.
 
     """
-    return render_template('protein_empty.html')
+    return render_template('protein-index.html')
 
 
 @main.route('/project/' + q_pattern)
@@ -1273,7 +1273,7 @@ def show_project(q):
 
 
 @main.route('/project/')
-def show_project_empty():
+def show_project_index():
     """Return project index page.
 
     Returns
@@ -1282,7 +1282,7 @@ def show_project_empty():
         Rendered index page for search view.
 
     """
-    return render_template('project_empty.html')
+    return render_template('project-index.html')
 
 
 @main.route('/search')
@@ -1352,7 +1352,7 @@ def show_gene(q):
 
 
 @main.route('/gene/')
-def show_gene_empty():
+def show_gene_index():
     """Return gene index page.
 
     Returns
@@ -1361,7 +1361,7 @@ def show_gene_empty():
         Rendered index page for gene view.
 
     """
-    return render_template('gene_empty.html')
+    return render_template('gene-index.html')
 
 
 @main.route('/taxon/' + q_pattern)
@@ -1383,7 +1383,7 @@ def show_taxon(q):
 
 
 @main.route('/taxon/')
-def show_taxon_empty():
+def show_taxon_index():
     """Return taxon index page.
 
     Returns
@@ -1392,7 +1392,7 @@ def show_taxon_empty():
         Rendered index page for taxon view.
 
     """
-    return render_template('taxon_empty.html')
+    return render_template('taxon-index.html')
 
 
 @main.route('/q-to-bibliography-templates')
@@ -1408,18 +1408,18 @@ def show_q_to_bibliography_templates():
     q_ = request.args.get('q')
 
     if not q_:
-        return render_template('q_to_bibliography_templates.html')
+        return render_template('q-to-bibliography-templates.html')
 
     current_app.logger.debug("q: {}".format(q_))
 
     q = sanitize_q(q_)
     if not q:
         # Could not identify a wikidata identifier
-        return render_template('q_to_bibliography_templates.html')
+        return render_template('q-to-bibliography-templates.html')
 
     wikitext = q_to_bibliography_templates(q)
 
-    return render_template('q_to_bibliography_templates.html',
+    return render_template('q-to-bibliography-templates.html',
                            q=q,
                            wikitext=wikitext)
 
@@ -1443,7 +1443,7 @@ def show_software(q):
 
 
 @main.route('/software/')
-def show_software_empty():
+def show_software_index():
     """Return software index page.
 
     Returns
@@ -1452,7 +1452,7 @@ def show_software_empty():
         Rendered index page for author view.
 
     """
-    return render_template('software_empty.html')
+    return render_template('software-index.html')
 
 
 @main.route('/text-to-topics', methods=['POST', 'GET'])
@@ -1477,10 +1477,10 @@ def show_text_to_topics():
         assert False
 
     if not current_app.text_to_topic_q_text_enabled:
-        return render_template('text_to_topics.html', enabled=False)
+        return render_template('text-to-topics.html', enabled=False)
 
     if not text:
-        return render_template('text_to_topics.html', enabled=True)
+        return render_template('text-to-topics.html', enabled=True)
 
     qs_list = current_app.text_to_topic_q_text.text_to_topic_qs(text)
     qs = ",".join(set(qs_list))
@@ -1529,7 +1529,7 @@ def show_topic_rss(q):
 
 
 @main.route('/topic/')
-def show_topic_empty():
+def show_topic_index():
     """Return rendered HTML index page for topic.
 
     Returns
@@ -1538,7 +1538,7 @@ def show_topic_empty():
         Rendered HTML index page for topic.
 
     """
-    return render_template('topic_empty.html')
+    return render_template('topic-index.html')
 
 
 @main.route('/topics/' + qs_pattern)
@@ -1634,11 +1634,11 @@ def show_chemical_element(q):
         Rendered HTML.
 
     """
-    return render_template('chemical_element.html', q=q)
+    return render_template('chemical-element.html', q=q)
 
 
 @main.route('/chemical-element/')
-def show_chemical_element_empty():
+def show_chemical_element_index():
     """Return rendered HTML index page for chemical element.
 
     Returns
@@ -1647,7 +1647,7 @@ def show_chemical_element_empty():
         Rendered HTML index page for chemical element.
 
     """
-    return render_template('chemical_element_empty.html')
+    return render_template('chemical-element-index.html')
 
 
 @main.route('/chemical-class/' + q_pattern)
@@ -1665,11 +1665,11 @@ def show_chemical_class(q):
         Rendered HTML.
 
     """
-    return render_template('chemical_class.html', q=q)
+    return render_template('chemical-class.html', q=q)
 
 
 @main.route('/chemical-class/')
-def show_chemical_class_empty():
+def show_chemical_class_index():
     """Return rendered HTML index page for a specific class of chemicals.
 
     Returns
@@ -1678,7 +1678,7 @@ def show_chemical_class_empty():
         Rendered HTML index page for a specific class of chemicals.
 
     """
-    return render_template('chemical_class_empty.html')
+    return render_template('chemical-class-index.html')
 
 
 @main.route('/twitter/<twitter>')
@@ -1734,7 +1734,7 @@ def show_venue_cito(q):
         Rendered HTML.
 
     """
-    return render_template('venue_cito.html', q=q)
+    return render_template('venue-cito.html', q=q)
 
 
 @main.route('/work/' + q_pattern + '/cito')
@@ -1752,7 +1752,7 @@ def show_work_cito(q):
         Rendered HTML.
 
     """
-    return render_template('work_cito.html', q=q)
+    return render_template('work-cito.html', q=q)
 
 
 @main.route('/work/' + q_pattern + '/export')
@@ -1770,7 +1770,7 @@ def show_work_export(q):
         Rendered HTML.
 
     """
-    return render_template('work_export.html', q=q)
+    return render_template('work-export.html', q=q)
 
 
 @main.route('/cito/' + q_pattern)
@@ -1792,7 +1792,7 @@ def show_cito(q):
 
 
 @main.route('/cito/')
-def show_cito_empty():
+def show_cito_index():
     """Return rendered HTML about CiTO annotation in Wikidata.
 
     Return rendered HTML index page with general info about CiTO annotation
@@ -1805,7 +1805,7 @@ def show_cito_empty():
         in Wikidata.
 
     """
-    return render_template('cito_empty.html')
+    return render_template('cito-index.html')
 
 
 @main.route('/venue/' + q_pattern + '/latest-works/rss')
@@ -1831,7 +1831,7 @@ def show_venue_rss(q):
 
 
 @main.route('/venue/')
-def show_venue_empty():
+def show_venue_index():
     """Return rendered HTML index page for venue.
 
     Returns
@@ -1840,7 +1840,7 @@ def show_venue_empty():
         Rendered HTML index page for venue.
 
     """
-    return render_template('venue_empty.html')
+    return render_template('venue-index.html')
 
 
 @main.route('/venues/' + qs_pattern)
@@ -1881,7 +1881,7 @@ def show_series(q):
 
 
 @main.route('/series/')
-def show_series_empty():
+def show_series_index():
     """Return rendered HTML index page for series.
 
     Returns
@@ -1890,7 +1890,7 @@ def show_series_empty():
         Rendered HTML index page for series.
 
     """
-    return render_template('series_empty.html')
+    return render_template('series-index.html')
 
 
 @main.route('/complex/' + q_pattern)
@@ -1912,7 +1912,7 @@ def show_complex(q):
 
 
 @main.route('/complex/')
-def show_complex_empty():
+def show_complex_index():
     """Return rendered HTML index page for complex.
 
     Returns
@@ -1921,7 +1921,7 @@ def show_complex_empty():
         Rendered HTML index page for complex.
 
     """
-    return render_template('complex_empty.html')
+    return render_template('complex-index.html')
 
 
 @main.route('/pathway/' + q_pattern)
@@ -1943,7 +1943,7 @@ def show_pathway(q):
 
 
 @main.route('/pathway/')
-def show_pathway_empty():
+def show_pathway_index():
     """Return rendered HTML index page for pathway.
 
     Returns
@@ -1952,7 +1952,7 @@ def show_pathway_empty():
         Rendered HTML index page for pathway.
 
     """
-    return render_template('pathway_empty.html')
+    return render_template('pathway-index.html')
 
 
 @main.route('/publisher/' + q_pattern)
@@ -1969,7 +1969,7 @@ def show_publisher(q):
 
 
 @main.route('/publisher/')
-def show_publisher_empty():
+def show_publisher_index():
     """Return rendered HTML index page for publisher.
 
     Returns
@@ -1978,7 +1978,7 @@ def show_publisher_empty():
         Rendered HTML for publisher index page.
 
     """
-    return render_template('publisher_empty.html')
+    return render_template('publisher-index.html')
 
 
 @main.route('/robots.txt')
@@ -2035,7 +2035,7 @@ def show_sponsor(q):
 
 
 @main.route('/sponsor/')
-def show_sponsor_empty():
+def show_sponsor_index():
     """Return rendered index page for sponsor.
 
     Returns
@@ -2044,7 +2044,7 @@ def show_sponsor_empty():
         Rendered HTML page for sponsor index page.
 
     """
-    return render_template('sponsor_empty.html')
+    return render_template('sponsor-index.html')
 
 
 @main.route('/sponsor/' + q_pattern + '/latest-works/rss')
@@ -2088,7 +2088,7 @@ def show_use(q):
 
 
 @main.route('/use/')
-def show_use_empty():
+def show_use_index():
     """Return use index page.
 
     Returns
@@ -2097,7 +2097,7 @@ def show_use_empty():
         Rendered index page for author view.
 
     """
-    return render_template('use_empty.html')
+    return render_template('use-index.html')
 
 
 @main.route('/work/' + q_pattern)
@@ -2123,7 +2123,7 @@ def show_work(q):
 
 
 @main.route('/work/')
-def show_work_empty():
+def show_work_index():
     """Return rendered index page for work.
 
     Returns
@@ -2132,7 +2132,7 @@ def show_work_empty():
         Rendered HTML page for work index page.
 
     """
-    return render_template('work_empty.html')
+    return render_template('work-index.html')
 
 
 @main.route('/works/' + qs_pattern)
@@ -2192,7 +2192,7 @@ def show_aspect_missing(aspect, q):
 
     """
     try:
-        return render_template('{aspect}_curation.html'.format(aspect=aspect),
+        return render_template('{aspect}-curation.html'.format(aspect=aspect),
                                q=q)
     except TemplateNotFound:
         return render_template(
