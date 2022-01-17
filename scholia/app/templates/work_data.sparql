@@ -1,4 +1,4 @@
-SELECT ?description ?value ?valueUrl
+SELECT DISTINCT ?description ?value ?valueUrl
 WHERE {
   BIND(wd:{{ q }} AS ?work)
   {
@@ -183,6 +183,21 @@ WHERE {
     FILTER (LANG(?value_string) = 'en')
     BIND(COALESCE(?value_string, ?pubqid) AS ?value)
     BIND(CONCAT("../work/", ?pubqid) AS ?valueUrl)}
+  }
+  UNION
+  {
+    BIND(17 AS ?order)
+    BIND("⚠️ Cites retracted article" AS ?description)
+    { ?work wdt:P2860 ?retracted . ?retracted wdt:P31 wd:Q45182324 . }
+    UNION
+    { ?work wdt:P2860 ?retracted . ?retracted wdt:P793 wd:Q7316896 . }
+    UNION
+    { ?work wdt:P2860 ?retracted . ?retracted wdt:P5824 [] . }
+    ?retracted rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(SUBSTR(STR(?retracted), 32) AS ?q) 
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../work/", ?q) AS ?valueUrl)
   }
 } 
 ORDER BY ?order
