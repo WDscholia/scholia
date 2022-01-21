@@ -120,6 +120,8 @@ h3 {
 
 .table-of-contents {
     margin: 1rem;
+    display: flex;
+    justify-content: space-between;
 }
 
 .loader {
@@ -173,4 +175,9 @@ h3 {
 
 #details img {
     margin: 0px 3px 1px;
+}
+
+#item-image {
+    max-width: 50%;
+    object-fit: contain;
 }
