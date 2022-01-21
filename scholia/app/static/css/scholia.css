@@ -181,3 +181,31 @@ h3 {
     max-width: 50%;
     object-fit: contain;
 }
+
+@page {
+    margin: 2cm;
+}
+
+@media print {
+    .container {
+        margin: 0;
+        padding: 0;
+    }
+
+    .table-of-contents a,
+    a.hlink {
+        text-decoration: none;
+        color: black;
+    } 
+
+    .dataTables_filter,
+    #aspect-chooser {
+        display: none;
+    }
+
+    iframe {
+        page-break-inside: avoid;
+        min-height: 30%;
+        min-width: 100%;
+    }
+}
