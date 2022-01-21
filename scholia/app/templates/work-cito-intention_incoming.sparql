@@ -1,0 +1,8 @@
+SELECT ?citingArticle ?citingArticleLabel ?intention ?intentionLabel WHERE {
+  VALUES ?CITEDARTICLE { wd:{{ q }} }
+  VALUES ?intention { wd:{{ q2 }} }
+  ?citingArticle p:P2860 ?citationStatement .
+  ?citationStatement pq:P3712 ?intention ;
+                     ps:P2860 ?CITEDARTICLE .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
