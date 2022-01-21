@@ -174,7 +174,29 @@ WHERE {
   }
   UNION
   {
-    BIND(16 AS ?order)
+    SELECT (COUNT(DISTINCT ?citationStatement) AS ?value) ?order ?description ?valueUrl WHERE {
+      VALUES ?work { wd:{{ q }} }
+      VALUES ?intention { wd:Q96472102 wd:Q101149476 }
+      ?work ^ps:P2860 ?citationStatement . ?citationStatement pq:P3712 ?intention .
+      BIND(20 AS ?order)
+      BIND("Data or method used by" AS ?description)
+      BIND("./{{ q }}/cito" AS ?valueUrl)
+    } GROUP BY ?order ?description ?valueUrl
+  }
+  UNION
+  {
+    SELECT (COUNT(DISTINCT ?citationStatement) AS ?value) ?order ?description ?valueUrl WHERE {
+      VALUES ?work { wd:{{ q }} }
+      VALUES ?intention { wd:Q107687829 wd:Q107710355 }
+      ?work ^ps:P2860 ?citationStatement . ?citationStatement pq:P3712 ?intention .
+      BIND(21 AS ?order)
+      BIND("Disagreed with by" AS ?description)
+      BIND("./{{ q }}/cito" AS ?valueUrl)
+    } GROUP BY ?order ?description ?valueUrl
+  }
+  UNION
+  {
+    BIND(30 AS ?order)
     BIND("⚠️ Preprint of" AS ?description)
     { ?work p:P31 ?statement .
       ?statement pq:P642 ?pub .
@@ -186,7 +208,7 @@ WHERE {
   }
   UNION
   {
-    BIND(17 AS ?order)
+    BIND(31 AS ?order)
     BIND("⚠️ Cites retracted article" AS ?description)
     { ?work wdt:P2860 ?retracted . ?retracted wdt:P31 wd:Q45182324 . }
     UNION
