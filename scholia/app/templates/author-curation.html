@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "q_curation.html" %}
 
 {% set aspect = "author-curation" %}
 
@@ -20,18 +20,13 @@
 {% endblock %}
 
 
-
-{% block page_content %}
-
-<h1 id="h1">Author</h1>
-
-Missing information with respect to the author.
-
+{% block curation_panels %}
 
 <h2 id="missing-author-resolving">Author name strings to be resolved</h2>
 
 The authorship may be represented as an author name string rather than a Wikidata item.
-To try to resolve the author name strings, follow the links below to use the Author disambiguator tool, which also has a <a href="https://author-disambiguator.toolforge.org/author_item_oauth.php?id={{ q }}">dedicated page for this author</a>.
+To try to resolve the author name strings, follow the links below to use the Author disambiguator tool,
+which also has a <a href="https://author-disambiguator.toolforge.org/author_item_oauth.php?id={{ q }}">dedicated page for this author</a>.
 
 <table class="table table-hover" id="missing-author-resolving-table"></table>
 
@@ -58,8 +53,12 @@ the authors.
 
 <h2 id="missing-topic">Authored works with missing topics</h2>
 
+<p>Works authored by {{q}} that do not have topics listed in Wikidata. You can improve the data by clicking the link
+  on the right, scrolling to "+ add statement" and adding a <a href="https://www.wikidata.org/wiki/Property:P921">"main subject" (P921)</a> if you know it:</p>
+
 <table class="table table-hover" id="missing-topic-table"></table>
 
+<hr>
 
 
 {% endblock %}
