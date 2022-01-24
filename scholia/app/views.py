@@ -2215,9 +2215,7 @@ def show_aspect_missing(aspect, q):
         return render_template('{aspect}-curation.html'.format(aspect=aspect),
                                q=q)
     except TemplateNotFound:
-        return render_template(
-            "404.html",
-            error="No curation page defined for " + aspect)
+        return render_template('q_curation.html', q=q, aspect=aspect)
 
 
 def page_not_found(e):

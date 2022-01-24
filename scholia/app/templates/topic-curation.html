@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "q_curation.html" %}
 
 {% set aspect = "topic-curation" %}
 
@@ -24,11 +24,9 @@
 
 {% endblock %}
 
-{% block page_content %}
 
-<h1 id="h1">Topic </h1>
 
-Missing information with respect to the topic <a href="{{ url_for('app.show_topic_index') }}{{ q }}">{{ q }}</a>.
+{% block curation_panels %}
 
 
 <h2 id="missing-author-items">Missing author items</h2>
@@ -40,21 +38,34 @@ the authors.
 
 <table class="table table-hover" id="missing-author-items-table"></table>
 
+<hr>
+
+
 <h2 id="missing-pub-date">Missing publication date</h2>
 
-For the listed publications, Wikidata does not have publication dates.
+These works are missing a <b>publication date</b>.
+
 <table class="table table-hover" id="missing-pub-date-table"></table>
 
-
-<h2 id="missing-pub-venue">Missing publication venue</h2>
-
-For the listed publications, Wikidata does not have a statement as to where they were published.
-<table class="table table-hover" id="missing-pub-venue-table"></table>
+<hr>
 
 
 <h2 id="missing-co-topic">Works on the topic with missing additional topics</h2>
 
 The following works have only been tagged with this one topic.
+
 <table class="table table-hover" id="missing-co-topic-table"></table>
+
+<hr>
+
+
+<h2 id="missing-pub-venue">Missing publication venue</h2>
+
+<p>For example, here are works with this topic that do not have a <b>publication venue</b>. You can improve the data by clicking the link
+  on the right and adding a <a href="https://www.wikidata.org/wiki/Property:P1433">"published in" (P1433)</a> statement if you know it:</p>
+
+<table class="table table-hover" id="missing-pub-venue-table"></table>
+
+
 
 {% endblock %}

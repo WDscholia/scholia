@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "q_curation.html" %}
 
 
 {% set aspect = "venue-curation" %}
@@ -15,8 +15,7 @@
 {% endblock %}
 
 
-{% block page_content %}
-<h1 id="h1">Venue</h1>
+{% block curation_panels %}
 
 <h2 id="missing-author-item">Missing author item</h2>
 
@@ -26,12 +25,12 @@ Follow the link to use the Author disambiguator tool to try to create links betw
 
 <table class="table table-hover" id="missing-author-item-table"></table>
 
+
 <h2 id="missing-topics">Missing topics</h2>
 
-The following highly cited articles have few or no "main subject" statements.
+<p>Works published in venue that have few or no main topics.</p>
 
 <table class="table table-hover" id="missing-topics-table"></table>
 
 
 {% endblock %}
-    
