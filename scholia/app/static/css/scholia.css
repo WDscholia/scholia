@@ -57,9 +57,24 @@ h3 {
     box-shadow: 2px 2px;
 }
 
+a.dropdown-item.active {
+    color: white;
+}
+
+.navbar {
+    height: 4rem;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+.nav {
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0 0.5rem;
+}
+
 .nav-search {
     max-width: 250px;
-}
 
 .nav-search #searchresult {
     height: 0;
