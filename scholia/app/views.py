@@ -1122,7 +1122,6 @@ def redirect_openalex(openalex):
 
     """
     qs = identifier_to_qs("P10283", openalex)
-    print(qs)
     if len(qs) > 0:
         q = qs[0]
         if openalex.startswith('A'):
