@@ -15,9 +15,9 @@ from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      github_to_qs, biorxiv_to_qs, chemrxiv_to_qs,
-                     inchikey_to_qs, issn_to_qs, orcid_to_qs, viaf_to_qs,
-                     q_to_class, q_to_dois, random_author, twitter_to_qs,
-                     cordis_to_qs, mesh_to_qs, pubmed_to_qs,
+                     identifier_to_qs, inchikey_to_qs, issn_to_qs, orcid_to_qs,
+                     viaf_to_qs, q_to_class, q_to_dois, random_author,
+                     twitter_to_qs, cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
                      ncbi_gene_to_qs, uniprot_to_qs)
@@ -1098,6 +1098,47 @@ def redirect_viaf(viaf):
         q = qs[0]
         return redirect(url_for('app.show_author', q=q), code=302)
     return render_template('404.html', error=could_not_find("VIAF ID"))
+
+
+@main.route('/openalex/<openalex>')
+def redirect_openalex(openalex):
+    """Return HTML rendering for OpenAlex.
+
+    Parameters
+    ----------
+    openalex : str
+        OpenAlex identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    Notes
+    -----
+    This function will triage based on the first letter in the OpenAlex
+    identifier: author (A), topic (C), organization (I), venue (V) and
+    work (W).
+
+    """
+    qs = identifier_to_qs("P10283", openalex)
+    print(qs)
+    if len(qs) > 0:
+        q = qs[0]
+        if openalex.startswith('A'):
+            return redirect(url_for('app.show_author', q=q), code=302)
+        elif openalex.startswith('C'):
+            return redirect(url_for('app.show_topic', q=q), code=302)
+        elif openalex.startswith('I'):
+            return redirect(url_for('app.show_organization', q=q), code=302)
+        elif openalex.startswith('V'):
+            return redirect(url_for('app.show_venue', q=q), code=302)
+        elif openalex.startswith('W'):
+            return redirect(url_for('app.show_work', q=q), code=302)
+        else:
+            # Fallback
+            return redirect(url_for('app.redirect_q', q=q), code=302)
+    return render_template('404.html', error=could_not_find("OpenAlex ID"))
 
 
 @main.route('/organization/' + q_pattern)
