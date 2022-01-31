@@ -83,8 +83,8 @@ sparqlToShortInchiKey(`# tool: scholia
 <script type="text/javascript" src="{{ url_for('static', filename='d3-scale-chromatic.v1.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='scholia.js') }}"></script>
-<link href="{{ url_for('static', filename='widgets/select2/css/select2.min.css') }}" rel="stylesheet" />
-<script type="text/javascript" src="{{ url_for('static', filename='widgets/select2/js/select2.min.js')}}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='bootstrap-autocomplete.min.js')}}"></script>
 
 <script type="text/javascript">
     {% if q %}
@@ -602,55 +602,76 @@ sparqlToShortInchiKey(`# tool: scholia
     })
   {% endif %}
 
- $(document).ready(function () {
-     let search_text = ""
-     $('#searchterm').select2({
-         allowClear: true,
-         {% if request.path.endswith("search") %}
-         placeholder: "Scientist, paper, topic, DOI, etc.",
-         {% else %}
-         placeholder: "Search...",
-         {% endif %}
-         ajax: {
-             url: "https://www.wikidata.org/w/api.php?callback=?",
-             dataType: 'jsonp',
-             data: function (params) {
-                 search_text = params.term
-                 var query = {
-                     search: params.term,
-                     action: "wbsearchentities",
-                     language: "en",
-                     uselang: "en",
-                     format: "json",
-                     strictlanguage: true
-                 }
-                 return query
-             },
-             processResults: function (data) {
-                 var results = [{id: -1, text: "Advanced search"}];
-                 $.each(data.search, function (index, item) {
-                     results.push({
-                         id: "{{ url_for('app.index') }}" + item.title,
-                         text: item.label + " - " + item.description
-                     });
-                 });
+  $(document).ready(function () {
+    $('#searchterm').autoComplete({
+      minLength: 2,
+      resolver: 'custom',
+      events: {
+        search: debounce((searchTerm, callback) => {
+          var url = "https://www.wikidata.org/w/api.php?callback=?";
+          var settings = {
+            dataType: 'jsonp',
+            data: {
+              search: searchTerm,
+              action: "wbsearchentities",
+              language: "en",
+              uselang: "en",
+              format: "json",
+              strictlanguage: true
+            }
+          };
 
-                 return {
-                     "results": results
-                 };
-             }
-         }
-     });
+          $.ajax(url, settings).then(function (data) {
+            if (data.search.length) {
+              let results = ['Show all results for "' + searchTerm + '"']
+              for (let item of data.search) {
+                results.push(item.label + " - " + item.description + " (" + item.title + ")");
+              }
+              callback(results)
+            } else {
+              callback([])
+            }
+          });
+        }, 200)
+      }
+    });
 
-     $("#searchterm").on("select2:select", function (e) {
-         const search_id = e.params.data.id
-         if (search_id === -1) {
-             if(search_text === undefined) search_text = ""
-             window.location.href = "/search?q=" + search_text;
-         } else {
-             window.location.href = e.params.data.id;
-         }
-     });
+    $("#searchterm").on("autocomplete.select", (event, item) => { handleSearch(item) });
+
+    $("#searchterm").on("keydown", function (event) {
+      switch (event.key) {
+        case "Enter":
+          handleSearch(this.value);
+          break;
+        default:
+      }
+    });
+
+    $("#searchbutton").on("click", () => { handleSearch(document.getElementById("searchterm").value) })
+
+    function handleSearch(item) {
+      let q_id = item.match(/ \((Q\d+)\)$/)
+      if (q_id) {
+        window.location.href = "/" + q_id[1];
+      } else {
+        let search_text = item.match(/Show all results for "(.+)"$/)
+        if (search_text) {
+          window.location.href = "/search?q=" + search_text[1];
+        } else {
+          window.location.href = "/search?q=" + item;
+        }
+      }
+    }
+
+    function debounce(callback, wait) {
+      let timeout;
+      return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(function () {
+          callback.apply(this, args);
+        }, wait);
+      };
+    }
 
      // Add table of content
   var headings = document.querySelectorAll("h2,h3");
@@ -842,9 +863,7 @@ sparqlToShortInchiKey(`# tool: scholia
     </ul>
     {% block nav_search %}
     <div class='nav nav-search'>
-	    <div class="input-group">
-        <input type="text" id="searchterm"/>
-      </div>
+        <input class="form-control" type="text" id="searchterm"/>
     </div>
     {% endblock %}
   </div>
