@@ -57,27 +57,6 @@ h3 {
     box-shadow: 2px 2px;
 }
 
-.navbar {
-    height: 4rem;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-}
-
-.nav {
-    align-items: center;
-    flex-wrap: wrap;
-    margin: 0 0.5rem;
-}
-
-.nav li {
-    margin-right: 1em;
-}
-
-.nav button {
-    margin-left: -1em;
-    margin-right: -0.5em;
-}
-
 .nav-search {
     max-width: 250px;
 }
@@ -208,4 +187,9 @@ h3 {
         min-height: 30%;
         min-width: 100%;
     }
+}
+
+.dataTables_scrollHeadInner,
+table.dataTable {
+    min-width: 100%;
 }
