@@ -200,7 +200,7 @@ def arxiv_to_qs(arxiv):
     True
 
     """
-    return _identifier_to_qs('P818', arxiv)
+    return identifier_to_qs('P818', arxiv)
 
 
 def biorxiv_to_qs(biorxiv_id):
@@ -222,7 +222,7 @@ def biorxiv_to_qs(biorxiv_id):
     True
 
     """
-    return _identifier_to_qs('P3951', biorxiv_id)
+    return identifier_to_qs('P3951', biorxiv_id)
 
 
 def chemrxiv_to_qs(chemrxiv_id):
@@ -236,7 +236,7 @@ def chemrxiv_to_qs(chemrxiv_id):
     Returns
     -------
     qs : list of str
-        List of string with Wikidata IDs.
+        List of strings with Wikidata IDs.
 
     Examples
     --------
@@ -244,20 +244,53 @@ def chemrxiv_to_qs(chemrxiv_id):
     True
 
     """
-    return _identifier_to_qs('P9262', chemrxiv_id)
+    return identifier_to_qs('P9262', chemrxiv_id)
 
 
-def _identifier_to_qs(prop, identifier):
-    query = 'select ?work where {{ ?work wdt:{prop} "{identifier}" }}'.format(
-        prop=prop,
+def identifier_to_qs(property, identifier):
+    """Convert identifier to Wikidata identifiers.
+
+    Convert an specific identifier to a Wikidata identifier given the
+    identifier type.
+
+    Parameters
+    ----------
+    property : str
+        String with Wikidata property identifier for a identifier.
+    identifier : str
+        String with specific identifier.
+
+    Returns
+    -------
+    qs : list of str
+        List of zero or more strings with Wikidata IDs matching the identifier.
+
+    Notes
+    -----
+    The Wikidata Query Service is queries to resolve the given identifier. If
+    an error happens an empty list is returned.
+
+    Examples
+    --------
+    >>> property = "P10283"  # Property identifier for OpenAlex ID
+    >>> identifier = "A2736231928"  # Corresponding to Q20980928 (Finn Nielsen)
+    >>> qs = identifier_to_qs(property, identifier)
+    >>> qs == ['Q20980928']
+    True
+
+    """
+    query = 'SELECT ?work {{ ?work wdt:{property} "{identifier}" }}'.format(
+        property=property,
         identifier=escape_string(identifier),
     )
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
-    data = response.json()
-
+    try:
+        response = requests.get(url, params=params, headers=HEADERS)
+        data = response.json()
+    except Exception:
+        return []
     return [item['work']['value'][31:]
             for item in data['results']['bindings']]
 
@@ -431,6 +464,31 @@ def pubchem_to_qs(cid):
 
     return [item['chemical']['value'][31:]
             for item in data['results']['bindings']]
+
+
+def openalex_to_qs(openalex):
+    """Convert OpenAlex ID to Wikidata identifiers.
+
+    Given an identifier from the OpenAlex return zero or more corresponding
+    Wikidata identifiers.
+
+    Parameters
+    ----------
+    openalex : str
+        OpenAlex identifier.
+
+    Returns
+    -------
+    qs : list of str
+        List of string with Wikidata IDs.
+
+    Examples
+    --------
+    >>> openalex_to_qs('A2736231928') == ['Q20980928']
+    True
+
+    """
+    return identifier_to_qs('P10283', openalex)
 
 
 def pubmed_to_qs(pmid):
