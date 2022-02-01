@@ -15,6 +15,32 @@ body {
     flex-shrink: 0;
 }
 
+.navbar {
+    height: 4rem;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+.nav {
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0 0.5rem;
+}
+
+.nav-search {
+    max-width: 250px;
+}
+.nav-search #searchresult {
+    height: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+.nav-search #searchresult div {
+    background: white;
+    width: 100%;
+}
+
 .content {
     flex-grow: 1;
 }
@@ -59,32 +85,6 @@ h3 {
 
 a.dropdown-item.active {
     color: white;
-}
-
-.navbar {
-    height: 4rem;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-}
-
-.nav {
-    align-items: center;
-    flex-wrap: wrap;
-    margin: 0 0.5rem;
-}
-
-.nav-search {
-    max-width: 250px;
-
-.nav-search #searchresult {
-    height: 0;
-    width: 100%;
-    z-index: 1;
-}
-
-.nav-search #searchresult div {
-    background: white;
-    width: 100%;
 }
 
 .full-width {
