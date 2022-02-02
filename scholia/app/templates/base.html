@@ -133,11 +133,11 @@ sparqlToShortInchiKey(`# tool: scholia
 	    var imageNameMd5 = md5(imageName);
 	    var imageURL = "https://upload.wikimedia.org/wikipedia/commons/" 
 	    imageURL += imageNameMd5[0] + "/" + imageNameMd5.slice(0,2) + "/"
-	    imageURL += imageName
+	    imageURL += encodeURIComponent(imageName);
 	    var itemImage = document.getElementById("item-image");
 	    if (itemImage) {
-		itemImage.src = encodeURI(imageURL);
-		itemImage.alt = imageName
+		itemImage.src = imageURL;
+		itemImage.setAttribute('alt', imageName);
 	    }
 	}
 
