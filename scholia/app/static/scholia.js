@@ -228,7 +228,7 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
             order: [],
             paging: paging,
             sDom: sDom,
-            scrollX: true,
+            scrollX: false,
         });
 
         $(element).append(
@@ -295,7 +295,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
             order: [],
             paging: paging,
             sDom: sDom,
-            scrollX: true,
+            scrollX: false,
             language: {
               emptyTable: "This query yielded no results. ",
               sZeroRecords: "This query yielded no results."
