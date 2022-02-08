@@ -1,0 +1,29 @@
+{% extends "q_curation.html" %}
+
+{% set aspect = "use-curation" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('missing-author-items') }}
+
+
+{% endblock %}
+
+
+
+{% block curation_panels %}
+
+
+<h2 id="missing-author-items">Missing author items</h2>
+
+The authors listed below may only be represented as strings in Wikidata
+with no link to Wikidata items.
+Follow the link to use the Author disambiguator tool to try to resolve
+the authors.
+
+<table class="table table-hover" id="missing-author-items-table"></table>
+
+<hr>
+
+
+{% endblock %}

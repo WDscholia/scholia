@@ -1,0 +1,63 @@
+SELECT
+  # Number of works with the author
+  ?count
+
+  # Author score - 3 points for authoring a work, 1 for being cited
+  ?score
+
+  # Author as a string
+  ?author
+
+  # Build URL to the Author disambiguator tool
+  (CONCAT(
+      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
+      ENCODE_FOR_URI(?author)) AS ?resolver_url)
+
+WITH {
+  SELECT DISTINCT ?work WHERE {
+    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* wd:{{ q }} .
+  }
+} AS %works
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?author
+  WHERE {
+    INCLUDE %works
+    ?work wdt:P2093 ?author .
+  }
+  GROUP BY ?author
+} AS %counts
+
+# Generate a score for each author
+WITH {
+  SELECT (SUM(?score_) AS ?score) ?author
+  WHERE {
+    {
+      # Assign them 3 points if they are an author of a work using the resource
+      SELECT (3 AS ?score_) ?author WHERE {
+        [] wdt:P2093 ?author ;
+           (wdt:P2283 | wdt:P4510) / wdt:P279* wd:{{ q }} .
+      }
+    }
+    UNION
+    {
+      # Assign them 1 point if they are the author of a work that is cited by a work using the resource
+      SELECT (1 AS ?score_) ?author WHERE {
+        [] wdt:P2860 / wdt:P2093 ?author ;
+           (wdt:P2283 | wdt:P4510) / wdt:P279* wd:{{ q }} .
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %scores
+
+WHERE {
+  INCLUDE %counts
+  INCLUDE %scores
+
+  # Label the result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?count) DESC(?score)
+LIMIT 500
