@@ -12,3 +12,4 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
 }
 ORDER BY DESC(?count)
+LIMIT 200
