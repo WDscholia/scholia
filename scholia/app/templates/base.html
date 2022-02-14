@@ -91,6 +91,8 @@ sparqlToShortInchiKey(`# tool: scholia
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
 	       '&format=json&callback=?';
+    
+    const currentAspect = window.location.pathname.split("/")[1];
      
     $.getJSON(url, function (data) {
 	 var item = data.entities["{{ q }}"];
@@ -380,16 +382,14 @@ sparqlToShortInchiKey(`# tool: scholia
 
      });
 
-    var currentURL = window.location.pathname.split("/");
-    var currentAspect = currentURL[1];
     var curationElement = document.getElementById("curation-link");
 
-    if (currentURL[3] == "curation") {
+    {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
       curationElement.innerText = "Back"
       curationElement.href = "/" + currentAspect + "/{{ q }}";
-    } else {
+    {% else %}
       curationElement.href = "/" + currentAspect + "/{{ q }}/curation";
-    }
+    {% endif %}
     curationElement.classList.remove("d-none");
 
      // this query opens the Wikidata item as a different aspect
@@ -457,7 +457,6 @@ sparqlToShortInchiKey(`# tool: scholia
      };
      
       $.ajax(endpointUrl, settings).then(function (data) {
-        var currentAspect = window.location.pathname.split("/")[1];
         createDropdownButton("aspect-chooser", 'aspectMenuButton', currentAspect, data, "{{q}}")
 
         if (data.results.bindings.length > 1) {
@@ -475,7 +474,6 @@ sparqlToShortInchiKey(`# tool: scholia
           };
 
           $.ajax(endpointUrl, settings).then(function (data) {
-            var currentAspect = window.location.pathname.split("/")[1];
             var aspectLabel = " / <a href='/" + currentAspect + "/{{q}}'>{{q}}</a> / "   
             document.getElementById("aspect-chooser-label").innerHTML = aspectLabel;
 
@@ -499,11 +497,11 @@ sparqlToShortInchiKey(`# tool: scholia
 
         // only show aspects which have a curation page with author-disambig or wikidata links
         var validCurationPages = ["author", "award", "organization", "topic", "venue"]
-        if (currentURL[3] == "curation") {
+        {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
           data.results.bindings = data.results.bindings.filter(elem => {
             return validCurationPages.indexOf(elem.aspect.value) != -1
           })
-        }
+        {% endif %}
 
         if (data.results.bindings.length > 1) {
           aspectDropdown.classList.add('dropdown-toggle');
@@ -530,9 +528,9 @@ sparqlToShortInchiKey(`# tool: scholia
             var dropdownItem = document.createElement('a');
             dropdownItem.classList = 'dropdown-item';
             dropdownItem.href = "{{ url_for('app.index') }}" + aspect + '/{{ q }}';
-            if (currentURL[3] == "curation") {
+            {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
               dropdownItem.href += "/curation"
-            }
+            {% endif %}
             dropdownItem.innerText = aspect;
             aspectDropdownMenu.append(dropdownItem);
           }
