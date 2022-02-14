@@ -93,3 +93,7 @@ ENV/
 
 # Jetbrains
 .idea
+
+# Eclipse
+.pydev
+.pydevproject
