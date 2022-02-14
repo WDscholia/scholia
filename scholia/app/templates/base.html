@@ -100,6 +100,7 @@ sparqlToShortInchiKey(`# tool: scholia
        $("title").text(title + " - Scholia");
 
 	     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
+	     $("#h1").text("Improve " + currentAspect + ": " + title);
 
 	     var linkedToFrom = "<p><a href='https://www.wikidata.org/w/index.php?hidecategorization=1&target={{ q }}&showlinkedto=1&limit=500&days=7&enhanced=1&title=Special:RecentChangesLinked&urlversion=2' >";
 	     linkedToFrom += "Recent changes to items that link <em>to</em> " + $('<div>').text(title).html() + "</a> and ";
@@ -378,7 +379,19 @@ sparqlToShortInchiKey(`# tool: scholia
 	 }
 
      });
-	
+
+    var currentURL = window.location.pathname.split("/");
+    var currentAspect = currentURL[1];
+    var curationElement = document.getElementById("curation-link");
+
+    if (currentURL[3] == "curation") {
+      curationElement.innerText = "Back"
+      curationElement.href = "/" + currentAspect + "/{{ q }}";
+    } else {
+      curationElement.href = "/" + currentAspect + "/{{ q }}/curation";
+    }
+    curationElement.classList.remove("d-none");
+
      // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
     if ("{{q2}}".length) {
@@ -483,6 +496,15 @@ sparqlToShortInchiKey(`# tool: scholia
         aspectDropdown.type = 'button';
         aspectDropdown.id = id;
         aspectDropdown.classList = 'btn btn-outline-secondary';
+
+        // only show aspects which have a curation page with author-disambig or wikidata links
+        var validCurationPages = ["author", "award", "organization", "topic", "venue"]
+        if (currentURL[3] == "curation") {
+          data.results.bindings = data.results.bindings.filter(elem => {
+            return validCurationPages.indexOf(elem.aspect.value) != -1
+          })
+        }
+
         if (data.results.bindings.length > 1) {
           aspectDropdown.classList.add('dropdown-toggle');
           aspectDropdown.setAttribute('data-toggle', 'dropdown');
@@ -508,6 +530,9 @@ sparqlToShortInchiKey(`# tool: scholia
             var dropdownItem = document.createElement('a');
             dropdownItem.classList = 'dropdown-item';
             dropdownItem.href = "{{ url_for('app.index') }}" + aspect + '/{{ q }}';
+            if (currentURL[3] == "curation") {
+              dropdownItem.href += "/curation"
+            }
             dropdownItem.innerText = aspect;
             aspectDropdownMenu.append(dropdownItem);
           }
@@ -872,7 +897,10 @@ sparqlToShortInchiKey(`# tool: scholia
 
 {% block content %}
 <div class="content">
-<div class="container dropdown" id="aspect-chooser">
+<div class="container d-flex justify-content-between">
+    <div class="dropdown" id="aspect-chooser">
+    </div>
+    <a id='curation-link' role="button" class="btn btn-outline-secondary d-none">Improve data</a>
 </div>
 <div class="container">
     {% block page_content %}{% endblock %}
