@@ -59,8 +59,8 @@ def get_user_data(user):
 
     Examples
     --------
-    >>> data = get_user_data('EofVNskAAAAJ')
-    >>> data['citations'] > 2800
+    >>> data = get_user_data('9cagBQYAAAAJ')
+    >>> data['citations'] > 6000  # F.A. Nielsen's citations are above 6.000
     True
 
     """
