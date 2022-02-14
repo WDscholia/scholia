@@ -87,9 +87,6 @@ sparqlToShortInchiKey(`# tool: scholia
 <script type="text/javascript" src="{{ url_for('static', filename='bootstrap-autocomplete.min.js')}}"></script>
 
 <script type="text/javascript">
-    var currentURL = window.location.pathname.split("/");
-    var currentAspect = currentURL[1];
-    
     {% if q %}
     var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
 	       '{{ q }}' + 
@@ -382,33 +379,18 @@ sparqlToShortInchiKey(`# tool: scholia
 	 }
 
      });
-	
-    var currentURL  = window.location.pathname.split("/")
+
+    var currentURL = window.location.pathname.split("/");
     var currentAspect = currentURL[1];
-
-	{% if q2 %}
-
-		var url2 = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-				   '{{ q2 }}' +
-				   '&format=json&callback=?';
-		$.getJSON(url2, function (data) {
-			 var item = data.entities["{{ q2 }}"];
-			 if ('en' in item.labels) {
-				 $("#h1").append(' - '+item.labels.en.value);
-			 }
-			 $("#h1").append(' (<a href="https://www.wikidata.org/wiki/{{ q2 }}">{{ q2 }}</a>)');
-		});
-	{% endif %}
-
-    var curation = document.getElementById("curation-link");
+    var curationElement = document.getElementById("curation-link");
 
     if (currentURL[3] == "curation") {
-      curation.innerText = "Back"
-      curation.href = "/" + currentAspect + "/{{ q }}";
+      curationElement.innerText = "Back"
+      curationElement.href = "/" + currentAspect + "/{{ q }}";
     } else {
-      curation.href = "/" + currentAspect + "/{{ q }}/curation";
+      curationElement.href = "/" + currentAspect + "/{{ q }}/curation";
     }
-    curation.classList.remove("d-none");
+    curationElement.classList.remove("d-none");
 
      // this query opens the Wikidata item as a different aspect
      var endpointUrl = 'https://query.wikidata.org/sparql';
