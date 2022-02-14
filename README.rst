@@ -2,10 +2,14 @@
    :width: 100%
    :alt: Scholia
 
-|Website scholia.toolforge.org|
 
-.. |Website scholia.toolforge.org| image:: https://img.shields.io/website-up-down-green-red/http/scholia.toolforge.org.svg
-      :target: https://scholia.toolforge.org/
+.. image:: https://img.shields.io/website-up-down-green-red/http/scholia.toolforge.org.svg
+   :target: https://scholia.toolforge.org/
+   :alt: Website
+
+.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+   :target: https://github.com/WDscholia/scholia/blob/master/LICENSE
+   :alt: License
 
 =======
 
