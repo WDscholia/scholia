@@ -1,6 +1,12 @@
 .. image:: scholia/app/static/images/scholia_logo.svg
    :width: 100%
    :alt: Scholia
+
+|Website scholia.toolforge.org|
+
+.. |Website scholia.toolforge.org| image:: https://img.shields.io/website-up-down-green-red/http/scholia.toolforge.org.svg
+      :target: https://scholia.toolforge.org/
+
 =======
 
 Scholia is a python package and webapp for interaction with scholarly information in Wikidata_.
@@ -31,7 +37,7 @@ As a webapp, it currently runs from `Wikimedia Toolforge`_, a facility provided 
 The webapp displays scholarly profiles for individual researchers, research topics, organizations, journals, works, events, awards and so on. For instance, the scholarly profile for psychologist Uta Frith is accessible from
 
     https://scholia.toolforge.org/author/Q8219
-    
+
 The information displayed on the page is only what is available in Wikidata.
 
 Run locally after installing with ``pip``:
