@@ -4,9 +4,9 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?score ?author ?authorLabel
 WITH {
-  SELECT
-    (SUM(?score_) AS ?score)
+  SELECT 
     ?author
+    (SUM(?score_) AS ?score)
   WHERE {
     { 
       ?author wdt:P101/wdt:P279* target: .
@@ -29,6 +29,8 @@ WITH {
     }
   }
   GROUP BY ?author
+  ORDER BY DESC(?score)
+  LIMIT 200
 } AS %results 
 WHERE {
   INCLUDE %results

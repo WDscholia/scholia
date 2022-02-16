@@ -28,10 +28,11 @@ WITH {
     }
   }
   GROUP BY ?author
+  ORDER BY DESC(?score)
+  LIMIT 200
 } AS %results 
 WHERE {
   INCLUDE %results
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
 }
 ORDER BY DESC(?score)
-LIMIT 200
