@@ -1,9 +1,11 @@
 #defaultView:ImageGrid
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?image
   ?item ?itemLabel
 WHERE {
-  ?item wdt:P972 wd:{{ q }} ;
+  ?item wdt:P972 target: ;
         wdt:P18 ?image .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,jp,nl,no,ru,sv,zh". }
 }

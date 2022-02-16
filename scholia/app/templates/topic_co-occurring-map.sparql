@@ -1,4 +1,7 @@
 #defaultView:Map
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?location ?locationLabel
   ?geo
@@ -9,7 +12,7 @@ WITH {
     (SAMPLE(?work) AS ?example_work)
   WHERE {
     # Find works that are marked with main subject of the topic.
-    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:{{ q }} .
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) target: .
     
     # Identify co-occuring topic that is geo-locatable. 
     ?work wdt:P921 ?location .

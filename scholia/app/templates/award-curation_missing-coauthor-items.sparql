@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   # Number of works with the coauthor
   ?count
@@ -12,7 +14,7 @@ SELECT
 WITH {
   SELECT (COUNT(?work) as ?count) ?coauthor WHERE {
     ?work wdt:P50 ?author .
-	  ?author wdt:P166 wd:{{ q }} .
+	  ?author wdt:P166 target: .
     ?work wdt:P2093 ?coauthor .
   }
   GROUP BY ?coauthor

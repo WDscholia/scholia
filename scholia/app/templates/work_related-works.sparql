@@ -1,11 +1,14 @@
 #defaultView:Table
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # List of related works by co-citation analysis
 SELECT ?count ?work ?workLabel
 WITH {
   SELECT ?work (COUNT(?work) AS ?count)
   WHERE {
-    wd:{{ q }} (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?work .
-    FILTER (wd:{{ q }} != ?work)
+    target: (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?work .
+    FILTER (target: != ?work)
   }
   GROUP BY ?work
   LIMIT 500

@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?count ?award ?awardLabel ?recipients ?recipientsUrl
 WITH {
   SELECT (COUNT(?researcher) AS ?count) ?award 
@@ -7,7 +9,7 @@ WITH {
     { 
       SELECT DISTINCT ?researcher ?award WHERE {
         hint:Query hint:optimizer "None" .
-        ?work wdt:P921 wd:{{ q }} .
+        ?work wdt:P921 target: .
         ?work wdt:P50 ?researcher .
         ?researcher wdt:P166 ?award .
       } 

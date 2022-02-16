@@ -1,6 +1,8 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?isotope ?isotopeLabel ?protons ?neutrons ?mass ?massUnit ?massUnitLabel ?halflife ?halflifeUnit?halflifeUnitLabel
 WHERE {
-  VALUES ?element { wd:{{ q }} }
+  VALUES ?element { target: }
   ?element wdt:P1086 ?protons .
   ?isotope wdt:P279 ?element ;
            wdt:P1148 ?neutrons ;

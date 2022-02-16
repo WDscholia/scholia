@@ -1,7 +1,10 @@
 #defaultView:Timeline
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT DISTINCT ?datetime ?venue ?venueLabel WHERE {
   # Publisher
-  ?venue wdt:P123 wd:{{ q }} .
+  ?venue wdt:P123 target: .
   
   # Periodic literature
   ?venue wdt:P31 / wdt:P279* wd:Q1002697 .

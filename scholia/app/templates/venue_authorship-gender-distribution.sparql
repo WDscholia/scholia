@@ -1,8 +1,11 @@
 # title: Authorship gender distribution for a specific venue
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?count ?gender ?genderLabel 
 WITH {
   SELECT (COUNT(?author) AS ?count) ?gender WHERE {
-    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P1433 target: .
     ?work wdt:P50 ?author .
     ?author wdt:P21 ?gender .
   } 

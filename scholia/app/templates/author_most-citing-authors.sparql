@@ -1,4 +1,6 @@
 #defaultView:Table
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?count
   ?citing_author ?citing_authorLabel
@@ -7,9 +9,9 @@ SELECT
   (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?citing_authorLabel))) AS ?orcid)
 WITH {
   SELECT (COUNT(?citing_work) AS ?count) ?citing_author WHERE {
-    ?work wdt:P50 wd:{{ q }} .
+    ?work wdt:P50 target: .
     ?citing_work wdt:P2860 ?work . 
-    MINUS { ?citing_work wdt:P50 wd:{{ q }} }
+    MINUS { ?citing_work wdt:P50 target: }
     ?citing_work wdt:P50 ?citing_author .
   }
   GROUP BY ?citing_author 

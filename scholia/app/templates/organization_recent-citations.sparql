@@ -1,7 +1,9 @@
- #defaultView:Table
+#defaultView:Table
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT DISTINCT ?publication_date ?citing_work ?citing_workLabel ?work ?workLabel
 WHERE {
-  ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} .
+  ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
   ?work wdt:P50 ?researcher .
   ?citing_work wdt:P2860 ?work .
   ?citing_work wdt:P577 ?publication_datetime .

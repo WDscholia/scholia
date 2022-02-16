@@ -1,4 +1,6 @@
 #defaultView:BarChart
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (STR(?year_) AS ?year)
   (COUNT(?work) AS ?number_of_publications)
@@ -10,7 +12,7 @@ WITH {
   SELECT
     ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
   WHERE {
-    VALUES ?complex { wd:{{ q }} }
+    VALUES ?complex { target: }
     ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) ?complex .
     ?work wdt:P577 ?dates .
     BIND(YEAR(?dates) AS ?years) .

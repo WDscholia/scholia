@@ -1,4 +1,7 @@
 #defaultView:BarChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # Pages per year bar chart of an organization
 SELECT
   ?year
@@ -11,7 +14,7 @@ WHERE {
       (SAMPLE(?pages) / COUNT(?researcher_of_paper) AS ?pages_per_author)
     WHERE {
       # Find authors associated with organization
-      FILTER EXISTS { ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) wd:{{ q }} . }
+      FILTER EXISTS { ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) target: . }
       
       ?work (wdt:P50|wdt:P2093) ?researcher_of_paper .
       

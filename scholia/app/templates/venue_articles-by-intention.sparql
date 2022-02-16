@@ -1,4 +1,7 @@
 #defaultView:BarChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
 select ?year (count(?work) as ?number_of_publications) ?intention where {
@@ -10,7 +13,7 @@ select ?year (count(?work) as ?number_of_publications) ?intention where {
       bind(year(?date) as ?year_)
       {
         select (min(?year_) as ?earliest_year)  (max(?year_) as ?latest_year) where {
-          VALUES ?JOURNAL { wd:{{ q }} }
+          VALUES ?JOURNAL { target: }
           ?work wdt:P1433 ?JOURNAL .
           ?work wdt:P577 ?publication_date . 
           bind(year(?publication_date) as ?year_)
@@ -22,7 +25,7 @@ select ?year (count(?work) as ?number_of_publications) ?intention where {
   }
   union {
     select ?work ?intention (min(?years) as ?year) where {
-      VALUES ?JOURNAL { wd:{{ q }} }
+      VALUES ?JOURNAL { target: }
       ?work wdt:P577 ?dates ;
             p:P2860 / pq:P3712 / rdfs:label ?intention ;
             wdt:P1433 ?JOURNAL .

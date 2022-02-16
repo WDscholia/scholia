@@ -1,6 +1,8 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?description ?value ?valueUrl
 WHERE {
-  BIND(wd:{{ q }} AS ?trial)
+  BIND(target: AS ?trial)
   {
     BIND(1 AS ?order)
     BIND("Title" AS ?description)

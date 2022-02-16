@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?publication_date
   ?work ?workLabel
@@ -6,7 +8,7 @@ WITH {
   SELECT
     DISTINCT ?person
   WHERE {
-    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
+    ?event wdt:P179 | wdt:P31 target: .
 
     {
       # speaker

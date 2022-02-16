@@ -1,8 +1,11 @@
 #defaultView:BarChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?year ?count ?organization ?organizationLabel
 WITH {
   SELECT (MIN(?year_) AS ?year) ?work WHERE {
-    ?collection wdt:P179 wd:{{ q }} . 
+    ?collection wdt:P179 target: .
     ?work wdt:P1433 ?collection .
     ?work wdt:P577 ?datetimes .
     BIND(STR(YEAR(?datetimes)) AS ?year_)

@@ -1,11 +1,14 @@
 #title: Recent works published in venue
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (MIN(?publication_date_) AS ?publication_date)
   ?work ?workLabel
   (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
   (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
 WHERE {
-  ?work wdt:P1433 wd:{{ q }} .
+  ?work wdt:P1433 target: .
   OPTIONAL {
     ?work wdt:P577 ?publication_datetime . 
     BIND(xsd:date(?publication_datetime) AS ?publication_date_)

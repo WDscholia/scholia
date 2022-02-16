@@ -1,8 +1,11 @@
 #defaultView:Graph
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label 
 WITH {
   SELECT ?author1 ?author2 ?rgb WHERE {
-    VALUES ?organisation { wd:{{ q }} }
+    VALUES ?organisation { target: }
     { ?author1 wdt:P108 ?organisation . } union { ?author1 wdt:P1416 [ wdt:P361* ?organisation ] .  }
     { ?author2 wdt:P108 ?organisation . } union { ?author2 wdt:P1416 [ wdt:P361* ?organisation ] .  }
     {?author1 wdt:P184 ?author2 }

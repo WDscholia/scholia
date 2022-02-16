@@ -1,8 +1,10 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # title: physicochemical properties of this chemical
 SELECT DISTINCT ?propEntity ?propEntityLabel ?value ?units ?unitsLabel ?qualifiers ?source ?sourceLabel ?doi
 WITH {
   SELECT DISTINCT ?propEntity ?value ?units ?source ?doi (GROUP_CONCAT(?qualifierStr; separator=", ") AS ?qualifiers) WHERE {
-    wd:{{ q }} ?propp ?statement .
+    target: ?propp ?statement .
     ?statement a wikibase:BestRank ;
       ?proppsv [
         wikibase:quantityAmount ?value ;

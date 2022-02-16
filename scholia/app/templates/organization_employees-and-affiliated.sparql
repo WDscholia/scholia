@@ -1,4 +1,7 @@
 # title: Employees and affiliated with a specified organization
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (SAMPLE(?number_of_works_) AS ?works)
   (SAMPLE(?wikis_) AS ?wikis)
@@ -6,7 +9,7 @@ SELECT
   (SAMPLE(?orcid_) AS ?orcid)
 WITH {
   SELECT DISTINCT ?researcher WHERE {
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
+    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
   } 
 } AS %researchers
 WITH {

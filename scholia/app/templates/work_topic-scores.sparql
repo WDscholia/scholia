@@ -1,4 +1,7 @@
 #defaultView:BubbleChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?score ?topic ?topicLabel
 WITH {
   SELECT
@@ -6,24 +9,24 @@ WITH {
     ?topic
   WHERE {
     { 
-      wd:{{q}} wdt:P921 ?topic .
+      target: wdt:P921 ?topic .
       BIND(20 AS ?score_)
     }
     UNION
     { 
-     wd:{{q}} wdt:P921/wdt:P279 ?topic .
+     target: wdt:P921/wdt:P279 ?topic .
      BIND(3 AS ?score_)
     }
     UNION
     {
       # Topic of a cited work
-      wd:{{q}} wdt:P2860/wdt:P921 ?topic .
+      target: wdt:P2860/wdt:P921 ?topic .
       BIND(1 AS ?score_)
     }
     UNION
     {
       SELECT (1 AS ?score_) ?topic WHERE {
-        ?citing_work wdt:P2860 wd:{{q}} .
+        ?citing_work wdt:P2860 target: .
         ?citing_work wdt:P921 ?topic . 
       }
     }

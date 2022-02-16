@@ -1,4 +1,7 @@
 #defaultView:Timeline
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?time ?endtime ?event ?eventLabel ?image
   ?description
@@ -6,7 +9,7 @@ WITH {
   SELECT DISTINCT ?event ?time ?endtime WHERE {
     # It seems to be necessary to have this line together with the 
     # optional event time triples here.
-    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
+    ?event wdt:P179 | wdt:P31 target: .
     
     OPTIONAL { ?event wdt:P580 ?starttime . }
 
@@ -25,7 +28,7 @@ WITH {
 WITH {
   # Include significant events
   SELECT ?event ?time ?description WHERE {
-    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
+    ?event wdt:P179 | wdt:P31 target: .
     ?event p:P793 [ ps:P793 ?item ; pq:P585 ?time ] .
     OPTIONAL {
       ?item rdfs:label ?description .

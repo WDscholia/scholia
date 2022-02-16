@@ -1,9 +1,11 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?IDpred ?IDpredLabel
   ?id ?idUrl
   ?IDpredDescription
 {
-  wd:{{ q }} ?IDdir ?id .
+  target: ?IDdir ?id .
   ?IDpred wikibase:directClaim ?IDdir ;
             wdt:P31 wd:Q19833835 .
   OPTIONAL {

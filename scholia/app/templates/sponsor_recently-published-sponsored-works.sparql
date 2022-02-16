@@ -1,9 +1,11 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?publication_date ?number_of_citations ?work ?workLabel ?quote
 WITH {
   SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_work) as ?number_of_citations) ?work (SAMPLE(?quote_) AS ?quote)
   WHERE {
     ?work p:P859+ ?sponsor_statement .
-    ?sponsor_statement ps:P859+ wd:{{ q }} .
+    ?sponsor_statement ps:P859+ target: .
     OPTIONAL { ?sponsor_statement prov:wasDerivedFrom/pr:P1683 ?quote_ . }
     OPTIONAL {
       ?work wdt:P577 ?datetime .

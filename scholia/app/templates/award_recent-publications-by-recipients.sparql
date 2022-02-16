@@ -1,10 +1,12 @@
-SELECT ?publication_date ?work ?workLabel ?recipient ?recipientLabel 
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT ?publication_date ?work ?workLabel ?recipient ?recipientLabel
 WITH {
   SELECT
     (MAX(?publication_datetimes) AS ?publication_datetime)
     ?work ?recipient
   WHERE {
-    ?recipient wdt:P166 wd:{{ q }} . 
+    ?recipient wdt:P166 target: .
     ?work wdt:P50 ?recipient .
     OPTIONAL { ?work wdt:P577 ?publication_datetimes . }
   }
