@@ -6,15 +6,13 @@
 
 {{ sparql_to_table('journals',
      options={
-         "linkPrefixes": { "journal": "../../venue/" },
-         "linkSuffixes": { "journal": "/cito" }
+         "linkPrefixes": { "journal": "../../venue/" }
      }
    )
 }}
 {{ sparql_to_table('articles',
      options={
-         "linkPrefixes": { "citedArticle": "../../work/", },
-         "linkSuffixes": { "citedArticle": "/cito", }
+         "linkPrefixes": { "citedArticle": "../../work/", }
      }
    )
 }}
