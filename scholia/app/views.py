@@ -1762,6 +1762,7 @@ def show_venue(q):
 @main.route('/venue/' + q_pattern + '/cito')
 def show_venue_cito(q):
     """Return HTML rendering for Citation Typing Ontology annotation of citations.
+
     Parameters
     ----------
     q : str
@@ -1777,6 +1778,7 @@ def show_venue_cito(q):
 @main.route('/work/' + q_pattern + '/cito')
 def show_work_cito(q):
     """Return HTML rendering for Citation Typing Ontology annotation of citations.
+
     Parameters
     ----------
     q : str
@@ -1792,6 +1794,7 @@ def show_work_cito(q):
 @main.route('/work/' + q_pattern + '/cito/' + q2_pattern)
 def show_work_cito_intention(q, q2):
     """Return HTML rendering for Citation Typing Ontology annotation of citations.
+
     Parameters
     ----------
     q : str
