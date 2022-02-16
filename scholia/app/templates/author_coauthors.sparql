@@ -1,10 +1,12 @@
 #defaultView:Graph
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # Egocentric co-author graph for an author
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
   SELECT (COUNT(?work) AS ?count) ?author1 ?author2 WHERE {
     # Find co-authors
-    ?work wdt:P50 wd:{{ q }}, ?author1, ?author2 .
+    ?work wdt:P50 target:, ?author1, ?author2 .
 
     # Filtering 
     # Only journal and conference articles, books, not (yet?) software

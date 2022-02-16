@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (COUNT(?work) AS ?count) 
   ?author_name
@@ -8,7 +10,7 @@ WHERE {
   {
     SELECT DISTINCT ?author_name {
       ?recipient p:P166 ?award_statement . 
-      ?award_statement ps:P166 wd:{{ q }} .
+      ?award_statement ps:P166 target: .
       
       ?recipient skos:altLabel | rdfs:label ?author_name_ .
       

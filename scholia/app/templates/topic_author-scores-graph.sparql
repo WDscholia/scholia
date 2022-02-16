@@ -1,19 +1,22 @@
 #defaultView:BubbleChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?score ?author ?authorLabel
 WITH {
-  SELECT
-    (SUM(?score_) AS ?score)
+  SELECT 
     ?author
+    (SUM(?score_) AS ?score)
   WHERE {
     { 
-      ?author wdt:P101/wdt:P279* wd:{{ q }} .
+      ?author wdt:P101/wdt:P279* target: .
       BIND(20 AS ?score_)
     }
     UNION
     {
       SELECT (3 AS ?score_) ?author WHERE {
         ?work wdt:P50 ?author ;
-              wdt:P921/wdt:P279* wd:{{ q }} . 
+              wdt:P921/wdt:P279* target: .
       }
     }
     UNION
@@ -21,11 +24,13 @@ WITH {
       SELECT (1 AS ?score_) ?author WHERE {
         ?cited_work wdt:P50 ?author .
         ?citing_work wdt:P2860 ?cited_work .
-        ?citing_work wdt:P921/wdt:P279* wd:{{ q }} . 
+        ?citing_work wdt:P921/wdt:P279* target: .
       }
     }
   }
   GROUP BY ?author
+  ORDER BY DESC(?score)
+  LIMIT 200
 } AS %results 
 WHERE {
   INCLUDE %results

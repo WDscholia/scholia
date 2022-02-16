@@ -1,4 +1,7 @@
 # title: Most cited authors published in venue
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?count
   ?author ?authorLabel
@@ -13,7 +16,7 @@ WITH {
     (SAMPLE(?cited_work) AS ?example_cited_work)
     (SAMPLE(?citing_work) AS ?example_citing_work)
   WHERE {
-    ?cited_work wdt:P1433 wd:{{ q }} .
+    ?cited_work wdt:P1433 target: .
     ?citing_work wdt:P2860 ?cited_work .
     ?cited_work wdt:P50 ?author .
   }

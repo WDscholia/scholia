@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # title: List of event and proceedings for a specific event series
 SELECT DISTINCT 
   (SAMPLE(?years) AS ?year)
@@ -6,7 +8,7 @@ SELECT DISTINCT
   ?proceedings ?proceedingsLabel
 WHERE {
   {
-    ?event wdt:P179 | wdt:P31 wd:{{ q }} .
+    ?event wdt:P179 | wdt:P31 target: .
     OPTIONAL {
       ?event wdt:P585 | wdt:P580 ?datetime .
       BIND(YEAR(?datetime) AS ?years)
@@ -21,7 +23,7 @@ WHERE {
   UNION
   {
     # proceedings even if the event is not there!!!
-    ?proceedings ( wdt:P179 / wdt:P4745 ) wd:{{ q }} .
+    ?proceedings ( wdt:P179 / wdt:P4745 ) target: .
     OPTIONAL {
       ?proceedings wdt:P577 ?datetime .
       BIND(YEAR(?datetime) AS ?years)    

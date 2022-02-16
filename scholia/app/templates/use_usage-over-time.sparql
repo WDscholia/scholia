@@ -1,11 +1,14 @@
 #defaultView:BarChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?year (COUNT(?work) AS ?number_of_works) ?useLabel
 WITH{
   SELECT
     (MIN(?year_) AS ?year) ?work ?use
   WHERE {
     ?work (wdt:P2283 | wdt:P4510) ?use .
-    ?use wdt:P279* wd:{{ q }} .
+    ?use wdt:P279* target: .
     ?work wdt:P577 ?publication_datetime .
     BIND(STR(YEAR(?publication_datetime)) AS ?year_)
   }

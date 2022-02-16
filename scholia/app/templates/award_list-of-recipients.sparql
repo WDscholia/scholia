@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?year
   ?recipient ?recipientLabel ?recipientDescription
@@ -5,7 +7,7 @@ SELECT
 WITH {
   SELECT DISTINCT ?recipient ?year (SAMPLE(?work) AS ?example_work) WHERE {
     ?recipient p:P166 ?award_statement . 
-    ?award_statement ps:P166 wd:{{ q }} .
+    ?award_statement ps:P166 target: .
     OPTIONAL {
       { ?award_statement pq:P585 ?time }
       UNION

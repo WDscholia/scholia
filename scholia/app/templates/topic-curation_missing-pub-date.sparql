@@ -1,9 +1,11 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
 ?citations ?work ?workLabel (?work AS ?wikidata_url)
 WITH {
   SELECT (COUNT(?work) as ?count) ?work WHERE {
   # Works on the topic
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:{{ q }} .
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
   # Works that do not have a publication date statement
     FILTER NOT EXISTS { ?work wdt:P577 ?date . }
   # Works that do not have an ISSN, i.e. that are not periodicals

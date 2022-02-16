@@ -1,3 +1,6 @@
+PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
+PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
+
 # title: Nearby researchers that work with a specific topic and near a specified geographical entity
 SELECT
   ?score
@@ -11,7 +14,7 @@ WITH {
 } AS %universities
 WITH {
   SELECT ?organization ?distance ?other_geo {
-    wd:{{ q1 }} wdt:P625 ?geo .
+    target1: wdt:P625 ?geo .
     SERVICE wikibase:around { 
       ?organization wdt:P625 ?other_geo .
       bd:serviceParam wikibase:center ?geo .
@@ -51,10 +54,10 @@ WITH {
     INCLUDE %authors_with_distance
     {
       ?work wdt:P50 ?author .
-      ?work wdt:P921 / wdt:P279* wd:{{ q2 }} . BIND(3 AS ?topic_score)
+      ?work wdt:P921 / wdt:P279* target2: . BIND(3 AS ?topic_score)
     }
     UNION
-    { ?author wdt:P101 wd:{{ q2 }} . BIND(20 AS ?topic_score) }
+    { ?author wdt:P101 target2: . BIND(20 AS ?topic_score) }
   }
   GROUP BY ?author
 } AS %results

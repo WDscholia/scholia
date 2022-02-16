@@ -1,8 +1,10 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
  ?count ?gender ?genderLabel 
 WITH {
   SELECT (COUNT(DISTINCT ?recipient) AS ?count) ?gender WHERE {
-    ?recipient wdt:P166 wd:{{ q }} . 
+    ?recipient wdt:P166 target: .
     ?recipient wdt:P21 ?gender . 
   } 
   GROUP BY ?gender

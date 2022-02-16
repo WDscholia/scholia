@@ -1,4 +1,7 @@
 #defaultView:Graph
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?author1 ?author1Label ?image1 ?rgb
   ?author2 ?author2Label ?image2 
@@ -8,7 +11,7 @@ WITH {
     ?author2 (SAMPLE(?image2_) AS ?image2)
     (SAMPLE(?rgb_) AS ?rgb)
   WHERE {
-    wd:{{ q }} ^wdt:P361* / ^( wdt:P108 | wdt:P1416 | wdt:P463 ) ?author1 , ?author2 . 
+    target: ^wdt:P361* / ^( wdt:P108 | wdt:P1416 | wdt:P463 ) ?author1 , ?author2 .
     ?work wdt:P50 ?author1 , ?author2 .
 
     # Only display co-authorship for certain types of documents

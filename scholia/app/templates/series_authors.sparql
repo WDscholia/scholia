@@ -1,4 +1,7 @@
 # Statistics for a serial grouped by author
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?number_of_works ?number_of_citations
   ?author ?authorLabel
@@ -10,7 +13,7 @@ WITH {
     (SAMPLE(?work) AS ?example_work)
     ?author
   WHERE {
-    ?collection wdt:P179 wd:{{ q }} .
+    ?collection wdt:P179 target: .
     ?work wdt:P1433 ?collection .
     ?work wdt:P50 ?author .
     OPTIONAL { ?citing_work wdt:P2860 ?work . }

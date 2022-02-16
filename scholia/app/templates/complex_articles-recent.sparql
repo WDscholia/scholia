@@ -1,9 +1,10 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?date ?work ?workLabel 
   ?topicsUrl ?topics 
 WITH {
   SELECT DISTINCT ?work WHERE {
-    VALUES ?complex { wd:{{ q }} }
+    VALUES ?complex { target: }
     ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) ?complex .
   }
 } AS %works

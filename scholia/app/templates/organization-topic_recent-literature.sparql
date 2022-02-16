@@ -1,15 +1,18 @@
+PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
+PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
+
 SELECT
   (xsd:date(MAX(?publication_date_)) AS ?publication_date)
   ?work ?workLabel ?author ?authorLabel 
 WHERE {
-  { ?author ?p1 wd:{{ q1 }}. }
+  { ?author ?p1 target1: . }
   UNION
   {
     ?author ?p2 ?something .
-    ?something wdt:P361 wd:{{ q1 }}.
+    ?something wdt:P361 target1: .
   }
   ?work wdt:P50 ?author;
-  wdt:P921 wd:{{ q2 }}.
+  wdt:P921 target2: .
   OPTIONAL { ?work wdt:P577 ?publication_date_ . }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }

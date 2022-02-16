@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
 ?citations  ?work ?workLabel (?work AS ?wikidata_url)
 WITH {
@@ -5,7 +7,7 @@ WITH {
   # Works by author
     ?work wdt:P50 ?author .
   # Author who received an award
-    ?author wdt:P166 wd:{{ q }} .
+    ?author wdt:P166 target: .
   # Work does not have a main subject statement
     FILTER NOT EXISTS { ?work wdt:P921 ?topic . }
   }

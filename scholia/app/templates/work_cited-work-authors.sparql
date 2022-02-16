@@ -1,4 +1,7 @@
 #defaultView:Table
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # List of authors with works that are cited by the specified work
 SELECT
   ?cited_works
@@ -11,7 +14,7 @@ WITH {
   SELECT (COUNT(?cited_work) AS ?cited_works) ?author
   WHERE {
     # Find works that are cited by the queried work
-    wd:{{ q }} wdt:P2860 ?cited_work .
+    target: wdt:P2860 ?cited_work .
     ?cited_work wdt:P50 ?author .
   }
   GROUP BY ?author

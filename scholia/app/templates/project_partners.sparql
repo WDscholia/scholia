@@ -1,8 +1,11 @@
 #defaultView:Map
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT ?partner ?partnerLabel ?location
 WITH {
   SELECT DISTINCT ?partner ?location WHERE {
-    wd:{{ q }} (^wdt:P1344 | wdt:P710)* / (wdt:P527 | wdt:P710 | wdt:P1416) ?partner .
+    target: (^wdt:P1344 | wdt:P710)* / (wdt:P527 | wdt:P710 | wdt:P1416) ?partner .
     ?partner wdt:P159* / wdt:P625 ?location .
   }
 } AS %result

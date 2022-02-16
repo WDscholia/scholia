@@ -64,6 +64,17 @@ md5 = (function () {
   };
 })();
 
+function scroll() {
+    let fragment = window.location.hash;
+    if (fragment.length > 1) {
+        fragment = document.getElementById(fragment.slice(1));
+        if (fragment) {
+            fragment.scrollIntoView();
+        }
+    }
+}
+/* scroll to anchor in case page has changed */
+document.addEventListener('DOMContentLoaded', () => {setTimeout(scroll, 2000)});
 
 function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {}) {
     // Handle 'Label' columns.
@@ -563,4 +574,28 @@ function sparqlToShortInchiKey(sparql, key,  element, filename) {
     shortkey = key.substring(0,14)
     new_sparql = sparql.replace("_shortkey_",shortkey)
     sparqlToDataTable(new_sparql, element, filename);
+}
+
+
+function askQuery(panel, askQuery, callback) {
+     var endpointUrl = 'https://query.wikidata.org/sparql';
+     
+     settings = {
+       headers: { Accept: 'application/sparql-results+json' },
+       data: { query: askQuery },
+     };
+
+     $.ajax(endpointUrl, settings).then((data) => {
+        if (data.boolean) {
+            // unhide panels
+            document.getElementById(panel).classList.remove("d-none");
+            callback();
+        } else {
+            // hide from table of contents
+            var headings = document.querySelectorAll("#" + panel + " h2, #" + panel + " h3");
+            for (var elem of headings) {
+                document.querySelector("li a[href='#" + elem.id + "']").parentElement.classList.add("d-none")
+            }
+        }
+    });
 }

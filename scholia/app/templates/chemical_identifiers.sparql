@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 # title: identifiers for this chemical
 SELECT
   ?Identifier ?IdentifierLabel
@@ -5,7 +7,7 @@ SELECT
   ?IdentifierDescription
 WITH {
   SELECT ?Identifier ?Value ?formatterurl WHERE {
-    wd:{{ q }} ?IDdir ?Value .
+    target: ?IDdir ?Value .
     ?Identifier wikibase:directClaim ?IDdir ;
             wdt:P31 wd:Q19833835 .
     OPTIONAL { 

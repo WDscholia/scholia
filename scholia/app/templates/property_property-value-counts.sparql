@@ -2,7 +2,7 @@
 SELECT ?count ?o ?oLabel 
 WITH {
   SELECT (COUNT(?s) AS ?count) ?o WHERE {
-    ?s wdt:{{ p }} ?o .
+    ?s wdt:target: ?o .
   }
   GROUP BY ?o
   ORDER BY DESC(?count)

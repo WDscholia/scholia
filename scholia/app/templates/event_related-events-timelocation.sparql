@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (ROUND(1000 * ?score_) / 1000 AS ?score)
   (ROUND(1000 * ?time_score_) / 1000 AS ?time_score)
@@ -25,7 +27,7 @@ WITH {
           
     { 
       # Around the same time
-      wd:{{ q }} wdt:P580 | wdt:P585 ?time0 .
+      target: wdt:P580 | wdt:P585 ?time0 .
       ?event wdt:P580 | wdt:P585 ?time .
       BIND((365.25 * YEAR(?time0) + 30.5 * MONTH(?time0) + DAY(?time0)) AS ?day0)
       BIND((365.25 * YEAR(?time) + 30.5 * MONTH(?time) + DAY(?time)) AS ?day)
@@ -39,7 +41,7 @@ WITH {
         INCLUDE %events 
                 
         # geocoordinate of the query event
-        wd:{{ q }} wdt:P276? / wdt:P159? / wdt:P625 ?geo0 .
+        target: wdt:P276? / wdt:P159? / wdt:P625 ?geo0 .
         
         # geocoordinate of other events
         ?event wdt:P276? / wdt:P625 ?geo .
@@ -63,7 +65,7 @@ WITH {
 } AS %results
 WHERE {
   INCLUDE %results
-  FILTER (?event != wd:{{ q }})
+  FILTER (?event != target:)
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,no,ru,sv,zh". }
 }
 ORDER BY DESC(?score)

@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?count
   ?work ?workLabel
@@ -10,7 +12,7 @@ WITH {
     (SAMPLE(?citing_work) AS ?example_citing_work)
     (COUNT(DISTINCT ?topic) AS ?topics)
   WHERE {
-    ?work wdt:P1433 wd:{{ q }} .
+    ?work wdt:P1433 target: .
     OPTIONAL { ?work wdt:P921 ?topic }
     OPTIONAL { ?citing_work wdt:P2860 ?work. }
   }

@@ -1,4 +1,6 @@
 #defaultView:BarChart
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 select ?year ?number_of_pages ?work_label where {
   {
     select ?year (sample(?pages) as ?number_of_pages) ?work_label where {
@@ -9,7 +11,7 @@ select ?year ?number_of_pages ?work_label where {
           bind(year(?date) as ?year_)
           {
             select (min(?year_) as ?earliest_year) (max(?year_) as ?latest_year) where {
-              ?work wdt:P50 wd:{{ q }} .
+              ?work wdt:P50 target: .
               ?work wdt:P577 ?publication_date . 
               bind(year(?publication_date) as ?year_)
             }
@@ -18,7 +20,7 @@ select ?year ?number_of_pages ?work_label where {
         }
       }
       union {
-        ?work wdt:P50 wd:{{ q }} .
+        ?work wdt:P50 target: .
         ?work wdt:P1104 ?pages .
         ?work wdt:P577 ?date . 
         ?work rdfs:label ?long_work_label . filter(lang(?long_work_label) = 'en')

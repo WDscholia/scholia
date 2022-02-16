@@ -1,4 +1,7 @@
 # title: Authors on works sponsored or funded from a specific entity.
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   ?publication_count
   ?author ?authorLabel
@@ -6,7 +9,7 @@ SELECT
 WITH {
   SELECT ?author (count(?work) as ?publication_count) (SAMPLE(?work) AS ?example_work)
   WHERE {
-    ?work wdt:P859+ wd:{{ q }} .
+    ?work wdt:P859+ target: .
     ?work wdt:P50 ?author .
   }
   GROUP BY ?author

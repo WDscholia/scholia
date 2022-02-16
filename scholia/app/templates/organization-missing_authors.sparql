@@ -1,3 +1,5 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT
   (COUNT(?work) AS ?count) 
   ?author_name
@@ -7,7 +9,7 @@ SELECT
 WHERE {
   {
     SELECT DISTINCT ?author_name {
-      ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{{ q }} . 
+      ?researcher_ ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
       
       ?researcher_ skos:altLabel | rdfs:label ?author_name_ .
       

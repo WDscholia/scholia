@@ -1,4 +1,7 @@
 #defaultView:BarChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
 SELECT (STR(?year_) AS ?year) (SUM(?count_) AS ?count)
 WHERE {
   {
@@ -13,7 +16,7 @@ WHERE {
       (COUNT(DISTINCT ?citing_work) AS ?count_)
       ?kind
     WHERE {
-      VALUES ?INTENTION { wd:{{ q }} }
+      VALUES ?INTENTION { target: }
       ?citing_work wdt:P2860 ?citedArticle ;
         p:P2860/pq:P3712 ?INTENTION .
 

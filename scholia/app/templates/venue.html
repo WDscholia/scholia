@@ -38,6 +38,33 @@
 {{ sparql_to_table('author-awards') }}
 
 
+{% call ask_query_callback('cito') %}
+  {{ sparql_to_iframe('articles-by-intention') }}
+
+  {{ sparql_to_iframe('incoming-bubble') }}
+
+  {{ sparql_to_table('incoming',
+    options={
+      "linkPrefixes": { "intention": "../../cito/" }
+    }
+  ) }}
+
+  {{ sparql_to_iframe('outgoing-bubble') }}
+
+  {{ sparql_to_table('outgoing',
+    options={
+      "linkPrefixes": { "intention": "../../cito/" }
+    }
+  ) }}
+
+  {{ sparql_to_table('most-reused-articles',
+    options={
+      "linkPrefixes": { "citedArticle": "../../work/" },
+      "linkSuffixes": { "citedArticle": "/cito" },
+    }
+  ) }}
+{% endcall %}
+
 {% endblock %}
 
 
@@ -119,6 +146,44 @@ page to resolve the author names.
 
 <table class="table table-hover" id="citing-venues-table"></table>
 
+<div id="cito" class="d-none">
+  <h2 id="citation-typing-ontology">Citation Typing Ontology</h2>
+
+  This page shows the use of the CiTO ontology in citation annotation in this venue.
+  The various sections show what intention types are used by article in this venue,
+  the intentions why articles in this venue are cited (incoming) and the intentions
+  why articles in this venue are citing other articles (outgoing).
+
+  <h3 id="articles-by-intention">Number of articles using a particular intention type</h3>
+
+  <div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" id="articles-by-intention-iframe"></iframe>
+  </div>
+
+  <h3 id="incoming-bubble">Incoming citations</h3>
+
+  <div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" id="incoming-bubble-iframe"></iframe>
+  </div>
+
+  <table class="table table-hover" id="incoming-table"></table>
+
+  <h3 id="outgoing-bubble">Outgoing citations</h3>
+
+  <div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" id="outgoing-bubble-iframe"></iframe>
+  </div>
+
+  <table class="table table-hover" id="outgoing-table"></table>
+
+  <h3 id="most-reused-articles">Most reused articles</h3>
+
+  This list shows articles most cited because of 'uses method in', 'cites as data source',
+  'uses data from'. This number is there always equals or lower than the total number of
+  citations to this article.
+
+  <table class="table table-hover" id="most-reused-articles-table"></table>
+</div>
 
 <h2 id="articles-citing-retracted-articles">Articles citing retracted articles</h2>
 
@@ -141,7 +206,6 @@ page to resolve the author names.
 <h2 id="author-awards">Author awards</h2>
 
 <table class="table table-hover" id="author-awards-table"></table>
-
 
 {% endblock %}
     
