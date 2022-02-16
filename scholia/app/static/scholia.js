@@ -64,6 +64,17 @@ md5 = (function () {
   };
 })();
 
+/* Scroll to anchor after resources have been fetched */
+function scroll() {
+    let fragment = window.location.hash;
+    if (fragment.length > 1) {
+        fragment = document.getElementById(fragment.slice(1));
+        if (fragment) {
+            fragment.scrollIntoView();
+        }
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {setTimeout(scroll, 5000)});
 
 function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {}) {
     // Handle 'Label' columns.
