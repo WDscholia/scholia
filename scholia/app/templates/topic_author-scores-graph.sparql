@@ -1,4 +1,3 @@
-# tool: scholia
 #defaultView:BubbleChart
 SELECT ?score ?author ?authorLabel
 WITH {
