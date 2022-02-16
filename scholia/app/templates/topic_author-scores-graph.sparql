@@ -1,9 +1,10 @@
+# tool: scholia
 #defaultView:BubbleChart
 SELECT ?score ?author ?authorLabel
 WITH {
-  SELECT
+  SELECT 
+    DISTINCT ?author
     (SUM(?score_) AS ?score)
-    ?author
   WHERE {
     { 
       ?author wdt:P101/wdt:P279* wd:{{ q }} .
@@ -26,6 +27,8 @@ WITH {
     }
   }
   GROUP BY ?author
+  ORDER BY DESC(?score)
+  LIMIT 200
 } AS %results 
 WHERE {
   INCLUDE %results
