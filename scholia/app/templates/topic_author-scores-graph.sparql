@@ -2,7 +2,7 @@
 SELECT ?score ?author ?authorLabel
 WITH {
   SELECT 
-    DISTINCT ?author
+    ?author
     (SUM(?score_) AS ?score)
   WHERE {
     { 
