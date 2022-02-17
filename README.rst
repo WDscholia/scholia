@@ -11,6 +11,11 @@
    :target: https://github.com/WDscholia/scholia/blob/master/LICENSE
    :alt: License
 
+.. image:: https://readthedocs.org/projects/scholia/badge/?version=latest
+   :target: https://scholia.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
+
 =======
 
 Scholia is a python package and webapp for interaction with scholarly information in Wikidata_.
