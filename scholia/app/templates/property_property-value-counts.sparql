@@ -1,4 +1,7 @@
 #defaultView:BubbleChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ p }}>
+
 SELECT ?count ?o ?oLabel 
 WITH {
   SELECT (COUNT(?s) AS ?count) ?o WHERE {
