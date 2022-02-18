@@ -1,7 +1,7 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX target: <http://www.wikidata.org/prop/direct/{{ p }}>
 
 SELECT ?item ?itemLabel ?property_value ?property_valueLabel WHERE {
-  ?item wdt:target: ?property_value .
+  ?item target: ?property_value .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 LIMIT 500
