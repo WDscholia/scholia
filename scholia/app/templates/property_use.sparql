@@ -1,4 +1,4 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX target: <http://www.wikidata.org/entity/{{ p }}>
 
 SELECT ?item ?itemLabel ?property_value ?property_valueLabel WHERE {
   ?item wdt:target: ?property_value .
