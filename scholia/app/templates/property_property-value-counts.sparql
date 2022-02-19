@@ -1,8 +1,11 @@
 #defaultView:BubbleChart
+
+PREFIX target: <http://www.wikidata.org/prop/direct/{{ p }}>
+
 SELECT ?count ?o ?oLabel 
 WITH {
   SELECT (COUNT(?s) AS ?count) ?o WHERE {
-    ?s wdt:target: ?o .
+    ?s target: ?o .
   }
   GROUP BY ?o
   ORDER BY DESC(?count)
