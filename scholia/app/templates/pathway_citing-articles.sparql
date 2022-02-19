@@ -1,5 +1,6 @@
 #defaultView:Table
-Q202864
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
 WITH {
