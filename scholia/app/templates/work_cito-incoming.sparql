@@ -1,11 +1,21 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
-  VALUES ?CITEDARTICLE { target: }
-  ?citingArticle p:P2860 ?citationStatement .
-  ?citationStatement pq:P3712 ?intention ;
-                     ps:P2860 ?CITEDARTICLE .
-  ?intention wdt:P31 wd:Q96471816 .
+SELECT ?intention ?intentionLabel  ?count ?example ?exampleLabel 
+
+WITH {
+  SELECT DISTINCT ?intention (COUNT(DISTINCT ?citingArticle) AS ?count) (SAMPLE(?citingArticle) AS ?example) {
+    VALUES ?CITEDARTICLE { target: }
+    ?citingArticle p:P2860 ?citationStatement .
+    ?citationStatement pq:P3712 ?intention ;
+                       ps:P2860 ?CITEDARTICLE .
+    ?intention wdt:P31 wd:Q96471816 .
+  }
+  GROUP BY ?intention ?count ?example
+
+} AS %intentions
+WHERE {
+  INCLUDE %intentions
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-} GROUP BY ?intention ?intentionLabel
-  ORDER BY DESC(?count)
+}
+GROUP BY ?intention ?intentionLabel ?count ?example ?exampleLabel
+ORDER BY DESC(?count)
