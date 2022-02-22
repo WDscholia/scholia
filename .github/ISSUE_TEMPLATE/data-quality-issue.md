@@ -7,4 +7,10 @@ assignees: ''
 
 ---
 
+**What is the issue?**
 
+**Why is this a problem?**
+
+**How could this be addressed?**
+
+**What are good places to discuss this?**
