@@ -1,4 +1,4 @@
-version: "3.9"
+version: "2.2"
 
 services:
     # RUN SCHOLIA ALONE 
@@ -9,15 +9,11 @@ services:
             - 8100:8100
         volumes: 
             - .:/scholia
-        profiles:
-            - local
 
     # RUN SCHOLIA WITH NGINX
     webapp_proxy:
         image: scholia
         build: .
-        profiles:
-            - proxy
         volumes: 
             - .:/scholia
 
@@ -26,10 +22,5 @@ services:
         build: ./nginx/
         ports:
             - 80:80
-        profiles:
-            - proxy
         depends_on: 
             - webapp_proxy
-        
-
-
