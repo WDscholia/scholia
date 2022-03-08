@@ -7,4 +7,9 @@ assignees: ''
 
 ---
 
+**What query is this about**
+Please provide a link to a Scholia profile and the appropriate section heading and/ or .sparql file.
 
+**What change do you propose, and why?**
+
+**Anything else to consider here?**

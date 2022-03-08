@@ -1,13 +1,11 @@
-image:
-  file: .gitpod.Dockerfile
-
 ports:
 - port: 8100
   onOpen: open-preview
 tasks:
 - before: |
     export FLASK_APP=runserver.py
+    python -m pip install --upgrade pip
   init: >
-    python -m pip install -r requirements.txt 
+    pip install -r requirements.txt 
   command: >
     flask run -h 0.0.0.0 -p 8100    
