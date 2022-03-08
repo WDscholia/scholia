@@ -3,14 +3,14 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 SELECT ?intention ?intentionLabel  ?count ?example_work_for_intention ?example_work_for_intentionLabel 
 
 WITH {
-  SELECT DISTINCT ?intention (COUNT(DISTINCT ?citingArticle) AS ?count) (SAMPLE(?citingArticle) AS ?example_work_for_intention) {
+  SELECT ?intention (COUNT(DISTINCT ?citingArticle) AS ?count) (SAMPLE(?citingArticle) AS ?example_work_for_intention) {
     VALUES ?CITEDARTICLE { target: }
     ?citingArticle p:P2860 ?citationStatement .
     ?citationStatement pq:P3712 ?intention ;
                        ps:P2860 ?CITEDARTICLE .
     ?intention wdt:P31 wd:Q96471816 .
   }
-  GROUP BY ?intention ?count ?example
+  GROUP BY ?intention
 
 } AS %intentions
 WHERE {
