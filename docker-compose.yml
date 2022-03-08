@@ -1,0 +1,26 @@
+version: "2.2"
+
+services:
+    # RUN SCHOLIA ALONE 
+    webapp:
+        image: scholia
+        build: .
+        ports:
+            - 8100:8100
+        volumes: 
+            - .:/scholia
+
+    # RUN SCHOLIA WITH NGINX
+    webapp_proxy:
+        image: scholia
+        build: .
+        volumes: 
+            - .:/scholia
+
+    nginx:
+        image: nginx
+        build: ./nginx/
+        ports:
+            - 80:80
+        depends_on: 
+            - webapp_proxy
