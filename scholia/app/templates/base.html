@@ -149,6 +149,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	    if (itemImage) {
 		itemImage.src = imageURL;
 		itemImage.setAttribute('alt', imageName);
+		itemImage.href = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(imageName);    
 	    }
 	}
 
@@ -726,6 +727,10 @@ askQuery("{{ panel }}", `# tool: scholia
     var itemImage = document.createElement("img");
     itemImage.id = "item-image";
     itemImage.alt = "";
+    itemImage.href = "";
+    itemImage.onclick = function () {
+            window.location.href = itemImage.href;
+    };	  
 
     tocParent.appendChild(toc);
     tocParent.appendChild(itemImage);
