@@ -18,6 +18,7 @@ WITH {
   SELECT DISTINCT ?work WHERE {
     ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
   }
+  LIMIT 10000
 } AS %works
 WITH {
   SELECT
@@ -38,7 +39,7 @@ WITH {
       # Assign them 3 points if they are an author of a work on the subject
       SELECT (3 AS ?score_) ?author ?work WHERE {
         ?work wdt:P2093 ?author .
-        ?work wdt:P921/wdt:P279* wd:{{ q }} .
+        ?work wdt:P921/wdt:P279* target: .
       }
     }
     UNION
@@ -47,7 +48,7 @@ WITH {
       SELECT (1 AS ?score_) ?author ?work WHERE {
         ?work wdt:P2093 ?author .
         ?citing_work wdt:P2860 ?work .
-        ?citing_work wdt:P921/wdt:P279* wd:{{ q }} .
+        ?citing_work wdt:P921/wdt:P279* target: .
       }
     }
   }
@@ -62,4 +63,4 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY DESC(?count) DESC(?score)
-LIMIT 500
+LIMIT 200
