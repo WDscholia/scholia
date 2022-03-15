@@ -1,15 +1,15 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT 
-?item ?title ?taxonname
+?item ?itemLabel ?taxonname
   (REPLACE(STR(?item), ".*Q", "Q") AS ?work) 
   ("P921" AS ?main_subject)
   (REPLACE(STR(target: ), ".*Q", "Q") AS ?taxon)
   ("S887" AS ?heuristic)
   ("Q69652283" AS ?deduced)
 
-WHERE
-{
+WITH
+{ SELECT  ?item ?taxonname WHERE {
   target: wdt:P225 ?taxonname .
   target: wdt:P105 wd:Q7432 . # this filters for species-level (Q7432) taxon names; comment out or adapt as necessary
 
@@ -28,5 +28,11 @@ WHERE
   MINUS {?item wdt:P921 [wdt:P171* target: ] } # this filters out works about subspecies of the target
 
   FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\\\", "b", ?taxonname ,"\\\\", "b"))))
+  }LIMIT 200
+}
+AS %items
+WHERE {
+  INCLUDE %items
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 LIMIT 200
