@@ -16,10 +16,10 @@ WITH
   SERVICE wikibase:mwapi
   {
     bd:serviceParam wikibase:endpoint "www.wikidata.org";
-                    wikibase:api "Generator";
-                    mwapi:generator "search";
-                    mwapi:gsrsearch ?taxonname;
-                    mwapi:gsrlimit "max".
+      wikibase:api "Generator";
+      mwapi:generator "search";
+      mwapi:gsrsearch ?taxonname;
+      mwapi:gsrlimit "max".
     ?item wikibase:apiOutputItem mwapi:title.
   }
   ?item wdt:P1476 ?title .
@@ -28,7 +28,8 @@ WITH
   MINUS {?item wdt:P921 [wdt:P171* target: ] } # this filters out works about subspecies of the target
 
   FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\\\", "b", ?taxonname ,"\\\\", "b"))))
-  }LIMIT 200
+  }
+  LIMIT 200
 }
 AS %items
 WHERE {
