@@ -1,4 +1,4 @@
-PREFIX target: <http://www.wikidata.org/entity/(( q }}))>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}))>
 
 SELECT DISTINCT 
 ?item ?title ?taxonname
