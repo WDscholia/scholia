@@ -27,6 +27,6 @@ WHERE
   MINUS {?item wdt:P921 target: }
   MINUS {?item wdt:P921 [wdt:P171* target: ] } # this filters out works about subspecies of the target
 
-  FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\", "b", ?taxonname ,"\\", "b"))))
+  FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\\\", "b", ?taxonname ,"\\\\", "b"))))
 }
 LIMIT 200
