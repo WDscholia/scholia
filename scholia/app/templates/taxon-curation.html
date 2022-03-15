@@ -1,0 +1,19 @@
+{% extends "q_curation.html" %}
+
+{% set aspect = "taxon-curation" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('missing-topic-tags-for-taxon-name') }}
+
+{% endblock %}
+
+
+
+{% block curation_panels %}
+
+<h2 id="missing-topic-tags-for-taxon-names">Missing topic tags for taxon name</h2>
+
+Test
+
+{% endblock %}
