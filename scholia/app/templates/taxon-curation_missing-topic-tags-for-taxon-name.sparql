@@ -1,0 +1,39 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT 
+?item ?itemLabel ?taxonname
+  (REPLACE(STR(?item), ".*Q", "Q") AS ?work) 
+  ("P921" AS ?main_subject)
+  (REPLACE(STR(target: ), ".*Q", "Q") AS ?taxon)
+  ("S887" AS ?heuristic)
+  ("Q69652283" AS ?deduced)
+
+WITH
+{ SELECT  ?item ?taxonname WHERE {
+  target: wdt:P225 ?taxonname .
+  target: wdt:P105 wd:Q7432 . # this filters for species-level (Q7432) taxon names; comment out or adapt as necessary
+
+  SERVICE wikibase:mwapi
+  {
+    bd:serviceParam wikibase:endpoint "www.wikidata.org";
+      wikibase:api "Generator";
+      mwapi:generator "search";
+      mwapi:gsrsearch ?taxonname;
+      mwapi:gsrlimit "max".
+    ?item wikibase:apiOutputItem mwapi:title.
+  }
+  ?item wdt:P1476 ?title .
+  
+  MINUS {?item wdt:P921 target: }
+  MINUS {?item wdt:P921 [wdt:P171* target: ] } # this filters out works about subspecies of the target
+
+  FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\\\", "b", ?taxonname ,"\\\\", "b"))))
+  }
+  LIMIT 200
+}
+AS %items
+WHERE {
+  INCLUDE %items
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+LIMIT 200
