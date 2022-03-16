@@ -4,7 +4,11 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('missing-topic-tags-for-taxon-name') }}
+{{ sparql_to_table('missing-topic-tags-for-taxon-name',
+    options={
+      "linkPrefixes": {
+        "example_citing_work": "../../work/",
+    }})}}
 
 {% endblock %}
 
