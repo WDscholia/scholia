@@ -11,6 +11,10 @@
    :target: https://gitpod.io/#https://github.com/WDscholia/scholia
    :alt: Gitpod
 
+.. image:: https://img.shields.io/github/last-commit/WDscholia/scholia.svg
+   :target: https://github.com/WDscholia/scholia
+   :alt: Github last commit
+
 .. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
    :target: https://github.com/WDscholia/scholia/blob/master/LICENSE
    :alt: License
