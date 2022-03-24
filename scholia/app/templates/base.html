@@ -148,6 +148,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	    var itemImage = document.getElementById("item-image");
 	    if (itemImage) {
 		itemImage.src = imageURL;
+		itemImage.title = imageName.slice(0, imageName.lastIndexOf('.'));
 		itemImage.setAttribute('alt', imageName);
 		itemImage.href = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(imageName);    
 	    }
