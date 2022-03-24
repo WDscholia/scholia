@@ -1,13 +1,18 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT
+SELECT DISTINCT
   ?metabolite ?metaboliteLabel ?metaboliteDescription
 WITH {
+  SELECT DISTINCT ?children WHERE {
+      ?children (wdt:P171*) target:.
+  }
+} AS %taxa 
+WITH {
   SELECT DISTINCT ?metabolite WHERE {
-    { ?metabolite wdt:P703 target: }
+    INCLUDE %taxa
+            { ?metabolite wdt:P703 ?children }
     UNION
-    { ?metabolite wdt:P1582 target: }
-    hint:Prior hint:runFirst "true" .
+    { ?metabolite wdt:P1582 ?children }
     VALUES ?chemical { wd:Q11173 wd:Q59199015 wd:Q56256086 wd:Q15711994 }.
     ?metabolite wdt:P31|wdt:P279/wdt:P31 ?chemical .
   }
