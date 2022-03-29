@@ -2,20 +2,35 @@ PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 
 SELECT
-  (xsd:date(MAX(?publication_date_)) AS ?publication_date)
-  ?work ?workLabel ?author ?authorLabel 
-WHERE {
-  { ?author ?p1 target1: . }
-  UNION
+  ?publication_date
+  ?work ?workLabel
+  ?authors ?authorsUrl
+WITH {
+  SELECT 
+    (xsd:date(MAX(?publication_date_)) AS ?publication_date)
+    ?work
+    (GROUP_CONCAT(DISTINCT ?author_; separator=", ") AS ?authors)
+    (CONCAT("../../../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
   {
-    ?author ?p2 ?something .
-    ?something wdt:P361 target1: .
+    { ?author ?p1 target1: . }
+    UNION
+    {
+      ?author ?p2 ?something .
+      ?something wdt:P361 target1: .
+    }
+    ?work wdt:P50 ?author;
+          wdt:P921 target2: .
+    ?author rdfs:label ?author_ .
+    FILTER (LANG(?author_) = 'en')
+    
+    ?work wdt:P577 ?publication_date_ .
   }
-  ?work wdt:P50 ?author;
-  wdt:P921 target2: .
-  OPTIONAL { ?work wdt:P577 ?publication_date_ . }
+  GROUP BY ?work
+  ORDER BY DESC (?publication_date)
+  LIMIT 200
+} AS %result
+WHERE {
+  INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-GROUP BY ?work ?workLabel ?author ?authorLabel 
 ORDER BY DESC (?publication_date)
-LIMIT 200
