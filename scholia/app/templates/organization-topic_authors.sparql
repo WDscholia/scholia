@@ -7,7 +7,7 @@ SELECT
   ?example_work ?example_workLabel
 WITH {
   SELECT
-    (COUNT(?work) AS ?works)
+    (COUNT(DISTINCT ?work) AS ?works)
     ?author
     (SAMPLE(?work) AS ?example_work)
   {
@@ -18,10 +18,10 @@ WITH {
       ?something wdt:P361 target1: .
     }
     ?work wdt:P50 ?author;
-          wdt:P921 target2: .
+          wdt:P921 / wdt:P279* target2: .
   }
   GROUP BY ?author
-  ORDER BY DESC (?number_of_works)
+  ORDER BY DESC (?works)
   LIMIT 200
 } AS %result
 WHERE {
