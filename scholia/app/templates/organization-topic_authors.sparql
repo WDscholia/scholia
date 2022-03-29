@@ -1,0 +1,31 @@
+PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
+PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
+
+SELECT
+  ?works
+  ?author ?authorLabel ?authorDescription
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    (COUNT(?work) AS ?works)
+    ?author
+    (SAMPLE(?work) AS ?example_work)
+  {
+    { ?author ?p1 target1: . }
+    UNION
+    {
+      ?author ?p2 ?something .
+      ?something wdt:P361 target1: .
+    }
+    ?work wdt:P50 ?author;
+          wdt:P921 target2: .
+  }
+  GROUP BY ?author
+  ORDER BY DESC (?number_of_works)
+  LIMIT 200
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC (?works)
