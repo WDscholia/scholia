@@ -17,10 +17,13 @@ WITH {
     (COUNT(?work) AS ?number_of_works_) ?researcher
   WHERE {
     INCLUDE %researchers
-    OPTIONAL { ?work wdt:P50 ?researcher . }
 
     # No biological pathways; they skew the statistics too much 
     MINUS { ?work wdt:P31 wd:Q4915012 } 
+
+    # This OPTIONAL query should be after the MINUS query, otherwise
+    # researchers might not show if they do not have any papers.
+    OPTIONAL { ?work wdt:P50 ?researcher . }
   } 
   GROUP BY ?researcher
 } AS %researchers_and_number_of_works
