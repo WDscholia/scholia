@@ -1767,10 +1767,12 @@ def show_venue_cito(q):
     ----------
     q : str
         Wikidata item identifier.
+
     Returns
     -------
     html : str
         Rendered HTML.
+
     """
     return redirect('/venue/' + q + '#cito')
 
@@ -1783,10 +1785,12 @@ def show_work_cito(q):
     ----------
     q : str
         Wikidata item identifier.
+
     Returns
     -------
     html : str
         Rendered HTML.
+
     """
     return redirect('/work/' + q + '#cito')
 
@@ -1801,10 +1805,12 @@ def show_work_cito_intention(q, q2):
         Wikidata item identifier for the work.
     q2 : str
         Wikidata item identifier for the citation intention.
+
     Returns
     -------
     html : str
         Rendered HTML.
+
     """
     return render_template('work-cito-intention.html', q=q, q2=q2)
 
