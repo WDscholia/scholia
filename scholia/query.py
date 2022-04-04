@@ -1083,6 +1083,7 @@ def q_to_class(q):
             'Q13442814',  # scientific article
             'Q15621286',  # intellectual work
             'Q21481766',  # academic chapter
+            'Q23927052',  # conference article
             'Q47461344',  # written work
             'Q54670950',  # conference poster
             'Q58632367',  # conference abstract
