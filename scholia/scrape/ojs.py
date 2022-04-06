@@ -79,6 +79,8 @@ def issue_url_to_paper_urls(url):
     urls : list of strs
         List of URLs to papers.
 
+    Notes
+    -----
     Based on the URL, the HTML issue webpage will be fetched and the returned
     HTML parsed. Different matching approached are tried to extract the article
     URLs.

@@ -180,7 +180,7 @@ def entity_to_authors(entity, return_humanness=False):
     entity : dict
         Dictionary with Wikidata item
     return_humanness : bool
-        Toogle whether return argument should contain be a list of strings or a
+        Toogle whether return argument should contain a list of strings or a
         list of tuples with both name and an indication of whether the author
         is a human. Some authors are organizations and formatting of authors
         may need to distinguish between humans and organizations.
