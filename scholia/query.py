@@ -1192,12 +1192,16 @@ def q_to_class(q):
             ]):
         class_ = 'event'
     elif set(classes).intersection([
+            'Q341',  # free software
             'Q7397',  # software
             'Q1639024',  # mathematical software
             'Q21127166',  # Java software library
             'Q21129801',  # natural language processing toolkit
-            'Q22811662',  # image database
             'Q24529812',  # statistical package
+            ]):
+        class_ = 'software'
+    elif set(classes).intersection([
+            'Q22811662',  # image database
             ]):
         class_ = 'use'
     elif set(classes).intersection([

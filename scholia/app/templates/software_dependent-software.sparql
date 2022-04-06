@@ -1,0 +1,24 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT 
+  ?count 
+  ?software ?softwareLabel ?softwareDescription
+WITH {
+  SELECT 
+    (COUNT(?other_software) AS ?count)
+    ?software 
+  {
+    ?software wdt:P1547+ target: .
+    OPTIONAL {
+      ?other_software wdt:P1547+ ?software .
+    } 
+  }
+  GROUP BY ?software
+  ORDER BY DESC(?count)
+  LIMIT 500
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)

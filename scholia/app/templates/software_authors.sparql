@@ -1,14 +1,21 @@
-#defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?count ?author ?authorLabel
+SELECT
+  ?count
+  ?author ?authorLabel ?authorDescription
+  ?example_work ?example_workLabel
 WITH{
-  SELECT (COUNT(?work) AS ?count) ?author WHERE {
-    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* target: .
-    ?work wdt:P50 ?author .
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?author
+    (SAMPLE(?work) AS ?example_work)
+  {
+    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* target: ;
+          wdt:P50 ?author .
   }
   GROUP BY ?author
+  ORDER BY DESC(?count)
+  LIMIT 500
 } AS %result
 WHERE {
   INCLUDE %result
