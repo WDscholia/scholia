@@ -1,4 +1,4 @@
 Sphinx==4.1.2
 Pallets-Sphinx-Themes==2.0.1
 sphinx-rtd-theme==0.5.2
-
+jinja2<3.1.0
