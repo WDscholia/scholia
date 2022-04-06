@@ -437,6 +437,8 @@ askQuery("{{ panel }}", `# tool: scholia
     UNION 
     { [] wdt:P179 wd:{{ q }} . BIND("series" AS ?aspect) }
     UNION 
+    { wd:{{ q }} wdt:P31 / wdt:P279* wd:Q7397 . BIND("software" AS ?aspect) }
+    UNION 
     { [] wdt:P859 wd:{{ q }} . BIND("sponsor" AS ?aspect) }
     UNION
     { [] wdt:P921 wd:{{ q }} . BIND("topic" AS ?aspect) }
@@ -844,6 +846,7 @@ askQuery("{{ panel }}", `# tool: scholia
       <a class="dropdown-item" href="{{ url_for('app.show_chemical_element_index') }}">Chemical element</a>
       <a class="dropdown-item" href="{{ url_for('app.show_chemical_class_index') }}">Chemical class</a>
       <a class="dropdown-item" href="{{ url_for('app.show_lexeme_index') }}">Lexeme</a>
+      <a class="dropdown-item" href="{{ url_for('app.show_software_index') }}">Software</a>
       <a class="dropdown-item" href="{{ url_for('app.show_use_index') }}">Use</a>
     </div>
   </li>
