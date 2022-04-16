@@ -14,6 +14,12 @@ WITH {
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P235 []. }
 } AS %inchikeys
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3636 []. }
+} AS %crystalStructures
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6689 []. }
+} AS %massSpectra
 WHERE {
   {
     INCLUDE %meltingpoints
@@ -38,6 +44,16 @@ WHERE {
   {
     INCLUDE %inchikeys
     BIND("Total number of InChIKeys" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %crystalStructures
+    BIND("Total number of chemicals with crystal structures" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %massSpectra
+    BIND("Total number of chemicals with mass spectra" AS ?description)
   }
 }
 ORDER BY DESC(?count)
