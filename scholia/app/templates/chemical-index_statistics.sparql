@@ -20,6 +20,9 @@ WITH {
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6689 []. }
 } AS %massSpectra
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P9405 []. }
+} AS %nmrSpectra
 WHERE {
   {
     INCLUDE %meltingpoints
@@ -54,6 +57,11 @@ WHERE {
   {
     INCLUDE %massSpectra
     BIND("Total number of chemicals with mass spectra" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %nmrSpectra
+    BIND("Total number of chemicals with NMR spectra" AS ?description)
   }
 }
 ORDER BY DESC(?count)
