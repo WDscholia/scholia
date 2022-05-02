@@ -1088,6 +1088,7 @@ def q_to_class(q):
             'Q47461344',  # written work
             'Q54670950',  # conference poster
             'Q58632367',  # conference abstract
+            'Q64548048',  # environmental impact assessment report
     ]):
         class_ = 'work'
     elif set(classes).intersection([
