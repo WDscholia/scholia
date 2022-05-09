@@ -137,7 +137,7 @@ def metadata_to_quickstatements(metadata):
             metadata['doi'].replace('"', '\"'))
 
     # DOI based on arXiv identifier
-    qs += u'LAST\tP356\t"10.48550/arXiv.{}"\n'.format(
+    qs += u'LAST\tP356\t"10.48550/ARXIV.{}"\n'.format(
             metadata['arxiv'])
 
     # arXiv classifications such as "cs.LG"
