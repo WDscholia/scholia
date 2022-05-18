@@ -1,0 +1,22 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT
+  ?count
+  ?use ?useLabel ?useDescription
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?use
+    (SAMPLE(?work) AS ?example_work)
+  {
+    ?work wdt:P1433 target: ;
+          wdt:P4510 ?use .
+  }
+  GROUP BY ?use
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
