@@ -1,0 +1,17 @@
+# title: List of uses
+SELECT
+  ?use ?useLabel ?useDescription
+  ?example_work ?example_workLabel
+WITH {
+  SELECT ?use (SAMPLE(?work) AS ?example_work) WHERE {
+    VALUES ?use { {% for q in qs %} wd:{{ q }} {% endfor %} }
+    OPTIONAL { 
+      ?work wdt:P4510 ?use .
+    }
+  }
+  GROUP BY ?use
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
