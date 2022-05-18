@@ -1777,6 +1777,26 @@ def show_venue_cito(q):
     return redirect('/venue/' + q + '#cito')
 
 
+@main.route('/venue/' + q1_pattern + '/use/' + q2_pattern)
+def show_venue_use(q1, q2):
+    """Return HTML rendering for specific venue and use.
+
+    Parameters
+    ----------
+    q1 : str
+        Wikidata item identifier for venue.
+    q2 : str
+        Wikidata item identifier for use.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific venue and use.
+
+    """
+    return render_template('venue-use.html', q1=q1, q2=q2, q=q1)
+
+
 @main.route('/work/' + q_pattern + '/cito')
 def show_work_cito(q):
     """Return HTML rendering for Citation Typing Ontology annotation of citations.

@@ -2,7 +2,11 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
   ?count
-  ?use ?useLabel ?useDescription
+  ?use ?useLabel 
+  ("🔎" AS ?zoom)
+  (CONCAT("{{ q }}/use/", SUBSTR(STR(?use), 32)) AS ?zoomUrl)
+  ?useDescription
+
   ?example_work ?example_workLabel
 WITH {
   SELECT
