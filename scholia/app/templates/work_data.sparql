@@ -129,6 +129,23 @@ WHERE {
   }
   UNION
   {
+    SELECT
+      (9 AS ?order)
+      ("Uses" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../uses/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      target: wdt:P4510 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      ?iri rdfs:label ?value_string . 
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
     BIND(10 AS ?order)
     BIND("DOI" AS ?description)
     ?work wdt:P356 ?valueUrl_ .

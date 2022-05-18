@@ -2160,6 +2160,33 @@ def show_use_index():
     return render_template('use-index.html')
 
 
+@main.route('/uses/' + qs_pattern)
+def show_uses(qs):
+    """Return HTML rendering for multiple specific topics.
+
+    Parameters
+    ----------
+    qs : str
+        Wikidata item identifiers.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    Notes
+    -----
+    In case there is only one use identifier in the URL, then the request is
+    redirected to the "use" aspect.
+
+    """
+    qs = Q_PATTERN.findall(qs)
+    if len(qs) == 1:
+        return redirect(url_for('app.show_use', q=qs[0]), code=301)
+    else:
+        return render_template('uses.html', qs=qs)
+
+
 @main.route('/work/' + q_pattern)
 def show_work(q):
     """Return rendered HTML page for specific work.
