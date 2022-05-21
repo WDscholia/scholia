@@ -30,24 +30,24 @@ WITH
   {
     {
       INCLUDE %RAWstrings
-              BIND(STR(?author_name) AS ?string) # the raw strings
+      BIND(STR(?author_name) AS ?string) # the raw strings
     }
     UNION
     {
       INCLUDE %RAWstrings
-              BIND(UCASE(STR(?author_name)) AS ?string) # uppercased versions of the raw strings
+      BIND(UCASE(STR(?author_name)) AS ?string) # uppercased versions of the raw strings
     }
     UNION
     {
       INCLUDE %RAWstrings
-              BIND(LCASE(STR(?author_name)) AS ?string) # lowercased versions of the raw strings
+      BIND(LCASE(STR(?author_name)) AS ?string) # lowercased versions of the raw strings
     }
   }
 } AS %NORMALIZEDstrings
 WHERE {
   # Find works that have "author name string" values equal to these normalized strings
   INCLUDE %NORMALIZEDstrings
-          ?work wdt:P2093 ?string. 
+  ?work wdt:P2093 ?string. 
 }
 GROUP BY ?string
 ORDER BY DESC (?count)
