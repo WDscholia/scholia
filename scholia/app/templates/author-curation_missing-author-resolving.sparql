@@ -23,6 +23,7 @@ WITH
   }
 } AS %RAWstrings
 WITH
+# This part is due to Dipsacus fullonum, as per https://w.wiki/5Brk
 {
   # Calculate capitalization variants of these raw strings
   SELECT DISTINCT ?string
