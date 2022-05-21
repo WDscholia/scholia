@@ -1,27 +1,53 @@
+#title: Variants of author name strings
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT
-  (COUNT(?work) AS ?count) 
-  ?author_name 
+SELECT 
+  (COUNT(?work) AS ?count)
+  ?string
   (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", 
-          ENCODE_FOR_URI(?author_name)) AS ?author_resolver_url) 
-WHERE {
+        ENCODE_FOR_URI(?string)) AS ?author_resolver_url) 
+WITH
+{
+  # Find strings associated with the target author
+  SELECT DISTINCT ?string_
+  WHERE
   {
-    SELECT DISTINCT ?author_name WHERE {
-      {
-        { target: skos:altLabel ?author_name_. }
-        UNION
-        { target: rdfs:label ?author_name_. }
-        BIND(STR(?author_name_) AS ?author_name)
-      }
-      UNION
-      {
-        ?author_statement ps:P50 target:;
-          pq:P1932 ?author_name.
-      }
+    { target: rdfs:label ?string_. } # in label
+    UNION
+    { target: skos:altLabel ?string_. } # in alias
+    UNION
+    {
+      ?author_statement ps:P50 target: ; 
+                        pq:P1932 ?string_. # in "stated as" strings for "author" statements on work items
     }
   }
-  OPTIONAL { ?work wdt:P2093 ?author_name. }
+} AS %RAWstrings
+WITH
+{
+  # Calculate capitalization variants of these raw strings
+  SELECT DISTINCT ?string
+  WHERE
+  {
+    {
+      INCLUDE %RAWstrings
+      BIND(STR(?string_) AS ?string) # the raw strings
+    }
+    UNION
+    {
+      INCLUDE %RAWstrings
+      BIND(UCASE(STR(?string_)) AS ?string) # uppercased versions of the raw strings
+    }
+    UNION
+    {
+      INCLUDE %RAWstrings
+      BIND(LCASE(STR(?string_)) AS ?string) # lowercased versions of the raw strings
+    }
+  }
+} AS %NORMALIZEDstrings
+WHERE {
+  # Find works that have "author name string" values equal to these normalized strings
+  INCLUDE %NORMALIZEDstrings
+  OPTIONAL { ?work wdt:P2093 ?string. }
 }
-GROUP BY ?author_name
+GROUP BY ?string
 ORDER BY DESC (?count)
