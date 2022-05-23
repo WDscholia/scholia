@@ -18,14 +18,14 @@ Check any of the following which apply:
 * [ ]  My code passes the [tox](https://tox.readthedocs.io/en/latest/) check, I can receive warnings about tests, documentation or both
 
 ### Testing
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.
+Please describe the [tests](https://numpy.org/doc/stable/reference/testing.html) that you ran to verify your changes. Provide instructions, so we can reproduce. Please also list any relevant details for your test configuration.
 
 * Test A
 * Test B
 
 ### Checklist
-* [ ] I have commented my code, particularly in hard-to-understand areas
+* [ ] I have [commented](https://peps.python.org/pep-0008/#comments) my code, particularly in hard-to-understand areas
 * [ ] My changes generate no new warnings
 * [ ] I have not used code from external sources without attribution
-* [ ] I have considered accessibility in my implementation 
+* [ ] I have considered [accessibility](https://www.w3.org/standards/webdesign/accessibility) in my implementation 
 * [ ] There are no remaining debug statements (print, console.log, ...)
