@@ -422,18 +422,32 @@ askQuery("{{ panel }}", `# tool: scholia
     { [] wdt:P50 wd:{{ q }} . BIND("author" AS ?aspect) }
     UNION 
     { [] wdt:P166 wd:{{ q }} . BIND("award" AS ?aspect) }
+    UNION
+    { wd:{{ q }} wdt:P31 / wdt:P279?  wd:Q22325163 . BIND("complex" AS ?aspect) }
     UNION 
     { [] wdt:P17 wd:{{ q }} . BIND("country" AS ?aspect) }
     UNION
     { [] wdt:P972 wd:{{ q }} . BIND("catalogue" AS ?aspect) }
     UNION
+    { wd:{{ q }} wdt:P235 [] . BIND("chemical" AS ?aspect) }
+    UNION
+    { wd:{{ q }} ^wdt:P31/wdt:P235 [] . BIND("chemical-class" AS ?aspect) }
+    UNION
+    { wd:{{ q }} wdt:P644 [] . BIND("gene" AS ?aspect) }
+    UNION
     { wd:{{ q }} wdt:P159? / wdt:P625 [] . BIND("location" AS ?aspect) } 
     UNION 
     { [] wdt:P1416 | wdt:P108 wd:{{ q }} . BIND("organization" AS ?aspect) }
-    UNION 
-    { [] wdt:P123 wd:{{ q }} . BIND("publisher" AS ?aspect) }
+    UNION
+    { wd:{{ q }} wdt:P31 wd:Q2996394 . BIND("pathway" AS ?aspect) }
+    UNION
+    { wd:{{ q }} wdt:P31 wd:Q4915012 . BIND("pathway" AS ?aspect) }
     UNION 
     { [] wdt:P872 wd:{{ q }} . BIND("printer" AS ?aspect) }
+    UNION
+    { wd:{{ q }} wdt:P31 wd:Q8054 . BIND("protein" AS ?aspect) }
+    UNION
+    { [] wdt:P123 wd:{{ q }} . BIND("publisher" AS ?aspect) }
     UNION 
     { [] wdt:P179 wd:{{ q }} . BIND("series" AS ?aspect) }
     UNION 
@@ -441,23 +455,13 @@ askQuery("{{ panel }}", `# tool: scholia
     UNION 
     { [] wdt:P859 wd:{{ q }} . BIND("sponsor" AS ?aspect) }
     UNION
+    { wd:{{ q }} wdt:P225 [] . BIND("taxon" AS ?aspect) }
+    UNION
     { [] wdt:P921 wd:{{ q }} . BIND("topic" AS ?aspect) }
     UNION
     { [] wdt:P4510 wd:{{ q }} . BIND("use" AS ?aspect) } 
     UNION
     { [] wdt:P1433 wd:{{ q }} . BIND("venue" AS ?aspect) } 
-    UNION
-    { wd:{{ q }} wdt:P235 [] . BIND("chemical" AS ?aspect) }
-    UNION
-    { wd:{{ q }} wdt:P225 [] . BIND("taxon" AS ?aspect) }
-    UNION
-    { wd:{{ q }} ^wdt:P31/wdt:P235 [] . BIND("chemical-class" AS ?aspect) }
-    UNION
-    { wd:{{ q }} wdt:P644 [] . BIND("gene" AS ?aspect) }
-    UNION
-    { wd:{{ q }} wdt:P31 / wdt:P279?  wd:Q22325163 . BIND("complex" AS ?aspect) }
-    UNION
-    { wd:{{ q }} wdt:P31 wd:Q8054 . BIND("protein" AS ?aspect) }
     UNION
     { wd:{{ q }} wdt:P50 | wdt:P2093 [] . BIND("work" AS ?aspect) }
     }
