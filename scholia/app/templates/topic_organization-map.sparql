@@ -16,7 +16,11 @@ WITH {
     # Authors who have published works on the topic
     ?work wdt:P50 ?author . 
     ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
-    ?organization wdt:P625 ?geo .
+    # Use the headquarters location by default but keep the coordinate location as a fallback
+    OPTIONAL{?organization p:P159/pq:P625 ?hq_geo}
+    OPTIONAL{?organization wdt:P625 ?coord_geo}
+    BIND(IF(BOUND(?hq_geo), ?hq_geo, ?coord_geo) AS ?geo) .
+    FILTER(BOUND(?geo)) .
   }
   GROUP BY ?organization ?geo
   ORDER BY DESC (?count)
