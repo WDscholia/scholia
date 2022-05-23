@@ -1175,6 +1175,7 @@ def q_to_class(q):
             ]):
         class_ = 'chemical_class'
     elif set(classes).intersection([
+            'Q2996394',  # biological process (Reactome pathway)
             'Q4915012',  # biological pathway
             ]):
         class_ = 'pathway'
