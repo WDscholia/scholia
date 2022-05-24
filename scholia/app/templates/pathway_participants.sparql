@@ -4,7 +4,8 @@ SELECT ?part ?partLabel ?partDescription ?type
 WITH {
   SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
   WHERE {
-    target: wdt:P31 wd:Q4915012 ;
+    VALUES ?process { wd:Q4915012 wd:Q2996394 }
+    target: wdt:P31 ?process ;
              wdt:P527 ?part .
     OPTIONAL { 
       ?part wdt:P31 ?type_ .
