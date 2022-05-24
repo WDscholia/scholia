@@ -33,6 +33,14 @@
 	     "author": "../author/",
 	     "example_work": "../work/",
      }})}}
+
+{{ sparql_to_table('uses',
+    options={
+      "linkPrefixes": { "use": "../use/" }
+    }
+) }}
+
+
 {{ sparql_to_table('venues',
     options={
     "linkPrefixes": {
@@ -160,6 +168,11 @@ Only a maximum of the 400 most often occuring links are shown.
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="co-occurring-map-iframe"></iframe>
 </div>
+
+
+<h2 id="uses">Uses</h2>
+
+<table class="table table-hover" id="uses-table"></table>
 
 
 <h2 id="venues">Venues and series publishing works about the topic</h2>

@@ -1581,6 +1581,26 @@ def show_topic_index():
     return render_template('topic-index.html')
 
 
+@main.route('/topic/' + q1_pattern + '/use/' + q2_pattern)
+def show_topic_use(q1, q2):
+    """Return HTML rendering for specific topic and use.
+
+    Parameters
+    ----------
+    q1 : str
+        Wikidata item identifier for topic.
+    q2 : str
+        Wikidata item identifier for use.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific topic and use.
+
+    """
+    return render_template('topic-use.html', q1=q1, q2=q2, q=q1)
+
+
 @main.route('/topics/' + qs_pattern)
 def show_topics(qs):
     """Return HTML rendering for specific topics.
