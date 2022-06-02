@@ -2,21 +2,97 @@
 
 {% block page_content %}
 
-<br />
-This page contains export formats for <a href="{{ url_for('app.show_work_index') + q }}">{{ q }}</a>.
+<p>
+  This page contains export formats for <a href="{{ url_for('app.show_work_index') + q }}">{{ q }}</a>.
+</p>
+
+<p>
+  <label for="export-format">Export format</label>
+  <select class="btn btn-outline-secondary" id="export-format">
+    {% for id, label in [
+      ("biblatex", "BibLaTeX"),
+      ("bibtex", "BibTeX"),
+      ("cff", "CFF"),
+      ("data", "CSL-JSON"),
+      ("refworks", "RefWorks"),
+      ("ris", "RIS"),
+    ] %}
+      <option value="{{ id }}" style="text-align: left;">{{ label }}</option>
+    {% endfor %}
+  </select>
+</p>
+
+<p hidden>
+  <label for="export-version">Software version</label>
+  <select class="btn btn-outline-secondary" id="export-version">
+    <option value="" style="text-align: left;">None</option>
+  </select>
+</p>
+
+<p>
+  <pre id="output"></pre>
+</p>
+
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
 
 <script src="{{ url_for('static', filename='js/citation.js') }}"></script>
+<script>
+$(function () {
+  var Cite = require('citation-js').Cite
+  var q = '{{ q }}'
 
-<h2>BibTeX</h2>
+  // var data
+  Cite.async(q, function (result) {
+    data = result
+    populateVersions()
+    generateOutput()
+  })
 
-<pre class="citation-js" data-input="{{ q }}" data-output-format="bibtex"></pre>
+  function populateVersions () {
+    if (data.data[0].custom && data.data[0].custom.versions) {
+      $('#export-version').parent().removeAttr('hidden')
+      var versions = data.data[0].custom.versions
+      for (var i = 0; i < versions.length; i++) {
+        var option = $('#export-version option').first().clone()
+        option.attr('value', i + 1)
+        option.text(versions[i].version)
+        option.appendTo('#export-version')
+      }
+    }
+  }
 
-<h2>CITATION.cff</h2>
+  function applyVersion (input, version) {
+    var item = Object.assign({}, input)
+    item.version = version.version
+    if (version.issued) { item.issued = version.issued }
+    if (version.DOI) { item.DOI = version.DOI }
+    if (version.SWHID) {
+      item.custom = item.custom ? Object.assign({}, item.custom) : {}
+      item.custom.SWHID = version.SWHID
+    }
+    return item
+  }
 
-<i>CITATION.cff</i> files are files that can be added to source code repository and distributions
-to indicate what literature can be cited when using that software. See
-<a href="https://github.com/citation-file-format/">this website</a>.<p />
+  function generateOutput () {
+    if (!data) {
+      return
+    }
+    var format = $('#export-format').val()
+    var version = $('#export-version').val()
 
-<pre class="citation-js" data-input="{{ q }}" data-output-format="cff"></pre>
+    var data_ = data
+    if (version) {
+      data_ = new Cite(applyVersion(data_.data[0], data_.data[0].custom.versions[version - 1]))
+    }
+    $('#output').text(data_.format(format))
+  }
+
+  $('#export-format').on('change', generateOutput)
+  $('#export-version').on('change', generateOutput)
+})
+</script>
 
 {% endblock %}
