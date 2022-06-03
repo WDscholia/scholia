@@ -14,7 +14,7 @@ from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
 from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
-                     github_to_qs, biorxiv_to_qs, chemrxiv_to_qs,
+                     doi_prefix_to_qs, github_to_qs, biorxiv_to_qs, chemrxiv_to_qs,
                      identifier_to_qs, inchikey_to_qs, issn_to_qs, orcid_to_qs,
                      viaf_to_qs, q_to_class, q_to_dois, random_author,
                      twitter_to_qs, cordis_to_qs, mesh_to_qs, pubmed_to_qs,
@@ -718,6 +718,24 @@ def redirect_doi(doi):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_work', q=q), code=302)
+    return render_template('404-doi.html', doi=doi)
+
+
+@main.route('/doi-prefix/<path:doi>')
+def redirect_doi_prefix(doi):
+    """Detect and redirect for DOI.
+
+    Parameters
+    ----------
+    doi : str
+        DOI identifier.
+
+    """
+    normalize_doi = remove_special_characters_url(doi)
+    qs = doi_prefix_to_qs(normalize_doi)
+    if len(qs) > 0:
+        q = qs[0]
+        return redirect(url_for('app.show_publisher', q=q), code=302)
     return render_template('404-doi.html', doi=doi)
 
 

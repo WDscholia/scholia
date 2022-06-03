@@ -383,6 +383,44 @@ def doi_to_qs(doi):
             for item in data['results']['bindings']]
 
 
+def doi_prefix_to_qs(doi):
+    """Convert DOI prefix to Wikidata ID.
+
+    Wikidata Query Service is used to resolve the DOI.
+
+    The DOI string is converted to uppercase before any
+    query is made. Uppercase DOIs are default in Wikidata.
+
+    Parameters
+    ----------
+    doi : str
+        DOI prefix identifier
+
+    Returns
+    -------
+    qs : list of str
+        Strings of Wikidata ID.
+
+    Examples
+    --------
+    >>> doi_prefix_to_qs('10.1186') == ['Q463494']
+    True
+
+    >>> doi_prefix_to_qs('10.1016') == ['Q746413']
+    True
+    """
+    query = 'select ?work where {{ ?work wdt:P1662 "{doi}" }}'.format(
+        doi=escape_string(doi.upper()))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['work']['value'][31:]
+            for item in data['results']['bindings']]
+
+
 def iso639_to_q(language):
     """Convert ISO639 to Q item.
 
