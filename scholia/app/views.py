@@ -736,7 +736,7 @@ def redirect_doi_prefix(doi):
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_publisher', q=q), code=302)
-    return render_template('404-doi.html', doi=doi)
+    return render_template('404.html', doi=doi)
 
 
 @main.route('/event/' + q_pattern)
