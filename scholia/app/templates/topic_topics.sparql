@@ -2,7 +2,8 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?count ?topic ?topicLabel ?example_work ?example_workLabel
+SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
+       ?topic ?topicLabel ?example_work ?example_workLabel
 WITH {
   SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
     # Find works for the specific queried topic

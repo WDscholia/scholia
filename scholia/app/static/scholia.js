@@ -84,12 +84,12 @@ function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {
     var convertedData = [];
     var convertedColumns = [];
     for (var i = 0; i < columns.length; i++) {
-        column = columns[i];
-        if (column.substr(-11) == 'Description') {
-            convertedColumns.push(column.substr(0, column.length - 11) + ' description');
-        } else if (column.substr(-5) == 'Label') {
+        var column = columns[i];
+        if (column.slice(-11) == 'Description') {
+            convertedColumns.push(column.slice(0, column.length - 11) + ' description');
+        } else if (column.slice(-5) == 'Label') {
             // pass
-        } else if (column.substr(-3) == 'Url') {
+        } else if (column.slice(-3) == 'Url') {
             // pass
         } else {
             convertedColumns.push(column);
@@ -98,8 +98,8 @@ function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {
     for (var i = 0 ; i < data.length ; i++) {
 	var convertedRow = {};
 	for (var key in data[i]) {
-	    if (key.substr(-11) == 'Description') {
-		convertedRow[key.substr(0, key.length - 11) + ' description'] = data[i][key];
+	    if (key.slice(-11) == 'Description') {
+		convertedRow[key.slice(0, key.length - 11) + ' description'] = data[i][key];
 
 	    } else if (
 			key + 'Label' in data[i] &&
@@ -108,20 +108,20 @@ function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {
 	    ) {
 		convertedRow[key] = '<a href="' +
 		    (linkPrefixes[key] || "../") + 
-		    data[i][key].substr(31) +
+		    data[i][key].slice(31) +
             (linkSuffixes[key] || "") +
 		    '">' + data[i][key + 'Label'] + '</a>';
-	    } else if (key.substr(-5) == 'Label') {
+	    } else if (key.slice(-5) == 'Label') {
 		// pass
 		
 	    } else if (key + 'Url' in data[i]) {
 		convertedRow[key] = '<a href="' +
 		    data[i][key + 'Url'] +
 		    '">' + data[i][key] + '</a>';
-	    } else if (key.substr(-3) == 'Url') {
+	    } else if (key.slice(-3) == 'Url') {
 		// pass
 
-	    } else if (key.substr(-3) == 'url') {
+	    } else if (key.slice(-3) == 'url') {
 		// Convert URL to a link
 		convertedRow[key] = "<a href='" +
 		    data[i][key] + "'>" + 
@@ -278,7 +278,10 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
                 defaultContent: "",
             }
             if (column['title'] == 'Count') {
-              column['render'] = $.fn.dataTable.render.number(',', '.');
+              // check that the count is not a link
+              if (convertedData.data[0]["count"][0] != "<") {
+                column['render'] = $.fn.dataTable.render.number(',', '.');
+              }
               if (i == 0) {
                 column['className'] = 'dt-right';
               }
