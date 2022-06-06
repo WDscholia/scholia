@@ -1111,6 +1111,7 @@ def q_to_class(q):
         class_ = 'gene'
     elif set(classes).intersection([
             'Q571',  # book
+            'Q49848',  # document
             'Q191067',  # article
             'Q253623',  # patent
             'Q580922',  # preprint
