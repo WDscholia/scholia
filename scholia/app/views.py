@@ -358,6 +358,26 @@ def show_author_random():
     return redirect(url_for('app.show_author', q=q), code=302)
 
 
+@main.route('/author/' + q1_pattern + '/use/' + q2_pattern)
+def show_author_use(q1, q2):
+    """Return HTML rendering for specific topic and use.
+
+    Parameters
+    ----------
+    q1 : str
+        Wikidata item identifier for author.
+    q2 : str
+        Wikidata item identifier for use.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific author and use.
+
+    """
+    return render_template('author-use.html', q1=q1, q2=q2, q=q1)
+
+
 @main.route('/authors/' + qs_pattern)
 def show_authors(qs):
     """Return HTML rendering for specific authors.
