@@ -1495,6 +1495,24 @@ def show_software_index():
     return render_template('software-index.html')
 
 
+@main.route('/software/' + q_pattern + '/export')
+def show_software_export(q):
+    """Return HTML rendering for export formats for this software.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('software-export.html', q=q)
+
+
 @main.route('/text-to-topics', methods=['POST', 'GET'])
 def show_text_to_topics():
     """Return HTML page for text-to-topics query.
