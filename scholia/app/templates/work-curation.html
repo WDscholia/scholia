@@ -1,0 +1,28 @@
+{% extends "q_curation.html" %}
+
+{% set aspect = "work-curation" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('author-resolving') }}
+
+
+{% endblock %}
+
+
+{% block curation_panels %}
+
+<h2 id="author-resolving">Author resolving</h2>
+
+The authorship may be represented as an author name string rather than a Wikidata item.
+To try to resolve the author name strings, follow the links below to use the Author disambiguator tool,
+which also has a <a href="https://author-disambiguator.toolforge.org/work_item_oauth.php?id={{ q }}">dedicated page for this work</a>.
+
+<table class="table table-hover" id="author-resolving-table"></table>
+
+
+
+<hr>
+
+
+{% endblock %}
