@@ -6,9 +6,14 @@
 
 {{ sparql_to_table('missing-author-items') }}
 
+{{ sparql_to_table('missing-co-uses',
+   options={ "linkPrefixes":{ "work": '../../work/' }}
+) }}
+
 {{ sparql_to_table('works-with-few-topics',
    options={ "linkPrefixes":{ "work": '../../work/' }}
 ) }}
+
 
 
 {% endblock %}
@@ -26,6 +31,11 @@ Follow the link to use the Author disambiguator tool to try to resolve
 the authors.
 
 <table class="table table-hover" id="missing-author-items-table"></table>
+
+
+<h2 id="missing-co-uses">Missing-co-uses</h2>
+
+<table class="table table-hover" id="missing-co-uses-table"></table>
 
 
 <h2 id="works-with-few-topics">Works with few topics</h2>

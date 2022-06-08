@@ -1,0 +1,31 @@
+# tool: scholia
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT
+  ?uses
+  ?citing_works
+  ?work ?workLabel
+WITH {
+  # Count citations
+  SELECT
+    (COUNT(DISTINCT ?citing_work) AS ?citing_works)
+    ?work
+    (SAMPLE(?citing_work) AS ?example_citing_work)
+    (COUNT(DISTINCT ?use) AS ?uses)
+  WHERE {
+    ?work wdt:P4510 target: .
+    OPTIONAL { ?work wdt:P4510 ?use . FILTER (?use != target: )}
+    OPTIONAL { ?citing_work wdt:P2860 ?work. }
+  }
+  GROUP BY ?work
+  HAVING (?uses < 1)
+  ORDER BY DESC(?count)
+  LIMIT 100
+} AS %result
+WHERE {
+  # Label results
+  INCLUDE %result
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+ORDER BY ?uses DESC(?citing_works)
