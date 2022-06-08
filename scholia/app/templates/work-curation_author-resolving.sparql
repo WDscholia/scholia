@@ -5,7 +5,7 @@ SELECT
   ?author_name
   ("Author Disambiguator ↗" AS ?author_disambiguator)
   (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", 
-          ENCODE_FOR_URI(?author_name)) AS ?author_resolverUrl) 
+          ENCODE_FOR_URI(?author_name)) AS ?author_disambiguatorUrl) 
 WITH {
   SELECT DISTINCT ?author WHERE {
     target: wdt:P50 ?author .
