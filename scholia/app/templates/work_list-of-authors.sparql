@@ -9,8 +9,7 @@ SELECT DISTINCT
 
   # Author item and label
   ?author ?authorUrl ?authorDescription
-  
-  ?orcid
+
 WHERE {
   {
     target: p:P50 ?author_statement .
@@ -22,9 +21,6 @@ WHERE {
       ?author_statement pq:P1545 ?order_ .
       BIND(xsd:integer(?order_) AS ?order)
     }
-    OPTIONAL { ?author_ wdt:P496 ?orcid_ . }
-    # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
-    BIND(COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?author))) AS ?orcid)
     OPTIONAL {
       ?author_ schema:description ?authorDescription .
       FILTER (LANG(?authorDescription) = "en")
@@ -34,7 +30,7 @@ WHERE {
   {
     target: p:P2093 ?authorstring_statement .
     ?authorstring_statement ps:P2093 ?author_
-    BIND(CONCAT("UNRESOLVED: ", ?author_) AS ?author)
+    BIND(CONCAT(?author_, " ↗") AS ?author)
     OPTIONAL {
       ?authorstring_statement pq:P1545 ?order_ .
       BIND(xsd:integer(?order_) AS ?order)

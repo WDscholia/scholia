@@ -15,14 +15,14 @@ WITH {
 WITH {
   SELECT DISTINCT ?author_name WHERE {
     INCLUDE %authors
-    ?author skos:altLabel | rdfs:label | (^ps:P50 / pq:P1932) ?author_name . 
+    { ?author skos:altLabel | rdfs:label | (^ps:P50 / pq:P1932) ?author_name . }
+    UNION
+    { target: wdt:P2093 ?author_name . } 
   }
 } AS %author_names
 WHERE {
   INCLUDE %author_names
-  { ?work wdt:P2093 ?author_name . }
-  UNION
-  { target: wdt:P2093 ?author_name . }
+  ?work wdt:P2093 ?author_name .
 }
 GROUP BY ?author_name
 ORDER BY DESC (?works)

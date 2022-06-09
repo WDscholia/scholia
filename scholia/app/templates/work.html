@@ -9,7 +9,13 @@
 {{ sparql_to_table('related-works') }}
 {{ sparql_to_table('citations') }}
 {{ sparql_to_table('cited-works') }}
-{{ sparql_to_table('cited-work-authors') }}
+{{ sparql_to_table('cited-work-authors',
+  options={
+    "linkPrefixes": {
+      "author": "../../author/",
+      "cited_work_example": "../../work/",
+  }}
+)}}
 {{ sparql_to_table('wikipedia-mentions') }}
 {{ sparql_to_table('statements') }}
 

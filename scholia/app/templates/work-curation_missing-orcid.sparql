@@ -1,0 +1,13 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT
+  ?author ?authorLabel ?authorDescription
+
+  ("ORCID search ↗" AS ?orcid_search)
+  (CONCAT("https://orcid.org/orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?authorLabel)) AS ?orcid_searchUrl)
+
+WHERE {
+  target: wdt:P50 ?author .
+  FILTER NOT EXISTS { ?author wdt:P496 ?orcid . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}

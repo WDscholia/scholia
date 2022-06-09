@@ -6,12 +6,14 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 SELECT
   ?cited_works
 
-  ?author ?authorLabel
+  ?author ?authorLabel ?authorDescription
 
-  # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
-  (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?authorLabel))) AS ?orcid)
+  ?cited_work_example ?cited_work_exampleLabel
 WITH {
-  SELECT (COUNT(?cited_work) AS ?cited_works) ?author
+  SELECT
+    (COUNT(?cited_work) AS ?cited_works)
+    ?author
+    (SAMPLE(?cited_work) AS ?cited_work_example)
   WHERE {
     # Find works that are cited by the queried work
     target: wdt:P2860 ?cited_work .
@@ -25,7 +27,6 @@ WITH {
 WHERE {
   # Label the result
   INCLUDE %result
-  OPTIONAL { ?author wdt:P496 ?orcid_ . }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY DESC(?cited_works)
