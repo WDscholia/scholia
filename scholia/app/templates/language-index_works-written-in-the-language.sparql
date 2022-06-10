@@ -1,0 +1,19 @@
+SELECT
+  ?count
+  ?language ?languageLabel ?languageDescription
+WITH {
+  SELECT
+    (COUNT(*) AS ?count)
+    ?language
+  WHERE {
+    [] wdt:P407 ?language   
+  }
+  GROUP BY ?language 
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
+
+  

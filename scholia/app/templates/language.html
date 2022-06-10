@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% set aspect = "language" %}
+
+
+
+{% block in_ready %}
+
+{{ sparql_to_table('recently-published-works',
+  options={
+    'linkPrefixes': {
+      'work': '../work/',
+    }
+  }) }}
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1 id="h1">Language</h1>
+
+<div id="intro"></div>
+
+<div id="wembedder"></div>
+
+
+<h2 id="recently-published-works">Recently published works</h2>
+
+<table class="table table-hover" id="recently-published-works-table"></table>
+
+
+{% endblock %}
