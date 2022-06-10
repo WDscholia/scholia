@@ -1,5 +1,6 @@
 """Views for app."""
 
+import datetime
 import re
 
 from flask import (Blueprint, current_app, redirect, render_template, request,
@@ -430,7 +431,7 @@ def show_award_index():
     Returns
     -------
     html : str
-        Rendered index page for author view.
+        Rendered index page for award view.
 
     """
     return render_template('award-index.html')
@@ -918,6 +919,37 @@ def redirect_issn(issn):
         q = qs[0]
         return redirect(url_for('app.show_venue', q=q), code=302)
     return render_template('404.html', error=could_not_find("ISSN serial ID"))
+
+
+@main.route('/language/' + q_pattern)
+def show_language(q):
+    """Return HTML rendering for specific language.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific language.
+
+    """
+    return render_template('language.html', q=q, datetime=datetime)
+
+
+@main.route('/language')
+def show_language_index():
+    """Return award index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for language view.
+
+    """
+    return render_template('language-index.html')
 
 
 @main.route('/lexeme/')

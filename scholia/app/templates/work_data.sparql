@@ -47,9 +47,11 @@ WHERE {
     BIND(2.5 AS ?order)
     BIND("Language" AS ?description)
     ?work wdt:P407 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
     BIND(STR(?value_string) AS ?value)
+    BIND(CONCAT("../language/", ?q) AS ?valueUrl)
   }
   UNION
   {
