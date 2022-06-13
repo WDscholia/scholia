@@ -983,6 +983,37 @@ def show_lexeme(lexeme):
     return render_template('lexeme.html', lexeme=lexeme)
 
 
+@main.route('/license/' + q_pattern)
+def show_license(q):
+    """Return HTML rendering for specific license.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for a specific license.
+
+    """
+    return render_template('license.html', q=q)
+
+
+@main.route('/license/')
+def show_license_index():
+    """Return license index page.
+
+    Returns
+    -------
+    html : str
+        Rendered index page for license view.
+
+    """
+    return render_template('license-index.html')
+
+
 @main.route('/location/')
 def show_location_index():
     """Return location index page.

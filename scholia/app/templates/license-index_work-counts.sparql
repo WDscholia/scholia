@@ -1,0 +1,17 @@
+SELECT 
+  ?count 
+  ?license ?licenseLabel ?licenseDescription
+WITH {
+  SELECT 
+    (COUNT(*) AS ?count)
+    ?license
+  WHERE {
+    [] wdt:P275 ?license .
+  }
+  GROUP BY ?license
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
