@@ -39,6 +39,17 @@ WHERE {
   UNION
   {
     BIND(3 AS ?order)
+    BIND("License" AS ?description)
+    ?software wdt:P275 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(STR(?value_string) AS ?value)
+    BIND(CONCAT("../license/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    BIND(4 AS ?order)
     BIND("Publication date" AS ?description)
     ?software p:P577 / psv:P577 ?publication_date_value .
     ?publication_date_value wikibase:timePrecision ?time_precision ;
