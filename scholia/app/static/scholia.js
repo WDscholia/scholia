@@ -264,7 +264,18 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
     var url = "https://query.wikidata.org/sparql?query=" +
         encodeURIComponent(sparql) + '&format=json';
 
+    const datatableFooter =
+        '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
+        encodeURIComponent(sparql) +
+        '">Wikidata Query Service</a></span>' +
+        '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
+        filename +
+        '">' +
+        filename.replace('_', ': ') +
+        '</a></span></caption>';
+
     $(element).html("<div class='loader'><div></div><div></div><div></div></div>")
+    $(element).append(datatableFooter);
 
     $.getJSON(url, function (response) {
         var simpleData = sparqlDataToSimpleData(response);
@@ -299,7 +310,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
             paging = false;
         }
 
-        $(element).html("");
+        $(element).html(""); // remove loader
 
         var table = $(element).DataTable({ 
             data: convertedData.data,
@@ -316,25 +327,10 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
             }
         });
 
-        $(element).append(
-            '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' + 
-                encodeURIComponent(sparql) +    
-                '">Wikidata Query Service</a></span>' +
-                '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
-                filename + '">' +
-                filename.replace("_", ": ") +
-                '</a></span></caption>'
-        );
+        $(element).append(datatableFooter);
     }).fail(function () {
-        $(element).append(
-            '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> ' +
-            '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
-                encodeURIComponent(sparql) +
-                '">Wikidata Query Service</a></span>' +
-                '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
-                filename + '">' +
-                filename.replace("_", ": ") +
-                '</a></span></caption>'
+        $(element).prepend(
+            '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> '
         );
     });
 };
