@@ -76,10 +76,8 @@ function scroll() {
 /* scroll to anchor in case page has changed */
 document.addEventListener('DOMContentLoaded', () => {setTimeout(scroll, 2000)});
 
-function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {}) {
+function convertDataTableData(data, columns, linkSuffixes = {}) {
     // Handle 'Label' columns.
-
-    // var linkPrefixes = (options && options.linkPrefixes) || {};
 
     var convertedData = [];
     var convertedColumns = [];
@@ -114,8 +112,7 @@ function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {
 			/^http/.test(data[i][key]) &&
 			data[i][key].length > 30
 	    ) {
-		    convertedRow[key] = '<a href="' +
-		    (linkPrefixes[key] || "../") + 
+		    convertedRow[key] = '<a href="../' +
 		    data[i][key].slice(31) +
             (linkSuffixes[key] || "") +
 		    '">' + data[i][key + 'Label'] + '</a>';
@@ -213,8 +210,7 @@ function sparqlDataToSimpleData(response) {
 
 
 function sparqlToDataTablePost(sparql, element, filename, options = {}) {
-    // Options: linkPrefixes={}, paging=true
-    var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
+    // Options: paging=true
     var linkSuffixes = (typeof options.linkSuffixes === 'undefined') ? {} : options.linkSuffixes;
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
@@ -225,7 +221,7 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
     $.post(url, data = { query: sparql }, function (response, textStatus) {
         var simpleData = sparqlDataToSimpleData(response);
 
-        convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes = linkPrefixes, linkSuffixes = linkSuffixes);
+        convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkSuffixes = linkSuffixes);
         columns = [];
         for (i = 0; i < convertedData.columns.length; i++) {
             var column = {
@@ -267,8 +263,7 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
 
 
 function sparqlToDataTable(sparql, element, filename, options = {}) {
-    // Options: linkPrefixes={}, paging=true
-    var linkPrefixes = (typeof options.linkPrefixes === 'undefined') ? {} : options.linkPrefixes;
+    // Options: paging=true
     var linkSuffixes = (typeof options.linkSuffixes === 'undefined') ? {} : options.linkSuffixes;
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
@@ -291,7 +286,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
     $.getJSON(url, function (response) {
         var simpleData = sparqlDataToSimpleData(response);
 
-        convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkPrefixes = linkPrefixes, linkSuffixes = linkSuffixes);
+        convertedData = convertDataTableData(simpleData.data, simpleData.columns,  linkSuffixes = linkSuffixes);
         columns = [];
         for (i = 0; i < convertedData.columns.length; i++) {
             var column = {
