@@ -4,7 +4,7 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('authors',options={ "linkPrefixes":{ "researcher": '../../author/' }}) }}
+{{ sparql_to_table('authors') }}
 {{ sparql_to_table('authors-no-initials') }}
 {{ sparql_to_table('authors-with-initials') }}
 
