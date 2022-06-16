@@ -2,7 +2,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
   ?date
-  ?work ?workLabel
+  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
   ?authors ?authorsUrl
   ?topics ?topicsUrl
 WITH {

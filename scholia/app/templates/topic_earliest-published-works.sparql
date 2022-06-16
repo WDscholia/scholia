@@ -1,6 +1,7 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?date ?work ?workLabel ?topicsUrl ?topics
+SELECT ?date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
+?topicsUrl ?topics
 WITH {
   SELECT DISTINCT ?work WHERE {
     ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .

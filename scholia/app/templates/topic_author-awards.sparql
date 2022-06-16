@@ -1,6 +1,8 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?count ?award ?awardLabel ?recipients ?recipientsUrl
+SELECT ?count 
+?award ?awardLabel (CONCAT("/award/", SUBSTR(STR(?award), 32)) AS ?awardUrl)
+?recipients ?recipientsUrl
 WITH {
   SELECT (COUNT(?researcher) AS ?count) ?award 
   (GROUP_CONCAT(DISTINCT ?researcher_label; separator=", ") AS ?recipients) 

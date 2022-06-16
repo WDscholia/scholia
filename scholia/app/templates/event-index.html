@@ -5,30 +5,9 @@
  
 {% block in_ready %}
 
-{{ sparql_to_table('upcoming-deadlines',
-     options={
-       "linkPrefixes":{
-         "event": "../event/",
-	     "location": "../location/",
-       }
-     }
-   ) }}
-{{ sparql_to_table('future-events',
-     options={
-       "linkPrefixes":{
-         "event": "../event/",
-	     "location": "../location/",
-       }
-    }
-  ) }}
-{{ sparql_to_table('past-events',
-     options={
-       "linkPrefixes":{
-         "event": "../event/",
-	     "location": "../location/",
-       }
-    }
-  ) }}
+{{ sparql_to_table('upcoming-deadlines') }}
+{{ sparql_to_table('future-events') }}
+{{ sparql_to_table('past-events') }}
  
 {% endblock %}
 

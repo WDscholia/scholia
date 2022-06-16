@@ -5,20 +5,9 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('recently-published-sponsored-works',
-    options={
-        "linkPrefixes": {
-	       "work": "../work/",
-	}
-    } ) }}
+{{ sparql_to_table('recently-published-sponsored-works') }}
 
-{{ sparql_to_table('authors-on-sponsored-works',
-    options={
-        "linkPrefixes": {
-	   "author": "../author/",
-	   "example_work": "../work/",
-        },
-    } ) }}
+{{ sparql_to_table('authors-on-sponsored-works') }}
 
 {{ sparql_to_iframe("topics-of-sponsored-works") }}
 
@@ -27,7 +16,6 @@
     options={
        "linkPrefixes": {
 	   "sponsor": "./",
-	   "example_work": "../work/",
        },
     } ) }}
 

@@ -1,4 +1,6 @@
-SELECT ?journal ?journalLabel (COUNT(DISTINCT ?citationStatement) AS ?citations) (COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
+SELECT ?journal ?journalLabel (CONCAT("/venue/", SUBSTR(STR(?journal), 32)) AS ?journalUrl)
+(COUNT(DISTINCT ?citationStatement) AS ?citations) 
+(COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
   ?citingArticle p:P2860 ?citationStatement ;
                  wdt:P1433 ?journal .
   ?citationStatement pq:P3712 ?intention ;

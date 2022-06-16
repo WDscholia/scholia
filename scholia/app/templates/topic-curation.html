@@ -5,21 +5,9 @@
 {% block in_ready %}
 
 {{ sparql_to_table('missing-author-items') }}
-{{ sparql_to_table('missing-pub-date',
-    options={
-      "linkPrefixes": {
-        "work": "../../work/",
-      }})}}
-{{ sparql_to_table('missing-pub-venue',
-    options={
-      "linkPrefixes": {
-        "work": "../../work/",
-      }})}}
-{{ sparql_to_table('missing-co-topic',
-    options={
-      "linkPrefixes": {
-        "work": "../../work/",
-      }})}}
+{{ sparql_to_table('missing-pub-date') }}
+{{ sparql_to_table('missing-pub-venue') }}
+{{ sparql_to_table('missing-co-topic') }}
 
 
 {% endblock %}

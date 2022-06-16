@@ -16,12 +16,7 @@
 }}
 {{ sparql_to_table('most-cited-works') }}
 {{ sparql_to_table('most-citing-authors') }}
-{{ sparql_to_table('events',
-     options={
-         "linkPrefixes": { "event": "../event/" }
-     }
-   )
-}}
+{{ sparql_to_table('events') }}
 {{ sparql_to_iframe('publications-per-year') }}
 {{ sparql_to_iframe('pages-per-year') }}
 {{ sparql_to_iframe('topic-scores') }}

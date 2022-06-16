@@ -1,8 +1,8 @@
 SELECT
   ?date
   ?short_name
-  ?event ?eventLabel
-  ?location ?locationLabel
+  ?event ?eventLabel (CONCAT("/event/", SUBSTR(STR(?event), 32)) AS ?eventUrl)
+  ?location ?locationLabel (CONCAT("/location/", SUBSTR(STR(?location), 32)) AS ?locationUrl)
 WITH {
   SELECT
     ?datetime ?event

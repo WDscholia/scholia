@@ -1,7 +1,7 @@
 SELECT
   ?count
   ?printer ?printerLabel ?printerDescription
-  ?example_work ?example_workLabel
+  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
 WHERE {
   {
     SELECT

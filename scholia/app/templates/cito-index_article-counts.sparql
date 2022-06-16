@@ -1,4 +1,6 @@
-SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citationStatement) AS ?citations) (COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
+SELECT ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl)
+(COUNT(DISTINCT ?citationStatement) AS ?citations) 
+(COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?citedArticle .

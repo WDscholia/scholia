@@ -1,6 +1,8 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?score ?author ?authorLabel ?example_work ?example_workLabel
+SELECT ?score 
+?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
+?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
 WITH {
   SELECT
     (SUM(?score_) AS ?score)

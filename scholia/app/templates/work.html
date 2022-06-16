@@ -27,11 +27,7 @@
 
 {% call ask_query_callback('cito') %}
 
-{{ sparql_to_table('cito-incoming',
-  options={
-    "linkPrefixes": {
-    "intention": "../../cito/",
-  }})}}
+{{ sparql_to_table('cito-incoming') }}
 
 {{ sparql_to_iframe('cito-incoming-chart') }}
 

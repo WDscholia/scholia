@@ -6,7 +6,7 @@ SELECT
   ("🔎" AS ?zoom)
   (CONCAT("{{ q }}/topic/", SUBSTR(STR(?topic), 32)) AS ?zoomUrl)
   ?topicDescription
-  ?samplework ?sampleworkLabel
+  ?samplework ?sampleworkLabel (CONCAT("/work/", SUBSTR(STR(?samplework), 32)) AS ?sampleworkUrl)
 WITH {
   SELECT DISTINCT ?researcher WHERE {
     ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .

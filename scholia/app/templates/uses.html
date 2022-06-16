@@ -9,21 +9,12 @@
     options={
 	 "linkPrefixes": {
 	     "use": "../use/",
-	     "example_work": "../work/",
          }
     }) }}
 
-{{ sparql_to_table('list-of-works',
-    options={
-        "linkPrefixes": { "work": "../work/" }
-    }) }}
+{{ sparql_to_table('list-of-works') }}
 
-{{ sparql_to_table('authors', options={
-	 "linkPrefixes": {
-	     "author": "../author/",
-	     "example_work": "../work/",
-         }
-     }) }}
+{{ sparql_to_table('authors') }}
 
 {% endblock %}
 

@@ -1,6 +1,7 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
+SELECT ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl)
+(COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
   VALUES ?JOURNAL { target: }
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?intention ;

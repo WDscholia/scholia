@@ -1,6 +1,8 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?number_of_citations ?author ?authorLabel ?cited_work_example ?cited_work_exampleLabel
+SELECT ?number_of_citations 
+?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
+?cited_work_example ?cited_work_exampleLabel (CONCAT("/work/", SUBSTR(STR(?cited_work_example), 32)) AS ?cited_work_exampleUrl)
 WITH {
   # Find works about the topic
   SELECT DISTINCT ?work WHERE {

@@ -5,14 +5,7 @@
  
 {% block in_ready %}
 
-{{ sparql_to_table('events',
-     options={
-       "linkPrefixes":{
-         "event": "../event/",
-	     "proceedings": "../venue/",
-       }
-     }
-   ) }}
+{{ sparql_to_table('events') }}
 {{ sparql_to_table('topics',
      options={
        "linkPrefixes":{
@@ -27,20 +20,8 @@
        }
      }
    ) }}
-{{ sparql_to_table('recent-publications',
-     options={
-       "linkPrefixes":{
-         "work": "../work/",
-       }
-     }
-   ) }}
-{{ sparql_to_table('proceedings-publications',
-     options={
-       "linkPrefixes":{
-         "work": "../work/",
-       }
-     }
-   ) }}
+{{ sparql_to_table('recent-publications') }}
+{{ sparql_to_table('proceedings-publications') }}
 {{ sparql_to_iframe('timeline') }}
 {{ sparql_to_iframe('map') }}
  

@@ -10,12 +10,7 @@
 {{ sparql_to_table('related') }}
 {{ sparql_to_table('recent-literature') }}
 {{ sparql_to_iframe('publications-per-year') }}
-{{ sparql_to_table('found-in-taxon',
-     options={
-         "linkPrefixes": { "taxon": "../taxon/", "source": "../work/" }
-     }
-   )
-}}
+{{ sparql_to_table('found-in-taxon') }}
 
 {% endblock %}
 

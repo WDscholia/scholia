@@ -2,7 +2,7 @@
 SELECT
   ?count 
   (MIN(?publication_date_) AS ?publication_date)
-  ?work ?workLabel
+  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
   ?topics ?topicsUrl
 WITH {
   SELECT (COUNT(?topic) AS ?count) ?work
