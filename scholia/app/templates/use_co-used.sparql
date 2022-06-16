@@ -3,7 +3,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 SELECT
   ?count
   
-  ?coused ?cousedLabel
+  ?coused ?cousedLabel (CONCAT("/use/", SUBSTR(STR(?coused), 32)) AS ?cousedUrl)
   ("🔎" AS ?zoom)
   (CONCAT("../uses/{{ q }},", SUBSTR(STR(?coused), 32)) AS ?zoomUrl)
   ?cousedDescription

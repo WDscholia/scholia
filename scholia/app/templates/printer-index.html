@@ -5,13 +5,7 @@
  
 {% block in_ready %}
 
-{{ sparql_to_table('printed-works-per-publisher',
-     options={
-       "linkPrefixes": {
-		 "printer": "./",
-       },
-     }
-   ) }}
+{{ sparql_to_table('printed-works-per-publisher') }}
 {{ sparql_to_iframe('map') }}
  
 {% endblock %}
