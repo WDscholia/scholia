@@ -6,14 +6,7 @@
 
 {{ sparql_to_table('recent-literature') }}
 
-{{ sparql_to_table('authors',
-     options={
-       "linkPrefixes":{
-        "author": "../../../author/",
-       }
-     }
-)
-}}
+{{ sparql_to_table('authors') }}
 
 
 {% endblock %}

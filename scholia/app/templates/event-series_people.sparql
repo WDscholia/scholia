@@ -4,6 +4,7 @@ SELECT
   ?number_of_roles
   # (?number_of_publications AS ?works)
   ?person ?personLabel ?personDescription
+  (CONCAT("/author/", SUBSTR(STR(?person), 32)) AS ?personUrl)
   ?roles
   ?example_work ?example_workLabel
 WITH {

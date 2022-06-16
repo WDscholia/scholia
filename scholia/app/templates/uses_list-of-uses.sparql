@@ -1,6 +1,6 @@
 # title: List of uses
 SELECT
-  ?use ?useLabel ?useDescription
+  ?use ?useLabel ?useDescription (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
   ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
 WITH {
   SELECT ?use (SAMPLE(?work) AS ?example_work) WHERE {

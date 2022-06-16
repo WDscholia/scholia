@@ -5,14 +5,7 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table("nearby-organizations",
-    options={
-        "linkPrefixes": {
-            "organization": "../organization/"
-      }
-    }
-  )
-}}
+{{ sparql_to_table("nearby-organizations") }}
 
 {{ sparql_to_table('nearby-locations-as-topics-in-works') }}
 

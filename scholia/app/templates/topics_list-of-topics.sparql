@@ -1,6 +1,6 @@
 # title: List of topics
 SELECT
-  ?topic ?topicLabel ?topicDescription
+  ?topic ?topicLabel ?topicDescription (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
   ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
 WITH {
   SELECT ?topic (SAMPLE(?work) AS ?example_work) WHERE {

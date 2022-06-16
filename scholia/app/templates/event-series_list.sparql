@@ -1,6 +1,7 @@
 SELECT
   ?events ?short_name
   ?event_series ?event_seriesLabel ?event_seriesDescription
+  (CONCAT("/event-series/", SUBSTR(STR(?event_series), 32)) AS ?event_seriesUrl)
 WITH {
   SELECT (COUNT(?event) AS ?events) ?event_series {  
     { ?event_series wdt:P31 wd:Q47258130 . }

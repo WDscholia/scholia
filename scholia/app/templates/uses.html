@@ -5,12 +5,7 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('list-of-uses',
-    options={
-	 "linkPrefixes": {
-	     "use": "../use/",
-         }
-    }) }}
+{{ sparql_to_table('list-of-uses') }}
 
 {{ sparql_to_table('list-of-works') }}
 

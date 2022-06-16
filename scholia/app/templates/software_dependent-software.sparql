@@ -2,7 +2,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT 
   ?count 
-  ?software ?softwareLabel ?softwareDescription
+  ?software ?softwareLabel ?softwareDescription (CONCAT("/software/", SUBSTR(STR(?software), 32)) AS ?softwareUrl)
 WITH {
   SELECT 
     (COUNT(?other_software) AS ?count)

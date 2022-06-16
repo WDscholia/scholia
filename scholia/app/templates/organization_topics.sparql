@@ -2,7 +2,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
   ?researchers
-  ?topic ?topicLabel
+  ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
   ("🔎" AS ?zoom)
   (CONCAT("{{ q }}/topic/", SUBSTR(STR(?topic), 32)) AS ?zoomUrl)
   ?topicDescription
