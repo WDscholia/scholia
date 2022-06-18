@@ -172,6 +172,7 @@ a.dropdown-item.active {
 }
 
 #item-image {
+    max-width: 100%;
     object-fit: contain;
 }
 
