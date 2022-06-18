@@ -147,11 +147,17 @@ askQuery("{{ panel }}", `# tool: scholia
 	    imageURL += encodeURIComponent(imageName);
 	    var itemImage = document.getElementById("item-image");
 	    if (itemImage) {
-		itemImage.src = imageURL;
-		itemImage.title = imageName.slice(0, imageName.lastIndexOf('.'));
-		itemImage.setAttribute('alt', imageName);
-		itemImage.href = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(imageName);    
-	    }
+      itemImage.src = imageURL;
+      itemImage.title = imageName.slice(0, imageName.lastIndexOf('.'));
+      itemImage.setAttribute('alt', imageName);
+
+      var link = document.createElement('a');
+      link.href = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(imageName);
+      link.style = "max-width: 50%"
+      var parent = itemImage.parentNode;
+      parent.replaceChild(link, itemImage);
+      link.appendChild(itemImage);
+    }
 	}
 
 	function socialMediaLink(detailsList, user, site, logo = '') {
