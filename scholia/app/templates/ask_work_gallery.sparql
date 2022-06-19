@@ -1,0 +1,3 @@
+ASK {
+  wd:{{q}} wdt:P373 ?gallery  .
+}
