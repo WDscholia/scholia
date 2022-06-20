@@ -37,6 +37,12 @@
 
 {% endcall %}
 
+{% call ask_query_callback('gallery') %}
+
+{{ sparql_to_iframe('associated-images') }}
+
+{% endcall %}
+
 {% endblock %}
 
 
@@ -68,6 +74,14 @@ Topics based on a weighting between main subject of work, cited and citing works
 
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="timeline-iframe"></iframe>
+</div>
+
+<div id="gallery" class="d-none">
+<h2 id="associated-images">Associated images</h2>
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" id="associated-images-iframe"></iframe>
+</div>
 </div>
 
 <h2>Related works</h2>

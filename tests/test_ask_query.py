@@ -27,6 +27,16 @@ def test_work_cito():
     assert ask_query(file_name, false_case) == False
 
 
+def test_work_gallery():
+    file_name = "ask_work_gallery.sparql"
+
+    true_case = "Q19966966"  # One hundred and one new species of Trigonopterus weevils from New Guinea
+    false_case = "Q22241243"  # Zika virus outside Africa
+
+    assert ask_query(file_name, true_case) == True
+    assert ask_query(file_name, false_case) == False
+
+
 def ask_query(file_name, q_number):
     file_path = "scholia/app/templates/" + file_name
     with open(file_path) as read:

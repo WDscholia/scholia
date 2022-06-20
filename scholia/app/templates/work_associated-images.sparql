@@ -1,0 +1,13 @@
+#defaultView:ImageGrid
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT ?image WHERE {
+  {
+    # Images from whatever property value is linked.
+    
+    # Excluded "different from" property and take all other properties
+    target: !wdt:P1889 ?item .
+
+    ?item wdt:P18 ?image . 
+  }
+}   
