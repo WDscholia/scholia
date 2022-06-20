@@ -103,43 +103,54 @@ function convertDataTableData(data, columns, linkPrefixes = {}, linkSuffixes = {
 
 	    } else if (
 			key + 'Label' in data[i] &&
+            key + 'Url' in data[i]
+	    ) {
+            convertedRow[key] = '<a href="' +
+		    data[i][key + 'Url'] +
+		    '">' + data[i][key + 'Label'] + '</a>';
+
+	    } else if (
+			key + 'Label' in data[i] &&
 			/^http/.test(data[i][key]) &&
 			data[i][key].length > 30
 	    ) {
-		convertedRow[key] = '<a href="' +
+		    convertedRow[key] = '<a href="' +
 		    (linkPrefixes[key] || "../") + 
 		    data[i][key].slice(31) +
             (linkSuffixes[key] || "") +
 		    '">' + data[i][key + 'Label'] + '</a>';
-	    } else if (key.slice(-5) == 'Label') {
+
+        } else if (key.slice(-5) == 'Label') {
 		// pass
 		
 	    } else if (key + 'Url' in data[i]) {
-		convertedRow[key] = '<a href="' +
+		    convertedRow[key] = '<a href="' +
 		    data[i][key + 'Url'] +
 		    '">' + data[i][key] + '</a>';
+
 	    } else if (key.slice(-3) == 'Url') {
 		// pass
 
 	    } else if (key.slice(-3) == 'url') {
 		// Convert URL to a link
-		convertedRow[key] = "<a href='" +
+		    convertedRow[key] = "<a href='" +
 		    data[i][key] + "'>" + 
 		    $("<div>").text(data[i][key]).html() + '</a>';
 
 	    } else if (key == 'orcid') {
 		// Add link to ORCID website
-		convertedRow[key] = '<a href="https://orcid.org/' +
+		    convertedRow[key] = '<a href="https://orcid.org/' +
 		    data[i][key] + '">' + 
 		    data[i][key] + '</a>';
 
 	    } else if (key == 'doi') {
 		// Add link to Crossref
-		convertedRow[key] = '<a href="https://doi.org/' +
+		    convertedRow[key] = '<a href="https://doi.org/' +
 		    encodeURIComponent(data[i][key]) + '">' +
 		    $("<div>").text(data[i][key]).html() + '</a>';
+
 	    } else {
-		convertedRow[key] = data[i][key];
+		    convertedRow[key] = data[i][key];
 	    }
 	}
 	convertedData.push(convertedRow);

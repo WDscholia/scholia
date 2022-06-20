@@ -3,7 +3,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # Venue statistics for a specific author
 SELECT
   ?count (SAMPLE(?short_name_) AS ?short_name)
-  ?venue ?venueLabel
+  ?venue ?venueLabel (CONCAT("/venue/", SUBSTR(STR(?venue), 32)) AS ?venueUrl)
   ?topics ?topicsUrl
 WITH {
   SELECT
