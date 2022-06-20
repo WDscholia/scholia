@@ -142,9 +142,9 @@ askQuery("{{ panel }}", `# tool: scholia
 	    // spaces must be replaced by underscores in the file name
 	    imageName = imageName.replaceAll(" ", "_")
 	    var imageNameMd5 = md5(imageName);
-	    var imageURL = "https://upload.wikimedia.org/wikipedia/commons/" 
+	    var imageURL = "https://upload.wikimedia.org/wikipedia/commons/thumb/" 
 	    imageURL += imageNameMd5[0] + "/" + imageNameMd5.slice(0,2) + "/"
-	    imageURL += encodeURIComponent(imageName);
+	    imageURL += encodeURIComponent(imageName) + "/500px-" + encodeURIComponent(imageName);
 	    var itemImage = document.getElementById("item-image");
 	    if (itemImage) {
       itemImage.src = imageURL;
