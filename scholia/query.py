@@ -408,6 +408,7 @@ def doi_prefix_to_qs(doi):
 
     >>> doi_prefix_to_qs('10.1016') == ['Q746413']
     True
+
     """
     query = 'select ?work where {{ ?work wdt:P1662 "{doi}" }}'.format(
         doi=escape_string(doi.upper()))
