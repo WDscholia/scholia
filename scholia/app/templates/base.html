@@ -650,27 +650,24 @@ askQuery("{{ panel }}", `# tool: scholia
 
     $("#searchterm").on("autocomplete.select", (event, item) => { handleSearch(item) });
 
-    $("#searchterm").on("keydown", function (event) {
-      switch (event.key) {
-        case "Enter":
-          handleSearch(this.value);
-          break;
-        default:
-      }
-    });
-
     $("#searchbutton").on("click", () => { handleSearch(document.getElementById("searchterm").value) })
 
     function handleSearch(item) {
-      let q_id = item.match(/ \((Q\d+)\)$/)
-      if (q_id) {
-        window.location.href = "/" + q_id[1];
+      // headerSearch and authorIndexAutocomplete reference where the two formats come from
+      let headerSearch =  item.match(/ \((Q\d+)\)$/);
+      if (headerSearch) {
+        window.location.href = "/" + headerSearch[1];
       } else {
-        let search_text = item.match(/Show all results for "(.+)"$/)
-        if (search_text) {
-          window.location.href = "/search?q=" + search_text[1];
+        let authorIndexAutocomplete = item.match(/\/\w+\/Q\d+$/);
+        if (authorIndexAutocomplete) {
+          window.location.href = item;
         } else {
-          window.location.href = "/search?q=" + item;
+          let search_text = item.match(/Show all results for "(.+)"$/)
+          if (search_text) {
+            window.location.href = "/search?q=" + search_text[1];
+          } else {
+            window.location.href = "/search?q=" + item;
+          }
         }
       }
     }
