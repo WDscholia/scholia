@@ -2,7 +2,6 @@ python-dateutil
 docopt
 flask
 Flask-Bootstrap
-flask-mwoauth>=0.1.14
 lxml>=4.6.5
 requests
 simplejson
