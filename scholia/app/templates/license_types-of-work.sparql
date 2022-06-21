@@ -1,0 +1,21 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT
+  ?count
+  ?type ?typeLabel ?typeDescription
+WITH {
+  SELECT
+    (COUNT(*) AS ?count)
+    ?type
+ 
+  WHERE {
+    [] wdt:P275 target: ; 
+       wdt:P31 ?type .
+  }
+  GROUP BY ?type
+} AS %types
+WHERE {
+  INCLUDE %types
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?count)
