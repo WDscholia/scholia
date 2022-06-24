@@ -30,7 +30,13 @@
 </p>
 
 <p>
-  <pre id="output"></pre>
+  <pre id="output" class="p-3 bg-light"></pre>
+</p>
+
+<p>
+  <button id="copy-output" class="btn btn-outline-secondary">
+    Copy
+  </button>
 </p>
 
 {% endblock %}
@@ -92,6 +98,12 @@ $(function () {
 
   $('#export-format').on('change', generateOutput)
   $('#export-version').on('change', generateOutput)
+
+  $('#copy-output').on('click', function () {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText($('#output').text())
+    }
+  })
 })
 </script>
 
