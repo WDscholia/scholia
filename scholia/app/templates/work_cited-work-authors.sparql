@@ -7,8 +7,10 @@ SELECT
   ?cited_works
 
   ?author ?authorLabel ?authorDescription
+  (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
 
   ?cited_work_example ?cited_work_exampleLabel
+   (CONCAT("/work/", SUBSTR(STR(?cited_work_example), 32)) AS ?cited_work_exampleUrl)
 WITH {
   SELECT
     (COUNT(?cited_work) AS ?cited_works)
