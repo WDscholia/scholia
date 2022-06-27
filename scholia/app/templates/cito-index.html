@@ -6,12 +6,7 @@
 {% block in_ready %}
 
 {{ sparql_to_table('article-counts') }}
-{{ sparql_to_table('journal-counts',
-     options={
-         "linkSuffixes": { "journal": "/cito", }
-     }
-   )
-}}
+{{ sparql_to_table('journal-counts') }}
 {{ sparql_to_table('statistics') }}
 {{ sparql_to_iframe('articles-by-year') }}
 

@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?citedArticle ?citedArticleLabel (CONCAT("/work/", SUBSTR(STR(?citedArticle), 32)) AS ?citedArticleUrl)
+SELECT ?citedArticle ?citedArticleLabel (CONCAT("/work/", SUBSTR(STR(?citedArticle), 32), "#cito") AS ?citedArticleUrl)
 (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
   VALUES ?JOURNAL { target: }
   VALUES ?INTENTION { wd:Q96472102 wd:Q96471820 wd:Q101149476 }

@@ -76,7 +76,7 @@ function scroll() {
 /* scroll to anchor in case page has changed */
 document.addEventListener('DOMContentLoaded', () => {setTimeout(scroll, 2000)});
 
-function convertDataTableData(data, columns, linkSuffixes = {}) {
+function convertDataTableData(data, columns) {
     // Handle 'Label' columns.
 
     var convertedData = [];
@@ -114,7 +114,6 @@ function convertDataTableData(data, columns, linkSuffixes = {}) {
 	    ) {
 		    convertedRow[key] = '<a href="../' +
 		    data[i][key].slice(31) +
-            (linkSuffixes[key] || "") +
 		    '">' + data[i][key + 'Label'] + '</a>';
 
         } else if (key.slice(-5) == 'Label') {
@@ -210,8 +209,7 @@ function sparqlDataToSimpleData(response) {
 
 
 function sparqlToDataTablePost(sparql, element, filename, options = {}) {
-    // Options: paging=true
-    var linkSuffixes = (typeof options.linkSuffixes === 'undefined') ? {} : options.linkSuffixes;
+    // Options: paging=
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var url = "https://query.wikidata.org/sparql";
@@ -221,7 +219,7 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
     $.post(url, data = { query: sparql }, function (response, textStatus) {
         var simpleData = sparqlDataToSimpleData(response);
 
-        convertedData = convertDataTableData(simpleData.data, simpleData.columns, linkSuffixes = linkSuffixes);
+        convertedData = convertDataTableData(simpleData.data, simpleData.columns);
         columns = [];
         for (i = 0; i < convertedData.columns.length; i++) {
             var column = {
@@ -264,7 +262,6 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
 
 function sparqlToDataTable(sparql, element, filename, options = {}) {
     // Options: paging=true
-    var linkSuffixes = (typeof options.linkSuffixes === 'undefined') ? {} : options.linkSuffixes;
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var url = "https://query.wikidata.org/sparql?query=" +
@@ -286,7 +283,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
     $.getJSON(url, function (response) {
         var simpleData = sparqlDataToSimpleData(response);
 
-        convertedData = convertDataTableData(simpleData.data, simpleData.columns,  linkSuffixes = linkSuffixes);
+        convertedData = convertDataTableData(simpleData.data, simpleData.columns);
         columns = [];
         for (i = 0; i < convertedData.columns.length; i++) {
             var column = {

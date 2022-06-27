@@ -1,4 +1,4 @@
-SELECT ?journal ?journalLabel (CONCAT("/venue/", SUBSTR(STR(?journal), 32)) AS ?journalUrl)
+SELECT ?journal ?journalLabel (CONCAT("/venue/", SUBSTR(STR(?journal), 32), "#cito") AS ?journalUrl)
 (COUNT(DISTINCT ?citationStatement) AS ?citations) 
 (COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
   ?citingArticle p:P2860 ?citationStatement ;
