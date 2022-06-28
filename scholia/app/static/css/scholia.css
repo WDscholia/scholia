@@ -37,15 +37,25 @@ body {
 }
 
 body, 
+input, 
 .form-control, 
+.select2-container--default .select2-selection--multiple,
+textarea,
 .dropdown-menu,
 .page-item.disabled .page-link {
     background-color: var(--background);
     color: var(--color-body);
 }
 
-.form-control {
+input, 
+.form-control,
+.select2-container--default .select2-selection--multiple,
+.select2-container--default.select2-container--focus .select2-selection--multiple {
     border-color: var(--divider);
+}
+
+.select2-results {
+    color: black
 }
 
 a, 
