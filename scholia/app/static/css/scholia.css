@@ -37,8 +37,9 @@ body {
 }
 
 body, 
-.form-control,
-.dropdown-menu {
+.form-control, 
+.dropdown-menu,
+.page-item.disabled .page-link {
     background-color: var(--background);
     color: var(--color-body);
 }
@@ -48,7 +49,8 @@ body,
 }
 
 a, 
-.dropdown-item {
+.dropdown-item,
+.page-link {
     color: var(--color-link);
 }
 
@@ -57,12 +59,17 @@ a:hover {
 }
 
 .dropdown-item:focus,
-.dropdown-item:hover {
-    color: var(--color-link);
+.dropdown-item:hover, 
+.page-link:focus,
+.page-link:hover {
+    color: var(--color-link-hover);
     background-color: var(--background-hover);
+    border-color: var(--divider);
 }
 
-.card {
+.card,
+.page-link,
+.page-item.disabled .page-link {
     background-color: var(--background);
     border-color: var(--outline);
 }

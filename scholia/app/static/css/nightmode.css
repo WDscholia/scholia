@@ -15,4 +15,13 @@
     .dropdown-menu {
         box-shadow: 0px 0px 2px black;
     }
+
+    iframe {
+        filter: invert(100%);
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--theme-blue);
+        border-color: var(--theme-blue);
+    }
 }
