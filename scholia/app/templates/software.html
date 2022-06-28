@@ -15,15 +15,16 @@
 
 {% endblock %}
 
+{% block page_actions %}
+<a href="/software/{{ q }}/export" role="button" class="btn btn-outline-secondary">Cite</a>
+{{ super() }}
+{% endblock %}
+
 {% block page_content %}
 
 <h1 id="h1">Software</h1>
 
 <div id="intro"></div>
-
-<div id="actions" class="mt-3">
-    <a href="/software/{{ q }}/export" role="button" class="btn btn-outline-secondary">Cite</a>
-</div>
 
 <table class="table table-hover" id="data-table"></table>
 

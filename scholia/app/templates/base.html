@@ -900,7 +900,11 @@ askQuery("{{ panel }}", `# tool: scholia
 <div class="container d-flex justify-content-between">
     <div class="dropdown" id="aspect-chooser">
     </div>
-    <a id='curation-link' role="button" class="btn btn-outline-secondary d-none">Improve data</a>
+    <div>
+      {% block page_actions %}
+      <a id='curation-link' role="button" class="btn btn-outline-secondary d-none">Improve data</a>
+      {% endblock %}
+    </div>
 </div>
 <div class="container">
     {% block page_content %}{% endblock %}
