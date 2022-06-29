@@ -2,8 +2,8 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
   (xsd:date(MIN(?start)) AS ?date)  
-  ?event
-  ?eventLabel
+  ?event ?eventLabel
+  (CONCAT("/event/", SUBSTR(STR(?event), 32)) AS ?eventUrl)
   (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
   (GROUP_CONCAT(DISTINCT ?location_label; separator=", ") AS ?locations)
 WHERE {

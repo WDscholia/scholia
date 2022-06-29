@@ -1,6 +1,7 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) ?journal ?journalLabel WHERE {
+SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) 
+?journal ?journalLabel (CONCAT("/venue/", SUBSTR(STR(?journal), 32)) AS ?journalUrl) WHERE {
   VALUES ?INTENTION { target: }
   ?citingArticle p:P2860 ?citationStatement ;
                  wdt:P1433 ?journal .

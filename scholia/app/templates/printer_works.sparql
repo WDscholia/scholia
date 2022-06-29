@@ -4,8 +4,8 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
   ?date
-  ?work ?workLabel
-  ?example_author ?example_authorLabel
+  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
+  ?example_author ?example_authorLabel (CONCAT("/author/", SUBSTR(STR(?example_author), 32)) AS ?example_authorUrl)
 WHERE {
   {
     SELECT

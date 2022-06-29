@@ -2,7 +2,8 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?count ?short_name ?venue ?venueLabel
+SELECT ?count ?short_name 
+?venue ?venueLabel (CONCAT("/venue/", SUBSTR(STR(?venue), 32)) AS ?venueUrl)
 WITH {
   SELECT (count(?work) as ?count) ?venue (SAMPLE(?short_name_) AS ?short_name) WHERE {
     { ?work wdt:P921/wdt:P31*/wdt:P279* target: . }

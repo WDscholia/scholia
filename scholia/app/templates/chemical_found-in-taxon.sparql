@@ -1,6 +1,8 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT DISTINCT ?taxon ?taxonLabel ?source ?sourceLabel ?DOI WHERE {
+SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl)
+?source ?sourceLabel (CONCAT("/work/", SUBSTR(STR(?source), 32)) AS ?sourceUrl)
+?DOI WHERE {
   VALUES ?chemical { target: }
   ?chemical p:P703 ?taxonStatement .
   ?taxonStatement ps:P703 ?taxon .

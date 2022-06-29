@@ -4,7 +4,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
   ?count
-  ?author ?authorLabel ?authorDescription
+  ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
   (COALESCE(?orcid_, CONCAT("orcid-search/quick-search/?searchQuery=", ?authorLabel)) AS ?orcid) 
 WITH {
   SELECT

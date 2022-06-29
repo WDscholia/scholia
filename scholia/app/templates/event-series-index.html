@@ -5,13 +5,7 @@
  
 {% block in_ready %}
 
-{{ sparql_to_table('list',
-     options={
-       "linkPrefixes":{
-         "event": "../event/"
-       }
-     }
-   ) }}
+{{ sparql_to_table('list') }}
  
 {% endblock %}
 

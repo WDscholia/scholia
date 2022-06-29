@@ -4,7 +4,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 SELECT
   ?couses
   ?citing_works
-  ?work ?workLabel
+  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
 WITH {
   # Count citations
   SELECT

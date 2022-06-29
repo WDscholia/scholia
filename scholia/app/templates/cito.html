@@ -4,18 +4,8 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('journals',
-     options={
-         "linkPrefixes": { "journal": "../../venue/" }
-     }
-   )
-}}
-{{ sparql_to_table('articles',
-     options={
-         "linkPrefixes": { "citedArticle": "../../work/", }
-     }
-   )
-}}
+{{ sparql_to_table('journals') }}
+{{ sparql_to_table('articles') }}
 {{ sparql_to_iframe('articles-by-year') }}
 
 {% endblock %}

@@ -1,7 +1,8 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT 
-?item ?itemLabel ?taxonname
+?item ?itemLabel (CONCAT("/work/", SUBSTR(STR(?item), 32)) AS ?itemUrl)
+?taxonname
   (REPLACE(STR(?item), ".*Q", "Q") AS ?work) 
   ("P921" AS ?main_subject)
   (REPLACE(STR(target: ), ".*Q", "Q") AS ?taxon)

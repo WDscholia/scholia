@@ -4,17 +4,8 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('recent-work-using-the-used',
-    options={
-      "linkPrefixes": {
-        "work": "../work/",
-      }})}}
-{{ sparql_to_table('co-used',
-    options={
-      "linkPrefixes": {
-        "coused": "./",
-	      "example_work": "../work/",
-      }})}}
+{{ sparql_to_table('recent-work-using-the-used') }}
+{{ sparql_to_table('co-used') }}
 
 {{ sparql_to_iframe('topics-of-works-using-the-resource') }}
 {{ sparql_to_iframe('authors-of-works-using-the-resource') }}

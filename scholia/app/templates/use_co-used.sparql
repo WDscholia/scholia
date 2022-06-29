@@ -3,12 +3,12 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 SELECT
   ?count
   
-  ?coused ?cousedLabel
+  ?coused ?cousedLabel (CONCAT("/use/", SUBSTR(STR(?coused), 32)) AS ?cousedUrl)
   ("🔎" AS ?zoom)
   (CONCAT("../uses/{{ q }},", SUBSTR(STR(?coused), 32)) AS ?zoomUrl)
   ?cousedDescription
   
-  ?example_work ?example_workLabel
+  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
 WITH {
   # Find works that are using a specific software,
   # and find other software used in the found works

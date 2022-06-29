@@ -1,6 +1,6 @@
 SELECT 
   ?count 
-  ?license ?licenseLabel ?licenseDescription
+  ?license ?licenseLabel ?licenseDescription (CONCAT("/license/", SUBSTR(STR(?license), 32)) AS ?licenseUrl)
 WITH {
   SELECT 
     (COUNT(*) AS ?count)

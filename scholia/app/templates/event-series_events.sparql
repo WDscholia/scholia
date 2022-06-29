@@ -4,8 +4,8 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 SELECT DISTINCT 
   (SAMPLE(?years) AS ?year)
   (SAMPLE(?short_names) AS ?short_name)
-  ?event ?eventLabel
-  ?proceedings ?proceedingsLabel
+  ?event ?eventLabel (CONCAT("/event/", SUBSTR(STR(?event), 32)) AS ?eventUrl)
+  ?proceedings ?proceedingsLabel (CONCAT("/venue/", SUBSTR(STR(?proceedings), 32)) AS ?proceedingsUrl)
 WHERE {
   {
     ?event wdt:P179 | wdt:P31 target: .

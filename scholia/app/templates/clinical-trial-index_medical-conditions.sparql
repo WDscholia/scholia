@@ -1,6 +1,6 @@
 SELECT
   ?count
-  ?medical_condition ?medical_conditionLabel
+  ?medical_condition ?medical_conditionLabel (CONCAT("/disease/", SUBSTR(STR(?medical_condition), 32)) AS ?medical_conditionUrl)
   ?example_trial ?example_trialLabel
 WHERE {
   {

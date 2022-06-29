@@ -5,25 +5,11 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('list-of-topics',
-    options={
-	 "linkPrefixes": {
-	     "topic": "../topic/",
-	     "example_work": "../work/",
-         }
-    }) }}
+{{ sparql_to_table('list-of-topics') }}
 
-{{ sparql_to_table('list-of-works',
-    options={
-        "linkPrefixes": { "work": "../work/" }
-    }) }}
+{{ sparql_to_table('list-of-works') }}
 
-{{ sparql_to_table('authors', options={
-	 "linkPrefixes": {
-	     "author": "../author/",
-	     "example_work": "../work/",
-         }
-     }) }}
+{{ sparql_to_table('authors') }}
 
 {% endblock %}
 

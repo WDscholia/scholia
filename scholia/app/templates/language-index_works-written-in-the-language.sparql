@@ -1,6 +1,6 @@
 SELECT
   ?count
-  ?language ?languageLabel ?languageDescription
+  ?language ?languageLabel ?languageDescription (CONCAT("/language/", SUBSTR(STR(?language), 32)) AS ?languageUrl)
 WITH {
   SELECT
     (COUNT(*) AS ?count)

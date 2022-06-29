@@ -5,7 +5,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
   ?works
-  ?researcher ?researcherLabel
+  ?researcher ?researcherLabel (CONCAT("/author/", SUBSTR(STR(?researcher), 32)) AS ?researcherUrl)
   ?author_name
   (CONCAT(
       "https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=",

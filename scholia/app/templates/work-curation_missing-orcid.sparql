@@ -2,6 +2,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT
   ?author ?authorLabel ?authorDescription
+  (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
 
   ("ORCID search ↗" AS ?orcid_search)
   (CONCAT("https://orcid.org/orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?authorLabel)) AS ?orcid_searchUrl)

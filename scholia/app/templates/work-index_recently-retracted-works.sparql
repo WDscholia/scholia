@@ -1,7 +1,7 @@
 SELECT DISTINCT
-  ?retracted_work ?retracted_workLabel
+  ?retracted_work ?retracted_workLabel (CONCAT("/work/", SUBSTR(STR(?retracted_work), 32)) AS ?retracted_workUrl)
   ?date
-  ?retraction ?retractionLabel
+  ?retraction ?retractionLabel (CONCAT("/work/", SUBSTR(STR(?retraction), 32)) AS ?retractionUrl)
 WITH {
   # Find retracted papers indicated by instance of retracted paper, 
   # by retraction notice property or by significant event

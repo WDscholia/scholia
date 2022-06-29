@@ -9,13 +9,7 @@
 {{ sparql_to_table('related-works') }}
 {{ sparql_to_table('citations') }}
 {{ sparql_to_table('cited-works') }}
-{{ sparql_to_table('cited-work-authors',
-  options={
-    "linkPrefixes": {
-      "author": "../../author/",
-      "cited_work_example": "../../work/",
-  }}
-)}}
+{{ sparql_to_table('cited-work-authors') }}
 {{ sparql_to_table('wikipedia-mentions') }}
 {{ sparql_to_table('statements') }}
 
@@ -27,11 +21,7 @@
 
 {% call ask_query_callback('cito') %}
 
-{{ sparql_to_table('cito-incoming',
-  options={
-    "linkPrefixes": {
-    "intention": "../../cito/",
-  }})}}
+{{ sparql_to_table('cito-incoming') }}
 
 {{ sparql_to_iframe('cito-incoming-chart') }}
 

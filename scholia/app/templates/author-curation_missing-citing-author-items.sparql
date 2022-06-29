@@ -13,6 +13,7 @@ SELECT
       ENCODE_FOR_URI(?citing_author)) AS ?resolver_url)
 
   ?example_citing_work ?example_citing_workLabel
+  (CONCAT("/work/", SUBSTR(STR(?example_citing_work), 32)) AS ?example_citing_workUrl)
 WITH {
   SELECT
     (COUNT(?work) as ?count)

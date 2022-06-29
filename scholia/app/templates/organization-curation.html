@@ -1,11 +1,11 @@
 {% extends "q_curation.html" %}
 
-{% set aspect = "organization-missing" %}
+{% set aspect = "organization-curation" %}
 
 {% block in_ready %}
 
-{{ sparql_to_table('authors',options={ "linkPrefixes":{ "researcher": '../../author/' }}) }}
-{{ sparql_to_table('authors-no-initials',options={ "linkPrefixes":{ "researcher": '../../author/' }}) }}
+{{ sparql_to_table('authors') }}
+{{ sparql_to_table('authors-no-initials') }}
 {{ sparql_to_table('authors-with-initials') }}
 
 {% endblock %}

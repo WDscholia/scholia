@@ -5,14 +5,7 @@
 {% block in_ready %}
 
 {{ sparql_to_table('employees-and-affiliated') }}
-{{ sparql_to_table('topics',
-     options={
-       "linkPrefixes":{
-         "topic": "../topic/",
-	     "samplework": "../work/",
-       }
-     }
-   ) }}
+{{ sparql_to_table('topics') }}
 {{ sparql_to_table('recent-literature') }}
 {{ sparql_to_table('recent-citations') }}
 {{ sparql_to_table('awards') }}

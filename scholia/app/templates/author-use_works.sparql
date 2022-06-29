@@ -3,7 +3,7 @@ PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 
 SELECT
   ?publication_date
-  ?work ?workLabel
+  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
 WHERE {
   ?work wdt:P50 target1: ;
         wdt:P4510 target2: .

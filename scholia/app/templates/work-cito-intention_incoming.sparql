@@ -1,4 +1,5 @@
-SELECT ?citingArticle ?citingArticleLabel ?intention ?intentionLabel WHERE {
+SELECT ?citingArticle ?citingArticleLabel 
+?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl) WHERE {
   VALUES ?CITEDARTICLE { wd:{{ q }} }
   VALUES ?intention { wd:{{ q2 }} }
   ?citingArticle p:P2860 ?citationStatement .

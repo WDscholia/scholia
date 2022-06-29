@@ -6,12 +6,7 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('recently-published-works',
-  options={
-    'linkPrefixes': {
-      'work': '../work/',
-    }
-  }) }}
+{{ sparql_to_table('recently-published-works') }}
 
 {% endblock %}
 

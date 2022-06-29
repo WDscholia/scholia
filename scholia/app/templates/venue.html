@@ -9,11 +9,7 @@
 
 {{ sparql_to_table('topics') }}
 
-{{ sparql_to_table('uses',
-    options={
-      "linkPrefixes": { "use": "../use/" }
-    }
-) }}
+{{ sparql_to_table('uses') }}
 
 {{ sparql_to_iframe('author-images') }}
 
@@ -48,26 +44,13 @@
 
   {{ sparql_to_iframe('incoming-bubble') }}
 
-  {{ sparql_to_table('incoming',
-    options={
-      "linkPrefixes": { "intention": "../../cito/" }
-    }
-  ) }}
+  {{ sparql_to_table('incoming') }}
 
   {{ sparql_to_iframe('outgoing-bubble') }}
 
-  {{ sparql_to_table('outgoing',
-    options={
-      "linkPrefixes": { "intention": "../../cito/" }
-    }
-  ) }}
+  {{ sparql_to_table('outgoing') }}
 
-  {{ sparql_to_table('most-reused-articles',
-    options={
-      "linkPrefixes": { "citedArticle": "../../work/" },
-      "linkSuffixes": { "citedArticle": "/cito" },
-    }
-  ) }}
+  {{ sparql_to_table('most-reused-articles') }}
 {% endcall %}
 
 {% endblock %}

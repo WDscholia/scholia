@@ -1,8 +1,8 @@
 # title: Authors for specific uses
 SELECT
   ?uses ?works
-  ?author ?authorLabel
-  ?example_work ?example_workLabel
+  ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
+  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
 WITH {
   SELECT
     (COUNT(DISTINCT ?use) AS ?uses)

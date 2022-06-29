@@ -1,4 +1,5 @@
-SELECT ?count ?use ?useLabel ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
+SELECT ?count ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
+?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
 WITH {
   SELECT
     (COUNT(DISTINCT ?work) AS ?count)

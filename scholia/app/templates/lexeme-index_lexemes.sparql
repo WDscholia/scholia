@@ -1,8 +1,8 @@
 SELECT 
   ?count
-  ?lexeme (?lexeme_label AS ?lexemeLabel)
+  ?lexeme (?lexeme_label AS ?lexemeLabel) (CONCAT("/lexeme/", SUBSTR(STR(?lexeme), 32)) AS ?lexemeUrl)
   ?language ?languageLabel
-  ?example_work ?example_workLabel ?example_workDescription
+  ?example_work ?example_workLabel ?example_workDescription (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
 WHERE {
   {
     SELECT

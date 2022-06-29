@@ -5,12 +5,7 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('lexemes',
-    options={
-    "linkPrefixes": {
-       "lexeme": "../lexeme/",
-	     "example_work": "../work/",
-     }})}}
+{{ sparql_to_table('lexemes')}}
 
 {% endblock %}
 

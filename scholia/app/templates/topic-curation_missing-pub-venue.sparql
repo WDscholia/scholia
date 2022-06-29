@@ -1,7 +1,9 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
-?citations ?work ?workLabel (?work AS ?wikidata_url)
+?citations 
+?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
+(?work AS ?wikidata_url)
 WITH {
   SELECT (COUNT(?work) as ?count) ?work WHERE {
   # Works on the topic

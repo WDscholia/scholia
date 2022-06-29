@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?date ?work ?workLabel
+SELECT ?date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
   ?topicsUrl ?topics 
 WITH {
   SELECT DISTINCT ?work WHERE {

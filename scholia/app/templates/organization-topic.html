@@ -4,24 +4,9 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('recent-literature',
-     options={
-       "linkPrefixes":{
-        "work": "../../../work/"
-       }
-     }
-   )
-}}
+{{ sparql_to_table('recent-literature') }}
 
-{{ sparql_to_table('authors',
-     options={
-       "linkPrefixes":{
-        "author": "../../../author/",
-        "example_work": "../../../work/"
-       }
-     }
-)
-}}
+{{ sparql_to_table('authors') }}
 
 
 {% endblock %}
