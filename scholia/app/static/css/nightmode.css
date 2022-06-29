@@ -1,0 +1,27 @@
+@media only screen and (prefers-color-scheme: dark) {
+    :root {
+        --background: #222;
+        --background-hover: #303030;
+        --color-body: #e1e1e1;
+        --color-link: #6cb1ff;
+        --color-link-hover: #2d86ff;
+        --divider: #6C757D;
+        --outline: rgba(255, 255, 255, 0.125);
+        --background-warning:#866504 ;
+        --border-warning: #4d3900;
+        --color-warning: #fff3cd;
+    }
+
+    .dropdown-menu {
+        box-shadow: 0px 0px 2px black;
+    }
+
+    iframe {
+        filter: invert(100%);
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--theme-blue);
+        border-color: var(--theme-blue);
+    }
+}
