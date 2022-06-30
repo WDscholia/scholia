@@ -193,6 +193,15 @@ Researcher with a published record.
 
     $("#search-author").on("autocomplete.select", (event, item) => { handleSearch(item.id) });
 
+    $("#search-author").on("keydown", function (event) {
+      switch (event.key) {
+        case "Enter":
+          handleSearch(this.value);
+          break;
+        default:
+      }
+    });
+
     $('#compare-authors').select2({
         allowClear: true,
         placeholder: "Compare authors...",
