@@ -17,6 +17,7 @@ WITH {
     ?item ?p ?statement .
     ?property wikibase:claim ?p . 
     ?statement ?a ?value .
+    FILTER (!CONTAINS(LCASE(STR(?a)), "http://www.wikidata.org/prop/qualifier/"))
     ?item ?b ?value . 
     OPTIONAL {?statement ?psv_statement_predicate ?psv_statement .
     ?statement_predicate_property wikibase:statementValue ?psv_statement_predicate.
