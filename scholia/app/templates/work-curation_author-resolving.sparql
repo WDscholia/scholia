@@ -14,8 +14,9 @@ WITH {
 } AS %authors
 WITH {
   SELECT DISTINCT ?author_name WHERE {
+    {
     INCLUDE %authors
-    { ?author skos:altLabel | rdfs:label | (^ps:P50 / pq:P1932) ?author_name . }
+    ?author skos:altLabel | rdfs:label | (^ps:P50 / pq:P1932) ?author_name . }
     UNION
     { target: wdt:P2093 ?author_name . } 
   }
