@@ -8,14 +8,14 @@
 
 <h2>Input</h2>
 
-<form action="" id="form" method="GET" class="form-horizontal">
+<form action="" id="form" method="GET" class="form-horizontal mb-3">
   <div class="input-group">
     {% if arxiv %}
     <input type="text" class="form-control" placeholder="Enter arXiv id" value="{{ arxiv | urlencode }}" id="searchterm" name="arxiv"/>
     {% else %}
     <input type="text" class="form-control" placeholder="Enter arXiv id" id="searchterm" name="arxiv"/>
     {% endif %}
-    <span class="input-group-btn">
+    <span class="input-group-append">
       <button class="btn btn-primary" type="submit">
         Extract metadata
       </button>
