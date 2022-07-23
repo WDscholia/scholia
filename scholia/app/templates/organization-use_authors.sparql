@@ -1,0 +1,26 @@
+PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
+PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
+
+SELECT
+    (COUNT(DISTINCT ?work) AS ?works)
+  ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
+    (SAMPLE(?work) AS ?example_work)
+ ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
+WITH {
+  SELECT DISTINCT ?author WHERE {
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target1: .
+  } 
+} AS %researchers
+WHERE {
+  INCLUDE %researchers
+
+  ?work wdt:P50 ?author ;
+        wdt:P4510 target2: .
+  OPTIONAL {
+    ?work wdt:P577 ?publication_datetime .
+    BIND(xsd:date(?publication_datetime) AS ?publication_date)
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+GROUP BY ?works ?author ?authorLabel ?authorDescription ?authorUrl ?example_work ?example_workLabel ?example_workUrl
+ORDER BY DESC (?works)
