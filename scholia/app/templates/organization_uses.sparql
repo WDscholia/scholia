@@ -4,7 +4,7 @@ SELECT
   ?researchers
   ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
   ("🔎" AS ?zoom)
-  (CONCAT("Q112326635/use/", SUBSTR(STR(?use), 32)) AS ?zoomUrl)
+  (CONCAT("{{ q }}/use/", SUBSTR(STR(?use), 32)) AS ?zoomUrl)
   ?useDescription
   ?samplework ?sampleworkLabel (CONCAT("/work/", SUBSTR(STR(?samplework), 32)) AS ?sampleworkUrl)
 WITH {
