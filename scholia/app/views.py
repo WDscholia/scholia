@@ -1314,6 +1314,7 @@ def show_organization_topic(q1, q2):
     """
     return render_template('organization-topic.html', q1=q1, q2=q2, q=q1)
 
+  
 @main.route('/organization/' + q1_pattern + '/use/' + q2_pattern)
 def show_organization_use(q1, q2):
     """Return HTML rendering for specific organization and use.
