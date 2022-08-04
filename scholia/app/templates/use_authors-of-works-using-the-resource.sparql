@@ -9,6 +9,7 @@ WITH{
     ?work wdt:P50 ?author .
   }
   GROUP BY ?author
+  LIMIT 10000
 } AS %result
 WHERE {
   INCLUDE %result
