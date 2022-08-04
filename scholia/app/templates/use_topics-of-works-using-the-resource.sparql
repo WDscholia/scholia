@@ -9,7 +9,7 @@ WITH{
     ?work wdt:P921 ?topic .
   }
   GROUP BY ?topic
-  LIMIT 100000
+  LIMIT 10000
 } AS %result
 WHERE {
   INCLUDE %result
