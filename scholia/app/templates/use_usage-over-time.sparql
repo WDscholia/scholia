@@ -7,8 +7,7 @@ WITH{
   SELECT
     (MIN(?year_) AS ?year) ?work ?use
   WHERE {
-    ?work (wdt:P2283 | wdt:P4510) ?use .
-    ?use wdt:P279* target: .
+    ?work (wdt:P2283 | wdt:P4510) target: .
     ?work wdt:P577 ?publication_datetime .
     BIND(STR(YEAR(?publication_datetime)) AS ?year_)
   }
