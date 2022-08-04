@@ -19,6 +19,7 @@ WITH {
     FILTER (?coused != target:)
   }
   GROUP BY ?coused
+  LIMIT 10000
 } AS %result
 WHERE {
   # Label the result
@@ -26,3 +27,4 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY DESC(?count) 
+LIMIT 200
