@@ -5,13 +5,16 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 SELECT ?count ?topic ?topicLabel
 WITH{
   SELECT (COUNT(?work) AS ?count) ?topic WHERE {
-    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* target: .
+    ?work wdt:P4510 target: .
     ?work wdt:P921 ?topic .
   }
   GROUP BY ?topic
+  ORDER BY DESC(?count)
+  LIMIT 400
 } AS %result
 WHERE {
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
 }
 ORDER BY DESC(?count)
+LIMIT 200
