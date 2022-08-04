@@ -9,9 +9,11 @@ WITH{
     ?work wdt:P921 ?topic .
   }
   GROUP BY ?topic
+  LIMIT 100000
 } AS %result
 WHERE {
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
 }
 ORDER BY DESC(?count)
+LIMIT 200
