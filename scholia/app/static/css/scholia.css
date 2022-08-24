@@ -97,9 +97,7 @@ a:hover {
 }
 
 .navbar {
-    height: 4rem;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
+    min-height: 4rem;
 }
 
 .nav {
