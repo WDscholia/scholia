@@ -1305,7 +1305,7 @@ def twitter_to_qs(twitter):
     True
 
     """
-    # This query only matches on exact and lowercase match
+    # This query matches exact and lowercased version of username
     query = """select ?item
                where {{ VALUES ?username {{ "{twitter}" "{lower}" }} 
                         ?item wdt:P2002 ?username }}""".format(
