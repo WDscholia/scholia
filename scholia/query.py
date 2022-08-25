@@ -1305,10 +1305,12 @@ def twitter_to_qs(twitter):
     True
 
     """
-    # This query only matches on exact match
+    # This query only matches on exact and lowercase match
     query = """select ?item
-               where {{ ?item wdt:P2002 "{twitter}" }}""".format(
-        twitter=escape_string(twitter))
+               where {{ VALUES ?username {{ "{twitter}" "{lower}" }} 
+                        ?item wdt:P2002 ?username }}""".format(
+        twitter=escape_string(twitter), lower=escape_string(twitter).lower()
+    )
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}
