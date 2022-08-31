@@ -1,5 +1,5 @@
 ---
-name: Modify a SPARQL query
+name: SPARQL query modification
 about: Propose a change to a SPARQL query currently in use at Scholia
 title: ''
 labels: SPARQL
@@ -12,4 +12,4 @@ Please provide a link to a Scholia profile and the appropriate section heading a
 
 **What change do you propose, and why?**
 
-**Anything else to consider here?**
+**Any other considerations?**
