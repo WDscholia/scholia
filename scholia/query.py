@@ -1306,8 +1306,8 @@ def twitter_to_qs(twitter):
 
     """
     # This query matches exact and lowercased version of username
-    query = """select ?item
-               where {{ VALUES ?username {{ "{twitter}" "{lower}" }} 
+    query = """SELECT DISTINCT ?item
+               WHERE {{ VALUES ?username {{ "{twitter}" "{lower}" }} 
                         ?item wdt:P2002 ?username }}""".format(
         twitter=escape_string(twitter), lower=escape_string(twitter).lower()
     )
