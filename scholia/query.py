@@ -1133,6 +1133,9 @@ def q_to_class(q):
             'Q56119332',  # tweet
             'Q58632367',  # conference abstract
             'Q64548048',  # environmental impact assessment report
+            'Q1266946',  # thesis
+            'Q1907875',  # master's thesis
+            'Q187685',  # doctoral thesis
     ]):
         class_ = 'work'
     elif set(classes).intersection([
