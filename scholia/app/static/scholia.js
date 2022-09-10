@@ -234,7 +234,7 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
           paging = false;
         }
 
-        $(element).html('');
+        $(element).html(''); // remove loader
 
         var table = $(element).DataTable({
             data: convertedData.data,
@@ -276,84 +276,117 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
         '">' +
         filename.replace('_', ': ') +
         '</a></span></caption>';
-
-    $(element).html("<div class='loader'><div></div><div></div><div></div></div>")
     $(element).append(datatableFooter);
+
+    const table = document.getElementById(element.slice(1));
+    var heading = table.previousElementSibling;
+
+    var button = document.createElement("button")
+    button.innerText = "🔃";
+    button.addEventListener("click", makeRequest)
+    if (["H2", "H3", "H4"].includes(heading.tagName)) {
+        heading.append(button)
+    } else {
+        table.insertAdjacentElement("beforebegin", button)
+    }
 
     makeRequest();
 
     function makeRequest() {
+        if ($.fn.dataTable.isDataTable(element)) {
+            // unnecessary to clear the data here but better UX to make it clear 
+            // that we are refreshing the data.
+            $(element).DataTable().clear().draw();
+        }
+
+        const loaderID = element.slice(1) + '-loader';
+        heading.insertAdjacentHTML("afterend",
+            "<div id='" +
+                loaderID +
+                "' class='loader'><div></div><div></div><div></div></div>"
+        );
+
+        
         $.getJSON(url, function (response) {
             var simpleData = sparqlDataToSimpleData(response);
 
             convertedData = convertDataTableData(simpleData.data, simpleData.columns);
             columns = [];
-            for (i = 0; i < convertedData.columns.length; i++) {
-                var column = {
-                    data: convertedData.columns[i],
-                    title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
-                    defaultContent: "",
+            if (convertedData.data.length > 0) {
+                for (i = 0; i < convertedData.columns.length; i++) {
+                    var column = {
+                        data: convertedData.columns[i],
+                        title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
+                        defaultContent: "",
+                    }
+                    if (column['title'] == 'Count') {
+                    // check that the count is not a link
+                    if (convertedData.data[0]["count"][0] != "<") {
+                        column['render'] = $.fn.dataTable.render.number(',', '.');
+                    }
+                    if (i == 0) {
+                        column['className'] = 'dt-right';
+                    }
+                    } else if (
+                    column['title'] == 'Score' ||
+                    column['title'] == 'Distance' ||
+                    /\Wper\W/.test(column['title'])
+                    ) {
+                    column['render'] = $.fn.dataTable.render.number(',', '.', 2);
+                    }
+                    columns.push(column);
                 }
-                if (column['title'] == 'Count') {
-                  // check that the count is not a link
-                  if (convertedData.data[0]["count"][0] != "<") {
-                    column['render'] = $.fn.dataTable.render.number(',', '.');
-                  }
-                  if (i == 0) {
-                    column['className'] = 'dt-right';
-                  }
-                } else if (
-                  column['title'] == 'Score' ||
-                  column['title'] == 'Distance' ||
-                  /\Wper\W/.test(column['title'])
-                ) {
-                  column['render'] = $.fn.dataTable.render.number(',', '.', 2);
+
+                if (convertedData.data.length <= 10) {
+                    paging = false;
                 }
-                columns.push(column);
+
+                $(element).html(""); // remove loader
+
+                if ($.fn.dataTable.isDataTable(element)) {
+                    // $(element).DataTable().clear();
+                    $(element).DataTable().rows.add(convertedData.data).draw();
+                } else {
+                    $(element).DataTable({
+                        data: convertedData.data,
+                        columns: columns,
+                        lengthMenu: [
+                            [10, 25, 100, -1],
+                            [10, 25, 100, 'All'],
+                        ],
+                        ordering: true,
+                        order: [],
+                        paging: paging,
+                        sDom: sDom,
+                        scrollX: false,
+                        language: {
+                            emptyTable: 'This query yielded no results. ',
+                            sZeroRecords: 'This query yielded no results.',
+                        },
+                    });
+                }
+
+                $(element).append(datatableFooter);
+            } else {
+                $(element).html(''); // remove loader
+
+                $(element).DataTable({
+                    data: [],
+                    lengthChange: false,
+                    searching: false,
+                    paging: false,
+                    ordering: true,
+                    order: [],
+                    sDom: sDom,
+                    scrollX: false,
+                    language: {
+                        emptyTable: 'This query yielded no results. ',
+                        sZeroRecords: 'This query yielded no results.',
+                    },
+                });
+
+                $(element).append(datatableFooter);
             }
-
-            if (convertedData.data.length <= 10) {
-                paging = false;
-            }
-
-            $(element).html(""); // remove loader
-
-            var table = $(element).DataTable({
-                data: convertedData.data,
-                columns: columns,
-                lengthMenu: [[10, 25, 100, -1], [10, 25, 100, "All"]],
-                ordering: true,
-                order: [],
-                paging: paging,
-                sDom: sDom,
-                scrollX: false,
-                language: {
-                  emptyTable: "This query yielded no results. ",
-                  sZeroRecords: "This query yielded no results."
-                }
-            });
-
-            $(element).append(datatableFooter);
-        } else {
-            $(element).html(''); // remove loader
-
-            $(element).DataTable({
-                data: [],
-                lengthChange: false,
-                searching: false,
-                paging: false,
-                ordering: true,
-                order: [],
-                sDom: sDom,
-                scrollX: false,
-                language: {
-                    emptyTable: 'This query yielded no results. ',
-                    sZeroRecords: 'This query yielded no results.',
-                },
-            });
-
-            $(element).append(datatableFooter);
-        }
     }).fail(function () {
         $(element).html(''); // remove loader
         $(element).prepend(
