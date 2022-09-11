@@ -1113,17 +1113,22 @@ def q_to_class(q):
     elif set(classes).intersection([
             'Q571',  # book
             'Q49848',  # document
+            'Q187685',  # doctoral thesis
             'Q191067',  # article
-            'Q871232'  # editorial
+            'Q815382',  # meta-analysis
+            'Q871232',  # editorial
             'Q253623',  # patent
             'Q580922',  # preprint
             'Q685935',  # trade magazine
+            'Q1266946',  # thesis
+            'Q1778788',  # cohort study
+            'Q1907875',  # master's thesis
             'Q1980247',  # chapter
             'Q3331189',  # edition
+            'Q4119870',  # academic writing
             'Q5707594',  # news article
             'Q10870555',  # report
             'Q10885494',  # scientific conference paper
-            'Q4119870'  # academic writing
             'Q13442814',  # scholarly article
             'Q7318358',  # review article
             'Q15621286',  # intellectual work
@@ -1136,11 +1141,6 @@ def q_to_class(q):
             'Q56119332',  # tweet
             'Q58632367',  # conference abstract
             'Q64548048',  # environmental impact assessment report
-            'Q1266946',  # thesis
-            'Q1907875',  # master's thesis
-            'Q187685',  # doctoral thesis
-            'Q815382'  # meta-analysis
-            'Q1778788'  # cohort study
     ]):
         class_ = 'work'
     elif set(classes).intersection([
