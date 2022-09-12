@@ -181,6 +181,18 @@ function resize(element) {
     console.log("resized with width " + width);
 }
 
+function addRefreshButton(element, callback) {    
+    var heading = element.previousElementSibling;
+
+    var button = document.createElement('button');
+    button.innerText = '🔃';
+    button.addEventListener('click', callback);
+    if (['H2', 'H3', 'H4'].includes(heading.tagName)) {
+        heading.append(button);
+    } else {
+        element.insertAdjacentElement('beforebegin', button);
+    }
+}
 
 function sparqlToResponse(sparql, doneCallback) {
     var endpointUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
@@ -279,16 +291,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
     $(element).append(datatableFooter);
 
     const table = document.getElementById(element.slice(1));
-    var heading = table.previousElementSibling;
-
-    var button = document.createElement("button")
-    button.innerText = "🔃";
-    button.addEventListener("click", makeRequest)
-    if (["H2", "H3", "H4"].includes(heading.tagName)) {
-        heading.append(button)
-    } else {
-        table.insertAdjacentElement("beforebegin", button)
-    }
+    addRefreshButton(table, makeRequest);
 
     makeRequest();
 
@@ -300,7 +303,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
         }
 
         const loaderID = element.slice(1) + '-loader';
-        heading.insertAdjacentHTML("afterend",
+        table.insertAdjacentHTML('beforebegin',
             "<div id='" +
                 loaderID +
                 "' class='loader'><div></div><div></div><div></div></div>"
