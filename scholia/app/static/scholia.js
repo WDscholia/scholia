@@ -280,12 +280,14 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
     $(element).html("<div class='loader'><div></div><div></div><div></div></div>")
     $(element).append(datatableFooter);
 
-    $.getJSON(url, function (response) {
-        var simpleData = sparqlDataToSimpleData(response);
+    makeRequest();
 
-        convertedData = convertDataTableData(simpleData.data, simpleData.columns);
-        columns = [];
-        if (convertedData.data.length > 0) {
+    function makeRequest() {
+        $.getJSON(url, function (response) {
+            var simpleData = sparqlDataToSimpleData(response);
+
+            convertedData = convertDataTableData(simpleData.data, simpleData.columns);
+            columns = [];
             for (i = 0; i < convertedData.columns.length; i++) {
                 var column = {
                     data: convertedData.columns[i],
@@ -358,7 +360,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
             '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> '
         );
     });
-};
+}
 
 
 function sparqlToIframe(sparql, element, filename) {
