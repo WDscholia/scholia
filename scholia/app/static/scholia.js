@@ -187,6 +187,7 @@ function addRefreshButton(element, callback) {
     var button = document.createElement('button');
     button.classList = 'btn btn-outline-secondary float-right';
     button.innerHTML = 'Reload';
+    button.id = element.id + "-reload";
     button.addEventListener('click', callback);
     if (['H2', 'H3', 'H4'].includes(heading.tagName)) {
         heading.append(button);
@@ -391,12 +392,16 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 
                 $(element).append(datatableFooter);
             }
-    }).fail(function () {
-        $(element).html(''); // remove loader
-        $(element).prepend(
-            '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> '
-        );
-    });
+        }).fail(function () {
+            $(element).html(''); // remove loader
+            $(element).prepend(
+                '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> '
+            );
+            const reloadButton = document.getElementById(element.slice(1) + '-reload')
+            reloadButton.classList.add('btn-secondary');
+            reloadButton.classList.remove('btn-outline-secondary');
+        });
+    }
 }
 
 
