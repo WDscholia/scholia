@@ -185,7 +185,8 @@ function addRefreshButton(element, callback) {
     var heading = element.previousElementSibling;
 
     var button = document.createElement('button');
-    button.innerText = '🔃';
+    button.classList = 'btn btn-outline-secondary float-right';
+    button.innerHTML = 'Reload';
     button.addEventListener('click', callback);
     if (['H2', 'H3', 'H4'].includes(heading.tagName)) {
         heading.append(button);
