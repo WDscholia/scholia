@@ -406,37 +406,33 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 
 
 function sparqlToIframe(sparql, element, filename) {
-    makeIframe();
+    let $iframe = $(element)
+    url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
+    $iframe.attr('src', url);
+    $iframe.attr('loading', 'lazy');
 
-    function makeIframe() {
-        let $iframe = $(element)
-        url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
-        $iframe.attr('src', url);
-        $iframe.attr('loading', 'lazy');
+    const wikidata_sparql = "https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparql)
+    const wikidata_query = "https://query.wikidata.org/#" + encodeURIComponent(sparql)
 
-        const wikidata_sparql = "https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparql)
-        const wikidata_query = "https://query.wikidata.org/#" + encodeURIComponent(sparql)
-
-        $.ajax({
-            url: wikidata_sparql,
-            success: function (data) {
-                let $xml = $(data);
-                let results = $xml.find('results')
-                if (results.text().trim().length === 0) {
-                    $iframe.parent().css("display", "none")
-                    $iframe.parent().after('<hr><p>This query yielded no results. You can still try to find something by ' +
-                        '<a href="' + wikidata_query + '" target="_blank">modifying it</a>.</p>')
-                }
-                $iframe.parent().after(
-                    '<span style="float:right; font-size:smaller">' +
-                        '<a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' + filename + '">' +
-                            filename.replace("_", ": ") +
-                        '</a>' +
-                    '</span>'
-                );
+    $.ajax({
+        url: wikidata_sparql,
+        success: function (data) {
+            let $xml = $(data);
+            let results = $xml.find('results')
+            if (results.text().trim().length === 0) {
+                $iframe.parent().css("display", "none")
+                $iframe.parent().after('<hr><p>This query yielded no results. You can still try to find something by ' +
+                    '<a href="' + wikidata_query + '" target="_blank">modifying it</a>.</p>')
             }
-        })
-    }
+            $iframe.parent().after(
+                '<span style="float:right; font-size:smaller">' +
+                    '<a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' + filename + '">' +
+                        filename.replace("_", ": ") +
+                    '</a>' +
+                '</span>'
+            );
+        }
+    })
 };
 
 
