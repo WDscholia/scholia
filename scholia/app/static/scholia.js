@@ -181,7 +181,7 @@ function resize(element) {
     console.log("resized with width " + width);
 }
 
-function addRefreshButton(element, callback) {    
+function addReloadButton(element, callback) {    
     var heading = element.previousElementSibling;
 
     var button = document.createElement('button');
@@ -190,8 +190,11 @@ function addRefreshButton(element, callback) {
     button.id = element.id + "-reload";
     button.addEventListener('click', callback);
     if (['H2', 'H3', 'H4'].includes(heading.tagName)) {
+        button.classList = 'btn btn-outline-secondary float-right';
         heading.append(button);
     } else {
+        button.classList = 'btn btn-outline-secondary d-block ml-auto';
+        button.style = 'clear: both';
         element.insertAdjacentElement('beforebegin', button);
     }
 }
@@ -293,14 +296,14 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
     $(element).append(datatableFooter);
 
     const table = document.getElementById(element.slice(1));
-    addRefreshButton(table, makeRequest);
+    addReloadButton(table, makeRequest);
 
     makeRequest();
 
     function makeRequest() {
         if ($.fn.dataTable.isDataTable(element)) {
             // unnecessary to clear the data here but better UX to make it clear 
-            // that we are refreshing the data.
+            // that we are reloading the data.
             $(element).DataTable().clear().draw();
         }
 
