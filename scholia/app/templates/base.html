@@ -154,8 +154,11 @@ askQuery("{{ panel }}", `# tool: scholia
 	    var imageURL = "https://upload.wikimedia.org/wikipedia/commons/thumb/" 
 	    imageURL += imageNameMd5[0] + "/" + imageNameMd5.slice(0,2) + "/"
 	    var filetype = imageName.match(/\.(\w+)$/);
-	    if (filetype[1] === "tif" || filetype[1] === "tiff") {
+      var extension = filetype[1].toLowerCase()
+	    if (extension === "tif" || extension === "tiff") {
 	      imageURL += encodeURIComponent(imageName) + "/lossy-page1-500px-" + encodeURIComponent(imageName) + ".jpg";
+	    } else if (extension === "svg") {
+	      imageURL += encodeURIComponent(imageName) + "/500px-" + encodeURIComponent(imageName) + ".png";
 	    } else {
 	      imageURL += encodeURIComponent(imageName) + "/500px-" + encodeURIComponent(imageName);
 	    }
