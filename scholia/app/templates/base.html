@@ -230,9 +230,8 @@ askQuery("{{ panel }}", `# tool: scholia
 
 	 /* Official homepage */
 	 if ("P856" in item.claims) {
-	     var user = { name: item.claims.P856[0].mainsnak.datavalue.value };
-	     var site = { name: "Homepage", url: item.claims.P856[0].mainsnak.datavalue.value };
-	     socialMediaLink(detailsList, user, site);
+	     var homepage = item.claims.P856[0].mainsnak.datavalue.value
+	     detailsList.push('&nbsp;<a href="' + homepage + '">' + homepage + '</a>');
 	 }
 
 	 if (detailsList.length > 0) {
