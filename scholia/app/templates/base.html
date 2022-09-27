@@ -228,6 +228,13 @@ askQuery("{{ panel }}", `# tool: scholia
 	     socialMediaLink(detailsList, user, site);
 	 }
 
+	 /* Official homepage */
+	 if ("P856" in item.claims) {
+	     var user = { name: item.claims.P856[0].mainsnak.datavalue.value };
+	     var site = { name: "Homepage", url: item.claims.P856[0].mainsnak.datavalue.value };
+	     socialMediaLink(detailsList, user, site);
+	 }
+
 	 if (detailsList.length > 0) {
 	     $('#details').append(detailsList.join(" | "));
 	 }
