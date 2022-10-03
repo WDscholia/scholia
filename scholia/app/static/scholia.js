@@ -161,9 +161,9 @@ function entityToLabel(entity, language = 'en') {
     }
 
     // Fallback
-    languages = ['en', 'da', 'de', 'es', 'fr', 'jp',
+    var languages = ['en', 'da', 'de', 'es', 'fr', 'jp',
         'nl', 'no', 'ru', 'sv', 'zh'];
-    for (lang in languages) {
+    for (var lang in languages) {
         if (lang in entity['labels']) {
             return entity['labels'][lang].value;
         }
@@ -176,7 +176,7 @@ function entityToLabel(entity, language = 'en') {
 
 function resize(element) {
     //width = document.getElementById("topics-works-matrix").clientWidth;
-    width = $(element)[0].clientWidth;
+    var width = $(element)[0].clientWidth;
     d3.select(element).attr("width", width);
     console.log("resized with width " + width);
 }
@@ -219,9 +219,9 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
     $.post(url, data = { query: sparql }, function (response, textStatus) {
         var simpleData = sparqlDataToSimpleData(response);
 
-        convertedData = convertDataTableData(simpleData.data, simpleData.columns);
-        columns = [];
-        for (i = 0; i < convertedData.columns.length; i++) {
+        var convertedData = convertDataTableData(simpleData.data, simpleData.columns);
+        var columns = [];
+        for (var i = 0; i < convertedData.columns.length; i++) {
             var column = {
                 data: convertedData.columns[i],
                 title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
@@ -257,7 +257,7 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
                 '</a></span></caption>'
         );
     }, "json");
-};
+}
 
 
 function sparqlToDataTable(sparql, element, filename, options = {}) {
@@ -363,7 +363,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 
 function sparqlToIframe(sparql, element, filename) {
     let $iframe = $(element)
-    url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
+    var url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
     $iframe.attr('src', url);
     $iframe.attr('loading', 'lazy');
 
@@ -389,7 +389,7 @@ function sparqlToIframe(sparql, element, filename) {
             );
         }
     })
-};
+}
 
 
 function sparqlToMatrix(sparql, element, filename){
@@ -414,7 +414,7 @@ function sparqlToMatrix(sparql, element, filename){
    
         // Sizes
         var margin = { top: 100, right: 0, bottom: 0, left: 0 },
-            width = $(element)[0].clientWidth
+            width = $(element)[0].clientWidth,
             axis_height = works.length * 12,
             full_height = axis_height + margin.top;
    
@@ -484,7 +484,7 @@ function sparqlToMatrix(sparql, element, filename){
             .style("font-size", "16px");
    
         var mouseover = function(d) {
-            html =
+            var html =
             "<a href='../work/" +
             d.work.value.substring(31) +
             "'>" +
@@ -567,7 +567,7 @@ function sparqlToPathWayPageViewer(sparql, filename){
             $("#description").text(dataValues.pathwayDescription);
           }
           if ("organism" in dataValues) {
-            organismScholia = dataValues.organism.replace("http://www.wikidata.org/entity/","https://scholia.toolforge.org/taxon/")
+            var organismScholia = dataValues.organism.replace("http://www.wikidata.org/entity/","https://scholia.toolforge.org/taxon/")
             $("#Organism").after('<a href="' + organismScholia + '">' +
                      escapeHTML(dataValues.organismLabel) +
                      '</a>'); 
@@ -595,8 +595,8 @@ function sparqlToPathWayPageViewer(sparql, filename){
 
 
 function sparqlToShortInchiKey(sparql, key,  element, filename) {
-    shortkey = key.substring(0,14)
-    new_sparql = sparql.replace("_shortkey_",shortkey)
+    var shortkey = key.substring(0,14)
+    var new_sparql = sparql.replace("_shortkey_",shortkey)
     sparqlToDataTable(new_sparql, element, filename);
 }
 
@@ -604,7 +604,7 @@ function sparqlToShortInchiKey(sparql, key,  element, filename) {
 function askQuery(panel, askQuery, callback) {
      var endpointUrl = 'https://query.wikidata.org/sparql';
      
-     settings = {
+     var settings = {
        headers: { Accept: 'application/sparql-results+json' },
        data: { query: askQuery },
      };
