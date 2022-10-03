@@ -97,3 +97,6 @@ ENV/
 # Eclipse
 .pydev
 .pydevproject
+
+# VirtualFish files
+.venv

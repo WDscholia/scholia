@@ -228,6 +228,12 @@ askQuery("{{ panel }}", `# tool: scholia
 	     socialMediaLink(detailsList, user, site);
 	 }
 
+	 /* Official homepage */
+	 if ("P856" in item.claims) {
+	     var homepage = item.claims.P856[0].mainsnak.datavalue.value
+	     detailsList.push('&nbsp;<a href="' + homepage + '">' + homepage + '</a>');
+	 }
+
 	 if (detailsList.length > 0) {
 	     $('#details').append(detailsList.join(" | "));
 	 }
