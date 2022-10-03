@@ -4,7 +4,7 @@ SELECT
   ?count
   ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
   ("🔎" AS ?zoom)
-  (CONCAT("{{ q }}/use/", SUBSTR(STR(?use), 32)) AS ?zoomUrl)
+  (CONCAT(SUBSTR(STR(target:), 32), "/use/", SUBSTR(STR(?use), 32)) AS ?zoomUrl)
   ?useDescription
 
   ?example_work ?example_workLabel
