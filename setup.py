@@ -39,9 +39,4 @@ setup(
         ],
     tests_require=['pytest', 'flake8'],
     version=versioneer.get_version(),
-    entry_points={
-        "console_scripts": [
-            "scholia = scholia.__main__:main",
-        ],
-    },
 )
