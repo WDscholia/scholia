@@ -349,7 +349,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
                     paging = false;
                 }
 
-                $(element).html(""); // remove loader
+                $("#" + loaderID).remove(); // remove loader
 
                 if ($.fn.dataTable.isDataTable(element)) {
                     // $(element).DataTable().clear();
@@ -373,10 +373,8 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
                         },
                     });
                 }
-
-                $(element).append(datatableFooter);
             } else {
-                $(element).html(''); // remove loader
+                $('#' + loaderID).remove(); // remove loader
 
                 $(element).DataTable({
                     data: [],
@@ -392,11 +390,9 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
                         sZeroRecords: 'This query yielded no results.',
                     },
                 });
-
-                $(element).append(datatableFooter);
             }
         }).fail(function () {
-            $(element).html(''); // remove loader
+            $('#' + loaderID).remove(); // remove loader
             $(element).prepend(
                 '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> '
             );
