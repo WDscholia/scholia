@@ -152,6 +152,7 @@ h2 {
 
 h3 {
     font-size: 1.65rem;
+    clear: both;
 }
 
 .dropdown-menu li {
