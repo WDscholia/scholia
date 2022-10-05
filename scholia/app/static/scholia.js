@@ -410,7 +410,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 
 function sparqlToIframe(sparql, element, filename) {
     let $iframe = $(element)
-    url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
+    var url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
     $iframe.attr('src', url);
     $iframe.attr('loading', 'lazy');
 
@@ -436,7 +436,7 @@ function sparqlToIframe(sparql, element, filename) {
             );
         }
     })
-};
+}
 
 
 function sparqlToMatrix(sparql, element, filename){
