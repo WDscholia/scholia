@@ -188,6 +188,20 @@ askQuery("{{ panel }}", `# tool: scholia
 	     detailsList.push(html);
 	 }
 
+	 function sortRank(a, b) {
+	  const aRank = a["rank"];
+	  const bRank = b["rank"];
+	  if (aRank == bRank) {
+	    return 0;
+	  }
+	  if (aRank == "preferred" || bRank == "deprecated") {
+	    return -1;
+	  }
+	  if (bRank == "preferred" || aRank == "deprecated") {
+	    return 1;
+	  }
+	}
+
 	 var detailsList = Array();
 	 if ("P496" in item.claims) {
 	     var user = {name: item.claims.P496[0].mainsnak.datavalue.value, prefix: 'https://orcid.org/'};
@@ -230,8 +244,9 @@ askQuery("{{ panel }}", `# tool: scholia
 
 	 /* Official homepage */
 	 if ("P856" in item.claims) {
-	     var homepage = item.claims.P856[0].mainsnak.datavalue.value
-	     detailsList.push('&nbsp;<a href="' + homepage + '">' + homepage + '</a>');
+	     var homepage = item.claims.P856.sort(sortRank)[0]
+       var homepageURL = homepage.mainsnak.datavalue.value
+	     detailsList.push('&nbsp;<a href="' + homepageURL + '">' + homepageURL + '</a>');
 	 }
 
 	 if (detailsList.length > 0) {
