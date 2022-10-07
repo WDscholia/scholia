@@ -1,8 +1,13 @@
-SELECT ?count ?software ?softwareLabel ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
+SELECT
+  ?count
+  ?software ?softwareLabel ?softwareUrl
+  ?described_by_example ?described_by_exampleLabel
+  ?example_use ?example_useLabel
 WITH {
   SELECT
     (COUNT(DISTINCT ?work) AS ?count)
     ?software
+    (CONCAT("/software/", SUBSTR(STR(?software), 32)) AS ?softwareUrl)
     (SAMPLE(?described_by) AS ?described_by_example)
     (SAMPLE(?work) AS ?example_use)
   WHERE {
