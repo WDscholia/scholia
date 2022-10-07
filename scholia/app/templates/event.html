@@ -7,6 +7,7 @@
 
 {{ sparql_to_table('people') }}
 {{ sparql_to_table('proceedings') }}
+{{ sparql_to_table('presentations') }}
 {{ sparql_to_table('recent-publications') }}
 {{ sparql_to_table('related-events-people') }}
 {{ sparql_to_table('related-events-timelocation') }}
@@ -63,6 +64,14 @@ Recent publications by organizers, speakers or participants of the event.
 Works published in the proceedings related to the event.
 
 <table class="table table-hover" id="proceedings-table"></table>
+
+
+<h3 id="presentations">Presentations</h3>
+
+Works (like talks, presentations, posters) presented at the event.
+
+<table class="table table-hover" id="presentations-table"></table>
+
 
 
 <h2>Related events</h2>
