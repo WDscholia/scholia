@@ -6,7 +6,7 @@ WITH {
     (SAMPLE(?described_by) AS ?described_by_example)
     (SAMPLE(?work) AS ?example_use)
   WHERE {
-    ?work wdt:P2283 ?software . 
+    ?work wdt:P4510 ?software . 
     ?software wdt:P31/wdt:P279* wd:Q7397 . 
     # Restricting to work takes too long time :(    
     # ?work wdt:P31/wdt:P279* wd:Q386724 .
