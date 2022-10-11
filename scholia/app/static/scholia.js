@@ -376,20 +376,22 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
             } else {
                 $('#' + loaderID).remove(); // remove loader
 
-                $(element).DataTable({
-                    data: [],
-                    lengthChange: false,
-                    searching: false,
-                    paging: false,
-                    ordering: true,
-                    order: [],
-                    sDom: sDom,
-                    scrollX: false,
-                    language: {
-                        emptyTable: 'This query yielded no results. ',
-                        sZeroRecords: 'This query yielded no results.',
-                    },
-                });
+                if (!$.fn.dataTable.isDataTable(element)) {
+                    $(element).DataTable({
+                        data: [],
+                        lengthChange: false,
+                        searching: false,
+                        paging: false,
+                        ordering: true,
+                        order: [],
+                        sDom: sDom,
+                        scrollX: false,
+                        language: {
+                            emptyTable: 'This query yielded no results. ',
+                            sZeroRecords: 'This query yielded no results.',
+                        },
+                    });
+                }
             }
         }).fail(function () {
             $('#' + loaderID).remove(); // remove loader
