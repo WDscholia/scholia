@@ -151,7 +151,7 @@ function convertDataTableData(data, columns) {
 	}
 	convertedData.push(convertedRow);
     }
-    return { data: convertedData, columns: convertedColumns }
+    return { data: convertedData, columns: convertedColumns };
 }
 
 
@@ -170,7 +170,7 @@ function entityToLabel(entity, language = 'en') {
     }
 
     // Last resort
-    return entity['id']
+    return entity['id'];
 }
 
 
@@ -203,7 +203,7 @@ function sparqlToResponse(sparql, doneCallback) {
     var endpointUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
     var settings = {
         headers: { Accept: "application/sparql-results+json" },
-        data: { query: sparql }
+        data: { query: sparql },
     };
     return $.ajax(endpointUrl, settings).then(doneCallback);
 }
@@ -212,7 +212,7 @@ function sparqlToResponse(sparql, doneCallback) {
 function sparqlDataToSimpleData(response) {
     // Convert long JSON data from from SPARQL endpoint to short form
     let data = response.results.bindings;
-    let columns = response.head.vars
+    let columns = response.head.vars;
     var convertedData = [];
     for (var i = 0; i < data.length; i++) {
         var convertedRow = {};
@@ -243,8 +243,8 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
                 data: convertedData.columns[i],
                 title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
                 defaultContent: "",
-            }
-            columns.push(column)
+            };
+            columns.push(column);
         }
 	
         if (convertedData.data.length <= 10) {
@@ -326,7 +326,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
                         data: convertedData.columns[i],
                         title: capitalizeFirstLetter(convertedData.columns[i]).replace(/_/g, "&nbsp;"),
                         defaultContent: "",
-                    }
+                    };
                     if (column['title'] == 'Count') {
                     // check that the count is not a link
                     if (convertedData.data[0]["count"][0] != "<") {
@@ -398,7 +398,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
             $(element).prepend(
                 '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> '
             );
-            const reloadButton = document.getElementById(element.slice(1) + '-reload')
+            const reloadButton = document.getElementById(element.slice(1) + '-reload');
             reloadButton.classList.add('btn-secondary');
             reloadButton.classList.remove('btn-outline-secondary');
         });
@@ -407,23 +407,23 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 
 
 function sparqlToIframe(sparql, element, filename) {
-    let $iframe = $(element)
+    let $iframe = $(element);
     var url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
     $iframe.attr('src', url);
     $iframe.attr('loading', 'lazy');
 
-    const wikidata_sparql = "https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparql)
-    const wikidata_query = "https://query.wikidata.org/#" + encodeURIComponent(sparql)
+    const wikidata_sparql = "https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparql);
+    const wikidata_query = "https://query.wikidata.org/#" + encodeURIComponent(sparql);
 
     $.ajax({
         url: wikidata_sparql,
         success: function (data) {
             let $xml = $(data);
-            let results = $xml.find('results')
+            let results = $xml.find('results');
             if (results.text().trim().length === 0) {
-                $iframe.parent().css("display", "none")
+                $iframe.parent().css("display", "none");
                 $iframe.parent().after('<hr><p>This query yielded no results. You can still try to find something by ' +
-                    '<a href="' + wikidata_query + '" target="_blank">modifying it</a>.</p>')
+                    '<a href="' + wikidata_query + '" target="_blank">modifying it</a>.</p>');
             }
             $iframe.parent().after(
                 '<span style="float:right; font-size:smaller">' +
@@ -433,7 +433,7 @@ function sparqlToIframe(sparql, element, filename) {
                 '</span>'
             );
         }
-    })
+    });
 }
 
 
@@ -494,7 +494,7 @@ function sparqlToMatrix(sparql, element, filename){
         var yScale = d3
             .scaleBand()
             .range([0, axis_height])
-            .domain(works)
+            .domain(works);
    
         svg
             .append("g")
@@ -510,11 +510,11 @@ function sparqlToMatrix(sparql, element, filename){
                 })
             )
    
-        // Move y-label slight to the right so the first lette is not cut
+        // Move y-label slight to the right so the first letter is not cut
             .selectAll("text")
-            .attr("x", 1)
+            .attr("x", 1);
    
-        svg.selectAll("g .domain").remove()
+        svg.selectAll("g .domain").remove();
    
         // Tooltip
         var tooltip = d3
@@ -596,10 +596,10 @@ function sparqlToPathWayPageViewer(sparql, filename){
 
     $(document).ready(function() {
         // Hide optional sections until data values are confirmed and ready
-        var organismSection = document.getElementById("Organism")                                                                                         
+        var organismSection = document.getElementById("Organism");
         organismSection.style.display = "none"; 
       
-        var pathwayViewerSection = document.getElementById("pathway-viewer")                                                                                
+        var pathwayViewerSection = document.getElementById("pathway-viewer");
         pathwayViewerSection.style.display = "none"; 
       
         // Check for optional data values and then use them if available
@@ -612,7 +612,7 @@ function sparqlToPathWayPageViewer(sparql, filename){
             $("#description").text(dataValues.pathwayDescription);
           }
           if ("organism" in dataValues) {
-            var organismScholia = dataValues.organism.replace("http://www.wikidata.org/entity/","https://scholia.toolforge.org/taxon/")
+            var organismScholia = dataValues.organism.replace("http://www.wikidata.org/entity/","https://scholia.toolforge.org/taxon/");
             $("#Organism").after('<a href="' + organismScholia + '">' +
                      escapeHTML(dataValues.organismLabel) +
                      '</a>'); 
@@ -635,13 +635,12 @@ function sparqlToPathWayPageViewer(sparql, filename){
           }
         });
       });
-
 }
 
 
 function sparqlToShortInchiKey(sparql, key,  element, filename) {
-    var shortkey = key.substring(0,14)
-    var new_sparql = sparql.replace("_shortkey_",shortkey)
+    var shortkey = key.substring(0,14);
+    var new_sparql = sparql.replace("_shortkey_",shortkey);
     sparqlToDataTable(new_sparql, element, filename);
 }
 
@@ -663,7 +662,7 @@ function askQuery(panel, askQuery, callback) {
             // hide from table of contents
             var headings = document.querySelectorAll("#" + panel + " h2, #" + panel + " h3");
             for (var elem of headings) {
-                document.querySelector("li a[href='#" + elem.id + "']").parentElement.classList.add("d-none")
+                document.querySelector("li a[href='#" + elem.id + "']").parentElement.classList.add("d-none");
             }
         }
     });
