@@ -12,14 +12,16 @@ SELECT
 WITH {
   # Find works that are using a specific software,
   # and find other software used in the found works
-  SELECT ?coused (COUNT(DISTINCT ?work) as ?count) (SAMPLE(?work) AS ?example_work)
+  SELECT
+    ?coused
+    (COUNT(DISTINCT ?work) as ?count)
+    (SAMPLE(?work) AS ?example_work)
   WHERE {
-    ?work (wdt:P2283 | wdt:P4510) / (wdt:P279*) target: .
-    ?work wdt:P2283 | wdt:P4510 ?coused .
+    ?work wdt:P4510 / wdt:P279* target: ;
+          wdt:P4510 ?coused .
     FILTER (?coused != target:)
   }
   GROUP BY ?coused
-  LIMIT 10000
 } AS %result
 WHERE {
   # Label the result
@@ -27,4 +29,3 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY DESC(?count) 
-LIMIT 200

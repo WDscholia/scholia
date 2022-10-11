@@ -2,18 +2,23 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?count ?author ?authorLabel
+SELECT
+  ?count
+  ?author ?authorLabel
 WITH{
-  SELECT (COUNT(?work) AS ?count) ?author WHERE {
-    ?work (wdt:P2283 | wdt:P4510) /wdt:P279* target: .
-    ?work wdt:P50 ?author .
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?author
+  WHERE {
+    ?work wdt:P4510 / wdt:P279* target: ;
+          wdt:P50 ?author .
   }
   GROUP BY ?author
-  LIMIT 10000
+  ORDER BY DESC(?count)
+  LIMIT 200
 } AS %result
 WHERE {
   INCLUDE %result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
 }
 ORDER BY DESC(?count)
-LIMIT 200
