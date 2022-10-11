@@ -318,8 +318,8 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
         $.getJSON(url, function (response) {
             var simpleData = sparqlDataToSimpleData(response);
 
-            convertedData = convertDataTableData(simpleData.data, simpleData.columns);
-            columns = [];
+            var convertedData = convertDataTableData(simpleData.data, simpleData.columns);
+            var columns = [];
             if (convertedData.data.length > 0) {
                 for (i = 0; i < convertedData.columns.length; i++) {
                     var column = {
