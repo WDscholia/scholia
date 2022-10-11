@@ -373,11 +373,17 @@ def scrape_paper_from_url(url):
     else:
         pages = _field_to_content('DC.Identifier.pageNumber')
     if pages is not None:
-        entry['pages'] = pages
-
         number_of_pages = pages_to_number_of_pages(pages)
         if number_of_pages is not None:
             entry['number_of_pages'] = number_of_pages
+
+        pages_parts = pages.split('-')
+        if len(pages_parts) == 2 and pages_parts[0] == pages_parts[1]:
+            # One-page publication
+            entry['pages'] = pages_parts[0]
+        else:
+            # Multiple pages
+            entry['pages'] = pages
 
     pdf_url = _field_to_content('citation_pdf_url')
     if pdf_url is not None:
