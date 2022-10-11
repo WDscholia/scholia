@@ -22,7 +22,6 @@ from __future__ import absolute_import, print_function
 import logging
 
 import os
-from os import write
 
 import signal
 
@@ -174,7 +173,7 @@ def main():
     if arguments['q-to-bibliography-templates']:
         q = arguments['<q>']
         wikitext = q_to_bibliography_templates(q)
-        write(output_file, wikitext.encode(output_encoding) + b('\n'))
+        os.write(output_file, wikitext.encode(output_encoding) + b('\n'))
 
 
 if __name__ == "__main__":

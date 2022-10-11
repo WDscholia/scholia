@@ -24,7 +24,6 @@ References
 from __future__ import absolute_import, division, print_function
 
 import os
-from os import write
 
 from . import arxiv
 from .query import orcid_to_qs
@@ -50,7 +49,7 @@ def main():
         arxiv_id = arguments['<arxiv>']
         metadata = arxiv.get_metadata(arxiv_id)
         quickstatements = arxiv.metadata_to_quickstatements(metadata)
-        write(output_file, quickstatements.encode(output_encoding))
+        os.write(output_file, quickstatements.encode(output_encoding))
 
     elif arguments['orcid-to-q']:
         qs = orcid_to_qs(arguments['<orcid>'])
