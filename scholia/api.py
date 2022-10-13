@@ -65,12 +65,12 @@ def entity_to_smiles(entity):
     for statement in entity['claims'].get('P2017', []):
         smiles = statement['mainsnak']['datavalue']['value']
         return smiles
-    else:
-        for statement in entity['claims'].get('P233', []):
-            smiles = statement['mainsnak']['datavalue']['value']
-            return smiles
-        else:
-            return ''
+
+    for statement in entity['claims'].get('P233', []):
+        smiles = statement['mainsnak']['datavalue']['value']
+        return smiles
+    
+    return ''
 
 
 def is_human(entity):
@@ -119,10 +119,10 @@ def select_value_by_language_preferences(
     for preference in preferences:
         if preference in choices:
             return choices[preference]
-    else:
-        # Select a random one
-        # iter here is for Python2
-        return next(iter(choices.values()))
+
+    # Select a random one
+    # iter here is for Python2
+    return next(iter(choices.values()))
 
 
 def wb_get_entities(qs):
@@ -284,8 +284,8 @@ def entity_to_doi(entity):
     for statement in entity['claims'].get('P356', []):
         doi = statement['mainsnak']['datavalue']['value']
         return doi
-    else:
-        return ''
+
+    return ''
 
 
 def entity_to_full_text_url(entity):
@@ -313,8 +313,8 @@ def entity_to_full_text_url(entity):
     for statement in entity['claims'].get('P953', []):
         url = statement['mainsnak']['datavalue']['value']
         return url
-    else:
-        return ''
+
+    return ''
 
 
 def entity_to_journal_title(entity):
@@ -457,8 +457,8 @@ def entity_to_pages(entity):
     for statement in entity['claims'].get('P304', []):
         pages = statement['mainsnak']['datavalue']['value']
         return pages
-    else:
-        return ''
+
+    return ''
 
 
 def entity_to_title(entity):
@@ -505,8 +505,8 @@ def entity_to_volume(entity):
     for statement in entity['claims'].get('P478', []):
         volume = statement['mainsnak']['datavalue']['value']
         return volume
-    else:
-        return ''
+
+    return ''
 
 
 def entity_to_year(entity):
