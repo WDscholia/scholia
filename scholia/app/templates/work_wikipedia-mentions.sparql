@@ -66,6 +66,22 @@ WHERE {
       BIND(wd:Q8447 AS ?wikipedia)
     }     
   }
+  UNION
+  {
+    SELECT ?title_ ?titleUrl ?item ?wikipedia {
+      SERVICE wikibase:mwapi {
+        bd:serviceParam wikibase:endpoint "pt.wikipedia.org" ;
+                        wikibase:api "Generator" ;
+			mwapi:generator "search" ;
+                        mwapi:gsrsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
+                        mwapi:gsrlimit "200" .
+        ?title_ wikibase:apiOutput mwapi:title .
+	?item wikibase:apiOutputItem mwapi:item .
+      }
+      BIND(URI(CONCAT("https://pt.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
+      BIND(wd:Q11921 AS ?wikipedia)
+    }     
+  }
   hint:Prior hint:runFirst "true" .
   BIND(CONCAT(?title_, "&nbsp;↗") AS ?title)
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
