@@ -18,7 +18,6 @@ from __future__ import absolute_import, division, print_function
 import json
 
 import os
-from os import write
 
 import re
 
@@ -209,7 +208,7 @@ def main():
         arxiv = arguments['<arxiv>']
         metadata = get_metadata(arxiv)
         quickstatements = metadata_to_quickstatements(metadata)
-        write(output_file, quickstatements.encode(output_encoding))
+        os.write(output_file, quickstatements.encode(output_encoding))
 
     else:
         assert False
