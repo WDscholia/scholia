@@ -1,0 +1,46 @@
+#defaultView:AreaChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT
+  ?year
+  ?works
+  ?topic ?topicLabel
+WITH {
+  SELECT 
+    ?work
+  WHERE {
+    ?work wdt:P1433 / wdt:P4745 / (wdt:P179 | wdt:P31) target: .
+  }
+} AS %works
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?topic
+  WHERE {
+    INCLUDE %works
+    ?work wdt:P921 ?topic .
+  }
+  GROUP BY ?topic
+  ORDER BY DESC(?count)
+  LIMIT 5
+} AS %topics
+WITH {
+  SELECT
+    ?year 
+    (COUNT(?work) AS ?works)
+    ?topic
+  WHERE {
+    INCLUDE %works
+    INCLUDE %topics
+    ?work wdt:P921 ?topic ;
+          wdt:P577 ?publication_datetime .
+    BIND(STR(YEAR(?publication_datetime)) AS ?year)
+  }
+  GROUP BY ?year ?topic
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY ?year

@@ -7,6 +7,7 @@
 
 {{ sparql_to_table('events') }}
 {{ sparql_to_table('topics') }}
+{{ sparql_to_iframe('top-topics-through-time') }}
 {{ sparql_to_table('people') }}
 {{ sparql_to_table('recent-publications') }}
 {{ sparql_to_table('proceedings-publications') }}
@@ -47,6 +48,13 @@
 <h2 id="topics">Topic scores</h2>
 
 <table class="table table-hover" id="topics-table"></table>
+
+
+<h2 id="top-topic-through-time">Top topics through time</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe loading="lazy" class="embed-responsive-item" id="top-topics-through-time-iframe"></iframe>
+</div>
 
 
 <h2 id="people">Persons</h2>
