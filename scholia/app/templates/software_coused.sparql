@@ -7,7 +7,7 @@ WITH{
   SELECT
     ?coused (COUNT(?work) as ?count) (SAMPLE(?work) AS ?example_work)
   WHERE {
-    ?work wdt:P4510 / (wdt:P279*) target: ;
+    ?work wdt:P4510 / wdt:P279* target: ;
           wdt:P4510 ?coused .
     FILTER (?coused != target:)
   }
