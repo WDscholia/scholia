@@ -69,7 +69,7 @@ def entity_to_smiles(entity):
     for statement in entity['claims'].get('P233', []):
         smiles = statement['mainsnak']['datavalue']['value']
         return smiles
-    
+
     return ''
 
 
