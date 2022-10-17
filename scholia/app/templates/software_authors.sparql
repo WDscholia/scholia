@@ -9,7 +9,7 @@ WITH{
     (COUNT(?work) AS ?count)
     ?author
     (SAMPLE(?work) AS ?example_work)
-  {
+  WHERE {
     ?work (wdt:P2283 | wdt:P4510) / wdt:P279* target: ;
           wdt:P50 ?author .
   }
