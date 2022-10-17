@@ -320,7 +320,7 @@ def scrape_paper_from_url(url):
             content = _field_to_content(field)
             if content is not None and content != '':
                 return content
-        
+
         return None
 
     entry = {'url': url}
