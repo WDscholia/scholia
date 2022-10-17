@@ -30,8 +30,6 @@ Semantic relatedness \cite{Q26973018}.
 from __future__ import print_function
 
 import os
-from os import write
-from os.path import splitext
 
 import re
 import unicodedata
@@ -353,7 +351,7 @@ def main():
 
     elif arguments['write-bbl-from-aux']:
         aux_filename = arguments['<file>']
-        base_filename, _ = splitext(aux_filename)
+        base_filename, _ = os.path.splitext(aux_filename)
         bbl_filename = base_filename + '.bbl'
 
         string = open(aux_filename).read()
@@ -382,7 +380,7 @@ def main():
 
     elif arguments['write-bib-from-aux']:
         aux_filename = arguments['<file>']
-        base_filename, _ = splitext(aux_filename)
+        base_filename, _ = os.path.splitext(aux_filename)
         bib_filename = base_filename + '.bib'
 
         string = open(aux_filename).read()
@@ -412,7 +410,7 @@ def main():
         # Write BibTeX-formatted string to file
         output_file = os.open(bib_filename, os.O_RDWR | os.O_CREAT)
         output_encoding = "utf-8"
-        write(output_file, bib.encode(output_encoding))
+        os.write(output_file, bib.encode(output_encoding))
 
 
 if __name__ == '__main__':
