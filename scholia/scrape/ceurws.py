@@ -318,8 +318,13 @@ def proceedings_url_to_proceedings(url, return_tree=False):
     response = requests.get(url)
     tree = etree.HTML(response.content)
 
-    proceedings['shortname'] = \
-        tree.xpath("//span[@class='CEURVOLACRONYM']")[0].text
+    acronym_elements = tree.xpath("//span[@class='CEURVOLACRONYM']")
+    if len(acronym_elements) == 1:
+        proceedings['shortname'] = acronym_elements[0].text
+    else:
+        acronym_elements = tree.xpath("//h1/a")
+        if len(acronym_elements) == 1:
+            proceedings['shortname'] = acronym_elements[0].text
 
     proceedings['urn'] = \
         tree.xpath("//span[@class='CEURURN']")[0].text
