@@ -33,7 +33,7 @@ import requests
 
 from ..qs import paper_to_quickstatements
 from ..query import iso639_to_q, issn_to_qs
-from ..utils import escape_string
+from ..utils import escape_string, pages_to_number_of_pages
 
 
 USER_AGENT = 'Scholia'
@@ -125,36 +125,6 @@ def issue_url_to_quickstatements(url, iso639=None):
     for paper_url in paper_urls:
         qs += paper_url_to_quickstatements(paper_url, iso639=iso639) + "\n"
     return qs
-
-
-def pages_to_number_of_pages(pages):
-    """Compute number of pages based on pages represented as string.
-
-    Parameters
-    ----------
-    pages : str
-        Pages represented as a string.
-
-    Returns
-    -------
-    number_of_pages : int or None
-        Number of pages returned as an integer. If the conversion is not
-        possible then None is returned.
-
-    Examples
-    --------
-    >>> pages_to_number_of_pages('61-67')
-    7
-
-    """
-    number_of_pages = None
-    page_elements = pages.split('-')
-    if len(page_elements) == 2:
-        try:
-            number_of_pages = int(page_elements[1]) - int(page_elements[0]) + 1
-        except ValueError:
-            pass
-    return number_of_pages
 
 
 def paper_to_q(paper):

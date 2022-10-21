@@ -31,7 +31,7 @@ import requests
 
 from ..qs import paper_to_quickstatements, proceedings_to_quickstatements
 from ..query import iso639_to_q
-from ..utils import escape_string
+from ..utils import escape_string, pages_to_number_of_pages
 
 
 USER_AGENT = 'Scholia'
@@ -111,33 +111,61 @@ def tree_to_papers(tree, proceedings, proceedings_q, iso639='en'):
     n = 1
     papers = []
     toc_elements = tree.xpath('//div[@class="CEURTOC"]')
-    if len(toc_elements) == 0:
+    if not toc_elements:
         # Cannot find papers
         return papers
-    paper_elements = toc_elements[0].xpath(".//li")
+
+    # paper_elements = toc_elements[0].xpath(".//li")
+    # Above insufficient for http://ceur-ws.org/Vol-3240/
+    # Is the following too broad?
+    paper_elements = toc_elements[0].xpath("//li")
+
+    # Iterate over papers on HTML page
     for element in paper_elements:
         title_elements = element.xpath(".//span[@class='CEURTITLE']")
-        if len(title_elements) == 0:
+        if not title_elements:
             # Probably a preface
             continue
+
         paper = {
             'published_in_q': proceedings_q,
             'date': proceedings['date'],
-            'full_text_url': os.path.join(
-                proceedings['url'],
-                element.xpath(".//a")[0].attrib['href']),
-            'title':
-            re.sub(r'\s+', ' ',
-                   title_elements[0].text),
-            'authors': [author_element.text
-                        for author_element in
-                        element.xpath(".//span[@class='CEURAUTHOR']")],
         }
+        paper['full_text_url'] = os.path.join(
+            proceedings['url'],
+            element.xpath(".//a")[0].attrib['href'])
+        paper['title'] = re.sub(r'\s+', ' ', title_elements[0].text)
+
+        # Authors
+        authors = [
+            author_element.text for author_element in
+            element.xpath(".//span[@class='CEURAUTHOR']")
+        ]
+        if not authors:
+            # http://ceur-ws.org/Vol-1191/ has "CEURAUTHORS" for authors
+            authors_element = element.xpath(".//span[@class='CEURAUTHORS']")
+            if len(authors_element) == 1:
+                authors = authors_element[0].text.split(', ')
+        if authors:
+            paper['authors'] = authors
+
+        # Pages
+        pages_element = element.xpath(".//span[@class='CEURPAGES']")
+        if len(pages_element) == 1:
+            pages = pages_element[0].text
+            paper['pages'] = pages
+            number_of_pages = pages_to_number_of_pages(pages)
+            if number_of_pages:
+                paper['number_of_pages'] = number_of_pages
+
+        # Language
         if iso639 is not None:
             paper['iso639'] = iso639
             paper['language_q'] = iso639_to_q(iso639)
+
         papers.append(paper)
         n += 1
+
     return papers
 
 
