@@ -191,7 +191,7 @@ WHERE {
   {
     BIND(15 AS ?order)
     BIND("⚠️ Preprint" AS ?description)
-    { ?work wdt:P31 wd:Q580922 . }
+    { ?work p:P31 ?statement . ?statement ps:P31 wd:Q580922 . MINUS { ?statement pq:P642 [] } }
   }
   UNION
   {
