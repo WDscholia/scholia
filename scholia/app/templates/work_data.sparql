@@ -242,5 +242,17 @@ WHERE {
     BIND(COALESCE(?value_string, ?q) AS ?value)
     BIND(CONCAT("../work/", ?q) AS ?valueUrl)
   }
+  UNION
+  {
+    BIND(32 AS ?order)
+    BIND("Preprint" AS ?description)
+    { ?preprint p:P31 ?statement .
+      ?statement pq:P642 ?work .
+    BIND(SUBSTR(STR(?preprint), 32) AS ?pubqid)
+    ?preprint rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?pubqid) AS ?value)
+    BIND(CONCAT("../work/", ?pubqid) AS ?valueUrl)}
+  }
 } 
 ORDER BY ?order
