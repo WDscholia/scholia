@@ -504,7 +504,7 @@ if (typeof console.Console === 'function') {
 var _default = logger;
 exports.default = _default;
 }).call(this)}).call(this,require('_process'))
-},{"_process":144}],11:[function(require,module,exports){
+},{"_process":159}],11:[function(require,module,exports){
 "use strict";
 
 var plugins = _interopRequireWildcard(require("../plugins"));
@@ -2465,7 +2465,7 @@ function setUserAgent(newUserAgent) {
 var _default = fetchFile;
 exports.default = _default;
 }).call(this)}).call(this,require('_process'))
-},{"../../package.json":43,"../logger.js":10,"_process":144,"fetch-ponyfill":116,"sync-fetch":145}],37:[function(require,module,exports){
+},{"../../package.json":43,"../logger.js":10,"_process":159,"fetch-ponyfill":131,"sync-fetch":160}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4275,7 +4275,7 @@ exports.bibtexGrammar = bibtexGrammar;
 function parse(text) {
   return bibtexGrammar.parse(lexer.reset(text));
 }
-},{"./constants.js":53,"@citation-js/core":"citation-js","moo":143}],57:[function(require,module,exports){
+},{"./constants.js":53,"@citation-js/core":"citation-js","moo":158}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4996,7 +4996,7 @@ function parse(text, field, languages = []) {
     col: 0
   }), getMainRule(fieldType, languages));
 }
-},{"../config.js":50,"./constants.js":53,"./name.js":58,"@citation-js/core":"citation-js","moo":143}],62:[function(require,module,exports){
+},{"../config.js":50,"./constants.js":53,"./name.js":58,"@citation-js/core":"citation-js","moo":158}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6920,6 +6920,2178 @@ function fetchDoiType(value, data) {
 },{}],79:[function(require,module,exports){
 "use strict";
 
+var _core = require("@citation-js/core");
+
+var _input = _interopRequireDefault(require("./input"));
+
+var _output = _interopRequireDefault(require("./output"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_core.plugins.add('@enw', {
+  input: _input.default,
+  output: _output.default
+});
+},{"./input":80,"./output":82,"@citation-js/core":"citation-js"}],80:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _mapping = require("./mapping");
+
+function finalizeRecord(fields) {
+  if ('0' in fields) {
+    fields[0] = fields[0].replace(/(^| )(.)/g, (_, prefix, letter) => prefix + letter.toUpperCase());
+  }
+
+  return {
+    scheme: 'enw',
+    fields
+  };
+}
+
+function parseFile(file) {
+  const lines = file.trim().replace(/^\$]/m, '%]').replace(/^(%[([]) ?/m, '$1 ').replace(/\n(?![%\n])/, ' ').split('\n');
+  const records = [];
+  let fields;
+
+  for (const line of lines) {
+    if (!line.length) {
+      continue;
+    }
+
+    const field = line.slice(1, 2);
+
+    if (field === '0') {
+      if (fields) {
+        records.push(finalizeRecord(fields));
+      }
+
+      fields = {};
+    }
+
+    const value = line.slice(3);
+
+    if (Array.isArray(fields[field])) {
+      fields[field].push(value);
+    } else if (field in fields) {
+      fields[field] = [fields[field], value];
+    } else {
+      fields[field] = value;
+    }
+  }
+
+  return records.concat(finalizeRecord(fields));
+}
+
+var _default = {
+  '@enw/file': {
+    parse(file) {
+      return parseFile(file);
+    },
+
+    parseType: {
+      dataType: 'String',
+      predicate: /^%0/m
+    }
+  },
+  '@enw/record': {
+    parse(record) {
+      return _mapping.translator.convertToTarget(record.fields);
+    },
+
+    parseType: {
+      dataType: 'SimpleObject',
+      propertyConstraint: {
+        props: 'scheme',
+
+        value(scheme) {
+          return scheme === 'enw';
+        }
+
+      }
+    }
+  }
+};
+exports.default = _default;
+},{"./mapping":81}],81:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.translator = void 0;
+
+var _core = require("@citation-js/core");
+
+var _date = require("@citation-js/date");
+
+var _name = require("@citation-js/name");
+
+const TYPES = {
+  toTarget: {
+    'Aggregated Database': 'dataset',
+    'Ancient Text': 'classic',
+    Artwork: 'graphic',
+    'Audiovisual Material': 'motion_picture',
+    Bill: 'bill',
+    Blog: 'post-weblog',
+    Book: 'book',
+    'Book Section': 'chapter',
+    Case: 'legal_case',
+    'Chart or Table': 'figure',
+    'Classical Work': 'classic',
+    'Computer Program': 'software',
+    'Conference Paper': 'paper-conference',
+    'Conference Proceedings': 'book',
+    Dataset: 'dataset',
+    Dictionary: 'entry-dictionary',
+    'Edited Book': 'book',
+    'Electronic Article': 'article-journal',
+    'Electronic Book': 'book',
+    'Electronic Chapter': 'chapter',
+    Encyclopedia: 'entry-encyclopedia',
+    Equation: 'figure',
+    Figure: 'figure',
+    'Film or Broadcast': 'motion_picture',
+    Generic: 'document',
+    'Government Document': 'document',
+    Grant: 'document',
+    Hearing: 'hearing',
+    'Journal Article': 'article-journal',
+    'Legal Rule or Regulation': 'regulation',
+    'Magazine Article': 'article-magazine',
+    Manuscript: 'manuscript',
+    Map: 'map',
+    Music: 'song',
+    'Newspaper Article': 'article-newspaper',
+    'Online Database': 'dataset',
+    'Online Multimedia': 'motion_picture',
+    Pamphlet: 'pamphlet',
+    Patent: 'patent',
+    'Personal Communication': 'personal_communication',
+    Report: 'report',
+    Serial: 'periodical',
+    Standard: 'standard',
+    Statute: 'legisliation',
+    Thesis: 'thesis',
+    'Unpublished Work': 'article',
+    'Web Page': 'webpage'
+  },
+  toSource: {
+    article: 'Unpublished Work',
+    'article-journal': 'Journal Article',
+    'article-magazine': 'Magazine Article',
+    'article-newspaper': 'Newspaper Article',
+    bill: 'Bill',
+    book: 'Book',
+    broadcast: 'Film or Broadcast',
+    chapter: 'Book Section',
+    classic: 'Classical Work',
+    dataset: 'Dataset',
+    document: 'Generic',
+    entry: 'Catalog',
+    'entry-dictionary': 'Dictionary',
+    'entry-encyclopedia': 'Encyclopedia',
+    figure: 'Figure',
+    graphic: 'Artwork',
+    hearing: 'Hearing',
+    legal_case: 'Case',
+    legislation: 'Statute',
+    manuscript: 'Manuscript',
+    map: 'Map',
+    motion_picture: 'Film or Broadcast',
+    musical_score: 'Music',
+    pamphlet: 'Pamphlet',
+    'paper-conference': 'Conference Paper',
+    patent: 'Patent',
+    periodical: 'Serial',
+    personal_communication: 'Personal Communication',
+    post: 'Blog',
+    'post-weblog': 'Blog',
+    regulation: 'Legal Rule or Regulation',
+    report: 'Report',
+    software: 'Computer Program',
+    song: 'Music',
+    standard: 'Standard',
+    thesis: 'Thesis',
+    webpage: 'Web Page'
+  }
+};
+const CONVERTERS = {
+  TYPE: {
+    toTarget(type) {
+      return TYPES.toTarget[type] || 'document';
+    },
+
+    toSource(type) {
+      return TYPES.toSource[type] || 'Generic';
+    }
+
+  },
+  DATE: {
+    toTarget(date, year) {
+      return date ? (0, _date.parse)(date) : CONVERTERS.YEAR.toTarget(year);
+    },
+
+    toSource(date) {
+      return [(0, _date.format)(date), CONVERTERS.YEAR.toSource(date)];
+    }
+
+  },
+  YEAR: {
+    toTarget(year) {
+      return {
+        'date-parts': [[+year]]
+      };
+    },
+
+    toSource(date) {
+      const year = date && date['date-parts'] && date['date-parts'][0] && date['date-parts'][0][0];
+      return year && year.toString();
+    }
+
+  },
+  NAMES: {
+    toTarget(names) {
+      return names.map(_name.parse);
+    },
+
+    toSource(names) {
+      return names.map(name => (0, _name.format)(name, true));
+    }
+
+  },
+  ISBN_ISSN: {
+    toTarget(number) {
+      return number.toString().match(/^\d{4}-\d{3}[0-9xX]$/) ? [undefined, number] : [number, undefined];
+    },
+
+    toSource(isbn, issn) {
+      return isbn || issn;
+    }
+
+  },
+  GENRE_DEGREE: {
+    toTarget(genre, degree) {
+      return degree || genre;
+    },
+
+    toSource(genre) {
+      return genre.match(/master|phd|doctoral/i) ? [undefined, genre] : [genre, undefined];
+    }
+
+  }
+};
+const MAPPINGS = [{
+  source: '!',
+  target: 'title-short',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Aggregated Database', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Book Section', 'Case', 'Catalog', 'Classical Work', 'Computer Program', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Chapter', 'Encyclopedia', 'Film or Broadcast', 'Generic', 'Grant', 'Hearing', 'Journal Article', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'patent', 'periodical', 'personal_communication', 'post', 'post-weblog', 'report', 'software', 'song', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'O',
+  target: 'title-short',
+  when: {
+    source: {
+      '!': false,
+      0: ['Ancient Text', 'Book', 'Book Section', 'Catalog', 'Dataset', 'Dictionary', 'Encyclopedia', 'Pamphlet', 'Personal Communication', 'Serial', 'Standard', 'Statute', 'Unpublished Work']
+    },
+    target: {
+      type: 'standard'
+    }
+  }
+}, {
+  source: '#',
+  target: 'medium',
+  when: {
+    source: {
+      0: ['Audiovisual Material', 'Online Multimedia']
+    },
+    target: false
+  }
+}, {
+  source: '#',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Grant']
+    },
+    target: false
+  }
+}, {
+  source: '#',
+  target: 'volume-title',
+  when: {
+    source: {
+      0: ['Electronic Article']
+    },
+    target: false
+  }
+}, {
+  source: '#',
+  target: 'publisher',
+  when: {
+    source: {
+      0: ['Statute']
+    },
+    target: {
+      type: ['legislation']
+    }
+  }
+}, {
+  source: '#',
+  target: 'references',
+  when: {
+    source: {
+      0: ['Patent']
+    },
+    target: {
+      type: ['patent']
+    }
+  }
+}, {
+  source: '9',
+  target: 'medium',
+  when: {
+    source: {
+      0: ['Film or Broadcast']
+    },
+    target: {
+      type: ['broadcast', 'motion_picture']
+    }
+  }
+}, {
+  source: ['#', 'D'],
+  target: 'issued',
+  when: {
+    source: {
+      0: ['Electronic Book']
+    },
+    target: false
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: '$',
+  target: 'issue',
+  when: {
+    source: {
+      0: ['Report']
+    },
+    target: {
+      type: ['report']
+    }
+  }
+}, {
+  source: '$',
+  target: 'status',
+  when: {
+    source: {
+      0: ['Patent']
+    },
+    target: {
+      type: ['patent']
+    }
+  }
+}, {
+  source: '$',
+  target: 'volume',
+  when: {
+    source: {
+      0: ['Statute']
+    },
+    target: {
+      type: ['legislation']
+    }
+  }
+}, {
+  source: '&',
+  target: 'available-date',
+  when: {
+    source: {
+      0: ['Electronic Article']
+    },
+    target: false
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: '&',
+  target: 'submitted',
+  when: {
+    source: {
+      0: ['Case']
+    },
+    target: {
+      type: ['legal_case']
+    }
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: '&',
+  target: 'page',
+  when: {
+    source: {
+      0: ['Book']
+    },
+    target: {
+      type: ['book']
+    }
+  }
+}, {
+  source: '&',
+  target: 'section',
+  when: {
+    source: {
+      0: ['Generic', 'Government Document', 'Legal Rule or Regulation', 'Music', 'Newspaper Article', 'Standard', 'Statute']
+    },
+    target: {
+      type: ['article-newspaper', 'document', 'legislation', 'musical_score', 'regulation', 'song', 'standard']
+    }
+  }
+}, {
+  source: '&',
+  target: 'page-first',
+  when: {
+    source: {
+      0: ['Journal Article', 'Magazine Article', 'Manuscript']
+    },
+    target: {
+      type: ['article-journal', 'article-magazine', 'manuscript']
+    }
+  }
+}, {
+  source: '&',
+  target: 'version',
+  when: {
+    source: {
+      0: ['Dictionary']
+    },
+    target: {
+      type: ['entry-dictionary']
+    }
+  }
+}, {
+  source: '(',
+  target: 'edition',
+  when: {
+    source: {
+      0: ['Electronic Book'],
+      7: false
+    },
+    target: false
+  }
+}, {
+  source: '*',
+  target: 'reviewed-title',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Book Section', 'Dictionary', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Generic', 'Grant', 'Journal Article', 'Magazine Article', 'Newspaper Article', 'Serial']
+    },
+    target: {
+      type: ['article-journal', 'article-magazine', 'article-newspaper', 'chapter', 'document', 'entry-dictionary', 'entry-encyclopedia', 'periodical']
+    }
+  }
+}, {
+  source: '0',
+  target: 'type',
+  convert: CONVERTERS.TYPE
+}, {
+  source: '1',
+  target: 'publisher-place',
+  when: {
+    source: {
+      0: ['Conference Paper', 'Conference Proceedings']
+    },
+    target: {
+      type: ['paper-conference']
+    }
+  }
+}, {
+  source: '1',
+  target: 'scale',
+  when: {
+    source: {
+      0: ['Map']
+    },
+    target: {
+      type: ['map']
+    }
+  }
+}, {
+  source: '2',
+  target: 'issue',
+  when: {
+    source: {
+      0: ['Newspaper Article']
+    },
+    target: {
+      type: ['article-newspaper']
+    }
+  }
+}, {
+  source: '2',
+  target: 'PMCID',
+  when: {
+    source: {
+      0: ['Journal Article']
+    },
+    target: {
+      type: ['article-journal']
+    }
+  }
+}, {
+  source: '2',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Serial']
+    },
+    target: {
+      type: ['periodical']
+    }
+  }
+}, {
+  source: ['8', '2'],
+  target: 'issued',
+  when: {
+    source: {
+      0: ['Conference Proceedings']
+    },
+    target: false
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: ['8', 'D'],
+  target: 'issued',
+  when: {
+    source: {
+      0: ['Patent']
+    },
+    target: {
+      type: ['patent']
+    }
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: ['2', 'D'],
+  target: 'issued',
+  when: {
+    source: {
+      0: ['Patent'],
+      8: false
+    },
+    target: false
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: '3',
+  target: 'genre',
+  when: {
+    source: {
+      0: ['Dataset']
+    },
+    target: {
+      type: ['dataset']
+    }
+  }
+}, {
+  source: '3',
+  target: 'PMCID',
+  when: {
+    source: {
+      0: ['Electronic Article']
+    },
+    target: false
+  }
+}, {
+  source: '3',
+  target: 'container-title',
+  when: {
+    source: {
+      0: ['Conference Proceedings']
+    },
+    target: false
+  }
+}, {
+  source: '3',
+  target: 'dimensions',
+  when: {
+    source: {
+      0: ['Artwork', 'Audiovisual Material', 'Map']
+    },
+    target: {
+      type: ['graphic', 'map']
+    }
+  }
+}, {
+  source: 'A',
+  target: 'author',
+  when: {
+    source: {
+      0: ['Book', 'Book Section', 'Electronic Article', 'Electronic Book', 'Electronic Chapter'],
+      4: false
+    },
+    target: {
+      type: ['book', 'chapter'],
+      'reviewed-author': false
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'A',
+  target: 'reviewed-author',
+  when: {
+    source: {
+      0: ['Book', 'Book Section', 'Electronic Article', 'Electronic Book', 'Electronic Chapter'],
+      4: true
+    },
+    target: {
+      type: ['book', 'chapter']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: '4',
+  target: 'author',
+  when: {
+    source: {
+      0: ['Book', 'Book Section', 'Electronic Article', 'Electronic Book', 'Electronic Chapter']
+    },
+    target: {
+      type: ['book', 'chapter'],
+      'reviewed-author': true
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: '6',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Catalog', 'Dataset', 'Manuscript', 'Personal Communication']
+    },
+    target: {
+      type: ['dataset', 'entry', 'manuscript', 'personal_communication']
+    }
+  }
+}, {
+  source: '6',
+  target: 'number-of-volumes',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Book', 'Book Section', 'Classical Work', 'Conference Proceedings', 'Dictionary', 'Edited Book', 'Electronic Chapter', 'Encyclopedia', 'Generic', 'Hearing', 'Music', 'Serial']
+    },
+    target: {
+      type: ['book', 'chapter', 'classic', 'document', 'entry-dictionary', 'entry-encyclopedia', 'hearing', 'musical_score', 'periodical', 'song']
+    }
+  }
+}, {
+  source: '6',
+  target: 'container-title-short',
+  when: {
+    source: {
+      0: ['Case']
+    },
+    target: {
+      type: ['legal_case']
+    }
+  }
+}, {
+  source: '6',
+  target: 'collection-number',
+  when: {
+    source: {
+      0: ['Report']
+    },
+    target: {
+      type: ['report']
+    }
+  }
+}, {
+  source: '6',
+  target: 'version',
+  when: {
+    source: {
+      0: ['Electronic Book']
+    },
+    target: false
+  }
+}, {
+  source: '@',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Standard']
+    },
+    target: {
+      type: ['standard']
+    }
+  }
+}, {
+  source: '6',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Statute']
+    },
+    target: {
+      type: ['legislation']
+    }
+  }
+}, {
+  source: 'V',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Legal Rule or Regulation']
+    },
+    target: {
+      type: ['regulation']
+    }
+  }
+}, {
+  source: ']',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Electronic Article']
+    },
+    target: false
+  }
+}, {
+  source: '7',
+  target: 'edition',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Artwork', 'Audiovisual Material', 'Blog', 'Book', 'Book Section', 'Catalog', 'Classical Work', 'Conference Proceedings', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Film or Broadcast', 'Generic', 'Government Document', 'Legal Rule or Regulation', 'Magazine Article', 'Map', 'Music', 'Newspaper Article', 'Pamphlet', 'Report', 'Serial', 'Web Page']
+    },
+    target: {
+      type: ['article-magazine', 'article-newspaper', 'book', 'broadcast', 'chapter', 'classic', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'graphic', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'periodical', 'post', 'post-weblog', 'regulation', 'report', 'song', 'webpage']
+    }
+  }
+}, {
+  source: '7',
+  target: 'available-date',
+  when: {
+    source: {
+      0: ['Journal Article']
+    },
+    target: {
+      type: ['article-journal']
+    }
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: '7',
+  target: 'version',
+  when: {
+    source: {
+      0: ['Chart or Table', 'Computer Program', 'Dataset', 'Equation', 'Figure']
+    },
+    target: {
+      type: ['dataset', 'figure', 'software']
+    }
+  }
+}, {
+  source: ['7', 'D'],
+  target: 'issued',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Online Database']
+    },
+    target: false
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: '8',
+  target: 'accessed',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Case', 'Electronic Article', 'Electronic Book', 'Online Database', 'Online Multimedia']
+    },
+    target: {
+      type: ['legal_case']
+    }
+  }
+}, {
+  source: ['8', 'D'],
+  target: 'issued',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Book', 'Catalog', 'Chart or Table', 'Conference Paper', 'Edited Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Pamphlet', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Thesis', 'Unpublished Work']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'document', 'entry', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'periodical', 'personal_communication', 'regulation', 'report', 'song', 'standard', 'thesis']
+    }
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: '9',
+  target: 'medium',
+  when: {
+    source: {
+      0: ['Music']
+    },
+    target: {
+      type: ['musical_score', 'song']
+    }
+  }
+}, {
+  source: '9',
+  target: 'genre',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Blog', 'Book', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Equation', 'Figure', 'Generic', 'Grant', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'book', 'classic', 'document', 'entry', 'entry-dictionary', 'figure', 'graphic', 'manuscript', 'map', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'standard', 'webpage']
+    }
+  }
+}, {
+  source: ['9', 'V'],
+  target: 'genre',
+  when: {
+    source: {
+      0: ['Thesis']
+    },
+    target: {
+      type: ['thesis']
+    }
+  },
+  convert: CONVERTERS.GENRE_DEGREE
+}, {
+  source: '?',
+  target: 'performer',
+  when: {
+    source: {
+      0: ['Audiovisual Material', 'Film or Broadcast']
+    },
+    target: {
+      type: ['broadcast', 'motion_picture']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: '?',
+  target: 'producer',
+  when: {
+    source: {
+      0: ['Music']
+    },
+    target: {
+      type: ['musical_score', 'song']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: '?',
+  target: 'translator',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Book', 'Book Section', 'Catalog', 'Classical Work', 'Dictionary', 'Edited Book', 'Electronic Chapter', 'Encyclopedia', 'Grant', 'Pamphlet']
+    },
+    target: {
+      type: ['book', 'chapter', 'classic', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'pamphlet']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: '@',
+  target: 'ISBN',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Audiovisual Material', 'Blog', 'Book', 'Book Section', 'Catalog', 'Computer Program', 'Conference Proceedings', 'Dictionary', 'Edited Book', 'Electronic Book', 'Encyclopedia', 'Hearing', 'Music', 'Pamphlet', 'Serial', 'Web Page']
+    },
+    target: {
+      type: ['book', 'chapter', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'hearing', 'musical_score', 'pamphlet', 'periodical', 'post', 'post-weblog', 'software', 'song', 'webpage']
+    }
+  }
+}, {
+  source: '@',
+  target: 'ISSN',
+  when: {
+    source: {
+      0: ['Dataset', 'Electronic Article', 'Journal Article', 'Magazine Article', 'Newspaper Article']
+    },
+    target: {
+      type: ['article-journal', 'article-magazine', 'article-newspaper', 'dataset']
+    }
+  }
+}, {
+  source: '@',
+  target: ['ISBN', 'ISSN'],
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Classical Work', 'Electronic Chapter', 'Generic', 'Government Document', 'Legal Rule or Regulation', 'Map']
+    },
+    target: {
+      type: ['classic', 'document', 'map', 'regulation']
+    }
+  },
+  convert: CONVERTERS.ISBN_ISSN
+}, {
+  source: '@',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Online Database', 'Patent']
+    },
+    target: {
+      type: ['patent']
+    }
+  }
+}, {
+  source: '@',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Report']
+    },
+    target: {
+      type: ['report']
+    }
+  }
+}, {
+  source: 'A',
+  target: 'author',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Blog', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Encyclopedia', 'Equation', 'Figure', 'Generic', 'Government Document', 'Grant', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'manuscript', 'map', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'standard', 'thesis', 'webpage']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'A',
+  target: 'composer',
+  when: {
+    source: {
+      0: ['Music']
+    },
+    target: {
+      type: ['musical_score', 'song']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'A',
+  target: 'editor',
+  when: {
+    source: {
+      0: ['Edited Book']
+    },
+    target: false
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'A',
+  target: 'director',
+  when: {
+    source: {
+      0: ['Film or Broadcast']
+    },
+    target: {
+      type: ['broadcast', 'motion_picture']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'E',
+  target: 'director',
+  when: {
+    source: {
+      0: ['Film or Broadcast'],
+      A: false
+    },
+    target: false
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'B',
+  target: 'container-title',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Bill', 'Blog', 'Book Section', 'Case', 'Dictionary', 'Electronic Article', 'Electronic Chapter', 'Encyclopedia', 'Magazine Article', 'Manuscript', 'Music', 'Newspaper Article', 'Online Database', 'Statute']
+    },
+    target: {
+      type: ['article-magazine', 'article-newspaper', 'bill', 'chapter', 'entry-dictionary', 'entry-encyclopedia', 'legal_case', 'legislation', 'manuscript', 'musical_score', 'post', 'post-weblog', 'song']
+    }
+  }
+}, {
+  source: 'B',
+  target: 'committee',
+  when: {
+    source: {
+      0: ['Hearing']
+    },
+    target: {
+      type: ['hearing']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'B',
+  target: 'event-title',
+  when: {
+    source: {
+      0: ['Conference Paper', 'Conference Proceedings']
+    },
+    target: {
+      type: ['paper-conference']
+    }
+  }
+}, {
+  source: 'B',
+  target: 'collection-title',
+  when: {
+    source: {
+      0: ['Audiovisual Material', 'Book', 'Catalog', 'Classical Work', 'Computer Program', 'Edited Book', 'Film or Broadcast', 'Map', 'Online Multimedia', 'Report', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'book', 'broadcast', 'classic', 'entry', 'map', 'motion_picture', 'report', 'software', 'webpage']
+    }
+  }
+}, {
+  source: 'C',
+  target: 'event-place',
+  when: {
+    source: {
+      0: ['Conference Paper', 'Conference Proceedings']
+    },
+    target: {
+      type: ['paper-conference']
+    }
+  }
+}, {
+  source: 'C',
+  target: 'publisher-place',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Blog', 'Book', 'Book Section', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Hearing', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Pamphlet', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-magazine', 'article-newspaper', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'D',
+  target: 'issued',
+  when: {
+    source: {
+      0: ['Blog', 'Book Section', 'Classical Work', 'Computer Program', 'Dataset', 'Dictionary', 'Electronic Article', 'Government Document', 'Grant', 'Online Multimedia', 'Web Page']
+    },
+    target: {
+      type: ['chapter', 'classic', 'dataset', 'entry-dictionary', 'post', 'post-weblog', 'software', 'webpage']
+    }
+  },
+  convert: CONVERTERS.YEAR
+}, {
+  source: 'D',
+  target: 'event-date',
+  when: {
+    source: {
+      0: ['Conference Proceedings']
+    },
+    target: false
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: 'E',
+  target: 'editor',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Blog', 'Book Section', 'Conference Paper', 'Conference Proceedings', 'Dictionary', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Music', 'Serial']
+    },
+    target: {
+      type: ['chapter', 'entry-dictionary', 'entry-encyclopedia', 'musical_score', 'paper-conference', 'periodical', 'post', 'post-weblog', 'song']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'E',
+  target: 'collection-editor',
+  when: {
+    source: {
+      0: ['Audiovisual Material', 'Book', 'Classical Work', 'Computer Program', 'Edited Book', 'Map', 'Online Multimedia', 'Report', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'book', 'classic', 'map', 'report', 'software', 'webpage']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'E',
+  target: 'recipient',
+  when: {
+    source: {
+      0: ['Personal Communication']
+    },
+    target: {
+      type: ['personal_communication']
+    }
+  }
+}, {
+  source: 'F',
+  target: 'citation-key',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Book Section', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'G',
+  target: 'language',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Book Section', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'I',
+  target: 'publisher',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Blog', 'Book', 'Book Section', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Hearing', 'Legal Rule or Regulation', 'Magazine Article', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Personal Communication', 'Serial', 'Standard', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-magazine', 'article-newspaper', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'Y',
+  target: 'publisher',
+  when: {
+    source: {
+      0: ['Report']
+    },
+    target: {
+      type: ['report']
+    }
+  }
+}, {
+  source: 'J',
+  target: 'container-title',
+  when: {
+    source: {
+      0: ['Journal Article']
+    },
+    target: {
+      type: ['article-journal']
+    }
+  }
+}, {
+  source: 'K',
+  target: 'keyword',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Book Section', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'L',
+  target: 'call-number',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Book Section', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Thesis', 'Web Page']
+    },
+    target: {
+      type: ['article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'patent', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'N',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Audiovisual Material', 'Bill', 'Chart or Table', 'Dictionary', 'Equation', 'Figure', 'Generic', 'Government Document', 'Hearing', 'Thesis', 'Unpublished Work']
+    },
+    target: {
+      type: ['article', 'bill', 'document', 'entry-dictionary', 'figure', 'hearing', 'thesis']
+    }
+  }
+}, {
+  source: 'N',
+  target: 'issue',
+  when: {
+    source: {
+      0: ['Conference Paper', 'Conference Proceedings', 'Electronic Article', 'Journal Article', 'Magazine Article']
+    },
+    target: {
+      type: ['article-journal', 'article-magazine', 'paper-conference']
+    }
+  }
+}, {
+  source: 'N',
+  target: 'collection-number',
+  when: {
+    source: {
+      0: ['Book', 'Book Section', 'Catalog', 'Classical Work', 'Edited Book', 'Electronic Chapter', 'Pamphlet', 'Serial']
+    },
+    target: {
+      type: ['book', 'chapter', 'classic', 'entry', 'pamphlet', 'periodical']
+    }
+  }
+}, {
+  source: 'N',
+  target: 'page-first',
+  when: {
+    source: {
+      0: ['Legal Rule or Regulation', 'Newspaper Article', 'Standard']
+    },
+    target: {
+      type: ['article-newspaper', 'regulation', 'standard']
+    }
+  }
+}, {
+  source: 'N',
+  target: 'status',
+  when: {
+    source: {
+      0: ['Grant']
+    },
+    target: false
+  }
+}, {
+  source: 'N',
+  target: 'accessed',
+  when: {
+    source: {
+      0: ['Web Page']
+    },
+    target: {
+      type: ['webpage']
+    }
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: 'P',
+  target: 'page',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Bill', 'Book Section', 'Catalog', 'Conference Paper', 'Conference Proceedings', 'Dictionary', 'Electronic Article', 'Encyclopedia', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Music', 'Newspaper Article', 'Online Database', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Unpublished Work']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'chapter', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'hearing', 'legislation', 'manuscript', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'regulation', 'report', 'song', 'standard']
+    }
+  }
+}, {
+  source: 'P',
+  target: 'page-first',
+  when: {
+    source: {
+      0: ['Case']
+    },
+    target: {
+      type: ['legal_case']
+    }
+  }
+}, {
+  source: 'P',
+  target: 'number-of-pages',
+  when: {
+    source: {
+      0: ['Book', 'Classical Work', 'Edited Book', 'Electronic Book', 'Electronic Chapter', 'Thesis']
+    },
+    target: {
+      type: ['book', 'classic', 'thesis']
+    }
+  }
+}, {
+  source: 'P',
+  target: 'dimensions',
+  when: {
+    source: {
+      0: ['Film or Broadcast']
+    },
+    target: {
+      type: ['broadcast', 'motion_picture']
+    }
+  }
+}, {
+  source: 'Q',
+  target: 'title',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Standard', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'classic', 'dataset', 'document', 'entry', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage'],
+      'original-title': true
+    }
+  }
+}, {
+  source: 'T',
+  target: 'original-title',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Standard', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page'],
+      Q: true
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'classic', 'dataset', 'document', 'entry', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'T',
+  target: 'title',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Standard', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page'],
+      Q: false
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'classic', 'dataset', 'document', 'entry', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage'],
+      'original-title': false
+    }
+  }
+}, {
+  source: '1',
+  target: 'title',
+  when: {
+    source: {
+      0: ['Book Section', 'Dictionary', 'Electronic Chapter', 'Encyclopedia', 'Serial']
+    },
+    target: {
+      type: ['chapter', 'entry-dictionary', 'entry-encyclopedia', 'periodical']
+    }
+  }
+}, {
+  source: '&',
+  target: 'title',
+  when: {
+    source: {
+      0: ['Book Section', 'Serial'],
+      1: false
+    },
+    target: false
+  }
+}, {
+  source: 'T',
+  target: 'container-title',
+  when: {
+    source: {
+      0: ['Book Section', 'Dictionary', 'Electronic Chapter', 'Encyclopedia', 'Serial']
+    },
+    target: {
+      type: ['chapter', 'entry-dictionary', 'entry-encyclopedia', 'periodical']
+    }
+  }
+}, {
+  source: 'R',
+  target: 'DOI',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Book Section', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'S',
+  target: 'collection-title',
+  when: {
+    source: {
+      0: ['Book Section', 'Conference Proceedings', 'Dataset', 'Electronic Book', 'Electronic Chapter', 'Government Document', 'Music', 'Serial']
+    },
+    target: {
+      type: ['chapter', 'dataset', 'musical_score', 'periodical', 'song']
+    }
+  }
+}, {
+  source: 'U',
+  target: 'URL',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Blog', 'Book', 'Book Section', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'post', 'post-weblog', 'regulation', 'report', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: 'V',
+  target: 'issue',
+  when: {
+    source: {
+      0: ['Statute']
+    },
+    target: {
+      type: ['legislation']
+    }
+  }
+}, {
+  source: 'V',
+  target: 'volume',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Audiovisual Material', 'Bill', 'Book', 'Book Section', 'Case', 'Catalog', 'Classical Work', 'Conference Paper', 'Conference Proceedings', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Generic', 'Government Document', 'Journal Article', 'Magazine Article', 'Manuscript', 'Music', 'Newspaper Article', 'Online Database', 'Report', 'Serial']
+    },
+    target: {
+      type: ['article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'chapter', 'classic', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'legal_case', 'manuscript', 'musical_score', 'paper-conference', 'periodical', 'report', 'song']
+    }
+  }
+}, {
+  source: 'V',
+  target: 'edition',
+  when: {
+    source: {
+      0: ['Computer Program']
+    },
+    target: {
+      type: ['software']
+    }
+  }
+}, {
+  source: 'V',
+  target: 'dimensions',
+  when: {
+    source: {
+      0: ['Chart or Table', 'Equation', 'Figure']
+    },
+    target: {
+      type: ['figure']
+    }
+  }
+}, {
+  source: 'V',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Pamphlet']
+    },
+    target: {
+      type: ['pamphlet']
+    }
+  }
+}, {
+  source: 'V',
+  target: 'version',
+  when: {
+    source: {
+      0: ['Patent']
+    },
+    target: {
+      type: ['patent']
+    }
+  }
+}, {
+  source: ['[', 'V'],
+  target: 'accessed',
+  when: {
+    source: {
+      0: ['Blog']
+    },
+    target: {
+      type: ['post', 'post-weblog']
+    }
+  },
+  convert: CONVERTERS.DATE
+}, {
+  source: 'X',
+  target: 'abstract'
+}, {
+  source: '7',
+  target: 'abstract',
+  when: {
+    source: {
+      0: ['Manuscript', 'Personal Communication'],
+      X: false
+    },
+    target: false
+  }
+}, {
+  source: 'P',
+  target: 'abstract',
+  when: {
+    source: {
+      0: ['Artwork', 'Blog', 'Chart or Table', 'Computer Program', 'Equation', 'Figure', 'Map', 'Web Page'],
+      X: false
+    },
+    target: false
+  }
+}, {
+  source: 'Y',
+  target: 'editor',
+  when: {
+    source: {
+      0: ['Book']
+    },
+    target: {
+      type: ['book']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'Y',
+  target: 'collection-editor',
+  when: {
+    source: {
+      0: ['Book Section', 'Conference Proceedings', 'Electronic Book', 'Electronic Chapter', 'Music', 'Serial']
+    },
+    target: {
+      type: ['chapter', 'musical_score', 'periodical', 'song']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'Y',
+  target: 'illustrator',
+  when: {
+    source: {
+      0: ['Blog']
+    },
+    target: {
+      type: ['post', 'post-weblog']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'Y',
+  target: 'producer',
+  when: {
+    source: {
+      0: ['Film or Broadcast']
+    },
+    target: {
+      type: ['broadcast', 'motion_picture']
+    }
+  },
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'Z',
+  target: 'note',
+  when: {
+    source: {
+      0: ['Aggregated Database', 'Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Book', 'Book Section', 'Case', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Article', 'Electronic Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Online Database', 'Online Multimedia', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Thesis', 'Unpublished Work', 'Web Page']
+    },
+    target: {
+      type: ['article', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'legal_case', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'report', 'software', 'song', 'standard', 'thesis', 'webpage']
+    }
+  }
+}, {
+  source: '[',
+  target: 'accessed',
+  when: {
+    source: {
+      0: ['Ancient Text', 'Artwork', 'Audiovisual Material', 'Bill', 'Book', 'Book Section', 'Catalog', 'Chart or Table', 'Classical Work', 'Computer Program', 'Conference Paper', 'Conference Proceedings', 'Dataset', 'Dictionary', 'Edited Book', 'Electronic Chapter', 'Encyclopedia', 'Equation', 'Figure', 'Film or Broadcast', 'Generic', 'Government Document', 'Grant', 'Hearing', 'Journal Article', 'Legal Rule or Regulation', 'Magazine Article', 'Manuscript', 'Map', 'Music', 'Newspaper Article', 'Pamphlet', 'Patent', 'Personal Communication', 'Report', 'Serial', 'Standard', 'Statute', 'Thesis', 'Unpublished Work']
+    },
+    target: {
+      type: ['article', 'article-journal', 'article-magazine', 'article-newspaper', 'bill', 'book', 'broadcast', 'chapter', 'classic', 'dataset', 'document', 'entry', 'entry-dictionary', 'entry-encyclopedia', 'figure', 'graphic', 'hearing', 'legislation', 'manuscript', 'map', 'motion_picture', 'musical_score', 'pamphlet', 'paper-conference', 'patent', 'periodical', 'personal_communication', 'regulation', 'report', 'software', 'song', 'standard', 'thesis']
+    }
+  }
+}, {
+  source: ']',
+  target: 'number',
+  when: {
+    source: {
+      0: ['Journal Article']
+    },
+    target: {
+      type: ['article-journal']
+    }
+  }
+}, {
+  source: ']',
+  target: 'PMCID',
+  when: {
+    source: {
+      0: ['Electronic Book', 'Electronic Chapter']
+    },
+    target: false
+  }
+}];
+const translator = new _core.util.Translator(MAPPINGS);
+exports.translator = translator;
+},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],82:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _mapping = require("./mapping");
+
+function formatRecord({
+  fields
+}, lineEnding) {
+  let record = '';
+
+  for (const field in fields) {
+    const values = [].concat(fields[field]);
+
+    for (const value of values) {
+      record += '%' + field + ' ' + value + lineEnding;
+    }
+  }
+
+  return record;
+}
+
+var _default = {
+  enw(csl, options = {}) {
+    const {
+      format = 'text',
+      lineEnding = '\n'
+    } = options;
+    const records = csl.map(record => ({
+      scheme: 'enw',
+      fields: _mapping.translator.convertToSource(record)
+    }));
+
+    if (format === 'object') {
+      return records;
+    }
+
+    return records.map(record => formatRecord(record, lineEnding)).join(lineEnding);
+  }
+
+};
+exports.default = _default;
+},{"./mapping":81}],83:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.parse = parse;
+exports.format = format;
+exports.GOOGLE_BOOKS_API_VERSION = void 0;
+
+var _core = require("@citation-js/core");
+
+var name = _interopRequireWildcard(require("@citation-js/name"));
+
+var date = _interopRequireWildcard(require("@citation-js/date"));
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+const GOOGLE_PROPS = [{
+  source: 'printType',
+  target: 'type',
+  convert: {
+    toTarget(type) {
+      return {
+        BOOK: 'book',
+        MAGAZINE: 'article-magazine'
+      }[type];
+    },
+
+    toSource(type) {
+      if (type.slice(0, 7) === 'article') {
+        return 'MAGAZINE';
+      } else {
+        return 'BOOK';
+      }
+    }
+
+  }
+}, {
+  source: 'authors',
+  target: 'author',
+  convert: {
+    toTarget(authors) {
+      return authors.map(name.parse);
+    },
+
+    toSource(authors) {
+      return authors.map(name.format);
+    }
+
+  }
+}, {
+  source: 'canonicalVolumeLink',
+  target: 'URL'
+}, {
+  source: 'categories',
+  target: 'keyword',
+  convert: {
+    toTarget(array) {
+      return array.join(',');
+    },
+
+    toSource(list) {
+      return list.split(',');
+    }
+
+  }
+}, {
+  source: 'description',
+  target: 'abstract'
+}, {
+  source: 'dimensions',
+  target: 'dimensions',
+  convert: {
+    toTarget({
+      height,
+      width,
+      thickness
+    }) {
+      return `${height} x ${width} x ${thickness} cm`;
+    },
+
+    toSource(list) {}
+
+  }
+}, {
+  source: 'industryIdentifiers',
+  target: ['ISBN', 'ISSN', 'DOI', 'PMID', 'PMCID'],
+  convert: {
+    toTarget(ids) {
+      return ['ISBN_13', 'ISSN'].map(id => (ids.find(({
+        type
+      }) => type === id) || {}).identifier);
+    },
+
+    toSource(isbn, issn, ...other) {
+      return [isbn && {
+        type: isbn.length === 13 ? 'ISBN_13' : 'ISBN_10',
+        identifier: isbn
+      }, issn && {
+        type: 'ISSN',
+        identifier: issn
+      }, ...other.map(identifier => ({
+        type: 'OTHER',
+        identifier
+      }))].filter(Boolean);
+    }
+
+  }
+}, 'language', {
+  source: 'pageCount',
+  target: 'number-of-pages'
+}, 'publisher', 'title', {
+  source: 'publishedDate',
+  target: 'issued',
+  convert: {
+    toTarget: date.parse,
+    toSource: date.format
+  }
+}];
+const translator = new _core.util.Translator(GOOGLE_PROPS);
+
+function parse(volume) {
+  if (volume.volumeInfo.language === 'un') {
+    delete volume.volumeInfo.language;
+  }
+
+  return translator.convertToTarget(volume.volumeInfo);
+}
+
+function format(records) {
+  return {
+    kind: 'books#volumes',
+    totalItems: records.length,
+    items: records.map(translator.convertToSource)
+  };
+}
+
+const GOOGLE_BOOKS_API_VERSION = 'v1';
+exports.GOOGLE_BOOKS_API_VERSION = GOOGLE_BOOKS_API_VERSION;
+},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],84:[function(require,module,exports){
+"use strict";
+
+var _core = require("@citation-js/core");
+
+var _input = require("./input");
+
+_core.plugins.add(_input.ref, {
+  input: _input.formats
+});
+},{"./input":85,"@citation-js/core":"citation-js"}],85:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.formats = exports.ref = void 0;
+
+var _core = require("@citation-js/core");
+
+var google = _interopRequireWildcard(require("./google-books.js"));
+
+var ol = _interopRequireWildcard(require("./open-library.js"));
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr && (typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]); if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+function getUrls(isbn) {
+  isbn = isbn.replace(/-/g, '');
+  return [[`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`, json => json.totalItems], [`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`, json => Object.keys(json).length]];
+}
+
+function getResponse(isbn) {
+  var _iterator = _createForOfIteratorHelper(getUrls(isbn)),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      const _step$value = _slicedToArray(_step.value, 2),
+            url = _step$value[0],
+            check = _step$value[1];
+
+      const json = JSON.parse(_core.util.fetchFile(url));
+
+      if (check(json)) {
+        return json;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  throw new Error(`Cannot find resource for ISBN: ${isbn}`);
+}
+
+function getResponseAsync(_x) {
+  return _getResponseAsync.apply(this, arguments);
+}
+
+function _getResponseAsync() {
+  _getResponseAsync = _asyncToGenerator(function* (isbn) {
+    var _iterator2 = _createForOfIteratorHelper(getUrls(isbn)),
+        _step2;
+
+    try {
+      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+        const _step2$value = _slicedToArray(_step2.value, 2),
+              url = _step2$value[0],
+              check = _step2$value[1];
+
+        const json = JSON.parse(yield _core.util.fetchFileAsync(url));
+
+        if (check(json)) {
+          return json;
+        }
+      }
+    } catch (err) {
+      _iterator2.e(err);
+    } finally {
+      _iterator2.f();
+    }
+
+    throw new Error(`Cannot find resource for ISBN: ${isbn}`);
+  });
+  return _getResponseAsync.apply(this, arguments);
+}
+
+const ref = '@isbn';
+exports.ref = ref;
+const formats = {
+  '@isbn/isbn-10': {
+    parse: getResponse,
+    parseAsync: getResponseAsync,
+    parseType: {
+      dataType: 'String',
+
+      predicate(id) {
+        return /^\d{10}$/.test(id.replace(/-/g, ''));
+      }
+
+    }
+  },
+  '@isbn/isbn-13': {
+    parse: getResponse,
+    parseAsync: getResponseAsync,
+    parseType: {
+      dataType: 'String',
+
+      predicate(id) {
+        return /^(978|979)\d{10}$/.test(id.replace(/-/g, ''));
+      }
+
+    }
+  },
+  '@isbn/isbn-a': {
+    parse: doi => doi.slice(3).replace(/\D/g, ''),
+    parseType: {
+      dataType: 'String',
+      predicate: /^10\.(978|979)\.\d{2,8}\/\d{2,7}$/
+    },
+    outputs: '@isbn/isbn-13'
+  },
+  '@isbn/number': {
+    parse: number => number.toString(),
+    parseType: {
+      dataType: 'Primitive',
+      predicate: number => [10, 13].includes(number.toString().length)
+    },
+    outputs: '@isbn/isbn-13'
+  },
+  '@isbn/vnd.google.books.volumes+object': {
+    parse(record) {
+      return record.items;
+    },
+
+    parseType: {
+      dataType: 'SimpleObject',
+      propertyConstraint: [{
+        props: 'kind',
+        value: kind => kind === 'books#volumes'
+      }, {
+        props: ['totalItems', 'items']
+      }]
+    }
+  },
+  '@isbn/vnd.google.books.volume+object': {
+    parse: google.parse,
+    parseType: {
+      dataType: 'SimpleObject',
+      propertyConstraint: [{
+        props: 'kind',
+        value: kind => kind === 'books#volume'
+      }, {
+        props: ['volumeInfo', 'id']
+      }]
+    },
+    outputs: '@csl/object'
+  },
+  '@isbn/vnd.archive.openlibrary.books+object': {
+    parse: ol.parse,
+    parseType: {
+      dataType: 'SimpleObject',
+
+      predicate(response) {
+        return Object.keys(response).every(key => key.slice(0, 5) === 'ISBN:');
+      }
+
+    },
+    outputs: '@csl/list+object'
+  }
+};
+exports.formats = formats;
+},{"./google-books.js":83,"./open-library.js":86,"@citation-js/core":"citation-js"}],86:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.parse = parse;
+exports.format = format;
+
+var _core = require("@citation-js/core");
+
+var name = _interopRequireWildcard(require("@citation-js/name"));
+
+var date = _interopRequireWildcard(require("@citation-js/date"));
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+const CONVERT_ARRAY_OF_OBJECTS = {
+  toTarget: ([{
+    name
+  }]) => name,
+  toSource: name => [{
+    name
+  }]
+};
+const OL_PROPS = [{
+  target: 'type',
+  convert: {
+    toTarget: () => 'book'
+  }
+}, {
+  source: 'authors',
+  target: 'author',
+  convert: {
+    toTarget(authors) {
+      return authors.map(({
+        name: author,
+        url
+      }) => {
+        author = name.parse(author);
+        author._url = url;
+        return author;
+      });
+    },
+
+    toSource: authors => authors.map(author => ({
+      name: name.format(author)
+    }))
+  }
+}, {
+  source: 'identifiers',
+  target: ['ISBN', 'ISSN', 'DOI', 'PMID', 'PMCID'],
+  convert: {
+    toTarget: identifiers => identifiers.isbn_13 || identifiers.isbn_10,
+
+    toSource(...identifiers) {
+      const ids = [identifiers[0] && `isbn_${identifiers[0].length}`, 'issn', 'doi', 'pmid', 'pmcid'];
+      return identifiers.reduce((acc, id, i) => {
+        if (id) {
+          acc[ids[i]] = id;
+        }
+
+        return acc;
+      }, {});
+    }
+
+  }
+}, {
+  source: 'number_of_pages',
+  target: 'number-of-pages'
+}, {
+  source: 'publishers',
+  target: 'publisher',
+  convert: CONVERT_ARRAY_OF_OBJECTS
+}, {
+  source: 'publish_date',
+  target: 'issued',
+  convert: {
+    toTarget: date.parse,
+    toSource: date.format
+  }
+}, {
+  source: 'publish_places',
+  target: 'publisher-place',
+  convert: CONVERT_ARRAY_OF_OBJECTS
+}, {
+  source: ['subjects', 'subject_places', 'subject_people', 'subject_times'],
+  target: 'keyword',
+  convert: {
+    toTarget: (...subjects) => [].concat(...subjects).filter(Boolean).map(({
+      name
+    }) => name).join(),
+    toSource: keywords => [keywords.split(',').map(name => ({
+      name,
+      url: 'https://openlibrary.org/subjects/' + name.toLowerCase().replace(/\W+/g, '_')
+    }))]
+  }
+}, 'title', {
+  source: 'url',
+  target: 'URL'
+}];
+const translator = new _core.util.Translator(OL_PROPS);
+
+function parse(response) {
+  return Object.keys(response).map(id => {
+    return translator.convertToTarget(response[id]);
+  });
+}
+
+function format(records) {
+  const output = {};
+
+  var _iterator = _createForOfIteratorHelper(records),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      const record = _step.value;
+
+      if (!record.ISBN) {
+        output[`ISBN:${record.ISBN}`] = translator.convertToSource(record);
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  return output;
+}
+},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],87:[function(require,module,exports){
+arguments[4][84][0].apply(exports,arguments)
+},{"./input":88,"@citation-js/core":"citation-js","dup":84}],88:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.formats = exports.ref = void 0;
+
+var _core = require("@citation-js/core");
+
+const ref = '@pubmed';
+exports.ref = ref;
+const formats = {
+  '@pubmed/id': {
+    parseAsync(id) {
+      id = id.replace('pmid:', '');
+      const url = `https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pubmed/?format=csl&id=${id}`;
+      const headers = {};
+      return _core.util.fetchFileAsync(url, {
+        headers
+      });
+    },
+
+    parseType: {
+      dataType: 'String',
+      predicate: /^pmid:\d+$/
+    }
+  },
+  '@pubmed/pmcid': {
+    parseAsync(id) {
+      id = id.replace('PMC', '');
+      const url = `https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pmc/?format=csl&id=${id}`;
+      const headers = {};
+      return _core.util.fetchFileAsync(url, {
+        headers
+      });
+    },
+
+    parseType: {
+      dataType: 'String',
+      predicate: /^PMC\d+$/
+    }
+  }
+};
+exports.formats = formats;
+},{"@citation-js/core":"citation-js"}],89:[function(require,module,exports){
+"use strict";
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -6995,7 +9167,7 @@ function fillCaches(csl) {
 
   return caches;
 }
-},{"@citation-js/core":"citation-js","wikidata-sdk":175}],80:[function(require,module,exports){
+},{"@citation-js/core":"citation-js","wikidata-sdk":191}],90:[function(require,module,exports){
 "use strict";
 
 var _core = require("@citation-js/core");
@@ -7009,7 +9181,7 @@ const ref = '@quickstatements';
 _core.plugins.add(ref, {
   output: _output.default
 });
-},{"./output":81,"@citation-js/core":"citation-js"}],81:[function(require,module,exports){
+},{"./output":91,"@citation-js/core":"citation-js"}],91:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7250,7 +9422,7 @@ var _default = {
         const cslProp = WIKIDATA_PROPS[wikidataProp];
         const cslValue = item[cslProp];
 
-        if (cslValue == null) {
+        if (cslValue == null || cslValue === '') {
           continue;
         }
 
@@ -7271,7 +9443,7 @@ var _default = {
 
 };
 exports.default = _default;
-},{"./cache.js":79,"@citation-js/date":44,"@citation-js/name":47}],82:[function(require,module,exports){
+},{"./cache.js":89,"@citation-js/date":44,"@citation-js/name":47}],92:[function(require,module,exports){
 "use strict";
 
 var _core = require("@citation-js/core");
@@ -7286,7 +9458,7 @@ _core.plugins.add('@refworks', {
   input: _input.default,
   output: _output.default
 });
-},{"./input":83,"./output":84,"@citation-js/core":"citation-js"}],83:[function(require,module,exports){
+},{"./input":93,"./output":94,"@citation-js/core":"citation-js"}],93:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7353,7 +9525,7 @@ var _default = {
   }
 };
 exports.default = _default;
-},{"./shared.js":85}],84:[function(require,module,exports){
+},{"./shared.js":95}],94:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7416,7 +9588,7 @@ var _default = {
 
 };
 exports.default = _default;
-},{"./shared.js":85}],85:[function(require,module,exports){
+},{"./shared.js":95}],95:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7854,12 +10026,12 @@ const PROP_MAPPINGS = [{
 }];
 const translator = new _core.util.Translator(PROP_MAPPINGS);
 exports.translator = translator;
-},{"@citation-js/core":"citation-js"}],86:[function(require,module,exports){
+},{"@citation-js/core":"citation-js"}],96:[function(require,module,exports){
 module.exports={
   "outputSpec": "mixed"
 }
 
-},{}],87:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8015,7 +10187,7 @@ const CONVERTERS = {
 };
 var _default = CONVERTERS;
 exports.default = _default;
-},{"./spec/types.json":96,"@citation-js/date":44}],88:[function(require,module,exports){
+},{"./spec/types.json":106,"@citation-js/date":44}],98:[function(require,module,exports){
 module.exports={
   "author": "NAME",
   "collection-editor": "NAME",
@@ -8046,7 +10218,7 @@ module.exports={
   "DOI": "DOI"
 }
 
-},{}],89:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 "use strict";
 
 var _core = require("@citation-js/core");
@@ -8110,7 +10282,7 @@ _core.plugins.add('@ris', {
     ris: _ris.format
   }
 });
-},{"./config.json":86,"./ris.js":90,"@citation-js/core":"citation-js"}],90:[function(require,module,exports){
+},{"./config.json":96,"./ris.js":100,"@citation-js/core":"citation-js"}],100:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8259,7 +10431,7 @@ function format(data, {
     return tags.join('\n');
   }).join('\n');
 }
-},{"./config.json":86,"./converters.js":87,"./dataTypes.json":88,"./spec/index.js":92,"@citation-js/core":"citation-js"}],91:[function(require,module,exports){
+},{"./config.json":96,"./converters.js":97,"./dataTypes.json":98,"./spec/index.js":102,"@citation-js/core":"citation-js"}],101:[function(require,module,exports){
 module.exports=[
   {
     "source": [
@@ -8878,7 +11050,7 @@ module.exports=[
   }
 ]
 
-},{}],92:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8908,7 +11080,7 @@ const SPECS = {
   mixed: _mixed.default
 };
 exports.SPECS = SPECS;
-},{"./mixed.js":93,"./new.json":94,"./old.js":95,"./types.json":96}],93:[function(require,module,exports){
+},{"./mixed.js":103,"./new.json":104,"./old.js":105,"./types.json":106}],103:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8925,7 +11097,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _default = _new.default.concat(_additions.default);
 
 exports.default = _default;
-},{"./additions.json":91,"./new.json":94}],94:[function(require,module,exports){
+},{"./additions.json":101,"./new.json":104}],104:[function(require,module,exports){
 module.exports=[
   {
     "source": "A2",
@@ -13632,7 +15804,7 @@ module.exports=[
   }
 ]
 
-},{}],95:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -13779,7 +15951,7 @@ var _default = [{
   target: 'URL'
 }];
 exports.default = _default;
-},{"../converters.js":87}],96:[function(require,module,exports){
+},{"../converters.js":97}],106:[function(require,module,exports){
 module.exports={
   "RIS": {
     "ABST": "article-journal",
@@ -13889,7 +16061,7 @@ module.exports={
   }
 }
 
-},{}],97:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -13921,7 +16093,7 @@ const CFF_SCHEMA = _jsYaml.default.DEFAULT_SCHEMA.extend({
 });
 
 exports.CFF_SCHEMA = CFF_SCHEMA;
-},{"js-yaml":118}],98:[function(require,module,exports){
+},{"js-yaml":133}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -14673,7 +16845,7 @@ function format(input, options = {}) {
 
 const CFF_VERSION = '1.2.0';
 exports.CFF_VERSION = CFF_VERSION;
-},{"@citation-js/core":"citation-js","@citation-js/date":44}],99:[function(require,module,exports){
+},{"@citation-js/core":"citation-js","@citation-js/date":44}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -14775,7 +16947,7 @@ function url(input) {
   const [, user, repo] = input.match(/^https?:\/\/github.com\/([^/]+)\/([^/]+)/);
   return `https://api.github.com/repos/${user}/${repo}`;
 }
-},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],100:[function(require,module,exports){
+},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],110:[function(require,module,exports){
 "use strict";
 
 var _core = require("@citation-js/core");
@@ -14950,7 +17122,7 @@ _core.plugins.add('@zenodo', {
 
   }
 });
-},{"./cff":98,"./cff-yaml":97,"./gh":99,"./npm":101,"./zenodo":102,"@citation-js/core":"citation-js","js-yaml":118}],101:[function(require,module,exports){
+},{"./cff":108,"./cff-yaml":107,"./gh":109,"./npm":111,"./zenodo":112,"@citation-js/core":"citation-js","js-yaml":133}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -15022,7 +17194,7 @@ function url(input) {
   const [, pkg] = input.match(/((@[^/]+\/)?[^/]+)$/);
   return `https://registry.npmjs.org/${pkg}`;
 }
-},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],102:[function(require,module,exports){
+},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -15370,7 +17542,7 @@ function format(input) {
 
 const VERSION = '1.0.0';
 exports.VERSION = VERSION;
-},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],103:[function(require,module,exports){
+},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -15393,12 +17565,23 @@ function parse(urls) {
 function parseAsync(urls) {
   return Promise.all([].concat(urls).map(fetchFileAsync));
 }
-},{"@citation-js/core":"citation-js"}],104:[function(require,module,exports){
+},{"@citation-js/core":"citation-js"}],114:[function(require,module,exports){
 module.exports={
   "langs": ["en"]
 }
 
-},{}],105:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
+module.exports={
+  "versions": { "values": "all", "props": ["P348:all"] },
+
+  "DistroWatchID": "P3112",
+  "FramalibreID": "P4107",
+  "RRID": "P9712",
+  "SW_MATHID": "P6830",
+  "SWHID": { "values": "any", "props": ["P6138", "P348#P6138"] }
+}
+
+},{}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -15415,6 +17598,8 @@ var response = _interopRequireWildcard(require("./response.js"));
 var _prop = require("./prop.js");
 
 var _props = _interopRequireDefault(require("./props.json"));
+
+var _customProps = _interopRequireDefault(require("./customProps.json"));
 
 var _ignoredProps = _interopRequireDefault(require("./ignoredProps.json"));
 
@@ -15493,6 +17678,18 @@ function parseEntity(entity) {
     }
   }
 
+  for (const prop in _customProps.default) {
+    const input = prepareValue(_customProps.default[prop], entity, unknown);
+
+    if (input) {
+      const output = (0, _prop.parseProp)(prop, input, entity);
+
+      if (output) {
+        data.custom[prop] = output;
+      }
+    }
+  }
+
   for (const prop of unknown) {
     if (prop in _ignoredProps.default) {
       continue;
@@ -15505,12 +17702,11 @@ function parseEntity(entity) {
     data.title = (0, _prop.getLabel)(entity);
   }
 
-  if (data['reviewed-title'] || data['reviewed-author']) {
-    if (data.type.slice(0, 6) !== 'review') {
-      data.type = 'review';
-    }
-
+  if (data.type.slice(0, 6) === 'review') {
     delete data.keyword;
+  } else {
+    delete data['reviewed-title'];
+    delete data['reviewed-author'];
   }
 
   if (data.recipient) {
@@ -15535,11 +17731,6 @@ function parseEntity(entity) {
     data.author = data['original-author'];
   }
 
-  if (data._versions) {
-    data.custom.versions = data._versions;
-    delete data._versions;
-  }
-
   return data;
 }
 
@@ -15554,7 +17745,7 @@ function parseEntities({
 }) {
   return response.parse(entities).map(parseEntity);
 }
-},{"./ignoredProps.json":107,"./prop.js":109,"./props.json":110,"./response.js":111,"@citation-js/core":"citation-js"}],106:[function(require,module,exports){
+},{"./customProps.json":115,"./ignoredProps.json":118,"./prop.js":120,"./props.json":121,"./response.js":122,"@citation-js/core":"citation-js"}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -15572,7 +17763,7 @@ function parseWikidata(data, langs) {
   const list = [].concat(data);
   return [].concat(_wikidataSdk.default.getManyEntities(list, langs || _config.default.langs));
 }
-},{"./config.json":104,"wikidata-sdk":175}],107:[function(require,module,exports){
+},{"./config.json":114,"wikidata-sdk":191}],118:[function(require,module,exports){
 module.exports={
   "P2860": "Cites",
   "P921": "Main subject",
@@ -15580,7 +17771,7 @@ module.exports={
   "P364": "Original language of work"
 }
 
-},{}],108:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -15709,12 +17900,13 @@ _core.plugins.add(ref, {
   input: formats,
   config: _config.default
 });
-},{"./api.js":103,"./config.json":104,"./entity.js":105,"./id.js":106,"./prop.js":109,"./url.js":113,"@citation-js/core":"citation-js"}],109:[function(require,module,exports){
+},{"./api.js":113,"./config.json":114,"./entity.js":116,"./id.js":117,"./prop.js":120,"./url.js":124,"@citation-js/core":"citation-js"}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.TYPE_PRIORITIES = void 0;
 exports.getLabel = getLabel;
 exports.default = exports.parse = exports.parseProp = parseProp;
 exports.parseType = parseType;
@@ -15807,6 +17999,55 @@ function parseVersion(version) {
   return output;
 }
 
+const TYPE_PRIORITIES = {
+  'review-book': 10,
+  review: 9,
+  'entry-dictionary': 5,
+  'entry-encyclopedia': 5,
+  map: 5,
+  dataset: 4,
+  legislation: 1,
+  'article-magazine': 0,
+  bill: 0,
+  chapter: 0,
+  classic: 0,
+  collection: 0,
+  entry: 0,
+  figure: 0,
+  graphic: 0,
+  hearing: 0,
+  interview: 0,
+  legal_case: 0,
+  manuscript: 0,
+  motion_picture: 0,
+  musical_score: 0,
+  pamphlet: 0,
+  'paper-conference': 0,
+  patent: 0,
+  personal_communication: 0,
+  'post-weblog': 0,
+  report: 0,
+  song: 0,
+  speech: 0,
+  standard: 0,
+  thesis: 0,
+  treaty: 0,
+  broadcast: -1,
+  'article-newspaper': -1,
+  'article-journal': -1,
+  periodical: -2,
+  regulation: -2,
+  post: -5,
+  webpage: -6,
+  software: -7,
+  article: -9,
+  book: -10,
+  performance: -11,
+  event: -12,
+  document: -100
+};
+exports.TYPE_PRIORITIES = TYPE_PRIORITIES;
+
 function parseProp(prop, value, entity) {
   switch (prop) {
     case 'type':
@@ -15866,7 +18107,7 @@ function parseProp(prop, value, entity) {
     case 'number-of-volumes':
       return value.length;
 
-    case '_versions':
+    case 'versions':
       return value.map(parseVersion);
 
     default:
@@ -15875,13 +18116,17 @@ function parseProp(prop, value, entity) {
 }
 
 function parseType(type) {
-  if (!_types.default[type]) {
+  const unmapped = Array.isArray(type) ? type : [type];
+  const mapped = unmapped.map(type => _types.default[type.value]).filter(Boolean);
+
+  if (!mapped.length) {
     _core.logger.unmapped('[plugin-wikidata]', 'publication type', type);
 
     return 'document';
   }
 
-  return _types.default[type];
+  mapped.sort((a, b) => TYPE_PRIORITIES[b] - TYPE_PRIORITIES[a]);
+  return mapped[0];
 }
 
 function getLabel(entity) {
@@ -15893,11 +18138,11 @@ function getLabel(entity) {
 
   return entity.labels[lang];
 }
-},{"./config.json":104,"./types.json":112,"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],110:[function(require,module,exports){
+},{"./config.json":114,"./types.json":123,"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],121:[function(require,module,exports){
 module.exports={
   "author": {
     "values": "all",
-    "props": ["P50", "P2093"]
+    "props": ["P50", "P2093", "P170", "P178"]
   },
   "composer": {
     "values": "all",
@@ -15918,10 +18163,6 @@ module.exports={
   "guest": {
     "values": "all",
     "props": ["P5030"]
-  },
-  "host": {
-    "values": "all",
-    "props": ["P371"]
   },
   "host": {
     "values": "all",
@@ -15998,7 +18239,7 @@ module.exports={
   },
   "ISSN": "P1433.P236",
   "issue": { "values": "any", "props": ["P433", "P1433#P433"] },
-  "issued": { "values": "any", "props": ["P577", "P1433#P577"]},
+  "issued": { "values": "any", "props": ["P577", "P1433#P577", "P348#P577"]},
   "journalAbbreviation": { "values": "any", "props": ["P1433.P1813", "P1433.P1160"] },
   "jurisdiction": "P1001",
   "keyword": {
@@ -16056,18 +18297,16 @@ module.exports={
     "values": "all",
     "props": ["P655"]
   },
-  "type": "P31",
+  "type": { "values": "all", "props": ["P31"] },
   "version": "P348",
   "volume": { "values": "any", "props": ["P478", "P1433#P478"] },
   "URL": {
     "values": "any",
-    "props": ["P856", "P953", "P973", "P2699"]
-  },
-
-  "_versions": { "values": "all", "props": ["P348:all"] }
+    "props": ["P856", "P953", "P2699"]
+  }
 }
 
-},{}],111:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -16104,11 +18343,23 @@ const FETCH_PUBLISHER = {
 const FETCH_ADDITIONAL = {
   P50: null,
   P57: null,
+  P58: null,
   P86: null,
   P98: null,
   P110: null,
+  P162: null,
+  P170: null,
+  P175: null,
+  P178: null,
+  P371: null,
+  P488: null,
   P655: null,
+  P664: null,
+  P1431: null,
+  P1640: null,
   P1817: null,
+  P2438: null,
+  P5030: null,
   P921: {
     P50: null
   },
@@ -16272,10 +18523,10 @@ async function parseAsync(entities) {
   const cache = await fillCacheAsync(entities);
   return finalizeItems(entities, cache);
 }
-},{"./api.js":103,"./id.js":106,"wikidata-sdk":175}],112:[function(require,module,exports){
+},{"./api.js":113,"./id.js":117,"wikidata-sdk":191}],123:[function(require,module,exports){
 module.exports={"Q2377289":"book","Q2396513":"book","Q2514954":"book","Q2537127":"book","Q2787237":"book","Q2831984":"book","Q3257187":"book","Q3257212":"book","Q3356371":"book","Q3423631":"dataset","Q3831846":"book","Q3831847":"book","Q3915339":"book","Q3975991":"book","Q4043103":"book","Q4067007":"book","Q4224691":"book","Q4230425":"book","Q4515179":"book","Q4677625":"book","Q4931288":"book","Q4943243":"book","Q5073531":"book","Q5093328":"book","Q5159310":"book","Q5189957":"book","Q5560014":"book","Q5591880":"book","Q6165948":"book","Q6374241":"book","Q6675210":"book","Q7291983":"book","Q8051587":"book","Q8275050":"book","Q9138748":"book","Q10656197":"book","Q10666342":"book","Q10666349":"book","Q10863072":"book","Q10911540":"book","Q11396303":"book","Q11424383":"book","Q11567160":"book","Q11589491":"book","Q11659402":"book","Q11750596":"book","Q11976342":"book","Q12021072":"book","Q12135062":"book","Q12215439":"book","Q12310958":"book","Q12327390":"book","Q12410152":"book","Q12731131":"book","Q13137339":"book","Q13430107":"book","Q13636757":"book","Q13751595":"book","Q16046027":"book","Q16385949":"book","Q16507688":"book","Q16670817":"book","Q16736578":"book","Q16968990":"book","Q17590416":"book","Q19379268":"book","Q19602268":"book","Q21446882":"book","Q21550981":"book","Q21598767":"book","Q21662746":"book","Q22988237":"book","Q25571778":"book","Q25679217":"book","Q26267321":"book","Q26271743":"book","Q26271823":"book","Q27277147":"book","Q29154430":"book","Q29586870":"book","Q31075282":"book","Q31441034":"book","Q31946409":"book","Q52005090":"book","Q52153485":"book","Q55610842":"book","Q56552233":"book","Q57933693":"book","Q58142059":"book","Q58211632":"book","Q58807269":"book","Q60226001":"book","Q60475414":"book","Q60475468":"book","Q60533444":"book","Q60627667":"book","Q60793696":"book","Q61696018":"book","Q63720062":"book","Q63922229":"book","Q65085460":"book","Q65769536":"book","Q65769568":"book","Q65769781":"book","Q65770793":"book","Q66382988":"book","Q72263827":"book","Q73153914":"book","Q73614409":"book","Q74634121":"book","Q74634279":"book","Q74634331":"book","Q74634636":"book","Q74634690":"book","Q74680846":"book","Q75112246":"book","Q75112260":"book","Q75112938":"book","Q75112943":"book","Q75112940":"book","Q75112946":"book","Q75112944":"book","Q75112950":"book","Q75112948":"book","Q75112954":"book","Q75112952":"book","Q75112959":"book","Q75112962":"book","Q75112966":"book","Q75112964":"book","Q75112971":"book","Q75112968":"book","Q75112973":"book","Q75112979":"book","Q75112976":"book","Q75112982":"book","Q75112987":"book","Q75112984":"book","Q75112990":"book","Q75112992":"book","Q75112999":"book","Q75112996":"book","Q75112997":"book","Q75113003":"book","Q75113001":"book","Q75113006":"book","Q75113005":"book","Q75113010":"book","Q75113008":"book","Q75113014":"book","Q75113015":"book","Q75113012":"book","Q75113019":"book","Q75113017":"book","Q75113023":"book","Q75113021":"book","Q75113025":"book","Q75113030":"book","Q75113028":"book","Q75113034":"book","Q75113032":"book","Q75113038":"book","Q75113037":"book","Q75113043":"book","Q75113041":"book","Q75113045":"book","Q75113050":"book","Q75113051":"book","Q75113048":"book","Q75113055":"book","Q75113053":"book","Q75113058":"book","Q75113057":"book","Q75113062":"book","Q75113060":"book","Q75113066":"book","Q75113064":"book","Q75113070":"book","Q75113071":"book","Q75113068":"book","Q75113073":"book","Q75113077":"book","Q75113082":"book","Q75113080":"book","Q75113085":"book","Q83818856":"book","Q84890753":"book","Q89676823":"book","Q92257259":"book","Q92259224":"book","Q97501585":"book","Q104438918":"book","Q105623646":"book","Q105890301":"book","Q106412622":"book","Q106597511":"book","Q106599082":"book","Q107026784":"book","Q107196901":"book","Q107339086":"book","Q109222913":"book","Q133792":"map","Q162206":"map","Q162827":"map","Q191072":"map","Q216526":"map","Q320228":"map","Q328720":"map","Q352416":"map","Q366511":"map","Q441903":"map","Q573980":"map","Q602481":"map","Q653848":"map","Q715789":"map","Q728502":"map","Q842617":"map","Q110078641":"book","Q110346117":"book","Q110494834":"book","Q1362775":"map","Q1410020":"map","Q110569815":"book","Q1453402":"map","Q1501880":"map","Q1502030":"map","Q1664468":"map","Q1783108":"map","Q110979523":"book","Q111028843":"book","Q1875628":"map","Q111051149":"book","Q2089517":"map","Q2127425":"map","Q111281891":"book","Q2177089":"map","Q111349622":"book","Q2309464":"map","Q2328087":"map","Q2353983":"map","Q2368091":"map","Q2426254":"map","Q111588306":"book","Q111594734":"book","Q2470969":"map","Q2471702":"map","Q2620815":"map","Q2656361":"map","Q112045634":"book","Q2940478":"map","Q2940522":"map","Q3268937":"map","Q3509676":"map","Q3515498":"map","Q3965372":"map","Q4120609":"map","Q4388138":"map","Q4505959":"map","Q5047387":"map","Q5177325":"map","Q5434353":"map","Q5594885":"map","Q6017843":"map","Q6158810":"map","Q6664848":"map","Q7104865":"map","Q7127170":"map","Q7291975":"map","Q7323492":"map","Q7646471":"map","Q7809952":"map","Q10544122":"map","Q11426259":"map","Q12059912":"map","Q14321585":"map","Q15877105":"map","Q17047956":"map","Q21935483":"map","Q22125384":"map","Q23887460":"map","Q41346237":"map","Q56753859":"map","Q61868337":"map","Q62071263":"map","Q63313331":"map","Q63872468":"map","Q64006414":"map","Q64138390":"map","Q65962034":"map","Q66495627":"map","Q69863064":"map","Q75085545":"map","Q86436436":"map","Q91985453":"map","Q94579381":"map","Q97016221":"map","Q97372097":"map","Q104885681":"map","Q108837752":"book","Q108862288":"book","Q87167":"manuscript","Q187947":"musical_score","Q253623":"patent","Q637866":"review-book","Q1002697":"periodical","Q1580166":"entry-dictionary","Q861911":"speech","Q2334719":"legal_case","Q5707594":"article-newspaper","Q1172284":"dataset","Q10870555":"report","Q13433827":"entry-encyclopedia","Q13442814":"article-journal","Q7216866":"post","Q17928402":"post-weblog","Q9388534":"collection","Q191067":"article","Q686822":"bill","Q11578774":"broadcast","Q23927052":"paper-conference","Q1980247":"chapter","Q106833":"book","Q174361":"book","Q193495":"book","Q203490":"book","Q203780":"book","Q216665":"book","Q223638":"book","Q241996":"book","Q254554":"book","Q273610":"book","Q265158":"review","Q448980":"book","Q489637":"book","Q604219":"book","Q605076":"book","Q642946":"software","Q30070590":"article-magazine","Q727715":"manuscript","Q756230":"regulation","Q830588":"book","Q855753":"book","Q890239":"book","Q913554":"book","Q922203":"legislation","Q944359":"book","Q1009641":"book","Q1072884":"book","Q1106827":"book","Q1184488":"book","Q1238720":"book","Q1250896":"book","Q1250897":"book","Q1294318":"software","Q1311092":"book","Q1415108":"book","Q1496857":"book","Q1507226":"book","Q1528894":"book","Q1569424":"book","Q1605954":"book","Q1609706":"book","Q1650727":"book","Q1760610":"periodical","Q1785330":"book","Q1792377":"book","Q1870591":"manuscript","Q1883939":"book","Q1986787":"book","Q2069066":"book","Q2072218":"book","Q2107273":"book","Q2128336":"book","Q2135225":"book","Q2208044":"book","Q1656682":"event","Q2314679":"book","Q2331348":"book","Q2363145":"book","Q317623":"standard","Q3331189":"book","Q7725634":"book","Q545861":"hearing","Q178651":"interview","Q3055347":"entry","Q30070753":"figure","Q4006":"map","Q11424":"motion_picture","Q1266946":"thesis","Q7366":"song","Q131569":"treaty","Q428148":"regulation","Q7397":"software","Q571":"book","Q23622":"book","Q43013":"book","Q49371":"legislation","Q35140":"performance","Q36774":"webpage","Q177771":"song","Q178122":"song","Q216860":"song","Q261434":"song","Q318894":"song","Q319448":"song","Q380233":"song","Q484692":"song","Q493169":"song","Q499042":"song","Q523896":"song","Q574784":"song","Q600094":"song","Q608862":"song","Q661651":"song","Q744327":"song","Q758422":"song","Q784074":"song","Q844450":"song","Q873000":"song","Q943929":"song","Q944800":"song","Q959583":"song","Q1009280":"song","Q1033810":"song","Q1033813":"song","Q1069070":"song","Q1073515":"song","Q1127578":"song","Q1148122":"song","Q1228189":"song","Q1229479":"song","Q1236108":"song","Q1288193":"song","Q1510942":"song","Q1779217":"song","Q1779319":"song","Q1899706":"song","Q1942905":"song","Q1963108":"song","Q2038845":"song","Q2058312":"song","Q2108499":"song","Q2138639":"song","Q2165184":"song","Q2212946":"song","Q2235352":"song","Q2281713":"song","Q2298624":"song","Q2334774":"song","Q2358279":"song","Q2544997":"song","Q2596399":"song","Q2891357":"song","Q2894096":"song","Q2956164":"song","Q3246270":"song","Q3345491":"song","Q3482281":"song","Q3562031":"song","Q3656514":"song","Q3843655":"song","Q3924081":"song","Q4770819":"song","Q4797274":"song","Q5031532":"song","Q5037289":"song","Q5151790":"song","Q5529931":"song","Q5747946":"song","Q6705418":"song","Q6781835":"song","Q6784085":"song","Q7148059":"song","Q7257251":"song","Q7314000":"song","Q7561608":"song","Q7579604":"song","Q7824869":"song","Q8053529":"song","Q8261762":"song","Q10600586":"song","Q10669480":"song","Q10677514":"song","Q11214531":"song","Q11341610":"song","Q11496089":"song","Q11502655":"song","Q11588375":"song","Q11637394":"song","Q12819160":"song","Q12976278":"song","Q12985660":"song","Q105872368":"map","Q106585509":"map","Q106963642":"map","Q108121955":"map","Q110996876":"map","Q111708950":"map","Q112076892":"map","Q93661":"software","Q104851":"software","Q116112":"software","Q131093":"software","Q137742":"software","Q166142":"software","Q184752":"software","Q208218":"software","Q210499":"software","Q218616":"software","Q281039":"software","Q351507":"software","Q358785":"software","Q386197":"software","Q438556":"software","Q444835":"software","Q528166":"software","Q529029":"software","Q581319":"software","Q598205":"software","Q604270":"software","Q629399":"software","Q639653":"software","Q676202":"software","Q694007":"software","Q735918":"software","Q816659":"software","Q830743":"software","Q854840":"software","Q856108":"software","Q861170":"software","Q872058":"software","Q876057":"software","Q884270":"software","Q891055":"software","Q893130":"software","Q13142456":"song","Q13212139":"song","Q13829124":"song","Q15810872":"song","Q15907187":"song","Q16084298":"song","Q16194930":"song","Q16891251":"song","Q16912992":"song","Q17102166":"song","Q17118203":"song","Q17118736":"song","Q17150323":"song","Q20107778":"song","Q20579345":"song","Q20737166":"song","Q21653344":"song","Q22086714":"song","Q23808313":"song","Q25022242":"song","Q28666781":"song","Q28704254":"song","Q39086064":"song","Q42681239":"song","Q48747276":"song","Q48952271":"song","Q55596271":"song","Q56299718":"song","Q56572789":"song","Q57248574":"song","Q59032066":"song","Q60030725":"song","Q61688673":"song","Q63141557":"song","Q64138195":"song","Q64139002":"song","Q64152470":"song","Q64152591":"song","Q65286306":"song","Q67608251":"song","Q341":"software","Q416":"periodical","Q11287":"software","Q14001":"software","Q19541":"software","Q58199":"software","Q61905":"software","Q81616558":"song","Q91192165":"song","Q93540236":"song","Q94499224":"song","Q97375316":"song","Q102250909":"song","Q104310542":"song","Q104831709":"song","Q107029565":"song","Q108823220":"song","Q109566187":"song","Q109566342":"song","Q109566383":"song","Q109566452":"song","Q110297557":"song","Q110647181":"song","Q111009299":"song","Q907342":"software","Q943442":"standard","Q946715":"software","Q956086":"software","Q956238":"software","Q999154":"software","Q1000501":"software","Q1003012":"software","Q1004415":"software","Q1023826":"software","Q1035852":"software","Q1035935":"software","Q1061077":"software","Q1092177":"software","Q1096695":"software","Q1124648":"software","Q1143070":"software","Q1156072":"software","Q1156881":"software","Q1172313":"software","Q1172474":"software","Q1178921":"software","Q1200186":"software","Q1254596":"software","Q1275377":"software","Q1297182":"software","Q1318054":"software","Q1335007":"software","Q1345429":"software","Q1369666":"software","Q1371279":"software","Q1384501":"software","Q1386743":"software","Q1403556":"software","Q1419081":"software","Q1427675":"software","Q1475717":"review","Q1480561":"software","Q1531370":"software","Q1594330":"software","Q1641413":"software","Q1668023":"software","Q1674651":"software","Q1739331":"dataset","Q1757693":"software","Q1760545":"software","Q1995545":"software","Q2023643":"software","Q2053289":"software","Q2057931":"software","Q2072225":"software","Q2102850":"software","Q2132167":"software","Q2134087":"software","Q2164499":"software","Q2259352":"software","Q2404906":"software","Q2418022":"software","Q2429814":"software","Q2463207":"software","Q2532749":"software","Q2916479":"software","Q2996416":"software","Q3125508":"software","Q3257918":"software","Q3257934":"software","Q3539533":"software","Q3618796":"software","Q3752489":"software","Q3809412":"software","Q4039665":"software","Q4043509":"software","Q4117406":"software","Q4120889":"software","Q4303335":"software","Q4307913":"software","Q4346576":"software","Q4388320":"software","Q4406907":"software","Q4550939":"software","Q4774400":"software","Q4774436":"software","Q4811587":"software","Q4826753":"software","Q4828920":"software","Q4943247":"software","Q5157529":"software","Q5249204":"software","Q5283161":"software","Q5287634":"software","Q5327172":"software","Q5416718":"software","Q5500964":"software","Q5535060":"software","Q5597177":"software","Q5610543":"software","Q5628889":"software","Q5957560":"software","Q6020321":"software","Q6059927":"software","Q6060218":"software","Q6484272":"software","Q6543028":"software","Q6543035":"software","Q6895998":"software","Q7094135":"software","Q7144990":"software","Q7201225":"software","Q7240669":"software","Q7247856":"software","Q7311809":"software","Q7312175":"software","Q7314108":"software","Q7392743":"software","Q7395178":"software","Q7554365":"standard","Q7558983":"software","Q7565031":"software","Q7573049":"software","Q7644530":"software","Q7833919":"software","Q7880671":"software","Q7927896":"software","Q7934950":"software","Q7935096":"software","Q8012311":"software","Q9127910":"software","Q10413423":"software","Q11275354":"software","Q11942877":"software","Q12014419":"software","Q12046424":"software","Q13515741":"software","Q15456942":"software","Q15593630":"software","Q15618637":"software","Q15933979":"software","Q16920237":"software","Q16947796":"software","Q17077007":"software","Q17081023":"software","Q17093781":"software","Q17137706":"software","Q18922759":"software","Q19307174":"software","Q20726407":"webpage","Q21129801":"software","Q21743174":"software","Q23931362":"software","Q24021076":"software","Q24091050":"software","Q24480005":"software","Q24841467":"software","Q25374232":"software","Q25588783":"software","Q26203767":"software","Q27861186":"software","Q28057052":"software","Q28148501":"software","Q28167864":"software","Q28778566":"software","Q28812506":"software","Q28966214":"software","Q29032804":"software","Q29032808":"software","Q29645725":"software","Q29649691":"software","Q30113732":"software","Q30324611":"software","Q30740917":"software","Q50316487":"software","Q50355772":"software","Q50410214":"software","Q51938570":"software","Q56273712":"software","Q56297973":"software","Q56298373":"software","Q56660744":"software","Q56842894":"software","Q60229368":"standard","Q61906203":"software","Q62057790":"software","Q63213147":"software","Q65951263":"software","Q66436511":"software","Q71348743":"software","Q76158006":"software","Q76443836":"software","Q77685760":"software","Q79600797":"software","Q80261011":"software","Q82748357":"software","Q85757110":"software","Q88465956":"software","Q89292899":"software","Q91314720":"software","Q91447167":"software","Q93533999":"software","Q95001953":"software","Q97656063":"software","Q130232":"motion_picture","Q157443":"motion_picture","Q185529":"motion_picture","Q188473":"motion_picture","Q202866":"motion_picture","Q219557":"motion_picture","Q226730":"motion_picture","Q229390":"motion_picture","Q319221":"motion_picture","Q336144":"motion_picture","Q369747":"motion_picture","Q370630":"motion_picture","Q421719":"motion_picture","Q430525":"motion_picture","Q455315":"motion_picture","Q455620":"motion_picture","Q459290":"motion_picture","Q505119":"motion_picture","Q506240":"motion_picture","Q517386":"motion_picture","Q628165":"motion_picture","Q645928":"motion_picture","Q652256":"motion_picture","Q663106":"motion_picture","Q677466":"dataset","Q790192":"motion_picture","Q842256":"motion_picture","Q848512":"motion_picture","Q882006":"motion_picture","Q917641":"motion_picture","Q959790":"motion_picture","Q1054574":"motion_picture","Q1067324":"motion_picture","Q1135802":"motion_picture","Q1146335":"motion_picture","Q1200678":"motion_picture","Q1251417":"motion_picture","Q1257444":"motion_picture","Q1268687":"motion_picture","Q1320115":"motion_picture","Q1339864":"motion_picture","Q1361932":"motion_picture","Q1397462":"motion_picture","Q1899749":"motion_picture","Q1933746":"motion_picture","Q1935609":"motion_picture","Q1994410":"motion_picture","Q2125170":"motion_picture","Q2143665":"motion_picture","Q2156835":"motion_picture","Q2165644":"motion_picture","Q2301591":"motion_picture","Q2484376":"motion_picture","Q2903140":"motion_picture","Q2973181":"motion_picture","Q3066315":"motion_picture","Q3072031":"motion_picture","Q3072043":"motion_picture","Q3294961":"motion_picture","Q3327002":"motion_picture","Q3585697":"motion_picture","Q3634883":"motion_picture","Q3648909":"motion_picture","Q3745400":"motion_picture","Q4220915":"motion_picture","Q4484381":"motion_picture","Q5145881":"motion_picture","Q5156753":"motion_picture","Q6133352":"motion_picture","Q7130449":"motion_picture","Q24862":"motion_picture","Q24865":"motion_picture","Q24869":"motion_picture","Q98808364":"software","Q98808384":"software","Q98808893":"software","Q98812836":"software","Q99263266":"software","Q100148106":"software","Q101408242":"software","Q104529428":"software","Q104595152":"software","Q104855363":"software","Q104901669":"software","Q105034815":"software","Q105557478":"software","Q105558035":"software","Q105832388":"software","Q106466562":"software","Q106572402":"software","Q106777209":"software","Q107417836":"software","Q108759345":"software","Q109252818":"software","Q110272868":"software","Q110322910":"software","Q110498923":"software","Q110509708":"software","Q111100275":"software","Q111660063":"software","Q7257728":"motion_picture","Q7299951":"motion_picture","Q7858343":"motion_picture","Q8030668":"motion_picture","Q9259727":"motion_picture","Q10475300":"motion_picture","Q11570976":"motion_picture","Q12410174":"motion_picture","Q12912091":"motion_picture","Q15859327":"motion_picture","Q16034224":"motion_picture","Q16641504":"motion_picture","Q16721823":"motion_picture","Q16909344":"motion_picture","Q17013749":"motion_picture","Q17123180":"motion_picture","Q18011171":"motion_picture","Q18011172":"motion_picture","Q18156020":"motion_picture","Q20202970":"motion_picture","Q20442589":"motion_picture","Q20650540":"motion_picture","Q21858363":"motion_picture","Q24887738":"motion_picture","Q24960157":"motion_picture","Q25212003":"motion_picture","Q26225677":"motion_picture","Q28735856":"motion_picture","Q29017630":"motion_picture","Q29226975":"motion_picture","Q33111614":"motion_picture","Q33373157":"motion_picture","Q48816645":"motion_picture","Q178406":"performance","Q204854":"performance","Q279752":"performance","Q823571":"performance","Q902899":"performance","Q1124733":"performance","Q1125630":"performance","Q1330221":"performance","Q1486440":"performance","Q1751775":"performance","Q1820662":"performance","Q2319401":"performance","Q2416176":"performance","Q2784170":"performance","Q2828251":"performance","Q2905677":"performance","Q3010369":"performance","Q3492850":"performance","Q3635468":"performance","Q5100970":"performance","Q54344007":"motion_picture","Q6942562":"performance","Q56240556":"motion_picture","Q7785123":"performance","Q11572071":"performance","Q11774631":"performance","Q11812395":"performance","Q60753838":"motion_picture","Q60965006":"motion_picture","Q61283808":"motion_picture","Q12535023":"performance","Q13136212":"performance","Q13454063":"performance","Q63302132":"motion_picture","Q15522668":"performance","Q64777087":"motion_picture","Q68974025":"motion_picture","Q21156425":"performance","Q73504838":"motion_picture","Q24906831":"performance","Q28492397":"performance","Q77906388":"motion_picture","Q30141393":"performance","Q88400940":"motion_picture","Q40249767":"performance","Q40249907":"performance","Q40250279":"performance","Q89928742":"motion_picture","Q45999579":"performance","Q47468117":"performance","Q47513101":"book","Q99526025":"motion_picture","Q52239285":"performance","Q101973724":"motion_picture","Q102706436":"motion_picture","Q103888910":"motion_picture","Q104840802":"motion_picture","Q107210978":"motion_picture","Q107210977":"motion_picture","Q109108478":"motion_picture","Q109122021":"motion_picture","Q109323491":"motion_picture","Q109733358":"motion_picture","Q109911570":"motion_picture","Q111241092":"motion_picture","Q111590800":"motion_picture","Q111745923":"motion_picture","Q81201196":"webpage","Q102241450":"performance","Q104872740":"performance","Q106499608":"performance","Q107100830":"performance","Q109044916":"performance","Q105004976":"webpage","Q106044661":"webpage","Q108156364":"webpage","Q109647055":"webpage","Q181589":"legislation","Q197806":"legislation","Q208202":"legislation","Q328293":"legislation","Q110227941":"webpage","Q476068":"legislation","Q574759":"legislation","Q621608":"legislation","Q661356":"legislation","Q694045":"legislation","Q903453":"legislation","Q928812":"legislation","Q110874299":"webpage","Q1135306":"legislation","Q111136048":"webpage","Q111279923":"webpage","Q1414472":"legislation","Q1637292":"legislation","Q1803798":"legislation","Q1864489":"legislation","Q1930934":"legislation","Q1938208":"legislation","Q1944228":"legislation","Q1946268":"legislation","Q2002525":"legislation","Q2070258":"legislation","Q111961945":"webpage","Q2094042":"legislation","Q2125353":"legislation","Q2251446":"legislation","Q2415181":"legislation","Q2416325":"legislation","Q2541543":"legislation","Q2799362":"legislation","Q3152878":"legislation","Q3430295":"legislation","Q3494013":"legislation","Q3571226":"legislation","Q4184949":"legislation","Q4349624":"legislation","Q4718567":"legislation","Q4774377":"legislation","Q4792967":"legislation","Q5021113":"legislation","Q5122775":"legislation","Q5133519":"legislation","Q5163317":"legislation","Q5313672":"legislation","Q6453643":"legislation","Q6542565":"legislation","Q7100795":"legislation","Q7243147":"legislation","Q7307387":"legislation","Q7327674":"legislation","Q7432325":"legislation","Q10263225":"legislation","Q10316956":"legislation","Q10701048":"legislation","Q11391992":"legislation","Q11644876":"legislation","Q11900299":"legislation","Q12760881":"legislation","Q13515734":"legislation","Q14565721":"legislation","Q16661688":"legislation","Q17018036":"legislation","Q18449256":"legislation","Q18894753":"legislation","Q18900373":"legislation","Q19752986":"legislation","Q19889049":"legislation","Q25339629":"legislation","Q1494741":"webpage","Q1503327":"webpage","Q1650567":"webpage","Q2139769":"webpage","Q2261569":"webpage","Q2641220":"webpage","Q2737701":"webpage","Q7631805":"webpage","Q23691297":"webpage","Q52314485":"performance","Q55760977":"performance","Q56477241":"performance","Q66371350":"webpage","Q78331840":"motion_picture","Q11439":"webpage","Q79355877":"book","Q85860240":"performance","Q213924":"manuscript","Q274076":"manuscript","Q390477":"manuscript","Q720106":"manuscript","Q865595":"manuscript","Q962741":"manuscript","Q1067768":"manuscript","Q1266076":"manuscript","Q1320539":"manuscript","Q110393809":"legislation","Q1641020":"manuscript","Q1671640":"manuscript","Q110707194":"legislation","Q1784036":"manuscript","Q2049275":"manuscript","Q2209578":"manuscript","Q2217259":"manuscript","Q111194727":"legislation","Q111208084":"legislation","Q2427245":"manuscript","Q2531964":"manuscript","Q2801575":"manuscript","Q2816501":"manuscript","Q3220177":"manuscript","Q3240926":"manuscript","Q3252544":"manuscript","Q3560324":"manuscript","Q3919785":"legislation","Q3960554":"manuscript","Q4475654":"manuscript","Q7012086":"manuscript","Q7261481":"manuscript","Q7452368":"manuscript","Q9026959":"manuscript","Q11564158":"manuscript","Q11613006":"manuscript","Q12043767":"manuscript","Q13430250":"manuscript","Q11122":"treaty","Q17143154":"manuscript","Q21089188":"manuscript","Q22669850":"manuscript","Q22948347":"manuscript","Q23840892":"manuscript","Q30103158":"manuscript","Q31078443":"manuscript","Q33308141":"manuscript","Q27243428":"legislation","Q28024845":"legislation","Q28097703":"legislation","Q28110087":"legislation","Q28807480":"legislation","Q60795643":"manuscript","Q35258599":"legislation","Q65769424":"manuscript","Q48498":"manuscript","Q49335":"manuscript","Q50319172":"legislation","Q193170":"treaty","Q252550":"treaty","Q625298":"treaty","Q837144":"treaty","Q88295258":"manuscript","Q60751404":"legislation","Q62179152":"legislation","Q63718677":"legislation","Q93643300":"manuscript","Q64605672":"legislation","Q64605677":"legislation","Q64605843":"legislation","Q64605863":"legislation","Q64607511":"legislation","Q65203908":"legislation","Q65203962":"legislation","Q65204493":"legislation","Q65204496":"legislation","Q67121475":"legislation","Q98561538":"manuscript","Q99032061":"manuscript","Q104198179":"manuscript","Q104199632":"manuscript","Q104211636":"manuscript","Q104417320":"manuscript","Q106957643":"manuscript","Q107007162":"manuscript","Q107181871":"manuscript","Q107213692":"manuscript","Q96048686":"legislation","Q97176272":"legislation","Q99771118":"legislation","Q102046748":"legislation","Q105071469":"legislation","Q105077399":"legislation","Q105106133":"legislation","Q105394735":"legislation","Q106377223":"legislation","Q106377248":"legislation","Q106463758":"legislation","Q143217":"musical_score","Q897381":"musical_score","Q1329869":"musical_score","Q1955137":"musical_score","Q2457903":"musical_score","Q2552822":"musical_score","Q57205857":"treaty","Q7190079":"musical_score","Q7452061":"musical_score","Q7673115":"musical_score","Q17991520":"musical_score","Q106393006":"interview","Q106813818":"interview","Q108418154":"interview","Q108576949":"interview","Q108679208":"interview","Q82317825":"treaty","Q108823064":"interview","Q109016973":"interview","Q109418359":"interview","Q110621229":"interview","Q85750821":"treaty","Q95692585":"treaty","Q97200740":"treaty","Q104178698":"treaty","Q110484215":"treaty","Q195414":"interview","Q442919":"interview","Q850171":"interview","Q1384479":"interview","Q1477475":"interview","Q1799882":"interview","Q2106925":"interview","Q3055290":"interview","Q3055291":"interview","Q3156406":"interview","Q4202018":"interview","Q4317093":"interview","Q5280330":"interview","Q7256239":"interview","Q7305960":"interview","Q65943904":"musical_score","Q7625207":"interview","Q8776455":"interview","Q12054584":"interview","Q16947017":"interview","Q22905880":"interview","Q864737":"treaty","Q931855":"treaty","Q1242841":"treaty","Q1414340":"treaty","Q1498487":"treaty","Q1671773":"treaty","Q1711115":"treaty","Q1758832":"treaty","Q1791610":"treaty","Q1976409":"treaty","Q2039547":"treaty","Q2113720":"treaty","Q2243479":"treaty","Q2245859":"treaty","Q2252156":"treaty","Q2290707":"treaty","Q2300991":"treaty","Q2325350":"treaty","Q2465017":"treaty","Q3305388":"treaty","Q3824506":"treaty","Q3847997":"treaty","Q4426710":"treaty","Q4461806":"treaty","Q4872029":"treaty","Q4985043":"treaty","Q6908053":"treaty","Q6934728":"treaty","Q6944158":"treaty","Q9557810":"treaty","Q11455760":"treaty","Q11510761":"treaty","Q11637357":"treaty","Q16835935":"treaty","Q16956642":"treaty","Q17124128":"treaty","Q18471364":"treaty","Q45933791":"interview","Q104479805":"musical_score","Q19958750":"treaty","Q20755435":"treaty","Q21044709":"treaty","Q21702674":"treaty","Q26877661":"treaty","Q29526855":"treaty","Q29527278":"treaty","Q29527544":"treaty","Q29883540":"treaty","Q30747863":"treaty","Q30921722":"treaty","Q38653134":"treaty","Q39234269":"treaty","Q50192946":"treaty","Q450873":"patent","Q681875":"patent","Q864645":"patent","Q913351":"patent","Q111020843":"review","Q2359937":"patent","Q5399577":"patent","Q19787436":"patent","Q580922":"article-journal","Q759838":"article","Q1809676":"article","Q2106255":"article-journal","Q2136117":"article","Q2438528":"report","Q6646525":"article","Q7582241":"article","Q265871":"review","Q1399118":"review","Q1589335":"review","Q2416230":"review","Q132364":"standard","Q170417":"standard","Q178562":"standard","Q184759":"standard","Q198614":"standard","Q235557":"standard","Q272683":"standard","Q290378":"standard","Q293813":"standard","Q304433":"standard","Q312100":"standard","Q375479":"standard","Q385853":"standard","Q579565":"standard","Q635130":"standard","Q681263":"standard","Q682415":"standard","Q774901":"standard","Q834575":"standard","Q848031":"standard","Q4589696":"review","Q5196473":"review","Q5251247":"review","Q15138389":"webpage","Q35639987":"patent","Q7247798":"review","Q17633526":"article-newspaper","Q18454631":"article","Q19389637":"entry-encyclopedia","Q21403168":"article","Q43305660":"patent","Q26260507":"broadcast","Q20058247":"review","Q42350535":"article","Q58010711":"article","Q56515249":"review","Q61992233":"review","Q75823667":"article","Q77253277":"article-journal","Q27588":"review","Q69699844":"review","Q31022":"standard","Q43521":"standard","Q105541326":"musical_score","Q105659338":"musical_score","Q105659385":"musical_score","Q105659398":"musical_score","Q105659428":"musical_score","Q105659450":"musical_score","Q105659498":"musical_score","Q105659558":"musical_score","Q105659572":"musical_score","Q105660091":"musical_score","Q105660178":"musical_score","Q105671645":"musical_score","Q105672249":"musical_score","Q105686838":"musical_score","Q106129133":"musical_score","Q80698083":"review","Q86460068":"review","Q86540783":"review","Q93404209":"review","Q104445146":"dataset","Q106253373":"article","Q106645507":"article","Q106648287":"article","Q98967226":"review","Q104898869":"review","Q106677599":"review","Q106707189":"review","Q107610481":"review","Q107610646":"review","Q108492447":"review","Q107560916":"standard","Q109560589":"standard","Q109829629":"standard","Q110040336":"standard","Q110404686":"standard","Q110421054":"standard","Q110822406":"standard","Q853547":"standard","Q917023":"standard","Q917824":"standard","Q919510":"standard","Q927865":"standard","Q932938":"standard","Q996023":"standard","Q1091326":"standard","Q1144899":"standard","Q1148887":"standard","Q1153670":"standard","Q1155472":"standard","Q1193215":"standard","Q1233868":"standard","Q1271511":"standard","Q1334738":"standard","Q1349015":"standard","Q1584581":"standard","Q1745938":"standard","Q1779838":"standard","Q2141493":"standard","Q2309650":"standard","Q2380440":"standard","Q2505632":"standard","Q2661442":"standard","Q2680559":"standard","Q2722351":"standard","Q3163103":"standard","Q3343904":"standard","Q3477575":"standard","Q3979666":"standard","Q5008573":"standard","Q5100562":"standard","Q5117123":"standard","Q5201840":"standard","Q5570849":"standard","Q6046311":"standard","Q6108055":"standard","Q6313217":"standard","Q6815743":"standard","Q6964137":"standard","Q7248507":"standard","Q7598374":"standard","Q7884737":"standard","Q11320552":"standard","Q11362401":"standard","Q11509377":"standard","Q12623246":"standard","Q13420342":"standard","Q14955693":"standard","Q15613582":"standard","Q15808102":"standard","Q15848903":"standard","Q16937237":"standard","Q22906682":"standard","Q23824424":"standard","Q24574728":"standard","Q25393707":"standard","Q26119883":"standard","Q26763979":"standard","Q29473497":"standard","Q39050366":"standard","Q42794186":"standard","Q44409829":"standard","Q45941145":"dataset","Q47119608":"standard","Q47477642":"standard","Q51885764":"standard","Q52162337":"standard","Q52162346":"standard","Q55593943":"standard","Q55755785":"standard","Q55871434":"standard","Q56277227":"standard","Q56751006":"standard","Q58184783":"standard","Q58467951":"standard","Q58468273":"standard","Q65037409":"standard","Q67035425":"standard","Q84957891":"standard","Q85785649":"standard","Q85875700":"standard","Q100708753":"standard","Q104213466":"standard","Q104634626":"standard","Q104948405":"standard","Q105047548":"standard","Q105989562":"standard","Q105989599":"standard","Q105990004":"standard","Q105990097":"standard","Q184528":"speech","Q203737":"speech","Q261197":"speech","Q272281":"speech","Q554211":"speech","Q55631395":"regulation","Q787020":"speech","Q805093":"speech","Q891813":"speech","Q960189":"speech","Q111193247":"standard","Q62966720":"regulation","Q66325840":"regulation","Q3074":"regulation","Q72389425":"regulation","Q862685":"bill","Q876477":"bill","Q1006544":"bill","Q1591172":"bill","Q3878684":"bill","Q5953169":"bill","Q7246224":"bill","Q7257705":"bill","Q7885007":"bill","Q10437243":"bill","Q10437244":"bill","Q10501549":"bill","Q10550020":"bill","Q10553236":"bill","Q11706145":"bill","Q87722315":"regulation","Q87745167":"regulation","Q88221447":"regulation","Q88323877":"regulation","Q88761692":"regulation","Q90659435":"regulation","Q16602140":"bill","Q16821677":"bill","Q17156988":"bill","Q18334806":"bill","Q20917883":"bill","Q21655772":"bill","Q24964968":"bill","Q99773426":"regulation","Q99902083":"regulation","Q28457660":"bill","Q1002816":"hearing","Q1167776":"hearing","Q30587581":"bill","Q105635736":"regulation","Q105749581":"regulation","Q105845569":"regulation","Q106570004":"regulation","Q106947327":"regulation","Q4888807":"hearing","Q108696274":"regulation","Q109042905":"regulation","Q7099379":"hearing","Q109934417":"legislation","Q110590221":"regulation","Q110623683":"regulation","Q60797":"speech","Q182899":"regulation","Q281095":"regulation","Q536149":"regulation","Q573538":"regulation","Q732898":"regulation","Q845436":"regulation","Q1538155":"regulation","Q1698722":"regulation","Q2113439":"regulation","Q2183290":"regulation","Q3027601":"regulation","Q4590880":"regulation","Q5165640":"regulation","Q5411641":"regulation","Q6665312":"regulation","Q6842880":"regulation","Q7075804":"regulation","Q7448168":"regulation","Q7832074":"regulation","Q7832073":"regulation","Q7880553":"regulation","Q7959501":"regulation","Q9050660":"regulation","Q9067730":"regulation","Q10713442":"regulation","Q75447980":"bill","Q12049270":"regulation","Q17010171":"regulation","Q85512917":"bill","Q28136600":"regulation","Q28525375":"regulation","Q106377135":"bill","Q106377140":"bill","Q106377258":"bill","Q106377257":"bill","Q110454131":"bill","Q50412353":"regulation","Q549638":"periodical","Q567357":"periodical","Q614289":"periodical","Q737498":"periodical","Q1227078":"periodical","Q1250903":"periodical","Q1250900":"periodical","Q1770383":"periodical","Q2065227":"periodical","Q2291158":"periodical","Q2305295":"periodical","Q1121851":"speech","Q2586014":"periodical","Q1346967":"speech","Q1389170":"speech","Q2903810":"periodical","Q3129162":"periodical","Q1832748":"speech","Q1833700":"speech","Q1840948":"speech","Q3186812":"periodical","Q1923787":"speech","Q1980740":"speech","Q3374808":"periodical","Q2127053":"speech","Q2136176":"speech","Q2183050":"speech","Q3490128":"periodical","Q2694964":"speech","Q2895132":"speech","Q3030189":"speech","Q3030216":"speech","Q3040417":"speech","Q5209394":"periodical","Q4329077":"speech","Q4388316":"speech","Q6307419":"periodical","Q5152362":"speech","Q6517555":"periodical","Q5264168":"speech","Q7506281":"periodical","Q7620434":"periodical","Q6735422":"speech","Q6972133":"speech","Q7628679":"speech","Q7979513":"speech","Q9288110":"periodical","Q10623884":"periodical","Q10536399":"speech","Q12102552":"periodical","Q10953735":"speech","Q11261492":"speech","Q11399933":"speech","Q11496736":"speech","Q11504413":"speech","Q11639251":"speech","Q11798867":"speech","Q11917341":"speech","Q11981659":"speech","Q12336939":"speech","Q13499711":"speech","Q13571862":"speech","Q13611058":"speech","Q13632631":"speech","Q15749620":"periodical","Q15853847":"speech","Q15877576":"speech","Q16962603":"speech","Q17010067":"speech","Q18907443":"speech","Q19776345":"speech","Q24634210":"broadcast","Q25451361":"periodical","Q27963520":"periodical","Q28869365":"periodical","Q50808469":"periodical","Q55089306":"periodical","Q55630524":"periodical","Q56191193":"speech","Q56192445":"speech","Q60534272":"periodical","Q60061482":"speech","Q60780612":"speech","Q61051477":"speech","Q11032":"periodical","Q30849":"periodical","Q41298":"periodical","Q49850":"periodical","Q88462341":"speech","Q96574230":"speech","Q100115646":"speech","Q100701567":"speech","Q104816002":"speech","Q107268129":"speech","Q108070213":"speech","Q108453730":"speech","Q109036000":"speech","Q110340050":"speech","Q110629616":"speech","Q82753":"dataset","Q186588":"dataset","Q193351":"dataset","Q367680":"dataset","Q857354":"dataset","Q1172480":"dataset","Q1469824":"dataset","Q2352616":"dataset","Q3219655":"dataset","Q3304360":"dataset","Q3519041":"dataset","Q3997298":"dataset","Q5227330":"dataset","Q5340806":"dataset","Q5465452":"dataset","Q6499736":"dataset","Q6973929":"dataset","Q7079603":"dataset","Q7884241":"dataset","Q7943567":"dataset","Q8034984":"dataset","Q20088085":"entry-dictionary","Q20088089":"entry-dictionary","Q17305522":"dataset","Q97466636":"thesis","Q18814183":"dataset","Q175331":"event","Q185220":"event","Q189760":"event","Q21264512":"dataset","Q106276531":"thesis","Q107490693":"thesis","Q31386861":"dataset","Q31388616":"dataset","Q111475835":"thesis","Q111475860":"thesis","Q111476177":"thesis","Q32945468":"dataset","Q43570203":"dataset","Q44106130":"dataset","Q50826803":"dataset","Q60534442":"periodical","Q55387750":"dataset","Q67016056":"periodical","Q187685":"thesis","Q798134":"thesis","Q1414362":"thesis","Q1884156":"thesis","Q1907875":"thesis","Q39825":"dataset","Q49918":"dataset","Q18249952":"thesis","Q77231205":"dataset","Q77231662":"dataset","Q88566195":"periodical","Q95916748":"periodical","Q96095238":"periodical","Q96096738":"periodical","Q96225078":"periodical","Q96241181":"periodical","Q96251079":"periodical","Q96358835":"periodical","Q96359087":"periodical","Q96621011":"periodical","Q96635732":"periodical","Q98704303":"periodical","Q30749496":"thesis","Q27259":"event","Q27318":"event","Q46855":"event","Q100282728":"periodical","Q91137337":"dataset","Q104213422":"periodical","Q94709889":"dataset","Q104897316":"periodical","Q104897459":"periodical","Q105353738":"periodical","Q105641905":"periodical","Q96051494":"dataset","Q96213647":"dataset","Q97173834":"dataset","Q108441504":"periodical","Q109819438":"entry-dictionary","Q110444999":"periodical","Q110479257":"periodical","Q101113283":"dataset","Q112031239":"periodical","Q104819290":"dataset","Q105036058":"dataset","Q46629343":"thesis","Q105342529":"dataset","Q106415528":"dataset","Q106603459":"dataset","Q107986363":"map","Q51282441":"thesis","Q110670200":"dataset","Q110686914":"dataset","Q111095542":"dataset","Q57262921":"thesis","Q200538":"event","Q207549":"event","Q254832":"event","Q261426":"event","Q267995":"event","Q273039":"event","Q273182":"event","Q312543":"event","Q318862":"event","Q378427":"event","Q383078":"event","Q446354":"event","Q450487":"event","Q481638":"event","Q517909":"event","Q558566":"event","Q603773":"event","Q625994":"event","Q635377":"event","Q635568":"event","Q645767":"event","Q657449":"event","Q683388":"event","Q745325":"event","Q812298":"event","Q841654":"event","Q847696":"event","Q860700":"event","Q860879":"event","Q868291":"event","Q885621":"event","Q951537":"event","Q1004317":"event","Q1004895":"event","Q1005954":"event","Q1006250":"event","Q1006694":"event","Q1009898":"event","Q1070669":"event","Q1106728":"event","Q1113939":"event","Q1135376":"event","Q1140043":"event","Q1140660":"event","Q1160214":"event","Q1306940":"event","Q1421331":"event","Q1431232":"event","Q1445650":"event","Q1457237":"event","Q1539016":"event","Q1567963":"performance","Q1568205":"event","Q1583778":"event","Q1643594":"event","Q1644573":"event","Q1668139":"event","Q1673271":"event","Q1694159":"event","Q1714945":"event","Q1733014":"event","Q1741794":"event","Q1751515":"event","Q1802168":"event","Q1819008":"broadcast","Q1863677":"event","Q1938861":"event","Q1984492":"event","Q2096163":"event","Q2136042":"event","Q2140455":"event","Q2147865":"event","Q2175990":"event","Q2177993":"event","Q2239246":"event","Q2253556":"event","Q2277475":"event","Q2280405":"event","Q2312082":"event","Q2332228":"event","Q2343198":"event","Q2441722":"event","Q2497972":"event","Q2545934":"event","Q2558684":"event","Q2609546":"event","Q2627975":"event","Q2681701":"event","Q2702632":"event","Q2761147":"event","Q2855494":"event","Q2985198":"event","Q2999003":"event","Q2999004":"event","Q3029385":"event","Q3191634":"event","Q3194451":"event","Q3304140":"event","Q3354903":"event","Q3428752":"event","Q3533809":"event","Q3734784":"event","Q3765035":"event","Q3834389":"event","Q3850676":"event","Q3918368":"event","Q4060300":"event","Q4829973":"event","Q4941415":"event","Q5469948":"event","Q5495352":"event","Q5953202":"event","Q6392390":"event","Q6549200":"event","Q6739275":"event","Q7179683":"event","Q7203113":"event","Q7205288":"event","Q7246244":"event","Q7269307":"event","Q7502926":"event","Q7912065":"event","Q10501952":"event","Q10712494":"event","Q10772859":"event","Q11263497":"event","Q11555016":"event","Q11612751":"event","Q12048934":"event","Q12508892":"event","Q13156501":"event","Q13156520":"event","Q13406554":"event","Q13728461":"event","Q13973290":"event","Q14208553":"event","Q14645228":"event","Q14828014":"event","Q15051339":"event","Q15116915":"event","Q15238777":"event","Q15275719":"event","Q15633604":"event","Q15726688":"event","Q15804130":"event","Q15820322":"event","Q16022392":"event","Q16510064":"event","Q16743915":"event","Q17193309":"event","Q17414829":"event","Q18915726":"event","Q20182967":"event","Q20649656":"event","Q20823612":"event","Q21358050":"event","Q21550582":"event","Q21893675":"event","Q22667754":"event","Q23058953":"event","Q23579700":"book","Q24030666":"event","Q24037741":"event","Q24273026":"event","Q24870096":"event","Q26883550":"event","Q27690146":"event","Q27968055":"event","Q28924760":"event","Q29052255":"event","Q29156916":"event","Q30111082":"event","Q32948345":"event","Q33385772":"event","Q42880958":"event","Q43099500":"event","Q43100730":"event","Q44532072":"event","Q47136026":"event","Q47150471":"event","Q50744367":"event","Q52260246":"event","Q55604548":"event","Q56298858":"event","Q58687420":"event","Q60221005":"event","Q63522650":"event","Q63523297":"event","Q64242378":"event","Q64348974":"event","Q64800812":"event","Q65064390":"event","Q65236448":"event","Q65395256":"event","Q65598177":"event","Q66309059":"event","Q67421136":"event","Q67817876":"event","Q68157611":"event","Q146071":"legal_case","Q177253":"legal_case","Q108886259":"event","Q108900992":"event","Q480498":"legal_case","Q697327":"legal_case","Q1124012":"legal_case","Q110573458":"event","Q2144800":"legal_case","Q110701040":"event","Q110799181":"event","Q2823677":"legal_case","Q111657387":"event","Q111823426":"event","Q112064134":"event","Q3771751":"legal_case","Q4116621":"legal_case","Q5467543":"legal_case","Q6942426":"legal_case","Q9283157":"legal_case","Q10706788":"legal_case","Q11519624":"legal_case","Q11827307":"legal_case","Q16738832":"legal_case","Q18536127":"legal_case","Q19692072":"legal_case","Q19902850":"legal_case","Q19930933":"legal_case","Q234262":"chapter","Q23759311":"legal_case","Q104029957":"entry","Q26885514":"legal_case","Q106377152":"entry","Q5555914":"chapter","Q240862":"motion_picture","Q308463":"book","Q680458":"book","Q778580":"book","Q1224889":"book","Q30637971":"legal_case","Q1341283":"book","Q1670252":"book","Q2030763":"book","Q2031291":"book","Q2338167":"book","Q2564985":"book","Q2568454":"book","Q2900369":"book","Q3901046":"book","Q5281629":"book","Q5394558":"book","Q12825884":"chapter","Q9250355":"book","Q9250353":"book","Q9250357":"book","Q9379159":"book","Q21481766":"chapter","Q26989423":"chapter","Q29154515":"chapter","Q56704157":"legal_case","Q1417174":"entry","Q60845736":"legal_case","Q61221204":"legal_case","Q64796768":"legal_case","Q43148525":"chapter","Q43180447":"chapter","Q10376649":"entry","Q53460949":"chapter","Q76647964":"legal_case","Q85821037":"legal_case","Q96251253":"legal_case","Q96482904":"legal_case","Q97451302":"legal_case","Q97451648":"legal_case","Q97451722":"legal_case","Q71537878":"event","Q105499756":"legal_case","Q76548380":"event","Q109018958":"legal_case","Q84562343":"event","Q85743284":"event","Q89564537":"event","Q96487369":"event","Q96500749":"event","Q97521133":"event","Q102854363":"event","Q104215654":"event","Q104411569":"event","Q104418497":"event","Q105061621":"event","Q105946019":"event","Q106691960":"event","Q106763129":"event","Q106892156":"event","Q108308625":"event","Q309481":"article-newspaper","Q2495037":"article-newspaper","Q111749705":"book","Q2602337":"article-newspaper","Q3326038":"article-newspaper","Q5001223":"article-newspaper","Q5149212":"article-newspaper","Q3503343":"post","Q4770042":"post","Q17628188":"article-newspaper","Q18339884":"article-newspaper","Q15646675":"post","Q28502153":"article-newspaper","Q25345994":"post","Q10379956":"book","Q10898227":"book","Q11060274":"book","Q11696048":"book","Q11696049":"book","Q15994174":"book","Q16937116":"book","Q17578748":"book","Q20826013":"book","Q20850604":"book","Q21112633":"book","Q56119332":"post-weblog","Q57988118":"post","Q66338351":"article-newspaper","Q39811647":"book","Q59908":"article-newspaper","Q63412991":"post","Q42793760":"book","Q66058204":"post","Q52147067":"webpage","Q55089312":"dataset","Q55155149":"book","Q87849013":"article-newspaper","Q58482601":"book","Q59466300":"book","Q59466853":"book","Q60997816":"software","Q84444779":"post","Q84497003":"post","Q65770270":"book","Q65772139":"book","Q65772760":"book","Q65920672":"book","Q428":"book","Q482":"book","Q676":"book","Q1004":"book","Q97487580":"post","Q104563003":"article-newspaper","Q104758629":"article-newspaper","Q108837133":"article-newspaper","Q108970988":"article-newspaper","Q104717411":"post","Q83378585":"book","Q106367310":"periodical","Q85806118":"book","Q110875209":"post","Q110888858":"dataset","Q111547222":"post","Q111602731":"post","Q111629695":"post","Q111630696":"post","Q111638057":"post","Q111660285":"post","Q111678745":"post","Q111678755":"post","Q111678758":"post","Q111678771":"post","Q111678776":"post","Q111691879":"post","Q112058486":"post","Q112058774":"post","Q92275711":"book","Q96636361":"book","Q101113149":"book","Q104804934":"book","Q104804938":"book","Q106053322":"periodical","Q106373589":"book","Q106373713":"book","Q106530803":"book","Q107044688":"book","Q107528122":"book","Q107529864":"book","Q107549014":"book","Q108744804":"book","Q83367":"book","Q113013":"book","Q114375":"book","Q124761":"book","Q131084":"book","Q133492":"book","Q182659":"book","Q185363":"book","Q185598":"book","Q189867":"book","Q234343":"book","Q268416":"book","Q277759":"book","Q354326":"book","Q727413":"book","Q757370":"book","Q867335":"book","Q870452":"book","Q920285":"book","Q1035168":"book","Q1056378":"book","Q1072723":"book","Q1093312":"book","Q1097273":"book","Q1132324":"book","Q1164267":"book","Q1194040":"book","Q1310296":"book","Q1412507":"book","Q1425198":"book","Q1440453":"book","Q1472357":"book","Q1497854":"book","Q1517777":"book","Q1585442":"book","Q1617445":"book","Q1663071":"book","Q1771692":"book","Q1790870":"book","Q1852950":"book","Q2012083":"book","Q2219343":"book","Q2250271":"book","Q2376293":"book","Q2477865":"book","Q2916240":"book","Q3025978":"book","Q3250561":"book","Q3328821":"book","Q3445695":"book","Q3691017":"book","Q3739522":"book","Q4167727":"book","Q4380077":"book","Q4530655":"book","Q4671704":"book","Q5185279":"book","Q5977103":"book","Q7679101":"book","Q7958155":"book","Q9380277":"book","Q10432278":"book","Q10529868":"book","Q11712374":"book","Q12047746":"book","Q12295065":"book","Q12617225":"book","Q12765855":"book","Q12799318":"book","Q13408937":"book","Q16681629":"book","Q16909089":"book","Q17009106":"book","Q17345318":"book","Q17518870":"book","Q18536349":"book","Q19904733":"book","Q20540385":"book","Q24906264":"book","Q30920856":"book","Q38072107":"book","Q42109240":"book","Q58483083":"book","Q58900620":"book","Q1661":"book","Q1845":"book","Q8261":"book","Q25372":"book","Q25379":"book","Q34990":"book","Q39950":"book","Q49084":"book","Q78814135":"book","Q109553089":"book","Q109588548":"book","Q109806598":"book","Q110295240":"book","Q113093":"report","Q223729":"report","Q524352":"report","Q110984751":"book","Q111042372":"book","Q628175":"report","Q699735":"report","Q111219279":"book","Q830689":"report","Q836925":"report","Q855232":"report","Q1004391":"report","Q111528869":"book","Q111834363":"book","Q1473099":"report","Q1554400":"report","Q1668727":"report","Q1926270":"report","Q2054229":"report","Q2135248":"report","Q2206516":"report","Q2307704":"report","Q2309880":"report","Q2677586":"report","Q2782326":"report","Q3000100":"report","Q3099732":"report","Q3926217":"report","Q4064750":"report","Q4343952":"report","Q4390057":"report","Q4690599":"report","Q4769694":"report","Q4951615":"report","Q5133397":"report","Q5915865":"report","Q6451276":"report","Q6457082":"report","Q7671191":"report","Q7918438":"report","Q9770904":"report","Q207601":"broadcast","Q10585384":"report","Q1190246":"broadcast","Q1241826":"broadcast","Q11640080":"report","Q1452460":"broadcast","Q11798615":"report","Q1555508":"broadcast","Q1983062":"broadcast","Q2155186":"broadcast","Q15629444":"report","Q15781350":"report","Q17090395":"report","Q19355445":"report","Q23954833":"report","Q27027169":"report","Q30012802":"report","Q30314941":"report","Q41274869":"report","Q47123453":"report","Q47126552":"report","Q56013707":"report","Q59387148":"report","Q64548048":"report","Q66104273":"report","Q60730271":"collection","Q15416":"broadcast","Q85653251":"report","Q88380217":"report","Q88802020":"report","Q96179541":"report","Q98550843":"report","Q101096466":"report","Q102391350":"report","Q104605006":"report","Q104900597":"report","Q105394996":"report","Q106034900":"report","Q106540977":"report","Q106908570":"report","Q107023179":"report","Q108378344":"report","Q109466918":"report","Q109768337":"report","Q110589838":"report","Q104976141":"collection","Q104977294":"collection","Q103820137":"book","Q105685558":"book","Q105688416":"book","Q105709657":"manuscript","Q108419088":"book","Q1347686":"article-journal","Q1504425":"article-journal","Q2774197":"article-journal","Q2903479":"post-weblog","Q7301211":"article-journal","Q7316896":"article-journal","Q7318358":"article-journal","Q10885494":"paper-conference","Q2178268":"broadcast","Q2435927":"broadcast","Q3588923":"broadcast","Q15706459":"article-journal","Q5177022":"broadcast","Q5401282":"broadcast","Q6863157":"broadcast","Q18918145":"article-journal","Q119391":"software","Q506883":"software","Q1037852":"software","Q1144323":"software","Q10709386":"broadcast","Q11079003":"broadcast","Q11293915":"broadcast","Q11325507":"broadcast","Q11334197":"broadcast","Q11351206":"broadcast","Q11378697":"broadcast","Q11464636":"broadcast","Q11483878":"broadcast","Q11491683":"broadcast","Q3772627":"software","Q15852671":"broadcast","Q9011149":"software","Q182357":"book","Q202208":"book","Q250090":"book","Q288909":"book","Q474090":"book","Q568286":"book","Q580340":"book","Q596594":"book","Q656042":"book","Q18458820":"broadcast","Q742530":"book","Q761529":"book","Q777828":"book","Q858271":"book","Q895311":"book","Q919982":"book","Q968679":"book","Q1069928":"book","Q1091366":"book","Q1113204":"book","Q1125196":"book","Q1161145":"book","Q1265067":"book","Q1292502":"book","Q1344317":"book","Q1384424":"book","Q1384433":"book","Q1428637":"book","Q1491684":"book","Q1494806":"book","Q20712193":"software","Q20825628":"software","Q20983788":"software","Q21125433":"software","Q27021481":"software","Q30314788":"software","Q56478376":"article-journal","Q58632367":"paper-conference","Q58898396":"article-journal","Q58900805":"article-journal","Q58901470":"article-journal","Q58902427":"article-journal","Q59458414":"article-journal","Q39999225":"software","Q60535861":"article-journal","Q52990223":"software","Q61953751":"broadcast","Q56191572":"software","Q82969330":"article-journal","Q84572095":"post-weblog","Q85521961":"entry-encyclopedia","Q388":"software","Q92998777":"article-journal","Q93003322":"article-journal","Q31411":"book","Q99770806":"article-journal","Q101116078":"article-journal","Q108196115":"article-journal","Q96756422":"broadcast","Q110716513":"article-journal","Q101494737":"broadcast","Q104652127":"software","Q108540395":"software","Q1499591":"book","Q1505583":"book","Q1510912":"book","Q1601739":"book","Q1613812":"book","Q1683305":"book","Q1784354":"book","Q1808721":"book","Q1980139":"book","Q2058791":"book","Q2158741":"book","Q2293670":"book","Q2578278":"book","Q2621904":"book","Q2671604":"book","Q2735649":"book","Q2891671":"book","Q3099146":"book","Q3149507":"book","Q3236984":"book","Q3315360":"book","Q3401045":"book","Q3401086":"book","Q3401097":"book","Q3401107":"book","Q3401112":"book","Q3426697":"book","Q3440974":"book","Q3556118":"book","Q3642905":"book","Q3684595":"book","Q3718743":"book","Q3906959":"book","Q3906957":"book","Q3906966":"book","Q3906965":"book","Q3906975":"book","Q3943110":"book","Q3958013":"book","Q4024576":"book","Q4112129":"book","Q4481123":"book","Q4484338":"book","Q4750852":"book","Q4907378":"book","Q4984279":"book","Q5098270":"book","Q5145848":"book","Q5179572":"book","Q5493881":"book","Q5643057":"book","Q5692451":"book","Q5774336":"book","Q6003397":"book","Q6026483":"book","Q6043568":"book","Q6054894":"book","Q6081426":"book","Q6082779":"book","Q6102109":"book","Q6154079":"book","Q6168405":"book","Q6496542":"book","Q6888692":"book","Q7084639":"book","Q7099402":"book","Q7143050":"book","Q7168247":"book","Q7207403":"book","Q7267789":"book","Q7316515":"book","Q7413883":"book","Q7565898":"book","Q7697891":"book","Q7709192":"book","Q7824966":"book","Q7928675":"book","Q9144651":"book","Q9210656":"book","Q11869215":"book","Q11917349":"book","Q12046027":"book","Q12218857":"book","Q12361583":"book","Q12483706":"manuscript","Q12503055":"book","Q12798580":"book","Q12799539":"book","Q12982033":"book","Q13134398":"book","Q13157313":"book","Q13646664":"book","Q14472342":"book","Q14524057":"book","Q14634492":"book","Q15141535":"book","Q15720097":"book","Q15805624":"book","Q15880899":"book","Q109353029":"book","Q109570005":"book","Q110733987":"book","Q149537":"book","Q181283":"book","Q387284":"book","Q438464":"book","Q562214":"book","Q725377":"book","Q754669":"book","Q838795":"book","Q881642":"book","Q906229":"book","Q1053765":"book","Q1114502":"book","Q1124088":"book","Q1366174":"book","Q1471388":"book","Q1474729":"book","Q1479970":"book","Q1679746":"book","Q1782964":"book","Q1866937":"book","Q2178671":"book","Q2268050":"book","Q2292302":"book","Q2342463":"book","Q2359975":"book","Q2410710":"book","Q2620972":"book","Q2816906":"book","Q2882208":"book","Q2882223":"book","Q2882221":"book","Q2882226":"book","Q2882230":"book","Q2882235":"book","Q2882233":"book","Q3138364":"book","Q3185361":"periodical","Q3285662":"book","Q3314991":"book","Q3325189":"book","Q3496994":"book","Q3543088":"book","Q3817331":"book","Q4262998":"book","Q4505975":"book","Q4971317":"book","Q7261479":"book","Q10913337":"book","Q13403571":"book","Q15890340":"book","Q16933953":"book","Q17030485":"book","Q19275887":"book","Q19310814":"book","Q19366069":"book","Q19628984":"book","Q20106666":"book","Q20523717":"book","Q20646003":"book","Q20857448":"book","Q22936789":"book","Q24055548":"book","Q24947942":"book","Q25536258":"book","Q26906566":"book","Q27589951":"book","Q29512782":"book","Q55689884":"book","Q55738783":"book","Q56239988":"book","Q65064557":"book","Q67555086":"book","Q8274":"book","Q38801":"book","Q70600066":"book","Q70686944":"book","Q70863928":"book","Q71842123":"book","Q72572910":"book","Q87805180":"book","Q95984504":"book","Q97213031":"book","Q97704215":"book","Q99395170":"book","Q101528367":"book","Q102316242":"book","Q103317810":"book","Q104096289":"book","Q105898065":"book","Q106629230":"book","Q106771414":"book","Q107226151":"book","Q107971457":"book","Q108759375":"book","Q108930504":"book","Q110894356":"book","Q111753071":"book","Q141126":"book","Q188007":"book","Q545533":"book","Q591099":"book","Q749674":"book","Q759708":"book","Q849692":"book","Q937691":"book","Q1253572":"book","Q1397862":"book","Q1669566":"book","Q1754210":"book","Q2154673":"book","Q2351286":"book","Q2363988":"book","Q3011071":"book","Q3094820":"book","Q3133334":"book","Q3321260":"book","Q3640435":"book","Q3682002":"book","Q3926615":"book","Q3999022":"book","Q4416531":"book","Q5043410":"book","Q5110307":"book","Q5648335":"book","Q5716961":"book","Q5745599":"book","Q5771262":"book","Q5821209":"book","Q5821600":"book","Q5822241":"book","Q5855864":"book","Q5905220":"book","Q5939750":"book","Q5946823":"book","Q5980911":"book","Q5981176":"book","Q6003212":"book","Q6112440":"book","Q6160146":"book","Q6398529":"book","Q6416261":"book","Q6887078":"book","Q7970827":"book","Q9002297":"book","Q9077888":"book","Q9646025":"book","Q10379766":"book","Q10616457":"book","Q11664268":"book","Q11892511":"book","Q12818502":"book","Q13134959":"book","Q13136081":"book","Q13566156":"book","Q14406742":"book","Q14466421":"book","Q16516572":"book","Q17351671":"book","Q17630544":"book","Q18384470":"book","Q20100282":"book","Q21081491":"book","Q24897257":"software","Q25616496":"book","Q47152505":"book","Q48977725":"book","Q55831886":"book","Q56305481":"book","Q56577736":"book","Q56855534":"book","Q60032729":"book","Q61744282":"book","Q61745175":"book","Q63888811":"book","Q67801963":"periodical","Q74411368":"book","Q74413080":"book","Q75530255":"book","Q76874795":"book","Q80356954":"book","Q80797877":"book","Q83962725":"book","Q90374281":"book","Q98608820":"book","Q104096788":"book","Q105758835":"book","Q108884806":"book","Q108904764":"book","Q108905728":"book","Q108905774":"book","Q108905781":"book","Q65201540":"regulation","Q21209375":"book","Q28134954":"book","Q448457":"regulation","Q33815646":"regulation","Q96438794":"book","Q98526825":"book","Q101625455":"book","Q186602":"book","Q192239":"book","Q208505":"book","Q223945":"book","Q286328":"book","Q319226":"book","Q465821":"book","Q512207":"book","Q583064":"book","Q583976":"book","Q718972":"book","Q740919":"book","Q747381":"book","Q858330":"book","Q884863":"book","Q908667":"book","Q948970":"book","Q1139378":"book","Q1156871":"book","Q1325447":"book","Q1347363":"book","Q1429059":"book","Q1469684":"book","Q1470773":"book","Q1491680":"book","Q1498403":"book","Q1593709":"book","Q1619888":"book","Q1799548":"book","Q2016518":"book","Q2134778":"book","Q2246055":"book","Q2358301":"book","Q2421000":"book","Q2481494":"book","Q2520572":"book","Q2561390":"book","Q2599412":"book","Q2802102":"book","Q2883183":"book","Q3048395":"book","Q3440809":"book","Q3440917":"book","Q3440956":"book","Q142043":"periodical","Q190705":"periodical","Q329669":"periodical","Q109581872":"book","Q442927":"periodical","Q569348":"periodical","Q665319":"periodical","Q738377":"periodical","Q832165":"periodical","Q895089":"periodical","Q1110794":"periodical","Q1278984":"periodical","Q1336693":"periodical","Q1416653":"periodical","Q1449648":"periodical","Q1868552":"periodical","Q1935225":"periodical","Q2006125":"periodical","Q2016362":"periodical","Q2048876":"periodical","Q2138556":"periodical","Q2328176":"periodical","Q2390658":"periodical","Q111591151":"book","Q2466157":"periodical","Q2497638":"periodical","Q2966795":"periodical","Q3186859":"periodical","Q3186988":"periodical","Q3535851":"periodical","Q3899141":"periodical","Q4736543":"periodical","Q5104179":"periodical","Q5155035":"periodical","Q5155101":"periodical","Q5276122":"periodical","Q5369583":"periodical","Q5469882":"periodical","Q6158891":"periodical","Q6841189":"periodical","Q3440959":"book","Q3440961":"book","Q3454581":"book","Q3940779":"book","Q3940776":"book","Q4375672":"book","Q4376526":"book","Q5067934":"book","Q5110346":"book","Q5248657":"book","Q5456296":"book","Q5528690":"book","Q6045390":"book","Q6045948":"book","Q6045959":"book","Q6045956":"book","Q6619804":"book","Q6915338":"book","Q6960620":"book","Q7064585":"book","Q7451276":"book","Q7797293":"book","Q10379557":"book","Q10646806":"book","Q10992055":"book","Q11282935":"book","Q11360573":"book","Q11452132":"book","Q11661562":"book","Q11825892":"book","Q11939005":"book","Q12075815":"book","Q12197074":"book","Q17009296":"book","Q17010642":"book","Q20225034":"book","Q20358335":"book","Q20792268":"book","Q21081921":"book","Q21615367":"book","Q26225474":"book","Q26906556":"book","Q26913048":"book","Q26987767":"book","Q27217074":"book","Q31074013":"book","Q49162829":"book","Q51780389":"book","Q55705111":"book","Q55705849":"book","Q56273349":"book","Q62397960":"book","Q71399826":"book","Q72996181":"book","Q89650533":"book","Q95994112":"book","Q98538409":"book","Q104543384":"book","Q106771238":"book","Q7019804":"periodical","Q7426758":"periodical","Q7531230":"periodical","Q10493961":"periodical","Q11313190":"periodical","Q11389521":"periodical","Q11511502":"periodical","Q11968661":"periodical","Q12046361":"periodical","Q16853516":"periodical","Q17016787":"periodical","Q19046104":"periodical","Q19138837":"periodical","Q20850562":"periodical","Q20919310":"periodical","Q22981456":"periodical","Q27156322":"periodical","Q31075044":"periodical","Q49094509":"periodical","Q56296973":"periodical","Q56824093":"periodical","Q62470341":"periodical","Q72717073":"periodical","Q87062808":"periodical","Q98785129":"periodical","Q104148637":"periodical","Q104459845":"periodical","Q106508612":"periodical","Q106634743":"periodical","Q106635283":"periodical","Q106650857":"periodical","Q106650895":"periodical","Q106650967":"periodical","Q106651073":"periodical","Q106651089":"periodical","Q106651150":"periodical","Q106651156":"periodical","Q106651322":"periodical","Q106651333":"periodical","Q106651338":"periodical","Q106651350":"periodical","Q106651372":"periodical","Q106651387":"periodical","Q106651430":"periodical","Q106652786":"periodical","Q106652971":"periodical","Q106652977":"periodical","Q106664582":"periodical","Q106668171":"periodical","Q106668248":"periodical","Q106668332":"periodical","Q106668420":"periodical","Q106668471":"periodical","Q106668535":"periodical","Q106668608":"periodical","Q106668646":"periodical","Q106671524":"periodical","Q106676147":"periodical","Q106676186":"periodical","Q106676275":"periodical","Q106676417":"periodical","Q106677807":"periodical","Q106677862":"periodical","Q106678098":"periodical","Q106678195":"periodical","Q106687540":"periodical","Q106687570":"periodical","Q106687639":"periodical","Q106687644":"periodical","Q106687653":"periodical","Q107170444":"periodical","Q107170468":"periodical","Q107170485":"periodical","Q107170506":"periodical","Q107170655":"periodical","Q107171978":"periodical","Q107171982":"periodical","Q107171980":"periodical","Q107171989":"periodical","Q107178453":"periodical","Q107181454":"periodical","Q107181979":"periodical","Q107182188":"periodical","Q107182194":"periodical","Q107182201":"periodical","Q107182208":"periodical","Q107182322":"periodical","Q107182456":"periodical","Q107183119":"periodical","Q107183122":"periodical","Q107183138":"periodical","Q107183145":"periodical","Q107183151":"periodical","Q107208914":"periodical","Q107208916":"periodical","Q107227701":"periodical","Q107236569":"periodical","Q107236603":"periodical","Q107236849":"periodical","Q182415":"broadcast","Q336059":"broadcast","Q336181":"broadcast","Q358942":"broadcast","Q390220":"broadcast","Q431102":"broadcast","Q622812":"broadcast","Q661436":"broadcast","Q846662":"broadcast","Q854995":"dataset","Q874342":"broadcast","Q986699":"broadcast","Q1172910":"dataset","Q1261214":"broadcast","Q1278356":"broadcast","Q1358344":"broadcast","Q1407240":"broadcast","Q1407245":"broadcast","Q1464125":"broadcast","Q1472288":"broadcast","Q1619206":"broadcast","Q1774527":"broadcast","Q1857766":"broadcast","Q1924371":"broadcast","Q1948292":"broadcast","Q2081003":"broadcast","Q2231383":"broadcast","Q2304946":"broadcast","Q2456999":"broadcast","Q2605607":"broadcast","Q2794180":"broadcast","Q3464665":"broadcast","Q3744532":"broadcast","Q5243465":"broadcast","Q5398426":"broadcast","Q5428822":"broadcast","Q5434357":"broadcast","Q6057169":"broadcast","Q6495169":"broadcast","Q6626746":"broadcast","Q7696995":"broadcast","Q180712":"software","Q193345":"software","Q309396":"software","Q612694":"software","Q635758":"standard","Q638079":"software","Q846726":"software","Q926331":"software","Q1140037":"software","Q1154669":"software","Q1291200":"software","Q1357381":"software","Q1522059":"software","Q10594993":"broadcast","Q10676514":"broadcast","Q1856893":"software","Q11086742":"broadcast","Q11492855":"broadcast","Q11504513":"broadcast","Q3062122":"software","Q4839599":"software","Q4976857":"software","Q6407569":"software","Q13090306":"software","Q13225925":"software","Q15401472":"software","Q16947775":"software","Q18649598":"software","Q19365656":"software","Q24896672":"software","Q25389983":"software","Q25496701":"software","Q28134936":"software","Q30592326":"software","Q56064107":"software","Q485":"software","Q14639":"software","Q14644":"software","Q14645":"software","Q107236916":"periodical","Q107237013":"periodical","Q107258494":"periodical","Q107258644":"periodical","Q107258714":"periodical","Q107258724":"periodical","Q107259317":"periodical","Q109420226":"periodical","Q110204935":"periodical","Q110408907":"periodical","Q111747619":"periodical","Q99936926":"software","Q105626027":"software","Q106255432":"software","Q5296":"webpage","Q108546259":"software","Q256900":"software","Q350882":"software","Q1138815":"software","Q1607417":"software","Q1891170":"software","Q2713778":"software","Q11664270":"broadcast","Q3775098":"software","Q3819460":"software","Q3909888":"software","Q14346334":"broadcast","Q14942329":"broadcast","Q15836186":"broadcast","Q7000900":"software","Q15903379":"broadcast","Q16068806":"broadcast","Q16206641":"broadcast","Q7441651":"software","Q16913666":"broadcast","Q17145545":"broadcast","Q17355003":"broadcast","Q378914":"book","Q521983":"book","Q533803":"book","Q697133":"book","Q18640746":"broadcast","Q859161":"dataset","Q861712":"book","Q897755":"book","Q932934":"book","Q975413":"book","Q1048400":"book","Q1224346":"book","Q10123170":"software","Q1304223":"book","Q1391417":"book","Q1455182":"book","Q1575315":"book","Q1656835":"book","Q1722340":"book","Q1820290":"book","Q19845560":"broadcast","Q2134855":"book","Q19973797":"broadcast","Q2191807":"book","Q2210568":"book","Q2361647":"dataset","Q2394934":"book","Q20220309":"broadcast","Q2640207":"book","Q2648129":"book","Q2843365":"book","Q21044675":"broadcast","Q21191270":"broadcast","Q21217315":"broadcast","Q3808854":"book","Q4428939":"book","Q4492301":"book","Q4750851":"book","Q5805540":"book","Q6486734":"book","Q25090976":"broadcast","Q27912070":"broadcast","Q19603862":"software","Q28664032":"broadcast","Q34682961":"broadcast","Q46706005":"broadcast","Q61704031":"broadcast","Q63585458":"broadcast","Q64224679":"broadcast","Q65128215":"broadcast","Q65212398":"broadcast","Q66382991":"software","Q8096":"book","Q93992677":"broadcast","Q97496299":"broadcast","Q91136116":"software","Q101716172":"broadcast","Q101720774":"broadcast","Q101761842":"broadcast","Q101860688":"broadcast","Q101863750":"broadcast","Q101895799":"broadcast","Q101898470":"broadcast","Q102227549":"broadcast","Q102430681":"broadcast","Q104034099":"broadcast","Q104223533":"broadcast","Q106942341":"broadcast","Q107040579":"broadcast","Q109736732":"broadcast","Q110436441":"broadcast","Q110757460":"broadcast","Q110940888":"motion_picture","Q111534108":"broadcast","Q107637706":"software","Q112076616":"software","Q193977":"motion_picture","Q245056":"motion_picture","Q109529255":"book","Q109529378":"book","Q423504":"motion_picture","Q735478":"motion_picture","Q972687":"motion_picture","Q110324066":"book","Q111096611":"book","Q2757149":"motion_picture","Q6942568":"motion_picture","Q7751682":"motion_picture","Q7832972":"motion_picture","Q7841716":"motion_picture","Q11900986":"motion_picture","Q11997526":"motion_picture","Q17517379":"motion_picture","Q20647642":"motion_picture","Q20667187":"motion_picture","Q29168811":"motion_picture","Q405584":"book","Q612513":"book","Q760110":"book","Q854836":"book","Q856327":"book","Q972769":"book","Q1050848":"book","Q1194583":"book","Q1255621":"book","Q1255669":"book","Q1310759":"book","Q1349065":"book","Q1370860":"book","Q1548170":"book","Q1582333":"book","Q1589402":"book","Q1649473":"book","Q1656714":"book","Q1660122":"book","Q1761274":"book","Q1897671":"book","Q1999791":"book","Q2079843":"book","Q2105776":"book","Q2207959":"book","Q2234241":"book","Q2305470":"book","Q2406762":"book","Q2430899":"book","Q31897275":"motion_picture","Q2635894":"broadcast","Q3038928":"book","Q3038946":"book","Q3038949":"book","Q3316111":"book","Q3351966":"book","Q5105016":"book","Q5110327":"book","Q7187214":"book","Q7191193":"book","Q7400100":"book","Q7621096":"book","Q11766949":"book","Q12558347":"book","Q12607437":"book","Q47486001":"motion_picture","Q23891671":"book","Q26868446":"book","Q31786464":"book","Q69084760":"motion_picture","Q45740849":"book","Q52162477":"book","Q52162481":"standard","Q52162484":"book","Q83424438":"motion_picture","Q55214821":"book","Q55594385":"book","Q55713039":"book","Q56297260":"book","Q60535660":"book","Q60550487":"book","Q63525289":"book","Q2743":"book","Q70328030":"book","Q70335128":"book","Q105101851":"motion_picture","Q77046980":"book","Q110397019":"motion_picture","Q84599584":"book","Q90580318":"book","Q98807796":"book","Q98905977":"software","Q99231526":"book","Q100401147":"book","Q104536999":"book","Q104629604":"book","Q106145652":"book","Q106914773":"broadcast","Q107978278":"book","Q108103627":"book","Q109673193":"book","Q110024700":"book","Q110275973":"book","Q110275977":"book","Q111972389":"book","Q245037":"event","Q255043":"event","Q759860":"event","Q873512":"event","Q1031365":"event","Q1087138":"event","Q1132542":"event","Q1355298":"event","Q1392263":"event","Q1536712":"event","Q1599337":"event","Q1720648":"event","Q1741002":"event","Q1967459":"event","Q2067088":"event","Q2067218":"event","Q2106138":"event","Q2783906":"book","Q2165332":"event","Q2180043":"event","Q2308121":"event","Q2316176":"event","Q3010123":"book","Q2356770":"event","Q2406443":"event","Q3092278":"book","Q2461826":"event","Q2469396":"event","Q2543625":"event","Q2551313":"event","Q2647917":"event","Q2733534":"event","Q3389567":"book","Q3566051":"book","Q2920411":"event","Q2953961":"event","Q2956466":"event","Q2992127":"event","Q3684598":"book","Q3062291":"event","Q3244907":"event","Q3269883":"event","Q3496346":"event","Q4202036":"book","Q3657183":"event","Q4042171":"event","Q4056451":"event","Q4311037":"event","Q4347853":"event","Q4430357":"event","Q5290180":"book","Q5038934":"event","Q5774663":"book","Q5141150":"event","Q5954513":"book","Q5378310":"event","Q6126478":"book","Q6139969":"book","Q5611272":"event","Q6592456":"book","Q6165531":"event","Q7261254":"book","Q6647568":"event","Q7697093":"broadcast","Q7162891":"event","Q7231330":"event","Q7243084":"event","Q13020317":"book","Q13049802":"book","Q16854678":"book","Q18450502":"book","Q26257569":"book","Q26805199":"book","Q29047452":"book","Q30899623":"book","Q30912678":"book","Q44092605":"book","Q44102201":"book","Q47284976":"book","Q47485959":"book","Q57965289":"book","Q60982751":"book","Q72408184":"book","Q87544043":"book","Q101509260":"book","Q102430127":"book","Q102711921":"book","Q103319035":"book","Q104097002":"book","Q104438919":"book","Q104704034":"book","Q106771428":"book","Q107547472":"book","Q92438":"periodical","Q108633576":"event","Q429707":"periodical","Q498783":"periodical","Q674926":"periodical","Q752295":"periodical","Q842399":"periodical","Q1134687":"periodical","Q110087292":"event","Q1780427":"periodical","Q1826799":"periodical","Q1968599":"periodical","Q2468316":"periodical","Q2617891":"periodical","Q2901024":"periodical","Q2906864":"periodical","Q3976078":"periodical","Q4797179":"periodical","Q111953054":"standard","Q5340829":"periodical","Q5431486":"periodical","Q5442871":"periodical","Q5690817":"periodical","Q7209566":"periodical","Q7210258":"periodical","Q7239010":"periodical","Q7245773":"periodical","Q7249390":"periodical","Q14759031":"periodical","Q15292273":"periodical","Q19786808":"periodical","Q20829703":"periodical","Q21130352":"periodical","Q25918088":"periodical","Q1261318":"standard","Q3044558":"standard","Q4671278":"standard","Q5802810":"standard","Q9340606":"event","Q10334719":"event","Q10507808":"event","Q10926758":"event","Q10932260":"event","Q11420812":"event","Q41557148":"periodical","Q11736601":"event","Q11826510":"event","Q12055231":"event","Q12183863":"event","Q12404423":"event","Q13458751":"event","Q47009221":"periodical","Q17156866":"event","Q17157236":"event","Q47472816":"periodical","Q18476724":"event","Q19602896":"event","Q20521429":"event","Q20816013":"event","Q23679940":"event","Q42291635":"event","Q44209773":"event","Q55719998":"event","Q85970961":"periodical","Q56462003":"event","Q89375907":"periodical","Q60269584":"event","Q69941436":"event","Q109515555":"periodical","Q82331151":"event","Q82439301":"event","Q93551880":"event","Q101113099":"event","Q106472758":"event","Q106992383":"event","Q106992420":"event","Q107020037":"event","Q108168870":"event","Q521414":"dataset","Q986756":"dataset","Q1345528":"dataset","Q1641277":"dataset","Q1787676":"dataset","Q1979529":"dataset","Q2361901":"dataset","Q2532367":"dataset","Q2532379":"dataset","Q3404855":"dataset","Q3405306":"dataset","Q3421859":"dataset","Q3518943":"dataset","Q3664416":"dataset","Q3678170":"dataset","Q4127466":"dataset","Q4350734":"dataset","Q4350735":"dataset","Q4350754":"dataset","Q4391701":"dataset","Q5058966":"dataset","Q5058970":"dataset","Q5058971":"dataset","Q5058968":"dataset","Q5058969":"dataset","Q5058974":"dataset","Q5058975":"dataset","Q5058972":"dataset","Q5058978":"dataset","Q5058977":"dataset","Q5058981":"dataset","Q5058989":"dataset","Q5165136":"dataset","Q5334384":"dataset","Q5478543":"dataset","Q5760464":"dataset","Q5760561":"dataset","Q7015254":"dataset","Q10497456":"dataset","Q10871947":"dataset","Q11452069":"dataset","Q12058091":"dataset","Q12409404":"dataset","Q12876973":"dataset","Q15194024":"dataset","Q15854286":"dataset","Q16056280":"dataset","Q17003001":"dataset","Q18029299":"dataset","Q18481148":"dataset","Q19799894":"dataset","Q19894430":"dataset","Q20715856":"dataset","Q24934691":"dataset","Q25380840":"dataset","Q25383554":"dataset","Q26207721":"dataset","Q28730356":"dataset","Q29795177":"dataset","Q37833472":"dataset","Q48790556":"dataset","Q56290048":"dataset","Q60518318":"dataset","Q60767795":"dataset","Q61355526":"dataset","Q64267945":"dataset","Q64853398":"dataset","Q69316638":"dataset","Q77713908":"dataset","Q100312296":"dataset","Q105872226":"dataset","Q264238":"periodical","Q685935":"periodical","Q847906":"periodical","Q867242":"periodical","Q1029418":"periodical","Q1170050":"periodical","Q1327300":"periodical","Q1350347":"periodical","Q1404635":"periodical","Q1407909":"periodical","Q1416251":"periodical","Q1572421":"periodical","Q1711354":"periodical","Q1743269":"periodical","Q1784788":"periodical","Q1791899":"periodical","Q1911105":"periodical","Q1958170":"periodical","Q2116411":"periodical","Q2178566":"periodical","Q2265195":"periodical","Q2514037":"periodical","Q2740804":"periodical","Q2784039":"periodical","Q3244962":"periodical","Q3267592":"periodical","Q3736345":"periodical","Q3817205":"periodical","Q4345830":"periodical","Q4468966":"periodical","Q4737473":"periodical","Q4971301":"periodical","Q5049323":"periodical","Q5433603":"periodical","Q5976452":"periodical","Q6046722":"periodical","Q6124786":"periodical","Q6297581":"periodical","Q6545508":"periodical","Q7493984":"periodical","Q8189527":"periodical","Q9019003":"periodical","Q9068487":"periodical","Q9198406":"periodical","Q9397629":"periodical","Q10300473":"periodical","Q11239137":"periodical","Q11780435":"periodical","Q11832342":"periodical","Q11887445":"periodical","Q11889441":"periodical","Q12298619":"periodical","Q12340140":"periodical","Q12408563":"periodical","Q12420307":"periodical","Q12834611":"periodical","Q12902861":"periodical","Q13112752":"periodical","Q13605686":"periodical","Q15695196":"periodical","Q16676025":"periodical","Q18215934":"periodical","Q21032630":"periodical","Q24273525":"periodical","Q25102282":"periodical","Q25351576":"periodical","Q1041638":"book","Q1709804":"book","Q101313":"standard","Q3687564":"book","Q6055945":"book","Q51448788":"periodical","Q53629993":"periodical","Q56313771":"periodical","Q57904379":"periodical","Q61851987":"periodical","Q79209169":"periodical","Q89488985":"periodical","Q92334825":"periodical","Q93716609":"periodical","Q98561135":"periodical","Q99424035":"periodical","Q103847161":"periodical","Q104146008":"periodical","Q107373430":"periodical","Q109174082":"periodical","Q109174122":"periodical","Q110280043":"periodical","Q111914189":"periodical","Q106105993":"dataset","Q106106042":"dataset","Q107285736":"dataset","Q107444042":"dataset","Q107862888":"dataset","Q107969031":"dataset","Q111219304":"dataset","Q111253599":"dataset","Q99393955":"book","Q267628":"article-newspaper","Q597695":"manuscript","Q856314":"manuscript","Q871232":"article-newspaper","Q928128":"manuscript","Q998631":"manuscript","Q1190781":"manuscript","Q1620808":"manuscript","Q1734271":"manuscript","Q111152090":"book","Q738826":"speech","Q111204686":"event","Q1813927":"speech","Q3637297":"manuscript","Q3694604":"article-newspaper","Q3719255":"article-newspaper","Q2623953":"speech","Q2781658":"speech","Q4307822":"manuscript","Q3479856":"speech","Q5153657":"periodical","Q5597707":"periodical","Q7454995":"speech","Q218013":"dataset","Q283579":"dataset","Q426674":"dataset","Q479833":"dataset","Q539662":"dataset","Q592312":"dataset","Q657179":"dataset","Q838281":"dataset","Q843670":"dataset","Q860625":"dataset","Q877809":"dataset","Q900856":"dataset","Q949532":"dataset","Q1250322":"dataset","Q1265166":"dataset","Q1571814":"dataset","Q11555354":"speech","Q13522717":"manuscript","Q4376548":"dataset","Q5128020":"dataset","Q5227290":"dataset","Q5227352":"dataset","Q7572716":"dataset","Q8069577":"dataset","Q8095398":"dataset","Q18558914":"manuscript","Q17993444":"speech","Q1844938":"software","Q13769783":"dataset","Q3559933":"software","Q14902318":"dataset","Q4110622":"software","Q8048052":"software","Q193206":"book","Q2532146":"book","Q386638":"standard","Q3928536":"book","Q5793771":"book","Q6034702":"book","Q5519943":"event","Q25975660":"dataset","Q26260540":"dataset","Q26987229":"dataset","Q27198004":"dataset","Q28948553":"dataset","Q29053519":"dataset","Q29694587":"dataset","Q7933844":"standard","Q10615359":"book","Q12046622":"book","Q11925961":"standard","Q15919135":"book","Q16143859":"book","Q16257663":"book","Q21853436":"book","Q21905924":"book","Q41709380":"dataset","Q47459830":"dataset","Q27812003":"event","Q60259696":"manuscript","Q60323106":"manuscript","Q60325498":"manuscript","Q60363009":"manuscript","Q51954352":"dataset","Q77463328":"manuscript","Q2115":"dataset","Q14679":"dataset","Q51845238":"event","Q55604459":"event","Q65647244":"software","Q64152609":"book","Q64152635":"book","Q65927107":"event","Q98810104":"book","Q106771575":"book","Q108269159":"event","Q109326945":"book","Q542475":"motion_picture","Q846544":"motion_picture","Q3072039":"motion_picture","Q7168625":"motion_picture","Q8192124":"motion_picture","Q11448155":"motion_picture","Q1146189":"software","Q1344636":"software","Q1625990":"software","Q1637801":"software","Q1810858":"software","Q2136127":"software","Q2288448":"software","Q5358377":"software","Q10853141":"software","Q12042784":"software","Q4943282":"book","Q7445203":"song","Q19868411":"software","Q21041173":"software","Q21474132":"book","Q63214877":"motion_picture","Q56822593":"dataset","Q59138954":"dataset","Q59154562":"dataset","Q59154746":"dataset","Q45211":"software","Q100721968":"motion_picture","Q102429885":"motion_picture","Q104536994":"motion_picture","Q104559206":"motion_picture","Q98405806":"dataset","Q109733318":"motion_picture","Q111605989":"motion_picture","Q86355865":"book","Q110854230":"dataset","Q110854780":"dataset","Q111269750":"dataset","Q102676349":"software","Q577697":"map","Q110459741":"book","Q1425895":"map","Q1554584":"legal_case","Q111175013":"book","Q2352868":"legal_case","Q112081373":"book","Q111336109":"standard","Q21944833":"map","Q221409":"book","Q254435":"book","Q371008":"book","Q569410":"book","Q646754":"book","Q651270":"book","Q679045":"book","Q905972":"book","Q915196":"book","Q1183753":"book","Q1221902":"book","Q1225625":"book","Q1339210":"book","Q1378260":"book","Q1388608":"book","Q1522225":"book","Q1758647":"book","Q1945147":"book","Q1963679":"book","Q1976376":"book","Q2116256":"book","Q2129011":"book","Q2390418":"book","Q81945":"standard","Q2602058":"book","Q133862":"standard","Q165194":"standard","Q2713365":"book","Q230872":"standard","Q230924":"standard","Q2727962":"book","Q2731728":"book","Q264364":"standard","Q386027":"standard","Q2940540":"book","Q11985288":"software","Q622993":"standard","Q847021":"standard","Q886092":"standard","Q974922":"standard","Q989220":"standard","Q1025017":"standard","Q1354819":"standard","Q1382530":"standard","Q13104404":"software","Q4634777":"book","Q2296308":"standard","Q2434518":"standard","Q2525317":"standard","Q5372544":"book","Q5383630":"book","Q5469932":"dataset","Q3359858":"standard","Q3408087":"standard","Q6449786":"book","Q7281267":"book","Q4825885":"standard","Q5004612":"standard","Q5965755":"standard","Q6045205":"standard","Q11883648":"book","Q11973502":"book","Q12306381":"book","Q13896240":"book","Q22918958":"software","Q13360597":"standard","Q16963509":"book","Q15836568":"standard","Q19143923":"book","Q16935517":"standard","Q21012191":"book","Q18761595":"standard","Q21662314":"book","Q19599398":"standard","Q20311482":"standard","Q52768654":"map","Q24260582":"book","Q25471746":"book","Q23891373":"standard","Q56408570":"book","Q65966993":"software","Q87663609":"map","Q87669200":"map","Q9158":"software","Q29522":"standard","Q39531":"standard","Q42283":"standard","Q94579027":"book","Q106858935":"book","Q108399221":"book","Q248583":"motion_picture","Q457832":"motion_picture","Q460214":"map","Q622548":"motion_picture","Q624771":"motion_picture","Q860626":"motion_picture","Q1115187":"motion_picture","Q1540100":"map","Q1788980":"motion_picture","Q2108819":"map","Q2250805":"map","Q2331945":"motion_picture","Q2359829":"map","Q2415383":"map","Q2678111":"motion_picture","Q2843083":"motion_picture","Q2869471":"map","Q2869478":"map","Q2905670":"legal_case","Q2991560":"motion_picture","Q3374310":"legal_case","Q3677141":"motion_picture","Q3745430":"motion_picture","Q3778115":"motion_picture","Q4816871":"map","Q5070847":"motion_picture","Q5135690":"map","Q5151497":"motion_picture","Q5778924":"motion_picture","Q10631817":"motion_picture","Q11025270":"map","Q11298147":"motion_picture","Q11894225":"motion_picture","Q15804095":"motion_picture","Q15849377":"legal_case","Q16950433":"motion_picture","Q17112331":"motion_picture","Q18331260":"motion_picture","Q19952560":"motion_picture","Q75050":"software","Q131212":"software","Q183197":"software","Q185534":"software","Q189210":"software","Q192726":"software","Q240795":"software","Q453843":"software","Q483130":"software","Q498267":"software","Q620615":"software","Q631525":"software","Q635540":"software","Q651476":"software","Q692199":"software","Q776688":"software","Q778043":"software","Q840703":"software","Q860676":"software","Q868410":"software","Q874411":"software","Q897678":"software","Q925622":"software","Q985394":"software","Q21936815":"map","Q21938018":"map","Q26885495":"map","Q30006080":"map","Q60029764":"legislation","Q60535736":"map","Q63969629":"map","Q6368":"software","Q7889":"software","Q13741":"software","Q54277":"software","Q95440291":"motion_picture","Q95952108":"motion_picture","Q98517089":"legal_case","Q105813043":"motion_picture","Q107353665":"map","Q107449079":"map","Q107531224":"map","Q108466999":"motion_picture","Q1047507":"software","Q1068192":"software","Q1074158":"software","Q1194864":"software","Q1324042":"software","Q1328864":"software","Q1331892":"software","Q1461523":"software","Q1568118":"software","Q1608344":"software","Q1684148":"software","Q1897589":"software","Q1932945":"software","Q1955251":"software","Q2115026":"software","Q2136515":"software","Q2158576":"software","Q2522958":"software","Q2903541":"software","Q2933820":"software","Q3189452":"software","Q3257916":"software","Q3552754":"software","Q3635085":"software","Q3751111":"software","Q4033109":"software","Q4034719":"software","Q4834650":"software","Q5134342":"software","Q5155929":"software","Q5164835":"software","Q5165883":"software","Q5227393":"software","Q5429711":"software","Q5519929":"software","Q5596600":"software","Q6577295":"software","Q6686945":"software","Q7554244":"software","Q7554300":"software","Q7805487":"software","Q7936632":"software","Q7950128":"software","Q9361521":"software","Q528892":"event","Q10336531":"software","Q10360429":"software","Q898830":"event","Q11121294":"software","Q11188577":"software","Q11275082":"software","Q11320567":"software","Q2344644":"standard","Q15122700":"software","Q15505266":"software","Q15544757":"software","Q15547961":"software","Q15548064":"software","Q15548076":"software","Q15548082":"software","Q15614008":"software","Q15614016":"software","Q15618491":"software","Q16972647":"software","Q17140402":"software","Q18456364":"software","Q21570197":"software","Q21572113":"software","Q21577192":"software","Q22907861":"software","Q24657198":"software","Q24960288":"software","Q25104204":"software","Q28051323":"software","Q28061130":"software","Q28454366":"software","Q30047053":"software","Q38984481":"software","Q48780637":"software","Q55344424":"software","Q60461507":"software","Q63862928":"software","Q65048190":"software","Q72271641":"software","Q84177695":"software","Q91231169":"software","Q92205975":"software","Q97644802":"software","Q99460482":"software","Q100158612":"software","Q104804744":"software","Q105044723":"software","Q105100182":"software","Q105273027":"software","Q105682544":"software","Q108684412":"software","Q110439009":"software","Q110907733":"software","Q111915979":"software","Q111926836":"event","Q383904":"song","Q564848":"song","Q721644":"song","Q65212460":"regulation","Q5158512":"song","Q6037387":"song","Q189053":"software","Q188602":"book","Q682203":"book","Q866144":"book","Q869210":"song","Q1000882":"book","Q917015":"legislation","Q1221179":"book","Q1025005":"event","Q1792348":"book","Q1147337":"event","Q1210697":"event","Q1241851":"event","Q1241933":"event","Q1947846":"book","Q2122997":"book","Q1518054":"event","Q1533355":"event","Q1562095":"event","Q2450419":"book","Q1902629":"event","Q2558132":"book","Q2605476":"book","Q2624969":"book","Q144352":"standard","Q184756":"standard","Q184766":"standard","Q21998394":"song","Q372395":"standard","Q386787":"standard","Q2891173":"book","Q2910735":"book","Q2345910":"event","Q2612295":"event","Q3395292":"book","Q1186870":"standard","Q1416278":"standard","Q3304691":"event","Q2289247":"standard","Q4301939":"event","Q2512796":"standard","Q5001430":"book","Q4437084":"event","Q2610482":"standard","Q2903897":"standard","Q5717007":"book","Q5792832":"book","Q5792840":"book","Q3775042":"standard","Q7694469":"book","Q7251589":"event","Q5514108":"standard","Q8026382":"book","Q7623054":"event","Q6108264":"standard","Q9311446":"book","Q10524630":"book","Q10551707":"book","Q10556386":"book","Q10594989":"book","Q10654964":"book","Q10655415":"book","Q10670937":"book","Q11487759":"event","Q12623918":"standard","Q12623919":"standard","Q15735174":"book","Q15631336":"event","Q99543120":"regulation","Q19362971":"book","Q104596067":"regulation","Q25616446":"standard","Q48999297":"song","Q29149990":"standard","Q30592417":"standard","Q47496733":"event","Q47167051":"standard","Q41270":"song","Q1674502":"regulation","Q1724745":"regulation","Q58815974":"event","Q4214118":"regulation","Q60716473":"event","Q59155105":"standard","Q63993400":"event","Q69405214":"event","Q76279659":"event","Q84322263":"song","Q85739691":"event","Q106103855":"song","Q106103953":"song","Q91280428":"event","Q94574942":"book","Q222639":"motion_picture","Q672598":"map","Q1033891":"motion_picture","Q1735630":"map","Q1740789":"motion_picture","Q1776156":"motion_picture","Q2297927":"motion_picture","Q2932613":"map","Q4373044":"motion_picture","Q4797626":"motion_picture","Q6010762":"map","Q6656179":"map","Q12090051":"map","Q2514870":"dataset","Q16254232":"motion_picture","Q16825889":"map","Q20649407":"motion_picture","Q20656232":"motion_picture","Q92206157":"thesis","Q96573613":"thesis","Q185597":"book","Q205919":"book","Q336468":"book","Q100328456":"thesis","Q100328465":"thesis","Q620035":"legislation","Q337987":"event","Q452237":"event","Q1125133":"book","Q615255":"event","Q708369":"event","Q926161":"event","Q1788866":"book","Q1141155":"event","Q1214249":"event","Q1433039":"event","Q2151774":"book","Q2393445":"book","Q3069017":"book","Q3186884":"book","Q3286535":"book","Q4016503":"event","Q5178219":"book","Q5522468":"book","Q5358448":"event","Q5358449":"event","Q26132283":"dataset","Q6164848":"event","Q7362854":"book","Q6887787":"event","Q7196127":"event","Q7443004":"event","Q7578606":"event","Q7858737":"event","Q10921030":"book","Q11606858":"book","Q11885722":"book","Q11423936":"event","Q11626449":"event","Q18121429":"book","Q18340514":"book","Q19255325":"book","Q19300775":"book","Q18915287":"event","Q20830278":"book","Q20591610":"event","Q21778963":"event","Q25063938":"event","Q78633168":"motion_picture","Q56653708":"book","Q62474270":"book","Q63344699":"event","Q97016664":"motion_picture","Q40231":"event","Q43109":"event","Q104537013":"motion_picture","Q104851179":"motion_picture","Q98069877":"dataset","Q24960616":"treaty","Q85855009":"event","Q51282711":"thesis","Q51282766":"thesis","Q51282798":"thesis","Q51282875":"thesis","Q51282918":"thesis","Q51282969":"thesis","Q51282999":"thesis","Q51283026":"thesis","Q51283053":"thesis","Q51283145":"thesis","Q51283327":"thesis","Q55399605":"thesis","Q97380578":"event","Q97696406":"event","Q98078994":"event","Q100163998":"book","Q105116684":"broadcast","Q105502076":"book","Q105296293":"event","Q106288677":"book","Q332564":"motion_picture","Q547760":"motion_picture","Q987831":"motion_picture","Q1047299":"motion_picture","Q3249257":"motion_picture","Q4765076":"motion_picture","Q13377551":"motion_picture","Q150139":"event","Q255208":"event","Q256611":"event","Q20707560":"dataset","Q375011":"event","Q381977":"event","Q429166":"event","Q478515":"event","Q696781":"event","Q819634":"event","Q884672":"event","Q899207":"event","Q925645":"event","Q992266":"event","Q1000774":"event","Q1113775":"event","Q1190070":"event","Q1290437":"event","Q1439766":"event","Q1472127":"event","Q1617360":"event","Q1679801":"event","Q1724702":"event","Q1759320":"event","Q1770155":"event","Q1954483":"event","Q2006207":"event","Q2086428":"event","Q2387698":"event","Q2458322":"event","Q2709567":"event","Q2717679":"event","Q2754877":"event","Q2994156":"event","Q3010205":"event","Q3069796":"event","Q3335361":"event","Q3399898":"event","Q3919798":"legislation","Q3919961":"legislation","Q3505413":"event","Q4370379":"event","Q4899367":"event","Q5215299":"event","Q5767018":"event","Q5849664":"event","Q6159649":"event","Q6612823":"event","Q7137430":"event","Q7619792":"event","Q8355038":"event","Q10281823":"event","Q10859648":"event","Q11547760":"event","Q11706236":"event","Q11906196":"event","Q11909230":"event","Q11921906":"event","Q12056720":"event","Q12389156":"event","Q13745686":"event","Q15361145":"event","Q16034435":"event","Q16154065":"event","Q18006428":"event","Q18752057":"event","Q19276041":"event","Q19544614":"event","Q20541005":"event","Q20826105":"event","Q22661166":"book","Q22961568":"book","Q22986126":"event","Q23459413":"event","Q28136564":"event","Q28692991":"event","Q28922083":"event","Q30325245":"event","Q33117691":"event","Q56551134":"event","Q62071432":"standard","Q66317493":"event","Q83710044":"event","Q88545234":"event","Q90993570":"book","Q94997350":"book","Q94634713":"event","Q97770079":"event","Q99833900":"event","Q106227544":"event","Q107304995":"event","Q107305006":"event","Q640492":"map","Q690851":"manuscript","Q1060398":"motion_picture","Q1105486":"manuscript","Q1502766":"motion_picture","Q1501945":"map","Q1550537":"map","Q1974665":"map","Q2915844":"map","Q2940514":"map","Q5600411":"manuscript","Q1773817":"song","Q11548991":"report","Q11559530":"report","Q11574068":"report","Q11632361":"report","Q11988943":"report","Q18089587":"motion_picture","Q17232848":"report","Q18648407":"motion_picture","Q20089346":"motion_picture","Q18845742":"report","Q178285":"software","Q430253":"software","Q763151":"software","Q1202273":"software","Q1340793":"software","Q1444631":"software","Q1645952":"software","Q234280":"chapter","Q234300":"chapter","Q2383135":"software","Q2489117":"software","Q3512599":"software","Q25110269":"motion_picture","Q25305175":"map","Q5005843":"software","Q5530385":"software","Q27959357":"motion_picture","Q28968258":"motion_picture","Q28968511":"motion_picture","Q158075":"book","Q459123":"book","Q950683":"book","Q1031245":"book","Q1434296":"book","Q1473015":"book","Q1507066":"book","Q1040489":"event","Q1955049":"book","Q2070861":"book","Q3257388":"book","Q3322346":"book","Q3384380":"book","Q3043499":"event","Q5909575":"book","Q6413244":"book","Q6588074":"book","Q6723673":"book","Q12047006":"legislation","Q40877606":"report","Q19060922":"book","Q40039114":"song","Q2500107":"performance","Q2568341":"performance","Q2751794":"performance","Q22336062":"legislation","Q5449034":"performance","Q54298448":"map","Q48549789":"song","Q64100970":"motion_picture","Q64006483":"song","Q64137975":"song","Q64138939":"song","Q64139024":"song","Q64140669":"song","Q64152500":"song","Q64152543":"song","Q64152559":"song","Q64152582":"song","Q29354307":"performance","Q85632254":"motion_picture","Q40248002":"performance","Q40248880":"performance","Q40249084":"performance","Q40249579":"performance","Q47000326":"performance","Q66023226":"event","Q47466735":"performance","Q98807719":"motion_picture","Q105606055":"motion_picture","Q106728041":"motion_picture","Q106963809":"map","Q110854783":"motion_picture","Q110996871":"map","Q111953147":"motion_picture","Q110453587":"song","Q84080639":"performance","Q106651116":"book","Q108492102":"legislation","Q167772":"standard","Q223535":"standard","Q229762":"standard","Q243303":"standard","Q278934":"standard","Q285972":"standard","Q287067":"standard","Q290741":"standard","Q336705":"standard","Q379545":"standard","Q467454":"standard","Q497118":"standard","Q507860":"standard","Q527723":"standard","Q594447":"standard","Q682626":"standard","Q691652":"standard","Q863883":"standard","Q1056408":"standard","Q1135858":"standard","Q1224822":"standard","Q1343033":"standard","Q1351368":"standard","Q1363415":"standard","Q1485661":"standard","Q1572121":"standard","Q1727359":"standard","Q1840684":"standard","Q1931564":"standard","Q1955133":"standard","Q2206173":"standard","Q2720536":"standard","Q3077335":"standard","Q3498805":"standard","Q3502441":"standard","Q3930596":"standard","Q6746509":"book","Q6794707":"book","Q6794743":"book","Q6800582":"book","Q6803493":"book","Q6804403":"book","Q6805339":"book","Q6805774":"book","Q6805831":"book","Q6807281":"book","Q6809785":"book","Q6810132":"book","Q6811408":"book","Q4781113":"standard","Q4836790":"standard","Q5008632":"standard","Q5090461":"standard","Q5090500":"standard","Q5156830":"standard","Q5227180":"standard","Q5248648":"standard","Q5426535":"standard","Q6046575":"standard","Q7079133":"standard","Q7203483":"standard","Q7508366":"standard","Q12182134":"book","Q12186067":"book","Q12186236":"book","Q12186237":"book","Q12207307":"book","Q12207310":"book","Q12207315":"book","Q12207312":"book","Q12207316":"book","Q12238706":"book","Q16120791":"book","Q16361936":"standard","Q16545707":"standard","Q17042621":"dataset","Q17074854":"standard","Q17087630":"standard","Q17560478":"standard","Q17636230":"standard","Q20418717":"book","Q18011768":"standard","Q18359031":"standard","Q20155966":"standard","Q28715505":"book","Q26697935":"standard","Q27823178":"standard","Q27824058":"standard","Q27826463":"standard","Q27915156":"standard","Q27915171":"standard","Q27915174":"standard","Q27915172":"standard","Q27915173":"standard","Q27967078":"standard","Q27978793":"standard","Q54900434":"book","Q54965913":"book","Q68170326":"book","Q108407196":"standard","Q112094119":"book","Q2339879":"speech","Q2436140":"speech","Q3709942":"speech","Q9158386":"speech","Q11785243":"speech","Q282144":"dataset","Q472637":"motion_picture","Q595801":"book","Q862334":"book","Q631489":"event","Q1623175":"book","Q1667921":"book","Q1700470":"book","Q1900755":"event","Q182933":"standard","Q189376":"standard","Q249743":"standard","Q3045706":"book","Q837330":"standard","Q922381":"standard","Q2788117":"event","Q1466064":"standard","Q2365430":"standard","Q4992631":"review","Q5164285":"event","Q5430013":"event","Q3736059":"standard","Q5601809":"event","Q4043424":"standard","Q10428815":"book","Q11502500":"book","Q11995068":"book","Q13593966":"book","Q17710980":"book","Q17710986":"book","Q18242494":"book","Q16987893":"standard","Q20655472":"book","Q24944126":"book","Q109315237":"regulation","Q55815842":"speech","Q110793160":"regulation","Q56344032":"speech","Q28009469":"standard","Q28049484":"standard","Q28049572":"standard","Q28344234":"standard","Q28846068":"standard","Q28846076":"standard","Q28846144":"standard","Q28846213":"standard","Q28858032":"standard","Q29642901":"dataset","Q29644049":"standard","Q29651120":"standard","Q29904526":"standard","Q29905212":"standard","Q29943235":"standard","Q29943476":"standard","Q29944450":"standard","Q30167277":"standard","Q64760522":"speech","Q34274654":"standard","Q34289060":"standard","Q34735959":"standard","Q34739013":"standard","Q34746188":"standard","Q67934054":"speech","Q42573997":"standard","Q42574058":"standard","Q47068459":"book","Q45989477":"standard","Q48570159":"standard","Q52269333":"book","Q53843792":"book","Q53756508":"standard","Q1058762":"regulation","Q1946428":"regulation","Q55281818":"standard","Q2914988":"regulation","Q3536928":"treaty","Q57696248":"standard","Q58787678":"standard","Q60846411":"event","Q65091969":"book","Q65185088":"book","Q69560230":"book","Q105587404":"speech","Q108400705":"speech","Q81986407":"standard","Q30588063":"regulation","Q101246540":"book","Q100324157":"standard","Q104841732":"book","Q106755566":"book","Q106974458":"book","Q107458055":"motion_picture","Q261468":"map","Q819652":"motion_picture","Q1433443":"motion_picture","Q1615638":"motion_picture","Q2096633":"motion_picture","Q3352071":"motion_picture","Q3379447":"map","Q3442060":"motion_picture","Q3556751":"article-newspaper","Q6722594":"motion_picture","Q7251156":"report","Q10654943":"motion_picture","Q15898171":"motion_picture","Q22981906":"motion_picture","Q165851":"event","Q172582":"event","Q188914":"event","Q194285":"event","Q282295":"event","Q294238":"event","Q314183":"event","Q314967":"event","Q474956":"event","Q572811":"event","Q593216":"event","Q611475":"event","Q641415":"event","Q684073":"event","Q691086":"event","Q772801":"event","Q780251":"event","Q809002":"event","Q809006":"event","Q809004":"event","Q833633":"event","Q836554":"event","Q848963":"event","Q896092":"event","Q897214":"event","Q936683":"event","Q1056251":"event","Q1056265":"event","Q1078671":"event","Q1086189":"event","Q1097927":"event","Q1136336":"event","Q1146594":"event","Q1237928":"event","Q1240448":"event","Q1357041":"event","Q1357196":"event","Q1379623":"event","Q1451417":"event","Q1480130":"event","Q1505018":"event","Q1725370":"event","Q1844504":"event","Q1973859":"event","Q2016946":"event","Q2048495":"event","Q2049287":"event","Q2090893":"event","Q2108417":"event","Q2196626":"event","Q2198648":"event","Q2216207":"event","Q2230776":"event","Q2285862":"event","Q2407607":"event","Q2522668":"event","Q2574880":"event","Q2576795":"event","Q2577390":"event","Q2640154":"event","Q2793926":"event","Q2806409":"event","Q3004693":"event","Q3045385":"event","Q3326403":"event","Q3332225":"event","Q3399090":"event","Q3404487":"event","Q3404943":"event","Q3404950":"event","Q3405076":"event","Q3405805":"event","Q3405829":"event","Q3405934":"event","Q3406037":"event","Q4354526":"legislation","Q17067381":"software","Q66914288":"motion_picture","Q78633775":"motion_picture","Q44174":"event","Q102245189":"motion_picture","Q104536870":"motion_picture","Q75837457":"book","Q100138714":"dataset","Q111146360":"software","Q3406039":"event","Q3406043":"event","Q3406041":"event","Q3910557":"event","Q4099217":"event","Q4377073":"event","Q4756548":"event","Q5243548":"event","Q6084386":"event","Q6084526":"event","Q6084941":"event","Q6084946":"event","Q6084961":"event","Q6084968":"event","Q6499703":"event","Q6565342":"event","Q6712059":"event","Q6759681":"event","Q6974707":"event","Q7011765":"event","Q7046412":"event","Q7240422":"event","Q7270981":"event","Q7739692":"event","Q7987535":"event","Q8057845":"event","Q9062227":"event","Q9062246":"event","Q9062280":"event","Q9062301":"event","Q9062304":"event","Q9062308":"event","Q9062375":"event","Q9062378":"event","Q9062380":"event","Q9062385":"event","Q10277408":"event","Q10336568":"event","Q10680224":"event","Q10685950":"event","Q11078174":"event","Q11124699":"event","Q11182893":"event","Q11700281":"event","Q11700344":"event","Q11722414":"event","Q11942605":"event","Q11942636":"event","Q11942643":"event","Q11942653":"event","Q12113171":"event","Q12398121":"event","Q13724713":"event","Q15846573":"event","Q16515422":"event","Q16520161":"event","Q16621554":"event","Q17008964":"event","Q17008972":"event","Q17008985":"event","Q17113356":"event","Q17122124":"event","Q19275707":"event","Q19275704":"event","Q19275705":"event","Q19275710":"event","Q19275708":"event","Q20016803":"event","Q20543658":"event","Q21126541":"event","Q21197397":"event","Q23042540":"event","Q23915027":"event","Q25421476":"event","Q27480982":"event","Q27496509":"event","Q28869447":"event","Q29478502":"event","Q29478547":"event","Q29479284":"event","Q30693950":"event","Q31189007":"event","Q31840600":"event","Q35230755":"event","Q37245682":"event","Q43814368":"event","Q47085949":"event","Q52434604":"event","Q52805003":"event","Q54824268":"event","Q55590479":"event","Q55992286":"event","Q57316691":"event","Q57316825":"event","Q57316828":"event","Q58706689":"event","Q58838460":"event","Q59241275":"event","Q59309547":"event","Q60666433":"event","Q108782497":"event","Q653916":"motion_picture","Q1108032":"motion_picture","Q1949797":"legal_case","Q111588511":"event","Q111589016":"event","Q3149408":"legal_case","Q111829178":"event","Q111829354":"event","Q111833200":"event","Q111974160":"event","Q111974184":"event","Q3731370":"legal_case","Q4340041":"legal_case","Q4453959":"motion_picture","Q6431798":"motion_picture","Q112762":"song","Q541947":"song","Q919516":"song","Q1123037":"song","Q1136047":"song","Q1365534":"song","Q1366983":"song","Q1460239":"song","Q11618908":"map","Q11859599":"motion_picture","Q1969410":"song","Q4202963":"song","Q4666464":"song","Q15055012":"motion_picture","Q6116724":"song","Q17003182":"legal_case","Q7535807":"song","Q9184793":"song","Q10811025":"song","Q1758389":"software","Q2252405":"software","Q25422198":"legal_case","Q17070464":"song","Q17629911":"song","Q574707":"periodical","Q296560":"event","Q1612881":"legislation","Q828468":"standard","Q5160964":"legislation","Q7101797":"legislation","Q17051057":"software","Q16089878":"legislation","Q16089882":"legislation","Q55262446":"legal_case","Q48727903":"song","Q63203971":"song","Q79637782":"motion_picture","Q79638554":"motion_picture","Q79639691":"motion_picture","Q79640397":"motion_picture","Q81718895":"motion_picture","Q81719416":"motion_picture","Q61778507":"event","Q65150778":"event","Q98701476":"motion_picture","Q98802676":"motion_picture","Q101071244":"motion_picture","Q71289841":"event","Q105320378":"legal_case","Q85029180":"software","Q78621336":"event","Q81819973":"event","Q84081134":"event","Q84081135":"event","Q84081132":"event","Q84081138":"event","Q84081137":"event","Q84081140":"event","Q85876530":"event","Q100518757":"software","Q93316217":"event","Q93316492":"event","Q96483070":"event","Q97172115":"event","Q97172130":"event","Q107209417":"software","Q98915287":"event","Q110619974":"software","Q104568744":"event","Q104597667":"event","Q105810971":"event","Q106197109":"event","Q106197608":"event","Q106547379":"event","Q106907673":"event","Q106978266":"event","Q106978537":"event","Q107463000":"event","Q107580405":"event","Q107581694":"event","Q107581778":"event","Q107627866":"event","Q108459688":"event","Q171341":"periodical","Q181298":"periodical","Q110067968":"legislation","Q1675302":"map","Q1826720":"map","Q110955674":"event","Q2861506":"periodical","Q7260412":"periodical","Q7620972":"map","Q7927945":"dataset","Q10283140":"periodical","Q12021575":"periodical","Q2625206":"song","Q570871":"software","Q846998":"software","Q912105":"software","Q918090":"software","Q1046926":"software","Q1307466":"software","Q1397896":"software","Q1399850":"software","Q1466095":"software","Q2462003":"software","Q2979024":"software","Q3367807":"software","Q3503189":"software","Q3774272":"software","Q4887690":"software","Q5018891":"software","Q5519927":"software","Q5976745":"software","Q28870025":"periodical","Q558939":"event","Q1133763":"legislation","Q926186":"event","Q10743690":"software","Q2111539":"event","Q3228788":"event","Q4129844":"legislation","Q4551312":"legislation","Q7094094":"event","Q7305681":"event","Q16920687":"software","Q17042339":"software","Q17042740":"software","Q17048758":"software","Q11498766":"legislation","Q11508806":"event","Q21295041":"software","Q29558845":"software","Q23058816":"event","Q24352765":"legislation","Q26202706":"event","Q111188815":"treaty","Q322943":"treaty","Q407954":"regulation","Q595819":"treaty","Q1003870":"treaty","Q1378084":"treaty","Q1412901":"treaty","Q66475733":"software","Q66481903":"software","Q64605569":"legislation","Q66986906":"event","Q67600422":"legislation","Q543":"legislation","Q46388":"legislation","Q75122566":"performance","Q108783313":"periodical","Q110163480":"periodical","Q100315040":"song","Q96252740":"software","Q96252759":"software","Q99937696":"software","Q112043170":"song","Q112043174":"song","Q94993180":"legislation","Q96798109":"legislation","Q96640732":"event","Q106531811":"software","Q106532218":"software","Q106532274":"software","Q106654545":"software","Q106654621":"software","Q106654631":"software","Q106654690":"software","Q106654990":"software","Q106655103":"software","Q106658276":"software","Q106658497":"software","Q106658823":"software","Q106666009":"software","Q106666040":"software","Q107049524":"software","Q107049586":"software","Q104153449":"legislation","Q122119":"event","Q184937":"event","Q189021":"event","Q304240":"event","Q483279":"event","Q516804":"event","Q640954":"event","Q668984":"event","Q851758":"event","Q856568":"event","Q896903":"event","Q1009287":"event","Q1077012":"event","Q1129398":"event","Q1154693":"event","Q1154933":"event","Q1204890":"event","Q1204926":"event","Q1205026":"event","Q1235095":"event","Q1415084":"event","Q1575381":"event","Q1683527":"event","Q1728972":"event","Q1781367":"event","Q1912415":"event","Q1947751":"event","Q1958056":"event","Q2020153":"event","Q2102897":"event","Q2288051":"event","Q2360207":"event","Q2449124":"event","Q2508813":"event","Q2558569":"event","Q2742150":"event","Q3070242":"event","Q3148252":"event","Q3150549":"event","Q3187082":"event","Q3686605":"event","Q3747527":"event","Q4382012":"event","Q5157579":"event","Q5332264":"event","Q5381332":"event","Q5433139":"event","Q5453473":"event","Q5535518":"event","Q5905214":"event","Q6555053":"event","Q6598853":"event","Q6730910":"event","Q6909498":"event","Q7688461":"event","Q7888355":"event","Q10853354":"event","Q12033571":"event","Q12060019":"event","Q13733193":"event","Q13783717":"event","Q15231127":"event","Q17034787":"event","Q17149596":"event","Q17195514":"event","Q18564543":"event","Q20052006":"event","Q22680699":"event","Q24406303":"event","Q27030777":"event","Q27150036":"event","Q29129469":"event","Q30545022":"event","Q31157300":"event","Q37807168":"event","Q37937330":"event","Q37940671":"event","Q37942728":"event","Q40692185":"event","Q42308998":"event","Q42406391":"event","Q43325366":"event","Q47697311":"event","Q52045923":"event","Q52261146":"event","Q54805501":"event","Q54848714":"event","Q54849282":"event","Q54856399":"event","Q54868442":"event","Q55775846":"event","Q55999548":"event","Q56220509":"event","Q56370415":"event","Q60030312":"event","Q60727631":"event","Q61728467":"event","Q61754086":"event","Q22678":"event","Q108654909":"event","Q312083":"map","Q109127478":"event","Q1030329":"dataset","Q1048515":"map","Q1667520":"map","Q1813543":"dataset","Q1869909":"dataset","Q110733760":"event","Q111019485":"event","Q2723202":"map","Q3072024":"motion_picture","Q111799602":"event","Q4984974":"motion_picture","Q5442753":"motion_picture","Q5449041":"motion_picture","Q146768":"software","Q216653":"software","Q312466":"software","Q605708":"software","Q610425":"software","Q628760":"software","Q628906":"software","Q782543":"software","Q1033951":"software","Q22908155":"dataset","Q5455479":"software","Q176497":"event","Q358576":"event","Q1117946":"event","Q1182673":"event","Q1413045":"event","Q1472255":"event","Q1568076":"event","Q1572731":"event","Q1734134":"event","Q1737226":"event","Q31836066":"motion_picture","Q1962255":"event","Q11833112":"software","Q2873953":"event","Q3043178":"event","Q4942772":"event","Q5281177":"event","Q5503489":"event","Q6804324":"event","Q7099782":"event","Q7227436":"event","Q17298682":"software","Q10394367":"event","Q11378372":"event","Q11608012":"event","Q11609513":"event","Q11960275":"event","Q12056872":"event","Q14806537":"event","Q16002495":"event","Q17014215":"event","Q48781895":"dataset","Q19562604":"event","Q20948892":"event","Q28052871":"event","Q28469958":"event","Q59688552":"dataset","Q33093659":"event","Q73403617":"dataset","Q81635374":"motion_picture","Q9135":"software","Q61858413":"event","Q61952495":"event","Q65549814":"event","Q66087801":"event","Q66801314":"event","Q68103526":"event","Q68691239":"event","Q51404":"event","Q75171163":"event","Q76650418":"event","Q106841600":"dataset","Q80593337":"event","Q85443050":"event","Q86935657":"event","Q98400269":"software","Q90285444":"event","Q93763662":"event","Q96203973":"event","Q97307251":"event","Q97594670":"event","Q97595211":"event","Q97613857":"event","Q97621215":"event","Q98593889":"event","Q98617807":"event","Q98741945":"event","Q105592411":"event","Q105703712":"event","Q105992668":"event","Q107285205":"event","Q109020948":"software","Q266680":"map","Q451584":"legal_case","Q627517":"periodical","Q676027":"legal_case","Q746654":"periodical","Q773668":"periodical","Q1056489":"legal_case","Q1288220":"legal_case","Q1355509":"map","Q1702772":"map","Q2035351":"map","Q2073537":"manuscript","Q2206565":"legal_case","Q2204393":"map","Q2325507":"map","Q2444392":"legal_case","Q2783852":"legal_case","Q2308891":"report","Q5500839":"legal_case","Q5504094":"legal_case","Q5633421":"periodical","Q6296062":"periodical","Q5469880":"report","Q5469893":"report","Q5469912":"report","Q7113774":"periodical","Q7318362":"periodical","Q9311507":"manuscript","Q10438653":"map","Q11356864":"motion_picture","Q11605103":"periodical","Q11626120":"legal_case","Q10714197":"report","Q16024164":"periodical","Q17093751":"motion_picture","Q19969434":"manuscript","Q20064845":"legal_case","Q19393197":"speech","Q597685":"legislation","Q1417548":"regulation","Q843065":"event","Q1298239":"legislation","Q1700962":"book","Q1126049":"event","Q2933856":"manuscript","Q2795484":"legislation","Q2479310":"event","Q2629979":"event","Q2653314":"event","Q3160852":"event","Q6406128":"legislation","Q7309699":"legislation","Q12163592":"legislation","Q11859675":"event","Q13093494":"event","Q11492817":"standard","Q16958989":"event","Q48415888":"periodical","Q51135530":"periodical","Q3042307":"performance","Q5209084":"performance","Q5805204":"performance","Q25432626":"legislation","Q56317484":"periodical","Q28148017":"event","Q59156245":"dataset","Q11611846":"performance","Q11649847":"performance","Q11649873":"performance","Q65770378":"periodical","Q17211407":"performance","Q17229171":"performance","Q3407263":"thesis","Q73364223":"periodical","Q73365221":"periodical","Q73365499":"periodical","Q73897617":"periodical","Q100162344":"report","Q102229379":"report","Q75029410":"legislation","Q104883495":"report","Q105650940":"report","Q108202210":"periodical","Q106941010":"report","Q107963213":"report","Q111324928":"manuscript","Q111709234":"report","Q90568342":"legislation","Q93698766":"legislation","Q93727012":"legislation","Q93788070":"legislation","Q93788815":"legislation","Q93789467":"legislation","Q93868967":"legislation","Q93916684":"legislation","Q94527229":"legislation","Q101073581":"legislation","Q105984528":"legislation","Q108066346":"legislation","Q643684":"motion_picture","Q1344642":"map","Q110055606":"event","Q814294":"report","Q2518205":"motion_picture","Q2665960":"report","Q4839755":"motion_picture","Q4118620":"report","Q5400070":"motion_picture","Q7097859":"motion_picture","Q11631240":"report","Q12805134":"report","Q17056655":"report","Q18030695":"report","Q274079":"event","Q322832":"event","Q500834":"event","Q599999":"event","Q956247":"event","Q1341622":"event","Q1436257":"event","Q1469424":"event","Q1520733":"event","Q1752292":"event","Q1836494":"event","Q2112179":"event","Q2176276":"event","Q2304125":"event","Q2446500":"event","Q4220917":"event","Q2507578":"standard","Q5157412":"event","Q5347841":"event","Q5505236":"event","Q6027235":"event","Q6887795":"event","Q7229766":"event","Q7404314":"event","Q7561653":"event","Q8047675":"standard","Q10883561":"event","Q11232199":"standard","Q11232203":"standard","Q11232214":"standard","Q11703801":"standard","Q12744912":"standard","Q16543246":"event","Q16940891":"event","Q17040469":"event","Q16082754":"standard","Q47512784":"report","Q20054762":"event","Q107093144":"regulation","Q24945394":"event","Q28666752":"event","Q1935048":"interview","Q7696504":"interview","Q65494947":"report","Q66686000":"report","Q11670583":"interview","Q47492618":"event","Q426759":"regulation","Q1454154":"regulation","Q56683522":"event","Q55682466":"standard","Q60191832":"event","Q60793682":"event","Q71817238":"event","Q107614552":"report","Q108624651":"report","Q109041551":"report","Q109041554":"report","Q86740154":"event","Q92885393":"event","Q99538912":"event","Q100707160":"event","Q107243326":"event","Q5465504":"patent","Q658334":"song","Q1162461":"song","Q1195630":"song","Q188558":"software","Q4272073":"software","Q628080":"legislation","Q670787":"book","Q699907":"legislation","Q731236":"legislation","Q1014906":"legislation","Q1358138":"book","Q1497584":"book","Q1068013":"event","Q1923776":"legislation","Q1462418":"event","Q2333573":"legislation","Q374911":"standard","Q3357101":"legislation","Q4690955":"book","Q7502092":"book","Q9197378":"book","Q11689371":"book","Q12041885":"legislation","Q17001582":"legislation","Q18378849":"event","Q21002890":"book","Q34311120":"standard","Q56309057":"manuscript","Q30941805":"legislation","Q38161310":"standard","Q50380591":"legislation","Q51881567":"legislation","Q56330488":"legislation","Q19705":"legislation","Q98400282":"software","Q105395504":"software","Q100165902":"standard","Q212781":"motion_picture","Q496523":"motion_picture","Q535518":"motion_picture","Q580013":"motion_picture","Q583768":"motion_picture","Q586250":"motion_picture","Q883179":"motion_picture","Q1092361":"motion_picture","Q1377546":"motion_picture","Q1474387":"motion_picture","Q1941707":"motion_picture","Q2101714":"motion_picture","Q2254193":"motion_picture","Q2273331":"motion_picture","Q2292320":"motion_picture","Q2445146":"motion_picture","Q2642760":"motion_picture","Q1427258":"report","Q1541065":"report","Q3677202":"motion_picture","Q4044177":"motion_picture","Q4047254":"motion_picture","Q4075563":"motion_picture","Q4875794":"motion_picture","Q5032666":"motion_picture","Q5897543":"motion_picture","Q7444356":"motion_picture","Q7063014":"report","Q1051575":"song","Q1206090":"song","Q1785243":"song","Q12049743":"motion_picture","Q1939197":"song","Q2138543":"song","Q2278881":"song","Q11552358":"report","Q2894547":"song","Q2956172":"song","Q3334664":"song","Q3542334":"song","Q3656521":"song","Q5639330":"song","Q5640528":"song","Q5716336":"song","Q5934478":"song","Q6348907":"song","Q6430313":"song","Q6480726":"song","Q7059159":"song","Q16664076":"report","Q8261759":"song","Q9031318":"song","Q9034560":"song","Q19367312":"motion_picture","Q10743749":"song","Q842193":"software","Q11989328":"song","Q12010046":"song","Q12135013":"song","Q12159910":"song","Q12623540":"song","Q12817895":"song","Q13025595":"song","Q13036970":"song","Q13114060":"song","Q25230421":"motion_picture","Q25533274":"motion_picture","Q15839077":"song","Q16304401":"song","Q16535861":"song","Q17009228":"song","Q17598653":"song","Q18534490":"song","Q18702741":"song","Q2026749":"standard","Q25537138":"song","Q25620807":"song","Q25629962":"song","Q4033930":"standard","Q31444443":"song","Q39774781":"song","Q31841064":"software","Q60477130":"song","Q63064412":"song","Q65211748":"song","Q65212418":"song","Q104536771":"motion_picture","Q109733630":"motion_picture","Q106654149":"song","Q107044696":"song","Q107356948":"song","Q108821603":"song","Q108833878":"song","Q108866112":"song","Q109559272":"song","Q110548351":"song","Q111042466":"song","Q111186968":"song","Q109358035":"book","Q5413472":"motion_picture","Q5578091":"motion_picture","Q5768328":"motion_picture","Q5872891":"motion_picture","Q6926334":"motion_picture","Q7116678":"motion_picture","Q7542092":"motion_picture","Q8038643":"legal_case","Q267136":"dataset","Q324254":"dataset","Q624546":"dataset","Q1147639":"dataset","Q1397073":"dataset","Q1662581":"dataset","Q1754331":"dataset","Q11631566":"legal_case","Q2262868":"dataset","Q2268965":"dataset","Q2285054":"dataset","Q3406872":"dataset","Q5033354":"dataset","Q5227322":"dataset","Q5378800":"dataset","Q5532670":"dataset","Q6410349":"song","Q7189593":"dataset","Q16984663":"motion_picture","Q7449052":"dataset","Q7598341":"dataset","Q7995661":"dataset","Q207170":"software","Q955452":"software","Q2276335":"software","Q24905792":"motion_picture","Q17050075":"dataset","Q17146953":"dataset","Q6821796":"software","Q128093":"book","Q632346":"book","Q776248":"book","Q856054":"book","Q1503133":"book","Q1503147":"book","Q1601744":"book","Q2004748":"legislation","Q1770563":"event","Q185149":"standard","Q2745914":"book","Q289038":"standard","Q300080":"standard","Q2043676":"standard","Q2043680":"standard","Q5571907":"book","Q6113985":"book","Q11505973":"book","Q11820947":"book","Q17321463":"legislation","Q19816504":"book","Q29642842":"software","Q20857758":"event","Q41623316":"dataset","Q26234050":"legislation","Q11694007":"performance","Q56297582":"dataset","Q66425231":"motion_picture","Q38647918":"book","Q22283598":"performance","Q81746082":"motion_picture","Q56293795":"legislation","Q60829836":"book","Q96405489":"motion_picture","Q97191621":"motion_picture","Q37484":"book","Q47148":"book","Q108084492":"motion_picture","Q95987576":"standard","Q99602118":"standard","Q99602591":"standard","Q105450799":"book","Q108302776":"performance","Q108404216":"performance","Q223770":"motion_picture","Q1117103":"motion_picture","Q108599373":"standard","Q108599417":"standard","Q111439107":"standard","Q111439112":"standard","Q111439204":"standard","Q111440435":"standard","Q111440514":"standard","Q1344700":"software","Q4781631":"software","Q4856363":"software","Q7156793":"software","Q911470":"standard","Q1114525":"standard","Q1329540":"standard","Q1340688":"standard","Q1372376":"standard","Q2920790":"standard","Q3393258":"standard","Q18357595":"software","Q7021281":"standard","Q21015577":"software","Q21031275":"software","Q15087423":"standard","Q28057030":"software","Q19428116":"standard","Q52162262":"motion_picture","Q21705905":"standard","Q56304998":"motion_picture","Q26234134":"standard","Q28324852":"standard","Q55935585":"standard","Q73213465":"standard","Q108921056":"motion_picture","Q108804797":"book","Q895583":"motion_picture","Q249697":"speech","Q2281511":"motion_picture","Q3076696":"motion_picture","Q7645884":"motion_picture","Q6549529":"book","Q4130722":"standard","Q4172733":"standard","Q4173959":"standard","Q4173961":"standard","Q19146569":"standard","Q19146573":"standard","Q19146577":"standard","Q19146581":"standard","Q19146586":"standard","Q19146594":"standard","Q19146598":"standard","Q19146602":"standard","Q19146608":"standard","Q19146612":"standard","Q19146626":"standard","Q19146631":"standard","Q19146635":"standard","Q19146639":"standard","Q19146649":"standard","Q19146655":"standard","Q19146662":"standard","Q19146666":"standard","Q19146670":"standard","Q19146676":"standard","Q19146683":"standard","Q19146680":"standard","Q19146687":"standard","Q19146690":"standard","Q19146694":"standard","Q19146705":"standard","Q19146714":"standard","Q19146719":"standard","Q19146724":"standard","Q19146728":"standard","Q19146736":"standard","Q19146750":"standard","Q19146754":"standard","Q19146758":"standard","Q19146763":"standard","Q19146768":"standard","Q19146772":"standard","Q19146776":"standard","Q19146780":"standard","Q19146784":"standard","Q19146789":"standard","Q19146797":"standard","Q19146806":"standard","Q19146811":"standard","Q19146814":"standard","Q19146818":"standard","Q19146822":"standard","Q19146826":"standard","Q19146831":"standard","Q19146834":"standard","Q19146839":"standard","Q19146850":"standard","Q19146854":"standard","Q19146858":"standard","Q19146864":"standard","Q19146875":"standard","Q19146873":"standard","Q19146881":"standard","Q19146885":"standard","Q19146889":"standard","Q19146894":"standard","Q19146898":"standard","Q19146901":"standard","Q19146905":"standard","Q19146909":"standard","Q19146921":"standard","Q19146925":"standard","Q19146930":"standard","Q19146934":"standard","Q19146943":"standard","Q19146940":"standard","Q19146951":"standard","Q19146956":"standard","Q19146960":"standard","Q55937426":"standard","Q58482603":"book","Q58806721":"book","Q67574925":"standard","Q108202392":"motion_picture","Q108212954":"motion_picture","Q108258724":"motion_picture","Q111278985":"motion_picture","Q111279477":"motion_picture","Q82813203":"book","Q86687516":"book","Q88306017":"software","Q87592808":"standard","Q71550":"software","Q76320":"software","Q186849":"software","Q230966":"software","Q336601":"software","Q513349":"software","Q745602":"software","Q784561":"software","Q859477":"software","Q1162303":"software","Q1315933":"software","Q1645817":"software","Q1892116":"software","Q1978818":"software","Q2021268":"software","Q3958017":"software","Q19146964":"standard","Q19146968":"standard","Q19146983":"standard","Q19146986":"standard","Q19146990":"standard","Q19146995":"standard","Q19146999":"standard","Q19147003":"standard","Q19147007":"standard","Q19147017":"standard","Q19147021":"standard","Q19147025":"standard","Q19147029":"standard","Q19147035":"standard","Q19147042":"standard","Q19147046":"standard","Q19147050":"standard","Q19147058":"standard","Q19147062":"standard","Q19147066":"standard","Q19147070":"standard","Q19147079":"standard","Q19147084":"standard","Q19147088":"standard","Q19147093":"standard","Q19147098":"standard","Q19147102":"standard","Q19147106":"standard","Q19147116":"standard","Q19147130":"standard","Q19147139":"standard","Q19147143":"standard","Q19147146":"standard","Q19147151":"standard","Q19147155":"standard","Q19147160":"standard","Q19147171":"standard","Q19147178":"standard","Q19147182":"standard","Q19147187":"standard","Q19147192":"standard","Q19147197":"standard","Q19147202":"standard","Q19147206":"standard","Q19147214":"standard","Q19147219":"standard","Q19147223":"standard","Q19147227":"standard","Q19147231":"standard","Q19147235":"standard","Q19147245":"standard","Q19147251":"standard","Q19147254":"standard","Q19153084":"standard","Q19153088":"standard","Q19153093":"standard","Q19153099":"standard","Q19153108":"standard","Q19153112":"standard","Q19414650":"standard","Q19414779":"standard","Q19414785":"standard","Q19588174":"standard","Q19588175":"standard","Q19588190":"standard","Q19669998":"standard","Q19669999":"standard","Q19670003":"standard","Q19670001":"standard","Q19800367":"standard","Q19800374":"standard","Q19857619":"standard","Q19857617":"standard","Q19857620":"standard","Q19857621":"standard","Q19857638":"standard","Q19967179":"standard","Q20204586":"standard","Q20204584":"standard","Q20204585":"standard","Q20204588":"standard","Q11189":"software","Q11288":"software","Q55541":"software","Q193842":"map","Q336371":"map","Q459798":"map","Q831939":"map","Q865144":"map","Q889561":"map","Q1152543":"map","Q1281814":"map","Q1403728":"map","Q1674401":"map","Q1688818":"map","Q1800237":"map","Q2126801":"map","Q2298569":"map","Q111302423":"event","Q1673963":"dataset","Q1711400":"broadcast","Q6006264":"software","Q17152639":"dataset","Q6546621":"review","Q17113138":"broadcast","Q471894":"book","Q586744":"book","Q181817":"event","Q216584":"event","Q956165":"book","Q483226":"event","Q599470":"event","Q655743":"event","Q744759":"event","Q838921":"event","Q1569753":"book","Q1154888":"event","Q1197685":"event","Q1238731":"event","Q1401461":"event","Q1897717":"event","Q2559933":"event","Q2583345":"event","Q112046597":"entry","Q2916333":"event","Q3104369":"event","Q3187076":"event","Q3322950":"event","Q3394418":"event","Q3776406":"event","Q4158203":"event","Q5242917":"event","Q5281906":"event","Q5368985":"event","Q15077416":"software","Q6508605":"event","Q16676491":"software","Q7295710":"event","Q7295709":"event","Q18511644":"software","Q9805074":"review","Q9385304":"event","Q11133386":"book","Q12040484":"book","Q12758917":"event","Q13079179":"event","Q13475159":"event","Q97378230":"map","Q98503814":"map","Q99414314":"manuscript","Q92248322":"broadcast","Q104079854":"manuscript","Q104079920":"manuscript","Q104080182":"manuscript","Q104080231":"manuscript","Q104080293":"manuscript","Q104080336":"manuscript","Q104086307":"manuscript","Q104376649":"manuscript","Q105709609":"manuscript","Q105709627":"manuscript","Q105709646":"manuscript","Q105709668":"manuscript","Q105709691":"manuscript","Q105830123":"manuscript","Q107107578":"map","Q108525371":"map","Q109568261":"map","Q104439055":"broadcast","Q106878632":"broadcast","Q104438917":"book","Q104438920":"book","Q104438925":"book","Q106603810":"event","Q16207587":"event","Q26261192":"software","Q18507466":"event","Q20900468":"event","Q21971577":"event","Q34044154":"software","Q1646902":"entry","Q41590688":"software","Q7132715":"entry","Q7180622":"entry","Q55069667":"software","Q56369138":"software","Q36524":"dataset","Q28801354":"entry","Q61020892":"book","Q61441268":"event","Q64214312":"event","Q65921414":"event","Q4618":"event","Q11269":"event","Q130":"event","Q131":"event","Q132":"event","Q79700418":"legislation","Q81859300":"event","Q102430381":"broadcast","Q89128237":"event","Q108857012":"broadcast","Q105518754":"event","Q815382":"article-journal","Q2940611":"map","Q2940627":"map","Q4201337":"manuscript","Q4903803":"map","Q5687679":"map","Q6484285":"map","Q10480692":"map","Q10604395":"map","Q11960416":"map","Q12008992":"map","Q502319":"broadcast","Q1187667":"broadcast","Q1742009":"broadcast","Q2125867":"broadcast","Q3237931":"broadcast","Q3956369":"broadcast","Q17074865":"map","Q17086104":"map","Q17147147":"map","Q6912943":"broadcast","Q7050677":"broadcast","Q19393521":"map","Q12049949":"broadcast","Q14623351":"broadcast","Q337055":"book","Q18311760":"broadcast","Q352581":"event","Q431867":"event","Q489644":"event","Q800193":"event","Q851387":"event","Q906066":"event","Q1405217":"event","Q1741806":"event","Q1847746":"event","Q2285545":"event","Q2436389":"event","Q3558006":"event","Q4613441":"event","Q6147123":"event","Q7239040":"event","Q9353932":"book","Q11263449":"event","Q11410140":"event","Q11762000":"event","Q12041674":"event","Q12042863":"event","Q12046411":"event","Q13077211":"event","Q15726071":"event","Q17051500":"event","Q17051602":"event","Q17068807":"event","Q19275772":"book","Q20205194":"event","Q28225716":"event","Q183169":"webpage","Q56240541":"broadcast","Q57608327":"broadcast","Q64617471":"song","Q55356330":"event","Q216297":"periodical","Q825914":"periodical","Q882682":"manuscript","Q933530":"periodical","Q1862738":"periodical","Q3088767":"periodical","Q4804740":"periodical","Q3564515":"speech","Q5374928":"map","Q5974932":"manuscript","Q5391567":"speech","Q7444692":"map","Q8036547":"map","Q10889286":"periodical","Q12076696":"motion_picture","Q1257934":"broadcast","Q3246768":"broadcast","Q105684597":"performance","Q4949058":"broadcast","Q17121221":"map","Q12912493":"broadcast","Q5145870":"software","Q5969903":"software","Q316025":"legislation","Q728629":"book","Q1027825":"book","Q1516252":"book","Q1006494":"event","Q1064441":"event","Q1133236":"event","Q1136723":"event","Q1899048":"legislation","Q1595680":"event","Q2139499":"legislation","Q1726671":"event","Q31898054":"motion_picture","Q176831":"standard","Q330153":"standard","Q2323817":"event","Q846292":"standard","Q932442":"standard","Q3993012":"book","Q5162726":"legislation","Q4048749":"standard","Q8019724":"book","Q7892471":"standard","Q10688394":"book","Q11292115":"standard","Q16240886":"standard","Q46992920":"speech","Q29051497":"software","Q29642950":"standard","Q1501912":"performance","Q21009694":"book","Q21013896":"legislation","Q2461853":"performance","Q3055151":"performance","Q23888763":"book","Q5309605":"performance","Q43178228":"broadcast","Q56028349":"periodical","Q56318478":"manuscript","Q56697520":"periodical","Q26849155":"event","Q61855877":"broadcast","Q63143903":"broadcast","Q57590076":"software","Q70589944":"dataset","Q61671409":"event","Q73539779":"software","Q41075":"legislation","Q10931":"event","Q45382":"event","Q90181054":"broadcast","Q97052294":"broadcast","Q111147075":"motion_picture","Q51282626":"thesis","Q51283070":"thesis","Q51283092":"thesis","Q51283110":"thesis","Q51283164":"thesis","Q51283181":"thesis","Q51283199":"thesis","Q51283219":"thesis","Q51283231":"thesis","Q51283362":"thesis","Q110920134":"broadcast","Q111723127":"broadcast","Q100235853":"book","Q110900077":"book","Q110903035":"dataset","Q1957385":"motion_picture","Q2135500":"manuscript","Q2302208":"periodical","Q5894660":"periodical","Q97293109":"performance","Q201456":"dataset","Q220393":"dataset","Q319949":"dataset","Q327349":"dataset","Q367035":"dataset","Q605175":"dataset","Q675474":"dataset","Q718744":"dataset","Q811443":"dataset","Q815410":"dataset","Q819688":"dataset","Q843152":"dataset","Q854459":"dataset","Q856638":"dataset","Q897682":"dataset","Q579955":"song","Q1006160":"dataset","Q1114135":"dataset","Q1283247":"dataset","Q1328072":"dataset","Q1347359":"dataset","Q1392703":"dataset","Q1400059":"dataset","Q1665882":"dataset","Q1754061":"dataset","Q1787111":"dataset","Q1789446":"dataset","Q1789476":"dataset","Q1807746":"dataset","Q1915979":"dataset","Q1988927":"dataset","Q1991865":"dataset","Q2038458":"dataset","Q2210505":"dataset","Q2249973":"dataset","Q2376426":"dataset","Q2534157":"dataset","Q2538912":"dataset","Q2597555":"dataset","Q745818":"broadcast","Q2235992":"song","Q1259376":"broadcast","Q3346024":"dataset","Q3348095":"dataset","Q17541977":"periodical","Q6495397":"broadcast","Q214932":"software","Q10671076":"song","Q333299":"software","Q778022":"software","Q1339469":"software","Q2081815":"software","Q5157524":"software","Q6290007":"software","Q215495":"book","Q220935":"book","Q558325":"book","Q728121":"book","Q1954906":"software","Q2022945":"book","Q2619673":"book","Q11774715":"software","Q4873075":"book","Q18350054":"software","Q19680204":"software","Q28216744":"software","Q19364663":"book","Q22938710":"book","Q31837551":"software","Q51719975":"broadcast","Q65128560":"software","Q1298958":"treaty","Q87527714":"periodical","Q86832479":"speech","Q91106056":"motion_picture","Q71177199":"software","Q63107117":"book","Q92581970":"periodical","Q65596220":"book","Q65598254":"book","Q65598475":"book","Q107803469":"periodical","Q77762853":"event","Q98047893":"software","Q105627212":"software","Q105723400":"software","Q98091669":"book","Q107710019":"software","Q107528347":"book","Q108346556":"book","Q108352496":"book","Q108352648":"book","Q111818121":"book","Q2750442":"manuscript","Q111522339":"event","Q3786423":"motion_picture","Q6899707":"map","Q2259405":"song","Q12488525":"manuscript","Q13094371":"manuscript","Q13095680":"manuscript","Q3404298":"dataset","Q3878797":"dataset","Q3932009":"dataset","Q4907362":"dataset","Q5123546":"dataset","Q5141544":"dataset","Q5146094":"dataset","Q5465083":"dataset","Q6982656":"dataset","Q7096331":"dataset","Q16879683":"manuscript","Q7455731":"dataset","Q10413470":"dataset","Q10624528":"dataset","Q176165":"software","Q469558":"software","Q11439867":"dataset","Q11581608":"dataset","Q11722865":"dataset","Q1059251":"software","Q1428723":"software","Q12617436":"dataset","Q2652378":"software","Q2713600":"software","Q3257930":"software","Q14760101":"dataset","Q15097084":"dataset","Q5133853":"software","Q16832380":"dataset","Q16956681":"dataset","Q7301504":"software","Q19386377":"dataset","Q125375":"event","Q138567":"event","Q167407":"event","Q209715":"event","Q20771519":"dataset","Q422695":"event","Q661950":"event","Q1962297":"book","Q22692845":"dataset","Q3287501":"event","Q4887449":"event","Q5938084":"performance","Q38608778":"motion_picture","Q29937289":"dataset","Q18369361":"event","Q1800684":"performance","Q28924364":"book","Q52666561":"dataset","Q59156121":"dataset","Q59157818":"dataset","Q59818481":"dataset","Q59977151":"dataset","Q60644424":"dataset","Q60686104":"dataset","Q62404897":"dataset","Q62680221":"dataset","Q62686468":"dataset","Q62809234":"dataset","Q63161834":"dataset","Q63539029":"dataset","Q64222248":"dataset","Q64620541":"dataset","Q71470157":"dataset","Q58471241":"event","Q65767991":"event","Q49836":"event","Q90076236":"dataset","Q91169544":"dataset","Q92206266":"dataset","Q104623069":"motion_picture","Q99515455":"dataset","Q109733294":"motion_picture","Q109733304":"motion_picture","Q109733333":"motion_picture","Q101191533":"dataset","Q101523329":"dataset","Q102700083":"dataset","Q103915590":"dataset","Q104450703":"dataset","Q85751523":"event","Q106206185":"dataset","Q106241443":"dataset","Q109730522":"dataset","Q109913439":"dataset","Q97940470":"event","Q108046453":"book","Q108808103":"event","Q108808120":"event","Q109767751":"event","Q110041043":"event","Q110732759":"event","Q110732756":"event","Q110733918":"event","Q110918239":"event","Q111161":"event","Q127807":"event","Q152263":"event","Q319024":"event","Q370149":"event","Q426394":"event","Q596643":"event","Q653079":"event","Q681204":"event","Q685639":"event","Q716770":"event","Q751892":"event","Q758824":"event","Q811671":"event","Q831942":"event","Q835941":"event","Q894615":"event","Q1067715":"event","Q1068633":"event","Q1075723":"event","Q1308126":"event","Q1359655":"event","Q1380982":"event","Q1549117":"event","Q1623327":"event","Q1671499":"event","Q1878381":"event","Q1905393":"event","Q1959157":"event","Q2050944":"event","Q2083964":"event","Q2146944":"event","Q2324916":"event","Q2879429":"event","Q3010392":"event","Q3276932":"event","Q3534263":"event","Q4202178":"event","Q4504495":"event","Q5032270":"event","Q5033350":"event","Q5072702":"event","Q5602431":"event","Q6359606":"event","Q6359604":"event","Q7447128":"event","Q7512982":"event","Q7519600":"event","Q8184060":"event","Q8344142":"event","Q10551803":"event","Q10655255":"event","Q10889547":"event","Q11407181":"event","Q11500844":"event","Q11581030":"event","Q11603432":"event","Q11658210":"event","Q12398174":"event","Q13096308":"event","Q13537604":"event","Q14475832":"event","Q16571590":"event","Q16635429":"event","Q18114433":"event","Q20004056":"event","Q20041008":"event","Q21490601":"event","Q41154026":"event","Q56424918":"event","Q63430831":"event","Q65681220":"event","Q66242135":"event","Q29710":"event","Q70004722":"event","Q85883975":"event","Q87355382":"event","Q93398711":"event","Q101584228":"event","Q104214305":"event","Q105030293":"event","Q105883653":"event","Q108045199":"event","Q108151198":"event","Q108151420":"event","Q108164916":"event","Q108178885":"event","Q108188863":"event","Q108196311":"event","Q108215655":"event","Q157394":"motion_picture","Q200092":"motion_picture","Q471839":"motion_picture","Q109829176":"event","Q1342372":"motion_picture","Q1535153":"motion_picture","Q110886414":"event","Q111039992":"event","Q1458153":"report","Q7551110":"motion_picture","Q20443008":"motion_picture","Q20656352":"motion_picture","Q12408875":"song","Q4819859":"software","Q1196060":"event","Q1325214":"event","Q1334097":"event","Q1459915":"event","Q1466789":"event","Q1518315":"event","Q1526506":"event","Q1543677":"event","Q1929797":"event","Q1952123":"event","Q2021351":"event","Q2045234":"event","Q2100614":"event","Q2172087":"event","Q2242213":"event","Q2281546":"event","Q2380882":"event","Q2411248":"event","Q2466596":"event","Q2495862":"event","Q2548750":"event","Q2557194":"event","Q2633882":"event","Q2684021":"event","Q2692421":"event","Q2714602":"event","Q2761621":"event","Q2849429":"event","Q2949435":"event","Q3117735":"event","Q3214682":"event","Q3315415":"event","Q3400581":"event","Q3458196":"event","Q3804071":"event","Q3816943":"event","Q4014799":"event","Q4228029":"event","Q4346052":"event","Q4355821":"event","Q4504516":"event","Q5188112":"event","Q5422235":"event","Q5463077":"event","Q5934865":"event","Q7137437":"event","Q7248067":"event","Q7646193":"event","Q10541153":"book","Q10900851":"event","Q11895625":"event","Q11999880":"event","Q12031382":"event","Q12046407":"event","Q13475282":"event","Q13734585":"event","Q16302720":"event","Q18087945":"event","Q18207781":"event","Q18482853":"event","Q18655582":"event","Q21198407":"book","Q20826063":"event","Q21087619":"event","Q22956392":"event","Q24669521":"event","Q25450912":"event","Q27556165":"event","Q28039691":"event","Q28753859":"event","Q66948581":"motion_picture","Q50877551":"event","Q52253007":"event","Q54877479":"event","Q61949333":"event","Q76835641":"event","Q77454117":"event","Q78187883":"event","Q86667968":"event","Q89029815":"event","Q97145754":"event","Q97478799":"event","Q104533918":"event","Q1228945":"report","Q101086122":"performance","Q1763023":"song","Q9049284":"song","Q10933254":"song","Q11722315":"song","Q12338005":"song","Q2429834":"software","Q4103363":"software","Q103076":"book","Q225672":"book","Q263790":"book","Q284465":"book","Q431193":"book","Q452961":"book","Q616622":"book","Q634123":"book","Q877342":"book","Q1000492":"book","Q806993":"legislation","Q1146822":"book","Q1208461":"book","Q1505819":"book","Q1483984":"legislation","Q1722157":"book","Q1530782":"legislation","Q1547724":"legislation","Q1758354":"book","Q1790314":"book","Q1671012":"legislation","Q1936984":"book","Q1486618":"event","Q1969688":"legislation","Q2138076":"legislation","Q2783529":"book","Q2894685":"book","Q3026054":"book","Q3423645":"dataset","Q4198569":"book","Q4726529":"legislation","Q4857264":"legislation","Q4921200":"legislation","Q5166475":"book","Q5149230":"legislation","Q5421946":"legislation","Q5479761":"legislation","Q5531999":"legislation","Q5611123":"legislation","Q5504093":"event","Q6015842":"legislation","Q6967951":"legislation","Q6973906":"legislation","Q6979928":"legislation","Q6980029":"legislation","Q6980034":"legislation","Q6980035":"legislation","Q6980109":"legislation","Q6980112":"legislation","Q7249895":"book","Q7260336":"book","Q7248917":"legislation","Q7335464":"legislation","Q7703913":"legislation","Q7835390":"legislation","Q7897001":"legislation","Q7899857":"legislation","Q9001409":"book","Q20706831":"software","Q14496600":"book","Q43911809":"motion_picture","Q14932089":"legislation","Q16259573":"legislation","Q17055932":"legislation","Q17084199":"legislation","Q17991521":"book","Q772257":"performance","Q21027567":"dataset","Q22908608":"legislation","Q22909191":"legislation","Q27036528":"book","Q28518359":"book","Q61032574":"article-newspaper","Q53746253":"broadcast","Q67497694":"report","Q46087746":"book","Q30922066":"performance","Q56315484":"book","Q1973500":"treaty","Q77659262":"legislation","Q106152295":"report","Q83708009":"dataset","Q108136244":"event","Q5563391":"map","Q4951617":"report","Q461183":"dataset","Q407916":"song","Q599510":"song","Q11812518":"map","Q2265295":"song","Q2312959":"song","Q2737175":"song","Q5581134":"song","Q8083433":"song","Q183065":"software","Q591919":"software","Q845900":"software","Q1341685":"software","Q4462013":"software","Q6470767":"software","Q16988763":"broadcast","Q118015":"book","Q142872":"book","Q173287":"book","Q178902":"book","Q178985":"book","Q193121":"book","Q204698":"book","Q332472":"book","Q338699":"book","Q497976":"book","Q537198":"book","Q570948":"book","Q686027":"book","Q715697":"book","Q781402":"book","Q20076760":"song","Q817063":"book","Q833590":"book","Q834060":"book","Q848577":"book","Q856713":"song","Q878026":"book","Q951215":"book","Q1043605":"book","Q1100591":"book","Q1200554":"book","Q1207269":"book","Q1207406":"book","Q1226395":"book","Q1232283":"book","Q1270422":"book","Q1294238":"book","Q1328435":"book","Q1385360":"book","Q1503358":"book","Q1754581":"book","Q1780507":"song","Q1862119":"book","Q1870618":"book","Q1970664":"book","Q1996447":"book","Q1849028":"legislation","Q2114246":"book","Q2144117":"book","Q2165325":"book","Q2955456":"book","Q2641292":"event","Q3299129":"book","Q3411830":"book","Q4059355":"book","Q4203401":"book","Q5177953":"event","Q6548306":"book","Q16000499":"software","Q6658760":"event","Q12074823":"legislation","Q12765421":"book","Q15276670":"book","Q15627042":"book","Q16709869":"book","Q16715217":"legislation","Q16960707":"book","Q19941906":"book","Q21660824":"book","Q21818614":"book","Q57987419":"interview","Q57987455":"interview","Q57987589":"interview","Q54592743":"event","Q40056":"software","Q47506":"software","Q5381350":"treaty","Q61725752":"book","Q65274471":"book","Q66018414":"book","Q37707":"book","Q106771533":"book","Q107639985":"legislation","Q109564886":"book","Q109643965":"book","Q1261319":"map","Q110714031":"book","Q110964185":"book","Q1321921":"dataset","Q2213077":"dataset","Q1461497":"broadcast","Q1130645":"software","Q3153714":"software","Q4746208":"software","Q2286290":"book","Q2307269":"book","Q2315500":"book","Q2455517":"book","Q2492025":"book","Q2572794":"book","Q2606238":"book","Q2634688":"book","Q2639708":"book","Q2660540":"book","Q2663701":"book","Q2790419":"book","Q2828776":"book","Q2921159":"book","Q3032156":"book","Q3164714":"book","Q3177980":"book","Q3576459":"book","Q3607227":"book","Q3783057":"book","Q3858189":"book","Q4293467":"book","Q4404552":"book","Q4730259":"book","Q4800993":"book","Q4960364":"book","Q5177509":"book","Q5273654":"book","Q5808269":"book","Q6037100":"book","Q6051491":"book","Q6071395":"book","Q6126527":"book","Q6711235":"book","Q6728645":"book","Q6888589":"book","Q6933467":"book","Q7253053":"book","Q7269564":"book","Q7269575":"book","Q7561196":"book","Q8565136":"book","Q29167422":"dataset","Q10296750":"book","Q10332660":"book","Q10752663":"book","Q10882175":"book","Q11022340":"book","Q11072974":"book","Q11137584":"book","Q11703766":"book","Q11802763":"book","Q11879078":"book","Q12497663":"book","Q12775327":"book","Q15063503":"book","Q16309546":"book","Q17366837":"book","Q19571385":"book","Q20585651":"book","Q21532381":"book","Q21651866":"book","Q23988414":"book","Q24457184":"book","Q24932593":"book","Q25399066":"book","Q31093658":"book","Q56296830":"book","Q56313459":"book","Q72406516":"book","Q98163019":"software","Q89544921":"book","Q90573495":"book","Q96384423":"book","Q108822790":"standard","Q111847301":"book","Q280257":"dataset","Q599108":"dataset","Q703021":"dataset","Q908017":"dataset","Q1022155":"dataset","Q1821397":"dataset","Q11551080":"map","Q2875011":"song","Q4222379":"dataset","Q4824114":"dataset","Q5188913":"dataset","Q5449473":"dataset","Q5569988":"dataset","Q6537891":"dataset","Q7524126":"dataset","Q10392259":"dataset","Q10404143":"dataset","Q10621579":"dataset","Q10831886":"dataset","Q21167586":"map","Q11631534":"dataset","Q865493":"software","Q18156576":"dataset","Q384840":"legislation","Q899485":"legislation","Q178048":"standard","Q186886":"standard","Q219919":"standard","Q462926":"standard","Q849275":"standard","Q905488":"standard","Q23120437":"dataset","Q23208317":"dataset","Q23306635":"dataset","Q23406751":"dataset","Q23465173":"dataset","Q23537932":"dataset","Q23541343":"dataset","Q23541348":"dataset","Q23563948":"dataset","Q23589361":"dataset","Q23596184":"dataset","Q23647820":"dataset","Q23662408":"dataset","Q23666223":"dataset","Q23687324":"dataset","Q23698335":"dataset","Q24120178":"dataset","Q24121290":"dataset","Q24188426":"dataset","Q24188436":"dataset","Q24189020":"dataset","Q24202115":"dataset","Q24202792":"dataset","Q24202917":"dataset","Q24232043":"dataset","Q24238628":"dataset","Q24247613":"dataset","Q87866152":"regulation","Q2558763":"standard","Q4006940":"standard","Q6866483":"legislation","Q5655515":"standard","Q9067055":"legislation","Q40426579":"map","Q43026977":"map","Q43037778":"map","Q25053629":"dataset","Q16669008":"book","Q47008743":"map","Q18338424":"legislation","Q182832":"performance","Q270827":"performance","Q318973":"performance","Q504514":"performance","Q588666":"performance","Q918727":"performance","Q1049625":"performance","Q1344860":"performance","Q43290228":"article","Q56408521":"dataset","Q69866663":"map","Q8102":"dataset","Q55754272":"legislation","Q1646218":"treaty","Q65167069":"book","Q12143":"standard","Q16567729":"treaty","Q99231508":"dataset","Q81329277":"legislation","Q81329802":"legislation","Q6010":"performance","Q27939":"performance","Q106377149":"legislation","Q110251539":"legislation","Q110487867":"legislation","Q110598278":"legislation","Q110601245":"legislation","Q2412849":"article-journal","Q1802243":"song","Q103964477":"performance","Q104853682":"performance","Q104985225":"performance","Q104996128":"performance","Q104998020":"performance","Q104998197":"performance","Q105107179":"performance","Q105233699":"performance","Q105237946":"performance","Q105245071":"performance","Q105279242":"performance","Q105279359":"performance","Q105279810":"performance","Q105280408":"performance","Q105339166":"performance","Q105535151":"performance","Q106148843":"performance","Q106148879":"performance","Q106163201":"performance","Q106293524":"performance","Q106421780":"performance","Q106805967":"performance","Q106991653":"performance","Q107183471":"performance","Q107373802":"performance","Q107514431":"performance","Q109660485":"performance","Q20136634":"article-journal","Q10926108":"song","Q13409498":"dataset","Q4746213":"software","Q188522":"review","Q626700":"review","Q667421":"review","Q1076579":"legislation","Q1683320":"review","Q2011881":"review","Q3319996":"review","Q3519102":"review","Q4493432":"review","Q6518187":"legislation","Q6804197":"legislation","Q7048920":"review","Q7122892":"review","Q7189625":"review","Q7252753":"legislation","Q7705750":"review","Q7978067":"review","Q7456126":"event","Q12504875":"legislation","Q18287076":"event","Q1955127":"performance","Q3256972":"performance","Q5312202":"performance","Q25412283":"event","Q6989196":"performance","Q23691":"song","Q60793112":"review","Q95977810":"article-journal","Q95988187":"article-journal","Q30612":"review","Q74673301":"legislation","Q111985815":"song","Q88958818":"performance","Q110037853":"book","Q110887037":"legislation","Q6457531":"motion_picture","Q61019332":"regulation","Q10718812":"legal_case","Q829147":"song","Q1195253":"song","Q11455596":"manuscript","Q52389":"regulation","Q10498310":"song","Q906556":"software","Q10439361":"broadcast","Q6934955":"software","Q18451170":"song","Q187791":"book","Q28472638":"speech","Q28472722":"speech","Q422321":"book","Q576921":"book","Q814208":"book","Q860708":"book","Q982897":"book","Q1260812":"book","Q1077350":"legislation","Q1306119":"book","Q1439646":"book","Q1893957":"book","Q2515441":"book","Q2995556":"book","Q3148886":"book","Q3357530":"book","Q3403684":"book","Q4801213":"book","Q5177020":"book","Q5130968":"legislation","Q5431484":"book","Q5436787":"book","Q5357553":"legislation","Q7602996":"book","Q7645310":"book","Q7943312":"book","Q7777568":"event","Q11497036":"book","Q11835431":"book","Q11872745":"book","Q96177324":"regulation","Q96781565":"regulation","Q17053253":"book","Q18022772":"book","Q18218093":"book","Q19556951":"legislation","Q19882205":"book","Q21550731":"book","Q22004031":"book","Q22569957":"book","Q22669635":"book","Q22669664":"book","Q23657361":"book","Q25313175":"event","Q28913685":"book","Q55132886":"book","Q372012":"regulation","Q56296627":"book","Q1001032":"regulation","Q57239931":"book","Q4844067":"regulation","Q95988374":"article-journal","Q66970124":"book","Q67080576":"book","Q67080642":"book","Q68679574":"book","Q68680335":"book","Q24723":"book","Q100701573":"speech","Q73501142":"book","Q73501146":"book","Q76112498":"book","Q110665014":"article-journal","Q85612002":"book","Q108298447":"song","Q91865939":"book","Q95975418":"book","Q96761193":"book","Q96882631":"book","Q97489614":"book","Q97995738":"book","Q98074840":"book","Q98151500":"book","Q70470863":"interview","Q99890706":"book","Q100575647":"book","Q100942530":"book","Q100943156":"book","Q100973182":"book","Q100973183":"book","Q106572959":"book","Q107193931":"book","Q107193934":"book","Q107193932":"book","Q109361415":"book","Q110165194":"book","Q1193236":"periodical","Q2055205":"legal_case","Q111649497":"book","Q111885592":"book","Q3355734":"motion_picture","Q7551315":"motion_picture","Q11396811":"manuscript","Q11553412":"manuscript","Q11610716":"manuscript","Q11662768":"manuscript","Q65931730":"regulation","Q107198899":"broadcast","Q10394634":"song","Q7090372":"bill","Q28026639":"motion_picture","Q179461":"book","Q189279":"book","Q193934":"book","Q193955":"book","Q336073":"book","Q339380":"book","Q126701":"event","Q167170":"event","Q169956":"event","Q175275":"event","Q217308":"event","Q283085":"event","Q304311":"event","Q325674":"event","Q990683":"book","Q340186":"event","Q376222":"event","Q383936":"event","Q391983":"event","Q428960":"event","Q429399":"event","Q1084059":"book","Q440534":"event","Q459975":"event","Q548095":"event","Q559507":"event","Q586633":"event","Q1250390":"book","Q609685":"event","Q615994":"event","Q641060":"event","Q641083":"event","Q658986":"event","Q673368":"event","Q1366370":"book","Q1548123":"book","Q1886036":"book","Q1974131":"book","Q3427762":"book","Q3985225":"book","Q4328808":"event","Q7246538":"book","Q11372298":"book","Q11410724":"book","Q11411421":"book","Q11428310":"book","Q11513646":"book","Q11519255":"book","Q11673118":"book","Q16854100":"book","Q16929794":"book","Q17006151":"book","Q18358220":"standard","Q2749069":"performance","Q5197782":"performance","Q11266252":"performance","Q11377624":"performance","Q11400631":"performance","Q11665098":"performance","Q12058791":"performance","Q22004354":"performance","Q55017318":"book","Q2289350":"regulation","Q61715571":"book","Q67142991":"book","Q90257546":"book","Q107193935":"book","Q107193938":"book","Q107193936":"book","Q107193942":"book","Q107193943":"book","Q107193940":"book","Q107193946":"book","Q107193947":"book","Q107193945":"book","Q107193951":"book","Q107193952":"book","Q107194326":"book","Q107426373":"book","Q107426381":"book","Q695012":"event","Q696031":"event","Q776773":"event","Q786414":"event","Q821580":"event","Q844685":"event","Q912171":"event","Q927363":"event","Q938096":"event","Q952053":"event","Q992060":"event","Q1005849":"event","Q1006461":"event","Q1038558":"event","Q1054417":"event","Q1079023":"event","Q1092604":"event","Q1095053":"event","Q1137275":"event","Q1144648":"event","Q1147475":"event","Q1164275":"event","Q1165405":"event","Q1165421":"event","Q1170410":"event","Q1206071":"event","Q1257258":"event","Q1298292":"event","Q1302645":"event","Q1349088":"event","Q1375512":"event","Q1384134":"event","Q1411929":"event","Q1415139":"event","Q1418201":"event","Q1439959":"event","Q1470460":"event","Q1476232":"event","Q1502193":"event","Q1517334":"event","Q1542723":"event","Q1542755":"event","Q1542872":"event","Q1571193":"event","Q1619812":"event","Q1677094":"event","Q1813328":"event","Q1824378":"event","Q1866538":"event","Q1879388":"event","Q1890914":"event","Q1936368":"event","Q1950504":"event","Q2000491":"event","Q2004950":"event","Q2006622":"event","Q2008904":"event","Q2035243":"event","Q2045861":"event","Q2054251":"event","Q2056451":"event","Q2062651":"event","Q2100967":"event","Q2190296":"event","Q2190746":"event","Q2209331":"event","Q2210277":"event","Q2250962":"event","Q2270306":"event","Q2280986":"event","Q2286694":"event","Q2293105":"event","Q2300449":"event","Q2312427":"event","Q2327575":"event","Q2347925":"event","Q2353497":"event","Q2404861":"event","Q2408469":"event","Q2410002":"event","Q2452319":"event","Q2459434":"event","Q2461450":"event","Q2474467":"event","Q2493694":"event","Q2507865":"event","Q2536619":"event","Q2541750":"event","Q2574170":"event","Q2608069":"event","Q2616886":"event","Q2618686":"event","Q2626253":"event","Q2632641":"event","Q2664186":"event","Q2688597":"event","Q2693408":"event","Q2698184":"event","Q2735683":"event","Q2755211":"event","Q2796048":"event","Q2836962":"event","Q2910684":"event","Q2948826":"event","Q2954930":"event","Q2955173":"event","Q2955182":"event","Q2955393":"event","Q2955743":"event","Q2990963":"event","Q2999425":"event","Q2999793":"event","Q3008684":"event","Q3072863":"event","Q3141859":"event","Q3173989":"event","Q3300730":"event","Q3329708":"event","Q3329729":"event","Q3354007":"event","Q3405564":"event","Q3414487":"event","Q3444554":"event","Q3467389":"event","Q3485623":"event","Q3485630":"event","Q3485629":"event","Q3485635":"event","Q3485632":"event","Q3485633":"event","Q3485638":"event","Q3485636":"event","Q3485642":"event","Q3485643":"event","Q3485640":"event","Q3534194":"event","Q3534195":"event","Q3534198":"event","Q3534196":"event","Q3543765":"event","Q3595175":"event","Q3653353":"event","Q3696168":"event","Q3854433":"event","Q4167714":"event","Q4243717":"event","Q4243782":"event","Q4272782":"event","Q4510080":"event","Q4639035":"event","Q4674589":"event","Q4713212":"event","Q4852696":"event","Q4867756":"event","Q4873000":"event","Q4894842":"event","Q4942597":"event","Q4948028":"event","Q4951251":"event","Q5029340":"event","Q5136168":"event","Q5209301":"event","Q5261453":"event","Q5311005":"event","Q5324645":"event","Q5412849":"event","Q5455087":"event","Q5470293":"event","Q5569597":"event","Q5787643":"event","Q6313377":"event","Q6315526":"event","Q6322015":"event","Q6383498":"event","Q6547925":"event","Q6747099":"event","Q7240344":"event","Q7605743":"event","Q7906416":"event","Q8035852":"event","Q10260884":"event","Q10577782":"event","Q10666337":"event","Q11235352":"event","Q11267643":"event","Q11370195":"event","Q11471159":"event","Q11488716":"event","Q11777151":"event","Q11783626":"event","Q12038182":"event","Q12307297":"event","Q13219666":"event","Q13357858":"event","Q13732546":"event","Q14547231":"event","Q15055391":"event","Q15588699":"event","Q15782487":"event","Q16455611":"event","Q16466010":"event","Q16648230":"event","Q16680659":"event","Q16680753":"event","Q16975526":"event","Q17024704":"event","Q17143991":"event","Q17299750":"event","Q17623620":"event","Q18161922":"event","Q18343977":"event","Q18536800":"event","Q18573266":"event","Q18632975":"event","Q18814828":"event","Q19393726":"event","Q20019127":"event","Q20160732":"event","Q20797921":"event","Q21013809":"event","Q21163347":"event","Q21163366":"event","Q21935543":"event","Q22029360":"event","Q22807283":"event","Q24840633":"event","Q26861438":"event","Q27020041":"event","Q27031975":"event","Q27927857":"event","Q28033877":"event","Q28089258":"event","Q28106029":"event","Q29121355":"event","Q30006753":"event","Q30232507":"event","Q31096609":"event","Q37803643":"event","Q38216979":"event","Q41479544":"event","Q41691580":"event","Q43767888":"event","Q45897039":"event","Q47009563":"event","Q47450331":"event","Q47459169":"event","Q48759219":"event","Q48865320":"event","Q48977160":"event","Q49480704":"event","Q50846264":"event","Q51031626":"event","Q51104681":"event","Q51931416":"event","Q53945096":"event","Q54967487":"event","Q55261073":"event","Q55393057":"event","Q55654379":"event","Q56199072":"event","Q56321344":"event","Q56683030":"event","Q56683160":"event","Q56829666":"event","Q56835059":"event","Q57494273":"event","Q58212491":"event","Q59134440":"event","Q60147807":"event","Q60515518":"event","Q60860371":"event","Q60926489":"event","Q61054255":"event","Q61314656":"event","Q61337521":"event","Q61983760":"event","Q62970974":"event","Q63385995":"event","Q64626740":"event","Q66239912":"event","Q71860259":"event","Q76998317":"event","Q79120925":"event","Q88976016":"event","Q92602118":"event","Q96679888":"event","Q98686973":"event","Q99346550":"event","Q99352691":"event","Q99383433":"event","Q99430142":"event","Q99430249":"event","Q99430281":"event","Q99430529":"event","Q99430785":"event","Q99430803":"event","Q99431617":"event","Q99432107":"event","Q99441928":"event","Q99441941":"event","Q109646550":"event","Q109646600":"event","Q109646805":"event","Q110087118":"event","Q110226979":"event","Q9137321":"webpage","Q184940":"event","Q211586":"event","Q256869":"event","Q380051":"event","Q627933":"event","Q835466":"event","Q846436":"event","Q1062672":"event","Q1136999":"event","Q1349214":"event","Q2062321":"event","Q2369189":"event","Q2497657":"event","Q2557639":"event","Q3920446":"event","Q4257172":"event","Q15056699":"webpage","Q5455176":"event","Q5879438":"event","Q16222597":"webpage","Q6723631":"event","Q17362920":"webpage","Q7920564":"event","Q18707678":"webpage","Q20160182":"webpage","Q20870830":"webpage","Q21163207":"webpage","Q21167453":"webpage","Q11820949":"book","Q17143271":"event","Q17990096":"event","Q18105680":"event","Q19396147":"event","Q30279428":"webpage","Q20827292":"event","Q26928600":"book","Q50081413":"webpage","Q55510433":"webpage","Q65010179":"webpage","Q59779792":"event","Q72044830":"webpage","Q80096233":"webpage","Q94574287":"webpage","Q85475422":"event","Q99441965":"event","Q99441984":"event","Q99442286":"event","Q99443664":"event","Q99444029":"event","Q99472025":"event","Q100621746":"event","Q102276098":"event","Q102292481":"event","Q104218430":"event","Q104224089":"event","Q104224112":"event","Q105855428":"event","Q106253544":"event","Q106394420":"event","Q106411217":"event","Q106603744":"event","Q106635272":"event","Q106762533":"event","Q107140138":"event","Q108118070":"event","Q108125464":"event","Q108741439":"event","Q132241":"event","Q152450":"event","Q182653":"event","Q193145":"event","Q225917":"event","Q299359":"event","Q299491":"event","Q315469":"event","Q431360":"event","Q459528":"event","Q745709":"event","Q773620":"event","Q850336":"event","Q979730":"event","Q1076105":"event","Q1107771":"event","Q1152956":"event","Q1153162":"event","Q1168476":"event","Q1196722":"event","Q1225911":"event","Q1392552":"event","Q1433642":"event","Q1469546":"event","Q1627140":"event","Q1630979":"event","Q1661095":"event","Q1895274":"event","Q1911797":"event","Q2127334":"event","Q2214911":"event","Q2300494":"event","Q2412808":"event","Q2418025":"event","Q2468447":"event","Q2547976":"event","Q2658935":"event","Q2795827":"event","Q3046190":"event","Q3186692":"event","Q3251043":"event","Q3299434":"event","Q3325889":"event","Q3478346":"event","Q3551559":"event","Q3617607":"event","Q3956822":"event","Q4317295":"event","Q4967142":"event","Q4994929":"event","Q5481153":"event","Q5781225":"event","Q5860910":"event","Q5888304":"event","Q6085164":"event","Q6460735":"event","Q6765524":"event","Q6952431":"event","Q21094819":"event","Q21095053":"event","Q21115902":"event","Q21128169":"event","Q28531312":"event","Q28976135":"event","Q29001044":"event","Q29471082":"event","Q33088985":"event","Q42555207":"event","Q43792361":"event","Q45380910":"event","Q45767416":"event","Q46582859":"event","Q46952859":"event","Q47015876":"event","Q47517941":"event","Q47986635":"event","Q51295770":"event","Q51657839":"event","Q51831744":"event","Q57085779":"event","Q57867143":"event","Q58454964":"event","Q61659880":"event","Q64504529":"event","Q65561661":"event","Q34812":"event","Q45774":"event","Q46525":"event","Q57305":"event","Q72284369":"event","Q96314922":"event","Q107723093":"webpage","Q98103264":"event","Q100251218":"event","Q105362186":"event","Q106450751":"event","Q107598520":"event","Q7058657":"event","Q7565760":"event","Q8054831":"event","Q9018710":"broadcast","Q9062329":"event","Q10550013":"event","Q11284768":"event","Q11483816":"event","Q11487032":"event","Q11511492":"event","Q11586679":"event","Q12121663":"event","Q12259614":"event","Q12359579":"event","Q12398164":"event","Q12826913":"event","Q13134791":"event","Q13134878":"event","Q13135724":"event","Q13135731":"event","Q13135932":"event","Q13137190":"event","Q13137353":"event","Q13443059":"event","Q13510387":"event","Q13632977":"event","Q13734483":"event","Q14517045":"event","Q14622356":"event","Q14942355":"event","Q15063219":"event","Q15874109":"event","Q15900616":"event","Q16023945":"event","Q16420501":"event","Q17092603":"event","Q18033462":"event","Q18202029":"event","Q18333232":"event","Q18560545":"event","Q18579323":"event","Q18579325":"event","Q18608583":"event","Q19859887":"event","Q20618240":"event","Q21281822":"event","Q21540023":"event","Q22981519":"event","Q23687335":"event","Q23755142":"event","Q24060841":"event","Q26234155":"event","Q27349622":"event","Q27649668":"event","Q27768253":"event","Q27839452":"event","Q27940535":"event","Q27995495":"event","Q28103027":"event","Q30088075":"event","Q51696175":"event","Q54802199":"event","Q54935318":"event","Q55426287":"event","Q56113378":"event","Q57775861":"event","Q59210717":"event","Q59296933":"event","Q59297078":"event","Q60197152":"event","Q61130878":"event","Q61719494":"event","Q61740765":"event","Q62737750":"event","Q63068285":"event","Q64364625":"event","Q65617121":"event","Q66458824":"event","Q70460346":"event","Q70629395":"event","Q72732806":"event","Q73012175":"event","Q77805379":"event","Q85625819":"event","Q87476385":"event","Q87477513":"event","Q87747932":"event","Q88672834":"event","Q97445956":"event","Q98216781":"event","Q99737532":"event","Q99739404":"event","Q103882295":"event","Q104700480":"event","Q104767140":"event","Q105439592":"event","Q106518893":"event","Q106547367":"event","Q108509955":"event","Q109331363":"event","Q109569970":"event","Q110197878":"event","Q110289243":"event","Q110392395":"event","Q110665091":"event","Q110665174":"event","Q110710079":"event","Q110763545":"event","Q110996190":"event","Q1249224":"report","Q111290996":"event","Q112079833":"event","Q3209941":"report","Q4575034":"report","Q11078958":"report","Q1064733":"software","Q179304":"event","Q252717":"event","Q271725":"event","Q489219":"event","Q493386":"event","Q842203":"event","Q1317101":"event","Q1366722":"event","Q1478437":"event","Q1574715":"event","Q1789999":"event","Q1817141":"event","Q1840742":"event","Q1910276":"event","Q1999120":"event","Q2031615":"event","Q2080304":"event","Q2122052":"event","Q2150335":"event","Q2296723":"event","Q2447666":"event","Q2468952":"event","Q2488604":"event","Q2558821":"event","Q2623547":"event","Q2683596":"event","Q2837389":"event","Q3305655":"event","Q3496570":"event","Q1774365":"standard","Q4288793":"event","Q4336440":"event","Q4353956":"event","Q4380246":"event","Q4380244":"event","Q5157463":"event","Q5245513":"event","Q5603591":"event","Q15593589":"software","Q15618646":"software","Q7079589":"event","Q7720582":"event","Q9344824":"event","Q12354782":"event","Q12362855":"event","Q13034996":"event","Q13403102":"event","Q13779455":"event","Q14931534":"event","Q15140166":"event","Q15140175":"event","Q16023776":"event","Q16033371":"event","Q16680663":"event","Q16680723":"event","Q16997177":"event","Q17194091":"event","Q18431960":"event","Q18536594":"event","Q18918137":"event","Q19753730":"event","Q20020588":"event","Q20647964":"event","Q20723111":"event","Q21140826":"event","Q21246076":"event","Q22774124":"event","Q22938576":"event","Q65173475":"song","Q47647413":"event","Q55806536":"event","Q84612307":"report","Q25847":"event","Q31645":"event","Q60617":"event","Q110826093":"report","Q95115361":"event","Q106606770":"event","Q106628113":"event","Q107238721":"event","Q107587273":"event","Q108063424":"event","Q576131":"motion_picture","Q1390819":"motion_picture","Q1718627":"legal_case","Q110290988":"event","Q110291794":"event","Q110373479":"event","Q2223653":"legal_case","Q4249087":"legal_case","Q7611274":"map","Q11070774":"legal_case","Q2983424":"broadcast","Q18609332":"legal_case","Q20014303":"article-newspaper","Q20267837":"motion_picture","Q21044347":"legal_case","Q1229611":"software","Q1602447":"software","Q2359689":"software","Q3814081":"software","Q5165404":"bill","Q388834":"event","Q1170725":"book","Q2055725":"book","Q2066703":"book","Q19969268":"broadcast","Q45182324":"article-journal","Q16505090":"book","Q16517254":"book","Q17277646":"book","Q19895101":"book","Q21211790":"book","Q21212164":"book","Q21212442":"book","Q21212446":"book","Q24273299":"book","Q23893804":"event","Q26225470":"book","Q26279855":"event","Q26279902":"event","Q27031964":"event","Q27600974":"event","Q27889498":"event","Q28800950":"event","Q30277550":"book","Q60848413":"motion_picture","Q67912210":"legal_case","Q38066778":"event","Q41479621":"event","Q15726909":"interview","Q46190676":"event","Q56056731":"software","Q47089371":"event","Q50393057":"event","Q50846468":"event","Q51590703":"event","Q51590770":"event","Q51591612":"event","Q51931369":"event","Q63241860":"software","Q55074672":"event","Q55097374":"event","Q55118684":"event","Q56274260":"event","Q56276798":"event","Q56850939":"event","Q57540859":"event","Q57542735":"event","Q57550169":"event","Q57550650":"event","Q57609296":"event","Q57609313":"event","Q57733494":"event","Q63254865":"event","Q64250307":"event","Q84491920":"event","Q88660792":"event","Q89033277":"event","Q93207256":"event","Q93233984":"event","Q93234631":"event","Q94484766":"event","Q94484833":"event","Q94484893":"event","Q94484982":"event","Q94485157":"event","Q94485173":"event","Q98448954":"event","Q98609858":"event","Q99564787":"event","Q100843605":"event","Q102076434":"book","Q104537405":"event","Q106179662":"event","Q108329152":"book","Q108329788":"book","Q220898":"motion_picture","Q425382":"manuscript","Q891235":"manuscript","Q1011299":"broadcast","Q1344426":"manuscript","Q110987317":"book","Q3276244":"broadcast","Q3461321":"broadcast","Q2297189":"report","Q7533316":"manuscript","Q503354":"song","Q16147871":"legal_case","Q19359000":"report","Q920890":"software","Q13016974":"song","Q13025584":"song","Q13025592":"song","Q13025598":"song","Q13025599":"song","Q24633474":"broadcast","Q16304469":"song","Q384515":"book","Q636946":"book","Q1047074":"book","Q1491125":"book","Q1813223":"book","Q1371453":"event","Q2233389":"book","Q2326951":"book","Q2500820":"book","Q2804309":"book","Q2980995":"book","Q539558":"standard","Q917805":"standard","Q1143530":"standard","Q1417378":"standard","Q1419905":"standard","Q1458121":"standard","Q4363806":"book","Q2069335":"standard","Q2293706":"standard","Q2636061":"standard","Q5209391":"book","Q3487109":"standard","Q3560970":"standard","Q4647007":"standard","Q7433672":"book","Q10493645":"book","Q10916116":"book","Q43096126":"motion_picture","Q11787920":"standard","Q48743931":"manuscript","Q18081961":"standard","Q20631656":"book","Q20669574":"book","Q1363997":"performance","Q1650357":"performance","Q21683863":"book","Q21727724":"book","Q21875313":"book","Q21662139":"event","Q20820163":"standard","Q23824436":"standard","Q27850015":"standard","Q62724790":"broadcast","Q42723239":"software","Q17317604":"performance","Q39086821":"review","Q50320796":"webpage","Q51139628":"webpage","Q48028851":"book","Q51930650":"book","Q51953425":"book","Q56514665":"book","Q59259613":"standard","Q63533016":"book","Q97135699":"legal_case","Q36279":"book","Q102141681":"motion_picture","Q81989119":"software","Q82004331":"software","Q104097073":"motion_picture","Q105320349":"motion_picture","Q110876331":"motion_picture","Q97001446":"software","Q106323251":"webpage","Q96676787":"standard","Q104177180":"book","Q104243413":"book","Q105080687":"event","Q105080700":"event","Q93204":"motion_picture","Q109301270":"event","Q914242":"motion_picture","Q2023874":"motion_picture","Q111011066":"periodical","Q111501773":"event","Q3377903":"motion_picture","Q4677832":"motion_picture","Q5338721":"motion_picture","Q322229":"software","Q15909161":"post","Q26225765":"motion_picture","Q6559906":"chapter","Q316572":"legislation","Q548408":"book","Q253946":"event","Q850716":"legislation","Q557450":"event","Q797476":"event","Q1153401":"event","Q10850880":"software","Q2135494":"legislation","Q2137778":"event","Q3270247":"legislation","Q1023122":"standard","Q3813456":"event","Q5165903":"legislation","Q6517603":"legislation","Q6647678":"legislation","Q6880647":"legislation","Q6880644":"legislation","Q6880645":"legislation","Q7256536":"legislation","Q7355045":"legislation","Q7598349":"legislation","Q9367401":"legislation","Q9352238":"event","Q10872094":"legislation","Q11221622":"event","Q16024891":"legislation","Q17054088":"legislation","Q17077441":"legislation","Q22098766":"event","Q27787439":"event","Q27968043":"event","Q28928544":"event","Q28928785":"event","Q29642990":"event","Q66503284":"motion_picture","Q47345468":"event","Q47403752":"event","Q5266727":"treaty","Q7033567":"treaty","Q62391930":"event","Q3887":"event","Q99526021":"motion_picture","Q99526024":"motion_picture","Q104880835":"motion_picture","Q75694944":"event","Q105885059":"broadcast","Q106094709":"broadcast","Q106094879":"broadcast","Q106625351":"broadcast","Q106921023":"broadcast","Q107737653":"broadcast","Q109542175":"broadcast","Q109822700":"periodical","Q110485525":"broadcast","Q29883647":"treaty","Q111630723":"post","Q111691554":"post","Q42214612":"treaty","Q97011843":"event","Q97011844":"event","Q107110354":"software","Q100741823":"event","Q101246533":"event","Q106393876":"event","Q106594095":"event","Q107028274":"event","Q107474077":"event","Q107659169":"event","Q107659248":"event","Q108095628":"event","Q110013395":"event","Q110895855":"event","Q111837255":"book","Q8041497":"patent","Q67230438":"regulation","Q8576":"treaty","Q909523":"software","Q12093963":"song","Q86860":"book","Q136472":"book","Q193606":"book","Q351718":"book","Q367591":"book","Q374466":"book","Q472808":"book","Q780816":"book","Q909887":"book","Q1057172":"book","Q1194480":"book","Q1236219":"book","Q1346592":"dataset","Q1498333":"book","Q1557877":"book","Q1250718":"event","Q2215170":"book","Q2387049":"book","Q1764062":"event","Q2681385":"book","Q2872516":"book","Q2915491":"book","Q616245":"standard","Q3238422":"book","Q758837":"standard","Q763131":"standard","Q796005":"standard","Q828287":"standard","Q1377447":"standard","Q1431617":"standard","Q1653434":"standard","Q1653437":"standard","Q1924747":"dataset","Q5457615":"book","Q25452063":"song","Q7005086":"book","Q7834250":"book","Q7834532":"book","Q8031151":"book","Q7777570":"event","Q11385322":"book","Q11509155":"book","Q12538685":"event","Q19710757":"book","Q599568":"performance","Q20664530":"book","Q2532894":"performance","Q50823049":"report","Q5450227":"performance","Q25493808":"event","Q26913402":"book","Q7596819":"performance","Q30110959":"event","Q11499497":"book","Q11502644":"book","Q33240030":"event","Q40444998":"event","Q60853089":"song","Q42609890":"event","Q43099869":"event","Q47451145":"book","Q51885719":"standard","Q55771109":"standard","Q55936923":"standard","Q55936932":"standard","Q55937502":"standard","Q766366":"regulation","Q1582778":"regulation","Q2043282":"regulation","Q3754526":"regulation","Q59163902":"event","Q5166307":"treaty","Q8187836":"treaty","Q61782522":"dataset","Q65926499":"book","Q59126":"book","Q14658":"standard","Q20874666":"treaty","Q65271226":"performance","Q110263559":"dataset","Q39233713":"treaty","Q110313265":"bill","Q110487819":"bill","Q110488086":"bill","Q102250949":"event","Q104100753":"book","Q104828091":"standard","Q104948406":"book","Q107432485":"book","Q109699239":"event","Q110103887":"event","Q1651804":"song","Q1989725":"song","Q3897519":"song","Q4528554":"song","Q12983463":"song","Q16927904":"motion_picture","Q4116861":"software","Q7575402":"software","Q18406550":"song","Q279272":"book","Q856058":"book","Q220505":"event","Q1249682":"book","Q3052748":"event","Q24840943":"song","Q4943143":"event","Q3146599":"standard","Q3146622":"standard","Q3146627":"standard","Q3146624":"standard","Q3487181":"standard","Q4041015":"standard","Q4386278":"standard","Q5906783":"standard","Q5906785":"standard","Q5906790":"standard","Q5970231":"standard","Q5970233":"standard","Q5970239":"standard","Q5970237":"standard","Q5970246":"standard","Q5970244":"standard","Q5970248":"standard","Q5970256":"standard","Q5970270":"standard","Q5970268":"standard","Q5970274":"standard","Q5970299":"standard","Q28135297":"song","Q12047175":"book","Q11223934":"standard","Q11223933":"standard","Q16941296":"event","Q17322391":"standard","Q17679554":"standard","Q22678605":"standard","Q28501089":"event","Q61868326":"map","Q30590703":"standard","Q30715976":"standard","Q62706465":"post-weblog","Q31073483":"standard","Q64727712":"post","Q63247669":"song","Q73738851":"article-journal","Q73744145":"article-journal","Q72180513":"post","Q61866692":"software","Q56365375":"book","Q55755869":"standard","Q58483088":"book","Q90490140":"article-journal","Q62085959":"book","Q64272108":"event","Q65773873":"book","Q66370783":"book","Q86735980":"song","Q1344":"book","Q102054386":"post-weblog","Q111653018":"post-weblog","Q105967840":"motion_picture","Q108296569":"post","Q108354410":"post","Q108354415":"post","Q86082198":"review","Q108970344":"post","Q111590483":"post","Q111590519":"post","Q102314626":"software","Q96604496":"software","Q107355827":"software","Q101238296":"book","Q101552184":"software","Q105760475":"software","Q108028700":"software","Q108028709":"software","Q108308863":"software","Q1241342":"map","Q1684600":"periodical","Q2865639":"legal_case","Q3402495":"periodical","Q11539885":"map","Q11626042":"map","Q1519864":"song","Q1484397":"broadcast","Q4056436":"song","Q4400497":"song","Q18001677":"map","Q9391553":"song","Q174989":"software","Q188506":"software","Q11590393":"song","Q11817196":"song","Q12983425":"song","Q22682013":"report","Q106633152":"interview","Q106697982":"interview","Q106747061":"interview","Q7565159":"software","Q83790":"book","Q155171":"book","Q918038":"book","Q1173065":"book","Q1414013":"book","Q1728555":"book","Q2150516":"book","Q2901352":"book","Q2972936":"book","Q3752011":"book","Q23072435":"song","Q3831821":"book","Q87073833":"regulation","Q5091196":"book","Q5093326":"book","Q88222337":"regulation","Q88319982":"regulation","Q88704770":"regulation","Q88706840":"regulation","Q25407651":"song","Q8034663":"book","Q7887959":"legislation","Q30682836":"post","Q27981708":"song","Q27981857":"song","Q28666961":"song","Q15528609":"standard","Q18744387":"book","Q18694092":"event","Q29364197":"software","Q105635725":"regulation","Q105635730":"regulation","Q107523873":"regulation","Q107524042":"regulation","Q7207537":"performance","Q30009376":"book","Q54621475":"post","Q65071384":"periodical","Q70471362":"article-journal","Q50965914":"book","Q48739515":"standard","Q55442722":"book","Q55442818":"book","Q647266":"regulation","Q847919":"regulation","Q907246":"regulation","Q1269627":"regulation","Q29581299":"interview","Q59466328":"event","Q5546654":"legislation","Q91901000":"article-journal","Q91985448":"map","Q7611327":"regulation","Q11555036":"regulation","Q67212770":"legislation","Q60520":"book","Q107197551":"manuscript","Q107268222":"speech","Q99230875":"song","Q99230884":"song","Q89288125":"software","Q90790055":"software","Q101515433":"song","Q30314010":"regulation","Q108673968":"collection","Q92257756":"book","Q92259219":"book","Q92275689":"book","Q92275705":"book","Q96106854":"event","Q106377252":"legislation","Q106747100":"review","Q111823430":"event","Q5985066":"song","Q7179597":"song","Q16682190":"song","Q108577034":"interview","Q624669":"book","Q86483":"event","Q153308":"event","Q231833":"event","Q1150253":"event","Q1523556":"event","Q1960124":"event","Q2032224":"event","Q2033651":"event","Q2376952":"event","Q2466190":"event","Q2546404":"event","Q2547181":"event","Q2547212":"event","Q2547256":"event","Q2547285":"event","Q2609861":"event","Q2818097":"event","Q3680691":"event","Q4047994":"event","Q4048027":"event","Q4920810":"event","Q5253380":"event","Q7299950":"book","Q10002682":"event","Q15140182":"event","Q15992351":"event","Q15992355":"event","Q15992407":"event","Q15992410":"event","Q15992408":"event","Q16025335":"event","Q16025333":"event","Q16025336":"event","Q16025347":"event","Q16025353":"event","Q16025356":"event","Q16025357":"event","Q16025370":"event","Q16025369":"event","Q16025382":"event","Q16025380":"event","Q16025381":"event","Q16025386":"event","Q16025387":"event","Q16025388":"event","Q16025406":"event","Q16025410":"event","Q17020734":"event","Q17620735":"event","Q15841472":"standard","Q22930958":"event","Q22930969":"event","Q22930997":"event","Q25203386":"book","Q26160672":"book","Q109934449":"legislation","Q15474042":"webpage","Q64140571":"song","Q21528878":"webpage","Q51119344":"event","Q51119363":"event","Q51119367":"event","Q51119381":"event","Q51119398":"event","Q51119402":"event","Q51119427":"event","Q51119425":"event","Q51120563":"event","Q51120565":"event","Q72862526":"song","Q328798":"regulation","Q55530927":"event","Q55530936":"event","Q919526":"regulation","Q56612794":"book","Q86726484":"legal_case","Q60809954":"book","Q67175826":"book","Q693":"book","Q699":"book","Q27283":"event","Q40317":"event","Q42236":"event","Q74551327":"book","Q84252804":"book","Q84253146":"book","Q85215989":"book","Q108744576":"dataset","Q111709174":"post","Q136277":"software","Q170378":"software","Q305873":"software","Q893210":"software","Q947369":"software","Q950981":"software","Q977076":"software","Q2174007":"software","Q2531940":"software","Q3600969":"software","Q3848426":"software","Q3926208":"software","Q4441598":"software","Q5991258":"software","Q6163847":"software","Q7715973":"software","Q8026703":"software","Q189835":"legislation","Q189837":"legislation","Q189845":"legislation","Q223590":"legislation","Q9427662":"software","Q449150":"legislation","Q492610":"legislation","Q603299":"legislation","Q604188":"legislation","Q691424":"legislation","Q862207":"legislation","Q915060":"legislation","Q1148232":"legislation","Q1185409":"legislation","Q1353859":"legislation","Q2028541":"legislation","Q2104464":"legislation","Q2385874":"legislation","Q2416319":"legislation","Q2944268":"legislation","Q2944277":"legislation","Q3664422":"legislation","Q4114390":"legislation","Q4115775":"legislation","Q4357923":"legislation","Q4503886":"legislation","Q4503884":"legislation","Q4503885":"legislation","Q4503889":"legislation","Q4503897":"legislation","Q4817455":"legislation","Q4925942":"legislation","Q5058912":"legislation","Q5058913":"legislation","Q5058918":"legislation","Q5058919":"legislation","Q5058916":"legislation","Q5058926":"legislation","Q5058924":"legislation","Q5058925":"legislation","Q5058930":"legislation","Q5058935":"legislation","Q5058933":"legislation","Q5058939":"legislation","Q5058937":"legislation","Q5421766":"legislation","Q5706946":"legislation","Q7210265":"legislation","Q18601928":"software","Q10598112":"legislation","Q19715216":"software","Q13424629":"legislation","Q16025403":"event","Q16025400":"event","Q16025409":"event","Q16956312":"legislation","Q16524890":"event","Q17144862":"legislation","Q17988485":"legislation","Q23048056":"legislation","Q22930956":"event","Q22931015":"event","Q23642670":"event","Q24961230":"event","Q25377603":"event","Q27897473":"legislation","Q28197261":"legislation","Q51119350":"event","Q51119369":"event","Q51119383":"event","Q51119404":"event","Q51119429":"event","Q51120567":"event","Q55530949":"event","Q16691":"software","Q48267":"software","Q60981963":"event","Q22696":"legislation","Q22759":"legislation","Q96631869":"software","Q106253790":"software","Q106880300":"software","Q1033573":"dataset","Q1205607":"dataset","Q1667884":"dataset","Q2145124":"dataset","Q2819247":"dataset","Q3570413":"dataset","Q4685824":"dataset","Q7002108":"dataset","Q7200622":"dataset","Q18609754":"dataset","Q119272":"book","Q148163":"book","Q148453":"book","Q208080":"book","Q210675":"book","Q253137":"book","Q377258":"book","Q470610":"book","Q599099":"book","Q602708":"book","Q662073":"book","Q674448":"book","Q785479":"book","Q785522":"book","Q915591":"book","Q1084127":"book","Q584659":"event","Q1255689":"book","Q1255726":"book","Q1474463":"book","Q1485271":"book","Q906363":"event","Q1742962":"book","Q1954953":"book","Q1497671":"event","Q2349495":"book","Q2522999":"book","Q3775629":"book","Q3883891":"book","Q4164367":"book","Q3577561":"event","Q4744117":"book","Q5100366":"book","Q5158398":"book","Q6027927":"book","Q5681048":"event","Q5691927":"event","Q6417435":"book","Q7293812":"book","Q7354827":"book","Q7534220":"book","Q7573432":"book","Q7556682":"event","Q7556683":"event","Q7556685":"event","Q10313304":"book","Q10830180":"book","Q11946197":"book","Q12578980":"book","Q13220650":"book","Q13582776":"event","Q18071186":"book","Q18689772":"book","Q19602704":"book","Q21086501":"book","Q24255634":"book","Q24842448":"book","Q24944707":"book","Q24943218":"event","Q47500192":"dataset","Q27866133":"book","Q28220756":"legislation","Q29887223":"legislation","Q30935481":"book","Q31842628":"legislation","Q42402646":"book","Q55622691":"book","Q59056824":"legislation","Q62782177":"legislation","Q31918":"book","Q70791907":"legislation","Q97229550":"book","Q97597112":"book","Q104439053":"book","Q105906205":"book","Q106124032":"book","Q106393147":"book","Q107177810":"book","Q108293881":"book","Q111394772":"event","Q101552821":"performance","Q116634":"software","Q208850":"software","Q209163":"software","Q266990":"software","Q270948":"software","Q467880":"software","Q472055":"software","Q584105":"software","Q744038":"software","Q839777":"software","Q845620":"software","Q848991":"software","Q858523":"software","Q900604":"software","Q958821":"software","Q1015325":"software","Q1041225":"software","Q1050023":"software","Q1121542":"software","Q1192658":"software","Q7708379":"software","Q153134":"event","Q205097":"event","Q537225":"event","Q815872":"event","Q1241858":"event","Q1328521":"event","Q11187440":"software","Q1813574":"event","Q1879352":"event","Q2110027":"event","Q2147804":"event","Q2265649":"event","Q2390665":"event","Q2425012":"event","Q2505543":"event","Q2710193":"event","Q2753995":"event","Q2836675":"event","Q2922227":"event","Q2939692":"event","Q2939693":"event","Q3889661":"event","Q13733263":"software","Q5044124":"event","Q5639717":"event","Q5752804":"event","Q5752855":"event","Q5752946":"event","Q15477174":"software","Q18156733":"software","Q18348827":"software","Q10273189":"event","Q13509947":"event","Q13571350":"event","Q15809323":"event","Q15961911":"event","Q141459":"performance","Q384181":"performance","Q438503":"performance","Q601235":"performance","Q877693":"performance","Q965635":"performance","Q1166726":"performance","Q21008098":"event","Q21011266":"event","Q21035151":"event","Q21035155":"event","Q21035156":"event","Q21035166":"event","Q21035176":"event","Q2352315":"performance","Q21971834":"event","Q5072880":"performance","Q5799402":"performance","Q25906521":"event","Q9334632":"performance","Q28339379":"event","Q28339417":"event","Q29050586":"event","Q29425176":"event","Q29466507":"event","Q12302979":"performance","Q12983518":"performance","Q15697534":"performance","Q9732903":"webpage","Q11002482":"webpage","Q12096573":"webpage","Q16059585":"webpage","Q16059613":"webpage","Q16059624":"webpage","Q19208935":"webpage","Q21450877":"webpage","Q23916":"software","Q27291":"software","Q54767":"software","Q63974574":"event","Q35232":"event","Q429083":"dataset","Q540264":"dataset","Q906648":"dataset","Q1478823":"dataset","Q1584044":"dataset","Q2537421":"dataset","Q3163116":"dataset","Q1223895":"software","Q1224999":"software","Q1327648":"software","Q1395577":"software","Q1425505":"software","Q1493064":"software","Q1506693":"software","Q1610017":"software","Q1635956":"software","Q1755420":"software","Q1823737":"software","Q2910554":"software","Q3257925":"software","Q3288281":"software","Q3362070":"software","Q3495514":"software","Q3739535":"software","Q4393107":"software","Q4449864":"software","Q4485157":"software","Q4704404":"software","Q5647425":"software","Q6561427":"software","Q6895044":"software","Q6955546":"software","Q7230210":"software","Q7766240":"software","Q7832342":"software","Q7888616":"software","Q7927920":"software","Q9318902":"software","Q10714182":"software","Q11297254":"software","Q11446445":"software","Q14411698":"software","Q15613992":"software","Q16021388":"software","Q16070115":"software","Q17042291":"software","Q17049225":"software","Q17992502":"software","Q21087661":"software","Q22974170":"software","Q25397095":"software","Q26692802":"software","Q28004621":"software","Q29471320":"software","Q29867401":"software","Q25508849":"book","Q37813767":"book","Q48835388":"software","Q50572288":"software","Q55588631":"software","Q43747":"dataset","Q60617825":"software","Q60617897":"software","Q60617909":"software","Q60617933":"software","Q60617940":"software","Q60617948":"software","Q60617960":"software","Q60777418":"software","Q61475894":"software","Q61642128":"software","Q61838206":"software","Q64170203":"software","Q64641660":"software","Q64692685":"software","Q65073088":"software","Q65963104":"software","Q67016067":"software","Q73548809":"software","Q73626664":"software","Q78444225":"software","Q85341917":"software","Q85422949":"software","Q85637992":"software","Q87741364":"software","Q89691527":"software","Q101900049":"software","Q104438884":"software","Q105488936":"software","Q105675772":"software","Q106542313":"software","Q107486718":"software","Q109115381":"software","Q109553454":"software","Q110817849":"software","Q110948671":"software","Q111223304":"software","Q109923223":"software","Q111520556":"software","Q3239011":"dataset","Q4971453":"dataset","Q5275636":"dataset","Q7658822":"dataset","Q9372631":"dataset","Q174666":"software","Q213666":"software","Q226264":"software","Q282080":"software","Q290196":"software","Q588145":"software","Q600659":"software","Q720353":"software","Q931140":"software","Q1053058":"software","Q1077480":"software","Q1139923":"software","Q1192309":"software","Q1198514":"software","Q2597557":"software","Q3030796":"software","Q3480046":"software","Q3496028":"software","Q3496042":"software","Q3900494":"software","Q4119202":"software","Q4162386":"software","Q16325412":"dataset","Q7005105":"software","Q7075017":"software","Q7300019":"software","Q7393022":"software","Q7643164":"software","Q231302":"book","Q237338":"book","Q242492":"book","Q382236":"book","Q438533":"book","Q470137":"book","Q478804":"book","Q503106":"book","Q865484":"book","Q751967":"event","Q819264":"event","Q1499199":"book","Q874579":"event","Q875948":"event","Q2279967":"event","Q2357104":"event","Q2415843":"event","Q12307966":"software","Q3909444":"software","Q4047260":"software","Q3827292":"event","Q5366097":"book","Q5636103":"software","Q5255897":"event","Q6013084":"software","Q5959004":"event","Q7142882":"software","Q16632299":"software","Q7927948":"software","Q11080558":"book","Q11304780":"book","Q11320378":"software","Q13512320":"software","Q28933703":"software","Q28933701":"software","Q28933706":"software","Q28933708":"software","Q28933712":"software","Q28933719":"software","Q20057018":"software","Q21198342":"book","Q21202185":"periodical","Q21997246":"motion_picture","Q60227597":"dataset","Q62414839":"legislation","Q66823362":"software","Q14656":"software","Q43627":"software","Q66800798":"event","Q29502":"event","Q85299672":"software","Q76160314":"event","Q108615611":"dataset","Q111904334":"dataset","Q106920999":"software","Q104536775":"book","Q104536849":"book","Q104536877":"book","Q104536908":"book","Q104536976":"book","Q104537024":"book","Q106231889":"book","Q107408274":"book","Q107413638":"book","Q106963495":"event","Q111181669":"review","Q1684595":"dataset","Q109584422":"performance","Q110279610":"performance","Q278610":"software","Q893147":"software","Q1239207":"software","Q5007725":"software","Q5323032":"software","Q6008645":"software","Q7950616":"software","Q166788":"event","Q181789":"event","Q818574":"review","Q307439":"event","Q452172":"event","Q1436668":"review","Q2245461":"review","Q2207867":"event","Q2265647":"event","Q2453094":"event","Q2801174":"event","Q3813242":"review","Q3956596":"legislation","Q5154588":"review","Q5160138":"review","Q5937746":"review","Q4127125":"standard","Q6934595":"review","Q6956315":"review","Q7907956":"review","Q8068723":"review","Q18287040":"software","Q11387009":"event","Q21283449":"software","Q16324744":"book","Q17637777":"review","Q179465":"performance","Q248255":"performance","Q17272482":"standard","Q17272692":"standard","Q17280916":"standard","Q20012720":"legislation","Q691771":"performance","Q20011486":"review","Q820922":"performance","Q1497328":"performance","Q1498088":"performance","Q1500983":"performance","Q1553339":"performance","Q1803735":"performance","Q2373914":"performance","Q2447826":"performance","Q2706051":"performance","Q2956237":"performance","Q3077527":"performance","Q3083000":"performance","Q3240930":"performance","Q3495144":"performance","Q22909167":"review","Q3655696":"performance","Q4408537":"performance","Q5396690":"performance","Q24255328":"event","Q5552415":"performance","Q5663801":"performance","Q27070652":"legislation","Q12336368":"performance","Q42342966":"software","Q15990884":"song","Q18822510":"performance","Q19973796":"performance","Q42824069":"review","Q42824440":"review","Q42824827":"review","Q42825046":"review","Q25616123":"performance","Q47462314":"event","Q48996431":"review","Q63563749":"software","Q70191115":"software","Q2150":"event","Q70447452":"review","Q78089383":"review","Q78093526":"review","Q66098673":"performance","Q96003705":"review","Q79054127":"performance","Q98446308":"review","Q108064715":"software","Q99672520":"review","Q100699183":"review","Q105762635":"event","Q107302128":"review","Q107302258":"review","Q108305133":"review","Q110856497":"book","Q110738072":"event","Q119191":"software","Q164274":"software","Q166514":"software","Q183427":"software","Q184609":"software","Q184748":"software","Q191865":"software","Q202871":"software","Q271680":"software","Q283770":"software","Q308980":"software","Q467707":"software","Q537993":"software","Q574582":"software","Q625518":"software","Q633182":"software","Q778586":"software","Q836795":"software","Q849945":"software","Q865817":"software","Q908242":"software","Q959462":"software","Q1047886":"software","Q1065980":"software","Q1070421":"software","Q1074173":"software","Q1122588":"software","Q1152477":"software","Q1156049":"software","Q1186978":"software","Q1220872":"software","Q1248874":"software","Q1623338":"software","Q1663795":"software","Q1949698":"software","Q208628":"book","Q446523":"book","Q651019":"book","Q419441":"event","Q1193421":"book","Q1436115":"book","Q1521512":"book","Q1601740":"book","Q1872234":"book","Q1956258":"book","Q1957413":"book","Q1347838":"event","Q2252176":"book","Q2583965":"book","Q1944136":"event","Q2072215":"event","Q2673302":"event","Q2855282":"event","Q3589331":"book","Q3534698":"event","Q4243465":"book","Q4263008":"book","Q4071451":"event","Q4326869":"event","Q4326886":"event","Q4832957":"event","Q6391136":"book","Q6021105":"event","Q7187715":"book","Q7672908":"book","Q7426562":"event","Q7561276":"event","Q9207029":"book","Q11362827":"book","Q11588264":"book","Q11612940":"book","Q12404438":"dataset","Q14333796":"book","Q16626925":"book","Q17118115":"book","Q18339531":"book","Q19602791":"book","Q19893409":"event","Q25831177":"book","Q28407836":"book","Q28682619":"book","Q28686106":"book","Q60557971":"dataset","Q18109":"software","Q65067294":"book","Q4184":"book","Q34274":"book","Q92915890":"book","Q98596704":"book","Q105609506":"book","Q106689897":"event","Q108304511":"book","Q1964195":"software","Q2102665":"software","Q2114277":"software","Q2257348":"software","Q2293691":"software","Q2297769":"software","Q2537171":"software","Q2578744":"software","Q2641372":"software","Q2706314":"software","Q2717852":"software","Q2831043":"software","Q4112099":"software","Q4154431":"software","Q4292129":"software","Q4810567":"software","Q5071882":"software","Q6486632":"software","Q6553536":"software","Q6665305":"software","Q6914653":"software","Q7302709":"software","Q7504648":"software","Q7544035":"software","Q139060":"event","Q250496":"event","Q257262":"event","Q269616":"event","Q277924":"event","Q279283":"event","Q327765":"event","Q373956":"event","Q377889":"event","Q481394":"event","Q489532":"event","Q509581":"event","Q526530":"event","Q573613":"event","Q645225":"event","Q669262":"event","Q765896":"event","Q832043":"event","Q832107":"event","Q858439":"event","Q877353":"event","Q917269":"event","Q931687":"event","Q1116750":"event","Q1142770":"event","Q1156016":"event","Q1196663":"event","Q1196727":"event","Q1252747":"event","Q1292614":"event","Q1333366":"event","Q1376777":"event","Q11238306":"software","Q1769698":"event","Q1914150":"event","Q1953538":"event","Q2055296":"event","Q2062518":"event","Q11774664":"software","Q2276065":"event","Q2300361":"event","Q2412015":"event","Q2439355":"event","Q2533468":"event","Q2534750":"event","Q2540467":"event","Q2644795":"event","Q2991470":"event","Q3026458":"event","Q3068523":"event","Q3117951":"event","Q3123403":"event","Q13563219":"software","Q15975283":"software","Q17176533":"software","Q18392997":"software","Q20826962":"software","Q21013268":"software","Q21055608":"software","Q25313447":"software","Q28031555":"software","Q30077597":"software","Q30581237":"software","Q37307899":"software","Q47525747":"software","Q55106975":"software","Q62651817":"software","Q70383937":"software","Q48968":"event","Q100508790":"software","Q104764409":"software","Q105103015":"software","Q105526153":"software","Q106391210":"software","Q107829364":"software","Q107829622":"software","Q109682730":"event","Q109860356":"event","Q109936365":"event","Q110192585":"event","Q680913":"legislation","Q978539":"legislation","Q3398563":"event","Q3563181":"event","Q3586695":"event","Q3586859":"event","Q3650619":"event","Q4128634":"event","Q5261563":"event","Q5354600":"event","Q5354619":"event","Q5354625":"event","Q5354656":"event","Q5354662":"event","Q5354663":"event","Q5354660":"event","Q5354692":"event","Q5354731":"event","Q5354734":"event","Q5354743":"event","Q5354744":"event","Q5354750":"event","Q5354752":"event","Q5354797":"event","Q5354802":"event","Q5354828":"event","Q5354829":"event","Q5354847":"event","Q5354859":"event","Q5354887":"event","Q5354893":"event","Q5354902":"event","Q5354906":"event","Q5452198":"event","Q5456339":"event","Q5827614":"event","Q6129823":"event","Q6508670":"event","Q6800733":"event","Q6936337":"event","Q6980735":"event","Q7305543":"event","Q7442979":"event","Q7596928":"event","Q8424783":"event","Q8774620":"event","Q10312794":"event","Q10430113":"event","Q10956631":"event","Q11394707":"event","Q11775075":"event","Q12195172":"event","Q12237967":"event","Q13012970":"event","Q13256577":"event","Q14006248":"event","Q14362442":"event","Q14513611":"event","Q15261477":"event","Q15857735":"event","Q15885655":"event","Q16482341":"event","Q16957500":"event","Q16983162":"event","Q18657746":"event","Q18915465":"event","Q21087349":"event","Q24097670":"event","Q24910722":"event","Q25548647":"event","Q26260699":"event","Q27242623":"event","Q28122293":"event","Q28152015":"event","Q28363647":"event","Q28404720":"event","Q28404971":"event","Q28453929":"event","Q29102902":"event","Q35647389":"webpage","Q38080355":"event","Q47239206":"event","Q55315853":"event","Q61051482":"event","Q61964017":"event","Q62019864":"event","Q65041937":"event","Q65210722":"event","Q71989553":"event","Q73283366":"event","Q74212708":"event","Q76853179":"event","Q85811908":"event","Q97185204":"event","Q101421918":"event","Q107394355":"event","Q81304":"software","Q110546":"software","Q180760":"software","Q400185":"software","Q1076785":"software","Q1325106":"software","Q1416699":"software","Q399999":"legislation","Q431226":"event","Q573790":"event","Q1060617":"legislation","Q1113097":"legislation","Q705043":"event","Q1163060":"event","Q1219394":"event","Q1279357":"event","Q1458216":"event","Q1935121":"event","Q2047421":"event","Q2670332":"legislation","Q2260870":"event","Q2412191":"event","Q2515494":"event","Q2531579":"event","Q2684556":"event","Q3813313":"legislation","Q3449092":"event","Q3454916":"event","Q3454917":"event","Q3518511":"event","Q3931571":"event","Q3931603":"event","Q4127618":"event","Q2553286":"standard","Q4393807":"event","Q4393809":"event","Q4460509":"event","Q5267359":"legislation","Q5021202":"event","Q7302614":"legislation","Q7302617":"legislation","Q7302625":"legislation","Q7307167":"event","Q7307171":"event","Q7307169":"event","Q7307172":"event","Q7658986":"event","Q8964629":"event","Q9305214":"event","Q10290435":"event","Q10290447":"event","Q10750394":"legislation","Q12292328":"event","Q16250608":"legislation","Q15923787":"event","Q16061631":"event","Q19387509":"event","Q20199086":"event","Q20720731":"event","Q25044704":"event","Q25906438":"event","Q33103999":"event","Q48995961":"software","Q48806007":"event","Q54086790":"event","Q56300805":"legislation","Q56298560":"event","Q56304426":"event","Q59824867":"event","Q60189435":"event","Q60364778":"event","Q60832313":"event","Q60832352":"event","Q60835687":"event","Q60835756":"event","Q60835763":"event","Q60835775":"event","Q60835779":"event","Q60835781":"event","Q60835788":"event","Q60835874":"event","Q60835880":"event","Q60835964":"event","Q60836037":"event","Q60836058":"event","Q60836063":"event","Q60836061":"event","Q60836068":"event","Q60836069":"event","Q60836079":"event","Q60836077":"event","Q60836546":"event","Q60841354":"event","Q59164118":"standard","Q65128545":"event","Q65154340":"event","Q65156136":"event","Q65156193":"event","Q88680860":"legislation","Q99659193":"event","Q2990416":"software","Q3081213":"software","Q3529432":"software","Q3614994":"software","Q6015444":"software","Q6934486":"software","Q9356612":"software","Q170063":"event","Q564478":"event","Q829768":"event","Q836738":"event","Q1069363":"event","Q1255251":"event","Q1319165":"event","Q1898928":"event","Q2294927":"event","Q4752855":"event","Q4816014":"event","Q4843072":"event","Q4887699":"event","Q4892460":"event","Q4922330":"event","Q4968978":"event","Q5035518":"event","Q5035639":"event","Q5121403":"event","Q5124643":"event","Q5146194":"event","Q5327560":"event","Q5530386":"event","Q5629055":"event","Q6457810":"event","Q6630631":"event","Q6672304":"event","Q6728070":"event","Q6815393":"event","Q6840806":"event","Q6904305":"event","Q7068355":"event","Q7242731":"event","Q7242733":"event","Q7242773":"event","Q7242784":"event","Q7242791":"event","Q7260359":"event","Q7306874":"event","Q7413706":"event","Q7589672":"event","Q7633517":"event","Q7832310":"event","Q7902389":"event","Q7917993":"event","Q7995719":"event","Q11571371":"event","Q11795794":"event","Q16467590":"event","Q16841169":"event","Q16850489":"event","Q16979257":"event","Q17013377":"event","Q17017230":"event","Q17023293":"event","Q17056240":"event","Q17512396":"event","Q18215243":"event","Q19365525":"event","Q20709277":"event","Q31302964":"software","Q22812496":"event","Q24190332":"event","Q25104624":"event","Q28449529":"event","Q29561166":"event","Q30675417":"event","Q30905514":"event","Q42377496":"event","Q56249071":"software","Q55075493":"event","Q63442071":"event","Q106199835":"event","Q106204678":"event","Q106491674":"event","Q107183265":"event","Q754584":"software","Q4866353":"software","Q7439078":"software","Q623703":"book","Q655192":"book","Q1047433":"book","Q1081564":"book","Q446643":"event","Q1581176":"book","Q998672":"event","Q1746029":"book","Q1156329":"event","Q2025786":"book","Q2065131":"book","Q1520423":"event","Q2250844":"book","Q2250960":"book","Q1604562":"event","Q1738761":"event","Q1875610":"event","Q2552040":"book","Q2083629":"event","Q2188449":"event","Q2443567":"event","Q647229":"standard","Q2556222":"event","Q2558300":"event","Q2613738":"event","Q3434123":"book","Q3434454":"book","Q3536411":"book","Q3740879":"book","Q1345102":"standard","Q3917426":"book","Q3997226":"book","Q3997225":"book","Q4010242":"book","Q4034405":"book","Q3428525":"event","Q2161334":"standard","Q5276199":"book","Q4670142":"event","Q4931516":"event","Q5446981":"event","Q7246954":"book","Q16167709":"software","Q9378888":"book","Q7851772":"standard","Q10874566":"book","Q11191558":"book","Q11638380":"book","Q12347562":"event","Q98103963":"regulation","Q16000421":"book","Q15874031":"event","Q16832430":"event","Q18629280":"event","Q19900542":"event","Q29584836":"event","Q28864053":"standard","Q55637909":"software","Q1660368":"regulation","Q57936091":"book","Q3039667":"regulation","Q58902997":"book","Q3405526":"regulation","Q3536685":"regulation","Q3577418":"regulation","Q59565144":"event","Q11261":"software","Q4820592":"regulation","Q6000409":"regulation","Q61961946":"event","Q62839381":"event","Q64605573":"event","Q64876314":"event","Q74541288":"event","Q84756370":"event","Q29932790":"regulation","Q85794472":"event","Q85816294":"event","Q85846981":"event","Q100510764":"webpage","Q101107078":"book","Q50335907":"regulation","Q106201964":"book","Q106632483":"event","Q107177091":"event","Q459435":"motion_picture","Q596138":"motion_picture","Q1092621":"motion_picture","Q1234018":"motion_picture","Q1271310":"motion_picture","Q1323308":"motion_picture","Q1352102":"motion_picture","Q1371394":"motion_picture","Q1464369":"motion_picture","Q1480924":"motion_picture","Q1760864":"motion_picture","Q1800833":"motion_picture","Q2084909":"motion_picture","Q2096046":"motion_picture","Q111317987":"book","Q2670855":"motion_picture","Q3566966":"motion_picture","Q6839279":"periodical","Q7858627":"periodical","Q4259672":"book","Q4566090":"book","Q4903138":"book","Q4903139":"book","Q4903142":"book","Q4903143":"book","Q4903140":"book","Q4903141":"book","Q4903147":"book","Q4903144":"book","Q4903150":"book","Q4903148":"book","Q4903149":"book","Q4903155":"book","Q4903152":"book","Q4903156":"book","Q4903161":"book","Q4903166":"book","Q4903167":"book","Q4903165":"book","Q4903170":"book","Q4903168":"book","Q4903174":"book","Q4903175":"book","Q4903173":"book","Q4903178":"book","Q4903176":"book","Q4903177":"book","Q4903183":"book","Q4903181":"book","Q4903186":"book","Q4903187":"book","Q4903184":"book","Q4903185":"book","Q4903190":"book","Q4903191":"book","Q4903188":"book","Q4903198":"book","Q4903199":"book","Q4903202":"book","Q4903200":"book","Q4903201":"book","Q4903207":"book","Q4903210":"book","Q4903209":"book","Q4903215":"book","Q4903213":"book","Q4903216":"book","Q4903222":"book","Q4903221":"book","Q4903226":"book","Q4903225":"book","Q4903231":"book","Q4903229":"book","Q4903234":"book","Q4903232":"book","Q4903233":"book","Q4903238":"book","Q4903239":"book","Q4903237":"book","Q4903242":"book","Q4903243":"book","Q4903240":"book","Q4903241":"book","Q4903246":"book","Q4903245":"book","Q4903289":"book","Q6821974":"book","Q7251597":"book","Q12038416":"book","Q16841483":"book","Q17005487":"book","Q17009357":"book","Q21995289":"dataset","Q25473994":"book","Q62582641":"book","Q63443310":"book","Q63652138":"book","Q64026048":"book","Q106650169":"book","Q7301269":"motion_picture","Q184900":"software","Q189722":"software","Q20732395":"motion_picture","Q522972":"software","Q21028464":"motion_picture","Q27697957":"motion_picture","Q7889336":"software","Q356055":"book","Q154012":"event","Q154502":"event","Q254279":"event","Q257717":"event","Q444456":"event","Q1114458":"book","Q461917":"event","Q633181":"event","Q673514":"event","Q804560":"event","Q866210":"event","Q911924":"event","Q986161":"event","Q1116333":"event","Q1137923":"event","Q1152364":"event","Q1253480":"event","Q1264256":"event","Q1298953":"event","Q2008684":"book","Q1367629":"event","Q1406271":"event","Q1435951":"event","Q1511361":"event","Q1615460":"event","Q1712663":"event","Q1741789":"event","Q1762010":"event","Q1886706":"event","Q2743287":"book","Q2180970":"event","Q2181014":"event","Q2258086":"event","Q2304773":"event","Q3027814":"book","Q2387523":"event","Q2530662":"event","Q2655298":"event","Q2699757":"event","Q3491290":"book","Q2919327":"event","Q2972879":"event","Q3070310":"event","Q3070846":"event","Q3092946":"event","Q3206529":"event","Q3508866":"event","Q3819721":"event","Q4191987":"event","Q4955683":"book","Q4457169":"event","Q5197887":"book","Q4801521":"event","Q4838683":"event","Q4851250":"event","Q4931260":"event","Q4986276":"event","Q5151487":"event","Q5192915":"event","Q5193357":"event","Q5408063":"event","Q6071891":"book","Q5445835":"event","Q6149972":"book","Q5783621":"event","Q6447416":"book","Q17167101":"software","Q10551516":"event","Q10679874":"event","Q11565570":"book","Q13137923":"event","Q16840211":"book","Q20081479":"book","Q21224061":"event","Q29011550":"book","Q10253":"event","Q51645":"event","Q80592893":"software","Q106117184":"motion_picture","Q78788577":"software","Q107671265":"event","Q111144728":"book","Q111718195":"event","Q111718669":"event","Q146923":"software","Q193564":"software","Q538556":"software","Q1366152":"software","Q1551207":"software","Q5563000":"software","Q7170392":"software","Q1035220":"event","Q1264973":"event","Q2518231":"book","Q2273734":"event","Q2995599":"book","Q3561987":"book","Q3855510":"book","Q3423767":"event","Q3586483":"event","Q3722112":"event","Q5827511":"event","Q5894489":"event","Q6071389":"event","Q6664348":"event","Q6936317":"event","Q7061379":"event","Q7131232":"event","Q7281155":"performance","Q7433676":"event","Q7852059":"event","Q10271409":"event","Q10271630":"event","Q10271631":"event","Q11122993":"book","Q10845458":"event","Q11612941":"book","Q11232701":"event","Q11525676":"event","Q11864382":"event","Q11890047":"event","Q11918760":"event","Q11918790":"event","Q11918792":"event","Q11922114":"event","Q12131668":"event","Q12131669":"event","Q12322522":"event","Q12371153":"event","Q12387676":"event","Q12388486":"event","Q12406392":"event","Q13102763":"event","Q14215493":"event","Q15154951":"event","Q15264058":"event","Q15280243":"event","Q15974353":"event","Q16361655":"event","Q16883908":"event","Q16964284":"event","Q17071919":"event","Q17075010":"event","Q17496410":"event","Q18355162":"event","Q19883750":"event","Q20106847":"event","Q20203428":"event","Q20546236":"event","Q21281445":"book","Q20650615":"event","Q20791519":"event","Q21044497":"event","Q21506111":"event","Q23660852":"event","Q23925671":"event","Q24228675":"event","Q24896646":"event","Q24911873":"event","Q25504574":"event","Q26714979":"event","Q29053679":"event","Q29934288":"event","Q47196900":"event","Q48757176":"event","Q48968718":"event","Q50730773":"event","Q51028723":"event","Q53866594":"event","Q52233158":"standard","Q62027749":"event","Q64015453":"event","Q67002968":"book","Q76415672":"event","Q77131799":"event","Q85855017":"event","Q86157788":"event","Q96877897":"event","Q98417129":"event","Q106077542":"event","Q108167473":"event","Q107300839":"standard","Q109924177":"event","Q110408266":"event","Q110408267":"event","Q110408268":"event","Q110408269":"event","Q111292310":"standard","Q5769663":"motion_picture","Q5855976":"motion_picture","Q73633":"event","Q114699":"event","Q137161":"event","Q150147":"event","Q167071":"event","Q167824":"event","Q178340":"event","Q186196":"event","Q188158":"event","Q189994":"event","Q230186":"event","Q272090":"event","Q277069":"event","Q311466":"event","Q391394":"event","Q483463":"event","Q523511":"event","Q623708":"event","Q624968":"event","Q641572":"event","Q673097":"event","Q674435":"event","Q675510":"event","Q773129":"event","Q818463":"event","Q843360":"event","Q845262":"event","Q849939":"event","Q861883":"event","Q877484":"event","Q882761":"event","Q917575":"event","Q31086090":"motion_picture","Q1057000":"event","Q1060449":"event","Q1074009":"event","Q1075259":"event","Q127879":"standard","Q557770":"standard","Q927521":"standard","Q1110221":"standard","Q1172367":"standard","Q1323676":"standard","Q2739642":"standard","Q4392311":"standard","Q4672467":"standard","Q7095934":"standard","Q17148351":"book","Q25304621":"book","Q22937314":"standard","Q63860397":"motion_picture","Q41707512":"event","Q47012533":"event","Q47981644":"event","Q51172766":"event","Q56023992":"event","Q56024035":"event","Q56024038":"event","Q56024039":"event","Q56024037":"event","Q56024042":"event","Q56024043":"event","Q56024040":"event","Q56024041":"event","Q56583453":"event","Q56676100":"event","Q56254915":"standard","Q60009059":"event","Q61989916":"event","Q64778850":"event","Q64918845":"event","Q65152203":"event","Q65205015":"event","Q65205682":"event","Q65209646":"event","Q5389":"event","Q31909":"event","Q104536896":"motion_picture","Q75476195":"event","Q75951701":"event","Q76621956":"event","Q85547059":"event","Q85547214":"event","Q96747290":"event","Q97190544":"event","Q105580505":"event","Q107434480":"book","Q107434597":"book","Q105548196":"standard","Q1087613":"event","Q1117077":"event","Q1134131":"event","Q1140610":"event","Q1150550":"event","Q1155411":"event","Q1191392":"event","Q1196475":"event","Q1207799":"event","Q1216498":"event","Q1267445":"event","Q1269315":"event","Q1328412":"event","Q1358264":"event","Q1360658":"event","Q1366374":"event","Q1377066":"event","Q1628831":"event","Q1687964":"event","Q1741857":"event","Q1779835":"event","Q1859105":"event","Q2226020":"event","Q2231681":"event","Q2398220":"event","Q2495164":"event","Q2665176":"event","Q2900586":"event","Q3074026":"event","Q3178313":"event","Q3178363":"event","Q3178414":"event","Q3496987":"event","Q3735842":"event","Q3757977":"event","Q3909866":"event","Q3968473":"event","Q4288127":"event","Q4534009":"event","Q4583737":"event","Q4690165":"event","Q4806779":"event","Q4906371":"event","Q5008726":"event","Q5013660":"event","Q5100561":"event","Q5138229":"event","Q5146967":"event","Q5153819":"event","Q5185108":"event","Q5320207":"event","Q5566841":"event","Q5568541":"event","Q5577290":"event","Q5598051":"event","Q5759296":"event","Q5954294":"event","Q5954306":"event","Q6045582":"event","Q6060246":"event","Q6406489":"event","Q6496189":"event","Q6522578":"event","Q6671040":"event","Q6809912":"event","Q6972844":"event","Q6978652":"event","Q7015825":"event","Q7210011":"event","Q7320524":"event","Q7362553":"event","Q7435636":"event","Q7437755":"event","Q7450693":"event","Q7502893":"event","Q7522912":"event","Q7573872":"event","Q7585971":"event","Q7602628":"event","Q7987664":"event","Q8026289":"event","Q8035821":"event","Q10307706":"event","Q10387951":"event","Q10387949":"event","Q10891647":"event","Q11328791":"event","Q11389697":"event","Q12505307":"event","Q14489467":"event","Q15056133":"event","Q16056693":"event","Q16329755":"event","Q16585566":"event","Q16987323":"event","Q17012060":"event","Q17012083":"event","Q17055683":"event","Q17085818":"event","Q17635744":"event","Q108579428":"event","Q752001":"periodical","Q109315275":"event","Q110653130":"event","Q80689":"software","Q82231":"software","Q339678":"software","Q425567":"software","Q579047":"software","Q595971":"software","Q1050734":"software","Q1103464":"software","Q1142282":"software","Q1235236":"software","Q1307492":"software","Q1572823":"software","Q3251008":"software","Q3836406":"software","Q3932296":"software","Q4822779":"software","Q5254115":"software","Q5457555":"software","Q6031185":"software","Q7005136":"software","Q7302818":"software","Q7606661":"software","Q7662753":"software","Q7805429":"software","Q318247":"book","Q9295717":"software","Q2940408":"book","Q677818":"standard","Q742323":"standard","Q758851":"standard","Q911682":"standard","Q1320152":"standard","Q1428261":"standard","Q12847068":"software","Q1718036":"standard","Q2023100":"standard","Q2235486":"standard","Q2377054":"standard","Q2928673":"standard","Q4038774":"standard","Q4524036":"standard","Q5514543":"standard","Q6664300":"standard","Q7168699":"standard","Q7269014":"standard","Q7797281":"standard","Q7827452":"standard","Q7918427":"standard","Q22907102":"software","Q12352853":"standard","Q12356320":"standard","Q25099437":"software","Q16671949":"standard","Q28380029":"standard","Q28451968":"software","Q28600423":"software","Q28600424":"software","Q19646251":"event","Q19952464":"event","Q29904506":"software","Q19358669":"standard","Q21234868":"event","Q21411001":"event","Q24060932":"event","Q24871078":"event","Q34736746":"software","Q35687049":"software","Q28187305":"event","Q28447912":"event","Q27894992":"standard","Q28379876":"standard","Q48734839":"event","Q48781998":"event","Q50329691":"event","Q52158514":"event","Q53074392":"event","Q55394477":"event","Q55400435":"event","Q55671632":"event","Q65951343":"software","Q57913760":"event","Q59616856":"book","Q58756":"software","Q60492646":"event","Q96758034":"periodical","Q67862373":"event","Q101094203":"periodical","Q77036421":"event","Q108101999":"periodical","Q110589054":"periodical","Q86518131":"event","Q102111921":"event","Q106635331":"event","Q106875443":"event","Q108172239":"event","Q203081":"software","Q241411":"software","Q340002":"software","Q598063":"software","Q646029":"software","Q647710":"software","Q721332":"software","Q799930":"software","Q837942":"software","Q901705":"software","Q911654":"software","Q1048338":"software","Q1322529":"software","Q1454900":"software","Q1635613":"software","Q3133994":"software","Q3410013":"software","Q3434387":"software","Q3487336":"software","Q3496143":"software","Q3504297":"software","Q3504702":"software","Q3504854":"software","Q3571452":"software","Q3904937":"software","Q4052822":"software","Q4713382":"software","Q4774495":"software","Q4839596":"software","Q4923654":"software","Q4939411":"software","Q4997161":"software","Q5014646":"software","Q5221809":"software","Q5267627":"software","Q5297093":"software","Q5437580":"software","Q5578038":"software","Q5710220":"software","Q170207":"book","Q191825":"book","Q209719":"book","Q265461":"book","Q337921":"book","Q1001051":"book","Q1430953":"book","Q1960426":"book","Q1975029":"book","Q1999584":"book","Q2049690":"book","Q2350579":"book","Q2375917":"book","Q2111319":"event","Q3246385":"book","Q4119762":"book","Q5118086":"book","Q5509136":"book","Q7831615":"book","Q10552833":"book","Q10397458":"event","Q11588760":"book","Q12406664":"book","Q21078287":"standard","Q21078294":"standard","Q26261145":"book","Q28158818":"event","Q28158823":"event","Q28171454":"event","Q29851044":"book","Q28456370":"standard","Q53679891":"software","Q10267":"software","Q64689000":"book","Q64693901":"standard","Q4577":"book","Q51623":"book","Q51632":"book","Q68232326":"standard","Q68246256":"standard","Q68246374":"standard","Q68246797":"standard","Q68246894":"standard","Q68248543":"standard","Q68248690":"standard","Q68248916":"standard","Q106959691":"book","Q106959701":"book","Q106960366":"book","Q107471791":"book","Q3066678":"periodical","Q7433680":"periodical","Q288608":"broadcast","Q338632":"broadcast","Q3421644":"broadcast","Q5465514":"broadcast","Q5812300":"broadcast","Q7135559":"broadcast","Q6349088":"software","Q6355192":"software","Q6509902":"software","Q6849475":"software","Q6861969":"software","Q6982414":"software","Q7005124":"software","Q7289782":"software","Q27897977":"periodical","Q7398010":"software","Q7413163":"software","Q7530055":"software","Q7581717":"software","Q7622212":"software","Q7830347":"software","Q7898262":"software","Q7942447":"software","Q7946179":"software","Q7946177":"software","Q7969410":"software","Q8042478":"software","Q174864":"book","Q9304228":"software","Q830634":"book","Q339152":"performance","Q359414":"performance","Q362925":"performance","Q1118771":"book","Q1355393":"book","Q725169":"event","Q1497442":"book","Q1549585":"book","Q1551978":"book","Q1741846":"book","Q1813873":"book","Q1970381":"book","Q1993385":"book","Q1446621":"performance","Q1573906":"performance","Q1631023":"performance","Q2457695":"book","Q1850936":"performance","Q2095399":"performance","Q2296786":"performance","Q2329639":"performance","Q2427056":"performance","Q2466454":"performance","Q2574013":"performance","Q21232614":"broadcast","Q3833332":"book","Q3853151":"book","Q23199326":"broadcast","Q5556711":"book","Q5987973":"book","Q5987987":"book","Q5987989":"book","Q5987995":"book","Q5987992":"book","Q7315424":"performance","Q17125946":"software","Q17141457":"software","Q9339163":"book","Q10444893":"book","Q11757815":"book","Q11757816":"book","Q11816927":"book","Q22907913":"software","Q14831027":"book","Q16572301":"book","Q19385747":"book","Q31839056":"book","Q65028757":"broadcast","Q63860309":"book","Q86924676":"event","Q98398434":"software","Q109265150":"broadcast","Q109611288":"performance","Q109875869":"performance","Q110908540":"performance","Q97501753":"performance","Q1195197":"software","Q1368899":"software","Q6822248":"software","Q442770":"review","Q782466":"review","Q879969":"review","Q907375":"review","Q917415":"review","Q1066228":"review","Q1189053":"review","Q1305405":"review","Q1399743":"review","Q1550400":"review","Q1675637":"review","Q1744617":"review","Q1749668":"review","Q1810071":"review","Q1982529":"review","Q2024680":"review","Q2109237":"review","Q11311509":"software","Q1778149":"event","Q262238":"standard","Q271868":"standard","Q272629":"standard","Q2640883":"event","Q2882324":"event","Q3532236":"review","Q2937260":"event","Q3001425":"event","Q3001431":"event","Q3345493":"event","Q3502977":"event","Q3532270":"event","Q4308623":"review","Q4456475":"review","Q4986414":"review","Q5073782":"review","Q5135723":"review","Q5227098":"review","Q5227414":"review","Q5266714":"review","Q3879961":"standard","Q3991473":"standard","Q6149124":"event","Q4653329":"standard","Q5322571":"standard","Q7354800":"performance","Q7210023":"standard","Q8024464":"standard","Q11637096":"performance","Q11703975":"event","Q12031733":"performance","Q13751606":"performance","Q24081315":"software","Q16616368":"event","Q19844197":"event","Q19949956":"event","Q32024778":"event","Q32028215":"event","Q41734983":"standard","Q52314849":"performance","Q60214939":"performance","Q84052586":"performance","Q89822180":"event","Q90573599":"event","Q97960925":"event","Q1147986":"motion_picture","Q1428934":"map","Q2258523":"map","Q4342538":"map","Q327618":"software","Q20871935":"motion_picture","Q575771":"software","Q580148":"software","Q725485":"software","Q938892":"software","Q1502803":"software","Q1990286":"software","Q2273119":"software","Q2415400":"software","Q2858839":"software","Q3754919":"software","Q5422764":"software","Q6012283":"software","Q178519":"book","Q216507":"event","Q1425557":"book","Q852569":"event","Q1589214":"book","Q1993117":"book","Q2374151":"book","Q2448865":"book","Q2725354":"book","Q3243552":"book","Q2617054":"event","Q3440984":"book","Q3940784":"book","Q3312908":"event","Q4914883":"book","Q5328438":"book","Q5421362":"review","Q3638583":"standard","Q15221050":"software","Q6752328":"review","Q6823025":"review","Q6902851":"book","Q6887052":"review","Q7012116":"review","Q7125125":"review","Q7308027":"book","Q7303026":"review","Q7336207":"review","Q7554226":"review","Q7978626":"review","Q18746518":"software","Q12566525":"book","Q12270117":"event","Q13368640":"book","Q23679990":"software","Q15295591":"book","Q14774083":"event","Q16656361":"book","Q16690155":"review","Q16697708":"review","Q17143088":"review","Q17146789":"review","Q19715429":"book","Q20667180":"book","Q22073956":"review","Q23058942":"event","Q23058943":"event","Q23058940":"event","Q23058941":"event","Q23058945":"event","Q23058964":"event","Q25052888":"review","Q25111322":"review","Q25303607":"review","Q25303630":"review","Q55960075":"motion_picture","Q26913057":"book","Q30594664":"review","Q63208582":"motion_picture","Q63352034":"map","Q64009834":"map","Q66344600":"map","Q56062141":"software","Q51953936":"review","Q54862604":"review","Q55069811":"review","Q87000729":"motion_picture","Q14663":"software","Q93376240":"motion_picture","Q98406740":"motion_picture","Q102133820":"motion_picture","Q102222054":"motion_picture","Q75790147":"event","Q111207730":"map","Q108299004":"software","Q102260654":"book","Q107356803":"book","Q108655216":"book","Q108655245":"book","Q108655406":"book","Q108655430":"book","Q798555":"motion_picture","Q853630":"motion_picture","Q909586":"motion_picture","Q1723850":"motion_picture","Q4925568":"motion_picture","Q5551875":"motion_picture","Q7256286":"motion_picture","Q8066387":"motion_picture","Q818391":"dataset","Q972090":"dataset","Q10674355":"motion_picture","Q1192634":"dataset","Q1353555":"dataset","Q16247268":"motion_picture","Q6967152":"dataset","Q18355406":"motion_picture","Q381983":"software","Q621196":"software","Q1121901":"software","Q1393965":"software","Q2092884":"software","Q23044991":"motion_picture","Q318140":"event","Q464122":"event","Q572421":"event","Q628007":"event","Q644077":"event","Q669329":"event","Q834550":"event","Q873501":"event","Q1543634":"book","Q1145419":"event","Q1940294":"book","Q1983504":"book","Q1358538":"event","Q1429194":"event","Q1443064":"event","Q1614639":"event","Q1964212":"event","Q2346003":"event","Q2429635":"event","Q12072005":"software","Q2615857":"event","Q2820185":"event","Q3547325":"event","Q3812488":"event","Q3881827":"event","Q24579448":"dataset","Q5035283":"book","Q5172238":"event","Q6038651":"event","Q15611243":"software","Q6961518":"event","Q11825891":"book","Q16583837":"event","Q16679275":"event","Q17637386":"event","Q18246596":"event","Q19389852":"book","Q20102893":"book","Q20664817":"book","Q21759196":"book","Q23498963":"event","Q26197794":"event","Q26936080":"event","Q28224582":"event","Q33113423":"event","Q39087739":"event","Q63524048":"dataset","Q48847692":"event","Q48965516":"event","Q102260466":"motion_picture","Q104902646":"motion_picture","Q108387267":"motion_picture","Q109626272":"motion_picture","Q109628205":"motion_picture","Q109628222":"motion_picture","Q109629396":"motion_picture","Q109653382":"motion_picture","Q109653402":"motion_picture","Q109653422":"motion_picture","Q110370447":"dataset","Q110370525":"dataset","Q91120774":"event","Q101048164":"book","Q109041634":"book","Q109594423":"event","Q262533":"speech","Q591055":"speech","Q1851305":"speech","Q2174013":"speech","Q4836991":"motion_picture","Q3588034":"speech","Q934552":"dataset","Q2277682":"dataset","Q4930138":"dataset","Q5319037":"software","Q783459":"book","Q141108":"event","Q205751":"event","Q1029945":"book","Q474265":"event","Q1312571":"book","Q1113829":"event","Q11201257":"software","Q1794431":"event","Q2446003":"event","Q3889367":"event","Q4763437":"book","Q4689559":"event","Q4689563":"event","Q4689561":"event","Q4892425":"event","Q5099677":"event","Q5168470":"event","Q5287670":"event","Q5710125":"event","Q5710494":"event","Q3943940":"standard","Q5856656":"event","Q5894534":"event","Q6010352":"event","Q6082069":"event","Q6120749":"event","Q6124460":"event","Q6367753":"event","Q6473368":"event","Q6815954":"event","Q7094028":"event","Q7119078":"event","Q7171374":"event","Q7826356":"event","Q9610154":"event","Q9696241":"event","Q10335626":"event","Q12055236":"book","Q11537266":"event","Q11821535":"event","Q11856211":"event","Q12127717":"event","Q13090411":"event","Q16060402":"event","Q16838050":"event","Q16952930":"event","Q18208274":"event","Q19894488":"book","Q62018250":"event","Q65211209":"event","Q110620022":"dataset","Q94238640":"event","Q100350675":"book","Q105091183":"event","Q106946577":"event","Q106946693":"event","Q106946746":"event","Q106946936":"event","Q106947025":"event","Q106947158":"event","Q106947493":"event","Q106949524":"event","Q106957967":"event","Q105854818":"standard","Q914229":"article-newspaper","Q1019996":"periodical","Q1061420":"map","Q2914518":"map","Q5465451":"article-newspaper","Q7033627":"periodical","Q97383183":"performance","Q10376670":"dataset","Q375580":"software","Q565428":"software","Q747948":"software","Q753486":"software","Q870898":"software","Q877886":"software","Q1077784":"software","Q1165574":"software","Q1208150":"software","Q1281199":"software","Q21816906":"article-newspaper","Q1464880":"software","Q2845269":"software","Q2990323":"software","Q3006107":"software","Q3248226":"software","Q3720681":"software","Q4044407":"software","Q4839801":"software","Q5134353":"software","Q5227383":"software","Q5282306":"software","Q5282304":"software","Q5282305":"software","Q5282310":"software","Q5448402":"software","Q5790483":"software","Q6815760":"software","Q7001229":"software","Q7246032":"software","Q7309457":"software","Q7663741":"software","Q7702738":"software","Q7705778":"software","Q7935198":"software","Q1431891":"event","Q11312455":"software","Q2609890":"book","Q2049337":"broadcast","Q3940778":"book","Q13224353":"software","Q1981678":"standard","Q34822698":"periodical","Q34886251":"periodical","Q4903135":"event","Q5756268":"event","Q15478230":"software","Q6983518":"book","Q7094118":"software","Q10499647":"event","Q10515305":"standard","Q18343749":"event","Q19384809":"event","Q20102416":"event","Q1889001":"performance","Q20708561":"event","Q2446979":"performance","Q22032108":"event","Q4176760":"performance","Q28229966":"event","Q28419214":"event","Q28455188":"event","Q28456437":"event","Q10349334":"performance","Q30970844":"event","Q63108743":"periodical","Q59139030":"dataset","Q59139047":"dataset","Q74596960":"article-newspaper","Q50825276":"event","Q54366":"software","Q60508070":"event","Q60762157":"event","Q60970062":"event","Q92334823":"periodical","Q65054598":"event","Q65250318":"event","Q108195060":"periodical","Q108386385":"article-newspaper","Q81460944":"event","Q98078079":"event","Q1437388":"dataset","Q1476656":"dataset","Q1925081":"dataset","Q940462":"broadcast","Q3882785":"dataset","Q15823625":"map","Q16824564":"motion_picture","Q7247296":"dataset","Q7554009":"dataset","Q7977959":"dataset","Q1917391":"software","Q2247481":"software","Q11492055":"broadcast","Q16354757":"dataset","Q74852":"event","Q94920":"event","Q162691":"event","Q1412138":"book","Q1308110":"event","Q1402000":"event","Q86920":"standard","Q184473":"standard","Q279979":"standard","Q2131698":"event","Q2941187":"legislation","Q12059961":"software","Q772992":"standard","Q3441003":"book","Q3536740":"book","Q2920389":"event","Q3307816":"event","Q3446130":"event","Q4363010":"book","Q1886335":"standard","Q25054829":"dataset","Q5550345":"event","Q5764313":"event","Q15544676":"software","Q15548044":"software","Q6484291":"event","Q7259584":"book","Q7708276":"book","Q7311364":"event","Q7121072":"standard","Q9561594":"event","Q10281773":"event","Q11558987":"book","Q12713932":"event","Q22665869":"software","Q25303924":"software","Q18649141":"event","Q17484151":"standard","Q28964688":"software","Q104844527":"regulation","Q106944204":"regulation","Q107910355":"regulation","Q25388072":"book","Q24905495":"event","Q110469028":"regulation","Q25103897":"standard","Q110795553":"regulation","Q26853769":"standard","Q28206733":"standard","Q54328426":"broadcast","Q56316739":"dataset","Q56316737":"dataset","Q56316745":"dataset","Q62210692":"dataset","Q62528509":"dataset","Q60776281":"broadcast","Q56298192":"event","Q27731":"software","Q60075825":"event","Q70385248":"software","Q81314568":"dataset","Q73899440":"software","Q65807770":"book","Q97170784":"map","Q44563":"book","Q587":"event","Q70345832":"book","Q42332":"standard","Q18201787":"regulation","Q19968154":"regulation","Q96626931":"dataset","Q91348108":"software","Q94208558":"software","Q105846678":"dataset","Q104767049":"broadcast","Q105971777":"broadcast","Q107984415":"dataset","Q104574429":"software","Q108394321":"software","Q100984126":"book","Q105300447":"legislation","Q108572645":"event","Q1341051":"motion_picture","Q2259701":"map","Q2514015":"legal_case","Q811525":"dataset","Q1291275":"dataset","Q2301073":"dataset","Q3509361":"software","Q5535082":"software","Q5915793":"software","Q329547":"event","Q330094":"event","Q698718":"event","Q1431020":"book","Q1150737":"event","Q1518216":"event","Q1519234":"event","Q1939218":"event","Q2294714":"event","Q3059309":"motion_picture","Q3044959":"legislation","Q2751586":"event","Q2880384":"event","Q2880395":"event","Q1140550":"standard","Q5263804":"book","Q4780960":"event","Q4863772":"event","Q5249494":"event","Q5326943":"event","Q6006149":"event","Q6839276":"book","Q6518229":"event","Q4866001":"standard","Q6792070":"event","Q6917734":"event","Q7261293":"event","Q17078319":"software","Q9160460":"book","Q10548388":"event","Q12592413":"event","Q13431159":"book","Q15806966":"book","Q15911176":"event","Q15911188":"event","Q15913221":"event","Q15913970":"event","Q15914386":"event","Q47009776":"motion_picture","Q19906929":"event","Q20057842":"event","Q109046280":"regulation","Q26248668":"event","Q29561638":"event","Q32194977":"book","Q31887391":"event","Q64705787":"motion_picture","Q48731269":"book","Q48896962":"event","Q59157831":"dataset","Q56250304":"book","Q56272651":"event","Q1876289":"regulation","Q86661322":"dataset","Q86661793":"dataset","Q67185648":"event","Q13102199":"regulation","Q31847":"event","Q57598":"event","Q16041022":"regulation","Q103925569":"motion_picture","Q104765957":"motion_picture","Q106671613":"periodical","Q107236680":"periodical","Q107259292":"periodical","Q109733685":"motion_picture","Q109733760":"motion_picture","Q81178297":"book","Q96739634":"event","Q97695005":"event","Q97695011":"event","Q97695021":"event","Q97695043":"event","Q102260188":"book","Q100737424":"standard","Q103413604":"event","Q105721759":"event","Q331810":"song","Q5163109":"broadcast","Q7248875":"broadcast","Q11741414":"song","Q16937368":"song","Q17058481":"broadcast","Q20589414":"song","Q678114":"event","Q20621902":"song","Q723835":"event","Q827135":"event","Q835803":"event","Q841144":"event","Q864897":"event","Q1002704":"event","Q1006326":"event","Q1251530":"event","Q1612155":"event","Q1707715":"event","Q1722653":"event","Q1778874":"event","Q1895928":"event","Q21848887":"song","Q1970362":"event","Q2011793":"event","Q2089242":"event","Q2195792":"event","Q2213936":"event","Q2315901":"event","Q2367194":"event","Q2377567":"event","Q2395474":"event","Q2559808":"event","Q2642253":"event","Q2643912":"event","Q2647651":"event","Q2990946":"event","Q3032333":"event","Q3113716":"event","Q3197054":"event","Q3665774":"event","Q3715313":"event","Q5399932":"event","Q5516520":"event","Q5569316":"event","Q7248116":"event","Q7382029":"event","Q7569793":"event","Q7963823":"event","Q8350616":"event","Q10383448":"event","Q11782814":"event","Q13357840":"event","Q13471788":"event","Q14505357":"event","Q16203068":"event","Q16481903":"event","Q16481910":"event","Q16846845":"event","Q17520343":"event","Q18325242":"event","Q18572872":"event","Q19611296":"event","Q19688404":"event","Q19899595":"event","Q19984095":"event","Q20182534":"event","Q20718275":"event","Q2048167":"performance","Q21006888":"event","Q21008603":"event","Q21013420":"event","Q21501489":"event","Q22691537":"event","Q22908614":"event","Q5156381":"performance","Q26156310":"event","Q28856262":"book","Q29383137":"event","Q38026890":"event","Q21998361":"performance","Q48004378":"event","Q51036091":"event","Q55131606":"event","Q55655315":"event","Q55807048":"event","Q57305027":"event","Q58109373":"event","Q61748301":"event","Q61748313":"event","Q67472109":"event","Q84263257":"event","Q97670872":"event","Q111735921":"software","Q104709550":"event","Q105412510":"event","Q587240":"manuscript","Q1473669":"manuscript","Q2981680":"manuscript","Q2981686":"manuscript","Q2981685":"manuscript","Q550089":"dataset","Q850950":"dataset","Q877050":"dataset","Q893139":"dataset","Q1134562":"song","Q1137588":"song","Q1973327":"dataset","Q2941628":"dataset","Q2997685":"song","Q5124548":"song","Q7448307":"dataset","Q7596498":"song","Q12353441":"dataset","Q2100811":"software","Q5155687":"software","Q15631798":"song","Q843096":"book","Q1124113":"book","Q1250905":"book","Q811531":"event","Q11236760":"software","Q193228":"standard","Q296277":"standard","Q2254537":"event","Q2292353":"event","Q492788":"standard","Q570951":"standard","Q913556":"standard","Q965758":"standard","Q1149757":"standard","Q12765697":"software","Q1531561":"standard","Q3587379":"event","Q2082387":"standard","Q2082398":"standard","Q4736179":"book","Q2471001":"standard","Q2598552":"standard","Q3267095":"standard","Q5424533":"event","Q6363219":"event","Q15968274":"software","Q7322429":"book","Q7978994":"software","Q5970295":"standard","Q17461444":"software","Q10826360":"book","Q10882176":"book","Q11356847":"book","Q9006368":"standard","Q11606415":"book","Q13125666":"book","Q13126435":"book","Q13146986":"legislation","Q13495699":"legislation","Q11189502":"standard","Q13626312":"event","Q16523070":"book","Q17500685":"book","Q18629653":"book","Q24890026":"book","Q9390711":"performance","Q63243358":"song","Q44854":"event","Q108832896":"map","Q106013762":"song","Q106013767":"song","Q86730311":"book","Q87433812":"book","Q87453264":"book","Q110231205":"song","Q104416770":"software","Q104704378":"event","Q856566":"periodical","Q965136":"map","Q1368848":"periodical","Q1413174":"map","Q110905237":"book","Q3428753":"periodical","Q4857987":"periodical","Q7572780":"periodical","Q11524690":"periodical","Q11540912":"map","Q1935626":"dataset","Q3546572":"broadcast","Q15206730":"periodical","Q6645282":"broadcast","Q18680105":"periodical","Q20183934":"motion_picture","Q21834496":"periodical","Q5157587":"software","Q846330":"event","Q1767217":"review","Q2380704":"book","Q300036":"standard","Q2874230":"book","Q2443004":"event","Q758853":"standard","Q3445262":"review","Q2943071":"event","Q4020880":"event","Q3415066":"standard","Q6045978":"book","Q15614021":"software","Q25360500":"broadcast","Q10920057":"book","Q11793314":"book","Q11985118":"event","Q25104632":"software","Q25421947":"software","Q28134845":"software","Q17144022":"standard","Q33100742":"event","Q33100743":"event","Q33100746":"event","Q33100744":"event","Q33100745":"event","Q33100750":"event","Q33100748":"event","Q65581442":"periodical","Q66465827":"periodical","Q60678830":"software","Q56599584":"book","Q58878072":"book","Q84368158":"software","Q106162750":"periodical","Q106661426":"periodical","Q107337277":"periodical","Q108886897":"periodical","Q88885188":"software","Q100266699":"broadcast","Q97357571":"software","Q88652774":"event","Q88787473":"event","Q99898668":"software","Q96405248":"book","Q106471136":"software","Q108273448":"software","Q100740737":"book","Q109946538":"software","Q100165244":"standard","Q100165439":"standard","Q100165480":"standard","Q100165626":"standard","Q100165780":"standard","Q100166033":"standard","Q102840250":"event","Q104213567":"book","Q106771443":"book","Q787397":"map","Q5953270":"periodical","Q6659258":"periodical","Q907054":"dataset","Q2678443":"dataset","Q3321854":"dataset","Q3655722":"song","Q3683985":"song","Q4567":"regulation","Q15715669":"map","Q17007303":"article-journal","Q205020":"software","Q213057":"software","Q365069":"software","Q645154":"software","Q1188200":"software","Q1190017":"software","Q1261854":"software","Q1326063":"software","Q3530050":"software","Q24035270":"report","Q5353026":"software","Q5988403":"software","Q448728":"book","Q79229":"event","Q1188882":"book","Q841817":"event","Q842208":"event","Q846240":"event","Q1572966":"book","Q10590816":"software","Q1072130":"event","Q10659464":"software","Q1517550":"event","Q1770557":"event","Q2880274":"book","Q951059":"standard","Q3376762":"event","Q4410904":"event","Q4578317":"event","Q4632203":"event","Q4632204":"event","Q4634325":"event","Q4639903":"event","Q5302213":"book","Q8142081":"event","Q13163313":"book","Q14943256":"book","Q17009185":"book","Q17354893":"book","Q14954905":"standard","Q16820803":"event","Q21007909":"event","Q21075974":"event","Q111594374":"regulation","Q39049594":"software","Q31197476":"book","Q66605818":"map","Q70470634":"article-journal","Q42891972":"event","Q73376505":"periodical","Q208679":"regulation","Q287831":"regulation","Q455282":"regulation","Q506630":"regulation","Q989473":"regulation","Q1117085":"regulation","Q1241195":"regulation","Q1317494":"regulation","Q1437487":"regulation","Q2180601":"regulation","Q3392263":"regulation","Q4062925":"regulation","Q4069739":"regulation","Q4212091":"regulation","Q4375882":"regulation","Q4400684":"regulation","Q4442868":"regulation","Q4492466":"regulation","Q5201823":"regulation","Q60995300":"book","Q6093162":"regulation","Q7228578":"regulation","Q16991622":"regulation","Q98382204":"dataset","Q108440863":"periodical","Q25389784":"regulation","Q102189017":"song","Q109350090":"song","Q99654400":"event","Q110402216":"dataset","Q110295041":"broadcast","Q3799185":"dataset","Q3942245":"periodical","Q7249835":"dataset","Q7905668":"dataset","Q190635":"dataset","Q526334":"dataset","Q1553298":"dataset","Q11669289":"map","Q1982918":"dataset","Q303064":"broadcast","Q2123557":"broadcast","Q5227671":"broadcast","Q18398246":"motion_picture","Q223653":"software","Q11581610":"dataset","Q860737":"software","Q19309746":"dataset","Q19312063":"dataset","Q211979":"song","Q18385907":"broadcast","Q844993":"song","Q909011":"book","Q1033831":"song","Q1087459":"song","Q1147354":"song","Q1191609":"book","Q1191618":"book","Q1246452":"song","Q1293057":"song","Q1337498":"song","Q1523875":"song","Q1533558":"book","Q1564657":"song","Q1823870":"book","Q2127044":"song","Q2263479":"book","Q2379556":"song","Q2478421":"song","Q3196335":"book","Q21190411":"broadcast","Q4083733":"song","Q4127418":"song","Q4138449":"song","Q4179926":"song","Q1777301":"standard","Q4700148":"book","Q25036778":"dataset","Q5956747":"song","Q5956766":"song","Q7786699":"book","Q11412438":"book","Q11424132":"event","Q21592115":"software","Q10860882":"standard","Q13403346":"event","Q15077373":"song","Q56683168":"map","Q30324607":"song","Q61314299":"dataset","Q42525933":"song","Q63254493":"dataset","Q65118638":"dataset","Q55694589":"book","Q56378186":"event","Q60021471":"event","Q92055857":"map","Q63243766":"song","Q64140460":"song","Q66341057":"song","Q36669":"standard","Q97495872":"dataset","Q96678733":"broadcast","Q99524531":"broadcast","Q97212046":"book","Q101525913":"song","Q107494231":"song","Q110598376":"legislation","Q110245716":"event","Q111286586":"event","Q7999883":"article-newspaper","Q221934":"song","Q6749508":"dataset","Q229371":"software","Q337820":"software","Q762157":"software","Q860760":"software","Q893012":"software","Q1155404":"software","Q13039854":"dataset","Q2351962":"software","Q5583816":"software","Q6694724":"software","Q6963607":"software","Q8039031":"software","Q477693":"book","Q524880":"book","Q622508":"book","Q376596":"event","Q751982":"event","Q774081":"event","Q784360":"event","Q1051792":"event","Q1143555":"event","Q1868607":"book","Q1310322":"event","Q1331385":"event","Q1381907":"event","Q1475455":"event","Q2090540":"event","Q2694643":"event","Q2787772":"event","Q3491001":"book","Q2946405":"event","Q3152904":"event","Q13101356":"software","Q4459737":"book","Q3818443":"event","Q3922366":"event","Q5044625":"event","Q5141248":"event","Q5199360":"event","Q15008073":"software","Q6487585":"book","Q6000326":"event","Q15590034":"software","Q15623421":"software","Q6901667":"book","Q6742759":"event","Q7191146":"event","Q7256463":"event","Q7295722":"event","Q7532159":"event","Q8422162":"event","Q10269946":"event","Q11410949":"book","Q11433354":"event","Q11589683":"event","Q11942845":"event","Q14404796":"event","Q17014283":"event","Q26726974":"software","Q20177666":"book","Q30716274":"software","Q26929719":"book","Q28415517":"event","Q38252996":"software","Q31836824":"event","Q47904718":"software","Q40693969":"book","Q43792381":"event","Q61456428":"software","Q63035828":"software","Q64139617":"dataset","Q54882043":"event","Q1538700":"regulation","Q66503439":"software","Q7033546":"regulation","Q61943417":"event","Q65089944":"event","Q65295320":"event","Q69886754":"event","Q86442388":"software","Q87906572":"software","Q95737275":"software","Q100744571":"software","Q107636679":"software","Q107636937":"software","Q107636953":"software","Q107636960":"software","Q108012985":"software","Q109417722":"software","Q111369260":"software","Q105194708":"event","Q948454":"dataset","Q4089698":"song","Q4217030":"song","Q69938020":"regulation","Q483318":"software","Q2141611":"software","Q4885200":"software","Q7784254":"software","Q382018":"book","Q1327461":"book","Q722029":"event","Q1535505":"book","Q1224988":"event","Q1508588":"performance","Q2449692":"book","Q5441632":"book","Q7321644":"book","Q28406796":"dataset","Q11497635":"event","Q11997713":"performance","Q12900222":"book","Q29535030":"event","Q41584545":"book","Q140182":"regulation","Q55713739":"book","Q55719253":"book","Q949149":"regulation","Q19576327":"regulation","Q87993016":"software","Q30589340":"regulation","Q96400880":"software","Q110614376":"song","Q106538545":"software","Q101068470":"book","Q105084871":"book","Q169672":"motion_picture","Q622310":"motion_picture","Q111972375":"book","Q111449198":"event","Q3072042":"motion_picture","Q3745429":"motion_picture","Q5104880":"motion_picture","Q1035228":"dataset","Q726761":"software","Q758870":"software","Q767899":"software","Q976308":"software","Q1373429":"software","Q1963488":"software","Q3696233":"software","Q4043482":"software","Q4052544":"software","Q5073739":"software","Q6078050":"software","Q7628422":"software","Q9371084":"software","Q500415":"event","Q10314140":"software","Q10391618":"software","Q1557252":"event","Q11243559":"software","Q11287765":"software","Q11373908":"software","Q11565508":"software","Q2753521":"book","Q2933082":"book","Q2600999":"event","Q2618461":"event","Q12313595":"software","Q3518969":"book","Q3287294":"event","Q3525798":"event","Q3586928":"event","Q3586936":"event","Q3586944":"event","Q3586951":"event","Q3586948":"event","Q3586952":"event","Q4128686":"event","Q4542969":"event","Q5255876":"event","Q14905958":"software","Q15079042":"software","Q7221392":"book","Q7890265":"book","Q7855108":"event","Q8436198":"standard","Q11774581":"event","Q12056881":"event","Q17808941":"event","Q18467373":"event","Q389993":"performance","Q624595":"performance","Q20202696":"book","Q1664535":"performance","Q3149508":"performance","Q6168370":"performance","Q56250671":"periodical","Q67414381":"motion_picture","Q54820068":"book","Q63951851":"software","Q66089259":"software","Q59342621":"book","Q64601":"software","Q71176790":"software","Q104176285":"motion_picture","Q106405444":"broadcast","Q106707362":"broadcast","Q106720947":"broadcast","Q106720951":"broadcast","Q106720953":"broadcast","Q106720957":"broadcast","Q106720962":"broadcast","Q106720960":"broadcast","Q106779416":"broadcast","Q106779606":"broadcast","Q106779676":"broadcast","Q79695687":"event","Q111306560":"motion_picture","Q111733012":"dataset","Q1006074":"legislation","Q1006079":"legislation","Q1006082":"legislation","Q1256685":"legislation","Q1307415":"legislation","Q3176490":"legislation","Q3258695":"legislation","Q4676706":"legislation","Q4677783":"legislation","Q4781740":"legislation","Q6560515":"legislation","Q10857741":"legislation","Q15983930":"legislation","Q15985269":"legislation","Q15985279":"legislation","Q15985276":"legislation","Q15985282":"legislation","Q17317625":"event","Q20085071":"event","Q22266214":"event","Q22276119":"event","Q22276208":"event","Q22276226":"event","Q22276331":"event","Q22276354":"event","Q22280976":"event","Q22283516":"event","Q22283753":"event","Q22333900":"event","Q22341315":"event","Q22341330":"event","Q22341433":"event","Q22342178":"event","Q22342312":"event","Q22343924":"event","Q22669526":"event","Q22669528":"event","Q22669535":"event","Q22669547":"event","Q22669552":"event","Q22669582":"event","Q22669591":"event","Q22669594":"event","Q22669611":"event","Q22669621":"event","Q22669627":"event","Q22696329":"event","Q22696370":"event","Q22696407":"event","Q22703240":"event","Q22703975":"event","Q22703997":"event","Q22704045":"event","Q24041602":"event","Q24045394":"event","Q24176839":"event","Q24178042":"event","Q24179252":"event","Q24180038":"event","Q24181434":"event","Q24183631":"event","Q24183876":"event","Q24292618":"event","Q24384357":"event","Q24451601":"event","Q24529773":"event","Q24713353":"event","Q24713572":"event","Q24714393":"event","Q24715318":"event","Q24715377":"event","Q24719004":"event","Q25343621":"event","Q25343642":"event","Q25343640":"event","Q25363097":"event","Q25363518":"event","Q25438796":"event","Q25449075":"event","Q25468000":"event","Q25476949":"event","Q25477438":"event","Q25530424":"event","Q25531065":"event","Q25534427":"event","Q25534840":"event","Q25544454":"event","Q25546358":"event","Q25547854":"event","Q25548020":"event","Q26252880":"event","Q26260402":"event","Q28333430":"event","Q41708957":"event","Q56188162":"event","Q56188227":"event","Q106145581":"event","Q106690375":"event","Q106691645":"event","Q107394349":"event","Q469510":"legislation","Q163313":"event","Q163696":"event","Q169359":"event","Q288066":"event","Q288079":"event","Q407991":"event","Q508051":"event","Q512129":"event","Q512963":"event","Q531635":"event","Q667997":"event","Q721063":"event","Q877671":"event","Q895534":"event","Q917566":"event","Q968639":"event","Q1032155":"event","Q1033744":"event","Q1059021":"event","Q1073723":"event","Q1077734":"event","Q1116814":"event","Q1120597":"event","Q1188726":"event","Q1189134":"event","Q1193854":"event","Q1203806":"event","Q1250656":"event","Q1273956":"event","Q1323147":"event","Q1327578":"event","Q1344963":"event","Q1346984":"event","Q1374588":"event","Q1374609":"event","Q1404060":"event","Q1468088":"event","Q1623569":"event","Q1750573":"event","Q1751126":"event","Q1897916":"event","Q2364787":"legislation","Q1970399":"event","Q2022394":"event","Q2036730":"event","Q2103991":"event","Q2269004":"event","Q2282372":"event","Q2318056":"event","Q2557059":"event","Q3241075":"legislation","Q3241095":"legislation","Q3241096":"legislation","Q3455841":"legislation","Q7345933":"legislation","Q7575531":"legislation","Q7575537":"legislation","Q7575552":"legislation","Q7575553":"legislation","Q7575560":"legislation","Q7575566":"legislation","Q7575567":"legislation","Q7575569":"legislation","Q10682995":"legislation","Q16117291":"legislation","Q16712433":"legislation","Q16892120":"legislation","Q16987235":"legislation","Q18009431":"legislation","Q18009506":"legislation","Q18009569":"legislation","Q18009587":"legislation","Q18009650":"legislation","Q18336255":"legislation","Q18673040":"legislation","Q20898399":"legislation","Q22995925":"legislation","Q22995958":"legislation","Q23000117":"legislation","Q23000122":"legislation","Q25041427":"legislation","Q28115446":"legislation","Q28963415":"event","Q33283984":"legislation","Q45753703":"legislation","Q55650344":"legislation","Q56731284":"legislation","Q10948":"event","Q28950":"event","Q33045":"event","Q91262953":"legislation","Q91267389":"legislation","Q91586285":"legislation","Q93945101":"legislation","Q96619653":"legislation","Q97480682":"legislation","Q100271152":"legislation","Q100324105":"legislation","Q105300221":"legislation","Q2565182":"event","Q2589882":"event","Q2617992":"event","Q2623334":"event","Q2690333":"event","Q2759944":"event","Q2796146":"event","Q2796173":"event","Q2948940":"event","Q2949278":"event","Q2949480":"event","Q2951201":"event","Q2953003":"event","Q2954080":"event","Q2954405":"event","Q2954411":"event","Q2999645":"event","Q3000564":"event","Q3046254":"event","Q3270632":"event","Q3334741":"event","Q3418219":"event","Q3436550":"event","Q3653318":"event","Q3653348":"event","Q3653602":"event","Q3653994":"event","Q3654440":"event","Q3700391":"event","Q3736900":"event","Q3736909":"event","Q3750874":"event","Q3824436":"event","Q4127374":"event","Q4179751":"event","Q4244129":"event","Q4264451":"event","Q4264454":"event","Q4489569":"event","Q4508905":"event","Q4508911":"event","Q4509265":"event","Q4509668":"event","Q4689962":"event","Q4689963":"event","Q4806587":"event","Q4806595":"event","Q4806598":"event","Q4806698":"event","Q4806699":"event","Q4806700":"event","Q4806704":"event","Q4806741":"event","Q4806752":"event","Q4806774":"event","Q4806775":"event","Q4845076":"event","Q4958733":"event","Q5153811":"event","Q5322959":"event","Q5324162":"event","Q5324163":"event","Q5324160":"event","Q5324164":"event","Q5324165":"event","Q5327742":"event","Q5412763":"event","Q5413069":"event","Q5413097":"event","Q5413386":"event","Q5413384":"event","Q5413391":"event","Q5413389":"event","Q5413394":"event","Q5413392":"event","Q5413398":"event","Q5413397":"event","Q5413403":"event","Q5413400":"event","Q5413404":"event","Q5413446":"event","Q5425586":"event","Q5425584":"event","Q5425585":"event","Q5425588":"event","Q5425593":"event","Q5637232":"event","Q5694546":"event","Q5969414":"event","Q5969429":"event","Q6026398":"event","Q6098635":"event","Q6098721":"event","Q6505941":"event","Q6952901":"event","Q7076181":"event","Q7076192":"event","Q7122265":"event","Q7378194":"event","Q7565965":"event","Q7575662":"event","Q8030888":"event","Q10685487":"event","Q10876319":"event","Q11291989":"event","Q11538952":"event","Q11588212":"event","Q12038186":"event","Q12299851":"event","Q12299908":"event","Q12770865":"event","Q14038357":"event","Q14623345":"event","Q14924306":"event","Q15067587":"event","Q15217470":"event","Q15781174":"event","Q16152180":"event","Q16245541":"event","Q16554971":"event","Q16716692":"event","Q16801223":"event","Q16834552":"event","Q16845090":"event","Q16954793":"event","Q16962038":"event","Q16962226":"event","Q16968229":"event","Q16975517":"event","Q17001339":"event","Q17003000":"event","Q17003082":"event","Q17003598":"event","Q17011181":"event","Q17075295":"event","Q17084760":"event","Q17087253":"event","Q17088907":"event","Q17092805":"event","Q17103014":"event","Q17131410":"event","Q17146534":"event","Q17146586":"event","Q17156776":"event","Q17624236":"event","Q18355710":"event","Q18469279":"event","Q19605480":"event","Q19803251":"event","Q19902252":"event","Q20012080":"event","Q20712914":"event","Q20804887":"event","Q21028314":"event","Q21282691":"event","Q21293376":"event","Q21520258":"event","Q22031906":"event","Q22032101":"event","Q22032208":"event","Q22570198":"event","Q22570231":"event","Q22833321":"event","Q22833327":"event","Q22987757":"event","Q23002101":"event","Q23308598":"event","Q24964541":"event","Q25038375":"event","Q25045203":"event","Q25051732":"event","Q25055084":"event","Q25055094":"event","Q25055098":"event","Q25110756":"event","Q25230508":"event","Q25404399":"event","Q28135573":"event","Q28403527":"event","Q28405922":"event","Q28448471":"event","Q28789901":"event","Q30274594":"event","Q30276524":"event","Q30323976":"event","Q30587802":"event","Q30634779":"event","Q30636248":"event","Q39054787":"event","Q39060746":"event","Q48817594":"event","Q48817599":"event","Q48817596":"event","Q48817644":"event","Q48817653":"event","Q48842375":"event","Q48844045":"event","Q48844054":"event","Q48847415":"event","Q48862207":"event","Q109660536":"event","Q1741521":"periodical","Q2108957":"periodical","Q2421910":"periodical","Q111076423":"event","Q2991565":"motion_picture","Q7019528":"periodical","Q441261":"dataset","Q457843":"dataset","Q193605":"song","Q783287":"dataset","Q1115961":"dataset","Q1713174":"dataset","Q11446810":"manuscript","Q13164421":"periodical","Q3656492":"song","Q4584145":"song","Q5160283":"dataset","Q17172633":"periodical","Q17232649":"periodical","Q11497177":"song","Q11674305":"song","Q12105422":"song","Q4229799":"software","Q488053":"book","Q914881":"book","Q933348":"book","Q1100405":"book","Q548126":"event","Q1675712":"book","Q3002658":"book","Q3292731":"book","Q900570":"standard","Q3831116":"book","Q4390543":"event","Q5109823":"book","Q4493539":"event","Q5310485":"book","Q6912675":"book","Q7515656":"book","Q7578116":"book","Q7939457":"book","Q11161560":"event","Q14523803":"book","Q14523556":"event","Q19724435":"event","Q25110279":"book","Q30008669":"book","Q60861390":"periodical","Q48862299":"event","Q48862310":"event","Q48862317":"event","Q48862325":"event","Q48862329":"event","Q48862332":"event","Q48862337":"event","Q48862345":"event","Q55639211":"event","Q56178068":"event","Q65807474":"software","Q56276268":"event","Q56291557":"event","Q56358929":"event","Q56526979":"event","Q58488048":"event","Q60772917":"event","Q61001459":"event","Q63578907":"book","Q63453754":"event","Q63642380":"performance","Q66155471":"book","Q66439822":"event","Q67478660":"event","Q89349829":"dataset","Q89374120":"dataset","Q89697681":"dataset","Q72115481":"event","Q73677564":"event","Q105372000":"periodical","Q76161101":"event","Q106247441":"periodical","Q81661501":"event","Q83476880":"event","Q84380012":"book","Q99569916":"book","Q100339660":"book","Q104595587":"event","Q105517027":"event","Q106603698":"event","Q106956751":"event","Q108209958":"event","Q109018775":"book","Q109018776":"book","Q109659723":"legislation","Q110707176":"event","Q247213":"dataset","Q658252":"dataset","Q2799345":"dataset","Q3820682":"dataset","Q5713169":"dataset","Q6002242":"dataset","Q53463":"regulation","Q3359857":"software","Q6055545":"software","Q265424":"legislation","Q454967":"legislation","Q277436":"event","Q843713":"legislation","Q458867":"event","Q488051":"event","Q618439":"event","Q649352":"event","Q802614":"event","Q838447":"event","Q877838":"event","Q981258":"event","Q1346367":"event","Q1401527":"event","Q1401550":"event","Q1401559":"event","Q1597273":"event","Q1674822":"event","Q2097974":"event","Q2438476":"event","Q3042975":"legislation","Q2667252":"event","Q3355475":"legislation","Q3092938":"event","Q3125354":"event","Q24839054":"dataset","Q4579115":"event","Q5378679":"book","Q5644122":"book","Q6081383":"book","Q5440532":"event","Q6806890":"book","Q7257831":"event","Q7257839":"event","Q7977019":"book","Q7458280":"event","Q7566622":"event","Q7942192":"event","Q10871996":"legislation","Q12218853":"book","Q11582668":"event","Q11588597":"event","Q12757709":"event","Q13125741":"event","Q14515312":"event","Q14914657":"event","Q16540254":"event","Q17210597":"book","Q16837407":"event","Q16948716":"event","Q20540663":"book","Q21971243":"event","Q22949068":"book","Q24023913":"book","Q110496930":"regulation","Q110496933":"regulation","Q27332385":"event","Q30694283":"legislation","Q48995725":"book","Q54965898":"book","Q61473833":"event","Q8037702":"regulation","Q85431214":"dataset","Q67992224":"book","Q67824596":"event","Q68010309":"event","Q70224924":"book","Q70228467":"book","Q17173058":"regulation","Q96375753":"dataset","Q85851440":"software","Q23001715":"regulation","Q99454767":"dataset","Q85988047":"book","Q85787994":"event","Q104775758":"broadcast","Q106772852":"broadcast","Q110184504":"dataset","Q100528793":"software","Q92036860":"legislation","Q95509700":"event","Q95998597":"legislation","Q97629621":"book","Q105984592":"legislation","Q108044854":"event","Q108490788":"event","Q1065444":"motion_picture","Q2137852":"motion_picture","Q3072049":"motion_picture","Q5258881":"motion_picture","Q6361539":"song","Q7892363":"broadcast","Q1245659":"software","Q3929429":"software","Q5357228":"software","Q7316614":"software","Q335414":"book","Q190344":"event","Q196761":"event","Q202298":"event","Q291768":"event","Q308678":"event","Q577698":"event","Q842375":"event","Q1616547":"dataset","Q1758719":"book","Q1292520":"event","Q1303602":"event","Q1374808":"event","Q1501560":"event","Q1714888":"event","Q1745996":"event","Q1798887":"event","Q1815895":"event","Q1897444":"event","Q136218":"standard","Q194831":"standard","Q270131":"standard","Q376762":"standard","Q2284382":"event","Q3166785":"book","Q2606657":"event","Q784695":"standard","Q2800920":"event","Q1320546":"standard","Q3553803":"event","Q4484477":"event","Q6082718":"book","Q5595257":"event","Q4298914":"standard","Q18206444":"software","Q10278592":"event","Q10567340":"event","Q10874739":"event","Q10915676":"event","Q18424480":"event","Q16910955":"standard","Q23008367":"standard","Q28065039":"event","Q27824016":"standard","Q35792653":"event","Q60393504":"broadcast","Q47405126":"event","Q47525586":"event","Q52495799":"event","Q52495817":"event","Q52495833":"event","Q52495848":"event","Q52495868":"event","Q52495889":"event","Q52495911":"event","Q52495931":"event","Q52495954":"event","Q52495976":"event","Q52496004":"event","Q52496024":"event","Q52496048":"event","Q52496070":"event","Q52496093":"event","Q52496122":"event","Q52496144":"event","Q52496166":"event","Q52496187":"event","Q52496205":"event","Q52496225":"event","Q52496248":"event","Q52496270":"event","Q52496292":"event","Q52496308":"event","Q52496323":"event","Q52496343":"event","Q52496363":"event","Q52496390":"event","Q52496410":"event","Q52496435":"event","Q52496456":"event","Q52496474":"event","Q27013":"event","Q108871626":"broadcast","Q109996742":"software","Q106762172":"standard","Q1519850":"report","Q111507776":"event","Q5100946":"periodical","Q632285":"dataset","Q1751819":"dataset","Q5903254":"software","Q255135":"book","Q375480":"book","Q134145":"event","Q169918":"event","Q194052":"event","Q223170":"event","Q304337":"event","Q330558":"event","Q478770":"event","Q482526":"event","Q508928":"event","Q528449":"event","Q1213555":"book","Q565657":"event","Q1227364":"regulation","Q1253136":"book","Q607965":"event","Q657438":"event","Q1347298":"book","Q1464287":"book","Q1591238":"book","Q2397155":"book","Q165678":"standard","Q206537":"standard","Q338702":"standard","Q621583":"standard","Q733507":"standard","Q859595":"standard","Q919509":"standard","Q1049168":"standard","Q1061159":"standard","Q1140942":"standard","Q1151063":"standard","Q21664088":"broadcast","Q1568240":"standard","Q4903126":"book","Q4941730":"book","Q2791193":"standard","Q4686339":"event","Q6806507":"book","Q7144987":"book","Q7523718":"book","Q7630614":"book","Q28455553":"dataset","Q6887219":"standard","Q18343316":"software","Q7598213":"standard","Q10527146":"book","Q11513787":"event","Q12311624":"book","Q13583784":"book","Q12355716":"standard","Q17561213":"standard","Q20181828":"standard","Q22947792":"event","Q25038259":"book","Q29032653":"event","Q16342":"dataset","Q52496497":"event","Q52496519":"event","Q52496540":"event","Q52496564":"event","Q52496587":"event","Q52496610":"event","Q73505550":"dataset","Q56408643":"book","Q56328566":"standard","Q59351530":"book","Q61748019":"event","Q65770283":"event","Q13394":"event","Q14930":"event","Q15804":"event","Q19317":"event","Q25020":"event","Q5297":"standard","Q5300":"standard","Q78794084":"book","Q78795953":"book","Q98388833":"event","Q98562826":"event","Q98116826":"standard","Q101509367":"standard","Q101533634":"standard","Q104223305":"event","Q105658571":"event","Q106656264":"standard","Q1898445":"map","Q110550201":"event","Q110886488":"event","Q110987275":"event","Q111089634":"event","Q587327":"book","Q617335":"event","Q646110":"event","Q648474":"event","Q663145":"event","Q1341659":"book","Q910542":"event","Q912165":"event","Q912933":"event","Q919472":"event","Q920397":"event","Q934724":"event","Q937649":"event","Q1643411":"book","Q1004054":"event","Q1024155":"event","Q1032086":"event","Q1061773":"event","Q1062311":"event","Q1075670":"event","Q1116662":"event","Q1129940":"event","Q1130031":"event","Q1133634":"event","Q1137641":"event","Q1138388":"event","Q1153109":"event","Q1154592":"event","Q1155117":"event","Q1190880":"event","Q1423881":"event","Q1547505":"event","Q1986705":"event","Q2005275":"event","Q2090583":"event","Q2790785":"book","Q2239275":"event","Q2465585":"event","Q2605489":"event","Q2952430":"event","Q3868655":"book","Q3239561":"event","Q4426598":"book","Q3911657":"event","Q5425721":"event","Q5647565":"event","Q6705667":"book","Q7439349":"book","Q9088760":"event","Q9675907":"event","Q10260007":"event","Q10383488":"event","Q11452214":"book","Q11390057":"event","Q11390066":"event","Q11390285":"event","Q13027880":"event","Q13636537":"event","Q15635954":"book","Q16056350":"event","Q16672878":"event","Q16837861":"event","Q16848281":"event","Q16850989":"event","Q16967821":"event","Q18088964":"event","Q19916292":"event","Q20988805":"book","Q24882750":"event","Q28792435":"book","Q28540863":"event","Q28540963":"event","Q29000951":"event","Q29423165":"event","Q34548322":"event","Q34548368":"event","Q41436524":"book","Q14717":"dataset","Q56063517":"event","Q59365764":"event","Q62819448":"event","Q63349193":"event","Q66362671":"book","Q66364343":"book","Q66368876":"book","Q102380136":"broadcast","Q106647671":"song","Q106603795":"broadcast","Q98095275":"event","Q98381855":"event","Q98381912":"event","Q104537401":"event","Q108535712":"event","Q1092846":"map","Q110994302":"event","Q110994327":"event","Q110994647":"event","Q110994669":"event","Q111755701":"standard","Q1149007":"dataset","Q3942677":"dataset","Q7797194":"dataset","Q587992":"software","Q2256933":"software","Q11935070":"broadcast","Q3458976":"software","Q737148":"book","Q746831":"book","Q199714":"event","Q856663":"book","Q985039":"book","Q997702":"book","Q1052496":"book","Q531156":"event","Q1274312":"book","Q1321402":"book","Q1506883":"book","Q906456":"event","Q1681086":"book","Q1711806":"book","Q1231564":"event","Q1936882":"review","Q2005755":"book","Q1640057":"event","Q11198093":"software","Q11224960":"software","Q1801602":"event","Q1908116":"event","Q1932115":"event","Q2124976":"event","Q3033681":"song","Q3109904":"book","Q3276281":"book","Q3533504":"review","Q1924634":"standard","Q2141903":"standard","Q5277221":"book","Q88307738":"regulation","Q4781363":"event","Q7313471":"book","Q8066481":"book","Q28786557":"dataset","Q11256364":"book","Q11353378":"book","Q11371981":"book","Q11377649":"book","Q11547089":"book","Q10658696":"standard","Q13103474":"event","Q17049321":"book","Q17217725":"book","Q16565592":"event","Q18351911":"event","Q24906154":"book","Q27996264":"standard","Q28049403":"standard","Q1506107":"entry","Q60846354":"map","Q61143605":"periodical","Q47491518":"event","Q58901591":"event","Q86585984":"book","Q96482969":"event","Q98713463":"standard","Q104526260":"book","Q104537001":"book","Q105599390":"standard","Q105599400":"standard","Q577487":"periodical","Q904678":"periodical","Q1662452":"dataset","Q1824338":"periodical","Q110372993":"event","Q111770833":"book","Q3391317":"map","Q4840473":"motion_picture","Q6729489":"motion_picture","Q1383152":"dataset","Q1499601":"dataset","Q11502292":"periodical","Q12357500":"map","Q3890208":"dataset","Q5029847":"dataset","Q15253354":"periodical","Q7304003":"dataset","Q167035":"software","Q305918":"software","Q330268":"software","Q1134817":"software","Q22575725":"periodical","Q2333087":"software","Q4088259":"software","Q5160310":"software","Q16141944":"song","Q17990546":"song","Q20043946":"song","Q778492":"book","Q380546":"event","Q21050458":"dataset","Q21050912":"dataset","Q2068526":"event","Q2981450":"legislation","Q2594068":"event","Q22808060":"song","Q3142557":"event","Q4096822":"book","Q3910891":"legislation","Q4646933":"book","Q4087270":"event","Q4231500":"event","Q5420592":"event","Q5453341":"event","Q26721650":"dataset","Q7643429":"book","Q18395582":"software","Q18844389":"software","Q18844946":"software","Q31841013":"dataset","Q14948388":"event","Q15804842":"event","Q25411809":"software","Q16000419":"event","Q16321184":"event","Q17624895":"event","Q18616720":"dataset","Q21040564":"event","Q21400465":"event","Q21994318":"event","Q22087418":"event","Q22583090":"event","Q28980408":"event","Q29650342":"standard","Q52506277":"dataset","Q56298002":"dataset","Q56303227":"song","Q59157227":"dataset","Q69662460":"periodical","Q65964019":"dataset","Q49000120":"event","Q61945149":"event","Q96630878":"dataset","Q106651444":"periodical","Q107181559":"periodical","Q107236883":"periodical","Q78904686":"book","Q78321781":"event","Q79257255":"event","Q106120739":"song","Q108066527":"dataset","Q93616224":"book","Q111670248":"software","Q104925455":"event","Q104925505":"event","Q107637812":"event","Q474157":"software","Q646683":"software","Q974828":"software","Q1153924":"software","Q143692":"event","Q263755":"event","Q617378":"event","Q662829":"event","Q856365":"event","Q887670":"event","Q1070962":"event","Q1117228":"event","Q1331607":"event","Q1530635":"event","Q1974959":"event","Q771510":"standard","Q2650249":"event","Q2879007":"event","Q3123196":"event","Q3510937":"event","Q3513877":"event","Q3552770":"event","Q3569782":"event","Q4175709":"event","Q2597575":"standard","Q4456967":"event","Q4686496":"event","Q4692204":"event","Q4708969":"event","Q4727824":"event","Q4765082":"event","Q4780260":"event","Q4785212":"event","Q4790906":"event","Q4792537":"event","Q4824472":"event","Q4826093":"event","Q4837688":"event","Q4852748":"event","Q4873895":"event","Q4947296":"event","Q4948389":"event","Q4982316":"event","Q5008697":"event","Q5013416":"event","Q5014594":"event","Q5034150":"event","Q5036248":"event","Q5087832":"event","Q5095554":"event","Q5138070":"event","Q5151802":"event","Q5157891":"event","Q5157894":"event","Q5157899":"event","Q5157902":"event","Q5157900":"event","Q5157901":"event","Q5157905":"event","Q5157911":"event","Q5157914":"event","Q5157912":"event","Q5159520":"event","Q5160222":"event","Q5165375":"event","Q5166126":"event","Q5170487":"event","Q5190775":"event","Q5209616":"event","Q5211295":"event","Q5250066":"event","Q5255323":"event","Q5266038":"event","Q5277252":"event","Q5281494":"event","Q5283926":"event","Q5305076":"event","Q5328323":"event","Q5329928":"event","Q5347112":"event","Q5424415":"event","Q5430495":"event","Q5433535":"event","Q5434248":"event","Q5442947":"event","Q5511895":"event","Q5519075":"event","Q5527037":"event","Q5528777":"event","Q5529780":"event","Q5532683":"event","Q16801521":"software","Q27959794":"standard","Q27959899":"standard","Q48956889":"event","Q85811481":"legal_case","Q72199233":"standard","Q23759369":"regulation","Q95988573":"software","Q96463181":"event","Q111171546":"event","Q111184234":"event","Q5640688":"event","Q5958068":"event","Q5969892":"event","Q5986585":"event","Q6008722":"event","Q6276334":"event","Q6506118":"event","Q6527812":"event","Q6544572":"event","Q6670410":"event","Q6703618":"event","Q6716948":"event","Q6743164":"event","Q6773082":"event","Q6773081":"event","Q6805421":"event","Q6808040":"event","Q6839383":"event","Q6840778":"event","Q6840891":"event","Q6843456":"event","Q6865209":"event","Q6897370":"event","Q6902646":"event","Q6918116":"event","Q6948909":"event","Q7015537":"event","Q7053866":"event","Q7060163":"event","Q7061444":"event","Q7064385":"event","Q7077014":"event","Q7105291":"event","Q7122554":"event","Q7162748":"event","Q7164699":"event","Q7182996":"event","Q7186818":"event","Q7199258":"event","Q7209118":"event","Q7209223":"event","Q7263612":"event","Q7279902":"event","Q7296383":"event","Q7300437":"event","Q7301343":"event","Q7310859":"event","Q7389889":"event","Q7389947":"event","Q7433375":"event","Q7562715":"event","Q7578762":"event","Q7605451":"event","Q7607205":"event","Q7641902":"event","Q7653412":"event","Q7670141":"event","Q7723696":"event","Q7843045":"event","Q7856635":"event","Q7857911":"event","Q7881914":"event","Q7884759":"event","Q7906631":"event","Q8023892":"event","Q8024867":"event","Q8027085":"event","Q8031746":"event","Q8035830":"event","Q8069136":"event","Q8077104":"event","Q12302690":"event","Q14686742":"event","Q15274619":"event","Q16898196":"event","Q16960864":"event","Q16982847":"event","Q16989031":"event","Q16991678":"event","Q16993114":"event","Q16996002":"event","Q16996486":"event","Q17081230":"event","Q17108233":"event","Q17119244":"event","Q17148787":"event","Q17153085":"event","Q18148290":"event","Q18160724":"event","Q19059464":"event","Q19899721":"event","Q20313154":"event","Q21015701":"event","Q21015803":"event","Q24910363":"event","Q30589254":"event","Q55610059":"event","Q56291777":"event","Q109450272":"event","Q1226505":"periodical","Q1303200":"periodical","Q111328625":"event","Q111439709":"event","Q111439723":"event","Q111439762":"event","Q111439782":"event","Q111439846":"event","Q111440226":"event","Q111440426":"event","Q111440769":"event","Q111440792":"event","Q111442198":"event","Q111442224":"event","Q111442284":"event","Q111442303":"event","Q111442314":"event","Q111442348":"event","Q111442412":"event","Q111682272":"event","Q111684737":"event","Q111722393":"event","Q111736824":"event","Q111974124":"event","Q112040106":"event","Q112040117":"event","Q112040121":"event","Q112040174":"event","Q112080263":"event","Q112080326":"event","Q4499034":"song","Q431790":"review","Q1326821":"book","Q823306":"event","Q908793":"event","Q1031998":"event","Q1124227":"event","Q2189757":"book","Q1801358":"event","Q1829369":"event","Q1949268":"event","Q1955280":"event","Q2083465":"event","Q2219726":"event","Q2510454":"event","Q2648125":"event","Q2737005":"event","Q2786642":"event","Q2827293":"event","Q2990952":"event","Q2992129":"event","Q2992152":"event","Q2992182":"event","Q2992200":"event","Q2992207":"event","Q2992205":"event","Q3114239":"event","Q3118018":"event","Q4714147":"event","Q4992592":"event","Q5159947":"event","Q5781213":"event","Q6745401":"event","Q6981253":"event","Q7191247":"event","Q7686644":"event","Q8024924":"event","Q10846717":"event","Q11681664":"event","Q11915199":"event","Q11915196":"event","Q16546149":"event","Q16551078":"event","Q17367286":"book","Q17370328":"book","Q17081602":"event","Q17306806":"event","Q18610962":"event","Q18812494":"event","Q20018876":"event","Q20097137":"event","Q20102884":"event","Q20104856":"event","Q20105343":"event","Q20107885":"event","Q20982552":"event","Q21006590":"event","Q26846554":"event","Q27074172":"event","Q30527924":"event","Q36458072":"event","Q45107397":"event","Q50996590":"event","Q65963008":"event","Q67200374":"book","Q97009790":"event","Q166489":"manuscript","Q108887209":"event","Q1059863":"periodical","Q2308189":"periodical","Q111470930":"event","Q111584826":"event","Q111584978":"event","Q3414785":"periodical","Q10280356":"motion_picture","Q11335135":"periodical","Q1352815":"broadcast","Q20820199":"periodical","Q21886169":"periodical","Q161981":"event","Q190042":"event","Q266098":"event","Q428303":"event","Q742584":"event","Q805775":"event","Q1776553":"book","Q1907293":"book","Q1477856":"event","Q1574438":"event","Q2178284":"event","Q2217238":"event","Q2220043":"event","Q2601792":"event","Q2668769":"event","Q3150530":"event","Q5032602":"legislation","Q5412886":"event","Q5583820":"event","Q7378254":"event","Q8026379":"event","Q18340254":"software","Q10340636":"event","Q10340641":"event","Q11944179":"event","Q12028919":"event","Q12055493":"event","Q13746416":"event","Q14528267":"event","Q16838078":"event","Q16838082":"event","Q17084298":"event","Q17118636":"event","Q17147668":"event","Q17163260":"event","Q20888918":"event","Q21170330":"event","Q22119581":"event","Q24534551":"event","Q25112329":"event","Q25325299":"event","Q28404863":"legislation","Q66854024":"periodical","Q54856428":"event","Q294142":"regulation","Q55582398":"event","Q55611373":"event","Q55669384":"event","Q806718":"regulation","Q873442":"regulation","Q1268199":"regulation","Q1423657":"regulation","Q3606845":"regulation","Q59783540":"event","Q5001929":"regulation","Q61658758":"event","Q61983225":"event","Q66208038":"event","Q21489913":"regulation","Q79400253":"event","Q80623762":"event","Q88866968":"event","Q88867448":"event","Q88869722":"event","Q88889028":"event","Q88951478":"event","Q88952667":"event","Q88953162":"event","Q88954132":"event","Q88954519":"event","Q88965342":"event","Q88965366":"event","Q88966018":"event","Q91476283":"event","Q100799210":"event","Q100921020":"event","Q102378764":"event","Q104479499":"event","Q104722025":"event","Q104762205":"event","Q104766850":"event","Q105883338":"event","Q107011713":"event","Q108314610":"event","Q217327":"legal_case","Q897797":"legal_case","Q894351":"map","Q110226966":"legislation","Q110623113":"legislation","Q2145099":"motion_picture","Q2940455":"map","Q6813020":"legal_case","Q6901292":"legal_case","Q11116488":"motion_picture","Q17146139":"map","Q18711682":"legal_case","Q11304409":"song","Q25917154":"legal_case","Q25917186":"legal_case","Q28934204":"legal_case","Q160225":"event","Q183482":"event","Q460132":"event","Q611855":"event","Q694766":"event","Q784007":"event","Q884125":"event","Q969079":"event","Q1138456":"event","Q1278424":"event","Q1388456":"event","Q1388468":"event","Q1399129":"event","Q1413715":"event","Q1471955":"event","Q1641088":"event","Q1723677":"event","Q1812995":"event","Q1828204":"event","Q1933172":"event","Q1972122":"event","Q2128113":"event","Q2134841":"event","Q2186869":"event","Q2271146":"event","Q2358030":"event","Q2379395":"event","Q2415599":"event","Q2574384":"event","Q2601944":"event","Q2753135":"event","Q2993180":"event","Q3102259":"event","Q3699282":"event","Q4229161":"event","Q4231782":"event","Q4719013":"event","Q6888313":"legislation","Q6773189":"event","Q11430090":"event","Q12270042":"book","Q12899761":"book","Q12868195":"event","Q13737219":"event","Q13872840":"event","Q15079132":"event","Q15908445":"event","Q16541389":"event","Q16724349":"event","Q17665272":"event","Q19394118":"event","Q19771501":"event","Q20921574":"event","Q20921589":"event","Q21936902":"event","Q61037469":"legal_case","Q47508301":"event","Q59633182":"event","Q110350343":"legal_case","Q112044283":"legal_case","Q86660706":"event","Q87648606":"event","Q87743864":"event","Q87743931":"event","Q96141142":"event","Q96472992":"event","Q98456674":"event","Q99345851":"event","Q101584341":"event","Q105966326":"event","Q107226630":"event","Q2155304":"broadcast","Q2333839":"broadcast","Q2621422":"broadcast","Q2645569":"broadcast","Q2687765":"broadcast","Q3071014":"broadcast","Q3443665":"broadcast","Q4506063":"broadcast","Q240831":"software","Q734413":"software","Q7392071":"software","Q80056":"book","Q572371":"book","Q735234":"book","Q910109":"book","Q1053849":"book","Q1093232":"book","Q1360742":"book","Q1412196":"book","Q1417272":"book","Q10417670":"software","Q1542815":"book","Q1006442":"event","Q1141458":"event","Q1628553":"event","Q1638500":"event","Q1989519":"event","Q2200779":"event","Q2914610":"book","Q2966817":"book","Q3433066":"book","Q2993090":"event","Q3001563":"event","Q3157041":"event","Q4070685":"event","Q4843065":"event","Q6045975":"book","Q5454025":"event","Q15548100":"software","Q10957735":"book","Q11123640":"book","Q13128271":"book","Q13128274":"book","Q13128275":"book","Q13128278":"book","Q13128279":"book","Q13128276":"book","Q13128277":"book","Q13128281":"book","Q13635864":"book","Q13742394":"book","Q14380772":"book","Q15923205":"book","Q17630580":"book","Q17455048":"event","Q28094186":"software","Q18650988":"event","Q17042507":"standard","Q17042510":"standard","Q20594633":"book","Q20601974":"book","Q25554162":"book","Q27044174":"event","Q47214765":"broadcast","Q64152667":"broadcast","Q60345396":"software","Q81529267":"periodical","Q58197759":"event","Q59108305":"event","Q58542":"software","Q60614585":"event","Q63100559":"event","Q63100584":"event","Q63100595":"event","Q63100601":"event","Q63100611":"event","Q74516302":"event","Q109653474":"motion_picture","Q106559863":"broadcast","Q107404540":"broadcast","Q109042540":"broadcast","Q105832563":"event","Q106215748":"event","Q350514":"map","Q357674":"map","Q56304507":"regulation","Q3391101":"map","Q12046416":"map","Q21936939":"map","Q4165150":"software","Q746727":"book","Q93842":"event","Q285389":"event","Q760113":"legislation","Q393189":"event","Q552161":"event","Q594812":"event","Q622016":"event","Q649749":"event","Q746474":"event","Q747696":"event","Q818714":"event","Q869121":"event","Q884370":"event","Q1338798":"legislation","Q933785":"event","Q1141402":"event","Q1144157":"event","Q1144163":"event","Q1318642":"event","Q1537360":"event","Q1671798":"event","Q1851677":"event","Q1851685":"event","Q2552561":"book","Q2025421":"event","Q2041991":"event","Q2087386":"event","Q2090627":"event","Q2882217":"book","Q2320317":"event","Q2342543":"event","Q2470247":"event","Q2471205":"event","Q2613104":"event","Q2707928":"event","Q1053358":"standard","Q2913890":"event","Q2913892":"event","Q2988192":"event","Q3305012":"event","Q4274450":"event","Q4354501":"event","Q4806634":"event","Q4819187":"event","Q4852697":"event","Q4907414":"event","Q4929940":"event","Q5168499":"event","Q5177995":"event","Q5191359":"event","Q5330437":"event","Q5448074":"event","Q5448075":"event","Q5522435":"event","Q5594924":"event","Q5925944":"event","Q5930430":"event","Q5931621":"event","Q5965161":"event","Q5974544":"event","Q6736813":"book","Q6356595":"event","Q7604692":"legislation","Q7604693":"legislation","Q9640316":"book","Q12347305":"book","Q12347316":"book","Q12347324":"book","Q12347403":"book","Q16143346":"book","Q16546417":"book","Q16657177":"book","Q16832389":"book","Q21401869":"book","Q25313319":"event","Q26211781":"event","Q48800459":"legislation","Q86671429":"legal_case","Q2708301":"regulation","Q58863414":"event","Q107569113":"map","Q91834932":"book","Q100532772":"legislation","Q101073445":"legislation","Q108072825":"event","Q109045853":"book","Q5974546":"event","Q5974551":"event","Q5974549":"event","Q5974555":"event","Q5974553":"event","Q5974558":"event","Q5974559":"event","Q5974556":"event","Q5974561":"event","Q5974566":"event","Q5974564":"event","Q5974565":"event","Q5974570":"event","Q5974568":"event","Q5974574":"event","Q5974572":"event","Q5974573":"event","Q5974576":"event","Q5974583":"event","Q5974581":"event","Q5974587":"event","Q5974585":"event","Q5974591":"event","Q5974589":"event","Q5974593":"event","Q5974598":"event","Q5974596":"event","Q5974602":"event","Q5974607":"event","Q5974605":"event","Q5985363":"event","Q6128710":"event","Q6136640":"event","Q6145647":"event","Q6148624":"event","Q6149606":"event","Q6710131":"event","Q6843472":"event","Q6903035":"event","Q6955214":"event","Q7053735":"event","Q7122390":"event","Q7155745":"event","Q7198123":"event","Q7419363":"event","Q7588376":"event","Q7809247":"event","Q7889632":"event","Q10290398":"event","Q10327191":"event","Q10385004":"event","Q11284681":"event","Q11311600":"event","Q11320867":"event","Q11323009":"event","Q11324638":"event","Q11336664":"event","Q11338803":"event","Q11343183":"event","Q11343714":"event","Q11421054":"event","Q11510125":"event","Q12060810":"event","Q12060811":"event","Q12060812":"event","Q15894752":"event","Q16933460":"event","Q16953232":"event","Q16955370":"event","Q16968401":"event","Q16971599":"event","Q17039073":"event","Q17098985":"event","Q17099499":"event","Q17100126":"event","Q17101864":"event","Q17149933":"event","Q17193933":"event","Q17991075":"event","Q17994901":"event","Q18355257":"event","Q18359247":"event","Q18470637":"event","Q18474372":"event","Q18700516":"event","Q20038989":"event","Q20040886":"event","Q20041674":"event","Q21154276":"event","Q23034407":"event","Q23048889":"event","Q24859934":"event","Q24860246":"event","Q24868735":"event","Q24871095":"event","Q24895314":"event","Q24897039":"event","Q24897674":"event","Q24900121":"event","Q24901654":"event","Q111972381":"book","Q839475":"book","Q235729":"event","Q245169":"event","Q288826":"event","Q672461":"event","Q707597":"event","Q814491":"event","Q30900100":"motion_picture","Q1544219":"book","Q1392762":"event","Q1932471":"event","Q2278062":"event","Q3026037":"book","Q2378962":"event","Q3440942":"book","Q3868755":"book","Q3270414":"event","Q4178674":"book","Q3899741":"event","Q4146861":"event","Q5484460":"periodical","Q5057655":"event","Q5792893":"periodical","Q5883078":"book","Q7311362":"book","Q7106348":"event","Q11391941":"event","Q12132683":"book","Q12719146":"book","Q15296520":"periodical","Q17157034":"standard","Q20443047":"book","Q25212097":"event","Q25315520":"event","Q25315524":"event","Q25315541":"event","Q25418927":"event","Q25419103":"event","Q25419101":"event","Q25419104":"event","Q26221084":"event","Q28056128":"event","Q28056136":"event","Q28056161":"event","Q28056178":"event","Q28056177":"event","Q28689743":"event","Q28689756":"event","Q29168234":"event","Q29964144":"event","Q30913161":"event","Q30927659":"event","Q30927662":"event","Q45045456":"event","Q48744481":"event","Q48995876":"event","Q48995910":"event","Q53889489":"event","Q56290623":"event","Q56338790":"event","Q57608780":"event","Q57611756":"event","Q57612023":"event","Q58622526":"event","Q58868610":"event","Q59544693":"event","Q59624231":"event","Q60473775":"event","Q60550377":"event","Q59053570":"standard","Q59057709":"standard","Q61763401":"event","Q61860767":"event","Q63076647":"event","Q63372996":"event","Q64605380":"event","Q64712054":"event","Q65954323":"book","Q65721197":"event","Q67467614":"book","Q7408":"event","Q19809":"event","Q19828":"event","Q51617":"event","Q69992216":"event","Q69992378":"event","Q74802306":"event","Q74803629":"event","Q108202384":"motion_picture","Q84312768":"event","Q84418196":"event","Q96757081":"event","Q98480259":"event","Q103880535":"event","Q107584900":"event","Q1324620":"motion_picture","Q56395994":"regulation","Q369074":"dataset","Q373853":"dataset","Q11330880":"periodical","Q5148657":"dataset","Q31728":"regulation","Q7935164":"broadcast","Q615985":"software","Q718969":"software","Q1186723":"software","Q1418000":"software","Q3307487":"software","Q5420063":"software","Q5772565":"software","Q7144983":"software","Q7692326":"software","Q7695873":"software","Q366176":"book","Q471194":"book","Q608971":"book","Q334113":"event","Q370553":"event","Q1230235":"book","Q1416320":"book","Q1426213":"book","Q844017":"event","Q848599":"event","Q879634":"event","Q10871684":"software","Q1977520":"book","Q2732056":"book","Q3199214":"book","Q2603340":"event","Q3320346":"event","Q3394366":"event","Q4205512":"event","Q4877154":"book","Q4903301":"book","Q4686251":"event","Q24886171":"broadcast","Q6560903":"event","Q7311227":"book","Q7574827":"book","Q7308127":"event","Q91138683":"regulation","Q11868106":"book","Q23442338":"software","Q23442766":"software","Q15918533":"book","Q16933744":"book","Q107471270":"regulation","Q45115695":"software","Q61130948":"broadcast","Q55680343":"software","Q55686778":"software","Q78898322":"periodical","Q239463":"regulation","Q1137608":"regulation","Q56683247":"review","Q56400596":"event","Q56403010":"event","Q2519258":"regulation","Q2578338":"regulation","Q3116860":"regulation","Q3480499":"regulation","Q5062052":"regulation","Q60753268":"event","Q35760":"book","Q69942561":"event","Q15835243":"regulation","Q15852746":"regulation","Q100269041":"broadcast","Q104978998":"dataset","Q106159499":"broadcast","Q107640824":"broadcast","Q110616917":"broadcast","Q98456209":"book","Q4078107":"song","Q538812":"book","Q110145":"event","Q163569":"event","Q174389":"event","Q182728":"event","Q194258":"event","Q212828":"event","Q223740":"event","Q268200":"event","Q279820":"event","Q286069":"event","Q290568":"event","Q306143":"event","Q311836":"event","Q317057":"event","Q341302":"event","Q369606":"event","Q382780":"event","Q384139":"event","Q431668":"event","Q453745":"event","Q483826":"event","Q496411":"event","Q496730":"event","Q497324":"event","Q501058":"event","Q538661":"event","Q566905":"event","Q580231":"event","Q594504":"event","Q655089":"event","Q685037":"event","Q693797":"event","Q708135":"event","Q708731":"event","Q732997":"event","Q785070":"event","Q795848":"event","Q844232":"event","Q845877":"event","Q873842":"event","Q889842":"event","Q891480":"event","Q910360":"event","Q915280":"event","Q919525":"event","Q979103":"event","Q1011547":"event","Q1011572":"event","Q1061172":"event","Q1075347":"event","Q10722474":"software","Q2084705":"book","Q2117603":"book","Q2781249":"book","Q2221327":"event","Q3256810":"book","Q5575435":"book","Q12188186":"event","Q13131052":"book","Q13131053":"book","Q30902188":"book","Q30738156":"event","Q58962661":"book","Q59601511":"book","Q13254":"book","Q19020":"event","Q19409":"event","Q24616":"event","Q31579":"event","Q37049":"event","Q40024":"event","Q40237":"event","Q49025":"event","Q94153037":"book","Q94947558":"book","Q97177085":"event","Q108852932":"book","Q1111310":"event","Q1186171":"event","Q1205048":"event","Q1205107":"event","Q1242148":"event","Q1258149":"event","Q1293276":"event","Q1321674":"event","Q1340271":"event","Q1350697":"event","Q1359606":"event","Q1381877":"event","Q1439650":"event","Q1444982":"event","Q1453733":"event","Q1502249":"event","Q1508179":"event","Q1538791":"event","Q1546403":"event","Q1604012":"event","Q1636955":"event","Q1662330":"event","Q1713744":"event","Q1762822":"event","Q1794567":"event","Q2004138":"event","Q2004286":"event","Q2024454":"event","Q2111259":"event","Q2223318":"event","Q2639596":"event","Q2652698":"event","Q2742209":"event","Q2819590":"event","Q2972198":"event","Q3000849":"event","Q3063242":"event","Q3077281":"event","Q3117505":"event","Q3394495":"event","Q3406648":"event","Q3411002":"event","Q3459735":"event","Q3492224":"event","Q3497114":"event","Q3524248":"event","Q3557042":"event","Q3595200":"event","Q3610287":"event","Q3664509":"event","Q4092704":"event","Q4887617":"event","Q4986375":"event","Q5029994":"event","Q5116459":"event","Q5338360":"event","Q5528416":"event","Q5579711":"event","Q5584324":"event","Q5781223":"event","Q6105667":"event","Q6372905":"event","Q7016062":"event","Q7032808":"event","Q7562850":"event","Q7567536":"event","Q7585305":"event","Q7681353":"event","Q7685420":"event","Q7743963":"event","Q7813994":"event","Q8964906":"event","Q9062425":"event","Q10873938":"event","Q10905949":"event","Q11024975":"event","Q11506265":"event","Q11700336":"event","Q11860564":"event","Q12004746":"event","Q12682760":"event","Q13057942":"event","Q13601550":"event","Q14094507":"event","Q15728786":"event","Q15728919":"event","Q16168215":"event","Q16184868":"event","Q16286298":"event","Q16621657":"event","Q16621678":"event","Q16825873":"event","Q16827140":"event","Q16941354":"event","Q17004976":"event","Q17629159":"event","Q17855191":"event","Q18015677":"event","Q18206005":"event","Q18344366":"event","Q172067":"motion_picture","Q108719793":"event","Q108776412":"event","Q109012141":"event","Q110426704":"event","Q110537409":"event","Q110738365":"event","Q836225":"dataset","Q17110220":"dataset","Q1310686":"event","Q3149792":"event","Q4438157":"event","Q4536542":"event","Q5445656":"event","Q5985273":"event","Q18345192":"event","Q18350834":"event","Q18640780":"event","Q18681625":"event","Q18712434":"event","Q18772252":"event","Q19360743":"event","Q19850992":"event","Q20744362":"event","Q21484313":"event","Q21509286":"event","Q21509433":"event","Q21521989":"event","Q21522006":"event","Q21705016":"event","Q21774045":"event","Q21844795":"event","Q21866930":"event","Q21866939":"event","Q21866936":"event","Q21898124":"event","Q22074863":"event","Q22175212":"event","Q23688051":"event","Q24256194":"event","Q24885747":"event","Q25341611":"event","Q25630923":"event","Q25713816":"event","Q26340132":"event","Q28053864":"event","Q28054019":"event","Q28054047":"event","Q28056433":"event","Q28147399":"event","Q28343115":"event","Q28343261":"event","Q28382046":"event","Q28382054":"event","Q28444913":"event","Q28468130":"event","Q28792027":"event","Q28820074":"event","Q28822711":"event","Q29980402":"event","Q30106378":"event","Q30588247":"event","Q30751050":"event","Q33540215":"event","Q39372459":"event","Q51885519":"event","Q56276961":"event","Q56741171":"event","Q60122889":"event","Q61744628":"event","Q65780861":"event","Q65782856":"event","Q69574974":"event","Q74066919":"event","Q78220196":"event","Q81427797":"event","Q81427806":"event","Q81565646":"event","Q84306075":"event","Q85584573":"event","Q85760823":"event","Q86664707":"event","Q87827974":"event","Q87841959":"event","Q96206874":"event","Q96619694":"event","Q97016080":"event","Q97355587":"event","Q97355606":"event","Q98090825":"event","Q100158614":"event","Q106352030":"event","Q106920872":"event","Q106921005":"event","Q106937985":"event","Q106938089":"event","Q106948920":"event","Q106949044":"event","Q107009012":"event","Q107507525":"event","Q109340006":"standard","Q111302296":"performance","Q112075105":"book","Q111890974":"event","Q3527765":"song","Q5227321":"dataset","Q6594074":"dataset","Q5243464":"broadcast","Q279650":"software","Q5978554":"software","Q6839216":"software","Q213369":"software","Q591016":"book","Q193141":"event","Q483271":"event","Q527207":"event","Q571381":"event","Q604109":"event","Q684138":"event","Q1334350":"review","Q726492":"event","Q996954":"event","Q1338948":"event","Q1339121":"event","Q1659242":"event","Q2062594":"event","Q2749428":"book","Q430140":"standard","Q2928770":"book","Q2593659":"event","Q2704778":"event","Q1059963":"standard","Q1109589":"standard","Q3653936":"event","Q5120692":"event","Q5146309":"event","Q5594802":"event","Q5903448":"event","Q7397922":"event","Q7946342":"event","Q7142872":"standard","Q7878662":"standard","Q11895140":"event","Q22909598":"software","Q16168861":"event","Q16191899":"event","Q19311591":"event","Q20749438":"event","Q23878304":"event","Q23978180":"event","Q24569309":"event","Q25302965":"event","Q27308875":"event","Q27308988":"event","Q28044810":"event","Q28057489":"event","Q28854537":"event","Q28913516":"event","Q27959500":"standard","Q27959524":"standard","Q30245758":"event","Q35222554":"event","Q40659951":"event","Q43150790":"event","Q45308090":"event","Q47455701":"event","Q47505518":"event","Q47533055":"event","Q47533067":"event","Q51019263":"event","Q63646250":"software","Q56751411":"event","Q59428876":"event","Q60302161":"event","Q65501526":"legislation","Q81427813":"event","Q81427817":"event","Q81427821":"event","Q81427827":"event","Q81427831":"event","Q81428011":"event","Q87830406":"event","Q91001695":"event","Q91248609":"standard","Q93211279":"event","Q93817540":"event","Q95612266":"event","Q100769007":"event","Q100796287":"event","Q101244755":"event","Q472298":"legal_case","Q2360559":"periodical","Q111972467":"book","Q111972478":"book","Q111972495":"book","Q3428685":"periodical","Q4835951":"periodical","Q5253501":"periodical","Q178840":"broadcast","Q12021525":"periodical","Q482612":"broadcast","Q581714":"broadcast","Q662197":"broadcast","Q3120825":"dataset","Q1273568":"broadcast","Q1366112":"broadcast","Q1676730":"broadcast","Q1802588":"broadcast","Q3951815":"broadcast","Q4783297":"broadcast","Q5455086":"broadcast","Q5778915":"broadcast","Q7185299":"broadcast","Q7603925":"broadcast","Q7724161":"broadcast","Q20055188":"periodical","Q9335576":"broadcast","Q9335577":"broadcast","Q16889492":"broadcast","Q80973":"event","Q177115":"event","Q209253":"event","Q245009":"event","Q333203":"event","Q558298":"event","Q1221272":"book","Q568285":"event","Q586615":"event","Q657221":"event","Q980035":"event","Q1065241":"event","Q1113192":"event","Q1131897":"event","Q1139315":"event","Q1195832":"event","Q19772367":"broadcast","Q1520293":"event","Q1605306":"event","Q1790659":"event","Q1835902":"event","Q1841993":"event","Q1897524":"event","Q230360":"standard","Q2293045":"event","Q2295197":"event","Q3178617":"book","Q3201017":"book","Q21188110":"broadcast","Q21191019":"broadcast","Q21191068":"broadcast","Q2746144":"event","Q21233490":"broadcast","Q2794178":"event","Q3420088":"event","Q7388865":"event","Q7572570":"event","Q26644852":"broadcast","Q27868077":"broadcast","Q10513545":"book","Q12218859":"book","Q17217514":"book","Q22025254":"book","Q3491297":"performance","Q4019680":"performance","Q53952740":"periodical","Q24902889":"book","Q56279868":"legal_case","Q64426019":"periodical","Q55082620":"broadcast","Q66759360":"periodical","Q56320653":"broadcast","Q56878968":"broadcast","Q62389259":"broadcast","Q62573441":"broadcast","Q74161894":"broadcast","Q60828138":"event","Q85133165":"broadcast","Q98526245":"broadcast","Q110896015":"periodical","Q100707163":"broadcast","Q101761418":"broadcast","Q104438889":"broadcast","Q106363897":"broadcast","Q108674843":"broadcast","Q108872880":"broadcast","Q109981780":"broadcast","Q110263445":"broadcast","Q111241100":"broadcast","Q110324480":"event","Q110515773":"event","Q6706470":"periodical","Q1799894":"broadcast","Q4039528":"software","Q6158458":"software","Q1407190":"event","Q3042344":"event","Q3436327":"event","Q4180394":"legislation","Q3787044":"event","Q4192299":"event","Q4202016":"event","Q4205456":"event","Q4272221":"event","Q4741441":"event","Q5146004":"event","Q5764649":"event","Q5803827":"event","Q6404879":"event","Q6866481":"legislation","Q6514389":"event","Q6962185":"event","Q7127953":"event","Q7204354":"event","Q16927924":"software","Q7439701":"event","Q7979074":"event","Q10715009":"event","Q11352926":"event","Q11387026":"event","Q11481730":"event","Q21087159":"software","Q11915198":"event","Q11926271":"event","Q11955723":"event","Q11966595":"event","Q12011440":"event","Q12495292":"event","Q12516001":"event","Q12516006":"event","Q12896105":"event","Q13093120":"event","Q13093505":"event","Q13097938":"event","Q14437429":"event","Q14947832":"event","Q15935644":"book","Q15974948":"legislation","Q17070134":"event","Q17175691":"event","Q19703493":"event","Q19738539":"event","Q19978226":"event","Q20427131":"event","Q20988817":"event","Q24895127":"event","Q25421222":"legislation","Q25466760":"event","Q27796293":"event","Q43304555":"event","Q43702513":"event","Q55884772":"legislation","Q55606888":"event","Q56232060":"event","Q58867915":"event","Q60823329":"event","Q63203764":"event","Q72192529":"event","Q96754171":"event","Q97230633":"event","Q98279051":"event","Q105480600":"event","Q107695269":"event","Q731194":"motion_picture","Q1250909":"periodical","Q111514738":"event","Q4689686":"periodical","Q6351976":"periodical","Q9311486":"periodical","Q99536154":"performance","Q380319":"dataset","Q10677794":"periodical","Q881912":"broadcast","Q899203":"broadcast","Q80998":"software","Q10672625":"song","Q4182287":"software","Q25040622":"periodical","Q210112":"review","Q786961":"review","Q419529":"event","Q547403":"event","Q1392117":"review","Q782864":"event","Q1755587":"book","Q1131276":"event","Q1812889":"event","Q2598929":"review","Q20652466":"broadcast","Q2877361":"review","Q2995465":"book","Q2935206":"event","Q33130924":"motion_picture","Q3504613":"event","Q4938353":"review","Q5896938":"book","Q5367041":"event","Q7100855":"event","Q7157511":"event","Q11582340":"book","Q13140991":"book","Q13424265":"review","Q13930359":"event","Q16255517":"book","Q17276616":"event","Q18405553":"event","Q196750":"performance","Q685123":"performance","Q26225493":"book","Q30242829":"review","Q30325164":"event","Q12051030":"performance","Q40092973":"event","Q41463713":"event","Q47467768":"event","Q63082925":"standard","Q75179330":"event","Q106651343":"periodical","Q106651395":"periodical","Q106664402":"periodical","Q89641294":"review","Q111292287":"dataset","Q108810446":"software","Q107212338":"event","Q108172332":"event","Q7864671":"broadcast","Q845636":"software","Q5416720":"software","Q7353436":"software","Q192782":"book","Q123524":"event","Q794357":"book","Q259977":"event","Q333016":"event","Q455674":"event","Q860005":"event","Q866427":"event","Q1619411":"book","Q1055047":"event","Q1062856":"event","Q1151125":"event","Q1278513":"event","Q1472650":"event","Q1750982":"event","Q1758841":"event","Q1918135":"event","Q2190103":"event","Q2573466":"event","Q2696609":"event","Q3481043":"book","Q3009014":"event","Q3074244":"event","Q3078662":"event","Q3107490":"event","Q3404834":"event","Q3470130":"event","Q4465563":"book","Q4045950":"event","Q4050586":"event","Q5368745":"book","Q4769686":"event","Q4769687":"event","Q4769684":"event","Q4826999":"event","Q4836792":"event","Q5045293":"event","Q5278260":"event","Q5295187":"event","Q5337997":"event","Q5643104":"event","Q5874489":"event","Q6124476":"event","Q6606006":"event","Q6606005":"event","Q7113940":"event","Q7892194":"event","Q7971665":"event","Q7977811":"event","Q7994532":"event","Q9378549":"book","Q11080698":"book","Q10680973":"event","Q11381119":"book","Q11477317":"book","Q11385469":"event","Q11492812":"event","Q11514338":"event","Q11705312":"event","Q12750036":"event","Q11292145":"standard","Q13533951":"event","Q17050763":"event","Q17145579":"event","Q18127275":"event","Q18574943":"event","Q18694077":"event","Q19851407":"event","Q21616374":"book","Q21931667":"book","Q26928598":"book","Q27020789":"book","Q27022970":"book","Q28521056":"event","Q28870211":"event","Q28870290":"event","Q28870398":"event","Q28870399":"event","Q28870409":"event","Q32845660":"event","Q43516519":"event","Q63952888":"broadcast","Q47076664":"event","Q53490595":"event","Q54913642":"event","Q59779546":"event","Q61014588":"event","Q1315":"event","Q26139":"event","Q31489":"event","Q97160212":"book","Q98459187":"book","Q109337002":"software","Q108884831":"event","Q3407067":"periodical","Q11410671":"legal_case","Q11498393":"speech","Q11606878":"speech","Q11660318":"report","Q210707":"event","Q277875":"event","Q320803":"event","Q428792":"event","Q620932":"event","Q694874":"event","Q739227":"event","Q765982":"event","Q772787":"event","Q778559":"event","Q791183":"event","Q926006":"event","Q951799":"event","Q983696":"event","Q1043345":"event","Q1135337":"event","Q1154703":"event","Q1161047":"event","Q1250640":"event","Q1417217":"event","Q1426540":"event","Q1585186":"event","Q1630626":"event","Q1681685":"event","Q2400279":"book","Q1814442":"event","Q1822326":"event","Q1995157":"event","Q2068688":"event","Q2202034":"event","Q2228810":"event","Q2297714":"event","Q2371046":"event","Q2575989":"event","Q2596525":"event","Q2954231":"event","Q2954234":"event","Q2954235":"event","Q2954328":"event","Q2954343":"event","Q2954437":"event","Q2954804":"event","Q2955753":"event","Q2999641":"event","Q3031465":"event","Q3492700":"event","Q3600404":"event","Q3691184":"event","Q4351908":"event","Q4354709":"event","Q4689729":"event","Q5060322":"event","Q5060326":"event","Q5060327":"event","Q5060330":"event","Q5954321":"event","Q7308029":"book","Q6952135":"event","Q7129610":"event","Q7565954":"event","Q7565966":"event","Q7565973":"event","Q7565978":"event","Q8035929":"event","Q10392399":"event","Q10685395":"event","Q10685482":"event","Q11390231":"event","Q11404432":"event","Q11446405":"event","Q11612512":"event","Q11708504":"event","Q11777258":"event","Q14867489":"event","Q16002008":"event","Q16961825":"event","Q16982514":"event","Q17009195":"event","Q17083199":"event","Q17143639":"event","Q18289615":"event","Q22130753":"book","Q63980799":"event","Q90483854":"dataset","Q93431056":"broadcast","Q78493655":"event","Q84027730":"event","Q96664258":"event","Q106592862":"event","Q106594041":"event","Q109423255":"event","Q5431448":"song","Q10951437":"song","Q12001523":"song","Q17048822":"song","Q17048829":"song","Q610406":"book","Q74705":"event","Q93565":"event","Q121702":"event","Q798415":"book","Q1277508":"book","Q1563294":"book","Q936821":"event","Q1119215":"event","Q1370156":"event","Q2305716":"legislation","Q2943319":"event","Q3400492":"event","Q4829850":"event","Q10605380":"book","Q11820946":"book","Q11913319":"event","Q11948067":"event","Q13165711":"book","Q15123870":"book","Q16129284":"event","Q16129305":"event","Q16879633":"manuscript","Q16879696":"manuscript","Q16338694":"event","Q17096546":"event","Q17147746":"event","Q18219090":"book","Q18887969":"book","Q19336875":"event","Q20102358":"event","Q20648996":"event","Q20715885":"event","Q20728678":"event","Q20804886":"event","Q22060043":"book","Q22669539":"book","Q22669546":"book","Q22080014":"event","Q23657281":"book","Q25382039":"book","Q25483388":"book","Q25402731":"event","Q26263367":"event","Q29346471":"event","Q30102663":"book","Q60982020":"report","Q40008090":"event","Q46999879":"event","Q49546289":"event","Q55279953":"event","Q55533811":"event","Q55625390":"event","Q55625388":"event","Q56231107":"event","Q56231148":"event","Q56648044":"event","Q59613404":"event","Q59710393":"event","Q61126943":"event","Q66330372":"event","Q8500":"event","Q12776":"event","Q24384":"event","Q41520":"event","Q43605":"event","Q60874":"event","Q64313":"event","Q64795":"event","Q70990126":"event","Q76394137":"legislation","Q98807065":"book","Q99430861":"manuscript","Q99471867":"manuscript","Q99471961":"manuscript","Q99472047":"manuscript","Q99472115":"manuscript","Q104805122":"legislation","Q107579084":"book","Q107171265":"event","Q107410905":"event","Q123577":"event","Q129535":"event","Q129532":"event","Q130222":"event","Q132373":"event","Q133547":"event","Q137959":"event","Q168582":"event","Q169947":"event","Q172760":"event","Q194976":"event","Q195125":"event","Q199356":"event","Q203273":"event","Q206984":"event","Q239103":"event","Q242052":"event","Q248952":"event","Q264806":"event","Q265609":"event","Q286203":"event","Q299126":"event","Q299125":"event","Q299128":"event","Q299163":"event","Q299178":"event","Q299180":"event","Q299186":"event","Q299187":"event","Q299189":"event","Q299198":"event","Q299202":"event","Q299206":"event","Q299235":"event","Q299241":"event","Q299248":"event","Q299254":"event","Q299256":"event","Q299263":"event","Q299264":"event","Q299269":"event","Q299274":"event","Q299279":"event","Q299277":"event","Q299281":"event","Q299287":"event","Q299289":"event","Q299299":"event","Q299296":"event","Q299332":"event","Q299362":"event","Q299382":"event","Q299402":"event","Q299409":"event","Q299423":"event","Q299425":"event","Q299432":"event","Q299439":"event","Q299437":"event","Q299459":"event","Q299473":"event","Q299499":"event","Q299496":"event","Q299506":"event","Q299511":"event","Q299516":"event","Q299526":"event","Q299531":"event","Q299532":"event","Q299543":"event","Q299541":"event","Q299561":"event","Q299582":"event","Q299603":"event","Q299634":"event","Q299640":"event","Q299651":"event","Q299658":"event","Q299664":"event","Q299668":"event","Q299701":"event","Q299706":"event","Q299714":"event","Q299719":"event","Q299729":"event","Q299740":"event","Q299745":"event","Q299783":"event","Q299802":"event","Q299814":"event","Q299818":"event","Q299821":"event","Q299914":"event","Q299931":"event","Q299939":"event","Q299950":"event","Q299948":"event","Q299963":"event","Q300009":"event","Q300027":"event","Q300031":"event","Q319496":"event","Q323824":"event","Q331570":"event","Q427873":"event","Q428394":"event","Q431569":"event","Q461834":"event","Q491853":"event","Q497769":"event","Q526017":"event","Q535453":"event","Q539495":"event","Q539784":"event","Q540920":"event","Q555063":"event","Q557099":"event","Q557548":"event","Q557814":"event","Q558006":"event","Q558656":"event","Q559476":"event","Q559650":"event","Q560080":"event","Q584646":"event","Q595467":"event","Q596990":"event","Q605286":"event","Q606172":"event","Q616701":"event","Q627279":"event","Q633933":"event","Q634567":"event","Q684730":"event","Q696794":"event","Q716601":"event","Q716644":"event","Q716678":"event","Q716943":"event","Q735402":"event","Q739665":"event","Q743453":"event","Q760716":"event","Q768991":"event","Q769417":"event","Q769431":"event","Q775471":"event","Q779922":"event","Q796569":"event","Q796839":"event","Q800121":"event","Q886270":"event","Q890516":"event","Q890882":"event","Q903729":"event","Q929574":"event","Q941398":"event","Q945967":"event","Q954590":"event","Q965607":"event","Q974505":"event","Q1025949":"event","Q1044168":"event","Q1091028":"event","Q1103815":"event","Q1103842":"event","Q1117449":"event","Q1119295":"event","Q1119578":"event","Q1122524":"event","Q1134214":"event","Q1151287":"event","Q1161519":"event","Q1204262":"event","Q1388797":"event","Q1393324":"event","Q1393450":"event","Q1393456":"event","Q1393508":"event","Q1426603":"event","Q1442756":"event","Q1442932":"event","Q1443177":"event","Q1443908":"event","Q1486923":"event","Q1559570":"event","Q1615988":"event","Q1634719":"event","Q1638045":"event","Q1653961":"event","Q1654339":"event","Q1654545":"event","Q1729493":"event","Q1765968":"event","Q1765987":"event","Q1765993":"event","Q1766004":"event","Q1766027":"event","Q1767359":"event","Q1767608":"event","Q1768061":"event","Q1770734":"event","Q1770736":"event","Q1770747":"event","Q1770744":"event","Q1770751":"event","Q1777029":"event","Q1783626":"event","Q1960810":"event","Q1961253":"event","Q1961762":"event","Q1966034":"event","Q1981381":"event","Q1995680":"event","Q2004692":"event","Q2016020":"event","Q2018057":"event","Q2065854":"event","Q2074452":"event","Q2080820":"event","Q2205905":"event","Q2244936":"event","Q2371030":"event","Q2371222":"event","Q2415348":"event","Q2420534":"event","Q2421258":"event","Q2423399":"event","Q2423417":"event","Q2425642":"event","Q2537839":"event","Q2616055":"event","Q2632546":"event","Q2657736":"event","Q2694093":"event","Q2830532":"event","Q2866098":"event","Q2872166":"event","Q2896105":"event","Q2937459":"event","Q2949523":"event","Q2963330":"event","Q2975162":"event","Q2976234":"event","Q2976273":"event","Q2976341":"event","Q2976449":"event","Q2999429":"event","Q2999810":"event","Q2999845":"event","Q3000131":"event","Q3042549":"event","Q3083292":"event","Q3083527":"event","Q3083653":"event","Q3083763":"event","Q3087335":"event","Q3087459":"event","Q3088894":"event","Q3089208":"event","Q3106786":"event","Q3153340":"event","Q3177909":"event","Q3257647":"event","Q3324280":"event","Q3353485":"event","Q3353595":"event","Q3353780":"event","Q3353913":"event","Q3353917":"event","Q3354028":"event","Q3377484":"event","Q3495290":"event","Q3497987":"event","Q3506485":"event","Q3534237":"event","Q3534294":"event","Q3534292":"event","Q3534358":"event","Q3534566":"event","Q3534612":"event","Q3534675":"event","Q3534676":"event","Q3534722":"event","Q3534725":"event","Q3534738":"event","Q3534814":"event","Q3534817":"event","Q3534865":"event","Q3534932":"event","Q3534993":"event","Q3535034":"event","Q3535035":"event","Q3535049":"event","Q3535077":"event","Q3535082":"event","Q3535088":"event","Q3535243":"event","Q3540474":"event","Q3540489":"event","Q3540525":"event","Q3597331":"event","Q3600432":"event","Q3600649":"event","Q3600718":"event","Q3600739":"event","Q3600751":"event","Q3600805":"event","Q3600843":"event","Q3600847":"event","Q3600856":"event","Q3600884":"event","Q3600903":"event","Q3600948":"event","Q3601327":"event","Q3601330":"event","Q3601347":"event","Q3601638":"event","Q3601887":"event","Q3601888":"event","Q3601990":"event","Q3601994":"event","Q3602132":"event","Q3602149":"event","Q3602256":"event","Q3603058":"event","Q3603490":"event","Q3603520":"event","Q3603907":"event","Q3604223":"event","Q3605142":"event","Q3605923":"event","Q3606309":"event","Q3606853":"event","Q3606912":"event","Q3606917":"event","Q3607004":"event","Q3607245":"event","Q3609725":"event","Q3610771":"event","Q3611654":"event","Q3611701":"event","Q3612542":"event","Q3612735":"event","Q3612771":"event","Q3613041":"event","Q3613656":"event","Q3614074":"event","Q3614110":"event","Q3614697":"event","Q3615237":"event","Q3615379":"event","Q3615406":"event","Q3616311":"event","Q3617962":"event","Q3620171":"event","Q3620457":"event","Q3621067":"event","Q3621221":"event","Q3623162":"event","Q3624633":"event","Q3624843":"event","Q3624984":"event","Q3625000":"event","Q3627426":"event","Q3627461":"event","Q3627687":"event","Q3627921":"event","Q3628224":"event","Q3629454":"event","Q3629473":"event","Q3629939":"event","Q3630094":"event","Q3631082":"event","Q3631557":"event","Q3631712":"event","Q3631856":"event","Q3631948":"event","Q3632102":"event","Q3632207":"event","Q3632289":"event","Q3632701":"event","Q3632713":"event","Q3632952":"event","Q3632956":"event","Q3632966":"event","Q3632973":"event","Q3632987":"event","Q3633572":"event","Q3634125":"event","Q3634142":"event","Q3634199":"event","Q3634380":"event","Q3634483":"event","Q3634815":"event","Q3634870":"event","Q3634976":"event","Q3635079":"event","Q3636208":"event","Q3636890":"event","Q3637504":"event","Q3637509":"event","Q3637575":"event","Q3637701":"event","Q3637844":"event","Q3637894":"event","Q3638210":"event","Q3638307":"event","Q3638528":"event","Q3638539":"event","Q3638580":"event","Q3638594":"event","Q3638593":"event","Q3639471":"event","Q3639751":"event","Q3640336":"event","Q3640695":"event","Q3641012":"event","Q3641088":"event","Q3641095":"event","Q3641441":"event","Q3641448":"event","Q3641513":"event","Q3641604":"event","Q3641859":"event","Q3641916":"event","Q3642936":"event","Q3643010":"event","Q3643283":"event","Q3643851":"event","Q3643894":"event","Q3643975":"event","Q3643984":"event","Q3644325":"event","Q3644342":"event","Q3644801":"event","Q3644842":"event","Q3645279":"event","Q3645520":"event","Q3645563":"event","Q3646016":"event","Q3646238":"event","Q3646273":"event","Q3646350":"event","Q3646356":"event","Q3646483":"event","Q3646516":"event","Q3646730":"event","Q3646751":"event","Q3646808":"event","Q3646940":"event","Q3647225":"event","Q3649463":"event","Q3649547":"event","Q3649879":"event","Q3649903":"event","Q3649998":"event","Q3650525":"event","Q3650660":"event","Q3650671":"event","Q3651832":"event","Q3651894":"event","Q3652027":"event","Q3653725":"event","Q3654748":"event","Q3655130":"event","Q3655294":"event","Q3656625":"event","Q3656772":"event","Q3656796":"event","Q3658127":"event","Q3658138":"event","Q3658445":"event","Q3658681":"event","Q3660576":"event","Q3661360":"event","Q3661371":"event","Q3661526":"event","Q3663286":"event","Q3663972":"event","Q3664140":"event","Q3664280":"event","Q3665269":"event","Q3665273":"event","Q3665766":"event","Q3665787":"event","Q3665857":"event","Q3665934":"event","Q3666008":"event","Q3666037":"event","Q3666105":"event","Q3666176":"event","Q3666713":"event","Q3666808":"event","Q3667771":"event","Q3674576":"event","Q3674597":"event","Q3675214":"event","Q3675598":"event","Q3677008":"event","Q3678553":"event","Q3678624":"event","Q3678641":"event","Q3678655":"event","Q3678714":"event","Q3678724":"event","Q3680362":"event","Q3680700":"event","Q3682571":"event","Q3682849":"event","Q3683335":"event","Q3683487":"event","Q3683613":"event","Q3683812":"event","Q3683866":"event","Q3684250":"event","Q3686296":"event","Q3686348":"event","Q3686362":"event","Q3686659":"event","Q3689188":"event","Q3689987":"event","Q3690315":"event","Q3690373":"event","Q3690473":"event","Q3690538":"event","Q3690645":"event","Q3690697":"event","Q3690726":"event","Q3690848":"event","Q3690973":"event","Q3693269":"event","Q3695077":"event","Q3695290":"event","Q3695673":"event","Q3695897":"event","Q3696159":"event","Q3696334":"event","Q3696508":"event","Q3696847":"event","Q3698733":"event","Q3699189":"event","Q3699404":"event","Q3699618":"event","Q3699955":"event","Q3699961":"event","Q3700797":"event","Q3702794":"event","Q3702866":"event","Q3703856":"event","Q3704859":"event","Q3705157":"event","Q3705562":"event","Q3705902":"event","Q3706160":"event","Q3706333":"event","Q3706372":"event","Q3707644":"event","Q3712550":"event","Q3714405":"event","Q3714412":"event","Q3714489":"event","Q3715761":"event","Q3715789":"event","Q3715936":"event","Q3716475":"event","Q3717008":"event","Q3717021":"event","Q3717680":"event","Q3717781":"event","Q3719180":"event","Q3720297":"event","Q3720663":"event","Q3720749":"event","Q3724053":"event","Q3724109":"event","Q3725435":"event","Q3726398":"event","Q3730949":"event","Q3733152":"event","Q3733267":"event","Q3733269":"event","Q3733487":"event","Q3735966":"event","Q3737344":"event","Q3738447":"event","Q3738448":"event","Q3742349":"event","Q3742740":"event","Q3743025":"event","Q3745746":"event","Q3746380":"event","Q3746685":"event","Q3746748":"event","Q3746863":"event","Q3747981":"event","Q3748002":"event","Q3748499":"event","Q3751985":"event","Q3752681":"event","Q3753107":"event","Q3754137":"event","Q3754141":"event","Q3756000":"event","Q3756044":"event","Q3757474":"event","Q3758388":"event","Q3758450":"event","Q3758455":"event","Q3760014":"event","Q3760037":"event","Q3760059":"event","Q3761543":"event","Q3771964":"event","Q3772825":"event","Q3772892":"event","Q3772944":"event","Q3773601":"event","Q3773610":"event","Q3774003":"event","Q3774233":"event","Q3775797":"event","Q3775969":"event","Q3776303":"event","Q3776626":"event","Q3776908":"event","Q3778037":"event","Q3778048":"event","Q3778065":"event","Q3778152":"event","Q3778186":"event","Q3778213":"event","Q3778410":"event","Q3780077":"event","Q3780296":"event","Q3782362":"event","Q3782574":"event","Q3782723":"event","Q3782793":"event","Q3782809":"event","Q3782846":"event","Q3782857":"event","Q3782895":"event","Q3782902":"event","Q3783058":"event","Q3783541":"event","Q3783549":"event","Q3783722":"event","Q3784068":"event","Q3784739":"event","Q3785650":"event","Q3785658":"event","Q3785678":"event","Q3785992":"event","Q3786453":"event","Q3786546":"event","Q3786855":"event","Q3787021":"event","Q3787550":"event","Q3787640":"event","Q3787667":"event","Q3787691":"event","Q3788665":"event","Q3788932":"event","Q3789032":"event","Q3789045":"event","Q3789162":"event","Q3789194":"event","Q3789244":"event","Q3789310":"event","Q3789328":"event","Q3789365":"event","Q3789370":"event","Q3789394":"event","Q3789434":"event","Q3789496":"event","Q3789528":"event","Q3789632":"event","Q3789674":"event","Q3789678":"event","Q3789703":"event","Q3789709":"event","Q3789718":"event","Q3789747":"event","Q3789754":"event","Q3789808":"event","Q3789812":"event","Q3789831":"event","Q3789839":"event","Q3789872":"event","Q3789878":"event","Q3789888":"event","Q3790340":"event","Q3796399":"event","Q3797954":"event","Q3797980":"event","Q3797988":"event","Q3798154":"event","Q3798590":"event","Q3799319":"event","Q3799525":"event","Q3799553":"event","Q3799599":"event","Q3799732":"event","Q3799913":"event","Q3799953":"event","Q3800174":"event","Q3800183":"event","Q3800198":"event","Q3800367":"event","Q3800418":"event","Q3801775":"event","Q3802402":"event","Q3803483":"event","Q3804562":"event","Q3804995":"event","Q3805009":"event","Q3805746":"event","Q3806198":"event","Q3806224":"event","Q3806774":"event","Q3808059":"event","Q3808966":"event","Q3808977":"event","Q3809508":"event","Q3809770":"event","Q3809992":"event","Q3811991":"event","Q3812427":"event","Q3812536":"event","Q3812703":"event","Q3812756":"event","Q3812760":"event","Q3812861":"event","Q3812873":"event","Q3813127":"event","Q3813144":"event","Q3813181":"event","Q3814044":"event","Q3814761":"event","Q3814967":"event","Q3815117":"event","Q3815639":"event","Q3815726":"event","Q3815931":"event","Q3815953":"event","Q3815974":"event","Q3816070":"event","Q3816522":"event","Q3816530":"event","Q3816545":"event","Q3816783":"event","Q3817247":"event","Q3817511":"event","Q3817559":"event","Q3817701":"event","Q3817814":"event","Q3820205":"event","Q3820336":"event","Q3820766":"event","Q3821202":"event","Q3825520":"event","Q3826095":"event","Q3826122":"event","Q3826129":"event","Q3826622":"event","Q3827535":"event","Q3827699":"event","Q3827705":"event","Q3828172":"event","Q3828437":"event","Q3829355":"event","Q3830229":"event","Q3830782":"event","Q3831285":"event","Q3831448":"event","Q3832105":"event","Q3832394":"event","Q3832447":"event","Q3832475":"event","Q3832572":"event","Q3833114":"event","Q3833141":"event","Q3833232":"event","Q3833375":"event","Q3833384":"event","Q3835058":"event","Q3835580":"event","Q3836476":"event","Q3837260":"event","Q3837390":"event","Q3837961":"event","Q3837971":"event","Q3838980":"event","Q3839218":"event","Q3840939":"event","Q3841562":"event","Q3841964":"event","Q3842052":"event","Q3842154":"event","Q3842339":"event","Q3842781":"event","Q3842806":"event","Q3842916":"event","Q3843106":"event","Q3843487":"event","Q3843957":"event","Q3844000":"event","Q3844082":"event","Q3844090":"event","Q3844309":"event","Q3844406":"event","Q3844686":"event","Q3844927":"event","Q3845224":"event","Q3845232":"event","Q3845317":"event","Q3846880":"event","Q3847060":"event","Q3849409":"event","Q3849820":"event","Q3849907":"event","Q3850218":"event","Q3850663":"event","Q3850837":"event","Q3852387":"event","Q3852477":"event","Q3853662":"event","Q3853831":"event","Q3854045":"event","Q3854131":"event","Q3854150":"event","Q3854393":"event","Q3854557":"event","Q3854635":"event","Q3854804":"event","Q3855370":"event","Q3855787":"event","Q3855791":"event","Q3855800":"event","Q3855807":"event","Q3856003":"event","Q3856009":"event","Q3857794":"event","Q3857832":"event","Q3858175":"event","Q3859501":"event","Q3859787":"event","Q3859891":"event","Q3860600":"event","Q3861045":"event","Q3861130":"event","Q3861310":"event","Q3862191":"event","Q3862336":"event","Q3862352":"event","Q3862360":"event","Q3862413":"event","Q3862419":"event","Q3862423":"event","Q3862506":"event","Q3862513":"event","Q3862871":"event","Q3863083":"event","Q3863112":"event","Q3867068":"event","Q3867125":"event","Q3867138":"event","Q3867219":"event","Q3867375":"event","Q3868522":"event","Q3869473":"event","Q3869907":"event","Q3869921":"event","Q3869966":"event","Q3870037":"event","Q3870180":"event","Q3870211":"event","Q3870225":"event","Q3870318":"event","Q3870591":"event","Q3874950":"event","Q3874973":"event","Q3875018":"event","Q3875024":"event","Q3875200":"event","Q3875235":"event","Q3875302":"event","Q3875329":"event","Q3875340":"event","Q3875621":"event","Q3875920":"event","Q3876603":"event","Q3876655":"event","Q3878533":"event","Q3878542":"event","Q3878798":"event","Q3878876":"event","Q3878897":"event","Q3879299":"event","Q3879897":"event","Q3879981":"event","Q3879986":"event","Q3880040":"event","Q3880501":"event","Q3880726":"event","Q3880964":"event","Q3881071":"event","Q3881249":"event","Q3881328":"event","Q3881483":"event","Q3882045":"event","Q3882927":"event","Q3883099":"event","Q3883111":"event","Q3883123":"event","Q3883130":"event","Q3883137":"event","Q3883169":"event","Q3883186":"event","Q3883193":"event","Q3883208":"event","Q3883215":"event","Q3883233":"event","Q3883251":"event","Q3883337":"event","Q3883377":"event","Q3883492":"event","Q3883592":"event","Q3884193":"event","Q3885939":"event","Q3886256":"event","Q3886348":"event","Q3886871":"event","Q3886886":"event","Q3888758":"event","Q3892716":"event","Q3892721":"event","Q3892726":"event","Q3892916":"event","Q3895234":"event","Q3895943":"event","Q3896910":"event","Q3898348":"event","Q3898885":"event","Q3898992":"event","Q3899121":"event","Q3899293":"event","Q3899422":"event","Q3900013":"event","Q3900553":"event","Q3900676":"event","Q3901601":"event","Q3905055":"event","Q3906301":"event","Q3906890":"event","Q3907679":"event","Q3908048":"event","Q3908655":"event","Q3909130":"event","Q3909332":"event","Q3909344":"event","Q3909705":"event","Q3909829":"event","Q3910963":"event","Q3911280":"event","Q3922259":"event","Q3925401":"event","Q3925427":"event","Q3925433":"event","Q3925440":"event","Q3926163":"event","Q3926228":"event","Q3928022":"event","Q3928171":"event","Q3929662":"event","Q3929735":"event","Q3929996":"event","Q3931236":"event","Q3931294":"event","Q3931297":"event","Q3931553":"event","Q3931782":"event","Q3932235":"event","Q3932963":"event","Q3933265":"event","Q3933868":"event","Q3933882":"event","Q3934241":"event","Q3935265":"event","Q3935780":"event","Q3936165":"event","Q3936227":"event","Q3936244":"event","Q3937969":"event","Q3938141":"event","Q3939694":"event","Q3939782":"event","Q3939832":"event","Q3940066":"event","Q3940383":"event","Q3940421":"event","Q3940804":"event","Q3941758":"event","Q3942056":"event","Q3942084":"event","Q3942628":"event","Q3943452":"event","Q3943519":"event","Q3943551":"event","Q3943731":"event","Q3943760":"event","Q3944106":"event","Q3944531":"event","Q3944943":"event","Q3945028":"event","Q3945463":"event","Q3945558":"event","Q3945759":"event","Q3945806":"event","Q3945808":"event","Q3945885":"event","Q3946307":"event","Q3946397":"event","Q3946726":"event","Q3946803":"event","Q3946829":"event","Q3946929":"event","Q3947386":"event","Q3947444":"event","Q3947890":"event","Q3948547":"event","Q3948564":"event","Q3948987":"event","Q3949390":"event","Q3949413":"event","Q3949561":"event","Q3950151":"event","Q3950160":"event","Q3950209":"event","Q3950225":"event","Q3950389":"event","Q3950405":"event","Q3950522":"event","Q3950988":"event","Q3951540":"event","Q3951895":"event","Q3952225":"event","Q3953614":"event","Q3954177":"event","Q3954480":"event","Q3954502":"event","Q3954565":"event","Q3954695":"event","Q3958447":"event","Q3959117":"event","Q3959335":"event","Q3959398":"event","Q3959511":"event","Q3959810":"event","Q3959809":"event","Q3959814":"event","Q3959891":"event","Q3960070":"event","Q3961775":"event","Q3961985":"event","Q3961996":"event","Q3962843":"event","Q3962955":"event","Q3964332":"event","Q3964962":"event","Q3965577":"event","Q3965585":"event","Q3965602":"event","Q3965608":"event","Q3966937":"event","Q3967100":"event","Q3967179":"event","Q3967192":"event","Q3967241":"event","Q3967245":"event","Q3967270":"event","Q3967503":"event","Q3967576":"event","Q3967614":"event","Q3968691":"event","Q3973768":"event","Q3975857":"event","Q3975861":"event","Q3976378":"event","Q3976914":"event","Q3976995":"event","Q3977040":"event","Q3977051":"event","Q3978105":"event","Q3978181":"event","Q3978361":"event","Q3978613":"event","Q3979022":"event","Q3979145":"event","Q3979249":"event","Q3979433":"event","Q3979440":"event","Q3979465":"event","Q3980194":"event","Q3980649":"event","Q3980744":"event","Q3980818":"event","Q3980834":"event","Q3980840":"event","Q3981092":"event","Q3981179":"event","Q3981238":"event","Q3981270":"event","Q3981343":"event","Q3981383":"event","Q3981480":"event","Q3981715":"event","Q3982594":"event","Q3982649":"event","Q3982723":"event","Q3982733":"event","Q3983023":"event","Q3983444":"event","Q3983669":"event","Q3983710":"event","Q3983735":"event","Q3985275":"event","Q3987443":"event","Q3987749":"event","Q3990341":"event","Q3990362":"event","Q3991146":"event","Q3991309":"event","Q3991460":"event","Q3991630":"event","Q3992207":"event","Q3992290":"event","Q3992375":"event","Q3992425":"event","Q3993795":"event","Q3994402":"event","Q3994427":"event","Q3994450":"event","Q3994506":"event","Q3994517":"event","Q3994536":"event","Q3994548":"event","Q3994549":"event","Q3994559":"event","Q3994570":"event","Q3994581":"event","Q3994665":"event","Q3994691":"event","Q3995105":"event","Q3996962":"event","Q3997087":"event","Q3997430":"event","Q3998000":"event","Q3999222":"event","Q3999332":"event","Q3999351":"event","Q3999363":"event","Q3999376":"event","Q3999433":"event","Q3999595":"event","Q3999701":"event","Q4000382":"event","Q4000412":"event","Q4000453":"event","Q4001138":"event","Q4002130":"event","Q4002148":"event","Q4002185":"event","Q4002204":"event","Q4002238":"event","Q4002380":"event","Q4003083":"event","Q4007206":"event","Q4007618":"event","Q4007977":"event","Q4007990":"event","Q4008491":"event","Q4008505":"event","Q4008548":"event","Q4009335":"event","Q4009661":"event","Q4010154":"event","Q4011100":"event","Q4011460":"event","Q4011468":"event","Q4011580":"event","Q4011707":"event","Q4013959":"event","Q4013961":"event","Q4013974":"event","Q4014104":"event","Q4014335":"event","Q4014751":"event","Q4015767":"event","Q4016836":"event","Q4016887":"event","Q4016895":"event","Q4017093":"event","Q4017170":"event","Q4017354":"event","Q4017622":"event","Q4017666":"event","Q4017785":"event","Q4017825":"event","Q4018287":"event","Q4018384":"event","Q4018777":"event","Q4018790":"event","Q4018912":"event","Q4019086":"event","Q4019091":"event","Q4019107":"event","Q4019104":"event","Q4019130":"event","Q4019506":"event","Q4019713":"event","Q4020075":"event","Q4020461":"event","Q4020513":"event","Q4020717":"event","Q4020733":"event","Q4020740":"event","Q4021029":"event","Q4021433":"event","Q4022725":"event","Q4023183":"event","Q4023185":"event","Q4023309":"event","Q4023575":"event","Q4023674":"event","Q4023687":"event","Q4023857":"event","Q4024105":"event","Q4024108":"event","Q4024112":"event","Q4024918":"event","Q4025007":"event","Q4025012":"event","Q4025042":"event","Q4045891":"event","Q4050441":"event","Q4052770":"event","Q4224218":"event","Q4256960":"event","Q4288439":"event","Q4339756":"event","Q4366215":"event","Q4366218":"event","Q4366216":"event","Q4366217":"event","Q4454733":"event","Q4509271":"event","Q4510456":"event","Q4797848":"event","Q4836135":"event","Q4942801":"event","Q4957984":"event","Q4984045":"event","Q5068924":"event","Q5071577":"event","Q5082753":"event","Q5168153":"event","Q5168210":"event","Q5413401":"event","Q5490846":"event","Q5514875":"event","Q5551202":"event","Q5744971":"event","Q5787894":"event","Q5942858":"event","Q6005569":"event","Q6052577":"event","Q6053982":"event","Q6123948":"event","Q6417564":"event","Q6728095":"event","Q6785427":"event","Q6785432":"event","Q6819490":"event","Q6905402":"event","Q6952254":"event","Q6952263":"event","Q6952969":"event","Q6980868":"event","Q7023722":"event","Q7096050":"event","Q7127993":"event","Q7179488":"event","Q7269946":"event","Q7335177":"event","Q7426098":"event","Q7523148":"event","Q7607039":"event","Q7698261":"event","Q7700325":"event","Q7700459":"event","Q7700462":"event","Q7700460":"event","Q7700461":"event","Q7829347":"event","Q7832260":"event","Q7863693":"event","Q7889248":"event","Q7907578":"event","Q7992062":"event","Q8036294":"event","Q8349777":"event","Q9560694":"event","Q11090803":"event","Q11351733":"event","Q11362264":"event","Q11389224":"event","Q11389239":"event","Q11389359":"event","Q11419795":"event","Q11421030":"event","Q11421028":"event","Q13222050":"event","Q13360734":"event","Q13493441":"event","Q13526286":"event","Q13528155":"event","Q13582675":"event","Q13582710":"event","Q13583330":"event","Q13600685":"event","Q13861080":"event","Q14174007":"event","Q14320759":"event","Q14342109":"event","Q14395789":"event","Q14478218":"event","Q14514524":"event","Q14856072":"event","Q15041810":"event","Q15054936":"event","Q15069684":"event","Q15097531":"event","Q15131563":"event","Q15131574":"event","Q15144568":"event","Q15147839":"event","Q15211049":"event","Q15275875":"event","Q15295658":"event","Q15361334":"event","Q15502507":"event","Q15689750":"event","Q15729796":"event","Q15731893":"event","Q15735641":"event","Q15781230":"event","Q15781235":"event","Q15781242":"event","Q15781244":"event","Q15959551":"event","Q15974424":"event","Q16023722":"event","Q16054181":"event","Q16219512":"event","Q16274825":"event","Q16512362":"event","Q16529509":"event","Q16534435":"event","Q16546328":"event","Q16563995":"event","Q16564054":"event","Q16564136":"event","Q16580434":"event","Q16584404":"event","Q16613251":"event","Q16615810":"event","Q16618886":"event","Q16632531":"event","Q16680326":"event","Q16680679":"event","Q16680755":"event","Q16830262":"event","Q16830263":"event","Q16830264":"event","Q16850252":"event","Q16955406":"event","Q16956397":"event","Q16977292":"event","Q16981798":"event","Q16984643":"event","Q16987821":"event","Q17011128":"event","Q17011135":"event","Q17022891":"event","Q17151899":"event","Q17256963":"event","Q17270829":"event","Q17306815":"event","Q17310096":"event","Q17310097":"event","Q17333175":"event","Q17333181":"event","Q17333184":"event","Q17333197":"event","Q17333214":"event","Q17333223":"event","Q17361963":"event","Q17383767":"event","Q17461001":"event","Q17462082":"event","Q17462095":"event","Q17464028":"event","Q17489335":"event","Q17493278":"event","Q17620008":"event","Q17622371":"event","Q17622546":"event","Q17623114":"event","Q17624645":"event","Q17625497":"event","Q17628571":"event","Q17633105":"event","Q17633886":"event","Q17637042":"event","Q17637518":"event","Q17639419":"event","Q17639746":"event","Q17640525":"event","Q17747114":"event","Q17993729":"event","Q18018759":"event","Q18129441":"event","Q18159015":"event","Q18194670":"event","Q18202318":"event","Q18213482":"event","Q18213481":"event","Q18213488":"event","Q18287737":"event","Q18341693":"event","Q18377780":"event","Q18392682":"event","Q18396069":"event","Q18409973":"event","Q18412581":"event","Q18415531":"event","Q18418347":"event","Q18536387":"event","Q18544772":"event","Q18580167":"event","Q18604482":"event","Q18641731":"event","Q18698620":"event","Q18979560":"event","Q19160228":"event","Q19258246":"event","Q19428421":"event","Q19605869":"event","Q19606574":"event","Q19817651":"event","Q19833989":"event","Q19891914":"event","Q19892939":"event","Q19924530":"event","Q20010797":"event","Q20020843":"event","Q20127833":"event","Q20164838":"event","Q20312401":"event","Q20439575":"event","Q20647502":"event","Q20648829":"event","Q20713720":"event","Q20797926":"event","Q20804888":"event","Q20807181":"event","Q21010022":"event","Q21027485":"event","Q21030874":"event","Q21040127":"event","Q21055686":"event","Q21093703":"event","Q21093700":"event","Q21093701":"event","Q21093712":"event","Q21093723":"event","Q21093726":"event","Q21093725":"event","Q21234484":"event","Q21235476":"event","Q21235523":"event","Q21336943":"event","Q21395689":"event","Q21408242":"event","Q21476775":"event","Q22008239":"event","Q22026039":"event","Q22059426":"event","Q22079824":"event","Q22079845":"event","Q22079851":"event","Q22079858":"event","Q22086620":"event","Q22095418":"event","Q22095956":"event","Q22096122":"event","Q22096136":"event","Q22096406":"event","Q22096448":"event","Q22222885":"event","Q22235842":"event","Q22298555":"event","Q22683265":"event","Q22829012":"event","Q22919781":"event","Q22948449":"event","Q23018491":"event","Q23038902":"event","Q23039164":"event","Q23039200":"event","Q23039334":"event","Q23039397":"event","Q23039414":"event","Q23039600":"event","Q23785490":"event","Q23795293":"event","Q23797188":"event","Q23895149":"event","Q23956839":"event","Q24088385":"event","Q24197286":"event","Q24636970":"event","Q24699540":"event","Q24908119":"event","Q24911704":"event","Q24972047":"event","Q24993214":"event","Q24993217":"event","Q25247386":"event","Q25316304":"event","Q25350515":"event","Q25377940":"event","Q25378133":"event","Q25378153":"event","Q25378415":"event","Q25378540":"event","Q25378617":"event","Q25383755":"event","Q25384986":"event","Q25403316":"event","Q26268612":"event","Q26268650":"event","Q26307058":"event","Q26694763":"event","Q26722566":"event","Q26806402":"event","Q26836193":"event","Q26836508":"event","Q26863790":"event","Q26869510":"event","Q27220048":"event","Q27308030":"event","Q27517306":"event","Q27567168":"event","Q27888220":"event","Q27897066":"event","Q28003735":"event","Q28065175":"event","Q28071051":"event","Q28108951":"event","Q28141548":"event","Q28223971":"event","Q28224191":"event","Q28229057":"event","Q28230598":"event","Q28402654":"event","Q28434536":"event","Q28439721":"event","Q28446863":"event","Q28447931":"event","Q28449553":"event","Q28681433":"event","Q28739880":"event","Q28970885":"event","Q28976348":"event","Q29045824":"event","Q29111854":"event","Q29976438":"event","Q30056998":"event","Q30224302":"event","Q30329653":"event","Q30636372":"event","Q30640119":"event","Q30644035":"event","Q30644056":"event","Q30644268":"event","Q30899671":"event","Q30909403":"event","Q34802615":"event","Q34972831":"event","Q38184051":"event","Q39045340":"event","Q39056481":"event","Q39057700":"event","Q39061118":"event","Q39080169":"event","Q40445394":"event","Q41799397":"event","Q42531004":"event","Q43380317":"event","Q47006610":"event","Q47013041":"event","Q47117944":"event","Q47482648":"event","Q47487926":"event","Q47487925":"event","Q47487928":"event","Q47487971":"event","Q47487968":"event","Q47487973":"event","Q47488698":"event","Q47488699":"event","Q47488700":"event","Q47488701":"event","Q47488750":"event","Q47832385":"event","Q47841968":"event","Q47916304":"event","Q47921081":"event","Q48031037":"event","Q48133303":"event","Q48207643":"event","Q48261162":"event","Q48636487":"event","Q48673590":"event","Q48843043":"event","Q50185613":"event","Q50186904":"event","Q50384692":"event","Q50410412":"event","Q50418195":"event","Q50418202":"event","Q50470152":"event","Q50470240":"event","Q50470306":"event","Q50472085":"event","Q50472157":"event","Q50472800":"event","Q50476608":"event","Q50476661":"event","Q50476759":"event","Q50476812":"event","Q50476866":"event","Q50477552":"event","Q50477604":"event","Q50477754":"event","Q50477829":"event","Q50477931":"event","Q50477995":"event","Q50478097":"event","Q50479021":"event","Q50479069":"event","Q50479199":"event","Q50479241":"event","Q50479278":"event","Q50479308":"event","Q50479383":"event","Q50479631":"event","Q50547864":"event","Q50547896":"event","Q50547916":"event","Q50547939":"event","Q50547960":"event","Q50548026":"event","Q50548059":"event","Q50548110":"event","Q50548457":"event","Q50548533":"event","Q50548556":"event","Q50548710":"event","Q50548734":"event","Q50548757":"event","Q50548777":"event","Q50548802":"event","Q50548834":"event","Q50548865":"event","Q50548896":"event","Q50548930":"event","Q50548946":"event","Q50548968":"event","Q50549210":"event","Q50549208":"event","Q50549209":"event","Q50549215":"event","Q50549218":"event","Q50549222":"event","Q50549220":"event","Q50549221":"event","Q111187591":"event","Q120804":"event","Q141716":"event","Q145505":"event","Q149882":"event","Q175861":"event","Q203784":"event","Q209556":"event","Q245886":"event","Q245885":"event","Q245892":"event","Q257285":"event","Q301292":"event","Q303419":"event","Q303811":"event","Q314038":"event","Q324257":"event","Q328539":"event","Q375218":"event","Q375545":"event","Q443941":"event","Q474007":"event","Q474534":"event","Q524107":"event","Q540439":"event","Q608883":"event","Q616151":"event","Q628010":"event","Q645310":"event","Q645545":"event","Q653127":"event","Q655951":"event","Q656382":"event","Q663964":"event","Q683469":"event","Q683482":"event","Q684360":"event","Q688120":"event","Q689657":"event","Q689703":"event","Q692149":"event","Q694225":"event","Q695984":"event","Q696667":"event","Q696677":"event","Q696710":"event","Q724011":"event","Q724014":"event","Q724094":"event","Q727021":"event","Q727359":"event","Q729230":"event","Q735943":"event","Q747654":"event","Q758639":"event","Q773829":"event","Q781528":"event","Q783023":"event","Q792499":"event","Q797176":"event","Q797189":"event","Q799209":"event","Q799305":"event","Q799330":"event","Q799376":"event","Q799377":"event","Q799422":"event","Q799425":"event","Q799434":"event","Q799450":"event","Q50549223":"event","Q50549224":"event","Q50549228":"event","Q50549229":"event","Q50549232":"event","Q50549233":"event","Q50549237":"event","Q50549246":"event","Q50549247":"event","Q50549250":"event","Q50549251":"event","Q50549249":"event","Q50549257":"event","Q50549263":"event","Q50549266":"event","Q50842727":"event","Q56291178":"event","Q56378748":"event","Q60846927":"event","Q62666870":"event","Q64822995":"event","Q15222":"event","Q27450":"event","Q31345":"event","Q97670098":"event","Q99655727":"event","Q99656088":"event","Q99656421":"event","Q100786919":"event","Q106938984":"event","Q799469":"event","Q799591":"event","Q799594":"event","Q799593":"event","Q799633":"event","Q799644":"event","Q799658":"event","Q799659":"event","Q799657":"event","Q799661":"event","Q803628":"event","Q805057":"event","Q805144":"event","Q805762":"event","Q806492":"event","Q806493":"event","Q806528":"event","Q807299":"event","Q815487":"event","Q815488":"event","Q815500":"event","Q816076":"event","Q822054":"event","Q834406":"event","Q894458":"event","Q894457":"event","Q894470":"event","Q894571":"event","Q894853":"event","Q899204":"event","Q903055":"event","Q954074":"event","Q960248":"event","Q969090":"event","Q991734":"event","Q992559":"event","Q995595":"event","Q1003607":"event","Q1003631":"event","Q1003698":"event","Q1003701":"event","Q1003889":"event","Q1032264":"event","Q1032833":"event","Q1035830":"event","Q1043418":"event","Q1072807":"event","Q1073307":"event","Q1073355":"event","Q1073735":"event","Q1073977":"event","Q1110379":"event","Q1130994":"event","Q1131040":"event","Q1140677":"event","Q1149324":"event","Q1149395":"event","Q1152534":"event","Q1152533":"event","Q1152542":"event","Q1152547":"event","Q1152706":"event","Q1152708":"event","Q1152819":"event","Q1152836":"event","Q1162557":"event","Q1162560":"event","Q1169153":"event","Q1180970":"event","Q1188736":"event","Q1193650":"event","Q1194788":"event","Q1202091":"event","Q1203123":"event","Q1203198":"event","Q1203472":"event","Q1203591":"event","Q1203593":"event","Q1204142":"event","Q1233985":"event","Q1235427":"event","Q1240036":"event","Q1245467":"event","Q1246458":"event","Q1254649":"event","Q1255145":"event","Q1256690":"event","Q1262142":"event","Q1266209":"event","Q1267784":"event","Q1267829":"event","Q1270050":"event","Q1270143":"event","Q1274559":"event","Q1276626":"event","Q1277716":"event","Q1278396":"event","Q1279569":"event","Q1282002":"event","Q1282211":"event","Q1283160":"event","Q1290911":"event","Q1291694":"event","Q1307348":"event","Q1309521":"event","Q1315945":"event","Q1316180":"event","Q1321278":"event","Q1323243":"event","Q1325650":"event","Q1334737":"event","Q1341097":"event","Q1342577":"event","Q1342810":"event","Q1353734":"event","Q1358044":"event","Q1367044":"event","Q1370190":"event","Q1370189":"event","Q1370324":"event","Q1370420":"event","Q1370853":"event","Q1371249":"event","Q1375254":"event","Q1375518":"event","Q1376114":"event","Q1377363":"event","Q1385247":"event","Q1387258":"event","Q1387905":"event","Q1390124":"event","Q1390140":"event","Q1396170":"event","Q1401758":"event","Q1410316":"event","Q1412253":"event","Q1413731":"event","Q1417544":"event","Q1417794":"event","Q1417799":"event","Q1418147":"event","Q1418979":"event","Q1420655":"event","Q1428559":"event","Q1430384":"event","Q1433086":"event","Q1433192":"event","Q1450503":"event","Q1450505":"event","Q1450598":"event","Q1455275":"event","Q1456424":"event","Q1462977":"event","Q1465483":"event","Q1469053":"event","Q1469581":"event","Q1477055":"event","Q1478906":"event","Q1478904":"event","Q1484521":"event","Q1491833":"event","Q1502455":"event","Q1505582":"event","Q1505882":"event","Q1507281":"event","Q1509457":"event","Q1513289":"event","Q1515782":"event","Q1517150":"event","Q1521351":"event","Q1522958":"event","Q1522970":"event","Q1522968":"event","Q1522973":"event","Q1524526":"event","Q1526627":"event","Q1531252":"event","Q1531700":"event","Q1538381":"event","Q1544524":"event","Q1546327":"event","Q1546329":"event","Q1551665":"event","Q1551671":"event","Q1551668":"event","Q1551983":"event","Q1552924":"event","Q1556727":"event","Q1557948":"event","Q1562929":"event","Q1563114":"event","Q1563377":"event","Q1566376":"event","Q1572887":"event","Q1573963":"event","Q1574935":"event","Q1575199":"event","Q1576656":"event","Q1579590":"event","Q1586501":"event","Q1604564":"event","Q1608552":"event","Q1614032":"event","Q1617761":"event","Q1618143":"event","Q1626942":"event","Q1632327":"event","Q1632810":"event","Q1637740":"event","Q1644669":"event","Q1651180":"event","Q1652172":"event","Q1661179":"event","Q1661203":"event","Q1661253":"event","Q1661462":"event","Q1661461":"event","Q1661531":"event","Q1661706":"event","Q1661730":"event","Q1661757":"event","Q1661763":"event","Q1667712":"event","Q1667853":"event","Q1668185":"event","Q1668910":"event","Q1670208":"event","Q1672768":"event","Q1672769":"event","Q1672850":"event","Q1674279":"event","Q1674283":"event","Q1674634":"event","Q1674632":"event","Q1674669":"event","Q1675034":"event","Q1675067":"event","Q1675068":"event","Q1675123":"event","Q1679821":"event","Q1683169":"event","Q1683232":"event","Q1684034":"event","Q1685213":"event","Q1685869":"event","Q1687914":"event","Q1695924":"event","Q1703624":"event","Q1705940":"event","Q1711429":"event","Q1711454":"event","Q1711490":"event","Q1719131":"event","Q1723084":"event","Q1723513":"event","Q1731784":"event","Q1740580":"event","Q1741051":"event","Q1747348":"event","Q1749925":"event","Q1750264":"event","Q1750458":"event","Q1752398":"event","Q1755200":"event","Q1758889":"event","Q1780951":"event","Q1781629":"event","Q1784333":"event","Q1789594":"event","Q1789592":"event","Q1797308":"event","Q1803360":"event","Q1805717":"event","Q1810278":"event","Q1821179":"event","Q1821177":"event","Q1823166":"event","Q1824036":"event","Q1853314":"event","Q1864968":"event","Q1864969":"event","Q1878292":"event","Q1878314":"event","Q1882522":"event","Q1882589":"event","Q1883115":"event","Q1887081":"event","Q1887782":"event","Q1887862":"event","Q1887860":"event","Q1890454":"event","Q1891856":"event","Q1911518":"event","Q1914690":"event","Q1914688":"event","Q1918724":"event","Q1919760":"event","Q1926218":"event","Q1926589":"event","Q1943321":"event","Q1943330":"event","Q1944455":"event","Q1956478":"event","Q1956484":"event","Q1964273":"event","Q1977678":"event","Q1977689":"event","Q1981535":"event","Q1982890":"event","Q1983296":"event","Q1988018":"event","Q1989626":"event","Q2000667":"event","Q2000712":"event","Q2000899":"event","Q2000969":"event","Q2001330":"event","Q2001418":"event","Q2001423":"event","Q2034849":"event","Q2048934":"event","Q2065510":"event","Q2067749":"event","Q2070093":"event","Q2072630":"event","Q2087865":"event","Q2099680":"event","Q2102206":"event","Q2102204":"event","Q2104038":"event","Q2105303":"event","Q2105362":"event","Q2105361":"event","Q2108612":"event","Q2117459":"event","Q2152739":"event","Q2164862":"event","Q2175726":"event","Q2175869":"event","Q2177010":"event","Q2177019":"event","Q2177020":"event","Q2177040":"event","Q2205028":"event","Q2205295":"event","Q2216954":"event","Q2216952":"event","Q2223631":"event","Q2228875":"event","Q2249247":"event","Q2249252":"event","Q2249297":"event","Q2254761":"event","Q2254764":"event","Q2255260":"event","Q2255911":"event","Q2261202":"event","Q2271055":"event","Q2272115":"event","Q2272152":"event","Q2272156":"event","Q2272190":"event","Q2289123":"event","Q2289151":"event","Q2294542":"event","Q2294540":"event","Q2294583":"event","Q2295176":"event","Q2304242":"event","Q2304603":"event","Q2305039":"event","Q2315195":"event","Q2315299":"event","Q2353605":"event","Q2368560":"event","Q2368579":"event","Q2368577":"event","Q2368637":"event","Q2369781":"event","Q2372330":"event","Q2372973":"event","Q2376386":"event","Q2380385":"event","Q2380393":"event","Q2380447":"event","Q2380836":"event","Q2381177":"event","Q2388298":"event","Q2388904":"event","Q2392422":"event","Q2395088":"event","Q2457528":"event","Q2457619":"event","Q2457622":"event","Q2460806":"event","Q2464679":"event","Q2465009":"event","Q2467831":"event","Q2468228":"event","Q2472969":"event","Q2473864":"event","Q2473895":"event","Q2473892":"event","Q2474373":"event","Q2493431":"event","Q2522263":"event","Q2522738":"event","Q2540626":"event","Q2542334":"event","Q2550479":"event","Q2557307":"event","Q2564240":"event","Q2564374":"event","Q2564408":"event","Q2567276":"event","Q2593517":"event","Q2593712":"event","Q2600838":"event","Q2601690":"event","Q2604275":"event","Q2647774":"event","Q2660810":"event","Q2668171":"event","Q2673366":"event","Q2677993":"event","Q2678375":"event","Q2692250":"event","Q2692249":"event","Q2699419":"event","Q2708412":"event","Q2740408":"event","Q2791348":"event","Q2796024":"event","Q2920838":"event","Q2947213":"event","Q2947219":"event","Q2947670":"event","Q2947678":"event","Q5390385":"event","Q5481629":"event","Q6053670":"event","Q6952899":"event","Q10876320":"event","Q10888408":"event","Q11327932":"event","Q11389709":"event","Q11389738":"event","Q11390114":"event","Q11419798":"event","Q11421034":"event","Q12480205":"event","Q13425771":"event","Q13425769":"event","Q13425787":"event","Q13425794":"event","Q13425795":"event","Q13425807":"event","Q13425811":"event","Q13425813":"event","Q13425822":"event","Q13425820":"event","Q13425831":"event","Q13425838":"event","Q13425836":"event","Q13425842":"event","Q13425841":"event","Q13425845":"event","Q13425848":"event","Q13433401":"event","Q13440326":"event","Q13440635":"event","Q13476049":"event","Q13476139":"event","Q13481914":"event","Q13482000":"event","Q13482869":"event","Q13483119":"event","Q13486474":"event","Q13487266":"event","Q13487270":"event","Q13487282":"event","Q13504533":"event","Q13504537":"event","Q13505709":"event","Q13506458":"event","Q13506679":"event","Q13506957":"event","Q13506970":"event","Q13506974":"event","Q13507103":"event","Q13507290":"event","Q13507309":"event","Q13507314":"event","Q13507321":"event","Q13507326":"event","Q13507331":"event","Q13507387":"event","Q13507423":"event","Q13507585":"event","Q13518398":"event","Q13534150":"event","Q14191429":"event","Q14624995":"event","Q14627250":"event","Q14634758":"event","Q14646306":"event","Q14646316":"event","Q14646875":"event","Q14671734":"event","Q14702601":"event","Q14702604":"event","Q14719011":"event","Q14719014":"event","Q14847061":"event","Q14848223":"event","Q14848224":"event","Q14848225":"event","Q14920651":"event","Q14920652":"event","Q14924292":"event","Q14943523":"event","Q14943530":"event","Q15010886":"event","Q15012133":"event","Q15059709":"event","Q15059793":"event","Q15059798":"event","Q15059873":"event","Q15103181":"event","Q15244982":"event","Q15293777":"event","Q15293871":"event","Q15345977":"event","Q15346053":"event","Q15629323":"event","Q15730410":"event","Q15730408":"event","Q15784703":"event","Q15941614":"event","Q15941619":"event","Q15941628":"event","Q16325346":"event","Q16325350":"event","Q16548549":"event","Q16686153":"event","Q16725896":"event","Q16817374":"event","Q16872946":"event","Q17152453":"event","Q17166701":"event","Q17565737":"event","Q18171099":"event","Q18204130":"event","Q18342520":"event","Q18421661":"event","Q18524061":"event","Q18572173":"event","Q18638297":"event","Q18643370":"event","Q18643369":"event","Q18664082":"event","Q18668362":"event","Q18670367":"event","Q18713229":"event","Q18729894":"event","Q18759773":"event","Q18814377":"event","Q19118320":"event","Q19355314":"event","Q19467946":"event","Q20807089":"event","Q20807092":"event","Q20884549":"event","Q20884819":"event","Q22119585":"event","Q22120056":"event","Q22670106":"event","Q23687386":"event","Q23815643":"event","Q25468850":"event","Q26132559":"event","Q26206573":"event","Q26265941":"event","Q26265947":"event","Q26268654":"event","Q27118920":"event","Q27267358":"event","Q28090496":"event","Q28608792":"event","Q28920021":"event","Q29292973":"event","Q30093390":"event","Q30113252":"event","Q30143268":"event","Q33060692":"event","Q33076666":"event","Q33090228":"event","Q39995075":"event","Q39995177":"event","Q40287245":"event","Q40353592":"event","Q40353856":"event","Q40504484":"event","Q40733460":"event","Q41598960":"event","Q41633887":"event","Q41942238":"event","Q41946161":"event","Q41948885":"event","Q41952404":"event","Q42329067":"event","Q42614437":"event","Q42940471":"event","Q43289454":"event","Q44726365":"event","Q44845418":"event","Q45319806":"event","Q46219689":"event","Q46649143":"event","Q47045263":"event","Q47164937":"event","Q47407008":"event","Q47509275":"event","Q47509290":"event","Q47509294":"event","Q47509309":"event","Q49274380":"event","Q50074222":"event","Q50074494":"event","Q50298306":"event","Q50301923":"event","Q50301952":"event","Q50363106":"event","Q50363445":"event","Q50363453":"event","Q50363524":"event","Q50376394":"event","Q50381011":"event","Q50382567":"event","Q50382592":"event","Q50383283":"event","Q52734874":"event","Q52734927":"event","Q52735607":"event","Q53572574":"event","Q53572582":"event","Q53572691":"event","Q54196650":"event","Q55073977":"event","Q55691286":"event","Q55777361":"event","Q55971753":"event","Q56377965":"event","Q56422682":"event","Q56426226":"event","Q56492528":"event","Q56524515":"event","Q56545112":"event","Q56564298":"event","Q56564297":"event","Q56598959":"event","Q56598956":"event","Q56598970":"event","Q56605209":"event","Q56653854":"event","Q56809299":"event","Q56928388":"event","Q57003917":"event","Q57228612":"event","Q57450124":"event","Q57947373":"event","Q59181239":"event","Q59181274":"event","Q59555985":"event","Q62079816":"event","Q62081308":"event","Q62081740":"event","Q62985932":"event","Q63343131":"event","Q63845306":"event","Q63845307":"event","Q63845310":"event","Q63845311":"event","Q63845308":"event","Q63845309":"event","Q63845312":"event","Q63845313":"event","Q63845398":"event","Q63845399":"event","Q63845396":"event","Q63845397":"event","Q63845402":"event","Q63845403":"event","Q63845401":"event","Q63845405":"event","Q63845486":"event","Q63845487":"event","Q63845491":"event","Q63845488":"event","Q63845489":"event","Q63845494":"event","Q63845493":"event","Q63845496":"event","Q63845717":"event","Q63845721":"event","Q63845727":"event","Q63845724":"event","Q63845730":"event","Q63845733":"event","Q63845737":"event","Q63845743":"event","Q63845740":"event","Q63845942":"event","Q63845943":"event","Q63845941":"event","Q63845946":"event","Q63845947":"event","Q63845944":"event","Q63845945":"event","Q63845948":"event","Q63846030":"event","Q63846031":"event","Q63846029":"event","Q63846032":"event","Q63846033":"event","Q63846037":"event","Q63846040":"event","Q63846041":"event","Q63846135":"event","Q63846138":"event","Q63846136":"event","Q63846137":"event","Q63846191":"event","Q63846192":"event","Q63846193":"event","Q63854265":"event","Q63854272":"event","Q63925462":"event","Q64618050":"event","Q64875437":"event","Q64944636":"event","Q65048613":"event","Q65548946":"event","Q65548947":"event","Q65548945":"event","Q65552678":"event","Q65552679":"event","Q65552680":"event","Q65706137":"event","Q65725727":"event","Q65725724":"event","Q65725725":"event","Q65725729":"event","Q65735644":"event","Q65736363":"event","Q65736937":"event","Q65739095":"event","Q65739103":"event","Q65807190":"event","Q65807191":"event","Q65807194":"event","Q65807192":"event","Q65807193":"event","Q65807391":"event","Q65807394":"event","Q65807395":"event","Q65807392":"event","Q65807393":"event","Q65807398":"event","Q65807399":"event","Q65807396":"event","Q65807397":"event","Q65807400":"event","Q65807494":"event","Q65926798":"event","Q66023989":"event","Q66062438":"event","Q66127952":"event","Q66127959":"event","Q66127956":"event","Q66127957":"event","Q66127962":"event","Q66127963":"event","Q66127960":"event","Q66127961":"event","Q66127966":"event","Q66127967":"event","Q66127964":"event","Q66127965":"event","Q66207654":"event","Q67147038":"event","Q67147039":"event","Q67147043":"event","Q67147044":"event","Q67147067":"event","Q67147068":"event","Q67166219":"event","Q67166221":"event","Q67206715":"event","Q67491838":"event","Q109476821":"event","Q109859460":"event","Q109860089":"event","Q109860254":"event","Q110111868":"event","Q110385105":"event","Q110660804":"event","Q110818785":"event","Q110869635":"event","Q110939227":"event","Q111036119":"event","Q111036131":"event","Q111036132":"event","Q111036142":"event","Q111036146":"event","Q111036150":"event","Q111036151":"event","Q111036157":"event","Q111036162":"event","Q111036181":"event","Q111036189":"event","Q111036202":"event","Q111036219":"event","Q111036225":"event","Q111036229":"event","Q111036233":"event","Q111036237":"event","Q111036241":"event","Q111036245":"event","Q111036248":"event","Q111038586":"event","Q111038588":"event","Q111038594":"event","Q111038595":"event","Q111038596":"event","Q111038608":"event","Q111191574":"event","Q111191575":"event","Q67567806":"event","Q67567807":"event","Q67567805":"event","Q67567810":"event","Q67567809":"event","Q67567813":"event","Q67567816":"event","Q67567821":"event","Q67567826":"event","Q67567841":"event","Q67567845":"event","Q67567850":"event","Q68066457":"event","Q68066462":"event","Q68066468":"event","Q68066474":"event","Q68066493":"event","Q68066499":"event","Q69992823":"event","Q69993044":"event","Q71029213":"event","Q71363771":"event","Q71608701":"event","Q71609251":"event","Q71782233":"event","Q71788368":"event","Q72365643":"event","Q73989685":"event","Q75145522":"event","Q76386450":"event","Q76386460":"event","Q79132633":"event","Q79132790":"event","Q79132806":"event","Q79132828":"event","Q79313070":"event","Q79313616":"event","Q79967121":"event","Q79967943":"event","Q79978422":"event","Q80681226":"event","Q84068115":"event","Q86914384":"event","Q87086840":"event","Q94474207":"event","Q96880618":"event","Q100893968":"event","Q100977379":"event","Q101110957":"event","Q106653057":"event","Q106785811":"event","Q106785815":"event","Q106785813":"event","Q106785818":"event","Q106785819":"event","Q106854629":"event","Q107404408":"event","Q107410127":"event","Q107840466":"event","Q107843764":"event","Q108166416":"event","Q108324504":"event","Q108581862":"event","Q111191576":"event","Q111192678":"event","Q111192679":"event","Q111192681":"event","Q111192687":"event","Q111192684":"event","Q111201102":"event","Q111201276":"event","Q111217780":"event","Q111217789":"event","Q111217799":"event","Q111217796":"event","Q111217803":"event","Q111217805":"event","Q111217808":"event","Q111238705":"event","Q111238710":"event","Q111238714":"event","Q111238718":"event","Q111238716":"event","Q111238721":"event","Q111252395":"event","Q111252404":"event","Q111252405":"event","Q111252411":"event","Q111252414":"event","Q111252412":"event","Q111252419":"event","Q111252416":"event","Q111252417":"event","Q111267576":"event","Q111267581":"event","Q111267590":"event","Q111267588":"event","Q111279662":"event","Q111279667":"event","Q111279664":"event","Q111279669":"event","Q111281006":"event","Q111281004":"event","Q111281005":"event","Q111281011":"event","Q111281013":"event","Q111281018":"event","Q111285985":"event","Q111285993":"event","Q111286002":"event","Q111286003":"event","Q111286001":"event","Q111286006":"event","Q111286028":"event","Q111286029":"event","Q111291114":"event","Q111291115":"event","Q111291113":"event","Q111291118":"event","Q111291119":"event","Q111291116":"event","Q111291120":"event","Q111301343":"event","Q111301371":"event","Q111301373":"event","Q111305041":"event","Q111305062":"event","Q111305060":"event","Q111305065":"event","Q111305069":"event","Q111305240":"event","Q111305295":"event","Q111306282":"event","Q111306305":"event","Q111306310":"event","Q111306335":"event","Q111306351":"event","Q111310186":"event","Q111310191":"event","Q111310188":"event","Q111310192":"event","Q111310193":"event","Q111310217":"event","Q111364404":"event","Q111369405":"event","Q111837771":"event","Q66086":"event","Q132612":"event","Q1582987":"event","Q632343":"standard","Q2044498":"standard","Q10551470":"event","Q10869199":"event","Q16149104":"event","Q17990877":"event","Q55862681":"dataset","Q12561":"event","Q26706":"event","Q35856":"event","Q88173204":"event","Q98183947":"event","Q108581959":"event","Q111745047":"book","Q1003021":"dataset","Q526877":"broadcast","Q3511312":"broadcast","Q25670":"standard","Q7531819":"dataset","Q11971341":"dataset","Q12029619":"dataset","Q10685952":"broadcast","Q14324227":"dataset","Q16501309":"dataset","Q707372":"book","Q857836":"book","Q277222":"event","Q277768":"event","Q1003292":"book","Q506294":"event","Q586821":"event","Q626066":"event","Q742793":"event","Q847462":"event","Q851302":"event","Q207819":"standard","Q721667":"standard","Q795966":"standard","Q3297186":"book","Q852641":"standard","Q2992900":"event","Q1322065":"standard","Q2164287":"standard","Q3182386":"standard","Q3273017":"standard","Q15967335":"software","Q7093850":"book","Q5974436":"standard","Q8018402":"event","Q10869080":"event","Q10875631":"event","Q10926241":"event","Q12899593":"book","Q11224332":"standard","Q16688308":"event","Q17163851":"event","Q28168011":"software","Q21190961":"book","Q21191134":"book","Q20665106":"standard","Q20665104":"standard","Q20665174":"standard","Q24833906":"event","Q24887203":"event","Q25381816":"event","Q29178266":"standard","Q33113349":"event","Q37822576":"standard","Q50599084":"event","Q52681713":"event","Q52771586":"event","Q51686074":"standard","Q65230396":"event","Q90878157":"dataset","Q90878165":"dataset","Q74262765":"book","Q96106098":"dataset","Q104587594":"dataset","Q105921971":"dataset","Q106133829":"dataset","Q106257158":"dataset","Q98073985":"webpage","Q105834419":"software","Q103839756":"event","Q83378654":"webpage","Q10400522":"periodical","Q10400521":"periodical","Q10400525":"periodical","Q210337":"software","Q653475":"software","Q751850":"software","Q1050567":"software","Q1639024":"software","Q2467310":"software","Q2506554":"software","Q3653635":"software","Q4497736":"software","Q5738835":"software","Q7485604":"software","Q739672":"book","Q129372":"event","Q163243":"event","Q852395":"event","Q1519335":"book","Q1070156":"event","Q1105365":"event","Q1275557":"event","Q10852089":"software","Q1306889":"event","Q1473981":"event","Q11387554":"software","Q81414":"standard","Q126998":"standard","Q184230":"standard","Q203087":"standard","Q2176422":"event","Q2672785":"event","Q909736":"standard","Q957589":"standard","Q2913791":"event","Q1128629":"standard","Q1131705":"standard","Q1254335":"standard","Q1422324":"standard","Q1648707":"standard","Q1654055":"standard","Q3595351":"event","Q2044242":"standard","Q3978087":"event","Q2622793":"standard","Q5103581":"event","Q5121078":"event","Q3359815":"standard","Q3408089":"standard","Q5439557":"event","Q4112081":"standard","Q15548075":"software","Q15562063":"software","Q15614005":"software","Q5012982":"standard","Q5013874":"standard","Q7191343":"event","Q7193242":"event","Q7193247":"event","Q7309795":"event","Q7440363":"event","Q17138243":"software","Q7603676":"event","Q7676111":"event","Q24966456":"software","Q15900647":"event","Q28050159":"software","Q21886655":"event","Q25112226":"event","Q25685889":"event","Q24091098":"standard","Q28100410":"event","Q30589009":"event","Q11382506":"webpage","Q15475226":"webpage","Q15475319":"webpage","Q15633587":"webpage","Q47459256":"event","Q64769132":"software","Q66088840":"software","Q58743167":"event","Q31209114":"webpage","Q62505":"software","Q65048633":"event","Q65498626":"standard","Q65498858":"standard","Q65498884":"standard","Q65498996":"standard","Q10283":"event","Q42416093":"webpage","Q8777":"standard","Q8795":"standard","Q81881796":"event","Q58494026":"webpage","Q96473852":"standard","Q106169352":"event","Q104985816":"standard","Q109623729":"event","Q110729709":"event","Q111519484":"standard","Q8027877":"legal_case","Q2594143":"dataset","Q3918025":"song","Q4130112":"song","Q4329943":"song","Q4367044":"song","Q182495":"software","Q569915":"software","Q994121":"software","Q12090126":"song","Q12090507":"song","Q12104691":"song","Q12113375":"song","Q12115862":"song","Q12140332":"song","Q12149338":"song","Q12154183":"song","Q12168212":"song","Q2207210":"software","Q25324216":"periodical","Q16635474":"song","Q194796":"event","Q245512":"event","Q960511":"event","Q964741":"event","Q1072326":"event","Q30044873":"report","Q1477846":"event","Q1892297":"event","Q1931444":"event","Q2142757":"event","Q2346191":"event","Q2627841":"event","Q2629138":"event","Q2819305":"event","Q3023688":"event","Q3092943":"event","Q3107744":"event","Q3114398":"event","Q1384925":"standard","Q3524717":"event","Q7904542":"event","Q28704212":"song","Q29573701":"dataset","Q10895016":"legislation","Q26205359":"webpage","Q16637328":"event","Q16821191":"event","Q17315159":"event","Q18469476":"event","Q18521515":"event","Q20819742":"event","Q22907900":"standard","Q27832699":"event","Q27832702":"event","Q27832706":"event","Q27832704":"event","Q27832710":"event","Q27832715":"event","Q27832712":"event","Q27832718":"event","Q27832724":"event","Q27832728":"event","Q27832734":"event","Q27832732":"event","Q27832739":"event","Q27832737":"event","Q52087504":"song","Q17218112":"performance","Q56358499":"song","Q39081581":"event","Q57312861":"webpage","Q48855846":"event","Q48862300":"event","Q48872399":"event","Q51279780":"event","Q63968276":"event","Q63968290":"event","Q63968288":"event","Q63968955":"event","Q63969026":"event","Q63969031":"event","Q63969028":"event","Q63969035":"event","Q104867611":"legal_case","Q97574586":"dataset","Q105552696":"dataset","Q85341842":"event","Q86009876":"event","Q111600206":"song","Q99521375":"event","Q109615627":"webpage","Q106592283":"standard","Q106592291":"standard","Q106592289":"standard","Q289543":"event","Q303372":"event","Q375423":"event","Q500860":"event","Q502948":"event","Q603536":"event","Q642482":"event","Q773327":"event","Q781434":"event","Q892194":"event","Q919925":"event","Q958723":"event","Q973759":"event","Q979392":"event","Q1032219":"event","Q1096045":"event","Q1170415":"event","Q1204189":"event","Q1261456":"event","Q1285570":"event","Q1318363":"event","Q1330699":"event","Q1360577":"event","Q1376860":"event","Q1475171":"event","Q1529643":"event","Q1544612":"event","Q1548381":"event","Q1563816":"event","Q1579285":"event","Q1666410":"event","Q1672884":"event","Q1672910":"event","Q1789500":"event","Q2031197":"event","Q2037951":"event","Q2731488":"event","Q3306648":"event","Q3335008":"event","Q4035886":"event","Q4036033":"event","Q4036509":"event","Q4040830":"event","Q4042133":"event","Q4044273":"event","Q4045306":"event","Q4047234":"event","Q4047235":"event","Q4048102":"event","Q4048105":"event","Q4993329":"event","Q4993677":"event","Q10525929":"event","Q14405816":"event","Q15047133":"event","Q15176819":"event","Q15790888":"event","Q15848022":"event","Q16828501":"event","Q17507505":"event","Q17984898":"event","Q18432335":"event","Q19577175":"event","Q20747688":"event","Q21089539":"event","Q21999753":"event","Q22079925":"event","Q22336953":"event","Q23022267":"event","Q23072367":"event","Q24553364":"event","Q25172016":"event","Q25380042":"event","Q27212388":"event","Q27630808":"event","Q27676063":"event","Q28936398":"event","Q30334461":"event","Q30600938":"event","Q33311724":"event","Q42062109":"event","Q47831465":"event","Q48813387":"event","Q50358729":"event","Q50378024":"event","Q50385398":"event","Q55636069":"event","Q56383693":"event","Q56753361":"event","Q56753469":"event","Q57308278":"event","Q57470579":"event","Q57470646":"event","Q60041851":"event","Q60428654":"event","Q60617178":"event","Q60690987":"event","Q61412708":"event","Q62086468":"event","Q68919477":"event","Q849666":"motion_picture","Q110086297":"book","Q110425279":"book","Q110643319":"book","Q110718502":"event","Q111028916":"event","Q18089617":"motion_picture","Q5974118":"webpage","Q184740":"book","Q301671":"book","Q1221280":"book","Q615072":"event","Q623109":"event","Q637848":"event","Q1536279":"book","Q1539532":"book","Q938458":"event","Q1167252":"event","Q1344269":"event","Q1376770":"event","Q1563081":"event","Q1628661":"event","Q2383890":"book","Q11888968":"webpage","Q2558958":"book","Q2290593":"event","Q3109302":"book","Q3257804":"book","Q2806793":"event","Q2814440":"event","Q2817758":"event","Q4504462":"book","Q3892502":"event","Q3892574":"event","Q4364848":"event","Q4778419":"event","Q5793767":"book","Q5834682":"book","Q15883028":"webpage","Q7081172":"book","Q7102502":"book","Q7157512":"event","Q7295180":"event","Q11512680":"book","Q21286738":"webpage","Q15259995":"event","Q16954248":"book","Q16675435":"event","Q16764895":"event","Q18396864":"book","Q18033451":"event","Q18560568":"event","Q80353":"performance","Q278329":"performance","Q597009":"performance","Q17560541":"standard","Q865096":"performance","Q868250":"performance","Q1044551":"performance","Q1348595":"performance","Q20737410":"book","Q21007842":"book","Q21008249":"book","Q22669562":"book","Q3564871":"performance","Q4737503":"performance","Q23869445":"event","Q25999229":"event","Q26183114":"event","Q7843547":"performance","Q27954955":"event","Q9655765":"performance","Q28954851":"event","Q44198061":"event","Q56298568":"webpage","Q65137675":"book","Q66363341":"book","Q70106932":"event","Q74445032":"event","Q76826681":"event","Q36103":"performance","Q104829457":"event","Q105492335":"event","Q105492332":"event","Q106782362":"book","Q106453208":"event","Q106457682":"event","Q106541812":"event","Q106542375":"event","Q106600824":"event","Q106601420":"event","Q106612724":"event","Q106612926":"event","Q106613506":"event","Q107301475":"event","Q107407050":"event","Q107642314":"event","Q321745":"periodical","Q2188827":"manuscript","Q5647631":"manuscript","Q2138567":"dataset","Q2792831":"dataset","Q3456824":"dataset","Q4291954":"dataset","Q7309365":"dataset","Q9067655":"dataset","Q10649598":"dataset","Q10657704":"dataset","Q609331":"software","Q11452068":"dataset","Q864680":"software","Q2492841":"software","Q4677166":"software","Q16516429":"dataset","Q18694602":"dataset","Q28404878":"motion_picture","Q19381281":"dataset","Q206270":"book","Q1099524":"book","Q1159457":"book","Q543429":"event","Q1225344":"book","Q653604":"event","Q744040":"event","Q897119":"event","Q1057959":"event","Q1418168":"event","Q2142464":"event","Q576465":"standard","Q3424305":"book","Q3440922":"book","Q2819161":"event","Q2922711":"event","Q3310228":"event","Q3986798":"event","Q4906520":"event","Q5159882":"event","Q7208288":"book","Q7399161":"book","Q7122263":"event","Q7265401":"event","Q7432280":"event","Q7450654":"event","Q7503184":"event","Q7768411":"event","Q7987778":"event","Q19868416":"software","Q15726348":"book","Q16256406":"event","Q16969891":"event","Q16975506":"event","Q18166183":"event","Q20665028":"book","Q21683658":"book","Q22095332":"event","Q23662496":"event","Q27683265":"event","Q59157850":"dataset","Q39087320":"event","Q51937413":"book","Q51938153":"book","Q51954180":"book","Q55567596":"book","Q55569052":"book","Q55571976":"book","Q55007268":"event","Q61629906":"event","Q66623743":"book","Q29144":"event","Q32096":"event","Q56707":"event","Q71723427":"book","Q91500776":"dataset","Q107243694":"article-journal","Q102260507":"broadcast","Q104951794":"dataset","Q106892082":"dataset","Q111703312":"dataset","Q101067831":"event","Q104760099":"book","Q106027598":"book","Q106088788":"book","Q105445345":"event","Q106232233":"event","Q106616204":"event","Q106909852":"event","Q2290276":"broadcast","Q3252662":"broadcast","Q96286657":"webpage","Q5287435":"broadcast","Q7923105":"broadcast","Q1071233":"software","Q13359539":"broadcast","Q491053":"event","Q491505":"event","Q675180":"event","Q1905729":"event","Q2104048":"event","Q2203703":"event","Q21191265":"broadcast","Q2755354":"event","Q3264518":"event","Q3454043":"event","Q4160913":"event","Q4969278":"event","Q5071582":"event","Q5099539":"event","Q5270745":"event","Q5282202":"event","Q5299874":"event","Q5438764":"event","Q5928466":"event","Q5956294":"event","Q6137959":"event","Q6469427":"event","Q7243772":"event","Q7244376":"event","Q7244610":"event","Q7244625":"event","Q7244800":"event","Q7267967":"event","Q7270477":"event","Q7311750":"event","Q7332332":"event","Q7516042":"event","Q7615667":"event","Q7936339":"event","Q8039744":"event","Q10869075":"event","Q10873376":"event","Q10874846":"event","Q11065422":"event","Q29555881":"broadcast","Q11251820":"event","Q11261368":"event","Q11578736":"event","Q12323689":"event","Q14360312":"event","Q17051146":"event","Q17189483":"event","Q18121235":"event","Q22100745":"event","Q24839291":"event","Q30942770":"event","Q50062923":"broadcast","Q50914552":"broadcast","Q61220733":"broadcast","Q16869909":"webpage","Q16905922":"webpage","Q19648608":"webpage","Q21278897":"webpage","Q50584731":"event","Q29197":"broadcast","Q50820765":"event","Q72607030":"broadcast","Q55732365":"event","Q79766755":"broadcast","Q79768983":"broadcast","Q79769107":"broadcast","Q79769844":"broadcast","Q79770458":"broadcast","Q79770638":"broadcast","Q79848748":"broadcast","Q79848760":"broadcast","Q99079902":"broadcast","Q99296898":"broadcast","Q102364578":"broadcast","Q104438898":"broadcast","Q86737046":"event","Q86743033":"event","Q106082402":"broadcast","Q110288240":"broadcast","Q110372546":"broadcast","Q111660893":"broadcast","Q111805666":"broadcast","Q111829292":"broadcast","Q111851297":"broadcast","Q98806339":"event","Q98806373":"event","Q98806417":"event","Q98806455":"event","Q98806479":"event","Q98806494":"event","Q98806492":"event","Q244955":"song","Q265147":"song","Q582093":"song","Q604748":"song","Q849305":"song","Q867914":"song","Q965834":"song","Q1027114":"song","Q1490620":"dataset","Q1120530":"song","Q1320248":"song","Q2554974":"dataset","Q2707688":"song","Q2747852":"song","Q3307269":"dataset","Q2956242":"song","Q2956240":"song","Q2956246":"song","Q2997110":"song","Q3423635":"dataset","Q4067146":"song","Q4371786":"song","Q4444254":"song","Q5058545":"song","Q5725591":"song","Q5771033":"song","Q6084315":"song","Q6089610":"song","Q6105825":"song","Q6132291":"song","Q6160688":"song","Q97498045":"webpage","Q7663254":"song","Q7935998":"song","Q99264677":"webpage","Q13164291":"song","Q18324847":"song","Q339991":"book","Q798985":"event","Q953136":"event","Q1338800":"event","Q1367591":"event","Q21653515":"song","Q21654728":"song","Q2300997":"event","Q2308238":"event","Q2954322":"event","Q25386691":"song","Q25400286":"song","Q28163991":"song","Q11314585":"book","Q11999894":"book","Q14856232":"event","Q18748056":"book","Q19509393":"book","Q39046042":"song","Q23641696":"book","Q23011722":"event","Q23058950":"event","Q23058951":"event","Q23058954":"event","Q23058955":"event","Q23058952":"event","Q23058959":"event","Q24282796":"book","Q23719064":"event","Q23755128":"event","Q24457192":"book","Q24457232":"book","Q24050099":"event","Q25381170":"book","Q26204053":"book","Q56558213":"song","Q60792489":"song","Q47015434":"book","Q60566516":"book","Q64058005":"event","Q300":"book","Q74123387":"event","Q100321326":"song","Q108297178":"song","Q108297215":"song","Q109018310":"song","Q98758865":"event","Q100235041":"standard","Q100235128":"standard","Q104637634":"event","Q618254":"event","Q649930":"event","Q1059994":"event","Q1501660":"event","Q1661524":"event","Q2108803":"event","Q2301224":"event","Q3209535":"event","Q3389165":"event","Q4366088":"event","Q4735619":"event","Q4743621":"event","Q5029004":"event","Q5290181":"event","Q5448077":"event","Q5899429":"event","Q6313295":"event","Q6448126":"event","Q7542322":"event","Q7700500":"event","Q7856853":"event","Q10509145":"event","Q10715702":"event","Q11685509":"event","Q11968694":"event","Q17115912":"event","Q17624166":"event","Q18400581":"event","Q18890098":"event","Q18890124":"event","Q19118609":"event","Q19605587":"event","Q21511345":"event","Q22833318":"event","Q26897352":"event","Q47358534":"event","Q47465437":"event","Q49870668":"event","Q51624051":"event","Q56231131":"event","Q63874701":"event","Q84470557":"dataset","Q64641382":"event","Q64641394":"event","Q64657694":"event","Q64667852":"event","Q64681730":"event","Q64691832":"event","Q64706513":"event","Q64715490":"event","Q64741346":"event","Q64775779":"event","Q64784663":"event","Q64784716":"event","Q64786445":"event","Q64786527":"event","Q64788184":"event","Q64819746":"event","Q64825625":"event","Q64831519":"event","Q64831521":"event","Q64831583":"event","Q64847663":"event","Q64848420":"event","Q64848430":"event","Q64850498":"event","Q64850496":"event","Q64864971":"event","Q64912702":"event","Q64917162":"event","Q64944559":"event","Q64952244":"event","Q64994967":"event","Q64995931":"event","Q65013127":"event","Q65032927":"event","Q65044046":"event","Q65044048":"event","Q65048341":"event","Q65063969":"event","Q65065277":"event","Q65078705":"event","Q65088436":"event","Q65104958":"event","Q79539844":"event","Q104217129":"book","Q108611979":"event","Q108761755":"event","Q108858827":"event","Q108934264":"event","Q109302750":"event","Q109606336":"event","Q109619439":"event","Q110226279":"event","Q110226282":"event","Q111072137":"event","Q111274809":"event","Q111552269":"event","Q111552433":"event","Q111621266":"event","Q111628470":"event","Q109971736":"standard","Q109971762":"standard","Q111995276":"event","Q111496643":"standard","Q7434450":"software","Q429049":"event","Q458206":"event","Q1069698":"event","Q3070337":"event","Q3298291":"event","Q4732183":"event","Q5264306":"event","Q5573020":"event","Q6034714":"event","Q6212347":"event","Q7844979":"event","Q9031850":"event","Q10354901":"event","Q11410674":"event","Q11506025":"event","Q18907876":"event","Q20108719":"event","Q20429197":"event","Q28207296":"standard","Q41582469":"event","Q48879222":"event","Q48879225":"event","Q48879275":"event","Q48879277":"event","Q48879303":"event","Q48879306":"event","Q48879307":"event","Q48879327":"event","Q48879329":"event","Q52387412":"event","Q52387417":"event","Q55545766":"event","Q55631298":"event","Q59009655":"event","Q61350640":"event","Q61409194":"event","Q61409316":"event","Q61862142":"event","Q65148846":"event","Q65159055":"event","Q65159057":"event","Q65480326":"event","Q65507994":"event","Q65548297":"event","Q65553461":"event","Q65556452":"event","Q65598523":"event","Q65619883":"event","Q65620048":"event","Q65648686":"event","Q66311725":"event","Q66311885":"event","Q66313508":"event","Q67447052":"event","Q67447095":"event","Q76941636":"event","Q97361908":"broadcast","Q83507038":"event","Q97178504":"event","Q97276907":"event","Q98971225":"event","Q104525773":"event","Q104538110":"event","Q106043413":"event","Q106562461":"event","Q106644070":"event","Q106834892":"event","Q106978496":"event","Q107009735":"event","Q107118086":"event","Q107540719":"event","Q108141120":"event","Q108167569":"event","Q108337727":"event","Q110226297":"event","Q110226307":"event","Q110813292":"event","Q110814366":"event","Q110814403":"event","Q110815346":"event","Q110815347":"event","Q110815345":"event","Q110815348":"event","Q110857470":"event","Q110858542":"event","Q110858547":"event","Q110858544":"event","Q110858545":"event","Q110858549":"event","Q110858554":"event","Q110858552":"event","Q110858561":"event","Q110858566":"event","Q110858564":"event","Q110858571":"event","Q110858574":"event","Q110858572":"event","Q110858573":"event","Q110858576":"event","Q110858598":"event","Q110858613":"event","Q110997026":"event","Q110997027":"event","Q110997030":"event","Q110997031":"event","Q110997028":"event","Q110997029":"event","Q110997033":"event","Q110997080":"event","Q2584671":"motion_picture","Q3454252":"motion_picture","Q2357684":"dataset","Q17175676":"motion_picture","Q26196748":"motion_picture","Q7978623":"software","Q217192":"book","Q742460":"legislation","Q242068":"event","Q248554":"event","Q935780":"book","Q1494791":"book","Q1623122":"book","Q1678499":"event","Q1869055":"event","Q2966833":"book","Q777955":"standard","Q1480633":"standard","Q3540503":"event","Q88324033":"regulation","Q88324058":"regulation","Q89681240":"regulation","Q91104866":"regulation","Q11383281":"event","Q15138918":"event","Q16681240":"event","Q16681244":"event","Q37731261":"song","Q18411082":"event","Q20821966":"event","Q26819140":"event","Q29943361":"standard","Q29943364":"standard","Q35231018":"event","Q35231086":"event","Q41071806":"event","Q51052348":"event","Q223625":"regulation","Q562667":"treaty","Q2135443":"regulation","Q57980469":"event","Q6725585":"regulation","Q7251380":"regulation","Q67946764":"event","Q17037999":"regulation","Q93995803":"dataset","Q97449690":"song","Q99640601":"event","Q99654627":"event","Q99654739":"event","Q99654809":"event","Q99655046":"event","Q99655076":"event","Q99655647":"event","Q99655654":"event","Q99655660":"event","Q99655665":"event","Q99655670":"event","Q99655674":"event","Q99655684":"event","Q99735927":"event","Q107494071":"event","Q2973154":"motion_picture","Q5620056":"motion_picture","Q1966622":"song","Q212434":"event","Q426729":"event","Q589184":"event","Q622383":"event","Q666840":"event","Q1046221":"event","Q1046254":"event","Q1047162":"event","Q1133950":"event","Q1186515":"event","Q1193637":"event","Q1325137":"event","Q1363953":"event","Q1478081":"event","Q1478084":"event","Q1863006":"event","Q2057656":"event","Q2734141":"event","Q2869095":"event","Q2869225":"event","Q2887191":"event","Q2922871":"event","Q2922905":"event","Q3008386":"event","Q3057773":"event","Q3126700":"event","Q3440468":"event","Q3452924":"event","Q3641551":"event","Q3650366":"event","Q3892348":"event","Q3892442":"event","Q3952242":"event","Q3998588":"event","Q4366001":"event","Q4806651":"event","Q4815578":"event","Q4815583":"event","Q4867733":"event","Q4867739":"event","Q4867736":"event","Q4875783":"event","Q4931300":"event","Q4936994":"event","Q4951243":"event","Q5033154":"event","Q5153755":"event","Q5184997":"event","Q5192575":"event","Q5198622":"event","Q5198620":"event","Q5215424":"event","Q5284371":"event","Q5305318":"event","Q5443199":"event","Q5443202":"event","Q5447065":"event","Q5463571":"event","Q5466169":"event","Q5466173":"event","Q5624491":"event","Q5647309":"event","Q5732939":"event","Q5966065":"event","Q5966758":"event","Q5966840":"event","Q5966935":"event","Q6362591":"event","Q7782444":"event","Q11612178":"book","Q21484471":"webpage","Q30605374":"event","Q47351865":"event","Q47352001":"event","Q47352086":"event","Q47352170":"event","Q47352240":"event","Q47449779":"event","Q50843310":"event","Q109653432":"motion_picture","Q105770631":"webpage","Q98557322":"legislation","Q492951":"motion_picture","Q110969762":"event","Q111140972":"event","Q111141428":"event","Q1072356":"book","Q2122918":"book","Q3295609":"book","Q4200760":"event","Q5966998":"event","Q5967267":"event","Q5967351":"event","Q6123108":"event","Q6160041":"event","Q6304153":"event","Q6304156":"event","Q6304160":"event","Q6356041":"event","Q6368757":"event","Q7129601":"event","Q7361076":"event","Q7569301":"event","Q7658365":"event","Q7673414":"event","Q7894227":"event","Q8035768":"event","Q8038086":"event","Q10286747":"event","Q10367086":"event","Q10882647":"event","Q10882840":"event","Q14851978":"event","Q14855244":"event","Q14916389":"event","Q15978401":"event","Q16147222":"event","Q16166945":"event","Q16841345":"event","Q16851022":"event","Q16982887":"event","Q17125181":"event","Q17149468":"event","Q18216875":"event","Q19882131":"event","Q20713534":"event","Q20713549":"event","Q52207310":"motion_picture","Q52207399":"motion_picture","Q23356219":"book","Q24948032":"event","Q25042727":"event","Q25047428":"event","Q25220992":"event","Q26132862":"event","Q26996240":"event","Q27862684":"event","Q27962621":"event","Q30682355":"event","Q35718073":"event","Q39055625":"event","Q48781520":"event","Q50472594":"event","Q50686271":"event","Q53062420":"event","Q53967335":"event","Q56275855":"event","Q58867406":"event","Q58867834":"event","Q59699947":"event","Q65129733":"event","Q65202159":"event","Q72011280":"event","Q72011538":"event","Q72011642":"event","Q84476898":"event","Q85743991":"event","Q85743989":"event","Q85743995":"event","Q85743997":"event","Q85744000":"event","Q85745592":"event","Q85748479":"event","Q85754555":"event","Q85769951":"event","Q85782609":"event","Q85786015":"event","Q85804527":"event","Q85804530":"event","Q96371075":"event","Q98650163":"event","Q104835757":"event","Q104860438":"event","Q104863907":"event","Q104870655":"event","Q104871260":"event","Q104873856":"event","Q105320308":"event","Q105320442":"event","Q106015658":"event","Q107404398":"event","Q110135832":"book","Q216315":"event","Q221259":"event","Q270166":"event","Q277593":"event","Q304918":"event","Q376996":"event","Q511855":"event","Q522661":"event","Q522786":"event","Q527589":"event","Q537000":"event","Q547348":"event","Q565448":"event","Q586010":"event","Q613542":"event","Q651760":"event","Q698783":"event","Q743595":"event","Q766663":"event","Q843256":"event","Q869563":"event","Q891243":"event","Q908784":"event","Q908828":"event","Q908870":"event","Q1482264":"event","Q2072755":"event","Q300851":"standard","Q731128":"standard","Q2576723":"event","Q785247":"standard","Q2748086":"event","Q1206939":"standard","Q3712211":"book","Q1562489":"standard","Q3461863":"event","Q4423780":"book","Q2330096":"standard","Q4435061":"event","Q4999776":"event","Q6158568":"book","Q3788482":"standard","Q6648456":"book","Q6084623":"event","Q6084979":"event","Q7240444":"event","Q16856825":"software","Q12623394":"book","Q13135720":"book","Q30721375":"book","Q37784323":"book","Q56191922":"software","Q55443535":"book","Q55594100":"book","Q55594114":"book","Q55594143":"book","Q55594435":"book","Q55594452":"book","Q55619801":"book","Q55619935":"book","Q55620443":"book","Q55623087":"book","Q55623753":"book","Q55624423":"book","Q55625587":"book","Q55625828":"book","Q55633982":"book","Q55671315":"book","Q55693697":"book","Q55695009":"book","Q55739666":"book","Q55739723":"book","Q55758901":"book","Q55758954":"book","Q55759018":"book","Q55768581":"book","Q55768668":"book","Q55938552":"book","Q56012644":"book","Q56398267":"event","Q61752993":"book","Q63214346":"event","Q65090058":"standard","Q98277904":"periodical","Q29861":"event","Q77940145":"book","Q77942102":"book","Q77944268":"book","Q77944409":"book","Q77944785":"book","Q86598505":"book","Q87479384":"event","Q98539261":"event","Q98539274":"event","Q909952":"event","Q912196":"event","Q913252":"event","Q925355":"event","Q926026":"event","Q1050132":"event","Q1068673":"event","Q1071351":"event","Q1071357":"event","Q1080415":"event","Q1080427":"event","Q1080438":"event","Q1082815":"event","Q1179231":"event","Q1179427":"event","Q1510056":"event","Q1548839":"event","Q2037281":"event","Q2704271":"event","Q2815227":"event","Q3054061":"event","Q3505844":"event","Q3598049":"event","Q6843620":"event","Q7335381":"event","Q11481410":"event","Q11903556":"event","Q20972355":"event","Q42431080":"event","Q56353850":"event","Q74825616":"event","Q74831359":"event","Q74831402":"event","Q86731128":"event","Q96243426":"event","Q97165139":"event","Q97165154":"event","Q97171040":"event","Q98799820":"event","Q98803888":"event","Q98804452":"event","Q98843046":"event","Q98843068":"event","Q98843135":"event","Q98844607":"event","Q99343759":"event","Q99347157":"event","Q99347565":"event","Q99353255":"event","Q99354278":"event","Q99430206":"event","Q99430267":"event","Q99430287":"event","Q99430607":"event","Q99430799":"event","Q99430809":"event","Q99431720":"event","Q99432320":"event","Q99441932":"event","Q99441952":"event","Q99441974":"event","Q99441995":"event","Q99443044":"event","Q99443817":"event","Q99444147":"event","Q99472045":"event","Q99520829":"event","Q99540178":"event","Q99540822":"event","Q99540868":"event","Q99540889":"event","Q99540908":"event","Q99540929":"event","Q99654384":"event","Q99654458":"event","Q99662602":"event","Q99662712":"event","Q99662805":"event","Q99662853":"event","Q99663085":"event","Q99664737":"event","Q99688417":"event","Q99843977":"event","Q99844297":"event","Q99844568":"event","Q99844758":"event","Q99846300":"event","Q99846964":"event","Q99936871":"event","Q100137290":"event","Q100137363":"event","Q100137669":"event","Q100165583":"event","Q100165758":"event","Q100165793":"event","Q100165825":"event","Q100165898":"event","Q100166026":"event","Q104762953":"event","Q105676265":"event","Q108715248":"event","Q108732020":"event","Q108738628":"event","Q108738758":"event","Q108738891":"event","Q108748847":"event","Q108748998":"event","Q108759581":"event","Q108769188":"event","Q108769575":"event","Q108769634":"event","Q108769927":"event","Q108936089":"event","Q109233425":"event","Q109964663":"book","Q109471870":"event","Q109473326":"event","Q109984849":"event","Q110357911":"event","Q110358837":"event","Q111489136":"book","Q110887248":"event","Q110888093":"event","Q110888126":"event","Q111042820":"event","Q111050070":"event","Q1250520":"dataset","Q1394657":"dataset","Q303871":"event","Q587679":"event","Q635103":"event","Q836943":"event","Q1005339":"event","Q1005679":"event","Q1152266":"event","Q1152265":"event","Q1152270":"event","Q1152271":"event","Q1152273":"event","Q1188732":"event","Q1188737":"event","Q1188740":"event","Q1202088":"event","Q1202089":"event","Q1202094":"event","Q1202092":"event","Q1202093":"event","Q1205216":"event","Q1222273":"event","Q1222562":"event","Q1420666":"event","Q1548436":"event","Q2091206":"event","Q2516049":"event","Q3653440":"event","Q3748339":"event","Q7378519":"event","Q8228881":"event","Q12164334":"event","Q15079786":"book","Q20151226":"event","Q26887428":"event","Q28025056":"event","Q60536252":"dataset","Q59139015":"dataset","Q55140060":"event","Q57539893":"event","Q59134402":"event","Q57695955":"standard","Q60147786":"event","Q58787903":"standard","Q61630069":"event","Q7852":"event","Q88291753":"book","Q104636634":"software","Q98017851":"event","Q98017920":"event","Q99299800":"event","Q99617648":"event","Q106129926":"event","Q106345759":"event","Q106345798":"event","Q107435280":"book","Q106958550":"event","Q106959885":"event","Q107629937":"event","Q108159060":"event","Q108453748":"event","Q548206":"motion_picture","Q109969754":"book","Q385271":"dataset","Q762917":"song","Q1631107":"dataset","Q1905727":"song","Q1973860":"song","Q3976062":"song","Q5051330":"dataset","Q6941730":"dataset","Q17300027":"periodical","Q11418206":"song","Q209939":"book","Q368281":"book","Q260858":"event","Q963099":"book","Q385739":"event","Q459459":"event","Q670265":"event","Q1375427":"event","Q2409117":"event","Q2550299":"event","Q2949123":"event","Q4653676":"event","Q5278333":"event","Q5570217":"event","Q13360129":"event","Q14830021":"event","Q15111554":"event","Q16541164":"event","Q19384767":"event","Q20737336":"book","Q21884005":"standard","Q47114558":"dataset","Q30325538":"event","Q30681640":"event","Q65494848":"report","Q64224805":"broadcast","Q59152282":"software","Q58232557":"book","Q59854802":"book","Q60713210":"book","Q62019336":"book","Q59560196":"standard","Q7973721":"regulation","Q61782519":"dataset","Q64251310":"event","Q65596297":"book","Q65598315":"book","Q65598478":"book","Q65598493":"book","Q10898474":"regulation","Q106554914":"song","Q106797790":"broadcast","Q109501804":"broadcast","Q109654109":"broadcast","Q109677093":"broadcast","Q109684855":"broadcast","Q109750820":"broadcast","Q110438165":"broadcast","Q110730867":"broadcast","Q102336992":"software","Q102337068":"software","Q105038301":"software","Q105443475":"event","Q105443516":"event","Q105443545":"event","Q105452088":"event","Q105479764":"event","Q105589549":"event","Q108887198":"event","Q108454654":"standard","Q111421098":"event","Q11545359":"map","Q423189":"webpage","Q6542723":"software","Q7246937":"software","Q281829":"event","Q1392593":"event","Q1417098":"event","Q2127960":"dataset","Q1782935":"event","Q2583265":"book","Q2040963":"event","Q2777879":"event","Q2998897":"event","Q3092269":"event","Q3578301":"event","Q7278753":"book","Q10526654":"event","Q11411772":"event","Q95349143":"regulation","Q12949048":"event","Q17067427":"event","Q19952562":"event","Q73897568":"periodical","Q55426935":"event","Q56068367":"event","Q65150416":"event","Q72284214":"event","Q72591660":"event","Q72592003":"event","Q72601141":"event","Q72601146":"event","Q72601149":"event","Q72601153":"event","Q72601159":"event","Q72601161":"event","Q72601168":"event","Q72601172":"event","Q72601178":"event","Q72601181":"event","Q72601191":"event","Q72601197":"event","Q72601202":"event","Q72601208":"event","Q72601212":"event","Q72601217":"event","Q72601221":"event","Q72601226":"event","Q72601224":"event","Q72601231":"event","Q72601237":"event","Q72601244":"event","Q72601250":"event","Q72601254":"event","Q72601257":"event","Q72601261":"event","Q72601267":"event","Q72601271":"event","Q72601276":"event","Q72601283":"event","Q72601291":"event","Q72601297":"event","Q72601303":"event","Q72601311":"event","Q72601309":"event","Q72601318":"event","Q72601322":"event","Q72601327":"event","Q72601330":"event","Q72601340":"event","Q72601346":"event","Q72601351":"event","Q72601354":"event","Q72601358":"event","Q72607814":"event","Q76289061":"event","Q77454236":"event","Q78793696":"event","Q78794217":"event","Q78794597":"event","Q96602509":"webpage","Q89579780":"event","Q89580544":"event","Q89580727":"event","Q89582128":"event","Q89584514":"event","Q89584528":"event","Q89670486":"event","Q89671012":"event","Q95597105":"dataset","Q106036966":"webpage","Q104830881":"event","Q108264898":"event","Q108390245":"event","Q109044243":"event","Q931552":"motion_picture","Q109497724":"event","Q111539301":"event","Q3196405":"manuscript","Q2522949":"dataset","Q2553613":"dataset","Q775344":"broadcast","Q5282128":"dataset","Q5421240":"dataset","Q5500344":"dataset","Q859398":"software","Q12983462":"song","Q13582267":"dataset","Q179797":"book","Q818963":"event","Q819961":"event","Q2376111":"book","Q72415":"standard","Q2295790":"event","Q23058567":"dataset","Q2739382":"event","Q4351985":"event","Q88223288":"regulation","Q88320241":"regulation","Q25324511":"dataset","Q88705465":"regulation","Q88706341":"regulation","Q88707306":"regulation","Q88709702":"regulation","Q89061144":"regulation","Q5447138":"event","Q6084414":"event","Q6156617":"event","Q6359078":"event","Q29405157":"dataset","Q28225717":"broadcast","Q12035201":"event","Q17050828":"event","Q19860625":"event","Q23657366":"book","Q26185628":"event","Q10668278":"performance","Q38806003":"event","Q51675442":"software","Q67533191":"dataset","Q30894000":"performance","Q552461":"regulation","Q86833385":"broadcast","Q61002034":"event","Q7316326":"regulation","Q10282403":"regulation","Q105885086":"broadcast","Q105885166":"broadcast","Q106101379":"manuscript","Q97054320":"broadcast","Q99515493":"dataset","Q100139554":"dataset","Q100139796":"dataset","Q98526239":"broadcast","Q101856615":"broadcast","Q101893835":"broadcast","Q104539790":"dataset","Q104123273":"broadcast","Q106077699":"dataset","Q106425682":"dataset","Q106807531":"dataset","Q106878463":"dataset","Q110832804":"dataset","Q91865493":"book","Q92601632":"event","Q95116664":"event","Q96798209":"legislation","Q96372405":"event","Q96474700":"event","Q98745410":"event","Q99890588":"book","Q99738027":"event","Q99738092":"event","Q99738111":"event","Q100575346":"book","Q104537413":"event","Q105810973":"event","Q106752095":"book","Q107996504":"event","Q110022526":"book","Q110275985":"book","Q110541086":"book","Q106588852":"performance","Q28135032":"broadcast","Q322259":"event","Q332225":"event","Q594550":"event","Q1709894":"event","Q2005272":"event","Q18131152":"event","Q890206":"performance","Q1982463":"broadcast","Q107524369":"regulation","Q11931373":"performance","Q61856389":"periodical","Q74303978":"broadcast","Q446780":"regulation","Q4590027":"regulation","Q63068880":"book","Q64657836":"book","Q105011823":"broadcast","Q105440808":"broadcast","Q105580963":"broadcast","Q105882178":"broadcast","Q105908617":"broadcast","Q106070543":"broadcast","Q106393132":"broadcast","Q106462625":"broadcast","Q106625193":"broadcast","Q106625205":"broadcast","Q106625222":"broadcast","Q106625419":"broadcast","Q106635276":"periodical","Q106639851":"broadcast","Q106651148":"periodical","Q106664450":"periodical","Q106668702":"periodical","Q106677940":"periodical","Q106727606":"broadcast","Q106727619":"broadcast","Q106727696":"broadcast","Q106882658":"broadcast","Q106902380":"broadcast","Q106914760":"broadcast","Q107170524":"periodical","Q107171988":"periodical","Q107178411":"periodical","Q107179479":"periodical","Q107181855":"periodical","Q107182185":"periodical","Q107182376":"periodical","Q107182467":"periodical","Q107183126":"periodical","Q107236776":"periodical","Q107236966":"periodical","Q107442166":"broadcast","Q63481999":"performance","Q63483382":"performance","Q73067531":"performance","Q106255345":"software","Q107110391":"software","Q105104863":"book","Q106635228":"event","Q106635229":"event","Q106635287":"event","Q106640245":"event","Q107581015":"event","Q107628485":"event","Q107628488":"event","Q107628507":"event","Q107628546":"event","Q107745632":"event","Q108552900":"event","Q110025156":"book","Q110275970":"book","Q110313262":"legislation","Q110487796":"legislation","Q110902846":"dataset","Q110903048":"dataset","Q110903105":"dataset","Q1778220":"map","Q110373000":"event","Q111180384":"book","Q110996236":"event","Q111040000":"event","Q111818118":"book","Q111678621":"event","Q508790":"song","Q4470542":"song","Q6379472":"song","Q11655362":"song","Q12111341":"song","Q12274303":"song","Q12802984":"song","Q112983":"book","Q181275":"book","Q719645":"book","Q723362":"book","Q841983":"book","Q918887":"book","Q929047":"book","Q1279564":"book","Q2499142":"book","Q371805":"standard","Q3046922":"book","Q3056541":"book","Q3429239":"book","Q4735223":"book","Q4880745":"event","Q5806951":"book","Q5359685":"event","Q6124900":"book","Q6128115":"book","Q5879905":"event","Q6865030":"book","Q6938511":"event","Q12106333":"book","Q12250928":"event","Q12250944":"event","Q12250949":"event","Q12250958":"event","Q12250971":"event","Q12250993":"event","Q13632557":"book","Q16324495":"book","Q17518557":"book","Q17004607":"event","Q20024995":"book","Q24283984":"book","Q24965412":"event","Q24965482":"event","Q27560760":"book","Q59112725":"book","Q64445892":"book","Q64447045":"book","Q64682895":"book","Q64764212":"book","Q65234641":"event","Q66679998":"book","Q72857184":"book","Q75178934":"event","Q108202399":"motion_picture","Q109568295":"map","Q111280422":"motion_picture","Q101413630":"song","Q109470682":"song","Q109470683":"song","Q109470686":"song","Q109470687":"song","Q109470684":"song","Q109470685":"song","Q109470688":"song","Q91224525":"event","Q105753296":"legislation","Q107124972":"book","Q108329751":"book","Q108671830":"book","Q108135774":"event","Q18531":"regulation","Q83382":"standard","Q106370":"standard","Q129075":"standard","Q211063":"standard","Q221257":"standard","Q237757":"standard","Q255528":"standard","Q284810":"standard","Q296763":"standard","Q378761":"standard","Q406283":"standard","Q428486":"standard","Q483488":"standard","Q555032":"standard","Q628189":"standard","Q674007":"standard","Q749081":"standard","Q763656":"standard","Q767710":"standard","Q820586":"standard","Q849609":"standard","Q856732":"standard","Q916240":"standard","Q918409":"standard","Q922881":"standard","Q937498":"standard","Q950234":"standard","Q971102":"standard","Q1024934":"standard","Q1088832":"standard","Q1101415":"standard","Q1103055":"standard","Q1103058":"standard","Q1125051":"standard","Q1132453":"standard","Q1192691":"standard","Q1196571":"standard","Q1196777":"standard","Q1205020":"standard","Q1243971":"standard","Q1268094":"standard","Q1323830":"standard","Q1323895":"standard","Q1324028":"standard","Q1351277":"standard","Q1369202":"standard","Q1381151":"standard","Q1385264":"standard","Q1717522":"standard","Q1718805":"standard","Q1751334":"standard","Q1990952":"standard","Q2051580":"standard","Q2060802":"standard","Q2087344":"standard","Q2159612":"standard","Q2253011":"standard","Q4826265":"book","Q2458582":"standard","Q2635535":"standard","Q2641407":"standard","Q2755335":"standard","Q2819366":"standard","Q2819372":"standard","Q2837438":"standard","Q3066421":"standard","Q3601015":"standard","Q3601138":"standard","Q3979397":"standard","Q4024445":"standard","Q4273687":"standard","Q4273690":"standard","Q4273691":"standard","Q4273689":"standard","Q4273692":"standard","Q4306969":"standard","Q4652596":"standard","Q4653852":"standard","Q4733372":"standard","Q5204791":"standard","Q5653080":"standard","Q5968928":"standard","Q5992943":"standard","Q6043560":"standard","Q6716885":"standard","Q6717810":"standard","Q6805986":"standard","Q6918351":"standard","Q6953434":"standard","Q7391293":"standard","Q7435388":"standard","Q7948330":"standard","Q10927187":"book","Q8679274":"standard","Q54365951":"book","Q2473200":"regulation","Q97613710":"book","Q107422949":"book","Q107090790":"standard","Q107360661":"standard","Q108106607":"standard","Q108106614":"standard","Q108555967":"standard","Q108764898":"standard","Q133493":"standard","Q175848":"standard","Q203315":"standard","Q229932":"standard","Q294890":"standard","Q295060":"standard","Q295097":"standard","Q295109":"standard","Q296778":"standard","Q378246":"standard","Q433285":"standard","Q522233":"standard","Q614417":"standard","Q615955":"standard","Q719867":"standard","Q786183":"standard","Q850364":"standard","Q858314":"standard","Q863823":"standard","Q917228":"standard","Q957191":"standard","Q10748030":"standard","Q12047070":"standard","Q12047068":"standard","Q12047069":"standard","Q12349971":"standard","Q15104442":"standard","Q16519569":"standard","Q16656613":"standard","Q16683480":"standard","Q16722027":"standard","Q16722025":"standard","Q17112311":"standard","Q17637401":"standard","Q18651108":"standard","Q18669450":"standard","Q19606482":"standard","Q21660989":"standard","Q23017087":"standard","Q23308618":"standard","Q23308620":"standard","Q23308627":"standard","Q23308667":"standard","Q24910504":"standard","Q25047934":"standard","Q25393060":"standard","Q26122998":"standard","Q28848853":"standard","Q28849038":"standard","Q28859206":"standard","Q28936807":"standard","Q28936810":"standard","Q39052875":"standard","Q39052876":"standard","Q47088294":"standard","Q51290110":"standard","Q55099448":"standard","Q55663807":"standard","Q56752458":"standard","Q56752466":"standard","Q56752470":"standard","Q58820781":"standard","Q60523194":"standard","Q60523490":"standard","Q60969329":"standard","Q61016625":"standard","Q64003266":"standard","Q64821798":"standard","Q64822010":"standard","Q64827079":"standard","Q64840813":"standard","Q64840821":"standard","Q64840888":"standard","Q64842806":"standard","Q64845943":"standard","Q64852858":"standard","Q64859524":"standard","Q65047538":"standard","Q65643777":"standard","Q65659341":"standard","Q65951697":"standard","Q84308958":"standard","Q84312738":"standard","Q86460118":"standard","Q86460423":"standard","Q90882503":"standard","Q92206164":"standard","Q93563472":"standard","Q97482625":"standard","Q101517027":"standard","Q104889211":"standard","Q104889263":"standard","Q104889396":"standard","Q106221705":"standard","Q108732094":"event","Q107435420":"standard","Q110989701":"standard","Q79531":"software","Q131669":"software","Q269856":"software","Q930714":"software","Q959549":"software","Q1405638":"software","Q1475825":"software","Q1545398":"software","Q2871730":"software","Q3251801":"software","Q8465350":"software","Q82414":"event","Q159821":"event","Q188468":"event","Q988994":"event","Q277919":"standard","Q1066956":"standard","Q1074624":"standard","Q1092481":"standard","Q1126648":"standard","Q1193262":"standard","Q1233006":"standard","Q1545600":"standard","Q1665596":"standard","Q1760303":"standard","Q1890727":"standard","Q1997451":"standard","Q2042663":"standard","Q2467811":"standard","Q2470214":"standard","Q2477766":"standard","Q2505138":"standard","Q2602839":"standard","Q2713403":"standard","Q4936344":"event","Q3334337":"standard","Q3813277":"standard","Q4050793":"standard","Q4181187":"standard","Q15814161":"software","Q15980209":"software","Q6022524":"standard","Q18012472":"software","Q19683982":"software","Q12048403":"event","Q11239825":"standard","Q11252439":"standard","Q11764840":"standard","Q23665359":"software","Q12356809":"standard","Q13551274":"standard","Q15573179":"event","Q25429379":"software","Q15902424":"event","Q17280917":"standard","Q28718983":"software","Q28859989":"software","Q28861781":"software","Q20153891":"event","Q23045352":"standard","Q24875725":"standard","Q24893756":"standard","Q25021818":"standard","Q28721615":"standard","Q36398436":"standard","Q51906260":"standard","Q56063152":"standard","Q56808665":"standard","Q11368":"software","Q34182":"software","Q44571":"software","Q48464":"software","Q48493":"software","Q63098429":"standard","Q11089":"standard","Q44484":"standard","Q97782987":"software","Q96378808":"standard","Q98611686":"standard","Q98611991":"standard","Q99526991":"standard","Q99527014":"standard","Q110091424":"event","Q110680555":"legislation","Q189248":"software","Q343568":"software","Q1143118":"software","Q1395452":"software","Q2628513":"software","Q3093294":"software","Q5923736":"software","Q8018891":"software","Q146575":"event","Q214152":"event","Q217015":"event","Q217019":"event","Q217026":"event","Q217024":"event","Q217034":"event","Q217036":"event","Q217041":"event","Q836854":"legislation","Q839180":"legislation","Q632639":"event","Q1668046":"legislation","Q1252585":"event","Q1252596":"event","Q1254181":"event","Q1254184":"event","Q1661478":"event","Q2309297":"legislation","Q2494151":"legislation","Q2906787":"legislation","Q3117517":"event","Q3311614":"event","Q3345908":"event","Q4942972":"legislation","Q5058941":"legislation","Q5058949":"legislation","Q5111497":"event","Q5464060":"event","Q5671238":"event","Q6024584":"event","Q7462493":"event","Q11913426":"legislation","Q12353139":"event","Q13377536":"legislation","Q13099480":"event","Q15628675":"event","Q15628696":"event","Q16182777":"event","Q18208174":"legislation","Q18630286":"event","Q18633267":"event","Q18641061":"event","Q19853509":"legislation","Q21035141":"event","Q21035188":"event","Q27491541":"event","Q40720553":"event","Q40720559":"event","Q40720564":"event","Q40720568":"event","Q40720946":"event","Q40720950":"event","Q40720953":"event","Q40720956":"event","Q58857460":"event","Q22702":"legislation","Q1311":"event","Q1314":"event","Q1312":"event","Q1313":"event","Q73712380":"event","Q97957575":"software","Q100350715":"event","Q101545880":"event","Q103846501":"legislation","Q104819488":"event","Q56315911":"regulation","Q173904":"software","Q1137596":"software","Q80300407":"regulation","Q5323129":"standard","Q417633":"regulation","Q1009216":"regulation","Q1535576":"regulation","Q1816371":"regulation","Q1936399":"regulation","Q2354801":"regulation","Q2520750":"regulation","Q2824584":"regulation","Q2824642":"regulation","Q3199654":"regulation","Q5657860":"regulation","Q7257711":"regulation","Q11904181":"regulation","Q15141478":"regulation","Q20757173":"regulation","Q27631499":"regulation","Q27995043":"regulation","Q29575404":"regulation","Q109971781":"standard","Q6774739":"dataset","Q70437274":"regulation","Q372269":"software","Q11187442":"dataset","Q1137896":"software","Q5448778":"software","Q7700782":"software","Q7802107":"software","Q106046":"book","Q228675":"book","Q82866":"event","Q231659":"event","Q20645845":"dataset","Q693827":"event","Q1366376":"book","Q855067":"event","Q976547":"event","Q1675259":"book","Q1033140":"event","Q1142865":"event","Q1985913":"book","Q1415772":"event","Q1426764":"event","Q1431591":"event","Q2089875":"book","Q1532651":"event","Q1741926":"event","Q2484834":"book","Q85486397":"regulation","Q125650":"standard","Q1977131":"event","Q2164591":"event","Q2382560":"event","Q2429728":"event","Q2468444":"event","Q2648795":"event","Q2883697":"event","Q3592712":"book","Q1423339":"standard","Q3381319":"event","Q1547957":"standard","Q3517779":"event","Q3543393":"event","Q3618131":"event","Q3618134":"event","Q3618132":"event","Q3618133":"event","Q4305572":"book","Q3775029":"event","Q13522376":"software","Q13717398":"software","Q87895383":"regulation","Q4527099":"event","Q4804181":"event","Q4857582":"event","Q5053154":"event","Q6189715":"book","Q6334544":"event","Q9139154":"book","Q11410589":"book","Q21055677":"software","Q98017499":"legislation","Q25377002":"software","Q15943568":"event","Q15964720":"event","Q15080196":"standard","Q16989249":"event","Q18543102":"event","Q102410240":"regulation","Q105766512":"regulation","Q107549239":"regulation","Q108602895":"regulation","Q48559493":"software","Q55335263":"software","Q48773471":"book","Q60617925":"software","Q62591185":"software","Q314537":"legislation","Q467578":"regulation","Q862765":"regulation","Q3458253":"regulation","Q3633724":"regulation","Q14116":"software","Q6518453":"regulation","Q18838604":"regulation","Q72414054":"standard","Q99495581":"dataset","Q28147500":"regulation","Q104234001":"dataset","Q102040062":"software","Q94285357":"book","Q104760508":"software","Q108099476":"software","Q104156769":"book","Q106203422":"book","Q106645589":"book","Q106771604":"book","Q111671331":"event","Q451816":"software","Q831660":"software","Q1061460":"software","Q1102629":"software","Q1640628":"software","Q1784206":"software","Q1931790":"software","Q3086736":"software","Q3297989":"software","Q3765017":"software","Q5380395":"software","Q6821765":"software","Q7831460":"software","Q7935102":"software","Q73989":"event","Q82809":"event","Q121393":"event","Q201196":"event","Q207932":"event","Q327835":"event","Q686500":"event","Q734263":"event","Q814767":"event","Q964755":"event","Q1076567":"event","Q1194539":"event","Q2080435":"book","Q1517900":"event","Q1735829":"event","Q1783455":"event","Q11335799":"software","Q11376090":"software","Q2646388":"book","Q2064560":"event","Q2296224":"event","Q2339285":"event","Q2428577":"event","Q2456855":"event","Q2534205":"event","Q2534837":"event","Q2607189":"event","Q2736114":"event","Q2904535":"event","Q1421584":"standard","Q3277405":"event","Q3317976":"event","Q3322731":"event","Q3327913":"event","Q3512010":"event","Q3572511":"event","Q3855312":"event","Q3997308":"event","Q4178567":"event","Q4233956":"event","Q4264021":"event","Q5249063":"event","Q5405824":"event","Q5405829":"event","Q5614243":"event","Q6312465":"event","Q7362828":"book","Q6783971":"event","Q7810997":"book","Q7603898":"event","Q7690791":"event","Q9309947":"event","Q9395683":"event","Q9396701":"event","Q20706915":"software","Q11891940":"event","Q12351569":"event","Q12769647":"event","Q12981823":"event","Q13420159":"event","Q14549021":"event","Q15782928":"event","Q17004624":"book","Q17006274":"book","Q19131811":"book","Q21877233":"event","Q25302803":"event","Q27070651":"event","Q28757850":"standard","Q31398150":"standard","Q37760740":"standard","Q39170567":"standard","Q64584601":"event","Q65320687":"event","Q51616":"event","Q58263":"event","Q89448385":"book","Q110505373":"software","Q110874204":"software","Q111490490":"software","Q105288154":"event","Q107456893":"event","Q668312":"motion_picture","Q1046788":"motion_picture","Q1258565":"manuscript","Q109641075":"standard","Q109653775":"standard","Q110126851":"standard","Q8049065":"motion_picture","Q18655723":"motion_picture","Q477202":"software","Q1807085":"software","Q2062060":"software","Q2070573":"software","Q2298125":"software","Q4036754":"software","Q4228982":"software","Q4497428":"software","Q7894144":"software","Q8073201":"software","Q113497":"book","Q583236":"book","Q682198":"book","Q1054662":"book","Q1536561":"book","Q1429577":"event","Q82516":"standard","Q203257":"standard","Q216651":"standard","Q296760":"standard","Q330086":"standard","Q2279440":"event","Q640596":"standard","Q650553":"standard","Q694036":"standard","Q725524":"standard","Q2671658":"event","Q1028009":"standard","Q1334973":"standard","Q1486338":"standard","Q1630069":"standard","Q1640617":"standard","Q1662390":"standard","Q1753717":"standard","Q1881617":"standard","Q4457046":"book","Q2354396":"standard","Q2597531":"standard","Q2819531":"standard","Q5638059":"book","Q5153879":"event","Q3460082":"standard","Q3510146":"standard","Q4041447":"standard","Q6718887":"book","Q4654573":"standard","Q4676760":"standard","Q5276158":"standard","Q5322986":"standard","Q6956007":"standard","Q7394773":"standard","Q8071925":"standard","Q10332600":"event","Q10585097":"event","Q12110179":"event","Q11188258":"standard","Q11199722":"standard","Q12043459":"standard","Q12043462":"standard","Q12043460":"standard","Q16995226":"standard","Q193217":"performance","Q210854":"performance","Q442133":"performance","Q448738":"performance","Q599877":"performance","Q630161":"performance","Q704073":"performance","Q774475":"performance","Q988502":"performance","Q20055091":"event","Q1432540":"performance","Q1674378":"performance","Q1917591":"performance","Q3228974":"performance","Q3981262":"performance","Q21094865":"standard","Q5765288":"performance","Q27921668":"standard","Q19754215":"performance","Q41335025":"event","Q48999145":"book","Q56043054":"event","Q56194833":"standard","Q47112":"performance","Q98913323":"standard","Q110651451":"software","Q110651453":"software","Q110651967":"software","Q105626374":"standard","Q107581410":"event","Q2396005":"song","Q260080":"software","Q507703":"software","Q578173":"software","Q1066707":"software","Q1154770":"software","Q1187338":"software","Q1196126":"software","Q11792325":"song","Q2433210":"software","Q2481505":"software","Q2665141":"software","Q3687628":"software","Q3724887":"software","Q3866394":"software","Q4189732":"software","Q4634986":"software","Q4681865":"software","Q5161689":"software","Q5433600":"software","Q6133556":"software","Q9374948":"software","Q1195034":"book","Q10478832":"software","Q1958065":"book","Q11190216":"software","Q11305042":"software","Q180122":"standard","Q294889":"standard","Q294897":"standard","Q2180696":"event","Q492197":"standard","Q841708":"standard","Q1188495":"standard","Q1193354":"standard","Q3178415":"event","Q1421681":"standard","Q1653444":"standard","Q4017617":"event","Q2746589":"standard","Q2747387":"standard","Q15730690":"software","Q16178184":"software","Q17083583":"software","Q5970258":"standard","Q5970262":"standard","Q8035355":"event","Q10986174":"event","Q11781628":"book","Q11986043":"book","Q10566612":"standard","Q12512318":"event","Q12512320":"event","Q13096825":"event","Q13096834":"event","Q16878826":"event","Q15995158":"standard","Q15995156":"standard","Q15995157":"standard","Q28169064":"software","Q24534575":"standard","Q25100938":"standard","Q29167474":"standard","Q29167475":"standard","Q29167476":"standard","Q29167477":"standard","Q29167495":"standard","Q52229854":"software","Q56191369":"software","Q56196027":"software","Q48734573":"event","Q59138843":"software","Q59138899":"software","Q59138925":"software","Q59139052":"software","Q59154480":"software","Q59154494":"software","Q54953993":"standard","Q45842":"software","Q59326100":"standard","Q59851707":"standard","Q85815517":"software","Q105685577":"song","Q96882649":"software","Q100354072":"software","Q96791859":"book","Q106248240":"software","Q108480878":"software","Q108702521":"software","Q108702628":"software","Q111847169":"software","Q109406736":"song","Q109565888":"book","Q696497":"legal_case","Q109588571":"event","Q63226722":"regulation","Q63259138":"regulation","Q627181":"song","Q1151259":"song","Q4793302":"song","Q18493502":"legal_case","Q267151":"software","Q272597":"software","Q285237":"software","Q758895":"software","Q1545483":"software","Q1637192":"software","Q2560413":"software","Q4047728":"software","Q4048342":"software","Q5156020":"software","Q5906732":"software","Q7395272":"software","Q102843":"event","Q177275":"event","Q179226":"event","Q186190":"event","Q235670":"event","Q235673":"event","Q235676":"event","Q235680":"event","Q235687":"event","Q235684":"event","Q235690":"event","Q389654":"event","Q10397513":"software","Q906577":"event","Q1141850":"event","Q1984664":"review","Q11194160":"software","Q2665700":"review","Q2238822":"event","Q3058675":"review","Q12127664":"software","Q3494258":"software","Q3780403":"review","Q4367188":"review","Q4382347":"review","Q3846508":"event","Q13636504":"software","Q3548041":"standard","Q23930024":"software","Q16240947":"event","Q20089094":"book","Q19646375":"event","Q19731959":"event","Q19731962":"event","Q19731963":"event","Q19731964":"event","Q20427327":"event","Q104154380":"regulation","Q26835642":"review","Q28053962":"review","Q31173193":"event","Q31173508":"event","Q41798378":"event","Q54328396":"software","Q55739527":"software","Q48817613":"review","Q50079209":"event","Q56232277":"event","Q57981542":"event","Q58339033":"event","Q3769847":"regulation","Q3769851":"regulation","Q3814115":"regulation","Q5474477":"regulation","Q65208584":"event","Q65213454":"event","Q65213460":"event","Q542":"event","Q3930":"event","Q11420":"event","Q25424534":"regulation","Q26857436":"regulation","Q93440972":"software","Q93723008":"software","Q98391050":"review","Q98607365":"review","Q102352081":"event","Q105528979":"event","Q106676473":"event","Q7023411":"song","Q642215":"software","Q756637":"software","Q828322":"software","Q846224":"software","Q1186471":"software","Q1330336":"software","Q1422746":"software","Q2622299":"software","Q4282636":"software","Q5014368":"software","Q7265518":"software","Q7705752":"software","Q7935188":"software","Q1351781":"event","Q1895188":"event","Q2920383":"legislation","Q3586860":"event","Q3586864":"event","Q1758006":"standard","Q5354603":"event","Q5354658":"event","Q5354664":"event","Q5354677":"event","Q5354684":"event","Q5354694":"event","Q5354705":"event","Q5354710":"event","Q5354711":"event","Q5354708":"event","Q5354722":"event","Q5354741":"event","Q5354756":"event","Q5354762":"event","Q5354763":"event","Q5354761":"event","Q5354765":"event","Q5354770":"event","Q5354776":"event","Q5354777":"event","Q5354787":"event","Q5354788":"event","Q5354796":"event","Q5354804":"event","Q5354832":"event","Q5354848":"event","Q5354861":"event","Q5354870":"event","Q5354879":"event","Q5354876":"event","Q5354880":"event","Q5354901":"event","Q5354916":"event","Q6927120":"legislation","Q7002556":"legislation","Q7063753":"legislation","Q6936320":"event","Q7892462":"event","Q7892463":"event","Q7892466":"event","Q7892464":"event","Q7892465":"event","Q7892468":"event","Q21030988":"software","Q21169670":"software","Q12410259":"legislation","Q24789150":"software","Q16191258":"event","Q16974574":"event","Q16974580":"event","Q16974590":"event","Q15219210":"standard","Q16525012":"standard","Q18395045":"event","Q18589086":"event","Q21028317":"event","Q22019872":"event","Q24894176":"event","Q25022058":"event","Q67650225":"software","Q61125769":"legislation","Q96475230":"software","Q97185377":"legislation","Q108739976":"software","Q109496685":"software","Q109657450":"software","Q110647054":"software","Q111515096":"software","Q108311215":"legislation","Q884257":"map","Q111539646":"event","Q991335":"dataset","Q107415":"software","Q261918":"software","Q1193246":"software","Q1389380":"software","Q1632665":"software","Q1641902":"software","Q2368049":"software","Q3025858":"software","Q3715530":"software","Q5133829":"software","Q6044094":"software","Q6109327":"software","Q6165271":"software","Q6770906":"software","Q7574057":"software","Q486025":"book","Q83145":"event","Q177351":"event","Q208704":"event","Q719632":"event","Q896995":"event","Q901706":"event","Q1073526":"event","Q1158377":"event","Q1203320":"event","Q1327767":"event","Q1451837":"event","Q1499496":"event","Q1504429":"event","Q11224846":"software","Q1798173":"event","Q1801994":"event","Q1872987":"event","Q1879308":"event","Q11668228":"software","Q294956":"standard","Q2257070":"event","Q2314207":"event","Q2505535":"event","Q3143333":"event","Q3745603":"event","Q4336086":"event","Q4423961":"event","Q5250436":"event","Q5393721":"event","Q5797730":"event","Q5813725":"event","Q5813807":"event","Q6063435":"event","Q6150323":"event","Q6150714":"event","Q6784807":"event","Q7270559":"event","Q7270690":"event","Q7366192":"event","Q18156745":"software","Q9356162":"book","Q18377772":"software","Q20514253":"software","Q11284677":"event","Q25110971":"software","Q15824588":"event","Q19287565":"book","Q21050393":"event","Q25080094":"event","Q26772977":"event","Q28936291":"book","Q28368813":"event","Q28368897":"event","Q28402154":"event","Q28404860":"event","Q28404906":"event","Q28405010":"event","Q28405094":"event","Q39087072":"event","Q41707977":"event","Q41708808":"event","Q54593011":"event","Q55315917":"event","Q65682609":"event","Q85737192":"event","Q86755961":"event","Q97124825":"event","Q98381930":"event","Q98382194":"event","Q98382202":"event","Q98382211":"event","Q98382209":"event","Q98382216":"event","Q98382413":"event","Q108878058":"software","Q105476330":"event","Q105517947":"event","Q108657675":"event","Q112033376":"event","Q485228":"dataset","Q1359130":"dataset","Q3935817":"dataset","Q105637123":"performance","Q4765080":"broadcast","Q70373167":"regulation","Q7601206":"dataset","Q208189":"software","Q588289":"software","Q603555":"software","Q941283":"software","Q22575733":"periodical","Q2176159":"software","Q2454898":"software","Q2822898":"software","Q12485565":"broadcast","Q4375640":"software","Q16674705":"song","Q6886151":"software","Q7705753":"software","Q492175":"legislation","Q606639":"event","Q10334075":"software","Q11244274":"software","Q747499":"standard","Q2748940":"event","Q1208648":"standard","Q3351641":"event","Q1653454":"standard","Q1678488":"standard","Q2645429":"standard","Q4765148":"event","Q4851867":"event","Q4859824":"event","Q3146614":"standard","Q3146613":"standard","Q3146619":"standard","Q3146617":"standard","Q3146623":"standard","Q3146620":"standard","Q3146621":"standard","Q3146625":"standard","Q3146628":"standard","Q3146629":"standard","Q5449003":"legislation","Q5449006":"legislation","Q5449007":"legislation","Q5449005":"legislation","Q5449009":"legislation","Q25393087":"dataset","Q5185963":"event","Q89897004":"regulation","Q18822231":"software","Q12317905":"standard","Q18153387":"event","Q28135300":"software","Q1620079":"performance","Q20202982":"standard","Q30688666":"legislation","Q30672422":"event","Q54932319":"broadcast","Q60617834":"software","Q55226612":"event","Q1070654":"regulation","Q2111129":"regulation","Q2376629":"regulation","Q67650958":"software","Q56827160":"standard","Q56827161":"standard","Q77253697":"broadcast","Q61978471":"event","Q89273633":"broadcast","Q17004170":"regulation","Q108146417":"broadcast","Q110408389":"broadcast","Q110955215":"broadcast","Q92891824":"standard","Q100708729":"legislation","Q108444995":"event","Q7551149":"motion_picture","Q224377":"song","Q1331138":"dataset","Q1345076":"dataset","Q1786016":"song","Q5657245":"song","Q170434":"software","Q383826":"software","Q415298":"software","Q1047696":"software","Q1146030":"software","Q1326260":"software","Q1327157":"software","Q1369131":"software","Q2632782":"software","Q2990357":"software","Q2990366":"software","Q4751062":"software","Q4994515":"software","Q7360327":"software","Q7360332":"software","Q285320":"event","Q471881":"event","Q493742":"event","Q721067":"event","Q1053079":"event","Q1370066":"event","Q1474208":"event","Q1728634":"event","Q1757181":"event","Q2087929":"event","Q2413978":"event","Q22802895":"dataset","Q2899221":"event","Q2992826":"event","Q3126275":"event","Q3363711":"event","Q3642692":"event","Q2612841":"standard","Q25094598":"song","Q3513811":"standard","Q5508174":"event","Q6888651":"book","Q6631808":"event","Q5014995":"standard","Q7112919":"event","Q7622676":"standard","Q10382709":"event","Q10389571":"event","Q10938245":"event","Q11953147":"event","Q13744949":"event","Q15991290":"event","Q15991303":"event","Q25595203":"software","Q18536323":"event","Q28130009":"software","Q19704499":"event","Q20716290":"legislation","Q22251965":"event","Q26720971":"event","Q26857732":"event","Q28458043":"event","Q29224491":"event","Q30133162":"event","Q35069054":"event","Q42046473":"event","Q55621552":"software","Q51792175":"event","Q63067479":"software","Q60823510":"event","Q63349452":"event","Q75179210":"event","Q75179296":"event","Q108783737":"speech","Q92608103":"software","Q88358807":"event","Q111241357":"broadcast","Q110393272":"software","Q104537393":"event","Q106314805":"event","Q106725777":"event","Q106726544":"event","Q107579066":"event","Q512410":"song","Q854775":"song","Q1060750":"software","Q1076355":"software","Q1109779":"software","Q1265717":"software","Q1298366":"software","Q1397886":"software","Q1529437":"software","Q1882110":"software","Q12985461":"song","Q2641207":"software","Q3434466":"software","Q4042979":"software","Q4045294":"software","Q5923834":"software","Q170384":"book","Q258331":"book","Q9332384":"software","Q678489":"book","Q773298":"book","Q252496":"event","Q332814":"event","Q1190662":"book","Q567241":"event","Q736491":"event","Q1059464":"event","Q1414383":"event","Q2650956":"book","Q3084465":"book","Q3414877":"book","Q3246994":"legislation","Q2861432":"event","Q2916312":"event","Q1153410":"standard","Q3722602":"event","Q1952448":"standard","Q4482446":"event","Q4994137":"event","Q5513458":"event","Q5828909":"event","Q6024340":"event","Q7049544":"event","Q7096449":"event","Q7575667":"event","Q7575669":"event","Q7575672":"event","Q7575673":"event","Q7575676":"event","Q7575682":"event","Q6026738":"standard","Q10542416":"event","Q11267316":"book","Q11417718":"book","Q11489321":"book","Q11561935":"legislation","Q11656992":"book","Q17084138":"book","Q17146043":"event","Q22030032":"event","Q22266583":"event","Q4208567":"performance","Q4469861":"performance","Q25316241":"event","Q26885471":"event","Q28741065":"event","Q29976900":"book","Q50493233":"book","Q61654424":"software","Q457753":"regulation","Q674304":"regulation","Q746515":"regulation","Q941185":"regulation","Q1548025":"regulation","Q1751574":"regulation","Q61070574":"event","Q102430221":"broadcast","Q91021222":"event","Q105906396":"software","Q97487177":"event","Q97730452":"event","Q107631040":"software","Q111515094":"software","Q104715213":"event","Q105687604":"event","Q109606010":"event","Q55825971":"regulation","Q219897":"dataset","Q3482005":"dataset","Q5369900":"software","Q384445":"review","Q829179":"book","Q973917":"book","Q961652":"review","Q459555":"event","Q1363686":"book","Q890055":"event","Q1025586":"event","Q1274389":"event","Q1307227":"event","Q11198227":"software","Q1674216":"event","Q1980316":"event","Q2115187":"event","Q3012407":"book","Q2406578":"event","Q3077811":"event","Q3497179":"event","Q3586558":"event","Q3586559":"event","Q3587380":"event","Q4128590":"event","Q4128699":"event","Q4926165":"book","Q4985019":"book","Q4592477":"event","Q5518574":"event","Q6980675":"review","Q7185370":"event","Q7241485":"event","Q7405556":"event","Q10862680":"event","Q96107414":"regulation","Q96107484":"regulation","Q17092694":"standard","Q2078967":"performance","Q28692660":"event","Q31297261":"event","Q33146420":"standard","Q50284081":"event","Q61722278":"software","Q1941439":"regulation","Q58959170":"book","Q59590412":"book","Q59604726":"book","Q4856329":"regulation","Q4856345":"regulation","Q4856361":"regulation","Q59773383":"event","Q5717821":"regulation","Q61756860":"event","Q61888674":"event","Q62713833":"book","Q71683375":"software","Q11833245":"regulation","Q13417108":"regulation","Q47566":"event","Q84862062":"review","Q30589394":"regulation","Q30671797":"regulation","Q106355253":"book","Q106355975":"book","Q109668823":"event","Q110554613":"book","Q110111461":"event","Q112045689":"book","Q111594597":"event","Q111703192":"event","Q478679":"broadcast","Q2385777":"dataset","Q12304354":"article-newspaper","Q5260569":"dataset","Q93249":"software","Q373110":"software","Q567624":"software","Q745881":"software","Q833766":"software","Q1037622":"software","Q2025943":"software","Q3905195":"software","Q4713339":"software","Q4774499":"software","Q4774525":"software","Q4825890":"software","Q5656691":"software","Q7978562":"software","Q114811":"event","Q735641":"event","Q884103":"event","Q10655706":"software","Q1183238":"event","Q1416059":"event","Q1499600":"event","Q1548628":"event","Q2212408":"review","Q1824674":"event","Q183484":"standard","Q3332850":"book","Q3298250":"event","Q13429867":"software","Q4243924":"event","Q3698833":"standard","Q4781177":"standard","Q10638581":"event","Q11366960":"event","Q11564376":"event","Q11930795":"event","Q12046982":"event","Q12057768":"event","Q12778811":"event","Q15146717":"event","Q15779876":"event","Q16361747":"event","Q17269186":"event","Q17301632":"event","Q26921397":"software","Q18285098":"event","Q18698522":"event","Q16927922":"standard","Q19801853":"event","Q20053795":"event","Q22337503":"event","Q22341340":"event","Q3930216":"performance","Q23498202":"event","Q24069004":"event","Q26267877":"event","Q26338179":"event","Q24705172":"standard","Q24895600":"standard","Q25106376":"standard","Q28545697":"event","Q28664499":"event","Q29054285":"event","Q34542757":"event","Q47484406":"event","Q46331372":"standard","Q54257384":"event","Q1047352":"regulation","Q1452606":"regulation","Q1511642":"regulation","Q1618728":"regulation","Q1885318":"regulation","Q2425869":"regulation","Q3306798":"regulation","Q4368931":"regulation","Q40612":"software","Q5446829":"regulation","Q60676589":"event","Q67175754":"book","Q87319988":"event","Q99904346":"software","Q97016907":"event","Q105751138":"event","Q106690408":"event","Q106691665":"event","Q108798661":"event","Q4499627":"song","Q815820":"software","Q1325927":"software","Q3257939":"software","Q24826340":"periodical","Q5182402":"software","Q209680":"book","Q385530":"book","Q231039":"legislation","Q556900":"book","Q612405":"book","Q668439":"book","Q867870":"book","Q261282":"event","Q281558":"event","Q976646":"book","Q1070955":"book","Q1100782":"book","Q467557":"event","Q1153367":"book","Q1191035":"book","Q1005841":"legislation","Q1006175":"legislation","Q626723":"event","Q1309200":"legislation","Q1416468":"legislation","Q985655":"event","Q1136848":"event","Q1202197":"event","Q1940409":"legislation","Q11064557":"software","Q1664977":"event","Q2986204":"book","Q2450914":"event","Q3481480":"book","Q1060131":"standard","Q2951085":"event","Q1163955":"standard","Q1629076":"standard","Q4451306":"book","Q4921034":"event","Q3702356":"standard","Q6433093":"event","Q7133779":"book","Q7630946":"book","Q8210687":"event","Q18351283":"software","Q10914523":"event","Q11554370":"event","Q12021385":"event","Q12867166":"event","Q12867171":"event","Q12871890":"standard","Q15256689":"event","Q16164739":"book","Q16044494":"event","Q16323290":"event","Q16934675":"event","Q17591033":"legislation","Q17998502":"event","Q18662453":"event","Q19745541":"event","Q19844610":"event","Q105561045":"regulation","Q24884579":"event","Q28724885":"event","Q28724890":"event","Q41795401":"book","Q61791393":"software","Q54803583":"event","Q56063032":"standard","Q56063221":"standard","Q62018894":"book","Q62071638":"event","Q7973803":"regulation","Q64025364":"event","Q66603542":"event","Q66603543":"event","Q66603544":"event","Q66615612":"event","Q66659576":"event","Q66724548":"event","Q47223":"event","Q72164270":"book","Q105581148":"periodical","Q79136391":"standard","Q30680962":"regulation","Q100235486":"standard","Q104630996":"event","Q108408336":"event","Q109536021":"event","Q110805611":"event","Q70453138":"regulation","Q106654239":"performance","Q188860":"software","Q193231":"software","Q212474":"software","Q523796":"software","Q545406":"software","Q580334":"software","Q913697":"software","Q1199316":"software","Q1487455":"software","Q1727373":"software","Q1780936":"software","Q2164323":"software","Q2391834":"software","Q2640620":"software","Q2727468":"software","Q4343954":"software","Q5145831":"software","Q6456989":"software","Q6953261":"software","Q429767":"book","Q715768":"book","Q455444":"event","Q467938":"event","Q468731":"event","Q485644":"event","Q488526":"event","Q643292":"event","Q1048801":"event","Q1123217":"event","Q1484421":"event","Q2477849":"book","Q133973":"standard","Q1975250":"event","Q2139567":"event","Q2319714":"event","Q3140617":"book","Q5147136":"book","Q3146606":"standard","Q3146610":"standard","Q3146609":"standard","Q3146612":"standard","Q5727698":"book","Q5368590":"event","Q6059065":"book","Q15618492":"software","Q6827710":"event","Q17073339":"software","Q17088419":"software","Q7688876":"event","Q13732971":"event","Q14554958":"event","Q28059995":"software","Q18575573":"event","Q19877485":"event","Q20739115":"event","Q30671703":"software","Q22328415":"event","Q24833619":"event","Q26805735":"event","Q10360435":"performance","Q39185662":"software","Q30178840":"event","Q31886929":"event","Q39046297":"event","Q28721502":"performance","Q48745331":"event","Q52230346":"event","Q366193":"regulation","Q883708":"regulation","Q56315696":"event","Q3773715":"regulation","Q4923501":"regulation","Q5657858":"regulation","Q6746707":"regulation","Q72846320":"event","Q74595662":"event","Q83493046":"event","Q84588901":"event","Q84589021":"event","Q85852394":"event","Q99542992":"software","Q101111163":"software","Q107819359":"software","Q101246147":"event","Q105581094":"event","Q105754052":"event","Q106638042":"event","Q108430097":"event","Q109315463":"book","Q111280042":"standard","Q111288275":"standard","Q111366443":"standard","Q111426478":"standard","Q111489535":"standard","Q111588257":"standard","Q2889327":"dataset","Q11310550":"dataset","Q1198122":"software","Q1370727":"software","Q2281709":"software","Q2509091":"software","Q2639241":"software","Q7063032":"software","Q18086661":"dataset","Q18086666":"dataset","Q18086667":"dataset","Q18086665":"dataset","Q18889352":"dataset","Q20005020":"dataset","Q82991":"event","Q205570":"event","Q239973":"event","Q270088":"event","Q273469":"event","Q327110":"event","Q422986":"event","Q428526":"event","Q506424":"event","Q542554":"event","Q551817":"event","Q596886":"event","Q610865":"event","Q627485":"event","Q639244":"event","Q646317":"event","Q1334257":"book","Q1381447":"song","Q1254652":"event","Q1591510":"event","Q1673136":"event","Q191943":"standard","Q206494":"standard","Q272165":"standard","Q2358647":"event","Q3327521":"software","Q908608":"standard","Q1092688":"standard","Q1193479":"standard","Q1252368":"standard","Q21629439":"broadcast","Q1414155":"standard","Q4082733":"book","Q4400636":"book","Q1943286":"standard","Q5192593":"book","Q4926628":"event","Q25336664":"dataset","Q3306713":"standard","Q3997677":"standard","Q9190324":"song","Q18344624":"software","Q7551852":"standard","Q11288680":"book","Q11571348":"book","Q9326126":"standard","Q12164319":"book","Q21490628":"software","Q12237265":"standard","Q16934823":"standard","Q17074885":"standard","Q18413104":"standard","Q31839143":"software","Q55521408":"dataset","Q47401041":"event","Q58325919":"software","Q58898459":"software","Q60616268":"software","Q60617574":"software","Q65007441":"software","Q1416368":"regulation","Q11871":"book","Q6843":"event","Q16640":"event","Q31668":"event","Q46326":"event","Q103109864":"motion_picture","Q101416734":"dataset","Q92257769":"software","Q96146141":"software","Q111148855":"dataset","Q107576803":"book","Q108100335":"book","Q108864219":"event","Q661101":"event","Q725909":"event","Q765057":"event","Q781192":"event","Q806391":"event","Q819951":"event","Q845098":"event","Q909300":"event","Q911134":"event","Q932452":"event","Q936619":"event","Q943691":"event","Q953415":"event","Q975128":"event","Q979298":"event","Q1034242":"event","Q1112779":"event","Q1112958":"event","Q1128219":"event","Q1141381":"event","Q1145925":"event","Q1162779":"event","Q1191199":"event","Q1205063":"event","Q1284388":"event","Q1319876":"event","Q1399526":"event","Q1413606":"event","Q1415179":"event","Q1473250":"event","Q1515869":"event","Q1517419":"event","Q1531542":"event","Q1754117":"event","Q1755998":"event","Q1812109":"event","Q1870596":"event","Q2005506":"event","Q2083108":"event","Q2244992":"event","Q2270699":"event","Q2283223":"event","Q2348572":"event","Q2439750":"event","Q2468836":"event","Q2557178":"event","Q2564304":"event","Q2610233":"event","Q2953911":"event","Q2954142":"event","Q2955477":"event","Q2955692":"event","Q3063011":"event","Q3334740":"event","Q3461806":"event","Q3654350":"event","Q4511512":"event","Q4511568":"event","Q4638793":"event","Q4774455":"event","Q5450960":"event","Q5974617":"event","Q6139189":"event","Q8035610":"event","Q10711847":"event","Q11339103":"event","Q11783508":"event","Q11783509":"event","Q12365621":"event","Q12594341":"event","Q14518260":"event","Q15855106":"event","Q16717546":"event","Q17379619":"event","Q18170326":"event","Q21055703":"event","Q21804572":"event","Q21804580":"event","Q21809337":"event","Q21857771":"event","Q22669035":"event","Q23425564":"event","Q25038435":"event","Q25379789":"event","Q25383937":"event","Q26709563":"event","Q28793120":"event","Q30899369":"event","Q55729484":"event","Q61056709":"event","Q61459801":"event","Q63891765":"event","Q75058565":"event","Q102277744":"event","Q105769000":"event","Q106949747":"event","Q107251839":"event","Q108485992":"event","Q865585":"periodical","Q3399338":"periodical","Q4433771":"periodical","Q399811":"broadcast","Q12898151":"periodical","Q1658957":"broadcast","Q1786567":"broadcast","Q4382232":"broadcast","Q16000113":"periodical","Q5219865":"broadcast","Q11086745":"broadcast","Q4011359":"software","Q5156780":"software","Q14509702":"broadcast","Q80767":"event","Q129292":"event","Q129455":"event","Q223251":"event","Q252397":"event","Q429292":"event","Q579095":"event","Q648257":"event","Q688127":"event","Q913063":"event","Q929905":"event","Q935708":"event","Q1141321":"event","Q1257251":"event","Q1319755":"event","Q1376517":"event","Q1397416":"event","Q1467563":"event","Q1499149":"event","Q19952572":"broadcast","Q1503455":"event","Q1622604":"event","Q1663817":"event","Q1810789":"event","Q1839475":"event","Q1948986":"event","Q1983915":"event","Q2066197":"event","Q2144108":"event","Q2166202":"event","Q2185592":"event","Q2419773":"event","Q2462288":"event","Q2553885":"event","Q2609547":"event","Q2651160":"event","Q2949471":"event","Q2949521":"event","Q2954449":"event","Q2954514":"event","Q3375071":"event","Q3652861":"event","Q3653395":"event","Q3653952":"event","Q3789959":"event","Q5360132":"event","Q5412228":"event","Q5413453":"event","Q5424338":"event","Q28195059":"broadcast","Q11346229":"event","Q12362452":"event","Q13440232":"event","Q14923870":"event","Q15714635":"event","Q16467746":"event","Q16849691":"event","Q17075088":"event","Q17335201":"event","Q17335214":"event","Q18061350":"event","Q18125614":"event","Q18125699":"event","Q18397818":"event","Q18416783":"event","Q18711024":"event","Q18712912":"event","Q20747438":"event","Q21234541":"event","Q21234774":"event","Q25399151":"event","Q27027131":"event","Q28151532":"event","Q31897668":"event","Q33219694":"event","Q41497558":"event","Q42309070":"event","Q47289823":"event","Q48862215":"event","Q23739":"broadcast","Q23745":"broadcast","Q85879530":"periodical","Q56325600":"event","Q76160317":"broadcast","Q108828376":"event","Q111254004":"book","Q111655411":"event","Q1428914":"dataset","Q3136090":"dataset","Q22810230":"report","Q263233":"event","Q285957":"performance","Q361909":"event","Q462100":"event","Q1038199":"event","Q1185865":"event","Q1456010":"event","Q1501864":"event","Q2882210":"book","Q2919068":"book","Q2428138":"event","Q3058662":"review","Q3511337":"book","Q3620728":"book","Q3153927":"event","Q3797537":"event","Q4229193":"event","Q4958902":"event","Q6541336":"event","Q7322369":"event","Q7892643":"event","Q7892641":"event","Q7892647":"event","Q7893535":"event","Q7893537":"event","Q11279175":"event","Q12079472":"event","Q16981125":"event","Q18357042":"event","Q23962616":"event","Q26887310":"book","Q26894053":"book","Q26895936":"book","Q26896697":"book","Q27020779":"book","Q26988085":"event","Q30889662":"event","Q48977411":"event","Q48977459":"event","Q50862300":"event","Q492886":"regulation","Q762034":"regulation","Q56063508":"event","Q1399956":"regulation","Q56399237":"event","Q60526674":"event","Q61519036":"event","Q61519203":"event","Q61519381":"event","Q61519759":"event","Q61519892":"event","Q61520114":"event","Q61520261":"event","Q7007379":"regulation","Q61984600":"event","Q65028060":"event","Q87328118":"dataset","Q68708725":"event","Q14167904":"regulation","Q69152161":"event","Q69426776":"event","Q69499553":"event","Q69505214":"event","Q69580701":"event","Q69881200":"event","Q71271906":"event","Q88181393":"event","Q97359920":"event","Q101087116":"event","Q104761176":"event","Q104901635":"event","Q105535583":"event","Q105535632":"event","Q106018406":"event","Q107377714":"event","Q107649955":"event","Q108570960":"review","Q107976231":"event","Q108131727":"event","Q110880374":"performance","Q111425780":"performance","Q273057":"dataset","Q1371849":"dataset","Q1391116":"dataset","Q1569406":"dataset","Q1609353":"dataset","Q2033233":"dataset","Q2110197":"dataset","Q3962380":"dataset","Q4769616":"dataset","Q104254982":"performance","Q104508698":"performance","Q5615468":"dataset","Q6822329":"dataset","Q7144753":"dataset","Q107291016":"performance","Q108296071":"performance","Q108854146":"performance","Q536420":"software","Q578868":"software","Q868217":"software","Q1036289":"software","Q1190228":"software","Q1199309":"software","Q1311927":"software","Q1339223":"software","Q12331427":"dataset","Q1718710":"software","Q1759397":"software","Q1790389":"software","Q2097762":"software","Q2576999":"software","Q3177954":"software","Q3775539":"software","Q5432283":"software","Q7551387":"software","Q7708433":"software","Q1798316":"event","Q11756212":"software","Q2333803":"performance","Q24879310":"dataset","Q26876682":"dataset","Q14551913":"book","Q131510":"performance","Q1433428":"performance","Q1957470":"performance","Q2489759":"performance","Q34685933":"software","Q29032784":"book","Q59156045":"dataset","Q59156132":"dataset","Q59156152":"dataset","Q59156183":"dataset","Q59156192":"dataset","Q59156210":"dataset","Q59156238":"dataset","Q59156244":"dataset","Q59156256":"dataset","Q59156264":"dataset","Q59156692":"dataset","Q59156700":"dataset","Q59156710":"dataset","Q59156725":"dataset","Q59156734":"dataset","Q59156741":"dataset","Q59156767":"dataset","Q60586493":"dataset","Q25396338":"performance","Q55058128":"software","Q53532033":"book","Q53534649":"book","Q53538403":"book","Q53538476":"book","Q53642685":"book","Q58841951":"book","Q71474253":"software","Q106764019":"software","Q111149309":"software","Q111549183":"software","Q109023693":"event","Q2872429":"periodical","Q751424":"software","Q830340":"software","Q1440548":"software","Q1966904":"software","Q2467894":"software","Q5454233":"software","Q6805426":"software","Q7554269":"software","Q7593080":"software","Q688869":"book","Q1292786":"review","Q1253781":"event","Q1443249":"event","Q11350034":"software","Q2114776":"event","Q2117807":"event","Q2156219":"event","Q431028":"standard","Q2542485":"event","Q939636":"standard","Q1047541":"standard","Q1072083":"standard","Q1122267":"standard","Q2977046":"event","Q13199995":"software","Q1961044":"standard","Q2044200":"standard","Q3879024":"event","Q3898276":"performance","Q3054349":"standard","Q5326799":"event","Q3564764":"standard","Q6084566":"event","Q6269530":"event","Q5421990":"standard","Q7574869":"event","Q7894502":"event","Q10655129":"event","Q10655253":"event","Q10711120":"event","Q11141294":"event","Q11410200":"event","Q11434242":"event","Q11500116":"event","Q11573620":"event","Q12593167":"event","Q17149938":"book","Q18694350":"event","Q22134877":"event","Q22276038":"event","Q22909636":"event","Q25385905":"event","Q25999227":"event","Q27826498":"event","Q34262807":"event","Q34542788":"event","Q42170175":"event","Q47221960":"event","Q47240905":"event","Q47466753":"event","Q50288571":"event","Q51158871":"standard","Q57450669":"event","Q74086777":"software","Q2078":"standard","Q77023152":"event","Q85680242":"event","Q87337481":"event","Q87764589":"event","Q87768669":"event","Q88456792":"event","Q102128235":"software","Q96754639":"event","Q98807712":"event","Q108575058":"software","Q105717058":"event","Q107580332":"event","Q108408357":"event","Q277583":"manuscript","Q568765":"periodical","Q110611344":"event","Q3402519":"periodical","Q5769583":"motion_picture","Q5769580":"motion_picture","Q5769586":"motion_picture","Q5769589":"motion_picture","Q5769592":"motion_picture","Q1752462":"dataset","Q12016659":"periodical","Q2663608":"song","Q763744":"software","Q870780":"software","Q918333":"software","Q1142726":"software","Q1283077":"software","Q3277848":"software","Q3467906":"software","Q4112110":"software","Q4826465":"software","Q202344":"book","Q339091":"book","Q393148":"book","Q653101":"book","Q206959":"event","Q257913":"event","Q935452":"book","Q1314918":"book","Q704813":"event","Q857981":"event","Q1006573":"event","Q1009297":"event","Q1009301":"event","Q1153918":"event","Q1203886":"event","Q1638749":"event","Q1780972":"event","Q2538131":"book","Q1925193":"event","Q2049711":"event","Q2166448":"event","Q2212942":"event","Q2299201":"event","Q2340640":"event","Q2431923":"event","Q2583784":"event","Q3376272":"book","Q3488759":"book","Q3246424":"event","Q3625361":"event","Q3686096":"performance","Q4311799":"review","Q4156666":"event","Q5196998":"event","Q5570137":"event","Q6055821":"legislation","Q6061510":"event","Q6815921":"event","Q6898689":"event","Q6941403":"event","Q11265757":"event","Q12351927":"event","Q13157160":"event","Q15089348":"event","Q15875625":"event","Q15973082":"event","Q17321236":"book","Q20107140":"event","Q20181485":"event","Q20603222":"event","Q20807545":"event","Q21115086":"event","Q22160401":"event","Q24198315":"event","Q25048962":"performance","Q27630524":"performance","Q57326878":"software","Q53566454":"book","Q57776091":"event","Q57776190":"event","Q60723717":"event","Q60988014":"event","Q64004398":"event","Q13959":"event","Q56909":"event","Q85801888":"software","Q97496940":"event","Q106613434":"event","Q109019267":"book","Q3310463":"dataset","Q4842492":"dataset","Q6530268":"dataset","Q235131":"book","Q425943":"event","Q602900":"event","Q671111":"event","Q698654":"event","Q716176":"event","Q849095":"event","Q864463":"event","Q918346":"event","Q1007356":"event","Q1057954":"event","Q1128324":"event","Q1201816":"event","Q1202269":"event","Q1207217":"event","Q1370841":"event","Q1540633":"event","Q1572106":"event","Q2041542":"legislation","Q1665609":"event","Q210700":"standard","Q2112448":"event","Q2177183":"event","Q2243695":"event","Q2385043":"event","Q2409723":"event","Q1428844":"standard","Q1535269":"standard","Q1653458":"standard","Q3587147":"event","Q3587148":"event","Q4370097":"book","Q4384332":"book","Q4058302":"event","Q4127445":"event","Q4127470":"event","Q4193497":"event","Q4201985":"event","Q4216626":"event","Q4288581":"event","Q4289143":"event","Q4303936":"event","Q4333828":"event","Q4369093":"event","Q4400789":"event","Q4466245":"event","Q4824471":"event","Q4852690":"event","Q5100410":"event","Q5827809":"event","Q6067231":"event","Q7432143":"event","Q5970272":"standard","Q7865794":"event","Q7878497":"event","Q7890695":"event","Q7890774":"event","Q7890780":"event","Q8241475":"event","Q8242546":"event","Q10340639":"event","Q10340642":"event","Q10340643":"event","Q10340640":"event","Q10824155":"event","Q10860648":"event","Q11723196":"event","Q11862935":"event","Q11918755":"event","Q11918770":"event","Q12033797":"event","Q12041763":"event","Q12042582":"event","Q12090908":"event","Q13679033":"standard","Q17019867":"book","Q16911184":"event","Q17099653":"event","Q19128706":"book","Q18479521":"event","Q19870925":"event","Q21637595":"event","Q23688115":"event","Q24389253":"event","Q24659965":"event","Q28136455":"book","Q27644483":"event","Q28677340":"event","Q47472773":"event","Q56254033":"event","Q56316064":"event","Q113":"event","Q52641":"standard","Q93771184":"dataset","Q90403399":"event","Q96374831":"book","Q100235449":"event","Q3722420":"event","Q4128600":"event","Q5116010":"event","Q5518656":"event","Q5827551":"event","Q5828421":"event","Q6518201":"event","Q7232773":"event","Q10271596":"event","Q10271606":"event","Q10660882":"event","Q11366961":"event","Q11931634":"event","Q12311825":"event","Q12323704":"event","Q12778795":"event","Q14509381":"event","Q14516417":"event","Q15273379":"event","Q15283424":"event","Q16939528":"event","Q17317594":"event","Q18248981":"event","Q22160105":"event","Q22160112":"event","Q22160120":"event","Q22160593":"event","Q22162827":"event","Q22266213":"event","Q22266255":"event","Q22266624":"event","Q22266709":"event","Q22268901":"event","Q22269206":"event","Q22269333":"event","Q22269349":"event","Q22275878":"event","Q22275938":"event","Q22275982":"event","Q22276008":"event","Q22276080":"event","Q22276155":"event","Q22276186":"event","Q22276264":"event","Q22276298":"event","Q22276316":"event","Q22280876":"event","Q22280897":"event","Q22281036":"event","Q22283539":"event","Q22284407":"event","Q22330752":"event","Q22330839":"event","Q22330909":"event","Q22330922":"event","Q22333025":"event","Q22333190":"event","Q22333339":"event","Q22333685":"event","Q22338585":"event","Q22338592":"event","Q22341275":"event","Q22341286":"event","Q22341320":"event","Q22341339":"event","Q22342153":"event","Q22342180":"event","Q22342211":"event","Q22342918":"event","Q22342927":"event","Q22342947":"event","Q22342957":"event","Q22343980":"event","Q22442768":"event","Q22442774":"event","Q22442788":"event","Q22669381":"event","Q22669427":"event","Q22669480":"event","Q22669513":"event","Q22669521":"event","Q22669525":"event","Q22669531":"event","Q22669585":"event","Q22669603":"event","Q22669601":"event","Q22669606":"event","Q22669618":"event","Q22669625":"event","Q22669632":"event","Q22669642":"event","Q22695893":"event","Q22695898":"event","Q22695896":"event","Q22695905":"event","Q22696274":"event","Q22696377":"event","Q22696383":"event","Q22696395":"event","Q22696400":"event","Q110453684":"event","Q1428162":"song","Q4440575":"song","Q4763551":"song","Q80735":"software","Q137341":"event","Q769451":"event","Q786705":"event","Q1515229":"event","Q1753160":"event","Q2374581":"event","Q2997934":"event","Q2997943":"event","Q3367750":"event","Q5353623":"event","Q5629417":"event","Q6025903":"event","Q6952729":"event","Q11865368":"event","Q12876999":"event","Q16553259":"event","Q22696414":"event","Q22703992":"event","Q22704005":"event","Q22704041":"event","Q24176296":"event","Q24176345":"event","Q24177311":"event","Q24178659":"event","Q24179666":"event","Q24180344":"event","Q24182685":"event","Q24183035":"event","Q24332812":"event","Q24333627":"event","Q24397514":"event","Q24410897":"event","Q24452127":"event","Q24541623":"event","Q24558942":"event","Q24566658":"event","Q24567296":"event","Q24568879":"event","Q24576690":"event","Q24618255":"event","Q24659969":"event","Q24706075":"event","Q24712693":"event","Q24713040":"event","Q24713657":"event","Q24713744":"event","Q24714461":"event","Q24714562":"event","Q24715089":"event","Q24715171":"event","Q24715411":"event","Q24718538":"event","Q24718627":"event","Q24718981":"event","Q25343327":"event","Q25343622":"event","Q25343631":"event","Q25343628":"event","Q25343650":"event","Q25343648":"event","Q25367811":"event","Q25367878":"event","Q25367968":"event","Q25369215":"event","Q25369324":"event","Q25369733":"event","Q25448839":"event","Q25448932":"event","Q25455090":"event","Q25467156":"event","Q25467527":"event","Q25517032":"event","Q25531251":"event","Q25532438":"event","Q25532583":"event","Q25534775":"event","Q25535282":"event","Q25544724":"event","Q25546854":"event","Q25548021":"event","Q28333164":"event","Q28649370":"event","Q29054308":"event","Q30139181":"event","Q30579807":"event","Q47516525":"event","Q26473":"song","Q49637768":"event","Q56185179":"event","Q56315594":"event","Q56364341":"event","Q56821073":"event","Q56821289":"event","Q26284":"event","Q84035267":"event","Q8054833":"song","Q182154":"book","Q121571":"event","Q255117":"event","Q265736":"event","Q268554":"event","Q280275":"event","Q281886":"event","Q281917":"event","Q282166":"event","Q298589":"event","Q320757":"event","Q334939":"event","Q384681":"event","Q386830":"event","Q429896":"event","Q477435":"event","Q488647":"event","Q524624":"event","Q581504":"event","Q582082":"event","Q648028":"event","Q998170":"event","Q1190392":"event","Q1411753":"event","Q1475062":"event","Q2000006":"event","Q2142411":"event","Q2299288":"event","Q2813537":"event","Q2862138":"event","Q2937412":"event","Q2955927":"event","Q2963375":"event","Q3052147":"event","Q3128742":"event","Q3139335":"event","Q3150010":"event","Q3151565":"event","Q3237804":"event","Q3304723":"event","Q3328467":"event","Q3338981":"event","Q3362755":"event","Q3519336":"event","Q3528162":"event","Q5151822":"book","Q4826550":"event","Q5171014":"event","Q5172488":"event","Q5178491":"event","Q5370451":"event","Q7048853":"event","Q7116323":"event","Q7304831":"event","Q7520824":"event","Q7815021":"event","Q7927469":"event","Q11328695":"event","Q15696873":"event","Q15697091":"event","Q16974177":"event","Q18694280":"book","Q18157090":"event","Q18480501":"event","Q19877750":"event","Q22095239":"event","Q22095399":"event","Q22095608":"event","Q22096254":"event","Q22931433":"event","Q24204538":"event","Q25415999":"event","Q30639095":"event","Q38498738":"event","Q39059968":"event","Q41888576":"event","Q48843376":"event","Q60753395":"event","Q63860280":"book","Q65043763":"event","Q65043766":"event","Q65043772":"event","Q65043982":"event","Q65043992":"event","Q65044827":"event","Q21884":"event","Q109523071":"song","Q104767287":"event","Q105283586":"event","Q106000106":"event","Q106377263":"event","Q106377266":"event","Q106377264":"event","Q106377265":"event","Q106901434":"event","Q648675":"event","Q654498":"event","Q654565":"event","Q675723":"event","Q680152":"event","Q680171":"event","Q744755":"event","Q749413":"event","Q774486":"event","Q776166":"event","Q778692":"event","Q783734":"event","Q800165":"event","Q828160":"event","Q848797":"event","Q854376":"event","Q910409":"event","Q919370":"event","Q919638":"event","Q927779":"event","Q936915":"event","Q941111":"event","Q949929":"event","Q961714":"event","Q975138":"event","Q1075582":"event","Q1149386":"event","Q1161755":"event","Q1162457":"event","Q1162472":"event","Q1289679":"event","Q1376855":"event","Q1399835":"event","Q1457762":"event","Q1501434":"event","Q1502732":"event","Q1583497":"event","Q1593292":"event","Q1619413":"event","Q1647788":"event","Q1673998":"event","Q1771731":"event","Q1771965":"event","Q1772214":"event","Q1772238":"event","Q1772957":"event","Q1772985":"event","Q1773662":"event","Q1775333":"event","Q1775967":"event","Q1776505":"event","Q1777773":"event","Q1778122":"event","Q1778804":"event","Q1779476":"event","Q1780193":"event","Q1780337":"event","Q1785973":"event","Q1807175":"event","Q1815189":"event","Q1820728":"event","Q1822501":"event","Q1825491":"event","Q1829727":"event","Q1835267":"event","Q1839891":"event","Q1848211":"event","Q1852166":"event","Q1853292":"event","Q1854372":"event","Q1856488":"event","Q1858179":"event","Q1858239":"event","Q1882006":"event","Q1887255":"event","Q1896344":"event","Q1901161":"event","Q1901308":"event","Q1901408":"event","Q1910741":"event","Q1915689":"event","Q1920067":"event","Q1924643":"event","Q1928644":"event","Q1938395":"event","Q1943456":"event","Q1944970":"event","Q1970545":"event","Q1971029":"event","Q1988451":"event","Q1993127":"event","Q1995042":"event","Q2001306":"event","Q2001949":"event","Q2007725":"event","Q2021654":"event","Q2028234":"event","Q2029846":"event","Q2037679":"event","Q2038748":"event","Q2041702":"event","Q2044665":"event","Q2048921":"event","Q2049374":"event","Q2049476":"event","Q2055374":"event","Q2063988":"event","Q2070623":"event","Q2073858":"event","Q2075676":"event","Q2089669":"event","Q2091754":"event","Q2095457":"event","Q2098245":"event","Q2102469":"event","Q2104798":"event","Q2106927":"event","Q2107026":"event","Q2112420":"event","Q2115671":"event","Q2119959":"event","Q2120006":"event","Q2122849":"event","Q2123962":"event","Q2124001":"event","Q2130185":"event","Q2131190":"event","Q2135525":"event","Q2137952":"event","Q2140388":"event","Q2142475":"event","Q2142753":"event","Q2168242":"event","Q2169090":"event","Q2172605":"event","Q2178781":"event","Q2181022":"event","Q2181047":"event","Q2181282":"event","Q2182092":"event","Q2186047":"event","Q2190893":"event","Q2194865":"event","Q2198516":"event","Q2199901":"event","Q2200544":"event","Q2201764":"event","Q2205070":"event","Q2206836":"event","Q2210155":"event","Q2212459":"event","Q2215930":"event","Q2221160":"event","Q2222777":"event","Q2227320":"event","Q2242233":"event","Q2246444":"event","Q2248087":"event","Q2249813":"event","Q2255046":"event","Q2260821":"event","Q2284977":"event","Q2286741":"event","Q2289880":"event","Q2290171":"event","Q2299752":"event","Q2300124":"event","Q2300678":"event","Q2303185":"event","Q2305720":"event","Q2309492":"event","Q2313361":"event","Q2316735":"event","Q2324540":"event","Q2325096":"event","Q2328480":"event","Q2331264":"event","Q2343166":"event","Q2344291":"event","Q2350510":"event","Q2351234":"event","Q2352486":"event","Q2357329":"event","Q2357402":"event","Q2365019":"event","Q2371402":"event","Q2388111":"event","Q2390662":"event","Q2393319":"event","Q2398517":"event","Q2401441":"event","Q2407049":"event","Q2416647":"event","Q2423140":"event","Q2427555":"event","Q2433323":"event","Q2436904":"event","Q2437424":"event","Q2438746":"event","Q2440678":"event","Q2449809":"event","Q2455961":"event","Q2457278":"event","Q2462825":"event","Q2466473":"event","Q2476668":"event","Q2479655":"event","Q2479920":"event","Q2482256":"event","Q2487426":"event","Q2498569":"event","Q2505370":"event","Q2522564":"event","Q2525491":"event","Q2527308":"event","Q2530190":"event","Q2538556":"event","Q2540644":"event","Q2546224":"event","Q2553046":"event","Q2555681":"event","Q2561185":"event","Q2562288":"event","Q2565086":"event","Q2576021":"event","Q2584032":"event","Q2585764":"event","Q2600561":"event","Q2602686":"event","Q2609854":"event","Q2611360":"event","Q2612919":"event","Q2612950":"event","Q2615811":"event","Q2619808":"event","Q2620358":"event","Q2622503":"event","Q2630007":"event","Q2631439":"event","Q2632902":"event","Q2636144":"event","Q2644268":"event","Q2648537":"event","Q2655932":"event","Q2659592":"event","Q2679940":"event","Q2681563":"event","Q2685099":"event","Q2694152":"event","Q2695089":"event","Q2702069":"event","Q2703109":"event","Q2707767":"event","Q2709893":"event","Q2714839":"event","Q2728843":"event","Q2735106":"event","Q2738642":"event","Q2743855":"event","Q2745221":"event","Q2753109":"event","Q2755811":"event","Q2780989":"event","Q2785398":"event","Q2792933":"event","Q2794722":"event","Q2802839":"event","Q2804141":"event","Q2818505":"event","Q2819182":"event","Q2835344":"event","Q2845871":"event","Q2856073":"event","Q2869206":"event","Q2873362":"event","Q2876554":"event","Q2881149":"event","Q2904893":"event","Q2914379":"event","Q2917022":"event","Q2924805":"event","Q2927761":"event","Q2958920":"event","Q2973190":"event","Q2991228":"event","Q3041780":"event","Q3044450":"event","Q3074962":"event","Q3101510":"event","Q3109268":"event","Q3111159":"event","Q3114036":"event","Q3153146":"event","Q3189573":"event","Q3196293":"event","Q3221656":"event","Q3230688":"event","Q3240544":"event","Q3353534":"event","Q3354037":"event","Q3467251":"event","Q3906932":"event","Q4322445":"event","Q4381821":"event","Q4406091":"event","Q4447597":"event","Q4487337":"event","Q4520636":"event","Q4552973":"event","Q4566050":"event","Q4574522":"event","Q4590508":"event","Q4627135":"event","Q4639733":"event","Q4661444":"event","Q4663331":"event","Q4705863":"event","Q4712635":"event","Q4733642":"event","Q4766207":"event","Q4788203":"event","Q4832133":"event","Q4842339":"event","Q4849310":"event","Q4855191":"event","Q4869478":"event","Q4877580":"event","Q4888756":"event","Q4923567":"event","Q4925730":"event","Q4929676":"event","Q5011744":"event","Q5021913":"event","Q5029247":"event","Q5033256":"event","Q5034420":"event","Q5041314":"event","Q5048940":"event","Q5059058":"event","Q5059323":"event","Q5138198":"event","Q5147881":"event","Q5147940":"event","Q5169460":"event","Q5169506":"event","Q5177979":"event","Q5205030":"event","Q5244757":"event","Q5270770":"event","Q5302626":"event","Q5311028":"event","Q5351785":"event","Q5374146":"event","Q5450696":"event","Q5450794":"event","Q5472298":"event","Q5488229":"event","Q5507479":"event","Q5507477":"event","Q5518439":"event","Q5579444":"event","Q5580603":"event","Q5603743":"event","Q5744540":"event","Q5745844":"event","Q6021402":"event","Q6025889":"event","Q6060250":"event","Q6071073":"event","Q6392235":"event","Q6423673":"event","Q6431929":"event","Q6462797":"event","Q6466808":"event","Q6517928":"event","Q6672320":"event","Q6861781":"event","Q6879162":"event","Q6886969":"event","Q6938887":"event","Q6947814":"event","Q6958648":"event","Q7058202":"event","Q7080842":"event","Q7089988":"event","Q7096377":"event","Q7119146":"event","Q7130105":"event","Q7191667":"event","Q7231613":"event","Q7234085":"event","Q7360672":"event","Q7375800":"event","Q7423474":"event","Q7447483":"event","Q7566619":"event","Q7569614":"event","Q7591500":"event","Q7592447":"event","Q7639049":"event","Q108939181":"event","Q964061":"motion_picture","Q1747837":"motion_picture","Q111668117":"event","Q3684597":"motion_picture","Q215552":"software","Q267634":"book","Q527006":"event","Q605458":"event","Q649128":"event","Q675181":"event","Q830090":"event","Q1760692":"event","Q2066411":"event","Q12032405":"software","Q7641191":"event","Q7641702":"event","Q7651059":"event","Q7709218":"event","Q7753394":"event","Q7758284":"event","Q7799091":"event","Q7827739":"event","Q7849644":"event","Q7850310":"event","Q7855286":"event","Q7927246":"event","Q7941311":"event","Q7945181":"event","Q7986142":"event","Q8035902":"event","Q8072002":"event","Q11316743":"event","Q11346118":"event","Q11507896":"event","Q12017912":"event","Q13461404":"event","Q13476069":"event","Q13546576":"event","Q13568091":"event","Q13583588":"event","Q13654029":"event","Q14852379":"event","Q15673027":"event","Q15879918":"event","Q15882707":"event","Q15961799":"event","Q15972983":"event","Q15974367":"event","Q15974450":"event","Q15975482":"event","Q15979002":"event","Q16743938":"event","Q16787438":"event","Q16830210":"event","Q17150906":"event","Q17162079":"event","Q17320443":"event","Q17988066":"event","Q18088520":"event","Q18358716":"event","Q18509037":"event","Q18509064":"event","Q18509187":"event","Q18523836":"event","Q18600393":"event","Q18600402":"event","Q18693936":"event","Q18756126":"event","Q18756127":"event","Q18756124":"event","Q18756125":"event","Q18756130":"event","Q18756131":"event","Q18756129":"event","Q18756134":"event","Q18756133":"event","Q18756139":"event","Q18756136":"event","Q18756137":"event","Q18756140":"event","Q18756141":"event","Q18815100":"event","Q20018613":"event","Q20019264":"event","Q20114079":"event","Q20154814":"event","Q20735954":"event","Q21013825":"event","Q21027484":"event","Q24898042":"event","Q108803475":"regulation","Q27494565":"event","Q30644804":"event","Q60526686":"event","Q60988533":"event","Q102124796":"event","Q105275188":"event","Q106612454":"book","Q82595":"event","Q86891":"event","Q115821":"event","Q129650":"event","Q142944":"event","Q145554":"event","Q147780":"event","Q157553":"event","Q162604":"event","Q162944":"event","Q163046":"event","Q163719":"event","Q163786":"event","Q163928":"event","Q167541":"event","Q168018":"event","Q169519":"event","Q170215":"event","Q175762":"event","Q182165":"event","Q182994":"event","Q187304":"event","Q188365":"event","Q194180":"event","Q194641":"event","Q201671":"event","Q202243":"event","Q202699":"event","Q204752":"event","Q206073":"event","Q206813":"event","Q209080":"event","Q209318":"event","Q209970":"event","Q210183":"event","Q210262":"event","Q210587":"event","Q210836":"event","Q211461":"event","Q216022":"event","Q217016":"event","Q218555":"event","Q219007":"event","Q219586":"event","Q219592":"event","Q220875":"event","Q224724":"event","Q225057":"event","Q235114":"event","Q235307":"event","Q237753":"event","Q238113":"event","Q239738":"event","Q244464":"event","Q245252":"event","Q246874":"event","Q247767":"event","Q247788":"event","Q247812":"event","Q247829":"event","Q248005":"event","Q248512":"event","Q248844":"event","Q248960":"event","Q250081":"event","Q250638":"event","Q252156":"event","Q255633":"event","Q257282":"event","Q259598":"event","Q259776":"event","Q260787":"event","Q267785":"event","Q271271":"event","Q275005":"event","Q275189":"event","Q275665":"event","Q276085":"event","Q276445":"event","Q277581":"event","Q277786":"event","Q277945":"event","Q278371":"event","Q278603":"event","Q279617":"event","Q284335":"event","Q285473":"event","Q287453":"event","Q291594":"event","Q295606":"event","Q308798":"event","Q242039":"standard","Q11620704":"book","Q24534424":"standard","Q40068":"event","Q44763":"event","Q60681":"event","Q65410":"event","Q318480":"event","Q322125":"event","Q324867":"event","Q326422":"event","Q326859":"event","Q338121":"event","Q368165":"event","Q370883":"event","Q384073":"event","Q384531":"event","Q387662":"event","Q391006":"event","Q402526":"event","Q450561":"event","Q463663":"event","Q477309":"event","Q480019":"event","Q485568":"event","Q497386":"event","Q511137":"event","Q518802":"event","Q537766":"event","Q548761":"event","Q557588":"event","Q570246":"event","Q581932":"event","Q582860":"event","Q583514":"event","Q585371":"event","Q589722":"event","Q589838":"event","Q592486":"event","Q600302":"event","Q605777":"event","Q606832":"event","Q607963":"event","Q608050":"event","Q611955":"event","Q612980":"event","Q614965":"event","Q628797":"event","Q629136":"event","Q630141":"event","Q636853":"event","Q647746":"event","Q654697":"event","Q662851":"event","Q663736":"event","Q667065":"event","Q667209":"event","Q672827":"event","Q672983":"event","Q677397":"event","Q680619":"event","Q687108":"event","Q689789":"event","Q696269":"event","Q728398":"event","Q734803":"event","Q738154":"event","Q739479":"event","Q747225":"event","Q752442":"event","Q761083":"event","Q761626":"event","Q763090":"event","Q764690":"event","Q769090":"event","Q772266":"event","Q778974":"event","Q780993":"event","Q785574":"event","Q788588":"event","Q793604":"event","Q793769":"event","Q794235":"event","Q794251":"event","Q794257":"event","Q812098":"event","Q820988":"event","Q821174":"event","Q824641":"event","Q830717":"event","Q831202":"event","Q847239":"event","Q849514":"event","Q849843":"event","Q850132":"event","Q856855":"event","Q863684":"event","Q863688":"event","Q868588":"event","Q874990":"event","Q880029":"event","Q891072":"event","Q902060":"event","Q912116":"event","Q922935":"event","Q923316":"event","Q926330":"event","Q929124":"event","Q932747":"event","Q935872":"event","Q938286":"event","Q954911":"event","Q960171":"event","Q967002":"event","Q971619":"event","Q974058":"event","Q978160":"event","Q980467":"event","Q988084":"event","Q988698":"event","Q990787":"event","Q1007931":"event","Q1023719":"event","Q1031665":"event","Q1033339":"event","Q1033349":"event","Q1041850":"event","Q1054442":"event","Q1063772":"event","Q1076828":"event","Q1087541":"event","Q1090396":"event","Q1090595":"event","Q1090607":"event","Q1090617":"event","Q1090623":"event","Q1090640":"event","Q1090809":"event","Q1090830":"event","Q1090855":"event","Q1090863":"event","Q1090867":"event","Q1093405":"event","Q1104981":"event","Q1110061":"event","Q1118304":"event","Q1129048":"event","Q1129600":"event","Q1137344":"event","Q1139408":"event","Q1139758":"event","Q1141778":"event","Q1152715":"event","Q1157234":"event","Q1179092":"event","Q1187715":"event","Q1187730":"event","Q1188284":"event","Q1202326":"event","Q1202379":"event","Q1203215":"event","Q1203524":"event","Q1203641":"event","Q1203701":"event","Q1203743":"event","Q1203964":"event","Q1225128":"event","Q1305444":"event","Q1311336":"event","Q1320341":"event","Q1324416":"event","Q1328315":"event","Q1330713":"event","Q1342351":"event","Q1385375":"event","Q1405103":"event","Q1418739":"event","Q1421206":"event","Q1421208":"event","Q1423762":"event","Q1429268":"event","Q1436035":"event","Q1437739":"event","Q1470401":"event","Q1487175":"event","Q1491334":"event","Q1520528":"event","Q1520622":"event","Q1522963":"event","Q1530659":"event","Q1532343":"event","Q1536706":"event","Q1546355":"event","Q1546408":"event","Q1567733":"event","Q1588651":"event","Q1622667":"event","Q1626934":"event","Q1627391":"event","Q1635558":"event","Q1644969":"event","Q1660801":"event","Q1675130":"event","Q1685492":"event","Q1687662":"event","Q1725521":"event","Q1774675":"event","Q1779116":"event","Q1812315":"event","Q1816968":"event","Q1824570":"event","Q1861301":"event","Q1874074":"event","Q1892680":"event","Q1963875":"event","Q2009289":"event","Q2047271":"event","Q2054331":"event","Q2060907":"event","Q2066655":"event","Q2067442":"event","Q2072802":"event","Q2082897":"event","Q2083746":"event","Q2083774":"event","Q2088526":"event","Q2102521":"event","Q2105017":"event","Q2120378":"event","Q2120557":"event","Q2164956":"event","Q2180367":"event","Q2198291":"event","Q2248858":"event","Q2253660":"event","Q2256671":"event","Q2261921":"event","Q2288509":"event","Q2289847":"event","Q2290420":"event","Q2292277":"event","Q2297972":"event","Q2299651":"event","Q2304336":"event","Q2306612":"event","Q2308030":"event","Q2310260":"event","Q2315908":"event","Q2331632":"event","Q2333731":"event","Q2334124":"event","Q2357382":"event","Q2358387":"event","Q2375100":"event","Q2386334":"event","Q2397581":"event","Q2409829":"event","Q2465459":"event","Q2467445":"event","Q2468619":"event","Q2494381":"event","Q2537744":"event","Q2538846":"event","Q2615588":"event","Q2621488":"event","Q2625448":"event","Q2629834":"event","Q2630379":"event","Q2660485":"event","Q2677790":"event","Q2701291":"event","Q2735889":"event","Q2739565":"event","Q2740424":"event","Q2803099":"event","Q2855634":"event","Q2909479":"event","Q2930969":"event","Q2948824":"event","Q2948906":"event","Q2948907":"event","Q2948905":"event","Q2948911":"event","Q2948915":"event","Q2948922":"event","Q2949044":"event","Q2949202":"event","Q2949208":"event","Q2949214":"event","Q2949854":"event","Q2949852":"event","Q2949853":"event","Q2949859":"event","Q2949856":"event","Q2949872":"event","Q2949879":"event","Q2949877":"event","Q2949880":"event","Q2949998":"event","Q2949997":"event","Q2950382":"event","Q2950380":"event","Q2950517":"event","Q2950521":"event","Q2950621":"event","Q2950627":"event","Q2950625":"event","Q2950630":"event","Q2950873":"event","Q2951014":"event","Q2951015":"event","Q2951021":"event","Q2951026":"event","Q2951242":"event","Q2951289":"event","Q2951395":"event","Q2951397":"event","Q2951558":"event","Q2951603":"event","Q2951606":"event","Q2951928":"event","Q2951934":"event","Q2952006":"event","Q2952044":"event","Q2952235":"event","Q2952304":"event","Q2952365":"event","Q2952370":"event","Q2952369":"event","Q2952374":"event","Q2952375":"event","Q2952373":"event","Q2952384":"event","Q2952931":"event","Q2952936":"event","Q2953228":"event","Q2953557":"event","Q2954296":"event","Q2954434":"event","Q2954943":"event","Q2954945":"event","Q2955087":"event","Q2955102":"event","Q2955110":"event","Q2955108":"event","Q2955194":"event","Q2955197":"event","Q2955214":"event","Q2955714":"event","Q3087942":"event","Q3179674":"event","Q3181379":"event","Q3240521":"event","Q3247654":"event","Q3292904":"event","Q3297868":"event","Q3323934":"event","Q3324860":"event","Q3392499":"event","Q3392552":"event","Q3402210":"event","Q3428306":"event","Q3437813":"event","Q3494101":"event","Q3497134":"event","Q3500680":"event","Q3510644":"event","Q3564678":"event","Q3639298":"event","Q3652179":"event","Q3652986":"event","Q3652990":"event","Q3652998":"event","Q3652997":"event","Q3653032":"event","Q3653079":"event","Q3654042":"event","Q3654052":"event","Q3654109":"event","Q3654114":"event","Q3654115":"event","Q3654155":"event","Q3654156":"event","Q3654195":"event","Q3654207":"event","Q3654205":"event","Q3654208":"event","Q3654209":"event","Q3654302":"event","Q3654311":"event","Q3654496":"event","Q3654501":"event","Q3663238":"event","Q3774394":"event","Q3775620":"event","Q3817458":"event","Q3820228":"event","Q3823950":"event","Q3930173":"event","Q3944757":"event","Q4116574":"event","Q4509470":"event","Q4509660":"event","Q4582333":"event","Q4584510":"event","Q4652534":"event","Q4654222":"event","Q4701868":"event","Q4709119":"event","Q4823594":"event","Q4823973":"event","Q4824043":"event","Q4824280":"event","Q4824451":"event","Q4824456":"event","Q4824682":"event","Q4824697":"event","Q4824706":"event","Q4824729":"event","Q4825497":"event","Q4855427":"event","Q4882577":"event","Q4947322":"event","Q4952027":"event","Q4970959":"event","Q4971081":"event","Q4971084":"event","Q4971088":"event","Q4978928":"event","Q5028293":"event","Q5098731":"event","Q5147922":"event","Q5147945":"event","Q5174890":"event","Q5201742":"event","Q5219740":"event","Q5317354":"event","Q5334350":"event","Q5348334":"event","Q5408432":"event","Q5431964":"event","Q5448585":"event","Q5450763":"event","Q5450793":"event","Q5548003":"event","Q5551129":"event","Q5597856":"event","Q5614251":"event","Q5680215":"event","Q6020005":"event","Q6045815":"event","Q6048962":"event","Q6070599":"event","Q6082072":"event","Q6087177":"event","Q6127417":"event","Q6156289":"event","Q6270922":"event","Q6417479":"event","Q6417477":"event","Q6444725":"event","Q6452377":"event","Q6497315":"event","Q6545763":"event","Q6545770":"event","Q6553333":"event","Q6648345":"event","Q6648383":"event","Q6678345":"event","Q6744786":"event","Q6825984":"event","Q6953036":"event","Q6972083":"event","Q6972728":"event","Q6978478":"event","Q7004971":"event","Q7015436":"event","Q7015626":"event","Q7034776":"event","Q7061142":"event","Q7072632":"event","Q7119138":"event","Q7125690":"event","Q7133162":"event","Q7134683":"event","Q7209876":"event","Q7209928":"event","Q7209936":"event","Q7232625":"event","Q7232647":"event","Q7232649":"event","Q7232671":"event","Q7232669":"event","Q7240322":"event","Q7401700":"event","Q7437655":"event","Q7458934":"event","Q7523257":"event","Q7541522":"event","Q7541803":"event","Q7565442":"event","Q7565785":"event","Q7855246":"event","Q7863694":"event","Q7864827":"event","Q7865802":"event","Q7865815":"event","Q7865827":"event","Q7875948":"event","Q7890746":"event","Q7890855":"event","Q7892303":"event","Q7901455":"event","Q7901468":"event","Q7904715":"event","Q7981873":"event","Q9252110":"event","Q9298807":"event","Q10495597":"event","Q11389921":"event","Q11389951":"event","Q11509342":"event","Q11782833":"event","Q11782838":"event","Q11782840":"event","Q11782846":"event","Q11782857":"event","Q11868535":"event","Q11870488":"event","Q11992135":"event","Q12169411":"event","Q12443987":"event","Q12837728":"event","Q13027698":"event","Q14377162":"event","Q14892596":"event","Q15027409":"event","Q15042689":"event","Q15101808":"event","Q15231491":"event","Q15805533":"event","Q15844146":"event","Q15879704":"event","Q15917511":"event","Q16056559":"event","Q16087288":"event","Q16382612":"event","Q16382660":"event","Q16383174":"event","Q16383176":"event","Q16481773":"event","Q16537401":"event","Q16537515":"event","Q16537520":"event","Q16537635":"event","Q16538029":"event","Q16538044":"event","Q16538151":"event","Q16716834":"event","Q16716832":"event","Q16826474":"event","Q16960366":"event","Q16971486":"event","Q16972047":"event","Q17019929":"event","Q17068802":"event","Q17098551":"event","Q17111297":"event","Q17156396":"event","Q17354263":"event","Q17354595":"event","Q17513955":"event","Q17513960":"event","Q17514051":"event","Q17514151":"event","Q17624381":"event","Q17624398":"event","Q17624403":"event","Q17624423":"event","Q17632439":"event","Q18156611":"event","Q18167837":"event","Q18351267":"event","Q18352040":"event","Q18357021":"event","Q18357029":"event","Q18391076":"event","Q18399671":"event","Q18680471":"event","Q18701510":"event","Q19332036":"event","Q20252393":"event","Q20311287":"event","Q20472631":"event","Q20804909":"event","Q20873007":"event","Q20920876":"event","Q21208335":"event","Q25662185":"event","Q25712578":"event","Q26198002":"event","Q26806709":"event","Q26836404":"event","Q27492342":"event","Q27511062":"event","Q28062628":"event","Q28152170":"event","Q110711846":"event","Q110711847":"event","Q110711844":"event","Q110711845":"event","Q111323031":"event","Q111324062":"event","Q1457145":"broadcast","Q7249354":"software","Q1558505":"review","Q1188852":"event","Q1258212":"event","Q2093973":"book","Q2739490":"book","Q263029":"standard","Q3587322":"event","Q3587323":"event","Q3587320":"event","Q3587321":"event","Q3587326":"event","Q3587327":"event","Q3587324":"event","Q3587325":"event","Q3587330":"event","Q3587328":"event","Q3587329":"event","Q3587334":"event","Q3587332":"event","Q6453074":"book","Q6501106":"event","Q24887478":"software","Q16543809":"event","Q22907854":"event","Q56843912":"map","Q28226004":"event","Q28941860":"review","Q28417718":"event","Q28653546":"event","Q28679823":"event","Q28679826":"event","Q29050118":"event","Q31086988":"event","Q60740694":"dataset","Q42170979":"event","Q55187831":"software","Q47019500":"event","Q47118669":"event","Q47464206":"event","Q47482732":"event","Q47482742":"event","Q47496058":"event","Q47543339":"event","Q48267135":"event","Q48758455":"event","Q48782280":"event","Q48861490":"event","Q49544696":"event","Q50326356":"event","Q51794851":"event","Q51897918":"event","Q52408848":"event","Q55582541":"book","Q55582560":"book","Q57496872":"event","Q3037400":"regulation","Q59877788":"event","Q60846649":"event","Q61396924":"event","Q61679484":"event","Q61875318":"event","Q61875331":"event","Q62020230":"event","Q63891772":"event","Q64500267":"event","Q64780520":"event","Q71829391":"event","Q71831237":"event","Q77518996":"event","Q80370460":"event","Q81805133":"event","Q83239893":"event","Q84497979":"event","Q108352651":"dataset","Q97621243":"software","Q97621286":"software","Q90048977":"event","Q90049197":"event","Q92292023":"event","Q93018258":"event","Q103821052":"software","Q94786545":"event","Q97228376":"event","Q98918317":"event","Q102016095":"event","Q105397574":"event","Q110711850":"event","Q110711851":"event","Q110711848":"event","Q110711854":"event","Q110711852":"event","Q110711853":"event","Q110711858":"event","Q110711859":"event","Q110711856":"event","Q110711857":"event","Q110711862":"event","Q110711863":"event","Q110711860":"event","Q110711861":"event","Q110711866":"event","Q110711867":"event","Q110711864":"event","Q110711865":"event","Q110711870":"event","Q110711871":"event","Q110711868":"event","Q110711869":"event","Q110711874":"event","Q110711875":"event","Q110711872":"event","Q110711873":"event","Q932420":"dataset","Q114106":"software","Q215819":"software","Q319417":"software","Q431195":"software","Q484935":"software","Q860748":"software","Q12154808":"song","Q2357154":"software","Q2496164":"software","Q2566342":"software","Q2919848":"software","Q3325092":"software","Q3884002":"software","Q5014224":"software","Q335918":"event","Q386006":"event","Q1498255":"event","Q11244263":"software","Q191012":"standard","Q206924":"standard","Q12018160":"software","Q3435775":"event","Q3722848":"event","Q16688751":"software","Q17089542":"software","Q16957146":"event","Q17042768":"standard","Q19819515":"event","Q20485156":"book","Q2338544":"performance","Q24885859":"event","Q24886113":"event","Q109595305":"regulation","Q35687379":"software","Q110350495":"regulation","Q39827535":"software","Q50822530":"software","Q47499504":"event","Q396152":"regulation","Q396338":"regulation","Q397334":"regulation","Q397439":"regulation","Q600846":"regulation","Q55632127":"event","Q55638971":"event","Q56295376":"event","Q63243997":"event","Q9395122":"regulation","Q66771315":"event","Q48359853":"performance","Q69886766":"event","Q69904376":"event","Q79197177":"event","Q85728641":"event","Q85728789":"event","Q85728915":"event","Q85729059":"event","Q85729269":"event","Q85729408":"event","Q85729526":"event","Q85729631":"event","Q89503324":"event","Q98952023":"event","Q108905501":"software","Q104630847":"event","Q104735712":"event","Q104865460":"event","Q107466402":"event","Q109361695":"event","Q3125472":"manuscript","Q2560570":"dataset","Q719798":"software","Q933625":"software","Q1502871":"software","Q1758804":"software","Q1854343":"software","Q11517223":"broadcast","Q12242979":"broadcast","Q5252671":"software","Q5562992":"software","Q185523":"event","Q970308":"legislation","Q868557":"event","Q895824":"event","Q1048728":"event","Q1321593":"event","Q1510887":"event","Q1592814":"event","Q1751626":"event","Q1772230":"event","Q2986441":"book","Q2393315":"event","Q2944276":"legislation","Q2539315":"event","Q2629590":"event","Q3409594":"book","Q3440918":"book","Q2869155":"event","Q3070220":"event","Q3070233":"event","Q3135724":"event","Q3822001":"review","Q3927614":"legislation","Q1665191":"standard","Q4912032":"legislation","Q4812461":"event","Q4819313":"event","Q5662428":"book","Q15282750":"software","Q6050412":"event","Q6664265":"legislation","Q6498067":"event","Q7456849":"book","Q6917814":"event","Q7495968":"event","Q18845397":"software","Q10712098":"event","Q11396839":"book","Q11612795":"book","Q12056837":"event","Q25001010":"software","Q17011199":"book","Q25929318":"software","Q16995927":"event","Q17017983":"event","Q17020857":"event","Q17153136":"event","Q17510384":"event","Q18210557":"event","Q18232178":"event","Q19646072":"legislation","Q936412":"performance","Q938118":"performance","Q1033913":"performance","Q19803127":"event","Q20679073":"book","Q21005969":"event","Q23902005":"event","Q28684433":"book","Q15790928":"performance","Q60475632":"software","Q61009090":"software","Q940525":"regulation","Q2821946":"regulation","Q67650639":"software","Q58852757":"event","Q59847891":"book","Q4671162":"regulation","Q34825":"software","Q48510":"software","Q63865762":"legislation","Q65067387":"event","Q105839923":"manuscript","Q110503664":"manuscript","Q94988386":"software","Q96781548":"software","Q88006977":"event","Q108373022":"dataset","Q89374949":"software","Q98559103":"software","Q92062711":"event","Q104381881":"event","Q105774620":"legislation","Q107022954":"event","Q109020342":"event","Q110131505":"standard","Q110132623":"standard","Q110132901":"standard","Q110133975":"standard","Q110134612":"standard","Q16927568":"periodical","Q108404215":"performance","Q5375622":"software","Q6822481":"software","Q693222":"book","Q102113":"event","Q127678":"event","Q210581":"event","Q215014":"event","Q299345":"event","Q299363":"event","Q300008":"event","Q300018":"event","Q300017":"event","Q300029":"event","Q404405":"event","Q557083":"event","Q671970":"event","Q681194":"event","Q863300":"event","Q1007336":"event","Q1047345":"event","Q1778620":"book","Q1193885":"event","Q1334786":"event","Q1563479":"event","Q1598329":"event","Q1682018":"event","Q1916089":"event","Q1991741":"event","Q2113053":"event","Q288096":"standard","Q2160076":"event","Q2939758":"book","Q2376496":"event","Q2478155":"event","Q2529196":"event","Q2537906":"event","Q2869223":"event","Q2922943":"event","Q21402249":"broadcast","Q21504449":"broadcast","Q3590900":"event","Q3879678":"event","Q3951961":"event","Q3998592":"event","Q4786142":"event","Q4815584":"event","Q4951242":"event","Q5198623":"event","Q5284370":"event","Q5365066":"event","Q5366509":"event","Q5367862":"event","Q5580623":"event","Q5954361":"event","Q6412308":"event","Q6889062":"event","Q7279854":"event","Q16872960":"software","Q7673421":"event","Q10289831":"event","Q9383074":"standard","Q11266554":"event","Q11280762":"event","Q11449290":"event","Q17213403":"book","Q16874408":"event","Q18217077":"event","Q18387135":"event","Q19577195":"event","Q20020359":"event","Q20642213":"event","Q20852929":"event","Q20916723":"event","Q20921987":"event","Q23005954":"event","Q25404888":"event","Q25430612":"event","Q25430613":"event","Q27961189":"event","Q39049892":"software","Q30608150":"event","Q30914354":"event","Q54850434":"event","Q56344618":"book","Q41000":"event","Q42378":"standard","Q107314083":"software","Q101115409":"event","Q110419927":"book","Q109614367":"standard","Q7901759":"periodical","Q170238":"broadcast","Q1259759":"broadcast","Q2388283":"broadcast","Q17710982":"periodical","Q387950":"software","Q11396323":"broadcast","Q5953007":"software","Q6155239":"software","Q353280":"event","Q478382":"event","Q580758":"event","Q10343079":"software","Q907666":"event","Q918368":"event","Q1141651":"event","Q1412369":"event","Q1543261":"event","Q1637433":"event","Q1988040":"event","Q728183":"standard","Q2701085":"event","Q2727525":"event","Q3393631":"event","Q3587369":"event","Q3595838":"event","Q3601629":"event","Q3602248":"event","Q3775082":"event","Q3789061":"event","Q4017355":"event","Q4017356":"event","Q4017357":"event","Q4398134":"event","Q4535172":"event","Q4824513":"event","Q5070083":"event","Q5110306":"event","Q5458869":"event","Q5974787":"event","Q6153062":"event","Q6165939":"event","Q6165941":"event","Q6304166":"event","Q6978903":"event","Q7410130":"event","Q16978760":"software","Q7631191":"event","Q7719450":"event","Q7934510":"event","Q10481722":"event","Q10726046":"event","Q11590783":"event","Q14928252":"event","Q14957210":"event","Q15850356":"event","Q15885061":"event","Q18018758":"event","Q18591647":"event","Q17086335":"standard","Q229345":"performance","Q20638346":"event","Q20638347":"event","Q20638344":"event","Q20638345":"event","Q22340719":"event","Q23938120":"event","Q5300113":"performance","Q108541894":"regulation","Q24900794":"event","Q24993224":"event","Q25350067":"event","Q28456244":"event","Q30337878":"event","Q48997688":"software","Q41524215":"event","Q50301185":"event","Q50549235":"event","Q50574730":"event","Q50657938":"event","Q50658266":"event","Q50658729":"event","Q50658948":"event","Q50699631":"event","Q50699774":"event","Q56134005":"book","Q77916592":"software","Q16346":"event","Q101244560":"periodical","Q111137792":"software","Q104412521":"event","Q104412526":"event","Q104412524":"event","Q104677346":"event","Q106303569":"book","Q107348207":"event","Q109461212":"event","Q109623346":"event","Q110733884":"event","Q10478639":"dataset","Q819122":"software","Q845159":"motion_picture","Q1049203":"software","Q12105343":"song","Q12134889":"song","Q713540":"legislation","Q488552":"event","Q491500":"event","Q798265":"event","Q836736":"event","Q861941":"event","Q865208":"event","Q866617":"event","Q1049397":"event","Q1049733":"event","Q1066172":"event","Q1073949":"event","Q1976583":"book","Q1991869":"book","Q3565822":"book","Q2953976":"event","Q3217464":"event","Q3940786":"book","Q3329365":"event","Q3386368":"event","Q3459291":"event","Q3538157":"event","Q3586831":"event","Q3586834":"event","Q3586835":"event","Q3586832":"event","Q3586838":"event","Q3586840":"event","Q3870151":"event","Q13631399":"software","Q4120872":"event","Q4331506":"event","Q5963034":"event","Q17030435":"software","Q28702252":"song","Q28704262":"song","Q9578683":"event","Q19377322":"software","Q11274709":"book","Q11455585":"book","Q11488223":"book","Q10869081":"event","Q11580879":"book","Q11690026":"book","Q11397993":"event","Q11398547":"event","Q11399932":"event","Q11440018":"event","Q11458582":"event","Q11476267":"event","Q11501315":"event","Q11526135":"event","Q11614282":"event","Q11669898":"event","Q12056882":"event","Q22908656":"software","Q15285702":"event","Q15622423":"event","Q16684585":"event","Q16688377":"event","Q17586363":"book","Q17214972":"event","Q19357149":"book","Q20043347":"book","Q20043999":"book","Q21087462":"book","Q22130467":"event","Q26225484":"book","Q26228231":"book","Q26928894":"book","Q27022710":"book","Q30068158":"event","Q15184295":"webpage","Q60748603":"software","Q39174":"event","Q91258173":"software","Q86736746":"event","Q88975093":"book","Q98034066":"software","Q108842705":"song","Q97292900":"event","Q105488055":"book","Q105488088":"book","Q108660836":"event","Q109923199":"software","Q109017384":"performance","Q4389389":"software","Q581634":"event","Q677406":"event","Q843417":"event","Q1501923":"review","Q1378622":"event","Q1383889":"event","Q1570656":"event","Q2260479":"book","Q1848041":"event","Q1984487":"event","Q2044642":"event","Q2757473":"event","Q2795779":"event","Q2815206":"event","Q2815625":"event","Q2819585":"event","Q2856451":"event","Q2856460":"event","Q2856464":"event","Q3164453":"event","Q3209165":"event","Q3225305":"event","Q3225501":"event","Q3547518":"event","Q4667633":"event","Q4824511":"event","Q4970222":"event","Q4970532":"event","Q5044604":"event","Q5055355":"event","Q5099912":"event","Q5132095":"event","Q5412760":"event","Q5500257":"event","Q5946528":"event","Q6722708":"event","Q7573033":"software","Q7000382":"event","Q7676227":"review","Q7523152":"event","Q7797265":"event","Q8035883":"event","Q13070866":"event","Q13776265":"event","Q14173028":"event","Q15101744":"event","Q15532381":"event","Q15812758":"event","Q15818916":"event","Q15848211":"event","Q16014225":"event","Q17017794":"event","Q17510435":"event","Q18026287":"event","Q19577037":"event","Q20648821":"event","Q20712049":"event","Q25207855":"event","Q25379161":"event","Q25384151":"event","Q25388352":"event","Q26268692":"event","Q27680204":"event","Q28008052":"event","Q47484141":"event","Q55394268":"event","Q55641457":"event","Q56112215":"event","Q56294610":"event","Q57418825":"event","Q60589845":"event","Q65706141":"event","Q79461534":"event","Q79461607":"event","Q82983020":"event","Q82983459":"event","Q86665410":"event","Q87263048":"event","Q96048367":"event","Q97277766":"event","Q98195555":"event","Q99408840":"event","Q100157075":"event","Q104236503":"event","Q105315129":"event","Q105400065":"event","Q105845411":"event","Q106351574":"event","Q106504785":"event","Q109279082":"event","Q109935395":"event","Q110009802":"event","Q772497":"song","Q2936610":"song","Q104847359":"performance","Q108297200":"performance","Q110643230":"performance","Q1023097":"software","Q1075238":"software","Q7594163":"software","Q245753":"event","Q419595":"event","Q841137":"event","Q1046763":"event","Q1264834":"event","Q1342323":"event","Q1402070":"event","Q1673340":"event","Q11308156":"software","Q1786415":"event","Q1968642":"event","Q2007314":"event","Q11578127":"software","Q2086665":"event","Q2921195":"book","Q2333621":"event","Q3210210":"event","Q3298051":"event","Q3406098":"event","Q3545509":"event","Q3587397":"event","Q3587541":"event","Q15008061":"software","Q6015972":"event","Q6015984":"event","Q6015989":"event","Q6016007":"event","Q6016005":"event","Q6016023":"event","Q6671135":"event","Q7013332":"event","Q7239034":"event","Q8027366":"event","Q18433212":"software","Q19595415":"software","Q10271510":"event","Q10488275":"event","Q11163656":"event","Q11261037":"event","Q11262978":"event","Q11395251":"event","Q11428715":"event","Q11489354":"event","Q11525357":"event","Q11595783":"event","Q11643942":"event","Q12776529":"event","Q12868922":"event","Q15296535":"periodical","Q14885577":"event","Q25303346":"software","Q15881232":"event","Q16152245":"event","Q16482065":"event","Q21550458":"book","Q21648161":"book","Q23657385":"book","Q27370064":"event","Q28686576":"event","Q28922256":"event","Q4167410":"webpage","Q13406463":"webpage","Q51673934":"software","Q51675374":"software","Q51675524":"software","Q54257293":"software","Q47258130":"event","Q47443726":"event","Q48743845":"event","Q65665574":"software","Q37152856":"webpage","Q72850604":"event","Q95124454":"software","Q96240590":"software","Q97730338":"event","Q107377911":"software","Q98456875":"event","Q108901409":"software","Q100272578":"book","Q109599573":"software","Q101246180":"event","Q106806190":"event","Q109017702":"event","Q1153191":"periodical","Q111050703":"event","Q111962642":"event","Q16487172":"periodical","Q165596":"software","Q175263":"software","Q184148":"software","Q1105784":"software","Q1378125":"software","Q1391335":"software","Q3761391":"software","Q4049444":"software","Q5597179":"software","Q7777054":"software","Q7784741":"software","Q188613":"event","Q485321":"event","Q660064":"event","Q979949":"event","Q11223899":"software","Q1685566":"event","Q2025261":"event","Q2266066":"event","Q11883090":"software","Q2348250":"event","Q5910791":"event","Q7089494":"event","Q7676069":"event","Q7973180":"event","Q11545728":"book","Q12038547":"event","Q12708896":"event","Q14796683":"event","Q16158036":"legislation","Q16675450":"event","Q30059018":"software","Q20646667":"event","Q20646670":"event","Q20646668":"event","Q20679712":"event","Q20680270":"event","Q21622405":"event","Q26001264":"event","Q66849906":"periodical","Q41795188":"event","Q42148058":"event","Q72398691":"periodical","Q84863652":"periodical","Q56326879":"event","Q4173982":"regulation","Q59658968":"event","Q37045":"software","Q70507976":"software","Q64736464":"event","Q11523643":"regulation","Q111038019":"periodical","Q96146237":"software","Q108935176":"dataset","Q96692808":"event","Q109483571":"software","Q109483604":"software","Q109483621":"software","Q109483631":"software","Q109483637":"software","Q100580950":"event","Q100582954":"event","Q111590542":"software","Q107357080":"event","Q107358505":"event","Q107358924":"event","Q107637253":"event","Q111983342":"book","Q438150":"dataset","Q276709":"book","Q130881":"event","Q211872":"event","Q382934":"event","Q587836":"event","Q605945":"event","Q1328330":"book","Q701555":"event","Q729106":"event","Q1396354":"book","Q824540":"event","Q913735":"event","Q928173":"event","Q1032167":"event","Q1057427":"event","Q1144343":"event","Q1282307":"event","Q1305501":"event","Q1337776":"event","Q1374739":"event","Q1388446":"event","Q2094039":"book","Q1558662":"event","Q1729655":"event","Q136167":"standard","Q2014189":"event","Q2831979":"book","Q2423871":"event","Q2538512":"event","Q2539625":"event","Q2999040":"event","Q2999131":"event","Q2999182":"event","Q3504309":"event","Q4912040":"legislation","Q4850649":"event","Q4872932":"event","Q4883139":"event","Q5587884":"book","Q4956217":"event","Q4962676":"event","Q5019665":"event","Q5030367":"event","Q5068904":"event","Q5159677":"event","Q5177985":"event","Q5197842":"event","Q5198880":"event","Q5200409":"event","Q5292847":"event","Q5394447":"event","Q6052534":"event","Q6106793":"event","Q6179017":"event","Q6314196":"event","Q6398459":"event","Q6721688":"event","Q6765772":"event","Q7269976":"event","Q7313605":"event","Q7330899":"event","Q7381099":"event","Q7697920":"event","Q7929459":"event","Q7987655":"event","Q8017886":"event","Q8036061":"event","Q11448081":"book","Q12104692":"book","Q11899957":"event","Q11938851":"event","Q12884584":"event","Q13593952":"event","Q15388803":"event","Q17103384":"event","Q18661357":"event","Q623202":"performance","Q21003389":"event","Q28653601":"event","Q37341555":"event","Q53709910":"event","Q65077112":"software","Q57701167":"event","Q64857237":"event","Q10467299":"regulation","Q32636":"event","Q75837421":"book","Q76765039":"book","Q77133429":"event","Q96392730":"book","Q97579381":"event","Q97579498":"event","Q97579500":"event","Q4922471":"broadcast","Q16247289":"broadcast","Q665182":"event","Q676429":"event","Q720609":"event","Q775342":"event","Q789237":"event","Q887604":"event","Q903407":"event","Q1205825":"event","Q1258503":"event","Q1266833":"event","Q1273394":"event","Q1300443":"event","Q1360284":"event","Q1404868":"event","Q1453709":"event","Q1520402":"event","Q1543109":"event","Q1667081":"event","Q1841122":"event","Q1934363":"event","Q1973903":"event","Q1979472":"event","Q1998921":"event","Q181693":"standard","Q2080525":"event","Q2124013":"event","Q2135911":"event","Q2151638":"event","Q2152583":"event","Q2166014":"event","Q2175997":"event","Q2195028":"event","Q2220085":"event","Q2252981":"event","Q2266608":"event","Q2273291":"event","Q2273820":"event","Q2407435":"event","Q2458639":"event","Q2576830":"event","Q2596276":"event","Q849492":"standard","Q2786776":"event","Q2945108":"event","Q3083983":"event","Q3144114":"event","Q3156042":"event","Q3280983":"event","Q3454956":"event","Q1867168":"standard","Q3891819":"event","Q3931682":"event","Q3931680":"event","Q4429654":"event","Q4442312":"event","Q4460750":"event","Q4652332":"event","Q4666912":"event","Q4733069":"event","Q4744956":"event","Q4816529":"event","Q4824659":"event","Q4948069":"event","Q4950413":"event","Q4968809":"event","Q4970103":"event","Q4970978":"event","Q4997351":"event","Q5013829":"event","Q5058544":"event","Q5092592":"event","Q5108821":"event","Q5153848":"event","Q5288350":"event","Q5316546":"event","Q5330484":"event","Q5347947":"event","Q5349156":"event","Q5378372":"event","Q5413395":"event","Q5580372":"event","Q5599880":"event","Q5645742":"event","Q5646189":"event","Q5676669":"event","Q5689403":"event","Q5689411":"event","Q5689414":"event","Q5689416":"event","Q5689423":"event","Q5689421":"event","Q5689461":"event","Q5714677":"event","Q5785219":"event","Q19936988":"event","Q63352667":"event","Q10982":"event","Q111307290":"software","Q5888446":"event","Q6096875":"event","Q6097272":"event","Q6103676":"event","Q6103686":"event","Q6104128":"event","Q6412323":"event","Q6413593":"event","Q6413741":"event","Q6523275":"event","Q6721011":"event","Q6735442":"event","Q6755023":"event","Q6771991":"event","Q6771993":"event","Q6796435":"event","Q6825228":"event","Q6896105":"event","Q6953001":"event","Q6971626":"event","Q7015637":"event","Q7231121":"event","Q7235497":"event","Q7300466":"event","Q7300576":"event","Q7300583":"event","Q7338738":"event","Q7372071":"event","Q7372072":"event","Q7373894":"event","Q7374286":"event","Q7374872":"event","Q7374920":"event","Q7423425":"event","Q7432702":"event","Q7439417":"event","Q7535122":"event","Q7561978":"event","Q7597039":"event","Q7636342":"event","Q7638972":"event","Q7709883":"event","Q7737900":"event","Q7753214":"event","Q7761589":"event","Q7774229":"event","Q7923377":"event","Q7963103":"event","Q7963824":"event","Q7969370":"event","Q8030876":"event","Q8030880":"event","Q8036047":"event","Q8036159":"event","Q8085786":"event","Q9067494":"event","Q9678177":"event","Q10378621":"event","Q10667928":"event","Q10882833":"event","Q11389425":"event","Q11389715":"event","Q11389741":"event","Q11390255":"event","Q11421040":"event","Q11495138":"event","Q11517446":"event","Q11582264":"event","Q11853514":"event","Q11883147":"event","Q11888216":"event","Q12046934":"event","Q12267013":"event","Q12882986":"event","Q13578912":"event","Q13816118":"event","Q13906726":"event","Q14942291":"event","Q14979598":"event","Q14980231":"event","Q15712423":"event","Q15841948":"event","Q15999858":"event","Q16537427":"event","Q16537585":"event","Q16932625":"event","Q16932629":"event","Q16983611":"event","Q16983615":"event","Q16983619":"event","Q17005525":"event","Q17017931":"event","Q17995418":"event","Q18039738":"event","Q18125104":"event","Q18470644":"event","Q18662166":"event","Q19577361":"event","Q19812499":"event","Q20016762":"event","Q108861375":"event","Q108861450":"event","Q108861665":"event","Q110641401":"event","Q2492568":"dataset","Q337445":"webpage","Q1242244":"webpage","Q6042740":"webpage","Q2047885":"event","Q507810":"standard","Q1144077":"standard","Q1425864":"standard","Q1757074":"standard","Q1878074":"standard","Q15279482":"webpage","Q16999523":"event","Q17110771":"event","Q17148060":"event","Q20153194":"event","Q20153779":"event","Q20477097":"event","Q20642275":"event","Q20804110":"event","Q21189798":"event","Q21282148":"event","Q21282569":"event","Q21282584":"event","Q21282718":"event","Q21282717":"event","Q22909293":"event","Q23058296":"event","Q23463562":"event","Q24666796":"event","Q25270494":"event","Q26695700":"event","Q25413445":"standard","Q30016890":"event","Q55422400":"broadcast","Q43446213":"event","Q43456981":"event","Q47000346":"event","Q47000422":"event","Q47000599":"event","Q47762931":"event","Q78898325":"periodical","Q55170631":"event","Q55171044":"event","Q55439428":"event","Q56877748":"event","Q58692830":"event","Q70597985":"webpage","Q70779441":"webpage","Q61910908":"event","Q63897228":"event","Q63977382":"event","Q63977402":"event","Q64495379":"event","Q65057098":"event","Q65640446":"event","Q65089134":"standard","Q67206426":"event","Q110875181":"dataset","Q107974527":"webpage","Q109352904":"software","Q20893947":"legal_case","Q114581":"event","Q120290":"event","Q173704":"event","Q173739":"event","Q174080":"event","Q188317":"event","Q208137":"event","Q262650":"event","Q270163":"event","Q282770":"event","Q429887":"event","Q431394":"event","Q1043786":"event","Q1092864":"event","Q1131293":"event","Q1346003":"event","Q1421853":"event","Q1548846":"event","Q1829157":"event","Q1937553":"event","Q1998642":"event","Q2021907":"event","Q2613789":"event","Q2818070":"event","Q3738583":"book","Q3113923":"event","Q4037235":"event","Q4810956":"event","Q5639161":"book","Q5171999":"event","Q5302273":"event","Q5527485":"event","Q5594971":"event","Q6470596":"event","Q6731952":"event","Q6954100":"event","Q7370982":"event","Q7830859":"event","Q7981321":"event","Q30945529":"dataset","Q12064367":"event","Q12790051":"event","Q16024637":"event","Q16965239":"event","Q19866105":"event","Q20107484":"event","Q20181844":"event","Q21647744":"book","Q24283994":"book","Q24284014":"book","Q25464347":"book","Q24906084":"event","Q57207479":"periodical","Q28206864":"event","Q28403568":"event","Q28403569":"event","Q28403751":"event","Q28403796":"event","Q28447773":"event","Q28447779":"event","Q28447809":"event","Q28447827":"event","Q28447867":"event","Q28447967":"event","Q30645601":"event","Q39046566":"event","Q39046576":"event","Q43080916":"event","Q60744346":"event","Q60785088":"event","Q62789940":"event","Q62790009":"event","Q63527079":"event","Q6876":"event","Q29762":"event","Q87267404":"event","Q87267425":"event","Q87267436":"event","Q87267444":"event","Q111661787":"dataset","Q96482439":"event","Q99026520":"event","Q99192928":"event","Q99541097":"event","Q104173673":"event","Q104677554":"event","Q104677577":"event","Q106452651":"book","Q107787123":"event","Q93441":"event","Q117827":"event","Q127780":"event","Q129921":"event","Q130122":"event","Q133440":"event","Q180570":"event","Q194537":"event","Q202744":"event","Q220347":"event","Q476642":"event","Q499650":"event","Q522071":"event","Q577739":"event","Q578715":"event","Q582959":"event","Q584160":"event","Q604756":"event","Q631254":"event","Q645677":"event","Q645688":"event","Q654150":"event","Q660559":"event","Q663317":"event","Q673767":"event","Q715044":"event","Q715992":"event","Q720605":"event","Q733352":"event","Q745444":"event","Q748627":"event","Q748643":"event","Q748741":"event","Q751518":"event","Q751527":"event","Q754496":"event","Q755148":"event","Q756053":"event","Q756057":"event","Q756744":"event","Q826703":"event","Q827016":"event","Q830686":"event","Q832177":"event","Q833790":"event","Q837886":"event","Q838067":"event","Q893182":"event","Q1115093":"event","Q1318139":"event","Q2080804":"event","Q2565953":"event","Q2882396":"event","Q3122656":"event","Q3440758":"event","Q3816474":"event","Q3866328":"event","Q3892267":"event","Q3967057":"event","Q4745466":"event","Q5281223":"event","Q5985530":"event","Q7078911":"event","Q7378334":"event","Q9322742":"event","Q28971994":"broadcast","Q16184518":"event","Q16677062":"event","Q21088077":"event","Q23041530":"event","Q26241551":"event","Q26832970":"event","Q28446493":"event","Q32635006":"event","Q39052122":"event","Q57775833":"software","Q48832833":"event","Q60740537":"event","Q60836663":"event","Q65231449":"event","Q39399":"event","Q76451129":"event","Q76451133":"event","Q76451318":"event","Q76451353":"event","Q76451412":"event","Q76496620":"event","Q76496621":"event","Q76496910":"event","Q76496914":"event","Q76496912":"event","Q76496916":"event","Q77304585":"event","Q77305023":"event","Q77305474":"event","Q83952275":"event","Q84017620":"event","Q84402060":"event","Q97201329":"event","Q108384535":"event","Q223010":"event","Q238982":"event","Q276682":"event","Q279861":"event","Q311783":"event","Q313414":"event","Q327798":"event","Q368461":"event","Q368860":"event","Q392385":"event","Q479411":"event","Q479901":"event","Q495101":"event","Q529927":"event","Q534426":"event","Q544710":"event","Q558225":"event","Q579569":"event","Q592389":"event","Q603001":"event","Q609695":"event","Q616375":"event","Q660558":"event","Q667092":"event","Q668065":"event","Q674440":"event","Q691907":"event","Q702215":"event","Q732973":"event","Q739723":"event","Q739888":"event","Q748995":"event","Q755314":"event","Q783137":"event","Q785389":"event","Q789097":"event","Q790341":"event","Q838761":"event","Q842047":"event","Q844700":"event","Q847573":"event","Q850990":"event","Q886519":"event","Q890528":"event","Q903576":"event","Q905666":"event","Q906441":"event","Q910967":"event","Q916897":"event","Q926869":"event","Q955298":"event","Q961537":"event","Q979943":"event","Q1032130":"event","Q1129634":"event","Q1134740":"event","Q1297867":"event","Q1322351":"event","Q1322369":"event","Q1322377":"event","Q1329312":"event","Q1421241":"event","Q1463396":"event","Q1499294":"event","Q1510835":"event","Q1520460":"event","Q1528578":"event","Q1568497":"event","Q1612985":"event","Q1625214":"event","Q1629934":"event","Q1644925":"event","Q1651460":"event","Q1762314":"event","Q1764600":"event","Q1765681":"event","Q1767214":"event","Q1783405":"event","Q1815771":"event","Q1816217":"event","Q1822089":"event","Q1851900":"event","Q1852401":"event","Q1888987":"event","Q1940040":"event","Q1991081":"event","Q2000678":"event","Q2015574":"event","Q2066031":"event","Q2072432":"event","Q2199668":"event","Q2298847":"event","Q2329596":"event","Q2410764":"event","Q2472221":"event","Q2537745":"event","Q2537751":"event","Q2537760":"event","Q2537767":"event","Q2537764":"event","Q2537774":"event","Q2537776":"event","Q2537783":"event","Q2537791":"event","Q2537799":"event","Q2537821":"event","Q2537831":"event","Q2537855":"event","Q2537860":"event","Q2537874":"event","Q2537886":"event","Q2537892":"event","Q2537936":"event","Q2537975":"event","Q2603172":"event","Q2622340":"event","Q2856354":"event","Q2951930":"event","Q2976277":"event","Q2976348":"event","Q2976466":"event","Q2976477":"event","Q2999579":"event","Q3083746":"event","Q3353231":"event","Q3353358":"event","Q3353513":"event","Q3353596":"event","Q3353689":"event","Q3353695":"event","Q3353750":"event","Q3353787":"event","Q3534238":"event","Q3534350":"event","Q3534352":"event","Q3534543":"event","Q3534619":"event","Q3534664":"event","Q3534726":"event","Q3534800":"event","Q3534887":"event","Q3534943":"event","Q3534966":"event","Q3534980":"event","Q3535032":"event","Q3535045":"event","Q3535052":"event","Q3535084":"event","Q3535094":"event","Q3535245":"event","Q3535302":"event","Q3535331":"event","Q3547462":"event","Q3547479":"event","Q3547494":"event","Q3800397":"event","Q3877108":"event","Q3883247":"event","Q4014176":"event","Q4017080":"event","Q4017086":"event","Q4017175":"event","Q4017348":"event","Q4742639":"event","Q4766524":"event","Q5132181":"event","Q5270792":"event","Q6431149":"event","Q7956071":"event","Q7956074":"event","Q7956075":"event","Q9170626":"event","Q9369429":"event","Q13222936":"event","Q13360739":"event","Q13528369":"event","Q13534286":"event","Q14238758":"event","Q14512078":"event","Q14517131":"event","Q14551987":"event","Q15055625":"event","Q15056459":"event","Q15077346":"event","Q15263377":"event","Q15502567":"event","Q15504389":"event","Q15650921":"event","Q15710001":"event","Q15853310":"event","Q15853308":"event","Q15853309":"event","Q15853315":"event","Q15853312":"event","Q15853318":"event","Q15853316":"event","Q16064794":"event","Q16064795":"event","Q16064793":"event","Q16079746":"event","Q108597200":"event","Q108597207":"event","Q108691989":"event","Q108783123":"event","Q109234967":"event","Q109570548":"event","Q109681671":"event","Q156097":"event","Q265586":"event","Q270907":"event","Q299147":"event","Q299144":"event","Q299159":"event","Q299174":"event","Q299176":"event","Q299193":"event","Q299197":"event","Q299220":"event","Q299236":"event","Q299406":"event","Q299415":"event","Q299454":"event","Q299475":"event","Q299517":"event","Q299560":"event","Q299617":"event","Q299622":"event","Q299678":"event","Q299685":"event","Q299707":"event","Q299712":"event","Q299720":"event","Q299791":"event","Q2313301":"standard","Q3570403":"standard","Q16680689":"event","Q17021287":"event","Q17311580":"event","Q17493146":"event","Q17561018":"event","Q17561114":"event","Q18088938":"event","Q18413542":"event","Q18413540":"event","Q18413541":"event","Q18415533":"event","Q20656604":"event","Q20710122":"event","Q20970324":"event","Q20982704":"event","Q22079747":"event","Q23854141":"event","Q24289601":"event","Q25379073":"event","Q25385301":"event","Q26874537":"event","Q27276247":"event","Q27901751":"event","Q26205771":"standard","Q26207712":"standard","Q26207734":"standard","Q26207792":"standard","Q26207808":"standard","Q26207821":"standard","Q26207986":"standard","Q26208253":"standard","Q26211338":"standard","Q26211510":"standard","Q26211528":"standard","Q26211536":"standard","Q29397293":"event","Q29411134":"event","Q28346137":"standard","Q39058982":"event","Q47487929":"event","Q47508845":"event","Q47763511":"event","Q50321171":"event","Q52739176":"event","Q61062132":"event","Q64830643":"event","Q65746965":"event","Q65934295":"event","Q8496":"event","Q48644":"event","Q64827":"event","Q74110205":"event","Q74127622":"event","Q85859665":"event","Q98228191":"event","Q100375171":"event","Q104550106":"event","Q106382469":"event","Q106421279":"event","Q106834409":"event","Q106840313":"event","Q107556491":"event","Q107573051":"event","Q107905053":"event","Q108083554":"event","Q108783909":"event","Q299795":"event","Q299951":"event","Q300007":"event","Q300028":"event","Q465450":"event","Q558266":"event","Q558672":"event","Q597169":"event","Q597452":"event","Q954772":"event","Q1109657":"event","Q1230166":"event","Q1364943":"event","Q1376760":"event","Q1393477":"event","Q1426858":"event","Q1633700":"event","Q1770729":"event","Q1993182":"event","Q280761":"standard","Q2317197":"event","Q2531614":"event","Q2603957":"event","Q2632544":"event","Q2792159":"event","Q2869380":"event","Q3353878":"event","Q3601563":"event","Q3601604":"event","Q3601630":"event","Q3602047":"event","Q3602052":"event","Q3602162":"event","Q3602172":"event","Q3603465":"event","Q3649351":"event","Q3665808":"event","Q3683622":"event","Q3860590":"event","Q3886561":"event","Q3979068":"event","Q5109325":"event","Q5764200":"event","Q6962449":"event","Q6965981":"event","Q7009606":"event","Q7505806":"event","Q7699221":"event","Q7787114":"event","Q12012406":"event","Q13221816":"event","Q13221953":"event","Q13222012":"event","Q13222030":"event","Q13360692":"event","Q13360713":"event","Q13360724":"event","Q13427619":"event","Q13427623":"event","Q14326700":"event","Q14342744":"event","Q14405758":"event","Q14922727":"event","Q15043913":"event","Q15062154":"event","Q15116774":"event","Q15149863":"event","Q15218836":"event","Q15391365":"event","Q25053937":"software","Q15781252":"event","Q16465941":"event","Q17485677":"event","Q18926536":"event","Q19787652":"event","Q19799848":"event","Q20008620":"event","Q20182662":"event","Q25378680":"event","Q25380589":"event","Q26906554":"book","Q26279994":"event","Q26844937":"event","Q26329975":"standard","Q26383099":"standard","Q26385770":"standard","Q27894844":"standard","Q46135307":"event","Q46195901":"event","Q47511180":"event","Q48868616":"event","Q50321276":"event","Q51434463":"event","Q54824152":"event","Q65078216":"event","Q96418391":"event","Q106317803":"event","Q106847234":"event","Q107296532":"event","Q1760256":"song","Q1080961":"standard","Q10745789":"broadcast","Q72986":"event","Q117205":"event","Q154575":"event","Q186431":"event","Q187214":"event","Q201919":"event","Q203441":"event","Q203863":"event","Q207956":"event","Q208631":"event","Q211591":"event","Q212441":"event","Q212458":"event","Q215088":"event","Q216704":"event","Q216759":"event","Q221295":"event","Q239072":"event","Q245829":"event","Q255592":"event","Q261755":"event","Q273339":"event","Q273341":"event","Q273346":"event","Q298750":"event","Q309170":"event","Q320347":"event","Q321550":"event","Q331586":"event","Q332506":"event","Q332589":"event","Q332608":"event","Q379845":"event","Q390580":"event","Q428162":"event","Q430295":"event","Q464852":"event","Q503391":"event","Q503847":"event","Q506214":"event","Q507204":"event","Q507221":"event","Q534342":"event","Q548988":"event","Q585333":"event","Q597286":"event","Q647450":"event","Q648751":"event","Q659161":"event","Q660460":"event","Q722693":"event","Q723570":"event","Q729577":"event","Q5723144":"book","Q5725538":"book","Q6958560":"event","Q6958812":"event","Q6964355":"event","Q6964699":"event","Q6987067":"event","Q7027620":"event","Q8035864":"event","Q8463186":"event","Q12411895":"event","Q12411892":"event","Q12411893":"event","Q16130654":"event","Q16130658":"event","Q28056168":"event","Q28056182":"event","Q28056183":"event","Q28056186":"event","Q28056184":"event","Q28056185":"event","Q28966106":"event","Q28966115":"event","Q29053675":"event","Q29346472":"event","Q30943659":"book","Q30943829":"book","Q30945666":"book","Q34542827":"event","Q34548345":"event","Q60215679":"broadcast","Q60215966":"broadcast","Q61245365":"software","Q60969183":"event","Q74218661":"event","Q106393171":"broadcast","Q106634018":"broadcast","Q106681812":"broadcast","Q103842351":"software","Q110068411":"software","Q780605":"dataset","Q1050259":"dataset","Q106900079":"webpage","Q112055":"event","Q282576":"event","Q1074045":"book","Q426564":"event","Q489120":"event","Q527512":"event","Q550430":"event","Q730471":"event","Q850347":"event","Q1326196":"event","Q1478093":"event","Q11338014":"software","Q2603751":"event","Q2869122":"event","Q2886695":"event","Q3799069":"event","Q3937030":"event","Q4158493":"event","Q4925844":"event","Q16681627":"software","Q11223691":"book","Q11818941":"event","Q12584583":"event","Q12603684":"event","Q12713601":"event","Q12778744":"event","Q13515630":"event","Q14582865":"event","Q16470174":"event","Q17639483":"event","Q27670585":"software","Q18414336":"event","Q20542163":"event","Q20830799":"event","Q21003426":"event","Q25063983":"event","Q25377391":"event","Q28453851":"event","Q29564413":"event","Q30126458":"event","Q30580599":"event","Q30609014":"event","Q42409239":"software","Q36345696":"event","Q38080438":"event","Q45107320":"event","Q51155371":"event","Q51155378":"event","Q51155394":"event","Q51155399":"event","Q51155484":"event","Q51155491":"event","Q51155503":"event","Q51155506":"event","Q51155570":"event","Q51155575":"event","Q51155589":"event","Q51155592":"event","Q51155664":"event","Q51155668":"event","Q51155684":"event","Q51155766":"event","Q51155783":"event","Q51155860":"event","Q51155899":"event","Q51156125":"event","Q51156132":"event","Q51156147":"event","Q51156258":"event","Q51156339":"event","Q51156346":"event","Q51156363":"event","Q51156443":"event","Q51156449":"event","Q51156458":"event","Q51156537":"event","Q51156543":"event","Q51156561":"event","Q51156639":"event","Q51156644":"event","Q51156660":"event","Q56085106":"event","Q60533564":"event","Q61055621":"event","Q105729508":"event","Q106164053":"event","Q106164255":"event","Q106164503":"event","Q106164646":"event","Q106164813":"event","Q106181220":"event","Q106201677":"event","Q106213754":"event","Q106213814":"event","Q23034771":"event","Q27925543":"event","Q27925545":"event","Q27925646":"event","Q43233939":"event","Q51155402":"event","Q51155417":"event","Q51155426":"event","Q51155447":"event","Q51155451":"event","Q51155454":"event","Q51155467":"event","Q51155471":"event","Q51155517":"event","Q51155520":"event","Q51155539":"event","Q51155536":"event","Q51155542":"event","Q51155554":"event","Q51155557":"event","Q51155596":"event","Q51155607":"event","Q51155611":"event","Q51155627":"event","Q51155629":"event","Q51155632":"event","Q51155645":"event","Q51155649":"event","Q51155688":"event","Q51155689":"event","Q51155705":"event","Q51155708":"event","Q51155727":"event","Q51155730":"event","Q51155732":"event","Q51155750":"event","Q51155752":"event","Q51155787":"event","Q51155785":"event","Q51155805":"event","Q51155809":"event","Q51155826":"event","Q51155829":"event","Q51155833":"event","Q51155846":"event","Q51155845":"event","Q51155901":"event","Q51155904":"event","Q51155958":"event","Q51156069":"event","Q51156082":"event","Q51156080":"event","Q51156101":"event","Q51156108":"event","Q51156149":"event","Q51156152":"event","Q51156166":"event","Q51156173":"event","Q51156198":"event","Q51156196":"event","Q51156204":"event","Q51156220":"event","Q51156224":"event","Q51156263":"event","Q51156261":"event","Q51156285":"event","Q51156303":"event","Q51156301":"event","Q51156306":"event","Q51156317":"event","Q51156364":"event","Q51156370":"event","Q51156389":"event","Q51156398":"event","Q51156414":"event","Q51156412":"event","Q51156428":"event","Q51156462":"event","Q51156476":"event","Q51156482":"event","Q51156496":"event","Q51156501":"event","Q51156506":"event","Q51156524":"event","Q51156564":"event","Q51156568":"event","Q51156582":"event","Q51156590":"event","Q51156604":"event","Q51156605":"event","Q51156608":"event","Q51156622":"event","Q51156662":"event","Q51156665":"event","Q51156679":"event","Q51156684":"event","Q51156699":"event","Q51156703":"event","Q51156712":"event","Q51156738":"event","Q2299775":"dataset","Q2584888":"dataset","Q361880":"book","Q222772":"event","Q1508646":"book","Q4264067":"book","Q3628923":"event","Q5402049":"event","Q5466190":"event","Q5839622":"event","Q10289844":"event","Q15409382":"event","Q15409443":"event","Q15409446":"event","Q15409445":"event","Q15409450":"event","Q15409449":"event","Q15409452":"event","Q15409610":"event","Q15409611":"event","Q15409609":"event","Q15409614":"event","Q15409681":"event","Q15409758":"event","Q15409762":"event","Q15409833":"event","Q15409836":"event","Q15409944":"event","Q15669812":"event","Q15678828":"event","Q16575578":"event","Q16647802":"event","Q17397881":"event","Q18125080":"event","Q18350828":"event","Q18352052":"event","Q18398258":"event","Q20950097":"event","Q21270498":"event","Q21406868":"event","Q21519353":"event","Q21561376":"event","Q24887764":"event","Q27555119":"event","Q27572180":"event","Q28919047":"event","Q51155476":"event","Q51155559":"event","Q51155651":"event","Q51155757":"event","Q51155851":"event","Q51156110":"event","Q51156228":"event","Q51156320":"event","Q51156325":"event","Q51156430":"event","Q51156433":"event","Q51156526":"event","Q51156529":"event","Q51156625":"event","Q51156628":"event","Q51156742":"event","Q51156747":"event","Q51202846":"event","Q51202866":"event","Q51202880":"event","Q51202919":"event","Q51202923":"event","Q51202947":"event","Q51202945":"event","Q51202951":"event","Q51202970":"event","Q51202974":"event","Q51202973":"event","Q51202990":"event","Q51202995":"event","Q51202996":"event","Q51203019":"event","Q51203024":"event","Q51203030":"event","Q51203049":"event","Q51203057":"event","Q51203062":"event","Q51203111":"event","Q51203115":"event","Q51203119":"event","Q51203138":"event","Q51203146":"event","Q51203150":"event","Q51203168":"event","Q51203175":"event","Q51203173":"event","Q51203191":"event","Q51203193":"event","Q51203197":"event","Q51203217":"event","Q51203222":"event","Q51203225":"event","Q58310010":"book","Q105723390":"software","Q111955614":"book","Q922853":"song","Q829548":"software","Q104696061":"webpage","Q16695167":"song","Q161376":"event","Q285656":"event","Q301872":"event","Q478286":"event","Q492871":"event","Q1192278":"book","Q552835":"event","Q912726":"event","Q968354":"event","Q1654923":"event","Q1851026":"event","Q1853265":"event","Q1860997":"event","Q1861055":"event","Q2544753":"book","Q2031947":"event","Q2032961":"event","Q2033735":"event","Q3232779":"event","Q5412482":"event","Q11394662":"legislation","Q11489406":"legislation","Q11555052":"legislation","Q11555053":"legislation","Q11607679":"legislation","Q11607677":"legislation","Q12409117":"book","Q18324679":"event","Q21640805":"event","Q24865673":"legislation","Q27632406":"event","Q27922094":"event","Q27941277":"event","Q4592255":"webpage","Q45092341":"book","Q17379835":"webpage","Q51119345":"event","Q51119382":"event","Q55550551":"event","Q55550563":"event","Q55550577":"event","Q55550594":"event","Q55550606":"event","Q55550618":"event","Q55550641":"event","Q55550661":"event","Q55550671":"event","Q55550682":"event","Q55550689":"event","Q55550701":"event","Q55550713":"event","Q55550729":"event","Q55550745":"event","Q55550760":"event","Q55550774":"event","Q55550785":"event","Q55550799":"event","Q55550811":"event","Q55550824":"event","Q55550832":"event","Q55550842":"event","Q55550852":"event","Q55550864":"event","Q55550880":"event","Q55550889":"event","Q55550905":"event","Q55550919":"event","Q55550931":"event","Q55550947":"event","Q55550961":"event","Q55550972":"event","Q55550983":"event","Q55550999":"event","Q55551016":"event","Q55655722":"event","Q56255042":"standard","Q61696314":"event","Q61696978":"event","Q68319658":"event","Q31691":"event","Q60314":"event","Q69953293":"event","Q84326403":"software","Q80220485":"event","Q84082272":"event","Q85875088":"event","Q102336293":"software","Q108409114":"software","Q105477531":"event","Q106839571":"event","Q108418469":"legislation","Q111489125":"book","Q2367126":"dataset","Q15868218":"periodical","Q107080092":"performance","Q7601050":"broadcast","Q376522":"software","Q380266":"software","Q1194674":"software","Q2016457":"software","Q2449010":"software","Q379881":"event","Q815520":"event","Q1132436":"event","Q21652487":"dataset","Q1774127":"event","Q1825417":"event","Q2036577":"event","Q2038692":"event","Q2039892":"event","Q2066537":"event","Q2088133":"event","Q2089180":"event","Q2295425":"event","Q2330100":"event","Q2334043":"event","Q2336094":"event","Q2337854":"event","Q2338781":"event","Q2339404":"event","Q2340578":"event","Q2349249":"event","Q2397410":"event","Q2403630":"event","Q2473917":"event","Q2571739":"event","Q2582020":"event","Q2634964":"event","Q2658271":"event","Q3025298":"event","Q3413631":"event","Q3561078":"event","Q4508889":"event","Q4508925":"event","Q4508980":"event","Q4508986":"event","Q4509068":"event","Q4509073":"event","Q4509323":"event","Q4509385":"event","Q4509389":"event","Q4509401":"event","Q4509412":"event","Q4509421":"event","Q4509491":"event","Q4510975":"event","Q4510984":"event","Q4511004":"event","Q4511159":"event","Q5187118":"event","Q7863428":"event","Q9678843":"event","Q9679146":"event","Q9679952":"event","Q9679971":"event","Q9679977":"event","Q9685135":"event","Q10969960":"event","Q11831280":"event","Q12168697":"event","Q16980767":"event","Q18433459":"event","Q18470144":"event","Q18474363":"event","Q18474367":"event","Q18474868":"event","Q20052936":"event","Q20053011":"event","Q21710658":"event","Q25428540":"event","Q30715562":"event","Q44481679":"event","Q61719571":"software","Q63248180":"software","Q64170508":"software","Q65504042":"software","Q63953019":"event","Q66208461":"event","Q68902449":"book","Q18813":"book","Q104884479":"software","Q17069312":"report","Q1155702":"software","Q13635346":"dataset","Q5110393":"software","Q490396":"event","Q2039277":"event","Q3586949":"event","Q5168161":"event","Q11389977":"event","Q11981530":"event","Q11981534":"event","Q11981535":"event","Q11981533":"event","Q15883395":"event","Q16773134":"event","Q16965370":"event","Q996838":"performance","Q21282560":"event","Q22341298":"event","Q24660195":"event","Q28035577":"event","Q70453213":"report","Q50291818":"event","Q67574055":"software","Q67574919":"software","Q60743413":"event","Q64778852":"event","Q64918780":"event","Q64919264":"event","Q64995666":"event","Q65037116":"event","Q65037117":"event","Q65037122":"event","Q66362695":"book","Q66363169":"book","Q68431138":"event","Q91794765":"dataset","Q76418219":"event","Q106698068":"broadcast","Q106698131":"broadcast","Q106698140":"broadcast","Q106704934":"broadcast","Q106704937":"broadcast","Q106704989":"broadcast","Q78795588":"book","Q80716240":"event","Q92282911":"event","Q92282917":"event","Q92282921":"event","Q92312633":"event","Q93154471":"event","Q93306512":"event","Q93395403":"event","Q93455684":"event","Q93462299":"event","Q93557859":"event","Q93558267":"event","Q93559100":"event","Q93559480":"event","Q94175697":"event","Q94179291":"event","Q94184439":"event","Q94328265":"event","Q94330803":"event","Q94335159":"event","Q94440690":"event","Q94449872":"event","Q94456036":"event","Q94461921":"event","Q94464324":"event","Q94466552":"event","Q94553207":"event","Q94566633":"event","Q94572592":"event","Q94602639":"event","Q94606948":"event","Q94609396":"event","Q94614514":"event","Q94620924":"event","Q94634947":"event","Q94674064":"event","Q94679742":"event","Q94683099":"event","Q94684100":"event","Q94694443":"event","Q94694538":"event","Q94694673":"event","Q104869738":"event","Q105687046":"event","Q11999969":"dataset","Q20103485":"dataset","Q505425":"event","Q787065":"event","Q922379":"event","Q978420":"event","Q1679766":"book","Q1204825":"event","Q1346707":"event","Q1355247":"event","Q1408039":"event","Q2069922":"book","Q1535563":"event","Q1554232":"event","Q1683209":"event","Q1760295":"event","Q1967202":"event","Q2024469":"event","Q2964173":"event","Q3045762":"event","Q3140055":"event","Q3403230":"event","Q3404984":"event","Q3703473":"event","Q4649839":"event","Q4824156":"event","Q88509703":"regulation","Q4887635":"event","Q5461357":"event","Q6359046":"event","Q6963270":"event","Q6978541":"event","Q11970590":"event","Q11970589":"event","Q11981539":"event","Q11981536":"event","Q11981537":"event","Q11981542":"event","Q11981543":"event","Q11981540":"event","Q11981541":"event","Q11981546":"event","Q11981544":"event","Q11981545":"event","Q11981548":"event","Q12742766":"event","Q19141585":"book","Q18646143":"event","Q19377750":"event","Q19377751":"event","Q19377755":"event","Q19377752":"event","Q19377753":"event","Q19377758":"event","Q19377756":"event","Q19377757":"event","Q19377762":"event","Q19377763":"event","Q19377760":"event","Q19377761":"event","Q19377767":"event","Q19377764":"event","Q19377765":"event","Q19377770":"event","Q19377771":"event","Q19377769":"event","Q19377773":"event","Q31839822":"book","Q57265164":"software","Q106997754":"broadcast","Q106997761":"broadcast","Q106997767":"broadcast","Q106997772":"broadcast","Q106997784":"broadcast","Q83768835":"event","Q87453504":"book","Q87453699":"book","Q87453974":"book","Q87454073":"book","Q87454191":"book","Q87454275":"book","Q87454306":"book","Q87454305":"book","Q87454311":"book","Q87454308":"book","Q87454309":"book","Q88903067":"event","Q89031984":"event","Q89835896":"event","Q94953459":"event","Q106560450":"software","Q97976264":"event","Q107608170":"software","Q109720157":"software","Q108678537":"legislation","Q108750339":"event","Q110599832":"legislation","Q110600499":"legislation","Q191342":"software","Q373442":"software","Q732970":"software","Q30897819":"motion_picture","Q10991395":"webpage","Q2225964":"event","Q3910523":"event","Q4970106":"event","Q5378276":"event","Q5467878":"event","Q5533179":"event","Q5533180":"event","Q6457533":"book","Q6020058":"event","Q15590336":"software","Q6351681":"event","Q6359201":"event","Q6359205":"event","Q6963241":"event","Q6963244":"event","Q7437991":"legislation","Q7118812":"event","Q7604686":"legislation","Q7209850":"event","Q7423191":"event","Q7438994":"event","Q7589626":"event","Q18511695":"webpage","Q10873931":"event","Q10873965":"event","Q12808470":"event","Q23660930":"webpage","Q15279583":"event","Q15731592":"event","Q15916431":"event","Q16044814":"event","Q17028773":"book","Q16592353":"event","Q16687986":"event","Q17151691":"event","Q18204262":"event","Q18657938":"event","Q29647057":"software","Q20982919":"event","Q23888340":"event","Q24189210":"event","Q24835101":"event","Q25350548":"event","Q25587711":"event","Q28873760":"event","Q30715794":"event","Q48725816":"event","Q59536813":"software","Q52305798":"event","Q58281635":"event","Q65129840":"event","Q73107411":"event","Q73365776":"event","Q103821233":"broadcast","Q103842826":"broadcast","Q106845483":"broadcast","Q106845592":"broadcast","Q91990050":"event","Q96798339":"legislation","Q96474589":"event","Q96474603":"event","Q96474676":"event","Q96474677":"event","Q96474691":"event","Q96474692":"event","Q97970431":"event","Q98770211":"event","Q100532807":"legislation","Q100754500":"legislation","Q104226530":"book","Q104709546":"event","Q104716797":"event","Q104722655":"event","Q104722990":"event","Q104723376":"event","Q104723700":"event","Q104758795":"event","Q104758823":"event","Q104758855":"event","Q104758883":"event","Q104766956":"event","Q104787186":"event","Q107487610":"event","Q131303":"software","Q221178":"event","Q549884":"event","Q595998":"event","Q607354":"event","Q610903":"event","Q809005":"event","Q848943":"event","Q178051":"standard","Q192869":"standard","Q215106":"standard","Q654383":"standard","Q2584726":"standard","Q6963239":"event","Q16951282":"legislation","Q17154458":"standard","Q25212904":"legislation","Q48879612":"event","Q48879636":"event","Q52434585":"event","Q62617958":"standard","Q106625210":"broadcast","Q106697970":"broadcast","Q106697975":"broadcast","Q106727748":"broadcast","Q106727754":"broadcast","Q106727771":"broadcast","Q106727832":"broadcast","Q106727901":"broadcast","Q106727914":"broadcast","Q106727922":"broadcast","Q106727935":"broadcast","Q106727950":"broadcast","Q106727966":"broadcast","Q106727999":"broadcast","Q106744755":"broadcast","Q106745097":"broadcast","Q106745341":"broadcast","Q106747030":"broadcast","Q106748356":"broadcast","Q106748460":"broadcast","Q106748640":"broadcast","Q106749118":"broadcast","Q106749214":"broadcast","Q108263475":"broadcast","Q105103619":"software","Q105103699":"software","Q104787275":"event","Q104787302":"event","Q104817971":"event","Q104829424":"event","Q104831999":"event","Q104832083":"event","Q104832441":"event","Q104832507":"event","Q104842040":"event","Q104864806":"event","Q104865385":"event","Q104865744":"event","Q104866013":"event","Q104866279":"event","Q104883066":"event","Q104900138":"event","Q104903902":"event","Q104903952":"event","Q104904003":"event","Q104904033":"event","Q104904073":"event","Q104904110":"event","Q104909835":"event","Q104910622":"event","Q104949395":"event","Q622820":"article-journal","Q109659750":"legislation","Q109860353":"event","Q1696148":"motion_picture","Q2992277":"article-journal","Q3028597":"article-journal","Q111582946":"event","Q4220428":"article-journal","Q8031368":"article-journal","Q783874":"song","Q14472063":"periodical","Q4995819":"dataset","Q4390943":"software","Q28136925":"broadcast","Q523224":"event","Q787680":"event","Q1079817":"event","Q1670259":"event","Q3408287":"book","Q6112431":"event","Q7448114":"event","Q11223998":"event","Q11506547":"event","Q15651353":"book","Q16949509":"event","Q16969638":"event","Q19423910":"book","Q23657067":"event","Q23657075":"event","Q10543608":"performance","Q41463697":"event","Q62584801":"event","Q105011790":"broadcast","Q105012297":"broadcast","Q84944905":"software","Q105885171":"broadcast","Q105885182":"broadcast","Q105908707":"broadcast","Q106625239":"broadcast","Q106633624":"broadcast","Q106633763":"broadcast","Q106746993":"broadcast","Q106747143":"broadcast","Q106779377":"broadcast","Q106882345":"broadcast","Q106912483":"broadcast","Q106914703":"broadcast","Q107244961":"article-journal","Q99973598":"webpage","Q108881260":"broadcast","Q96474704":"event","Q106542308":"software","Q106193139":"event","Q106491623":"event","Q107411113":"event","Q107745617":"event","Q107996858":"event","Q110245212":"event","Q110245408":"event","Q110372986":"event","Q110373283":"event","Q110373359":"event","Q110373398":"event","Q110373429":"event","Q110373504":"event","Q110729548":"event","Q111489248":"book","Q111039982":"event","Q111419440":"event","Q112075077":"book","Q111436305":"event","Q111436315":"event","Q111436312":"event","Q111436804":"event","Q111436812":"event","Q111436826":"event","Q111436832":"event","Q111436919":"event","Q111437360":"event","Q338779":"song","Q1123734":"song","Q2515188":"dataset","Q3080071":"broadcast","Q6022825":"broadcast","Q79587":"software","Q166074":"software","Q204214":"software","Q237580":"software","Q362356":"software","Q719621":"software","Q725779":"software","Q731220":"software","Q831367":"software","Q973778":"software","Q1028939":"software","Q1691212":"software","Q1755887":"software","Q1758048":"software","Q1882031":"software","Q2165453":"software","Q2666693":"software","Q3788742":"software","Q6047784":"software","Q15977715":"broadcast","Q189336":"event","Q202391":"event","Q280004":"event","Q10261777":"software","Q1469740":"event","Q1538290":"event","Q1548072":"event","Q1753702":"event","Q1934817":"event","Q2093999":"event","Q2529839":"event","Q2533907":"event","Q2997936":"event","Q3085248":"event","Q3098404":"event","Q3312129":"event","Q5204797":"event","Q24906243":"broadcast","Q7272924":"legislation","Q10695431":"book","Q10235779":"event","Q11353517":"event","Q11514881":"event","Q11729398":"event","Q14094255":"event","Q34487266":"broadcast","Q18061850":"event","Q18061967":"event","Q20900741":"event","Q21384911":"event","Q109600401":"regulation","Q62903328":"broadcast","Q45311620":"event","Q58636917":"software","Q56054989":"event","Q56278201":"event","Q5310":"software","Q8811":"software","Q58630708":"standard","Q63869675":"event","Q63891738":"event","Q63891752":"event","Q11498848":"regulation","Q105994387":"software","Q97311410":"event","Q99463481":"event","Q106078186":"event","Q110930257":"event","Q918098":"broadcast","Q108847554":"performance","Q110241635":"performance","Q80585":"software","Q177929":"software","Q186152":"software","Q223655":"software","Q244916":"software","Q352090":"software","Q473751":"software","Q580427":"software","Q588784":"software","Q614361":"software","Q647220":"software","Q677051":"software","Q759899":"software","Q893290":"software","Q991293":"software","Q1047566":"software","Q1049628":"software","Q1412818":"software","Q1687403":"software","Q1901169":"software","Q3351552":"software","Q3623683":"software","Q4018860":"software","Q4052124":"software","Q5282303":"software","Q5463958":"software","Q5531642":"software","Q6786860":"software","Q6987201":"software","Q7520680":"software","Q8074176":"software","Q901296":"book","Q383917":"event","Q618395":"event","Q959599":"event","Q10724012":"software","Q1741802":"event","Q2569052":"book","Q861004":"standard","Q2751046":"event","Q2918219":"event","Q2940731":"event","Q1150103":"standard","Q2745394":"standard","Q3693164":"standard","Q4000095":"standard","Q4045265":"standard","Q5975769":"event","Q15975508":"software","Q16114598":"software","Q16347955":"software","Q16988498":"software","Q17004788":"software","Q17042400":"software","Q17424195":"software","Q17426384":"software","Q7268615":"standard","Q7707768":"standard","Q8047679":"standard","Q11300305":"event","Q20965967":"software","Q12409183":"event","Q24590781":"software","Q17619970":"event","Q19947604":"book","Q20026619":"standard","Q24678689":"book","Q22669938":"standard","Q28454487":"event","Q31836770":"standard","Q46371164":"software","Q53411682":"software","Q53679757":"software","Q50922911":"event","Q61714670":"software","Q64350339":"software","Q53959413":"standard","Q59245710":"event","Q27948":"software","Q63584350":"book","Q89580282":"software","Q98545376":"software","Q110720508":"broadcast","Q98271319":"event","Q96473327":"standard","Q96473325":"standard","Q109424921":"event","Q110887043":"event","Q110887201":"event","Q1128903":"software","Q1142922":"software","Q1146944":"software","Q1224994":"software","Q1324888":"software","Q1344409":"software","Q1374036":"software","Q1423858":"software","Q1890437":"software","Q1921825":"software","Q2296387":"software","Q2427787":"software","Q2680578":"software","Q3045702":"software","Q3990844":"software","Q4381439":"software","Q4736436":"software","Q4927183":"software","Q5159104":"software","Q5227153":"software","Q5678860":"software","Q6535093":"software","Q6554356":"software","Q6577686":"software","Q7632171":"software","Q7632678":"software","Q7887089":"software","Q186610":"book","Q186274":"event","Q628839":"event","Q902378":"event","Q976500":"event","Q1067135":"event","Q1185311":"event","Q1876815":"book","Q1323015":"event","Q1395855":"event","Q1411690":"event","Q137069":"standard","Q229405":"standard","Q286100":"standard","Q294958":"standard","Q295089":"standard","Q2143098":"event","Q430823":"standard","Q608089":"standard","Q825762":"standard","Q865381":"standard","Q970024":"standard","Q1028827":"standard","Q1121699":"standard","Q1192582":"standard","Q3358174":"event","Q3590905":"event","Q4227237":"event","Q16352367":"software","Q16707838":"software","Q16948622":"software","Q16960371":"software","Q17149514":"software","Q20031945":"software","Q10538096":"event","Q10552261":"event","Q9260028":"standard","Q25345007":"software","Q25379564":"software","Q17222321":"event","Q17354466":"event","Q27924245":"software","Q19978985":"event","Q30715609":"software","Q26208318":"event","Q50178360":"event","Q61627705":"event","Q66585557":"book","Q86719099":"software","Q104886715":"software","Q105636095":"software","Q107420052":"software","Q109403622":"software","Q108105593":"standard","Q108389044":"standard","Q108507236":"standard","Q108523499":"standard","Q240815":"software","Q383314":"software","Q510878":"software","Q773240":"software","Q783866":"software","Q1199356":"software","Q1444922":"software","Q1474218":"software","Q1559347":"software","Q1924669":"software","Q3045088":"software","Q3276556":"software","Q3363001":"software","Q4835082":"software","Q5227388":"software","Q5513505":"software","Q5516340":"software","Q5565944":"software","Q5689555":"software","Q214802":"event","Q10614538":"software","Q10622204":"software","Q1410418":"standard","Q1665558":"standard","Q1665604":"standard","Q2080312":"standard","Q2267090":"standard","Q2584276":"standard","Q2598676":"standard","Q2620412":"standard","Q5160126":"event","Q3557795":"standard","Q3960366":"standard","Q4654690":"standard","Q6497036":"standard","Q7048932":"standard","Q7191175":"standard","Q7276125":"standard","Q7506338":"standard","Q7506342":"standard","Q8028368":"standard","Q8069448":"standard","Q21127166":"software","Q12311433":"event","Q22003134":"software","Q12041504":"standard","Q12058183":"standard","Q15697821":"standard","Q15697844":"standard","Q16258100":"standard","Q16682931":"standard","Q29642875":"software","Q30591588":"software","Q21041346":"standard","Q21041369":"standard","Q25394855":"standard","Q25991545":"standard","Q25992631":"standard","Q28849147":"standard","Q47088303":"standard","Q47354279":"standard","Q48960764":"standard","Q48966727":"standard","Q56367287":"standard","Q61628047":"event","Q60522770":"standard","Q60523089":"standard","Q61016832":"standard","Q63061679":"standard","Q63109194":"standard","Q63109209":"standard","Q63109262":"standard","Q64821834":"standard","Q64827080":"standard","Q64840819":"standard","Q64840872":"standard","Q64840890":"standard","Q64842248":"standard","Q64845955":"standard","Q64852877":"standard","Q65093687":"standard","Q65659343":"standard","Q84124535":"standard","Q85928720":"standard","Q98611752":"standard","Q98611892":"standard","Q98614745":"standard","Q111536489":"software","Q101510588":"standard","Q101511114":"standard","Q101513939":"standard","Q101542263":"standard","Q101869717":"standard","Q101873666":"standard","Q101875479":"standard","Q104889239":"standard","Q110699355":"book","Q1189206":"software","Q2313710":"software","Q4339810":"software","Q4339809":"software","Q4875402":"software","Q5513518":"software","Q1005383":"legislation","Q1762323":"book","Q176245":"standard","Q266218":"standard","Q295030":"standard","Q295033":"standard","Q2891013":"book","Q656108":"standard","Q2742964":"event","Q2910009":"event","Q1090904":"standard","Q1497295":"standard","Q1508729":"standard","Q1889761":"standard","Q2258439":"standard","Q2291202":"standard","Q2468681":"standard","Q2600559":"standard","Q2706928":"standard","Q3374953":"standard","Q3664143":"standard","Q3982614":"standard","Q15881236":"software","Q7543645":"book","Q7683515":"book","Q7670377":"standard","Q11410812":"book","Q11588327":"book","Q11612882":"book","Q11626718":"book","Q21323922":"software","Q11960442":"event","Q15649725":"book","Q15104326":"event","Q16678341":"book","Q16823610":"event","Q17629404":"book","Q15141460":"standard","Q15273132":"standard","Q49201135":"manuscript","Q33523692":"software","Q33523835":"software","Q33524422":"software","Q33524721":"software","Q33524976":"software","Q33525229":"software","Q33526069":"software","Q33526443":"software","Q33526600":"software","Q33526801":"software","Q33527325":"software","Q33527549":"software","Q33527907":"software","Q33528238":"software","Q33528421":"software","Q33528628":"software","Q33635800":"software","Q25378807":"book","Q25493120":"event","Q25390342":"standard","Q10851335":"performance","Q27866048":"standard","Q46996496":"software","Q59191021":"dataset","Q59248059":"dataset","Q59248072":"dataset","Q39058148":"standard","Q61914117":"dataset","Q63385337":"dataset","Q48728621":"book","Q58287971":"book","Q83800887":"dataset","Q98540827":"dataset","Q98608879":"dataset","Q100707366":"dataset","Q100717717":"dataset","Q100721610":"dataset","Q100746750":"dataset","Q100748418":"dataset","Q104635718":"dataset","Q106546316":"dataset","Q106978635":"dataset","Q107156729":"dataset","Q107156739":"dataset","Q102314787":"book","Q109593799":"event","Q108545731":"standard","Q108929644":"standard","Q108934057":"standard","Q111154620":"standard","Q1138628":"broadcast","Q37055":"regulation","Q4798414":"broadcast","Q333967":"software","Q578713":"software","Q1130489":"software","Q11235226":"broadcast","Q11281236":"broadcast","Q11323152":"broadcast","Q11335932":"broadcast","Q11423603":"broadcast","Q11650048":"broadcast","Q3093436":"software","Q5248086":"software","Q295074":"standard","Q295076":"standard","Q420767":"standard","Q420764":"standard","Q420922":"standard","Q2954102":"event","Q1229379":"standard","Q1229441":"standard","Q1577937":"standard","Q1755411":"standard","Q2858729":"standard","Q3859722":"standard","Q19643088":"software","Q12340392":"event","Q15078695":"event","Q14887104":"standard","Q15845850":"standard","Q18205149":"standard","Q18298235":"standard","Q30680823":"software","Q19612643":"standard","Q108001496":"regulation","Q25385678":"standard","Q28403058":"standard","Q30146456":"standard","Q43634921":"software","Q43635278":"software","Q43636199":"software","Q43636658":"software","Q43637860":"software","Q33460595":"standard","Q33461331":"standard","Q33463963":"standard","Q33465361":"standard","Q33475241":"standard","Q33528323":"standard","Q33528739":"standard","Q39509243":"standard","Q39994907":"standard","Q54814292":"book","Q137773":"regulation","Q743257":"regulation","Q788176":"regulation","Q1046958":"regulation","Q1103298":"regulation","Q1515218":"regulation","Q55662595":"standard","Q2883300":"regulation","Q56298770":"standard","Q3382066":"regulation","Q56602087":"standard","Q4313396":"regulation","Q5048342":"regulation","Q60982459":"standard","Q7939813":"regulation","Q8328350":"regulation","Q63525900":"standard","Q65476804":"standard","Q65477188":"standard","Q66144614":"standard","Q66363375":"standard","Q66363376":"standard","Q66363383":"standard","Q66363384":"standard","Q67221827":"standard","Q67340681":"standard","Q17353755":"regulation","Q19916405":"regulation","Q25451366":"regulation","Q88860581":"standard","Q111835788":"broadcast","Q104093099":"software","Q107821296":"webpage","Q107822284":"webpage","Q107823845":"webpage","Q96257727":"standard","Q96748391":"standard","Q99372730":"standard","Q100324119":"standard","Q101439988":"standard","Q109924100":"event","Q108448580":"standard","Q66027248":"regulation","Q5449126":"song","Q5739165":"broadcast","Q10429683":"dataset","Q221181":"software","Q387688":"software","Q860750":"software","Q1080071":"software","Q1417032":"software","Q1757463":"software","Q1892535":"software","Q1923906":"software","Q1968605":"software","Q2070892":"software","Q4304915":"software","Q4419886":"software","Q4451239":"software","Q505654":"event","Q658769":"event","Q733953":"event","Q860228":"event","Q896606":"event","Q1185305":"event","Q2108532":"event","Q2954100":"event","Q2754921":"standard","Q3374815":"standard","Q3715624":"standard","Q15400317":"software","Q90240997":"regulation","Q8567266":"event","Q19683335":"software","Q19683436":"software","Q19845304":"software","Q10579078":"event","Q10861403":"event","Q12591047":"event","Q12621434":"event","Q25313371":"software","Q25348457":"software","Q1869334":"performance","Q20970820":"event","Q107589376":"regulation","Q25325220":"standard","Q26791581":"standard","Q31179347":"event","Q50251850":"event","Q60617880":"software","Q53865702":"event","Q54854623":"event","Q1114469":"regulation","Q1824146":"regulation","Q1908228":"regulation","Q8674968":"regulation","Q66481199":"standard","Q7983":"event","Q28859":"event","Q52857":"event","Q70863300":"event","Q2703":"standard","Q81575703":"software","Q81575705":"software","Q85219006":"standard","Q85219007":"standard","Q85219004":"standard","Q96741505":"software","Q104733778":"software","Q96464001":"standard","Q110651361":"software","Q110651371":"software","Q110651380":"software","Q110651417":"software","Q110651434":"software","Q110651437":"software","Q110651442":"software","Q110651443":"software","Q110651447":"software","Q110651449":"software","Q111508990":"software","Q111508995":"software","Q111509026":"software","Q111509027":"software","Q111509029":"software","Q48995994":"regulation","Q103921799":"event","Q107689195":"event","Q107693925":"event","Q106574154":"standard","Q401831":"software","Q580564":"software","Q691243":"software","Q917189":"software","Q1163960":"software","Q1478420":"software","Q1647019":"software","Q2187138":"software","Q2247688":"software","Q3177952":"software","Q3632939":"software","Q4438162":"software","Q6481091":"software","Q7089173":"software","Q7094075":"software","Q7888831":"software","Q9130638":"software","Q861060":"event","Q890297":"event","Q1154859":"event","Q1160329":"event","Q1360957":"event","Q1473577":"event","Q1882465":"event","Q1937932":"event","Q1944134":"event","Q2062773":"event","Q2526036":"event","Q2631354":"event","Q2657439":"event","Q3045874":"event","Q3070358":"event","Q3234433":"event","Q1931689":"standard","Q25390252":"song","Q8960966":"event","Q10280357":"event","Q16834937":"event","Q15141461":"standard","Q15217736":"standard","Q26921434":"software","Q46069542":"legislation","Q60256879":"software","Q60982656":"software","Q61719251":"software","Q61721552":"software","Q61793886":"software","Q62019045":"software","Q62019057":"software","Q62019077":"software","Q62019104":"software","Q62022558":"software","Q53080577":"event","Q63465202":"software","Q63466098":"software","Q63644993":"software","Q63645033":"software","Q63645108":"software","Q63645120":"software","Q63914800":"software","Q63915027":"software","Q63915162":"software","Q63915391":"software","Q1404268":"regulation","Q55521327":"standard","Q71443011":"software","Q71443612":"software","Q71467408":"software","Q71468194":"software","Q71471444":"software","Q71471935":"software","Q71472862":"software","Q71475833":"software","Q71476528":"software","Q94996507":"dataset","Q85792816":"software","Q93876174":"software","Q96195505":"software","Q97097760":"software","Q99015944":"software","Q104819482":"software","Q105221690":"software","Q108611897":"software","Q110639931":"software","Q111515095":"software","Q111515101":"software","Q108760929":"event","Q110733702":"event","Q3423660":"dataset","Q10497164":"dataset","Q350432":"software","Q1198141":"software","Q2108252":"software","Q7119555":"software","Q1746539":"book","Q1668097":"event","Q667808":"standard","Q2999652":"event","Q3405240":"event","Q3587382":"event","Q3587381":"event","Q3587386":"event","Q3592923":"event","Q3954604":"event","Q87745177":"regulation","Q2755444":"standard","Q5001982":"event","Q5110343":"event","Q5354786":"event","Q5354822":"event","Q26209596":"dataset","Q5969550":"event","Q6941964":"event","Q7241769":"event","Q7864918":"event","Q7887983":"event","Q7887986":"event","Q7887985":"event","Q28369847":"dataset","Q8182792":"event","Q10422418":"event","Q10466073":"event","Q9291739":"standard","Q11346238":"event","Q11710615":"event","Q96337364":"regulation","Q12756870":"event","Q11254770":"standard","Q13156702":"event","Q13407099":"event","Q14624533":"event","Q15304243":"event","Q15621523":"event","Q17071134":"review","Q16821656":"event","Q20737114":"event","Q24083601":"event","Q25303529":"event","Q25408461":"event","Q110408503":"regulation","Q27148732":"event","Q28057350":"event","Q29510735":"event","Q29588946":"event","Q30572165":"event","Q31842404":"event","Q51544760":"event","Q54848546":"event","Q621261":"regulation","Q56293017":"event","Q1661453":"regulation","Q5113962":"regulation","Q60609202":"event","Q75276527":"software","Q70436236":"review","Q71274998":"standard","Q71275233":"standard","Q71432876":"standard","Q71433176":"standard","Q71828821":"standard","Q71829168":"standard","Q71831258":"standard","Q71832451":"standard","Q71837258":"standard","Q71856089":"standard","Q71858982":"standard","Q71859176":"standard","Q71859354":"standard","Q71859512":"standard","Q71859659":"standard","Q71973058":"standard","Q79764303":"event","Q111517550":"dataset","Q97487120":"event","Q98608942":"event","Q108380937":"software","Q108731424":"software","Q104561683":"event","Q106428925":"event","Q107151225":"event","Q106845334":"standard","Q106846114":"standard","Q108863993":"event","Q109930449":"event","Q109937652":"event","Q689445":"software","Q2516568":"software","Q3567947":"software","Q6900507":"software","Q7094106":"regulation","Q7594819":"software","Q432935":"event","Q877358":"event","Q1330251":"event","Q11248529":"software","Q11323299":"software","Q2616539":"event","Q2617740":"event","Q2617907":"event","Q2992544":"event","Q3586251":"event","Q4158858":"event","Q2519245":"standard","Q4482975":"event","Q5003750":"event","Q5219928":"event","Q3841521":"standard","Q7349166":"event","Q8068972":"book","Q8193338":"book","Q7888976":"event","Q10876822":"book","Q11408956":"event","Q11419290":"event","Q11431351":"event","Q11442189":"event","Q11489226":"event","Q21996535":"software","Q18141771":"book","Q18916556":"event","Q20018725":"event","Q104540818":"regulation","Q21087255":"event","Q19610150":"standard","Q21512546":"event","Q22328193":"standard","Q23308497":"standard","Q23308546":"standard","Q23308548":"standard","Q23308626":"standard","Q23308624":"standard","Q23308633":"standard","Q23308638":"standard","Q23308636":"standard","Q23308643":"standard","Q23308640":"standard","Q23308646":"standard","Q25894802":"event","Q26466721":"event","Q39184097":"software","Q31086521":"standard","Q55632755":"software","Q51879476":"event","Q61448957":"software","Q52362967":"event","Q62707668":"software","Q63283385":"software","Q84322932":"motion_picture","Q60527676":"event","Q60522721":"standard","Q65206484":"event","Q98528181":"song","Q109626458":"song","Q107636709":"software","Q107636751":"software","Q107636783":"software","Q107636890":"software","Q109615047":"software","Q111662778":"software","Q111662777":"software","Q111669984":"software","Q104716172":"event","Q105398582":"event","Q106193092":"event","Q108448511":"standard","Q108503298":"standard","Q108508081":"standard","Q108554036":"standard","Q6517465":"dataset","Q5167153":"broadcast","Q610394":"software","Q804187":"software","Q1323555":"software","Q1502811":"software","Q1993135":"software","Q2533324":"software","Q3308694":"software","Q5661654":"software","Q17438413":"dataset","Q314561":"event","Q380532":"event","Q1063286":"book","Q1415231":"book","Q1009303":"event","Q1742054":"book","Q1203452":"event","Q1203463":"event","Q1338187":"event","Q2037613":"book","Q1483720":"event","Q1493190":"event","Q1537281":"event","Q1590995":"event","Q1802754":"event","Q1940140":"event","Q2047484":"event","Q2256201":"event","Q2372431":"event","Q2593298":"event","Q2739132":"event","Q2992354":"event","Q3088847":"event","Q3492828":"event","Q3503241":"event","Q4127453":"event","Q4127592":"event","Q4127615":"event","Q4407668":"event","Q7248423":"book","Q5451829":"standard","Q7901127":"event","Q19765952":"software","Q10299516":"event","Q20310948":"software","Q20822063":"software","Q11362251":"event","Q11362260":"event","Q12160280":"book","Q12384262":"event","Q13222763":"event","Q22952981":"software","Q14276938":"event","Q25861761":"software","Q17014374":"book","Q17143759":"event","Q18384473":"event","Q20180874":"event","Q3002559":"performance","Q3329162":"performance","Q21474241":"standard","Q24885817":"event","Q28683830":"event","Q28683832":"event","Q48837969":"software","Q56539593":"software","Q48836308":"event","Q60617863":"software","Q60775070":"software","Q1454498":"regulation","Q56679145":"event","Q11983":"software","Q5975204":"regulation","Q73885232":"event","Q58327700":"performance","Q60853413":"performance","Q107101993":"dataset","Q107102162":"dataset","Q110902956":"dataset","Q105475134":"software","Q111391909":"software","Q58081477":"regulation","Q60791882":"regulation","Q206290":"dataset","Q1088118":"dataset","Q7502102":"dataset","Q1668024":"software","Q2015669":"software","Q2311792":"software","Q5957454":"software","Q9375485":"software","Q80798":"event","Q129483":"event","Q129495":"event","Q213972":"event","Q1004329":"event","Q1730106":"event","Q1734347":"event","Q1945424":"event","Q2301786":"event","Q2710647":"event","Q878344":"standard","Q2732579":"event","Q2745456":"event","Q2755692":"event","Q2790614":"event","Q2795686":"event","Q2798560":"event","Q2856305":"event","Q2859545":"event","Q2918950":"event","Q2954795":"event","Q3101633":"event","Q3226846":"event","Q1639854":"standard","Q3708829":"event","Q3751354":"event","Q3752748":"event","Q3754756":"event","Q4244019":"event","Q4244020":"event","Q4323858":"event","Q4482978":"event","Q4825487":"event","Q4835055":"event","Q4992415":"event","Q6009879":"book","Q5412628":"event","Q7086900":"event","Q7462837":"event","Q7366570":"standard","Q10340653":"event","Q10340660":"event","Q11782483":"event","Q12047675":"event","Q14170532":"event","Q14170537":"event","Q14170543":"event","Q15989366":"event","Q16481968":"event","Q16668030":"event","Q16678023":"event","Q16716711":"event","Q16912063":"event","Q18434643":"event","Q18434645":"event","Q19910308":"event","Q19973786":"event","Q19973787":"event","Q19973788":"event","Q20680149":"event","Q21004536":"event","Q21030243":"event","Q24262161":"event","Q26962149":"event","Q27987675":"book","Q28667131":"event","Q40065581":"event","Q54560134":"event","Q55658306":"event","Q55658305":"event","Q59106911":"event","Q59397587":"event","Q60061449":"event","Q60220650":"event","Q60791791":"event","Q61861546":"event","Q15077505":"regulation","Q107494132":"software","Q109539832":"software","Q110874354":"software","Q104054982":"standard","Q355134":"software","Q1940713":"software","Q3139142":"software","Q4040458":"software","Q1920649":"event","Q2030469":"event","Q11590806":"software","Q2303329":"event","Q3114218":"event","Q3453588":"event","Q87645483":"regulation","Q4970523":"event","Q4970541":"event","Q5030372":"event","Q5493255":"event","Q5745104":"event","Q6826228":"event","Q7015539":"event","Q7061200":"event","Q7314673":"event","Q8202753":"book","Q7565756":"event","Q7890777":"event","Q7981955":"event","Q17639359":"software","Q8257794":"event","Q8257799":"event","Q8257833":"event","Q12882990":"event","Q12882991":"event","Q12882995":"event","Q12882997":"event","Q12883902":"event","Q12883909":"event","Q12883914":"event","Q12883915":"event","Q12883912":"event","Q12883918":"event","Q12883919":"event","Q12883923":"event","Q12883921":"event","Q12883926":"event","Q12883927":"event","Q12883924":"event","Q12883925":"event","Q12883930":"event","Q12883928":"event","Q13453902":"event","Q15689318":"event","Q16327253":"event","Q16327304":"event","Q16327311":"event","Q16327318":"event","Q16327322":"event","Q16330057":"event","Q16330062":"event","Q16330075":"event","Q16538244":"event","Q17624460":"event","Q27976571":"software","Q958982":"performance","Q2339999":"performance","Q33183362":"software","Q5737784":"performance","Q27042376":"event","Q29167063":"standard","Q29167066":"standard","Q29167086":"standard","Q37063340":"event","Q42132670":"event","Q43505736":"event","Q48507532":"event","Q48946537":"event","Q48946690":"event","Q50319112":"event","Q51946289":"event","Q51967293":"event","Q179831":"regulation","Q2824639":"regulation","Q61717298":"standard","Q16481846":"regulation","Q19834531":"regulation","Q28070878":"regulation","Q85801617":"event","Q88006502":"event","Q104530614":"software","Q99642299":"event","Q99659454":"event","Q99659459":"event","Q99659462":"event","Q99661843":"event","Q99661905":"event","Q99661957":"event","Q106828552":"event","Q109657442":"event","Q110833816":"book","Q255188":"software","Q305901":"software","Q796216":"software","Q862490":"software","Q1321517":"software","Q1367557":"software","Q1588573":"software","Q2742192":"software","Q4048537":"software","Q5960443":"software","Q450824":"book","Q645882":"book","Q1029715":"book","Q1131955":"book","Q580396":"event","Q583575":"event","Q605143":"event","Q936274":"event","Q940159":"event","Q960263":"event","Q2381068":"event","Q2420211":"event","Q2646789":"event","Q2883171":"event","Q2886525":"event","Q2919519":"event","Q2949194":"event","Q2949204":"event","Q2950589":"event","Q2952450":"event","Q3032656":"event","Q3038971":"event","Q3038974":"event","Q3038975":"event","Q3038972":"event","Q3038973":"event","Q3038978":"event","Q3038982":"event","Q3038983":"event","Q3038980":"event","Q3038981":"event","Q3038985":"event","Q3038988":"event","Q3038994":"event","Q3038993":"event","Q3038999":"event","Q3038996":"event","Q3039003":"event","Q3039006":"event","Q3039008":"event","Q3039019":"event","Q3039016":"event","Q3039020":"event","Q3039027":"event","Q3039033":"event","Q3039038":"event","Q3039039":"event","Q3039041":"event","Q3039046":"event","Q3039047":"event","Q3039045":"event","Q3039051":"event","Q3039054":"event","Q3039056":"event","Q3039065":"event","Q3039076":"event","Q3066936":"event","Q3066955":"event","Q3066961":"event","Q3113758":"event","Q16038990":"software","Q16675432":"software","Q9332740":"event","Q19597382":"software","Q22001389":"software","Q28239334":"event","Q54151974":"software","Q48805056":"event","Q61008929":"software","Q61008981":"software","Q58002801":"book","Q58002806":"book","Q58002814":"book","Q58002818":"book","Q58002828":"book","Q58002835":"book","Q381":"software","Q2027":"software","Q70461930":"software","Q67476316":"event","Q80933428":"software","Q72226942":"book","Q20127660":"regulation","Q108730964":"software","Q101949943":"book","Q101950258":"book","Q3114031":"event","Q3114214":"event","Q3114255":"event","Q3540375":"event","Q3540451":"event","Q5547595":"event","Q5550042":"event","Q5637675":"event","Q5718367":"event","Q5718378":"event","Q5718376":"event","Q5718381":"event","Q5718386":"event","Q5718405":"event","Q5718410":"event","Q5718427":"event","Q5718556":"event","Q5718719":"event","Q5718800":"event","Q5718930":"event","Q5810056":"event","Q5976132":"event","Q6103689":"event","Q6103693":"event","Q6103696":"event","Q6153081":"event","Q6153146":"event","Q8241526":"event","Q8241529":"event","Q8241585":"event","Q8241682":"event","Q8241685":"event","Q8241743":"event","Q8241815":"event","Q8257792":"event","Q8261060":"event","Q8350731":"event","Q11168475":"event","Q11220799":"event","Q11680139":"event","Q12253181":"event","Q12253330":"event","Q12253766":"event","Q12253767":"event","Q12253898":"event","Q12254335":"event","Q12254860":"event","Q12255005":"event","Q12255021":"event","Q12255027":"event","Q12255144":"event","Q12255218":"event","Q12255219":"event","Q12255228":"event","Q12255326":"event","Q12255329":"event","Q12255335":"event","Q12255336":"event","Q12256635":"event","Q12256632":"event","Q12256633":"event","Q12256787":"event","Q12256788":"event","Q12256789":"event","Q12258133":"event","Q12258461":"event","Q12258469":"event","Q12258519":"event","Q12258520":"event","Q12259054":"event","Q12259231":"event","Q12259378":"event","Q12259632":"event","Q12259777":"event","Q12259849":"event","Q12261155":"event","Q12261467":"event","Q12261527":"event","Q12261600":"event","Q12261618":"event","Q12261636":"event","Q12261885":"event","Q12262151":"event","Q12262148":"event","Q12263879":"event","Q12263958":"event","Q12265246":"event","Q12265255":"event","Q12265256":"event","Q12265570":"event","Q12265568":"event","Q12265569":"event","Q12266044":"event","Q12266933":"event","Q12267870":"event","Q12267871":"event","Q12268147":"event","Q12268148":"event","Q12268205":"event","Q12268385":"event","Q108565643":"event","Q110620467":"event","Q110892617":"event","Q175173":"software","Q185029":"software","Q1044478":"software","Q3965952":"software","Q526730":"event","Q905917":"event","Q1896500":"event","Q2455683":"event","Q2543529":"event","Q1140366":"standard","Q1660393":"standard","Q3586716":"event","Q3586734":"event","Q3586740":"event","Q3586757":"event","Q3587402":"event","Q3587401":"event","Q3587405":"event","Q3657790":"event","Q4127443":"event","Q4127446":"event","Q4127447":"event","Q4127450":"event","Q4127451":"event","Q4127454":"event","Q4127452":"event","Q4127459":"event","Q4127461":"event","Q3191392":"standard","Q4652949":"standard","Q5424472":"standard","Q5754887":"standard","Q5968680":"standard","Q5968684":"standard","Q6329481":"standard","Q6331196":"standard","Q6340374":"standard","Q6340378":"standard","Q6341717":"standard","Q6341720":"standard","Q7907029":"standard","Q11656585":"event","Q12268757":"event","Q12269226":"event","Q12269225":"event","Q12269484":"event","Q16516664":"event","Q16516896":"event","Q16517217":"event","Q18289362":"event","Q18769744":"event","Q19951941":"event","Q20492177":"event","Q20492188":"event","Q20492274":"event","Q20492468":"event","Q20492577":"event","Q20723970":"event","Q21426489":"event","Q22907241":"standard","Q25473659":"event","Q25473779":"event","Q25474119":"event","Q25476057":"event","Q31188105":"event","Q31188485":"event","Q15407973":"webpage","Q22808320":"webpage","Q52392693":"event","Q57319737":"event","Q60854016":"event","Q61365131":"event","Q62011419":"event","Q62011463":"event","Q66425450":"event","Q66425448":"event","Q78958238":"standard","Q61996773":"webpage","Q66480449":"webpage","Q96093266":"event","Q97152477":"event","Q97188778":"event","Q97502254":"event","Q98593607":"event","Q100392103":"event","Q108268888":"event","Q108445380":"event","Q108489811":"event","Q107602":"software","Q138754":"software","Q228323":"software","Q543151":"software","Q605117":"software","Q624163":"software","Q626500":"software","Q655908":"software","Q846925":"software","Q864718":"software","Q900585":"software","Q1070358":"software","Q1961588":"software","Q2600488":"software","Q2793151":"software","Q2885530":"software","Q5196736":"software","Q5282311":"software","Q6559288":"software","Q7130810":"software","Q7289274":"software","Q7380031":"software","Q7493588":"software","Q7606662":"software","Q129519":"event","Q757581":"review","Q10111060":"software","Q10855346":"software","Q1345171":"event","Q1361443":"event","Q1362402":"event","Q1412276":"event","Q2186782":"book","Q1847651":"event","Q2062028":"event","Q2118149":"event","Q2350176":"event","Q4066165":"book","Q4626151":"event","Q15882299":"software","Q7144691":"book","Q7210039":"book","Q7423765":"book","Q7457643":"book","Q7061321":"event","Q7100858":"event","Q7100859":"event","Q7100861":"event","Q7361870":"event","Q10843458":"event","Q20923146":"software","Q11983097":"event","Q11992144":"event","Q11992167":"event","Q11992175":"event","Q16965930":"review","Q19833190":"event","Q19833191":"event","Q19833189":"event","Q19833192":"event","Q19833193":"event","Q19857023":"event","Q30607131":"software","Q25379510":"event","Q25379508":"event","Q25434256":"event","Q29027803":"book","Q28718565":"event","Q30225036":"event","Q50716248":"event","Q56407985":"event","Q2475782":"regulation","Q6522361":"regulation","Q7894671":"regulation","Q7894668":"regulation","Q64533434":"event","Q67591664":"event","Q73396547":"event","Q104201951":"software","Q104830011":"software","Q105702790":"software","Q105702814":"software","Q106405894":"software","Q108882014":"software","Q109324772":"software","Q111519486":"software","Q111525937":"software","Q103899162":"event","Q104860813":"book","Q104245330":"event","Q104630354":"event","Q104664668":"event","Q107335338":"legislation","Q108855280":"event","Q108855332":"event","Q110273355":"legislation","Q65204166":"regulation","Q18099930":"dataset","Q19220511":"dataset","Q131772":"event","Q283912":"event","Q1143290":"book","Q670146":"event","Q701398":"event","Q10308060":"software","Q824202":"event","Q1516890":"book","Q1538538":"book","Q912988":"event","Q915172":"event","Q1539031":"legislation","Q1137966":"event","Q1309022":"event","Q2138712":"review","Q1571145":"event","Q1771778":"event","Q1808124":"event","Q1842230":"event","Q1878822":"event","Q2028330":"event","Q2364511":"event","Q2365273":"event","Q2816453":"legislation","Q2381159":"event","Q2910355":"legislation","Q2626843":"event","Q2856528":"event","Q2954800":"event","Q3329739":"event","Q5275276":"review","Q5987970":"book","Q7233267":"legislation","Q6803505":"event","Q16381999":"software","Q7508283":"legislation","Q5420993":"standard","Q7304576":"event","Q8249787":"event","Q10712099":"event","Q11611579":"book","Q11622338":"book","Q11157818":"event","Q11300403":"event","Q11300407":"event","Q11570733":"event","Q11603286":"event","Q11782686":"event","Q12038210":"event","Q16680709":"event","Q16680747":"event","Q16680763":"event","Q17640110":"event","Q18669741":"event","Q25999230":"event","Q28129515":"event","Q28129513":"event","Q29974308":"book","Q30038136":"book","Q30936962":"event","Q51676421":"software","Q47008378":"event","Q61715376":"software","Q55025820":"event","Q1757670":"regulation","Q56755168":"event","Q56761847":"event","Q56761853":"event","Q56815551":"event","Q61741875":"book","Q61605094":"event","Q7973850":"regulation","Q65054195":"event","Q67138330":"event","Q98670663":"webpage","Q104735362":"software","Q98560886":"event","Q100165600":"legislation","Q108416019":"event","Q107436189":"standard","Q107436323":"standard","Q107436514":"standard","Q107436586":"standard","Q107436646":"standard","Q107442192":"standard","Q107442408":"standard","Q107442924":"standard","Q107649911":"standard","Q107649948":"standard","Q107649996":"standard","Q107650033":"standard","Q107650381":"standard","Q107650633":"standard","Q108198071":"standard","Q1165116":"software","Q1654284":"software","Q2529678":"software","Q70475":"standard","Q205509":"standard","Q207539":"standard","Q213423":"standard","Q214314":"standard","Q216334":"standard","Q237794":"standard","Q253278":"standard","Q277482":"standard","Q294818":"standard","Q294855":"standard","Q294857":"standard","Q294947":"standard","Q295003":"standard","Q295014":"standard","Q295032":"standard","Q295057":"standard","Q295064":"standard","Q319509":"standard","Q324536":"standard","Q324610":"standard","Q330255":"standard","Q338518":"standard","Q390389":"standard","Q390562":"standard","Q468451":"standard","Q622888":"standard","Q656154":"standard","Q657808":"standard","Q764978":"standard","Q1058943":"standard","Q1065726":"standard","Q1097284":"standard","Q1118075":"standard","Q1324219":"standard","Q1344884":"standard","Q3037385":"standard","Q3086999":"standard","Q3152990":"standard","Q3152991":"standard","Q3152989":"standard","Q3272893":"standard","Q3337772":"standard","Q3488028":"standard","Q3572526":"standard","Q3634178":"standard","Q3832580":"standard","Q3962657":"standard","Q19631771":"software","Q19631768":"software","Q19631769":"software","Q12021695":"standard","Q12021698":"standard","Q12021699":"standard","Q12021696":"standard","Q12021697":"standard","Q12021702":"standard","Q12021703":"standard","Q12021700":"standard","Q12021701":"standard","Q12021706":"standard","Q12021704":"standard","Q12021705":"standard","Q12021708":"standard","Q12021709":"standard","Q13055354":"standard","Q29639345":"software","Q20102321":"event","Q19621245":"standard","Q105342350":"regulation","Q105342361":"regulation","Q39690758":"software","Q28845729":"standard","Q28972980":"standard","Q33083031":"standard","Q65561361":"standard","Q65582574":"standard","Q65584693":"standard","Q66363583":"standard","Q80127854":"standard","Q80128468":"standard","Q80953877":"standard","Q80787826":"webpage","Q80789820":"webpage","Q111633188":"event","Q83787417":"webpage","Q85195830":"webpage","Q98645843":"webpage","Q99228802":"webpage","Q99441948":"webpage","Q100251488":"webpage","Q100707223":"webpage","Q12085765":"song","Q12115216":"song","Q12141189":"song","Q12157230":"song","Q3509118":"software","Q5500304":"software","Q106803564":"webpage","Q108107367":"webpage","Q7663614":"software","Q18407189":"song","Q108914572":"webpage","Q110095011":"webpage","Q9350446":"software","Q9350447":"software","Q9350444":"software","Q111046447":"webpage","Q1478895":"event","Q1812897":"event","Q1919769":"event","Q1990939":"event","Q2018244":"event","Q2178208":"event","Q2259724":"event","Q28705723":"song","Q12021710":"standard","Q12021711":"standard","Q12021714":"standard","Q12021712":"standard","Q12021713":"standard","Q12364601":"standard","Q18660354":"standard","Q18660382":"standard","Q18660390":"standard","Q19481932":"standard","Q20671116":"standard","Q25024949":"standard","Q27995423":"standard","Q31888920":"standard","Q11062089":"webpage","Q15623926":"webpage","Q15713835":"webpage","Q15851373":"webpage","Q16291412":"webpage","Q18091489":"webpage","Q18340550":"webpage","Q19692233":"webpage","Q21167233":"webpage","Q26657792":"webpage","Q26884324":"webpage","Q53700422":"standard","Q782395":"regulation","Q836575":"regulation","Q55606717":"standard","Q30032916":"webpage","Q33532284":"webpage","Q7247299":"regulation","Q66660880":"standard","Q66713386":"standard","Q66778155":"standard","Q66778599":"standard","Q56297104":"webpage","Q59156113":"webpage","Q59738577":"webpage","Q61034350":"dataset","Q63032896":"webpage","Q65181814":"webpage","Q66050442":"webpage","Q66711852":"webpage","Q67182947":"webpage","Q67325957":"webpage","Q96417607":"standard","Q111746312":"event","Q111746317":"event","Q87879655":"webpage","Q2406355":"software","Q107344376":"webpage","Q18100125":"dataset","Q18810260":"dataset","Q18922463":"dataset","Q82899":"event","Q309168":"event","Q586726":"event","Q732876":"event","Q878505":"event","Q906559":"event","Q2034044":"event","Q2034054":"event","Q2241734":"event","Q2265397":"event","Q2331139":"event","Q2387647":"event","Q2450933":"event","Q2482360":"event","Q2503599":"event","Q2639971":"event","Q2749033":"event","Q2804311":"event","Q981514":"standard","Q3118005":"event","Q3473924":"event","Q87648631":"regulation","Q4510180":"event","Q4689006":"event","Q5413443":"event","Q5523106":"event","Q15145755":"webpage","Q18711811":"webpage","Q11834046":"event","Q96754681":"regulation","Q14509387":"event","Q18400153":"event","Q19544378":"event","Q19544384":"event","Q19544385":"event","Q19544390":"event","Q19544393":"event","Q19544407":"event","Q19544424":"event","Q19544434":"event","Q19544446":"event","Q19544458":"event","Q19544457":"event","Q19544460":"event","Q20723955":"event","Q23020591":"event","Q111262319":"regulation","Q29561587":"event","Q28206714":"standard","Q14204246":"webpage","Q14360432":"webpage","Q17442446":"webpage","Q59259626":"webpage","Q21623879":"webpage","Q28092864":"webpage","Q56005592":"webpage","Q109318313":"software","Q109567034":"event","Q111384974":"event","Q7099284":"software","Q18889371":"dataset","Q18889411":"dataset","Q198889":"event","Q281772":"event","Q537249":"event","Q556569":"event","Q595865":"event","Q613439":"event","Q616438":"event","Q629222":"event","Q636051":"event","Q656532":"event","Q658888":"event","Q725531":"event","Q776859":"event","Q782015":"event","Q819955":"event","Q849814":"event","Q849851":"event","Q857351":"event","Q898966":"event","Q899197":"event","Q925509":"event","Q966789":"event","Q981367":"event","Q1083752":"event","Q1088759":"event","Q1166178":"event","Q1294855":"event","Q1321934":"event","Q2069352":"book","Q1466163":"event","Q1749242":"event","Q1811632":"event","Q1852267":"event","Q2095472":"event","Q2106857":"event","Q2298236":"event","Q2333258":"event","Q2429941":"event","Q2526994":"event","Q2585212":"event","Q2609272":"event","Q2690707":"event","Q2704335":"event","Q2717396":"event","Q2740399":"event","Q3418173":"event","Q3418197":"event","Q3924399":"event","Q4855141":"event","Q6098556":"event","Q6098563":"event","Q6098729":"event","Q6888051":"event","Q7287062":"event","Q7649370":"event","Q9066172":"event","Q9066173":"event","Q27855821":"broadcast","Q27876130":"broadcast","Q11506392":"event","Q11670304":"event","Q11701966":"event","Q12048793":"event","Q16040090":"event","Q16040088":"event","Q17092633":"event","Q17628122":"event","Q20545759":"event","Q27161247":"event","Q27161628":"event","Q27161724":"event","Q48893562":"software","Q47194527":"event","Q50601640":"event","Q51955127":"event","Q56610307":"event","Q60643384":"event","Q60862257":"event","Q62032617":"event","Q85827478":"software","Q85920708":"software","Q85101118":"event","Q86596395":"event","Q92566161":"event","Q92586589":"event","Q93622529":"event","Q105483835":"software","Q105483881":"software","Q96622033":"event","Q96795694":"event","Q107610634":"software","Q98822459":"event","Q98843551":"event","Q99207010":"event","Q99541036":"event","Q110165559":"book","Q110098625":"standard","Q722192":"software","Q773424":"software","Q837975":"software","Q1123036":"software","Q3509049":"software","Q6746712":"software","Q6822269":"software","Q756721":"event","Q1568346":"review","Q1485307":"event","Q1804248":"event","Q2568422":"event","Q2633735":"event","Q3496797":"event","Q3496803":"event","Q1665598":"standard","Q3556429":"event","Q3563383":"event","Q3563436":"event","Q3563446":"event","Q3566196":"event","Q3735285":"event","Q4689966":"event","Q4724094":"event","Q5653192":"review","Q6618808":"event","Q7525493":"book","Q7455897":"event","Q23891038":"webpage","Q23891036":"webpage","Q23891037":"webpage","Q23891042":"webpage","Q23891043":"webpage","Q23891040":"webpage","Q23891041":"webpage","Q23891045":"webpage","Q23891050":"webpage","Q23891051":"webpage","Q23891048":"webpage","Q23891049":"webpage","Q23891054":"webpage","Q23891055":"webpage","Q23891052":"webpage","Q23891053":"webpage","Q23891056":"webpage","Q23891075":"webpage","Q26430975":"software","Q20948997":"event","Q19591713":"standard","Q22949126":"event","Q25289192":"event","Q26228228":"book","Q27186004":"event","Q27491613":"event","Q27491654":"event","Q27491766":"event","Q27491798":"event","Q26329648":"standard","Q37787110":"software","Q28941872":"review","Q31839826":"book","Q59156760":"dataset","Q44606775":"event","Q54314590":"software","Q54323360":"software","Q2994309":"regulation","Q9662":"software","Q18756":"event","Q80134605":"software","Q75597003":"standard","Q75597419":"standard","Q75597761":"standard","Q75598901":"standard","Q75710135":"standard","Q75710254":"standard","Q106712577":"report","Q108883056":"report","Q91267365":"software","Q84081457":"event","Q89503149":"book","Q91399957":"event","Q91399971":"event","Q91931245":"event","Q92320908":"event","Q92321112":"event","Q102259548":"software","Q107542272":"software","Q107542373":"software","Q109656536":"software","Q111436256":"software","Q104771478":"event","Q109936157":"event","Q18086671":"dataset","Q18089574":"dataset","Q18089575":"dataset","Q182068":"event","Q182473":"event","Q219261":"event","Q223366":"event","Q279800":"event","Q387970":"event","Q484028":"event","Q646823":"event","Q670053":"event","Q677053":"event","Q725960":"event","Q748389":"event","Q1083915":"event","Q1477115":"event","Q175957":"standard","Q3138495":"event","Q3138502":"event","Q3353551":"event","Q3535028":"event","Q3587589":"event","Q3607252":"event","Q3963775":"event","Q3965460":"event","Q4690035":"event","Q5115542":"event","Q5827419":"event","Q5827491":"event","Q6348103":"event","Q6463413":"event","Q7053528":"event","Q7076194":"event","Q7565981":"event","Q8774346":"event","Q8774419":"event","Q6998854":"standard","Q11642810":"event","Q11918772":"event","Q12581010":"event","Q13221792":"event","Q22907871":"software","Q15980635":"event","Q17023673":"book","Q17165333":"event","Q18124297":"event","Q18127058":"event","Q21130129":"event","Q22338444":"event","Q23688019":"event","Q24199684":"event","Q26213387":"event","Q27925538":"event","Q27925644":"event","Q26219924":"standard","Q26225909":"standard","Q30056164":"event","Q30926925":"event","Q29578378":"standard","Q29579024":"standard","Q29579039":"standard","Q29579043":"standard","Q35823051":"event","Q51675393":"software","Q44404737":"event","Q47069668":"event","Q47711758":"event","Q51155374":"event","Q51155420":"event","Q51155488":"event","Q51155519":"event","Q51155608":"event","Q51155665":"event","Q51155862":"event","Q51155973":"event","Q51156130":"event","Q51156169":"event","Q51156241":"event","Q51156281":"event","Q51156342":"event","Q51156393":"event","Q51156444":"event","Q51156478":"event","Q51156540":"event","Q51156587":"event","Q51156682":"event","Q1607722":"regulation","Q2660896":"regulation","Q2824641":"regulation","Q56255056":"standard","Q60168059":"event","Q84592525":"event","Q85812479":"event","Q99485722":"event","Q111184276":"software","Q107185688":"event","Q108743617":"event","Q63226726":"regulation","Q63226762":"regulation","Q63259144":"regulation","Q64187271":"regulation","Q1609504":"dataset","Q71067930":"regulation","Q1443965":"software","Q378806":"event","Q520388":"event","Q1001620":"event","Q1683337":"book","Q1430576":"event","Q2200822":"event","Q2672940":"event","Q4038992":"event","Q5393774":"event","Q5874005":"event","Q6696254":"event","Q6952504":"event","Q7237930":"event","Q7680005":"event","Q7814142":"event","Q11924610":"event","Q12353726":"standard","Q12353724":"standard","Q16523578":"event","Q16852243":"event","Q16987422":"event","Q17084022":"event","Q30314076":"software","Q28448109":"event","Q59156162":"dataset","Q59156179":"dataset","Q59156199":"dataset","Q59156242":"dataset","Q39050643":"event","Q39050716":"event","Q42264013":"event","Q42377041":"event","Q65770536":"dataset","Q48782035":"event","Q56318100":"event","Q56318101":"event","Q56318106":"event","Q60969170":"event","Q71683262":"software","Q63860191":"event","Q64569595":"event","Q65742449":"event","Q73712583":"event","Q80781545":"book","Q80370583":"event","Q80708319":"event","Q86681276":"event","Q87267448":"event","Q87798979":"event","Q87849896":"event","Q89947880":"event","Q90567362":"event","Q90921908":"event","Q91270787":"event","Q92320983":"event","Q92321117":"event","Q92402259":"event","Q92475919":"event","Q92480586":"event","Q92480584":"event","Q92480588":"event","Q92480589":"event","Q92482708":"event","Q92482719":"event","Q92482728":"event","Q92482736":"event","Q96371234":"event","Q96379154":"event","Q96379153":"event","Q96393054":"event","Q106529593":"software","Q97685728":"event","Q97768050":"event","Q97769737":"event","Q104850774":"event","Q106201842":"event","Q106946690":"event","Q107366029":"event","Q107366160":"event","Q107418089":"event","Q107969818":"event","Q164848":"event","Q164885":"event","Q187579":"event","Q216323":"event","Q216331":"event","Q1649046":"event","Q1935482":"event","Q2076801":"event","Q2807389":"event","Q2818079":"event","Q4546048":"event","Q4546049":"event","Q4642512":"event","Q4642516":"event","Q15812736":"event","Q67438344":"event","Q29613":"event","Q74685863":"event","Q74686741":"event","Q87268198":"event","Q87292806":"event","Q87292877":"event","Q87344584":"event","Q87592754":"event","Q87776830":"event","Q87776839":"event","Q87776842":"event","Q88007175":"event","Q92282907":"event","Q92282909":"event","Q92312582":"event","Q92313829":"event","Q93154810":"event","Q93155836":"event","Q93306595":"event","Q93306847":"event","Q93395449":"event","Q93395542":"event","Q93455815":"event","Q93455943":"event","Q93462300":"event","Q93462304":"event","Q93557741":"event","Q93558099":"event","Q93558289":"event","Q93558491":"event","Q93559180":"event","Q93559266":"event","Q93559482":"event","Q93559484":"event","Q94175988":"event","Q94176089":"event","Q94179568":"event","Q94179811":"event","Q94184446":"event","Q94184448":"event","Q94328268":"event","Q94330804":"event","Q94334991":"event","Q94340605":"event","Q94343868":"event","Q94343874":"event","Q94440678":"event","Q94440695":"event","Q94449970":"event","Q94450051":"event","Q94456115":"event","Q94456180":"event","Q94461968":"event","Q94462023":"event","Q94464365":"event","Q94464422":"event","Q94466676":"event","Q94466778":"event","Q94553391":"event","Q94553400":"event","Q94566760":"event","Q94566909":"event","Q94572595":"event","Q94572597":"event","Q94602741":"event","Q94602898":"event","Q94606984":"event","Q94607074":"event","Q94609398":"event","Q94609435":"event","Q94614602":"event","Q94614685":"event","Q94620942":"event","Q94620977":"event","Q94635295":"event","Q94674229":"event","Q94679811":"event","Q94683284":"event","Q94684262":"event","Q94694462":"event","Q94694551":"event","Q94694792":"event","Q97667346":"event","Q109172450":"event","Q109322393":"event","Q109535776":"event","Q1204811":"event","Q1204815":"event","Q1204813":"event","Q1204823":"event","Q2332435":"event","Q2332459":"event","Q2575326":"event","Q3394364":"event","Q3664502":"event","Q3664508":"event","Q3827270":"event","Q4376957":"event","Q4376998":"event","Q4887639":"event","Q4887636":"event","Q4887640":"event","Q4896558":"event","Q4896567":"event","Q4921543":"event","Q4921548":"event","Q5449102":"event","Q5449103":"event","Q5449104":"event","Q5449105":"event","Q5461348":"event","Q5569251":"event","Q6359110":"event","Q6359124":"event","Q6359166":"event","Q6364027":"event","Q6963264":"event","Q7423198":"event","Q7423197":"event","Q7438990":"event","Q7438991":"event","Q7589630":"event","Q7929107":"event","Q15465716":"event","Q16058278":"event","Q16058282":"event","Q17001884":"event","Q17011291":"event","Q17011296":"event","Q17162317":"event","Q17500617":"event","Q18204260":"event","Q18654238":"event","Q18654241":"event","Q18657941":"event","Q18657945":"event","Q18760021":"event","Q20019002":"event","Q21050208":"event","Q22773457":"event","Q24057108":"event","Q24838077":"event","Q24838614":"event","Q24838841":"event","Q27958270":"event","Q27959453":"event","Q28417679":"event","Q28417682":"event","Q28417685":"event","Q43401538":"event","Q48842194":"event","Q52358547":"event","Q52358585":"event","Q52362037":"event","Q55474574":"event","Q55639517":"event","Q59511589":"event","Q63522873":"event","Q65121886":"event","Q95124560":"software","Q85870490":"event","Q94635434":"event","Q94674325":"event","Q94679999":"event","Q94683604":"event","Q94684504":"event","Q94694487":"event","Q94694569":"event","Q94694933":"event","Q106925271":"software","Q97579415":"event","Q97579418":"event","Q97579482":"event","Q97579484":"event","Q97581349":"event","Q97581369":"event","Q97671312":"event","Q104864731":"event","Q105967793":"event","Q106623590":"event","Q106958128":"event","Q107211053":"event","Q108196863":"event","Q110408400":"event","Q111433963":"event","Q1143132":"software","Q2108852":"software","Q546842":"legislation","Q1349659":"review","Q4861057":"event","Q4861618":"event","Q4861943":"event","Q4899805":"event","Q4916653":"event","Q4940252":"event","Q4954788":"event","Q4961598":"event","Q4973708":"event","Q5001131":"event","Q5019056":"event","Q5025826":"event","Q5189716":"event","Q5325494":"event","Q5377332":"event","Q5637384":"event","Q5645760":"event","Q5657629":"event","Q5666613":"event","Q5683838":"event","Q5763312":"event","Q5913321":"event","Q6084407":"event","Q6391510":"event","Q6481463":"event","Q6537337":"event","Q6820741":"event","Q7305510":"event","Q7331066":"event","Q7571176":"event","Q7650353":"event","Q7829682":"event","Q7966607":"event","Q7967318":"event","Q7989235":"event","Q16993367":"event","Q16995693":"event","Q16998864":"event","Q18129485":"event","Q18395406":"event","Q18395411":"event","Q18395413":"event","Q18395420":"event","Q22909824":"event","Q25052881":"event","Q61005756":"software","Q75387698":"dataset","Q51631":"book","Q104822202":"broadcast","Q101416992":"dataset","Q101417052":"dataset","Q97273737":"event","Q97365604":"event","Q97728938":"event","Q98821837":"event","Q100393529":"event","Q100458400":"event","Q100458525":"event","Q100458691":"event","Q100458780":"event","Q100458838":"event","Q100458931":"event","Q100459125":"event","Q100459319":"event","Q100459495":"event","Q110546562":"software","Q101442571":"event","Q101464718":"event","Q101464937":"event","Q101465135":"event","Q101465286":"event","Q101465464":"event","Q101465641":"event","Q101465816":"event","Q101466018":"event","Q101466197":"event","Q101466371":"event","Q101466540":"event","Q101552796":"event","Q101558899":"event","Q101559306":"event","Q101559475":"event","Q101833672":"event","Q106606189":"event","Q4685991":"event","Q4732111":"event","Q4734074":"event","Q4741330":"event","Q4804976":"event","Q4805016":"event","Q4831377":"event","Q4837784":"event","Q4863857":"event","Q4867320":"event","Q4867535":"event","Q4868097":"event","Q4896023":"event","Q4920022":"event","Q4930867":"event","Q4940076":"event","Q4948241":"event","Q4960051":"event","Q4961802":"event","Q4966909":"event","Q4972212":"event","Q4973773":"event","Q4976945":"event","Q5025632":"event","Q5032731":"event","Q5033715":"event","Q5037606":"event","Q5046152":"event","Q5050186":"event","Q5050233":"event","Q5086586":"event","Q5089977":"event","Q5090248":"event","Q5092666":"event","Q5093425":"event","Q5093783":"event","Q5093842":"event","Q5096023":"event","Q5099214":"event","Q5105173":"event","Q5109107":"event","Q5123664":"event","Q5142121":"event","Q5160482":"event","Q5168382":"event","Q5169827":"event","Q5175497":"event","Q5179131":"event","Q5182988":"event","Q5184838":"event","Q5207728":"event","Q5225620":"event","Q5230306":"event","Q5263366":"event","Q5295526":"event","Q5302538":"event","Q5312035":"event","Q5327527":"event","Q5327986":"event","Q5328228":"event","Q5328537":"event","Q5328578":"event","Q5328841":"event","Q5329053":"event","Q5329427":"event","Q5329832":"event","Q5330764":"event","Q5336965":"event","Q5365263":"event","Q5366435":"event","Q5383887":"event","Q5385735":"event","Q5420150":"event","Q5434971":"event","Q5443506":"event","Q5527173":"event","Q6415764":"event","Q6423494":"event","Q6516179":"event","Q7017567":"event","Q7057066":"event","Q7085670":"event","Q7353823":"event","Q7370451":"event","Q7404395":"event","Q7417064":"event","Q7446128":"event","Q7492800":"event","Q7558104":"event","Q7568703":"event","Q7593363":"event","Q7618182":"event","Q7639752":"event","Q7681174":"event","Q7832574":"event","Q7963798":"event","Q7999562":"event","Q8027003":"event","Q8030526":"event","Q16152241":"event","Q5468895":"event","Q5469167":"event","Q5511221":"event","Q5529711":"event","Q5587449":"event","Q5597930":"event","Q5600313":"event","Q5615855":"event","Q5643673":"event","Q5644235":"event","Q5654743":"event","Q5658992":"event","Q5666435":"event","Q5674285":"event","Q5680473":"event","Q5744884":"event","Q5756073":"event","Q5765799":"event","Q5906330":"event","Q5956948":"event","Q6065673":"event","Q6389767":"event","Q6394406":"event","Q6395482":"event","Q6411002":"event","Q6483290":"event","Q6543284":"event","Q6551208":"event","Q6658347":"event","Q6722945":"event","Q6735513":"event","Q6742885":"event","Q6751712":"event","Q6816652":"event","Q6840929":"event","Q6840950":"event","Q6841015":"event","Q6841023":"event","Q6895916":"event","Q7016808":"event","Q7054918":"event","Q7055129":"event","Q7055145":"event","Q7055190":"event","Q7055593":"event","Q7055784":"event","Q7056197":"event","Q7056730":"event","Q7057275":"event","Q7057402":"event","Q7057657":"event","Q7061564":"event","Q7069814":"event","Q7073397":"event","Q7108258":"event","Q7115568":"event","Q7165382":"event","Q7232516":"event","Q7242032":"event","Q7260890":"event","Q7305658":"event","Q7310088":"event","Q7316257":"event","Q7322247":"event","Q7331070":"event","Q7354086":"event","Q7369795":"event","Q7370415":"event","Q7378326":"event","Q7380093":"event","Q7380780":"event","Q7380856":"event","Q7385007":"event","Q7430326":"event","Q7445235":"event","Q7445246":"event","Q7447568":"event","Q7494580":"event","Q7503708":"event","Q7566487":"event","Q7567032":"event","Q7567424":"event","Q7567618":"event","Q7567780":"event","Q7568034":"event","Q7568036":"event","Q7568096":"event","Q7568303":"event","Q7568461":"event","Q7568522":"event","Q7575923":"event","Q7593008":"event","Q7596675":"event","Q7596702":"event","Q7615445":"event","Q7621927":"event","Q7624890":"event","Q7634541":"event","Q7646811":"event","Q7688785":"event","Q108939375":"event","Q108939378":"event","Q108939390":"event","Q108939403":"event","Q108939424":"event","Q108939450":"event","Q109669515":"event","Q109935409":"event","Q109935517":"event","Q109935543":"event","Q109935560":"event","Q109935583":"event","Q109935605":"event","Q2941225":"software","Q7688441":"event","Q7694995":"event","Q7699664":"event","Q7705742":"event","Q7710268":"event","Q7797773":"event","Q7820779":"event","Q7827123":"event","Q7903446":"event","Q7909498":"event","Q7909562":"event","Q7968074":"event","Q7971126":"event","Q7974635":"event","Q7975390":"event","Q7975447":"event","Q7978014":"event","Q7978128":"event","Q7981288":"event","Q7985706":"event","Q7985764":"event","Q7986134":"event","Q7987001":"event","Q7990392":"event","Q8023873":"event","Q8029339":"event","Q8034237":"event","Q8037234":"event","Q8039547":"event","Q8039654":"event","Q8040466":"event","Q8040465":"event","Q15077890":"event","Q16150755":"event","Q16254485":"event","Q16985514":"event","Q16994465":"event","Q16997251":"event","Q16998731":"event","Q16998845":"event","Q17035426":"event","Q17035706":"event","Q17059228":"event","Q17063120":"event","Q20055575":"event","Q20962139":"event","Q21061461":"event","Q24039182":"event","Q24039181":"event","Q24039246":"event","Q24039247":"event","Q24039245":"event","Q24039250":"event","Q24039251":"event","Q24039248":"event","Q24039249":"event","Q24039254":"event","Q24039255":"event","Q24039252":"event","Q24039253":"event","Q24039258":"event","Q24039257":"event","Q24039262":"event","Q24039263":"event","Q24039260":"event","Q24039261":"event","Q24039266":"event","Q24039267":"event","Q24039264":"event","Q24039265":"event","Q24039270":"event","Q24039271":"event","Q24039274":"event","Q24039275":"event","Q24039273":"event","Q24039278":"event","Q24993739":"event","Q24993740":"event","Q65042246":"event","Q65057522":"event","Q106453584":"event","Q107388279":"book","Q108570967":"review","Q108570971":"review","Q109935648":"event","Q109935680":"event","Q111324105":"event","Q65281628":"regulation","Q8953":"regulation","Q72688":"software","Q207440":"software","Q287539":"software","Q380153":"software","Q387168":"software","Q608297":"software","Q726378":"software","Q753651":"software","Q1001215":"software","Q1052843":"software","Q1141941":"software","Q1189978":"software","Q1224342":"software","Q1251544":"software","Q1350261":"software","Q2324639":"software","Q2628648":"software","Q3067620":"software","Q5441191":"software","Q5500256":"software","Q7003418":"software","Q7208362":"software","Q7448156":"software","Q7489513":"software","Q606652":"event","Q10314988":"software","Q12226408":"software","Q12562332":"software","Q16705695":"software","Q7269933":"event","Q17091412":"software","Q18915790":"software","Q11267647":"event","Q11267645":"event","Q21043363":"software","Q21306238":"software","Q23672887":"software","Q27964209":"software","Q21051154":"standard","Q34305781":"software","Q191903":"regulation","Q3492425":"regulation","Q2130":"software","Q11250":"software","Q14643":"software","Q39238":"software","Q72205464":"software","Q66771576":"standard","Q100320716":"software","Q110146494":"software","Q128555":"software","Q274089":"software","Q281472":"software","Q285861":"software","Q288405":"software","Q380172":"software","Q627921":"software","Q690265":"software","Q749893":"software","Q818944":"software","Q837274":"software","Q934791":"software","Q975060":"software","Q1143237":"software","Q1194708":"software","Q1198051":"software","Q1259393":"software","Q1260861":"software","Q1276370":"software","Q1330734":"software","Q1992074":"software","Q2374485":"software","Q2667487":"software","Q2902363":"software","Q2918662":"software","Q3607994":"software","Q3714476":"software","Q3841143":"software","Q4021212":"software","Q4096094":"software","Q4284934":"software","Q4344917":"software","Q4388728":"software","Q4646997":"software","Q4680745":"software","Q5165889":"software","Q5297305":"software","Q5377339":"software","Q5421528":"software","Q5426601":"software","Q6451496":"software","Q6451502":"software","Q6554218":"software","Q7449055":"software","Q7563772":"software","Q7855619":"software","Q7915684":"software","Q9092779":"software","Q115802":"event","Q210673":"event","Q240387":"event","Q294755":"standard","Q294758":"standard","Q295067":"standard","Q295098":"standard","Q298882":"standard","Q298898":"standard","Q298914":"standard","Q298939":"standard","Q2268379":"standard","Q4642499":"event","Q3152993":"standard","Q4036548":"standard","Q16976839":"software","Q20665486":"software","Q11187180":"event","Q11187928":"event","Q29791656":"software","Q29791662":"software","Q29791660":"software","Q29793089":"software","Q29794122":"software","Q29794311":"software","Q30235544":"software","Q25814150":"standard","Q26998715":"standard","Q28379902":"standard","Q28379905":"standard","Q29578214":"standard","Q55234451":"event","Q14746":"software","Q44337":"software","Q99746060":"software","Q105084498":"software","Q98609806":"standard","Q98642562":"standard","Q111525931":"software","Q111568537":"software","Q112081159":"software","Q105086361":"event","Q107457035":"event","Q108328936":"event","Q86915":"software","Q240116":"software","Q375944":"software","Q603889":"software","Q677416":"software","Q734215":"software","Q762308":"software","Q783066":"software","Q835016":"software","Q846205":"software","Q849450":"software","Q878825":"software","Q1000349":"software","Q1044361":"software","Q1190947":"software","Q1228785":"software","Q1335171":"software","Q1481191":"software","Q2880842":"software","Q2995268":"software","Q3062515":"software","Q3513438":"software","Q3536726":"software","Q3631710":"software","Q3696410":"software","Q4365417":"software","Q5198152":"software","Q6713956":"software","Q568946":"event","Q294885":"standard","Q294894":"standard","Q294895":"standard","Q294899":"standard","Q295021":"standard","Q11794350":"software","Q1054864":"standard","Q1134560":"standard","Q12635161":"software","Q1256727":"standard","Q1256912":"standard","Q3272930":"event","Q3275782":"event","Q3587393":"event","Q1756979":"standard","Q2840060":"standard","Q4489474":"standard","Q17084394":"software","Q17084934":"software","Q17144865":"software","Q8030805":"event","Q8078623":"event","Q18357227":"software","Q7280114":"standard","Q7280115":"standard","Q7280119":"standard","Q7280120":"standard","Q7280121":"standard","Q20707190":"software","Q11559206":"event","Q21122879":"software","Q11597392":"event","Q11644839":"event","Q10366633":"standard","Q22205802":"software","Q11977640":"standard","Q13218505":"standard","Q25345907":"software","Q14193598":"standard","Q15220335":"standard","Q15226510":"standard","Q17215318":"event","Q16672015":"standard","Q28972913":"software","Q28972917":"software","Q19864051":"standard","Q20017641":"standard","Q22050646":"event","Q22248386":"event","Q29652955":"standard","Q30640197":"standard","Q55357515":"software","Q484785":"regulation","Q1270767":"regulation","Q65947879":"software","Q4060660":"regulation","Q5177039":"regulation","Q7124832":"regulation","Q9357459":"regulation","Q64167209":"standard","Q76683717":"software","Q14625662":"regulation","Q18457081":"regulation","Q24886268":"regulation","Q28455391":"regulation","Q37062409":"regulation","Q104642575":"software","Q107282615":"software","Q100887313":"standard","Q110086978":"standard","Q110146407":"standard","Q60641635":"regulation","Q169233":"software","Q169338":"software","Q180943":"software","Q374230":"software","Q382486":"software","Q682772":"software","Q829915":"software","Q956343":"software","Q1107344":"software","Q1766038":"software","Q1936252":"software","Q2078122":"software","Q2454939":"software","Q3487968":"software","Q4683692":"software","Q5510283":"software","Q5553661":"software","Q5853100":"software","Q7269731":"software","Q9760157":"software","Q756822":"event","Q756825":"event","Q10364685":"software","Q137255":"standard","Q137292":"standard","Q137351":"standard","Q2111163":"event","Q1028580":"standard","Q1028816":"standard","Q1028832":"standard","Q1028854":"standard","Q1028865":"standard","Q1028872":"standard","Q1028881":"standard","Q1028889":"standard","Q1029186":"standard","Q1029536":"standard","Q1031226":"standard","Q1053242":"standard","Q3250343":"event","Q3310250":"event","Q3310270":"event","Q1652510":"standard","Q1665639":"standard","Q1665642":"standard","Q1665641":"standard","Q13222167":"software","Q4554158":"event","Q4554343":"event","Q4554571":"event","Q2755495":"standard","Q5529412":"standard","Q5529420":"standard","Q9085831":"event","Q96393271":"regulation","Q96398070":"regulation","Q22682016":"software","Q14192738":"event","Q14192736":"event","Q17839732":"event","Q17839758":"event","Q17839787":"event","Q17839872":"event","Q17839923":"event","Q17839948":"event","Q16246703":"standard","Q16246700":"standard","Q16927918":"standard","Q21050921":"standard","Q24033460":"standard","Q25393281":"standard","Q25393365":"standard","Q111214764":"regulation","Q31836350":"event","Q31842269":"standard","Q779415":"regulation","Q782614":"regulation","Q1094397":"regulation","Q1208927":"regulation","Q1351282":"regulation","Q1977835":"regulation","Q2914565":"regulation","Q56298334":"standard","Q67943569":"software","Q3569918":"regulation","Q14675":"software","Q4826838":"regulation","Q4826865":"regulation","Q71726635":"software","Q65238766":"standard","Q12892398":"regulation","Q80969887":"standard","Q48731499":"regulation","Q109690198":"standard","Q65591542":"regulation","Q300914":"software","Q821157":"software","Q826308":"software","Q1037904":"software","Q1978975":"software","Q2127647":"software","Q2134646":"software","Q2232267":"software","Q2367339":"software","Q3922358":"software","Q4263410":"software","Q5253991":"software","Q5448351":"software","Q5449460":"software","Q5477883":"software","Q7671563":"software","Q7687272":"software","Q134211":"event","Q187916":"event","Q207703":"event","Q211773":"event","Q216033":"event","Q362605":"event","Q610243":"event","Q633506":"event","Q10269379":"software","Q838781":"event","Q1194269":"event","Q1229455":"event","Q1392681":"event","Q1421697":"event","Q1519236":"event","Q1660416":"event","Q1744672":"event","Q11331406":"software","Q345335":"standard","Q11771157":"software","Q86059166":"regulation","Q2483906":"event","Q1153651":"standard","Q1623419":"standard","Q3590901":"event","Q2345193":"standard","Q2456186":"standard","Q4892040":"event","Q5905662":"event","Q6484470":"event","Q16662008":"software","Q7133630":"event","Q18759108":"software","Q19798263":"software","Q20388419":"software","Q12043782":"event","Q25450968":"software","Q17115899":"event","Q18482429":"event","Q18638656":"event","Q30347815":"software","Q24175331":"event","Q23306572":"standard","Q60480500":"software","Q63914682":"software","Q63914753":"software","Q63914927":"software","Q419911":"regulation","Q613918":"regulation","Q827792":"regulation","Q66230650":"software","Q2122110":"regulation","Q56196481":"standard","Q71477837":"software","Q7556714":"regulation","Q7644486":"regulation","Q61782186":"standard","Q61866970":"standard","Q73476571":"software","Q78145485":"software","Q66771570":"standard","Q14944024":"regulation","Q85797695":"software","Q30688465":"regulation","Q96146284":"software","Q107042005":"broadcast","Q105098453":"software","Q97368812":"event","Q98048858":"event","Q108924240":"software","Q109470190":"software","Q98822806":"standard","Q110887639":"software","Q111306718":"software","Q111411020":"software","Q112074728":"software","Q106810710":"event","Q111535559":"event","Q65556511":"regulation","Q332719":"software","Q334167":"software","Q1170308":"software","Q1260039":"software","Q2315057":"software","Q4035639":"software","Q4041455":"software","Q4041466":"software","Q5280436":"software","Q5696532":"software","Q6987213":"software","Q5337691":"review","Q17142169":"software","Q9044439":"event","Q12038181":"event","Q12202543":"event","Q12641786":"event","Q16515674":"event","Q20379572":"event","Q20436354":"event","Q25000767":"event","Q25165455":"event","Q25317694":"event","Q25317695":"event","Q25317692":"event","Q25317699":"event","Q25317696":"event","Q25317702":"event","Q25317703":"event","Q25317701":"event","Q25317707":"event","Q25435571":"event","Q25482756":"event","Q48845629":"software","Q56298645":"software","Q57977677":"software","Q63915290":"software","Q63915650":"software","Q54812340":"event","Q65243773":"event","Q94660628":"legislation","Q104152389":"software","Q97376601":"standard","Q109278692":"event","Q108695570":"standard","Q161410":"software","Q168210":"software","Q170963":"software","Q184973":"software","Q186165":"software","Q193162":"software","Q559856":"software","Q615699":"software","Q950152":"software","Q1073015":"software","Q1210425":"software","Q1273203":"software","Q1368679":"software","Q1780763":"software","Q2428155":"software","Q3220391":"software","Q3391957":"software","Q4007046":"software","Q5440723":"software","Q5892272":"software","Q7094065":"software","Q588586":"event","Q1202167":"event","Q1719235":"event","Q1730108":"event","Q1730115":"event","Q1857148":"event","Q1999275":"event","Q2117827":"event","Q2145391":"event","Q2213861":"event","Q2237879":"event","Q2273681":"event","Q2306623":"event","Q2362894":"event","Q2431042":"event","Q2490367":"event","Q2879531":"event","Q2950611":"event","Q3425916":"event","Q3548048":"event","Q13636813":"software","Q4989541":"event","Q18385544":"software","Q19778981":"software","Q19967801":"software","Q11456116":"event","Q21154509":"software","Q15116286":"event","Q15879714":"event","Q15879715":"event","Q15879712":"event","Q15879719":"event","Q28404302":"software","Q29021290":"software","Q19767716":"event","Q19827858":"event","Q33279156":"book","Q55387209":"software","Q55387247":"software","Q56240402":"software","Q58327688":"software","Q59392156":"software","Q61507686":"software","Q466":"software","Q76373554":"software","Q69681398":"event","Q69772310":"event","Q69790936":"event","Q69792758":"event","Q69870650":"event","Q69887041":"event","Q69997198":"event","Q70369541":"event","Q70384357":"event","Q70442641":"event","Q71791810":"event","Q74813502":"event","Q76544848":"event","Q76544874":"event","Q76544897":"event","Q76544929":"event","Q96405218":"software","Q107210714":"software","Q107389616":"software","Q98609804":"standard","Q98617327":"standard","Q98617382":"standard","Q98640210":"standard","Q98641984":"standard","Q110421313":"software","Q102187931":"event","Q105933268":"event","Q109043402":"event","Q67064711":"regulation","Q67205374":"regulation","Q375176":"software","Q3011118":"software","Q4034678":"software","Q5308021":"software","Q7124288":"software","Q82614":"event","Q116135":"event","Q203712":"event","Q238602":"event","Q252623":"event","Q259509":"event","Q280739":"event","Q280750":"event","Q303039":"event","Q380068":"event","Q406699":"event","Q474990":"event","Q611260":"event","Q693661":"event","Q738723":"event","Q743750":"event","Q746918":"event","Q746937":"event","Q746958":"event","Q749941":"event","Q784878":"event","Q806668":"event","Q827572":"event","Q841738":"event","Q913496":"event","Q968233":"event","Q1001292":"event","Q1001587":"event","Q1094440":"event","Q1104915":"event","Q1129898":"event","Q1307796":"event","Q1338371":"event","Q1401639":"event","Q1419587":"event","Q1436736":"event","Q1485140":"event","Q1505803":"event","Q1505841":"event","Q1505870":"event","Q370855":"standard","Q378640":"standard","Q1057260":"standard","Q1058975":"standard","Q1502020":"standard","Q3586646":"event","Q3586662":"event","Q3586664":"event","Q3924425":"event","Q2907041":"standard","Q2975671":"standard","Q3094393":"standard","Q3127699":"standard","Q7670767":"standard","Q7670765":"standard","Q12407530":"legislation","Q12138859":"event","Q26367719":"software","Q15223620":"standard","Q18662021":"standard","Q24574680":"event","Q24940151":"event","Q48748555":"event","Q48835554":"event","Q52177345":"event","Q52390813":"event","Q55806871":"standard","Q55806925":"standard","Q2872764":"regulation","Q14037025":"regulation","Q18087867":"regulation","Q81024457":"event","Q81024490":"event","Q81024520":"event","Q81024546":"event","Q81033892":"event","Q81036853":"event","Q81039301":"event","Q81042176":"event","Q85305177":"event","Q108934731":"software","Q101136446":"event","Q101136450":"event","Q101136451":"event","Q101136449":"event","Q101136456":"event","Q101136466":"event","Q111167865":"event","Q111589558":"event","Q111589687":"event","Q111996315":"event","Q835937":"software","Q840498":"software","Q1102408":"software","Q1201679":"software","Q2100701":"software","Q3708937":"software","Q4780987":"software","Q170096":"event","Q173271":"event","Q1505897":"event","Q1505910":"event","Q1506353":"event","Q1506443":"event","Q1726780":"event","Q1735816":"event","Q1817684":"event","Q1914237":"event","Q2069781":"event","Q2101180":"event","Q2113792":"event","Q2113818":"event","Q2152768":"event","Q2216590":"event","Q2245146":"event","Q2338574":"event","Q2477052":"event","Q3370130":"event","Q4354922":"event","Q4705943":"event","Q14500324":"software","Q7100860":"event","Q7707423":"event","Q7669185":"standard","Q9697654":"event","Q11261499":"event","Q11327742":"event","Q11618043":"event","Q11677885":"event","Q12379557":"event","Q27940843":"event","Q48829622":"event","Q58336227":"event","Q7849":"event","Q7854":"event","Q7870":"event","Q7876":"event","Q7885":"event","Q7954":"event","Q7961":"event","Q7965":"event","Q7980":"event","Q7994":"event","Q7993":"event","Q7998":"event","Q7997":"event","Q8000":"event","Q8019":"event","Q8025":"event","Q8032":"event","Q8039":"event","Q8036":"event","Q8069":"event","Q8082":"event","Q8100":"event","Q8109":"event","Q9102":"event","Q9109":"event","Q9113":"event","Q9117":"event","Q9122":"event","Q9137":"event","Q9208":"event","Q9209":"event","Q9214":"event","Q9223":"event","Q9220":"event","Q9227":"event","Q9225":"event","Q9229":"event","Q9233":"event","Q17012863":"regulation","Q109597309":"broadcast","Q96482998":"event","Q98637324":"event","Q100953125":"event","Q101206065":"event","Q104216769":"event","Q104901744":"event","Q104902941":"event","Q105047089":"event","Q105274163":"event","Q107102173":"event","Q107107237":"event","Q107131233":"event","Q107139226":"event","Q107139306":"event","Q108750321":"event","Q111443584":"event","Q87358148":"webpage","Q96707234":"webpage","Q97011660":"webpage","Q97303167":"webpage","Q98545791":"webpage","Q102333788":"webpage","Q106706063":"webpage","Q108460357":"webpage","Q18889701":"dataset","Q110597964":"webpage","Q1886157":"event","Q386903":"standard","Q1044821":"standard","Q1152382":"standard","Q6034516":"event","Q6059325":"event","Q6373950":"event","Q7417177":"standard","Q11668522":"event","Q16955224":"event","Q18923548":"event","Q19945033":"event","Q20723971":"event","Q20723968":"event","Q20723974":"event","Q20723975":"event","Q20723973":"event","Q20723976":"event","Q20723983":"event","Q20723986":"event","Q20723987":"event","Q20723984":"event","Q20723990":"event","Q20723988":"event","Q26877537":"event","Q111699174":"regulation","Q28739510":"standard","Q28850469":"standard","Q4167836":"webpage","Q4387047":"webpage","Q4663903":"webpage","Q8615872":"webpage","Q11266439":"webpage","Q18043430":"webpage","Q44671215":"standard","Q21281405":"webpage","Q21469493":"webpage","Q21479588":"webpage","Q22247630":"webpage","Q23841178":"webpage","Q24571886":"webpage","Q25051296":"webpage","Q26214208":"webpage","Q64787790":"software","Q28368760":"webpage","Q28373483":"webpage","Q29057009":"webpage","Q30415057":"webpage","Q35250433":"webpage","Q66730546":"standard","Q66788953":"standard","Q74173914":"event","Q47382471":"webpage","Q47524402":"webpage","Q55648788":"webpage","Q58408484":"webpage","Q58492747":"webpage","Q58573615":"webpage","Q60715851":"webpage","Q63090714":"webpage","Q65967030":"webpage","Q66474017":"webpage","Q66666236":"webpage","Q66715753":"webpage","Q66794983":"webpage","Q67184262":"webpage","Q67185183":"webpage","Q109598322":"software","Q72610003":"webpage","Q106545547":"event","Q106856346":"event","Q106861620":"event","Q110664731":"standard","Q65038211":"regulation","Q2204919":"dataset","Q66740187":"regulation","Q66741795":"regulation","Q99913107":"webpage","Q101032436":"webpage","Q599843":"software","Q612728":"software","Q646197":"software","Q721795":"software","Q1472856":"software","Q2025459":"software","Q87881365":"regulation","Q87968373":"regulation","Q88008946":"regulation","Q88009764":"regulation","Q88061699":"regulation","Q88095209":"regulation","Q88529542":"regulation","Q88532493":"regulation","Q88579339":"regulation","Q15726780":"software","Q6587910":"event","Q17042661":"software","Q22908173":"software","Q15952409":"standard","Q18012553":"event","Q18629983":"event","Q19275977":"event","Q19298799":"event","Q28871062":"software","Q19631227":"event","Q19946292":"event","Q19969488":"event","Q20180679":"event","Q20180690":"event","Q20682745":"event","Q23044632":"event","Q23903087":"event","Q24928262":"event","Q27159717":"event","Q27230592":"event","Q27832398":"event","Q28972895":"standard","Q28972936":"standard","Q28972964":"standard","Q28972976":"standard","Q28972986":"standard","Q28972984":"standard","Q28973005":"standard","Q28973012":"standard","Q28973026":"standard","Q36381476":"event","Q42265032":"event","Q47538737":"event","Q48814173":"event","Q221275":"regulation","Q1068383":"regulation","Q56017387":"event","Q2945120":"regulation","Q3029530":"regulation","Q3029536":"regulation","Q3029575":"regulation","Q3029605":"regulation","Q3029614":"regulation","Q3151623":"regulation","Q3256521":"regulation","Q3477309":"regulation","Q3480073":"regulation","Q3480412":"regulation","Q3480518":"regulation","Q58965890":"event","Q60969695":"event","Q6592216":"regulation","Q63556891":"event","Q10429773":"regulation","Q66363418":"standard","Q66363419":"standard","Q68542705":"event","Q69434505":"standard","Q28070921":"regulation","Q28070925":"regulation","Q67184635":"webpage","Q67197591":"webpage","Q67198564":"webpage","Q67202271":"webpage","Q68926185":"webpage","Q69766158":"webpage","Q106767234":"event","Q100154329":"webpage","Q603481":"software","Q1630770":"software","Q3177953":"software","Q4740553":"software","Q181336":"event","Q204012":"event","Q253309":"event","Q371385":"event","Q689010":"event","Q789760":"event","Q820665":"event","Q913964":"event","Q958775":"event","Q1071162":"event","Q1246312":"event","Q1350359":"event","Q1355573":"event","Q1528406":"event","Q1626609":"event","Q1634916":"event","Q1881195":"event","Q1894516":"event","Q1935979":"event","Q2053700":"event","Q2080867":"event","Q2088660":"event","Q2090907":"event","Q2291785":"event","Q2328431":"event","Q2379010":"event","Q2658171":"event","Q3113804":"event","Q3113848":"event","Q3113887":"event","Q3113951":"event","Q3114049":"event","Q3633116":"event","Q4035729":"event","Q4036036":"event","Q4044491":"event","Q4046559":"event","Q4048349":"event","Q4048381":"event","Q4815989":"event","Q5370895":"event","Q5451983":"event","Q5451981":"event","Q5451988":"event","Q5594968":"event","Q5594973":"event","Q5975766":"event","Q6349925":"event","Q6905314":"event","Q7206524":"event","Q7779855":"event","Q7863028":"event","Q7936111":"event","Q8042351":"event","Q10259870":"event","Q10264888":"event","Q10298081":"event","Q10322320":"event","Q10534956":"event","Q14935528":"event","Q16624207":"event","Q18351451":"event","Q25377259":"event","Q1229525":"webpage","Q61033232":"dataset","Q61033736":"dataset","Q66680750":"dataset","Q61449115":"software","Q61745129":"software","Q62019097":"software","Q63243980":"software","Q63645022":"software","Q63645039":"software","Q63645079":"software","Q70344413":"software","Q60889414":"event","Q60983843":"event","Q61627078":"event","Q71441946":"software","Q71468383":"software","Q71474750":"software","Q96678034":"software","Q109689777":"dataset","Q66763446":"webpage","Q108099928":"software","Q99528515":"event","Q107092176":"event","Q107307769":"event","Q107476730":"event","Q107578812":"event","Q108020227":"event","Q92896548":"webpage","Q7548531":"software","Q200734":"event","Q205505":"event","Q263803":"event","Q280744":"event","Q303028":"event","Q379159":"event","Q463761":"event","Q518751":"event","Q581077":"event","Q597387":"event","Q749307":"event","Q809958":"event","Q910531":"event","Q912234":"event","Q922166":"event","Q958591":"event","Q1000415":"event","Q1003057":"event","Q1031214":"event","Q1031230":"event","Q1031242":"event","Q1035963":"event","Q1134505":"event","Q1182913":"event","Q1208702":"event","Q1235654":"event","Q1235660":"event","Q1280421":"event","Q1401411":"event","Q1435937":"event","Q1436721":"event","Q1451349":"event","Q1566018":"event","Q1608283":"event","Q1789702":"event","Q1789700":"event","Q1827590":"event","Q1917749":"event","Q1965756":"event","Q2000963":"event","Q2043402":"event","Q2219130":"event","Q2261424":"event","Q2341353":"event","Q2362456":"event","Q597648":"standard","Q1054315":"standard","Q2740833":"standard","Q4639658":"event","Q4835621":"event","Q4883094":"event","Q5583736":"event","Q6023015":"event","Q6948589":"event","Q7196694":"event","Q16935625":"software","Q7394799":"event","Q7685866":"event","Q16982445":"event","Q16985526":"event","Q16986585":"event","Q21586294":"event","Q28448398":"event","Q48841214":"event","Q61793874":"software","Q84322930":"motion_picture","Q63914602":"software","Q64358330":"software","Q71467370":"software","Q71477585":"software","Q63868344":"event","Q67181439":"event","Q66363914":"standard","Q66363913":"standard","Q9114":"event","Q72225695":"book","Q73712633":"event","Q92602121":"software","Q96583353":"software","Q65181871":"webpage","Q65181907":"webpage","Q66050470":"webpage","Q66101878":"webpage","Q66385405":"webpage","Q67182786":"webpage","Q97120595":"event","Q107139679":"software","Q100251706":"event","Q111196346":"software","Q104846358":"event","Q104854821":"event","Q105360183":"event","Q105555777":"event","Q105905601":"event","Q2086463":"software","Q2587354":"software","Q296939":"book","Q171650":"event","Q216330":"event","Q786646":"event","Q843564":"event","Q843570":"event","Q843579":"event","Q843831":"event","Q843836":"event","Q843842":"event","Q909344":"event","Q1071362":"event","Q1436719":"event","Q1444311":"event","Q1526444":"event","Q1587816":"event","Q1726982":"event","Q1744820":"event","Q1770395":"event","Q1789698":"event","Q1789699":"event","Q1873096":"event","Q1873097":"event","Q1892098":"event","Q1950841":"event","Q1983921":"event","Q2043392":"event","Q2043399":"event","Q2798871":"event","Q2818080":"event","Q4044246":"event","Q4044501":"event","Q4147738":"event","Q4412527":"event","Q4532940":"event","Q4635078":"event","Q4642515":"event","Q4642513":"event","Q4642518":"event","Q4743696":"event","Q88434121":"regulation","Q4997088":"event","Q5089349":"event","Q5148694":"event","Q5594961":"event","Q7071936":"event","Q7170805":"event","Q7185707":"event","Q7206531":"event","Q7270880":"event","Q7537626":"event","Q7687408":"event","Q7707420":"event","Q7823966":"event","Q7907065":"event","Q8026605":"event","Q96246183":"regulation","Q16768882":"event","Q16826251":"event","Q16961295":"event","Q16970173":"event","Q16972009":"event","Q16980789":"event","Q16980923":"event","Q16982317":"event","Q17326251":"event","Q18166188":"event","Q22025348":"event","Q23867898":"event","Q28128142":"event","Q48785303":"event","Q48803181":"event","Q48841253":"event","Q60770328":"event","Q96313657":"software","Q88007346":"event","Q96473181":"standard","Q99485986":"event","Q99485988":"event","Q99525687":"event","Q100392376":"event","Q100392977":"event","Q100400750":"event","Q100460289":"event","Q100460437":"event","Q100460551":"event","Q100460885":"event","Q100461071":"event","Q100461224":"event","Q100461380":"event","Q100461529":"event","Q104847437":"event","Q105038186":"event","Q105044533":"event","Q105082119":"event","Q106696123":"event","Q109377975":"event","Q109669593":"event","Q109669620":"event","Q110295952":"legislation","Q111183874":"standard","Q497957":"song","Q3879286":"song","Q5747907":"song","Q99441966":"webpage","Q9051102":"song","Q100775261":"webpage","Q100775825":"webpage","Q176604":"software","Q223683":"software","Q295179":"software","Q370634":"software","Q506041":"software","Q884772":"software","Q1050404":"software","Q1413769":"software","Q1482183":"software","Q1502046":"software","Q1535147":"software","Q1543908":"software","Q2526030":"software","Q2562273":"software","Q2620519":"software","Q2709591":"software","Q2739329":"software","Q2915997":"software","Q3029670":"software","Q3360633":"software","Q4053513":"software","Q4421683":"software","Q5156840":"software","Q5160239":"software","Q5227315":"software","Q5249565":"software","Q5264358":"software","Q5287620":"software","Q5685117":"software","Q106548776":"webpage","Q6908274":"software","Q7122936":"software","Q7226737":"software","Q7233183":"software","Q7273285":"software","Q7545384":"software","Q108914573":"webpage","Q537769":"event","Q111450319":"webpage","Q1200915":"event","Q10754052":"software","Q16674797":"software","Q17014996":"software","Q17071746":"software","Q17098697":"software","Q10415567":"event","Q20180775":"software","Q11412524":"event","Q11453226":"event","Q21050603":"software","Q21661921":"software","Q25303672":"software","Q18395423":"event","Q28130292":"software","Q29654788":"software","Q21467672":"event","Q39278852":"software","Q63106609":"software","Q54837":"software","Q109615173":"software","Q109615332":"software","Q111662771":"software","Q111669986":"software","Q140676":"software","Q231143":"software","Q448593":"software","Q635985":"software","Q666455":"software","Q984179":"software","Q1007056":"software","Q1020019":"software","Q1050092":"software","Q1072314":"software","Q1224870":"software","Q1503337":"software","Q1557261":"software","Q2544432":"software","Q2923097":"software","Q3519361":"software","Q3646602":"software","Q4716232":"software","Q5678892":"software","Q6542704":"software","Q6979507":"software","Q593092":"event","Q812836":"event","Q13157341":"software","Q13223892":"software","Q14251017":"software","Q5179573":"event","Q8047025":"event","Q18029311":"software","Q19601935":"software","Q22907300":"software","Q22907686":"software","Q28017710":"software","Q28464970":"software","Q55162610":"software","Q55605753":"software","Q61625231":"software","Q65403895":"software","Q65648501":"software","Q22666":"software","Q43060":"software","Q77978441":"software","Q80002220":"software","Q88686174":"webpage","Q110256698":"software","Q58592966":"regulation","Q599079":"software","Q623818":"software","Q657881":"software","Q751292":"software","Q863506":"software","Q1156047":"software","Q2466492":"software","Q2562299":"software","Q4035705":"software","Q4634019":"software","Q4876324":"software","Q4893208":"software","Q4972931":"software","Q5003703":"software","Q5157028":"software","Q5203305":"software","Q5448353":"software","Q7124395":"software","Q7553986":"software","Q7824733":"software","Q180935":"event","Q182570":"event","Q184865":"event","Q257336":"event","Q321654":"event","Q358805":"event","Q696267":"event","Q811630":"event","Q1137643":"event","Q10854318":"software","Q1311060":"event","Q1313129":"event","Q1509642":"event","Q2000509":"event","Q2021750":"event","Q2300237":"event","Q2913518":"event","Q2992145":"event","Q3214425":"event","Q3427324":"event","Q1665626":"standard","Q3694579":"event","Q4442178":"event","Q5209396":"event","Q5416627":"event","Q5905918":"event","Q5946442":"event","Q6145635":"event","Q17152481":"software","Q7880385":"event","Q11411258":"event","Q11424403":"event","Q11573688":"event","Q11598585":"event","Q21189942":"software","Q16672129":"event","Q15260683":"standard","Q20160549":"event","Q20190522":"event","Q29791667":"software","Q29791664":"software","Q29791673":"software","Q29793551":"software","Q29794170":"software","Q39076481":"event","Q1382057":"regulation","Q3721928":"regulation","Q4059641":"regulation","Q4819894":"regulation","Q55516":"software","Q5758323":"regulation","Q7239271":"regulation","Q7242400":"regulation","Q65154248":"event","Q65211922":"event","Q10476086":"regulation","Q16947814":"regulation","Q17029629":"regulation","Q98614878":"standard","Q110272188":"software","Q110279334":"software","Q110279335":"software","Q106372749":"event","Q107185076":"event","Q108538088":"standard","Q57362":"regulation","Q73502333":"regulation","Q73522917":"regulation","Q162738":"software","Q221552":"software","Q588365":"software","Q776657":"software","Q1139146":"software","Q1257611":"software","Q1684163":"software","Q1797819":"software","Q2250178":"software","Q2277901":"software","Q2422383":"software","Q2445104":"software","Q2523931":"software","Q2721136":"software","Q3144517":"software","Q4038545":"software","Q4677602":"software","Q5205812":"software","Q5368818":"software","Q7392452":"software","Q164731":"event","Q170004":"event","Q231419":"event","Q264136":"event","Q270944":"event","Q1026754":"event","Q1250156":"event","Q10876391":"software","Q11337347":"software","Q1785695":"event","Q11349986":"software","Q2291837":"event","Q2291843":"event","Q2291841":"event","Q2291847":"event","Q4639907":"event","Q4640620":"event","Q5640597":"event","Q6044676":"event","Q8054632":"event","Q10379423":"event","Q11306923":"event","Q11476054":"event","Q11831080":"event","Q14134315":"event","Q13162293":"standard","Q25392778":"software","Q15914808":"event","Q99677797":"regulation","Q16593159":"event","Q15229424":"standard","Q17150120":"event","Q18630802":"event","Q21513768":"event","Q107663141":"regulation","Q28727823":"event","Q30947464":"event","Q8615206":"webpage","Q60784896":"software","Q61715186":"software","Q63247979":"software","Q64620757":"software","Q195951":"regulation","Q788104":"regulation","Q806869":"regulation","Q834614":"regulation","Q1336099":"regulation","Q1632136":"regulation","Q3516888":"regulation","Q60968417":"event","Q6467311":"regulation","Q7554361":"regulation","Q79411422":"software","Q15819790":"regulation","Q16532593":"regulation","Q77562458":"event","Q94340627":"event","Q94993531":"event","Q104844776":"software","Q96178258":"event","Q98611825":"standard","Q98614836":"standard","Q98617239":"standard","Q98640215":"standard","Q98640222":"standard","Q110643339":"software","Q99688802":"standard","Q99718939":"standard","Q123733":"software","Q182270":"software","Q612825":"software","Q746674":"software","Q1838229":"software","Q2892536":"software","Q3457058":"software","Q4835786":"software","Q5283178":"software","Q5913803":"software","Q18170752":"song","Q7978568":"software","Q184654":"event","Q243264":"event","Q585784":"event","Q1171070":"event","Q1508421":"event","Q11195180":"software","Q1670819":"event","Q11252199":"software","Q1802537":"event","Q1975861":"event","Q2291790":"event","Q2291795":"event","Q2291813":"event","Q2454443":"event","Q3496090":"event","Q3612215":"event","Q4335797":"event","Q11830861":"event","Q11831022":"event","Q13474477":"event","Q16592971":"event","Q16593107":"event","Q15218754":"standard","Q15219262":"standard","Q18630801":"event","Q18630804":"event","Q19309186":"event","Q19309187":"event","Q19309191":"event","Q19309188":"event","Q19309189":"event","Q19309192":"event","Q19309193":"event","Q30753169":"software","Q21515551":"event","Q23562927":"event","Q24688986":"event","Q38339877":"software","Q1474116":"webpage","Q30914000":"event","Q5612559":"webpage","Q15647814":"webpage","Q54844883":"software","Q57409838":"software","Q58071790":"software","Q20769287":"webpage","Q24571879":"webpage","Q24574745":"webpage","Q51963118":"standard","Q51963572":"standard","Q53106948":"standard","Q53107555":"standard","Q56325973":"event","Q56343479":"event","Q56343477":"event","Q30432511":"webpage","Q4826860":"regulation","Q60861658":"event","Q60906143":"event","Q6841282":"regulation","Q7007213":"regulation","Q7569779":"regulation","Q66771566":"standard","Q66771569":"standard","Q79260675":"software","Q18558685":"regulation","Q76947372":"event","Q80125455":"event","Q80125668":"event","Q25392081":"regulation","Q54662266":"webpage","Q56428020":"webpage","Q59541917":"webpage","Q100370374":"software","Q106040099":"software","Q106532138":"software","Q110949494":"software","Q111381712":"software","Q111525924":"software","Q111610229":"software","Q104772534":"event","Q109042920":"event","Q95691391":"webpage","Q10742":"regulation","Q97303168":"webpage","Q97950663":"webpage","Q140819":"software","Q382454":"software","Q614120":"software","Q921594":"software","Q1143087":"software","Q1262687":"software","Q1417348":"software","Q1631141":"software","Q1641122":"software","Q1970686":"software","Q1996088":"software","Q2166013":"software","Q2349394":"software","Q2662525":"software","Q3181044":"software","Q3493519":"software","Q3608019":"software","Q3684624":"software","Q3731270":"software","Q3833440":"software","Q3963243":"software","Q4388313":"software","Q4651388":"software","Q105528595":"webpage","Q105653689":"webpage","Q5136712":"software","Q106574913":"webpage","Q106575300":"webpage","Q106612246":"webpage","Q107302455":"webpage","Q7094076":"software","Q108091160":"webpage","Q108094999":"webpage","Q108292642":"webpage","Q7551266":"software","Q7647325":"software","Q108783631":"webpage","Q110010043":"webpage","Q110242953":"webpage","Q141025":"event","Q230057":"event","Q230061":"event","Q110637382":"webpage","Q488532":"event","Q110863562":"webpage","Q569319":"event","Q111019629":"webpage","Q744307":"event","Q111143474":"webpage","Q111803808":"webpage","Q11347580":"software","Q2076688":"event","Q11631156":"software","Q2532187":"event","Q3114131":"event","Q2050761":"standard","Q4959681":"review","Q5171626":"review","Q7449618":"review","Q19967846":"software","Q11445430":"event","Q11678910":"event","Q4657797":"webpage","Q6540326":"webpage","Q11753321":"webpage","Q15671253":"webpage","Q17437798":"webpage","Q17437796":"webpage","Q17506997":"webpage","Q17580674":"webpage","Q19887878":"webpage","Q48941970":"event","Q20769160":"webpage","Q24731821":"webpage","Q26142649":"webpage","Q26267864":"webpage","Q65940638":"software","Q55236031":"standard","Q55236718":"standard","Q55236863":"standard","Q55236930":"standard","Q35127":"software","Q36330215":"webpage","Q12400514":"regulation","Q48552277":"webpage","Q51759403":"webpage","Q56876519":"webpage","Q110874431":"software","Q111526022":"software","Q111526031":"software","Q74980542":"webpage","Q106702187":"event","Q107975053":"event","Q110373741":"event","Q56218841":"regulation","Q84597428":"webpage","Q65591238":"regulation","Q96726072":"webpage","Q70447391":"regulation","Q245955":"software","Q309949":"software","Q685216":"software","Q1457900":"software","Q1488974":"software","Q2422376":"software","Q3041441":"software","Q3297601":"software","Q104435523":"webpage","Q104637420":"webpage","Q6137535":"software","Q107563839":"webpage","Q7884742":"software","Q7979855":"software","Q624482":"event","Q917206":"event","Q1163256":"event","Q1477807":"event","Q11061289":"software","Q492935":"standard","Q3001473":"event","Q3216963":"event","Q3945829":"event","Q87884834":"regulation","Q17081746":"software","Q21040917":"software","Q14596454":"event","Q27247519":"software","Q28840786":"software","Q28871067":"software","Q28871064":"software","Q28871065":"software","Q29791960":"software","Q29792785":"software","Q41799425":"software","Q55376534":"software","Q55809450":"software","Q18720640":"webpage","Q23841351":"webpage","Q27949687":"webpage","Q27949697":"webpage","Q28858528":"webpage","Q29075123":"webpage","Q29075121":"webpage","Q67323023":"software","Q67356512":"software","Q56062710":"standard","Q56062735":"standard","Q56062787":"standard","Q56062798":"standard","Q56062822":"standard","Q56062886":"standard","Q56062941":"standard","Q67460526":"software","Q3029583":"regulation","Q3029581":"regulation","Q3029590":"regulation","Q3029595":"regulation","Q3029601":"regulation","Q3029606":"regulation","Q60842425":"event","Q60889734":"event","Q61627339":"event","Q61627528":"event","Q40218570":"webpage","Q66763849":"standard","Q44292661":"webpage","Q81757321":"event","Q28070924":"regulation","Q84312775":"event","Q98045224":"software","Q98046250":"software","Q99869602":"software","Q65932995":"webpage","Q106238790":"software","Q106697748":"software","Q71533077":"webpage","Q109615233":"software","Q111598731":"software","Q81706896":"webpage","Q97303176":"webpage","Q98851381":"webpage","Q99903892":"webpage","Q99913142":"webpage","Q100775361":"webpage","Q100775856":"webpage","Q162727":"software","Q251527":"software","Q300870":"software","Q354869":"software","Q477840":"software","Q770881":"software","Q968598":"software","Q1043805":"software","Q1071902":"software","Q1225034":"software","Q1230542":"software","Q1255677":"software","Q1276157":"software","Q1340449":"software","Q1350108":"software","Q1414426":"software","Q1671576":"software","Q1931587":"software","Q1938536":"software","Q2006488":"software","Q2024406":"software","Q2274480":"software","Q2373485":"software","Q105635705":"webpage","Q105690751":"webpage","Q105729294":"webpage","Q107428796":"webpage","Q76800":"event","Q87491759":"regulation","Q88903302":"regulation","Q89487202":"regulation","Q89966200":"regulation","Q90258006":"regulation","Q94141388":"regulation","Q94381343":"regulation","Q96401587":"regulation","Q96731773":"regulation","Q96731877":"regulation","Q22908390":"software","Q97861418":"regulation","Q103406861":"regulation","Q103407338":"regulation","Q103407878":"regulation","Q103408251":"regulation","Q104604512":"regulation","Q104857357":"regulation","Q105474669":"regulation","Q105730136":"regulation","Q106347456":"regulation","Q17099416":"webpage","Q2736168":"regulation","Q3297051":"regulation","Q171":"software","Q67184216":"webpage","Q67187625":"webpage","Q67200518":"webpage","Q67202353":"webpage","Q109520717":"software","Q109942850":"software","Q111411588":"software","Q74842049":"webpage","Q108471352":"event","Q452912":"software","Q1333015":"software","Q2435717":"software","Q2648547":"software","Q3081320":"software","Q3390477":"software","Q3485465":"software","Q3505741":"software","Q3538400":"software","Q4088258":"software","Q4382945":"software","Q4680777":"software","Q4685932":"software","Q4787276":"software","Q4819969":"software","Q5128435":"software","Q5172434":"software","Q5172507":"software","Q5406123":"software","Q5691097":"software","Q6466676":"software","Q6542714":"software","Q6590235":"software","Q7094081":"software","Q7144994":"software","Q7170631":"software","Q7225533":"software","Q7265244":"software","Q7295723":"software","Q7307094":"software","Q7319034":"software","Q7503177":"software","Q7550843":"software","Q7935008":"software","Q8245074":"software","Q9384680":"software","Q10493980":"software","Q11074464":"software","Q11278428":"software","Q11392035":"software","Q11410738":"software","Q11431055":"software","Q11448776":"software","Q11463684":"software","Q11605626":"software","Q11900959":"software","Q12050976":"software","Q15633582":"software","Q16001076":"software","Q16002093":"software","Q16465919":"software","Q16509734":"software","Q16825545":"software","Q17080944":"software","Q17164395":"software","Q17164466":"software","Q17589204":"software","Q21087288":"software","Q21606686":"software","Q22137024":"software","Q25420156":"software","Q27031827":"software","Q27881073":"software","Q28754053":"software","Q28933155":"software","Q30137770":"software","Q105032316":"regulation","Q33270324":"software","Q23869328":"event","Q39835986":"software","Q50988419":"software","Q52720701":"software","Q59925870":"software","Q62471276":"software","Q72705885":"software","Q76788359":"software","Q84324516":"software","Q89290172":"software","Q90799127":"software","Q96882133":"software","Q101040848":"software","Q105538253":"software","Q106458739":"software","Q107316103":"software","Q107553922":"software","Q107667728":"software","Q108599057":"software","Q109924251":"software","Q80729":"software","Q795087":"software","Q852081":"software","Q1757700":"software","Q2527949":"software","Q2750301":"software","Q2933833":"software","Q3495176":"software","Q3875648":"software","Q3977978":"software","Q4521948":"software","Q4544940":"software","Q4735906":"software","Q4927198":"software","Q5155255":"software","Q5450242":"software","Q7100701":"software","Q7433383":"software","Q7537931":"software","Q7683117":"software","Q163892":"event","Q164761":"event","Q191691":"event","Q211155":"event","Q211164":"event","Q215677":"event","Q223779":"event","Q223836":"event","Q240500":"event","Q246681":"event","Q271008":"event","Q334734":"event","Q500050":"event","Q675770":"event","Q943635":"event","Q1629556":"event","Q2164200":"event","Q2402434":"event","Q2538895":"event","Q2774730":"event","Q2807981":"event","Q2815830":"event","Q2817139":"event","Q2817913":"event","Q3500855":"event","Q3730762":"event","Q3730761":"event","Q4637974":"event","Q4640627":"event","Q4993704":"event","Q17123743":"software","Q25304244":"software","Q29792340":"software","Q29792647":"software","Q29794207":"software","Q29795767":"software","Q21041009":"event","Q26844379":"event","Q30588012":"event","Q31029244":"event","Q43219517":"software","Q65947619":"software","Q4056396":"regulation","Q63761275":"event","Q77967267":"software","Q77971078":"software","Q26303":"event","Q40244":"event","Q81510265":"software","Q97291175":"software","Q107415808":"software","Q106373179":"event","Q176583":"software","Q225107":"software","Q242188":"software","Q339011":"software","Q428813":"software","Q526790":"software","Q579544":"software","Q581505":"software","Q609566":"software","Q612991":"software","Q650670":"software","Q727035":"software","Q806350":"software","Q814361":"software","Q943800":"software","Q952222":"software","Q964330":"software","Q1125095":"software","Q1482452":"software","Q1575637":"software","Q1767080":"software","Q1778169":"software","Q1970975":"software","Q2004951":"software","Q2492680":"software","Q2494911":"software","Q2598955":"software","Q2610096":"software","Q2645505":"software","Q2731964":"software","Q3062594":"software","Q3064361":"software","Q3299244":"software","Q3299258":"software","Q3299275":"software","Q3684894":"software","Q3751720":"software","Q3757134":"software","Q3848436":"software","Q3851915":"software","Q3851923":"software","Q3851926":"software","Q3895032":"software","Q4284939":"software","Q4796198":"software","Q4957187":"software","Q5041155":"software","Q5156556":"software","Q5166397":"software","Q5171639":"software","Q5204933":"software","Q5251123":"software","Q5338959":"software","Q5532500":"software","Q5680044":"software","Q5758413":"software","Q5931208":"software","Q7001154":"software","Q7263850":"software","Q7857001":"software","Q7885227":"software","Q7990340":"software","Q170737":"event","Q178108":"event","Q187204":"event","Q1670875":"event","Q3216966":"event","Q12806125":"software","Q3991761":"event","Q5369934":"event","Q5591883":"event","Q17029643":"software","Q19360939":"software","Q19878155":"software","Q21071503":"software","Q12880212":"event","Q22666682":"software","Q30594545":"software","Q104867947":"regulation","Q104868307":"regulation","Q104868335":"regulation","Q104868974":"regulation","Q39351938":"software","Q43144845":"software","Q44043275":"event","Q44174726":"event","Q212108":"regulation","Q228502":"regulation","Q1342704":"regulation","Q3480484":"regulation","Q5176990":"regulation","Q7554259":"regulation","Q7554342":"regulation","Q7681779":"regulation","Q11430672":"regulation","Q11993827":"regulation","Q77969601":"software","Q77980392":"software","Q110172188":"software","Q83790536":"webpage","Q191769":"software","Q212805":"software","Q559557":"software","Q803847":"software","Q1051422":"software","Q1334294":"software","Q2499178":"software","Q3077240":"software","Q3491832":"software","Q3513788":"software","Q105623375":"webpage","Q5193188":"software","Q6031177":"software","Q107285679":"webpage","Q7096323":"software","Q165704":"event","Q185027":"event","Q640026":"event","Q679291":"event","Q983987":"event","Q11288427":"software","Q1891945":"event","Q12582228":"software","Q6117564":"event","Q16739336":"software","Q11598605":"event","Q26932627":"software","Q18336781":"event","Q18394290":"event","Q29791666":"software","Q29791669":"software","Q29793968":"software","Q38042244":"software","Q6465339":"webpage","Q17024293":"webpage","Q55341040":"software","Q19842659":"webpage","Q20010800":"webpage","Q59825643":"software","Q23894233":"webpage","Q24046192":"webpage","Q24514938":"webpage","Q25826840":"webpage","Q65697924":"software","Q66364374":"software","Q67131048":"software","Q30330522":"webpage","Q72970624":"software","Q75209826":"software","Q38084761":"webpage","Q83807365":"software","Q84863712":"software","Q85632250":"software","Q88179872":"software","Q90404711":"software","Q90404756":"software","Q56062113":"webpage","Q56876503":"webpage","Q58118449":"webpage","Q62026391":"webpage","Q67131190":"webpage","Q105003122":"software","Q105195034":"software","Q111429877":"software","Q111634851":"software","Q76735573":"webpage","Q76735989":"webpage","Q105489874":"event","Q99904240":"webpage","Q99904310":"webpage","Q638153":"software","Q1994977":"software","Q2036509":"software","Q3568027":"software","Q5145844":"software","Q6852339":"software","Q161222":"event","Q175125":"event","Q179845":"event","Q253394":"event","Q385385":"event","Q528634":"event","Q578794":"event","Q679106":"event","Q748757":"event","Q752138":"event","Q807910":"event","Q826038":"event","Q837910":"event","Q842293":"event","Q1000616":"event","Q1071285":"event","Q1071822":"event","Q1146353":"event","Q1167026":"event","Q1187515":"event","Q1815484":"event","Q12582250":"software","Q87945071":"regulation","Q16000445":"software","Q16175145":"software","Q8234897":"event","Q22100850":"software","Q20747768":"event","Q20748079":"event","Q33120876":"software","Q33120921":"software","Q27685564":"event","Q47495990":"software","Q58494329":"software","Q48968670":"event","Q55236840":"standard","Q55236849":"standard","Q55236906":"standard","Q55236915":"standard","Q17460":"software","Q92567250":"software","Q67202224":"webpage","Q105518398":"software","Q106513246":"software","Q109542220":"software","Q109542482":"software","Q111381667":"software","Q66439731":"regulation","Q333871":"software","Q727103":"software","Q1052516":"software","Q1224984":"software","Q1235234":"software","Q1243340":"software","Q1367055":"software","Q1469444":"software","Q2705070":"software","Q3299249":"software","Q5227240":"software","Q5583904":"software","Q6888018":"software","Q975979":"event","Q1191380":"event","Q1258425":"event","Q1270816":"event","Q1298208":"event","Q1460484":"event","Q1473381":"event","Q1477977":"event","Q1513658":"event","Q1534720":"event","Q1631470":"event","Q1892219":"event","Q1963627":"event","Q1980764":"event","Q2417902":"event","Q12328550":"software","Q3287504":"event","Q3598269":"event","Q5150074":"event","Q5407485":"event","Q5995293":"event","Q7405868":"event","Q7618012":"event","Q10223197":"event","Q10437559":"event","Q11234342":"event","Q11259947":"event","Q11340947":"event","Q11346175":"event","Q11369595":"event","Q11374825":"event","Q21040941":"software","Q11490916":"event","Q16023904":"event","Q16357768":"event","Q18339108":"event","Q18405099":"event","Q28455755":"software","Q28455762":"software","Q29033102":"software","Q21030981":"event","Q24869424":"event","Q56316865":"software","Q161157":"regulation","Q338966":"regulation","Q942499":"regulation","Q977772":"regulation","Q56015537":"event","Q1146283":"regulation","Q1702839":"regulation","Q56641237":"event","Q2085069":"regulation","Q2125156":"regulation","Q66656823":"software","Q2966717":"regulation","Q2996130":"regulation","Q3381663":"regulation","Q4825882":"regulation","Q60269762":"event","Q5368811":"regulation","Q5469869":"regulation","Q5636135":"regulation","Q60851124":"event","Q6944186":"regulation","Q7336206":"regulation","Q7933380":"regulation","Q63456030":"event","Q11802011":"regulation","Q67102580":"event","Q67104570":"event","Q67105178":"event","Q67107586":"event","Q13381252":"regulation","Q15841172":"regulation","Q17008721":"regulation","Q17081967":"regulation","Q17125828":"regulation","Q17238569":"regulation","Q24192034":"regulation","Q86737786":"event","Q86743140":"event","Q105490626":"event","Q106514710":"event","Q193794":"software","Q332791":"software","Q336233":"software","Q338028":"software","Q506265":"software","Q620495":"software","Q627595":"software","Q772067":"software","Q849428":"software","Q851512":"software","Q901698":"software","Q967853":"software","Q1024424":"software","Q1047380":"software","Q1383744":"software","Q1449266":"software","Q1565674":"software","Q2268788":"software","Q2859802":"software","Q2916484":"software","Q3064355":"software","Q3299259":"software","Q3738073":"software","Q3751716":"software","Q4284932":"software","Q4633426":"software","Q4774357":"software","Q4880037":"software","Q4929982":"software","Q5002751":"software","Q5005076":"software","Q5047286":"software","Q5060045":"software","Q5156522":"software","Q5176967":"software","Q5316014":"software","Q5406122":"software","Q5499622":"software","Q6116137":"software","Q6518931":"software","Q6899477":"software","Q7094057":"software","Q7168088":"software","Q7446630":"software","Q7492183":"software","Q7496248":"software","Q7523714":"software","Q7582079":"software","Q7837618":"software","Q7843207":"software","Q8002551":"software","Q1141795":"event","Q10949536":"software","Q11079470":"software","Q11498522":"software","Q2861656":"event","Q4999784":"event","Q5461326":"event","Q15847164":"software","Q16259339":"software","Q20181655":"software","Q21045276":"software","Q25304407":"software","Q25377924":"software","Q27212903":"software","Q28455756":"software","Q29097253":"software","Q30836236":"software","Q26108705":"event","Q39286912":"software","Q43217907":"software","Q45787211":"software","Q50255844":"software","Q44897107":"event","Q61723737":"software","Q61754307":"software","Q55246937":"event","Q55247078":"event","Q55247140":"event","Q55247191":"event","Q834285":"regulation","Q56641290":"event","Q56641325":"event","Q1934609":"regulation","Q63929201":"event","Q77601218":"software","Q77601306":"software","Q29358":"event","Q87409986":"software","Q97664752":"software","Q107362984":"software","Q107401762":"software","Q55603125":"regulation","Q55608710":"regulation","Q245457":"software","Q253728":"software","Q365857":"software","Q856952":"software","Q1045351":"software","Q1065413":"software","Q1151645":"software","Q1256564":"software","Q1755277":"software","Q2024419":"software","Q2051983":"software","Q3085391":"software","Q3750339":"software","Q4921154":"software","Q5155088":"software","Q5281480":"software","Q107285708":"webpage","Q107285856":"webpage","Q6586607":"software","Q7104936":"software","Q7141739":"software","Q7887041":"software","Q428242":"event","Q1529228":"event","Q1950900":"event","Q87406427":"regulation","Q5465755":"event","Q15156455":"software","Q15851502":"software","Q15967034":"software","Q17622025":"software","Q19840511":"software","Q21286559":"software","Q29043181":"software","Q20921542":"event","Q30688741":"software","Q30941437":"software","Q21652095":"event","Q33120867":"software","Q36509592":"software","Q27654292":"event","Q43144903":"software","Q13331174":"webpage","Q55623036":"software","Q59826893":"software","Q23894246":"webpage","Q62465093":"software","Q632959":"regulation","Q928740":"regulation","Q1137840":"regulation","Q1781810":"regulation","Q2053878":"regulation","Q2141748":"regulation","Q3708832":"regulation","Q3997499":"regulation","Q263":"software","Q5205810":"regulation","Q7246319":"regulation","Q11143071":"regulation","Q11282954":"regulation","Q77968835":"software","Q77968837":"software","Q77969295":"software","Q77969452":"software","Q81311730":"software","Q95948776":"software","Q105693306":"software","Q109339434":"software","Q109339469":"software","Q109339472":"software","Q109542655":"software","Q66166813":"regulation","Q652941":"software","Q831774":"software","Q939272":"software","Q1052034":"software","Q1134404":"software","Q1395012":"software","Q1409400":"software","Q1422682":"software","Q1466923":"software","Q2150789":"software","Q2490652":"software","Q2655506":"software","Q2910253":"software","Q3851929":"software","Q3893192":"software","Q4039090":"software","Q4849993":"software","Q6042601":"software","Q107285953":"webpage","Q107285965":"webpage","Q6961560":"software","Q7164949":"software","Q7309581":"software","Q7430596":"software","Q7449314":"software","Q7616382":"software","Q13476292":"software","Q14907374":"software","Q17008156":"software","Q17103829":"software","Q19826567":"software","Q20671729":"software","Q22001316":"software","Q22001361":"software","Q22001390":"software","Q22582534":"software","Q22582649":"software","Q100377165":"regulation","Q110884128":"regulation","Q39287244":"software","Q43144947":"software","Q43148722":"software","Q43217162":"software","Q47450814":"software","Q55162840":"software","Q56811127":"software","Q62382254":"software","Q192532":"regulation","Q335888":"regulation","Q614239":"regulation","Q880096":"regulation","Q1207845":"regulation","Q1228590":"regulation","Q1330218":"regulation","Q1351306":"regulation","Q1363759":"regulation","Q1639895":"regulation","Q1888932":"regulation","Q2069855":"regulation","Q2217314":"regulation","Q2535979":"regulation","Q3150832":"regulation","Q3697256":"regulation","Q4923114":"regulation","Q5140110":"regulation","Q5155274":"regulation","Q5656419":"regulation","Q6665725":"regulation","Q77601250":"software","Q77601480":"software","Q77969871":"software","Q77969876":"software","Q78480143":"software","Q15738686":"regulation","Q15848109":"regulation","Q16002734":"regulation","Q104018626":"software","Q111083433":"software"}
 
-},{}],113:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -16286,7 +18537,559 @@ exports.parse = parse;
 function parse(input) {
   return input.match(/\/(Q\d+)(?:[#?/]|\s*$)/)[1];
 }
-},{}],114:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
+"use strict";
+
+var _core = require("@citation-js/core");
+
+var _output = _interopRequireDefault(require("./output"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_core.plugins.add('@wikipedia', {
+  output: _output.default
+});
+},{"./output":127,"@citation-js/core":"citation-js"}],126:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.convert = convert;
+
+var _core = require("@citation-js/core");
+
+var _date = require("@citation-js/date");
+
+var _name = require("@citation-js/name");
+
+const TYPE_MAPPING = {
+  article: 'journal',
+  'article-journal': 'journal',
+  'article-magazine': 'magazine',
+  'article-newspaper': 'news',
+  book: 'book',
+  broadcast: 'serial',
+  chapter: 'book',
+  dataset: 'web',
+  entry: 'encyclopedia',
+  'entry-dictionary': 'encyclopedia',
+  'entry-encyclopedia': 'encyclopedia',
+  figure: 'AV media',
+  graphic: 'AV media',
+  interview: 'interview',
+  map: 'map',
+  motion_picture: 'AV media',
+  'paper-conference': 'conference',
+  periodical: 'magazine',
+  post: 'web',
+  'post-weblog': 'web',
+  report: 'report',
+  software: 'web',
+  song: 'AV media',
+  speech: 'speech',
+  standard: 'techreport',
+  thesis: 'thesis',
+  webpage: 'web'
+};
+
+function getType(entry) {
+  if (entry.type === 'broadcast' && entry['container-title']) {
+    return 'episode';
+  }
+
+  return TYPE_MAPPING[entry.type];
+}
+
+function formatNameParts(name) {
+  if (!name.family) {
+    return [undefined, undefined, name.literal];
+  }
+
+  let last = name.family;
+
+  if (name['non-dropping-particle']) {
+    last = name['non-dropping-particle'] + ' ' + last;
+  }
+
+  let first = name.given;
+
+  if (first && name['dropping-particle']) {
+    first += ' ' + name['dropping-particle'];
+  }
+
+  if (first && name.suffix) {
+    first += ', ' + name.suffix;
+  }
+
+  return [last, first, undefined];
+}
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const CONTRIBUTORS = ['chair', 'compiler', 'composer', 'contributor', 'curator', 'director', 'executive-producer', 'guest', 'host', 'illustrator', 'narrator', 'organizer', 'performer', 'producer', 'recipient', 'script-writer', 'series-creator'];
+const CONVERTERS = {
+  NAMES: {
+    toSource(names) {
+      const output = [[], [], []];
+
+      for (const name of names) {
+        formatNameParts(name).forEach((part, index) => output[index].push(part));
+      }
+
+      return output;
+    }
+
+  },
+  FLAT_NAMES: {
+    toSource(names) {
+      return names.map(name => (0, _name.format)(name, false));
+    }
+
+  },
+  FLAT_NAMES_WITH_ROLES: {
+    toSource() {
+      const names = [];
+
+      for (const role of CONTRIBUTORS) {
+        if (Array.isArray(this[role])) {
+          for (const name of this[role]) {
+            const formattedName = (0, _name.format)(name, true);
+            const formattedRole = role.replace(/[_-]/g, ' ');
+            names.push(`${formattedName} (${formattedRole})`);
+          }
+        }
+      }
+
+      if (names.length) {
+        return names.join('; ');
+      }
+    }
+
+  },
+  DATE: {
+    toSource(date) {
+      if (date['date-parts'] && date['date-parts'].length === 2) {
+        const [start, end] = date['date-parts'];
+        const output = [];
+
+        if (start[2]) {
+          output.push(start[2]);
+        } else if (start[1]) {
+          output.push(MONTHS[start[1] - 1]);
+        } else {
+          output.push(start[0]);
+        }
+
+        if (start[2] && start[1] !== end[1]) {
+          output.push(MONTHS[start[1] - 1]);
+        }
+
+        if (start[1] && start[0] !== end[0]) {
+          output.push(start[0]);
+        }
+
+        output.push('\u2013');
+
+        if (end[2]) {
+          output.push(end[2]);
+        }
+
+        if (end[1]) {
+          output.push(MONTHS[end[1] - 1]);
+        }
+
+        output.push(end[0]);
+        return output.join(' ');
+      } else if (date['date-parts'] && date['date-parts'][0] && date['date-parts'][0].length === 2) {
+        const [year, month] = date['date-parts'][0];
+        return MONTHS[month - 1] + ' ' + year;
+      }
+
+      return (0, _date.format)(date);
+    }
+
+  },
+  TITLE: {
+    toSource(title) {
+      return title.replace(/<\/?(i|b|sup|sub|span [^>]+])>/g, '');
+    }
+
+  },
+  GENRE: {
+    toSource(genre, medium) {
+      return genre || medium;
+    }
+
+  },
+  ISSUE: {
+    toSource(issue, title) {
+      return issue && title ? `${issue}, ''${title}''` : issue;
+    }
+
+  },
+  PAGE: {
+    toSource(page) {
+      return page.includes('-') ? [undefined, page] : [page, undefined];
+    }
+
+  },
+  IDENTIFIERS: {
+    toSource(custom) {
+      return [custom.S2ID, custom.SWHID];
+    }
+
+  }
+};
+const FIELD_MAPPING = [{
+  source: ['last', 'first', 'author'],
+  target: 'author',
+  convert: CONVERTERS.NAMES
+}, {
+  source: ['last', 'first', 'author'],
+  target: 'container-author',
+  convert: CONVERTERS.NAMES,
+  when: {
+    target: {
+      author: false
+    }
+  }
+}, {
+  source: ['editor-last', 'editor-first', 'editor'],
+  target: 'editor',
+  convert: CONVERTERS.NAMES
+}, {
+  source: ['translator-last', 'translator-first', 'translator'],
+  target: 'translator',
+  convert: CONVERTERS.NAMES
+}, {
+  source: 'interviewer',
+  target: 'interviewer',
+  convert: CONVERTERS.FLAT_NAMES
+}, {
+  source: 'people',
+  convert: CONVERTERS.FLAT_NAMES_WITH_ROLES
+}, {
+  source: 'date',
+  target: 'issued',
+  convert: CONVERTERS.DATE
+}, {
+  source: 'orig-date',
+  target: 'original-date',
+  convert: CONVERTERS.DATE
+}, {
+  source: 'publication-date',
+  target: 'available-date',
+  convert: CONVERTERS.DATE
+}, {
+  source: 'access-date',
+  target: 'accessed',
+  convert: CONVERTERS.DATE
+}, {
+  source: 'title',
+  target: 'title',
+  convert: CONVERTERS.TITLE,
+  when: {
+    target: {
+      type(type) {
+        return type !== 'chapter';
+      },
+
+      'original-title': false
+    }
+  }
+}, {
+  source: 'work',
+  target: 'container-title',
+  convert: CONVERTERS.TITLE,
+  when: {
+    target: {
+      type(type) {
+        return !['broadcast', 'chapter'].includes(type);
+      }
+
+    }
+  }
+}, {
+  source: 'series',
+  target: 'container-title',
+  convert: CONVERTERS.TITLE,
+  when: {
+    target: {
+      type: 'broadcast'
+    }
+  }
+}, {
+  source: 'series',
+  target: 'collection-title',
+  convert: CONVERTERS.TITLE
+}, {
+  source: 'trans-title',
+  target: 'title',
+  convert: CONVERTERS.TITLE,
+  when: {
+    target: {
+      'original-title': true
+    }
+  }
+}, {
+  source: 'title',
+  target: 'original-title',
+  convert: CONVERTERS.TITLE
+}, {
+  source: 'title',
+  target: 'container-title',
+  convert: CONVERTERS.TITLE,
+  when: {
+    target: {
+      type: 'chapter'
+    }
+  }
+}, {
+  source: 'chapter',
+  target: 'title',
+  convert: CONVERTERS.TITLE,
+  when: {
+    target: {
+      type: 'chapter'
+    }
+  }
+}, {
+  source: 'conference',
+  target: 'event-title',
+  when: {
+    target: {
+      type: 'paper-conference'
+    }
+  }
+}, {
+  source: 'event',
+  target: 'event-title',
+  when: {
+    target: {
+      type: 'speech'
+    }
+  }
+}, {
+  source: 'url',
+  target: 'URL'
+}, {
+  source: 'department',
+  target: 'section'
+}, {
+  source: 'type',
+  target: ['genre', 'medium'],
+  convert: CONVERTERS.GENRE
+}, 'language', 'edition', 'scale', {
+  source: 'publisher',
+  target: 'publisher',
+  when: {
+    target: {
+      type(type) {
+        return !['broadcast'].includes(type);
+      }
+
+    }
+  }
+}, {
+  source: 'network',
+  target: 'publisher',
+  when: {
+    target: {
+      type: 'broadcast'
+    }
+  }
+}, {
+  source: 'location',
+  target: 'publisher-place',
+  when: {
+    target: {
+      'event-place': false
+    }
+  }
+}, {
+  source: 'publication-place',
+  target: 'publisher-place',
+  when: {
+    target: {
+      'event-place': true
+    }
+  }
+}, {
+  source: 'location',
+  target: 'event-place'
+}, 'volume', {
+  source: 'issue',
+  target: ['issue', 'volume-title'],
+  convert: CONVERTERS.ISSUE
+}, 'number', {
+  source: ['page', 'pages'],
+  target: 'page',
+  convert: CONVERTERS.PAGE
+}, {
+  source: 'at',
+  target: 'locator'
+}, {
+  source: 'doi',
+  target: 'DOI'
+}, {
+  source: 'isbn',
+  target: 'ISBN'
+}, {
+  source: 'issn',
+  target: 'ISSN'
+}, {
+  source: 'pmc',
+  target: 'PMCID'
+}, {
+  source: 'pmid',
+  target: 'PMID'
+}, {
+  source: ['s2cid', 'id'],
+  target: 'custom',
+  convert: CONVERTERS.IDENTIFIERS
+}];
+const translator = new _core.util.Translator(FIELD_MAPPING);
+
+function convert(entry) {
+  const type = getType(entry);
+  const parameters = [];
+  const data = translator.convertToSource(entry);
+
+  for (const field in data) {
+    if (Array.isArray(data[field])) {
+      data[field].forEach((value, index) => {
+        if (value === undefined) {
+          return;
+        }
+
+        parameters.push([field + (index + 1), value]);
+      });
+    } else {
+      parameters.push([field, data[field]]);
+    }
+  }
+
+  return {
+    type,
+    parameters
+  };
+}
+},{"@citation-js/core":"citation-js","@citation-js/date":44,"@citation-js/name":47}],127:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _mapping = require("./mapping.js");
+
+function formatTemplate(entry, {
+  format = 'vertical'
+}) {
+  const {
+    type,
+    parameters
+  } = (0, _mapping.convert)(entry);
+  const template = type ? `cite ${type}` : 'Citation';
+
+  if (format === 'horizontal') {
+    const body = parameters.map(([field, value]) => `|${field}=${value}`).join(' ');
+    return `{{${template} ${body}}}`;
+  }
+
+  const longestField = parameters.reduce((max, [field]) => Math.max(max, field.length), -Infinity);
+  const body = parameters.map(([field, value]) => ` | ${field.padEnd(longestField, ' ')} = ${value}`).join('\n');
+  return `{{${template}
+${body}
+}}`;
+}
+
+var _default = {
+  wikipediaTemplate(csl, options = {}) {
+    return csl.map(entry => formatTemplate(entry, options)).join('\n\n');
+  }
+
+};
+exports.default = _default;
+},{"./mapping.js":126}],128:[function(require,module,exports){
+"use strict";
+
+require("whatwg-fetch");
+
+var _core = require("@citation-js/core");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+const CSL_BASE_URL = 'cdn.jsdelivr.net/gh/citation-style-language';
+const CONFIG = document.currentScript.dataset;
+
+async function get(url) {
+  return (await fetch(url)).text();
+}
+
+function getOpts(options, prefix) {
+  return Object.keys(options).reduce((output, key) => {
+    if (key.slice(0, prefix.length) === prefix) {
+      let option = key.slice(prefix.length);
+      option = option[0].toLowerCase() + option.slice(1);
+      output[option] = options[key] === 'false' ? false : options[key];
+    }
+
+    return output;
+  }, {});
+}
+
+window.addEventListener('load', function () {
+  const inputOptions = getOpts(CONFIG, 'input');
+  const pluginConfig = getOpts(CONFIG, 'plugin');
+
+  for (const plugin of _core.plugins.list()) {
+    const config = _core.plugins.config.get(plugin);
+
+    if (config) {
+      Object.assign(config, getOpts(pluginConfig, plugin.slice(1)));
+    }
+  }
+
+  const elements = document.getElementsByClassName('citation-js');
+  Array.prototype.map.call(elements, async function (element) {
+    const format = element.dataset.outputFormat || 'bibliography';
+
+    const options = _objectSpread(_objectSpread({}, getOpts(element.dataset, 'output')), {}, {
+      format: 'html'
+    });
+
+    try {
+      const csl = _core.plugins.config.get('@csl');
+
+      if (options.template && !csl.templates.has(options.template)) {
+        csl.templates.add(options.template, await get(`https://${CSL_BASE_URL}/styles@master/${options.template}.csl`));
+      }
+
+      if (options.lang && !csl.locales.has(options.lang)) {
+        csl.locales.add(options.lang, await get(`https://${CSL_BASE_URL}/locales@master/${options.lang}.csl`));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    const data = await _core.Cite.async(element.dataset.input || element, inputOptions);
+    const output = data.format(format, options); // Only remove children after all other code has run, so that if there's an error
+    // the DOM still has the 'fallback', whatever that is
+
+    while (element.firstChild) {
+      element.removeChild(element.firstChild);
+    }
+
+    element.insertAdjacentHTML('beforeend', output);
+  });
+});
+},{"@citation-js/core":"citation-js","whatwg-fetch":162}],129:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -16438,7 +19241,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],115:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -18219,7 +21022,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":114,"buffer":115,"ieee754":117}],116:[function(require,module,exports){
+},{"base64-js":129,"buffer":130,"ieee754":132}],131:[function(require,module,exports){
 (function (global){(function (){
 (function (global) {
   'use strict';
@@ -18881,7 +21684,7 @@ function numberIsNaN (obj) {
 
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],117:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -18968,7 +21771,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],118:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 'use strict';
 
 
@@ -19017,7 +21820,7 @@ module.exports.safeLoad            = renamed('safeLoad', 'load');
 module.exports.safeLoadAll         = renamed('safeLoadAll', 'loadAll');
 module.exports.safeDump            = renamed('safeDump', 'dump');
 
-},{"./lib/dumper":120,"./lib/exception":121,"./lib/loader":122,"./lib/schema":123,"./lib/schema/core":124,"./lib/schema/default":125,"./lib/schema/failsafe":126,"./lib/schema/json":127,"./lib/type":129,"./lib/type/binary":130,"./lib/type/bool":131,"./lib/type/float":132,"./lib/type/int":133,"./lib/type/map":134,"./lib/type/merge":135,"./lib/type/null":136,"./lib/type/omap":137,"./lib/type/pairs":138,"./lib/type/seq":139,"./lib/type/set":140,"./lib/type/str":141,"./lib/type/timestamp":142}],119:[function(require,module,exports){
+},{"./lib/dumper":135,"./lib/exception":136,"./lib/loader":137,"./lib/schema":138,"./lib/schema/core":139,"./lib/schema/default":140,"./lib/schema/failsafe":141,"./lib/schema/json":142,"./lib/type":144,"./lib/type/binary":145,"./lib/type/bool":146,"./lib/type/float":147,"./lib/type/int":148,"./lib/type/map":149,"./lib/type/merge":150,"./lib/type/null":151,"./lib/type/omap":152,"./lib/type/pairs":153,"./lib/type/seq":154,"./lib/type/set":155,"./lib/type/str":156,"./lib/type/timestamp":157}],134:[function(require,module,exports){
 'use strict';
 
 
@@ -19078,7 +21881,7 @@ module.exports.repeat         = repeat;
 module.exports.isNegativeZero = isNegativeZero;
 module.exports.extend         = extend;
 
-},{}],120:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 'use strict';
 
 /*eslint-disable no-use-before-define*/
@@ -20045,7 +22848,7 @@ function dump(input, options) {
 
 module.exports.dump = dump;
 
-},{"./common":119,"./exception":121,"./schema/default":125}],121:[function(require,module,exports){
+},{"./common":134,"./exception":136,"./schema/default":140}],136:[function(require,module,exports){
 // YAML error class. http://stackoverflow.com/questions/8458984
 //
 'use strict';
@@ -20102,7 +22905,7 @@ YAMLException.prototype.toString = function toString(compact) {
 
 module.exports = YAMLException;
 
-},{}],122:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 'use strict';
 
 /*eslint-disable max-len,no-use-before-define*/
@@ -21831,7 +24634,7 @@ function load(input, options) {
 module.exports.loadAll = loadAll;
 module.exports.load    = load;
 
-},{"./common":119,"./exception":121,"./schema/default":125,"./snippet":128}],123:[function(require,module,exports){
+},{"./common":134,"./exception":136,"./schema/default":140,"./snippet":143}],138:[function(require,module,exports){
 'use strict';
 
 /*eslint-disable max-len*/
@@ -21954,7 +24757,7 @@ Schema.prototype.extend = function extend(definition) {
 
 module.exports = Schema;
 
-},{"./exception":121,"./type":129}],124:[function(require,module,exports){
+},{"./exception":136,"./type":144}],139:[function(require,module,exports){
 // Standard YAML's Core schema.
 // http://www.yaml.org/spec/1.2/spec.html#id2804923
 //
@@ -21967,7 +24770,7 @@ module.exports = Schema;
 
 module.exports = require('./json');
 
-},{"./json":127}],125:[function(require,module,exports){
+},{"./json":142}],140:[function(require,module,exports){
 // JS-YAML's default schema for `safeLoad` function.
 // It is not described in the YAML specification.
 //
@@ -21991,7 +24794,7 @@ module.exports = require('./core').extend({
   ]
 });
 
-},{"../type/binary":130,"../type/merge":135,"../type/omap":137,"../type/pairs":138,"../type/set":140,"../type/timestamp":142,"./core":124}],126:[function(require,module,exports){
+},{"../type/binary":145,"../type/merge":150,"../type/omap":152,"../type/pairs":153,"../type/set":155,"../type/timestamp":157,"./core":139}],141:[function(require,module,exports){
 // Standard YAML's Failsafe schema.
 // http://www.yaml.org/spec/1.2/spec.html#id2802346
 
@@ -22010,7 +24813,7 @@ module.exports = new Schema({
   ]
 });
 
-},{"../schema":123,"../type/map":134,"../type/seq":139,"../type/str":141}],127:[function(require,module,exports){
+},{"../schema":138,"../type/map":149,"../type/seq":154,"../type/str":156}],142:[function(require,module,exports){
 // Standard YAML's JSON schema.
 // http://www.yaml.org/spec/1.2/spec.html#id2803231
 //
@@ -22031,7 +24834,7 @@ module.exports = require('./failsafe').extend({
   ]
 });
 
-},{"../type/bool":131,"../type/float":132,"../type/int":133,"../type/null":136,"./failsafe":126}],128:[function(require,module,exports){
+},{"../type/bool":146,"../type/float":147,"../type/int":148,"../type/null":151,"./failsafe":141}],143:[function(require,module,exports){
 'use strict';
 
 
@@ -22134,7 +24937,7 @@ function makeSnippet(mark, options) {
 
 module.exports = makeSnippet;
 
-},{"./common":119}],129:[function(require,module,exports){
+},{"./common":134}],144:[function(require,module,exports){
 'use strict';
 
 var YAMLException = require('./exception');
@@ -22202,7 +25005,7 @@ function Type(tag, options) {
 
 module.exports = Type;
 
-},{"./exception":121}],130:[function(require,module,exports){
+},{"./exception":136}],145:[function(require,module,exports){
 'use strict';
 
 /*eslint-disable no-bitwise*/
@@ -22329,7 +25132,7 @@ module.exports = new Type('tag:yaml.org,2002:binary', {
   represent: representYamlBinary
 });
 
-},{"../type":129}],131:[function(require,module,exports){
+},{"../type":144}],146:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22366,7 +25169,7 @@ module.exports = new Type('tag:yaml.org,2002:bool', {
   defaultStyle: 'lowercase'
 });
 
-},{"../type":129}],132:[function(require,module,exports){
+},{"../type":144}],147:[function(require,module,exports){
 'use strict';
 
 var common = require('../common');
@@ -22465,7 +25268,7 @@ module.exports = new Type('tag:yaml.org,2002:float', {
   defaultStyle: 'lowercase'
 });
 
-},{"../common":119,"../type":129}],133:[function(require,module,exports){
+},{"../common":134,"../type":144}],148:[function(require,module,exports){
 'use strict';
 
 var common = require('../common');
@@ -22623,7 +25426,7 @@ module.exports = new Type('tag:yaml.org,2002:int', {
   }
 });
 
-},{"../common":119,"../type":129}],134:[function(require,module,exports){
+},{"../common":134,"../type":144}],149:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22633,7 +25436,7 @@ module.exports = new Type('tag:yaml.org,2002:map', {
   construct: function (data) { return data !== null ? data : {}; }
 });
 
-},{"../type":129}],135:[function(require,module,exports){
+},{"../type":144}],150:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22647,7 +25450,7 @@ module.exports = new Type('tag:yaml.org,2002:merge', {
   resolve: resolveYamlMerge
 });
 
-},{"../type":129}],136:[function(require,module,exports){
+},{"../type":144}],151:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22684,7 +25487,7 @@ module.exports = new Type('tag:yaml.org,2002:null', {
   defaultStyle: 'lowercase'
 });
 
-},{"../type":129}],137:[function(require,module,exports){
+},{"../type":144}],152:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22730,7 +25533,7 @@ module.exports = new Type('tag:yaml.org,2002:omap', {
   construct: constructYamlOmap
 });
 
-},{"../type":129}],138:[function(require,module,exports){
+},{"../type":144}],153:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22785,7 +25588,7 @@ module.exports = new Type('tag:yaml.org,2002:pairs', {
   construct: constructYamlPairs
 });
 
-},{"../type":129}],139:[function(require,module,exports){
+},{"../type":144}],154:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22795,7 +25598,7 @@ module.exports = new Type('tag:yaml.org,2002:seq', {
   construct: function (data) { return data !== null ? data : []; }
 });
 
-},{"../type":129}],140:[function(require,module,exports){
+},{"../type":144}],155:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22826,7 +25629,7 @@ module.exports = new Type('tag:yaml.org,2002:set', {
   construct: constructYamlSet
 });
 
-},{"../type":129}],141:[function(require,module,exports){
+},{"../type":144}],156:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22836,7 +25639,7 @@ module.exports = new Type('tag:yaml.org,2002:str', {
   construct: function (data) { return data !== null ? data : ''; }
 });
 
-},{"../type":129}],142:[function(require,module,exports){
+},{"../type":144}],157:[function(require,module,exports){
 'use strict';
 
 var Type = require('../type');
@@ -22926,7 +25729,7 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
   represent: representYamlTimestamp
 });
 
-},{"../type":129}],143:[function(require,module,exports){
+},{"../type":144}],158:[function(require,module,exports){
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     define([], factory) /* global define */
@@ -23528,7 +26331,7 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
 
 }));
 
-},{}],144:[function(require,module,exports){
+},{}],159:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -23714,7 +26517,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],145:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 /* eslint-env browser */
 
 const { Buffer } = require('buffer/')
@@ -24104,7 +26907,7 @@ syncFetch.Request = SyncRequest
 syncFetch.Response = SyncResponse
 module.exports = syncFetch
 
-},{"buffer/":146}],146:[function(require,module,exports){
+},{"buffer/":161}],161:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -25925,7 +28728,629 @@ var hexSliceLookupTable = (function () {
 })()
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":114,"buffer":115,"ieee754":117}],147:[function(require,module,exports){
+},{"base64-js":129,"buffer":130,"ieee754":132}],162:[function(require,module,exports){
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (factory((global.WHATWGFetch = {})));
+}(this, (function (exports) { 'use strict';
+
+  var global =
+    (typeof globalThis !== 'undefined' && globalThis) ||
+    (typeof self !== 'undefined' && self) ||
+    (typeof global !== 'undefined' && global);
+
+  var support = {
+    searchParams: 'URLSearchParams' in global,
+    iterable: 'Symbol' in global && 'iterator' in Symbol,
+    blob:
+      'FileReader' in global &&
+      'Blob' in global &&
+      (function() {
+        try {
+          new Blob();
+          return true
+        } catch (e) {
+          return false
+        }
+      })(),
+    formData: 'FormData' in global,
+    arrayBuffer: 'ArrayBuffer' in global
+  };
+
+  function isDataView(obj) {
+    return obj && DataView.prototype.isPrototypeOf(obj)
+  }
+
+  if (support.arrayBuffer) {
+    var viewClasses = [
+      '[object Int8Array]',
+      '[object Uint8Array]',
+      '[object Uint8ClampedArray]',
+      '[object Int16Array]',
+      '[object Uint16Array]',
+      '[object Int32Array]',
+      '[object Uint32Array]',
+      '[object Float32Array]',
+      '[object Float64Array]'
+    ];
+
+    var isArrayBufferView =
+      ArrayBuffer.isView ||
+      function(obj) {
+        return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+      };
+  }
+
+  function normalizeName(name) {
+    if (typeof name !== 'string') {
+      name = String(name);
+    }
+    if (/[^a-z0-9\-#$%&'*+.^_`|~!]/i.test(name) || name === '') {
+      throw new TypeError('Invalid character in header field name: "' + name + '"')
+    }
+    return name.toLowerCase()
+  }
+
+  function normalizeValue(value) {
+    if (typeof value !== 'string') {
+      value = String(value);
+    }
+    return value
+  }
+
+  // Build a destructive iterator for the value list
+  function iteratorFor(items) {
+    var iterator = {
+      next: function() {
+        var value = items.shift();
+        return {done: value === undefined, value: value}
+      }
+    };
+
+    if (support.iterable) {
+      iterator[Symbol.iterator] = function() {
+        return iterator
+      };
+    }
+
+    return iterator
+  }
+
+  function Headers(headers) {
+    this.map = {};
+
+    if (headers instanceof Headers) {
+      headers.forEach(function(value, name) {
+        this.append(name, value);
+      }, this);
+    } else if (Array.isArray(headers)) {
+      headers.forEach(function(header) {
+        this.append(header[0], header[1]);
+      }, this);
+    } else if (headers) {
+      Object.getOwnPropertyNames(headers).forEach(function(name) {
+        this.append(name, headers[name]);
+      }, this);
+    }
+  }
+
+  Headers.prototype.append = function(name, value) {
+    name = normalizeName(name);
+    value = normalizeValue(value);
+    var oldValue = this.map[name];
+    this.map[name] = oldValue ? oldValue + ', ' + value : value;
+  };
+
+  Headers.prototype['delete'] = function(name) {
+    delete this.map[normalizeName(name)];
+  };
+
+  Headers.prototype.get = function(name) {
+    name = normalizeName(name);
+    return this.has(name) ? this.map[name] : null
+  };
+
+  Headers.prototype.has = function(name) {
+    return this.map.hasOwnProperty(normalizeName(name))
+  };
+
+  Headers.prototype.set = function(name, value) {
+    this.map[normalizeName(name)] = normalizeValue(value);
+  };
+
+  Headers.prototype.forEach = function(callback, thisArg) {
+    for (var name in this.map) {
+      if (this.map.hasOwnProperty(name)) {
+        callback.call(thisArg, this.map[name], name, this);
+      }
+    }
+  };
+
+  Headers.prototype.keys = function() {
+    var items = [];
+    this.forEach(function(value, name) {
+      items.push(name);
+    });
+    return iteratorFor(items)
+  };
+
+  Headers.prototype.values = function() {
+    var items = [];
+    this.forEach(function(value) {
+      items.push(value);
+    });
+    return iteratorFor(items)
+  };
+
+  Headers.prototype.entries = function() {
+    var items = [];
+    this.forEach(function(value, name) {
+      items.push([name, value]);
+    });
+    return iteratorFor(items)
+  };
+
+  if (support.iterable) {
+    Headers.prototype[Symbol.iterator] = Headers.prototype.entries;
+  }
+
+  function consumed(body) {
+    if (body.bodyUsed) {
+      return Promise.reject(new TypeError('Already read'))
+    }
+    body.bodyUsed = true;
+  }
+
+  function fileReaderReady(reader) {
+    return new Promise(function(resolve, reject) {
+      reader.onload = function() {
+        resolve(reader.result);
+      };
+      reader.onerror = function() {
+        reject(reader.error);
+      };
+    })
+  }
+
+  function readBlobAsArrayBuffer(blob) {
+    var reader = new FileReader();
+    var promise = fileReaderReady(reader);
+    reader.readAsArrayBuffer(blob);
+    return promise
+  }
+
+  function readBlobAsText(blob) {
+    var reader = new FileReader();
+    var promise = fileReaderReady(reader);
+    reader.readAsText(blob);
+    return promise
+  }
+
+  function readArrayBufferAsText(buf) {
+    var view = new Uint8Array(buf);
+    var chars = new Array(view.length);
+
+    for (var i = 0; i < view.length; i++) {
+      chars[i] = String.fromCharCode(view[i]);
+    }
+    return chars.join('')
+  }
+
+  function bufferClone(buf) {
+    if (buf.slice) {
+      return buf.slice(0)
+    } else {
+      var view = new Uint8Array(buf.byteLength);
+      view.set(new Uint8Array(buf));
+      return view.buffer
+    }
+  }
+
+  function Body() {
+    this.bodyUsed = false;
+
+    this._initBody = function(body) {
+      /*
+        fetch-mock wraps the Response object in an ES6 Proxy to
+        provide useful test harness features such as flush. However, on
+        ES5 browsers without fetch or Proxy support pollyfills must be used;
+        the proxy-pollyfill is unable to proxy an attribute unless it exists
+        on the object before the Proxy is created. This change ensures
+        Response.bodyUsed exists on the instance, while maintaining the
+        semantic of setting Request.bodyUsed in the constructor before
+        _initBody is called.
+      */
+      this.bodyUsed = this.bodyUsed;
+      this._bodyInit = body;
+      if (!body) {
+        this._bodyText = '';
+      } else if (typeof body === 'string') {
+        this._bodyText = body;
+      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+        this._bodyBlob = body;
+      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+        this._bodyFormData = body;
+      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+        this._bodyText = body.toString();
+      } else if (support.arrayBuffer && support.blob && isDataView(body)) {
+        this._bodyArrayBuffer = bufferClone(body.buffer);
+        // IE 10-11 can't handle a DataView body.
+        this._bodyInit = new Blob([this._bodyArrayBuffer]);
+      } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
+        this._bodyArrayBuffer = bufferClone(body);
+      } else {
+        this._bodyText = body = Object.prototype.toString.call(body);
+      }
+
+      if (!this.headers.get('content-type')) {
+        if (typeof body === 'string') {
+          this.headers.set('content-type', 'text/plain;charset=UTF-8');
+        } else if (this._bodyBlob && this._bodyBlob.type) {
+          this.headers.set('content-type', this._bodyBlob.type);
+        } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+          this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+        }
+      }
+    };
+
+    if (support.blob) {
+      this.blob = function() {
+        var rejected = consumed(this);
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyArrayBuffer) {
+          return Promise.resolve(new Blob([this._bodyArrayBuffer]))
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as blob')
+        } else {
+          return Promise.resolve(new Blob([this._bodyText]))
+        }
+      };
+
+      this.arrayBuffer = function() {
+        if (this._bodyArrayBuffer) {
+          var isConsumed = consumed(this);
+          if (isConsumed) {
+            return isConsumed
+          }
+          if (ArrayBuffer.isView(this._bodyArrayBuffer)) {
+            return Promise.resolve(
+              this._bodyArrayBuffer.buffer.slice(
+                this._bodyArrayBuffer.byteOffset,
+                this._bodyArrayBuffer.byteOffset + this._bodyArrayBuffer.byteLength
+              )
+            )
+          } else {
+            return Promise.resolve(this._bodyArrayBuffer)
+          }
+        } else {
+          return this.blob().then(readBlobAsArrayBuffer)
+        }
+      };
+    }
+
+    this.text = function() {
+      var rejected = consumed(this);
+      if (rejected) {
+        return rejected
+      }
+
+      if (this._bodyBlob) {
+        return readBlobAsText(this._bodyBlob)
+      } else if (this._bodyArrayBuffer) {
+        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+      } else if (this._bodyFormData) {
+        throw new Error('could not read FormData body as text')
+      } else {
+        return Promise.resolve(this._bodyText)
+      }
+    };
+
+    if (support.formData) {
+      this.formData = function() {
+        return this.text().then(decode)
+      };
+    }
+
+    this.json = function() {
+      return this.text().then(JSON.parse)
+    };
+
+    return this
+  }
+
+  // HTTP methods whose capitalization should be normalized
+  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT'];
+
+  function normalizeMethod(method) {
+    var upcased = method.toUpperCase();
+    return methods.indexOf(upcased) > -1 ? upcased : method
+  }
+
+  function Request(input, options) {
+    if (!(this instanceof Request)) {
+      throw new TypeError('Please use the "new" operator, this DOM object constructor cannot be called as a function.')
+    }
+
+    options = options || {};
+    var body = options.body;
+
+    if (input instanceof Request) {
+      if (input.bodyUsed) {
+        throw new TypeError('Already read')
+      }
+      this.url = input.url;
+      this.credentials = input.credentials;
+      if (!options.headers) {
+        this.headers = new Headers(input.headers);
+      }
+      this.method = input.method;
+      this.mode = input.mode;
+      this.signal = input.signal;
+      if (!body && input._bodyInit != null) {
+        body = input._bodyInit;
+        input.bodyUsed = true;
+      }
+    } else {
+      this.url = String(input);
+    }
+
+    this.credentials = options.credentials || this.credentials || 'same-origin';
+    if (options.headers || !this.headers) {
+      this.headers = new Headers(options.headers);
+    }
+    this.method = normalizeMethod(options.method || this.method || 'GET');
+    this.mode = options.mode || this.mode || null;
+    this.signal = options.signal || this.signal;
+    this.referrer = null;
+
+    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+      throw new TypeError('Body not allowed for GET or HEAD requests')
+    }
+    this._initBody(body);
+
+    if (this.method === 'GET' || this.method === 'HEAD') {
+      if (options.cache === 'no-store' || options.cache === 'no-cache') {
+        // Search for a '_' parameter in the query string
+        var reParamSearch = /([?&])_=[^&]*/;
+        if (reParamSearch.test(this.url)) {
+          // If it already exists then set the value with the current time
+          this.url = this.url.replace(reParamSearch, '$1_=' + new Date().getTime());
+        } else {
+          // Otherwise add a new '_' parameter to the end with the current time
+          var reQueryString = /\?/;
+          this.url += (reQueryString.test(this.url) ? '&' : '?') + '_=' + new Date().getTime();
+        }
+      }
+    }
+  }
+
+  Request.prototype.clone = function() {
+    return new Request(this, {body: this._bodyInit})
+  };
+
+  function decode(body) {
+    var form = new FormData();
+    body
+      .trim()
+      .split('&')
+      .forEach(function(bytes) {
+        if (bytes) {
+          var split = bytes.split('=');
+          var name = split.shift().replace(/\+/g, ' ');
+          var value = split.join('=').replace(/\+/g, ' ');
+          form.append(decodeURIComponent(name), decodeURIComponent(value));
+        }
+      });
+    return form
+  }
+
+  function parseHeaders(rawHeaders) {
+    var headers = new Headers();
+    // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
+    // https://tools.ietf.org/html/rfc7230#section-3.2
+    var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, ' ');
+    // Avoiding split via regex to work around a common IE11 bug with the core-js 3.6.0 regex polyfill
+    // https://github.com/github/fetch/issues/748
+    // https://github.com/zloirock/core-js/issues/751
+    preProcessedHeaders
+      .split('\r')
+      .map(function(header) {
+        return header.indexOf('\n') === 0 ? header.substr(1, header.length) : header
+      })
+      .forEach(function(line) {
+        var parts = line.split(':');
+        var key = parts.shift().trim();
+        if (key) {
+          var value = parts.join(':').trim();
+          headers.append(key, value);
+        }
+      });
+    return headers
+  }
+
+  Body.call(Request.prototype);
+
+  function Response(bodyInit, options) {
+    if (!(this instanceof Response)) {
+      throw new TypeError('Please use the "new" operator, this DOM object constructor cannot be called as a function.')
+    }
+    if (!options) {
+      options = {};
+    }
+
+    this.type = 'default';
+    this.status = options.status === undefined ? 200 : options.status;
+    this.ok = this.status >= 200 && this.status < 300;
+    this.statusText = options.statusText === undefined ? '' : '' + options.statusText;
+    this.headers = new Headers(options.headers);
+    this.url = options.url || '';
+    this._initBody(bodyInit);
+  }
+
+  Body.call(Response.prototype);
+
+  Response.prototype.clone = function() {
+    return new Response(this._bodyInit, {
+      status: this.status,
+      statusText: this.statusText,
+      headers: new Headers(this.headers),
+      url: this.url
+    })
+  };
+
+  Response.error = function() {
+    var response = new Response(null, {status: 0, statusText: ''});
+    response.type = 'error';
+    return response
+  };
+
+  var redirectStatuses = [301, 302, 303, 307, 308];
+
+  Response.redirect = function(url, status) {
+    if (redirectStatuses.indexOf(status) === -1) {
+      throw new RangeError('Invalid status code')
+    }
+
+    return new Response(null, {status: status, headers: {location: url}})
+  };
+
+  exports.DOMException = global.DOMException;
+  try {
+    new exports.DOMException();
+  } catch (err) {
+    exports.DOMException = function(message, name) {
+      this.message = message;
+      this.name = name;
+      var error = Error(message);
+      this.stack = error.stack;
+    };
+    exports.DOMException.prototype = Object.create(Error.prototype);
+    exports.DOMException.prototype.constructor = exports.DOMException;
+  }
+
+  function fetch(input, init) {
+    return new Promise(function(resolve, reject) {
+      var request = new Request(input, init);
+
+      if (request.signal && request.signal.aborted) {
+        return reject(new exports.DOMException('Aborted', 'AbortError'))
+      }
+
+      var xhr = new XMLHttpRequest();
+
+      function abortXhr() {
+        xhr.abort();
+      }
+
+      xhr.onload = function() {
+        var options = {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: parseHeaders(xhr.getAllResponseHeaders() || '')
+        };
+        options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL');
+        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+        setTimeout(function() {
+          resolve(new Response(body, options));
+        }, 0);
+      };
+
+      xhr.onerror = function() {
+        setTimeout(function() {
+          reject(new TypeError('Network request failed'));
+        }, 0);
+      };
+
+      xhr.ontimeout = function() {
+        setTimeout(function() {
+          reject(new TypeError('Network request failed'));
+        }, 0);
+      };
+
+      xhr.onabort = function() {
+        setTimeout(function() {
+          reject(new exports.DOMException('Aborted', 'AbortError'));
+        }, 0);
+      };
+
+      function fixUrl(url) {
+        try {
+          return url === '' && global.location.href ? global.location.href : url
+        } catch (e) {
+          return url
+        }
+      }
+
+      xhr.open(request.method, fixUrl(request.url), true);
+
+      if (request.credentials === 'include') {
+        xhr.withCredentials = true;
+      } else if (request.credentials === 'omit') {
+        xhr.withCredentials = false;
+      }
+
+      if ('responseType' in xhr) {
+        if (support.blob) {
+          xhr.responseType = 'blob';
+        } else if (
+          support.arrayBuffer &&
+          request.headers.get('Content-Type') &&
+          request.headers.get('Content-Type').indexOf('application/octet-stream') !== -1
+        ) {
+          xhr.responseType = 'arraybuffer';
+        }
+      }
+
+      if (init && typeof init.headers === 'object' && !(init.headers instanceof Headers)) {
+        Object.getOwnPropertyNames(init.headers).forEach(function(name) {
+          xhr.setRequestHeader(name, normalizeValue(init.headers[name]));
+        });
+      } else {
+        request.headers.forEach(function(value, name) {
+          xhr.setRequestHeader(name, value);
+        });
+      }
+
+      if (request.signal) {
+        request.signal.addEventListener('abort', abortXhr);
+
+        xhr.onreadystatechange = function() {
+          // DONE (success or failure)
+          if (xhr.readyState === 4) {
+            request.signal.removeEventListener('abort', abortXhr);
+          }
+        };
+      }
+
+      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit);
+    })
+  }
+
+  fetch.polyfill = true;
+
+  if (!global.fetch) {
+    global.fetch = fetch;
+    global.Headers = Headers;
+    global.Request = Request;
+    global.Response = Response;
+  }
+
+  exports.Headers = Headers;
+  exports.Request = Request;
+  exports.Response = Response;
+  exports.fetch = fetch;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
+
+},{}],163:[function(require,module,exports){
 const toDateObject = require('./wikibase_time_to_date_object')
 
 const helpers = {}
@@ -26046,7 +29471,7 @@ helpers.getEntityIdFromGuid = guid => {
 
 module.exports = helpers
 
-},{"./wikibase_time_to_date_object":162}],148:[function(require,module,exports){
+},{"./wikibase_time_to_date_object":178}],164:[function(require,module,exports){
 const { wikibaseTimeToISOString, wikibaseTimeToEpochTime, wikibaseTimeToSimpleDay } = require('./helpers')
 
 const simple = datavalue => datavalue.value
@@ -26167,7 +29592,7 @@ module.exports = {
   }
 }
 
-},{"./helpers":147}],149:[function(require,module,exports){
+},{"./helpers":163}],165:[function(require,module,exports){
 const { simplifyEntity } = require('./simplify_entity')
 
 const wb = {
@@ -26194,7 +29619,7 @@ module.exports = {
   wd: wb
 }
 
-},{"./simplify_entity":153}],150:[function(require,module,exports){
+},{"./simplify_entity":169}],166:[function(require,module,exports){
 const truthyPropertyClaims = propClaims => {
   const aggregate = propClaims.reduce(aggregatePerRank, {})
   // on truthyness: https://www.mediawiki.org/wiki/Wikibase/Indexing/RDF_Dump_Format#Truthy_statements
@@ -26222,7 +29647,7 @@ const truthyClaims = claims => {
 
 module.exports = { truthyClaims, truthyPropertyClaims, nonDeprecatedPropertyClaims }
 
-},{}],151:[function(require,module,exports){
+},{}],167:[function(require,module,exports){
 const { labels, descriptions, aliases, lemmas, glosses } = require('./simplify_text_attributes')
 
 const {
@@ -26274,7 +29699,7 @@ module.exports = {
   // entities,
 }
 
-},{"./simplify_claims":152,"./simplify_forms":154,"./simplify_senses":155,"./simplify_sitelinks":156,"./simplify_sparql_results":157,"./simplify_text_attributes":158}],152:[function(require,module,exports){
+},{"./simplify_claims":168,"./simplify_forms":170,"./simplify_senses":171,"./simplify_sitelinks":172,"./simplify_sparql_results":173,"./simplify_text_attributes":174}],168:[function(require,module,exports){
 const { parse: parseClaim } = require('./parse_claim')
 const { uniq } = require('../utils/utils')
 const { truthyPropertyClaims, nonDeprecatedPropertyClaims } = require('./rank')
@@ -26468,7 +29893,7 @@ module.exports = {
   simplifyReferences,
 }
 
-},{"../utils/utils":173,"./parse_claim":148,"./rank":150}],153:[function(require,module,exports){
+},{"../utils/utils":189,"./parse_claim":164,"./rank":166}],169:[function(require,module,exports){
 const simplify = require('./simplify')
 
 const simplifyEntity = (entity, options) => {
@@ -26528,7 +29953,7 @@ simplify.entities = simplifyEntities
 
 module.exports = { simplifyEntity, simplifyEntities }
 
-},{"./simplify":151}],154:[function(require,module,exports){
+},{"./simplify":167}],170:[function(require,module,exports){
 const { isFormId } = require('./helpers')
 const { representations: simplifyRepresentations } = require('./simplify_text_attributes')
 const { simplifyClaims } = require('./simplify_claims')
@@ -26548,7 +29973,7 @@ const simplifyForms = (forms, options) => forms.map(form => simplifyForm(form, o
 
 module.exports = { simplifyForm, simplifyForms }
 
-},{"./helpers":147,"./simplify_claims":152,"./simplify_text_attributes":158}],155:[function(require,module,exports){
+},{"./helpers":163,"./simplify_claims":168,"./simplify_text_attributes":174}],171:[function(require,module,exports){
 const { isSenseId } = require('./helpers')
 const { glosses: simplifyGlosses } = require('./simplify_text_attributes')
 const { simplifyClaims } = require('./simplify_claims')
@@ -26567,7 +29992,7 @@ const simplifySenses = (senses, options) => senses.map(sense => simplifySense(se
 
 module.exports = { simplifySense, simplifySenses }
 
-},{"./helpers":147,"./simplify_claims":152,"./simplify_text_attributes":158}],156:[function(require,module,exports){
+},{"./helpers":163,"./simplify_claims":168,"./simplify_text_attributes":174}],172:[function(require,module,exports){
 const { getSitelinkUrl } = require('./sitelinks')
 
 module.exports = (sitelinks, options = {}) => {
@@ -26591,7 +30016,7 @@ const aggregateValues = (sitelinks, addUrl) => (index, key) => {
   return index
 }
 
-},{"./sitelinks":159}],157:[function(require,module,exports){
+},{"./sitelinks":175}],173:[function(require,module,exports){
 module.exports = (input, options = {}) => {
   if (typeof input === 'string') input = JSON.parse(input)
 
@@ -26714,7 +30139,7 @@ const specialNames = {
   altLabel: 'aliases'
 }
 
-},{}],158:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 const simplifyTextAttributes = multivalue => data => {
   const simplified = {}
   Object.keys(data).forEach(lang => {
@@ -26741,7 +30166,7 @@ module.exports = {
   glosses: singleValue
 }
 
-},{}],159:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 const { fixedEncodeURIComponent, replaceSpaceByUnderscores, isPlainObject } = require('../utils/utils')
 const { isPropertyId } = require('./helpers')
 const wikidataBase = 'https://www.wikidata.org/wiki/'
@@ -26853,7 +30278,7 @@ const projectsBySuffix = {
 
 module.exports = { getSitelinkUrl, getSitelinkData, isSitelinkKey }
 
-},{"../utils/utils":173,"./helpers":147,"./sitelinks_languages":160}],160:[function(require,module,exports){
+},{"../utils/utils":189,"./helpers":163,"./sitelinks_languages":176}],176:[function(require,module,exports){
 // Generated by 'npm run update-sitelinks-languages'
 module.exports = [
   'aa',
@@ -27188,7 +30613,7 @@ module.exports = [
   'zu'
 ]
 
-},{}],161:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 const helpers = require('./helpers')
 
 const validate = (name, testName) => value => {
@@ -27202,7 +30627,7 @@ module.exports = {
   revisionId: validate('revision id', 'isRevisionId')
 }
 
-},{"./helpers":147}],162:[function(require,module,exports){
+},{"./helpers":163}],178:[function(require,module,exports){
 module.exports = wikibaseTime => {
   // Also accept claim datavalue.value objects
   if (typeof wikibaseTime === 'object') {
@@ -27243,7 +30668,7 @@ const expandedYearDate = (sign, rest, year) => {
   return new Date(date)
 }
 
-},{}],163:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 // See https://www.wikidata.org/w/api.php?action=help&modules=query%2Bsearch
 
 const { isPlainObject } = require('../utils/utils')
@@ -27323,7 +30748,7 @@ module.exports = buildUrl => params => {
   })
 }
 
-},{"../utils/utils":173}],164:[function(require,module,exports){
+},{"../utils/utils":189}],180:[function(require,module,exports){
 const { isPlainObject, forceArray, shortLang } = require('../utils/utils')
 const validate = require('../helpers/validate')
 
@@ -27372,7 +30797,7 @@ module.exports = buildUrl => (ids, languages, props, format, redirects) => {
   return buildUrl(query)
 }
 
-},{"../helpers/validate":161,"../utils/utils":173}],165:[function(require,module,exports){
+},{"../helpers/validate":177,"../utils/utils":189}],181:[function(require,module,exports){
 const { isPlainObject, forceArray, shortLang } = require('../utils/utils')
 
 module.exports = buildUrl => (titles, sites, languages, props, format, redirects) => {
@@ -27429,7 +30854,7 @@ module.exports = buildUrl => (titles, sites, languages, props, format, redirects
 // convert 2 letters language code to Wikipedia sitelinks code
 const parseSite = site => site.length === 2 ? `${site}wiki` : site
 
-},{"../utils/utils":173}],166:[function(require,module,exports){
+},{"../utils/utils":189}],182:[function(require,module,exports){
 const validate = require('../helpers/validate')
 const { isPlainObject } = require('../utils/utils')
 
@@ -27443,7 +30868,7 @@ module.exports = (instance, wgScriptPath) => (id, revision) => {
   return `${instance}/${wgScriptPath}/index.php?title=Special:EntityData/${id}.json&revision=${revision}`
 }
 
-},{"../helpers/validate":161,"../utils/utils":173}],167:[function(require,module,exports){
+},{"../helpers/validate":177,"../utils/utils":189}],183:[function(require,module,exports){
 const { isPlainObject } = require('../utils/utils')
 
 module.exports = buildUrl => {
@@ -27471,7 +30896,7 @@ const getIdsGroups = ids => {
   return groups
 }
 
-},{"../utils/utils":173,"./get_entities":164}],168:[function(require,module,exports){
+},{"../utils/utils":189,"./get_entities":180}],184:[function(require,module,exports){
 const { forceArray } = require('../utils/utils')
 const { isItemId } = require('../helpers/helpers')
 const validate = require('../helpers/validate')
@@ -27536,7 +30961,7 @@ const caseInsensitiveValueQuery = (properties, value, filter, limit) => {
 
 const prefixifyProperty = property => 'wdt:' + property
 
-},{"../helpers/helpers":147,"../helpers/validate":161,"../utils/utils":173,"./sparql_query":171}],169:[function(require,module,exports){
+},{"../helpers/helpers":163,"../helpers/validate":177,"../utils/utils":189,"./sparql_query":187}],185:[function(require,module,exports){
 const { forceArray } = require('../utils/utils')
 const validate = require('../helpers/validate')
 
@@ -27582,7 +31007,7 @@ const getEpochSeconds = date => {
 
 const earliestPointInMs = new Date('2000-01-01').getTime()
 
-},{"../helpers/validate":161,"../utils/utils":173}],170:[function(require,module,exports){
+},{"../helpers/validate":177,"../utils/utils":189}],186:[function(require,module,exports){
 const { isPlainObject } = require('../utils/utils')
 const types = [ 'item', 'property', 'lexeme', 'form', 'sense' ]
 
@@ -27626,7 +31051,7 @@ module.exports = buildUrl => (search, language, limit, format, uselang) => {
   })
 }
 
-},{"../utils/utils":173}],171:[function(require,module,exports){
+},{"../utils/utils":189}],187:[function(require,module,exports){
 const { fixedEncodeURIComponent } = require('../utils/utils')
 
 module.exports = sparqlEndpoint => sparql => {
@@ -27634,7 +31059,7 @@ module.exports = sparqlEndpoint => sparql => {
   return `${sparqlEndpoint}?format=json&query=${query}`
 }
 
-},{"../utils/utils":173}],172:[function(require,module,exports){
+},{"../utils/utils":189}],188:[function(require,module,exports){
 const isBrowser = typeof location !== 'undefined' && typeof document !== 'undefined'
 
 const stringifyQuery = queryObj => new URLSearchParams(queryObj).toString()
@@ -27652,7 +31077,7 @@ module.exports = instanceApiEndpoint => queryObj => {
   return instanceApiEndpoint + '?' + stringifyQuery(queryObj)
 }
 
-},{}],173:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 module.exports = {
   // Ex: keep only 'fr' in 'fr_FR'
   shortLang: language => language.toLowerCase().split('_')[0],
@@ -27683,7 +31108,7 @@ module.exports = {
 
 const encodeCharacter = char => '%' + char.charCodeAt(0).toString(16)
 
-},{}],174:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 const { isPlainObject } = require('./utils/utils')
 
 const simplify = require('./helpers/simplify')
@@ -27784,13 +31209,13 @@ const missingInstance = missingConfig('an instance')
 
 module.exports = WBK
 
-},{"../lib/helpers/rank":150,"../lib/helpers/sitelinks":159,"./helpers/helpers":147,"./helpers/parse_responses":149,"./helpers/simplify":151,"./queries/cirrus_search":163,"./queries/get_entities":164,"./queries/get_entities_from_sitelinks":165,"./queries/get_entity_revision":166,"./queries/get_many_entities":167,"./queries/get_reverse_claims":168,"./queries/get_revisions":169,"./queries/search_entities":170,"./queries/sparql_query":171,"./utils/build_url":172,"./utils/utils":173}],175:[function(require,module,exports){
+},{"../lib/helpers/rank":166,"../lib/helpers/sitelinks":175,"./helpers/helpers":163,"./helpers/parse_responses":165,"./helpers/simplify":167,"./queries/cirrus_search":179,"./queries/get_entities":180,"./queries/get_entities_from_sitelinks":181,"./queries/get_entity_revision":182,"./queries/get_many_entities":183,"./queries/get_reverse_claims":184,"./queries/get_revisions":185,"./queries/search_entities":186,"./queries/sparql_query":187,"./utils/build_url":188,"./utils/utils":189}],191:[function(require,module,exports){
 module.exports = require('wikibase-sdk')({
   instance: 'https://www.wikidata.org',
   sparqlEndpoint: 'https://query.wikidata.org/sparql'
 })
 
-},{"wikibase-sdk":174}],"citation-js":[function(require,module,exports){
+},{"wikibase-sdk":190}],"citation-js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27834,4 +31259,4 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 const version = _package.default.version;
 exports.version = version;
-},{"../package.json":43,"./Cite/index.js":3,"./logger.js":10,"./plugin-common/index.js":11,"./plugins/index.js":23,"./util/index.js":39}]},{},[51,76,80,82,89,100,108]);
+},{"../package.json":43,"./Cite/index.js":3,"./logger.js":10,"./plugin-common/index.js":11,"./plugins/index.js":23,"./util/index.js":39}]},{},[51,76,79,84,87,90,92,99,110,119,125,128]);
