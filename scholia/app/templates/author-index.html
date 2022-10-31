@@ -186,6 +186,9 @@ Researcher with a published record.
                 } else {
                     callback([])
                 }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+              callback(["Search failed"])
+              console.error("Search failed. " + textStatus + " " + errorThrown)
             });
             }, 200)
         }
