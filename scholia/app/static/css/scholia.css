@@ -38,7 +38,8 @@ input,
 .select2-container--default .select2-selection--multiple,
 textarea,
 .dropdown-menu,
-.page-item.disabled .page-link {
+.page-item.disabled .page-link,
+pre {
     background-color: var(--background);
     color: var(--color-body);
 }
