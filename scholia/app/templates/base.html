@@ -433,6 +433,8 @@ askQuery("{{ panel }}", `# tool: scholia
 		 }
 		 $("#wikiversity-extract").text(text).append(html);
 	     }).fail(function(d, textStatus, error) {
+		 var html = "Read on the <a href=\"" + wikiversityUrl + "\">English Wikiversity</a>";
+		 $("#wikiversity-extract").append(html);
 		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
 	     });
 	 }
