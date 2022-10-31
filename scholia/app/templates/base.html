@@ -550,8 +550,12 @@ askQuery("{{ panel }}", `# tool: scholia
             if (data.results.bindings.length > 1) {
               addDropdownList("aspect-chooser", 'aspectMenuList', currentSubAspect, data)
             }
-          })
+          }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Subaspect chooser failed to generate. " + textStatus + " " + errorThrown)
+          });
         }
+      }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.error("Aspect chooser failed to generate. " + textStatus + " " + errorThrown)
       });
 
       function createDropdownButton(parent, id, currentAspect, data, q) {        
@@ -643,7 +647,10 @@ askQuery("{{ panel }}", `# tool: scholia
 		 });
 	     });
 	     $( '#wembedder' ).append( '<hr>' );
-	 }
+	 },
+	 error: function (jqXHR, textStatus, errorThrown) {
+         console.error("Wembedder failed. " + textStatus + " " + errorThrown)
+	 },
      });
   {% endif %}
 
@@ -692,6 +699,9 @@ askQuery("{{ panel }}", `# tool: scholia
             } else {
               callback([])
             }
+          }).fail(function (jqXHR, textStatus, errorThrown) {
+            callback(["Search failed"])
+            console.error("Search failed. " + textStatus + " " + errorThrown)
           });
         }, 200)
       }
