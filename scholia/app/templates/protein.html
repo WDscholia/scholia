@@ -4,9 +4,9 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('similar-proteins') }}
-{{ sparql_to_table('cofunctional-proteins') }}
 {{ sparql_to_table('participates-in') }}
+{{ sparql_to_table('cofunctional-proteins') }}
+{{ sparql_to_table('cointeracting-proteins') }}
 {{ sparql_to_iframe('publications-per-year') }}
 
 {% endblock %}
@@ -17,14 +17,15 @@
 
 <div id="intro"></div>
 
-<!-- 
-     <h2 id="similar-proteins">Similar proteins</h2>
+<div id="wembedder"></div>
 
-     Proteins sharing similar properties (molecular function(s),
-     cell components, biological process, physical interaction).
 
-     <table class="table table-hover" id="similar-proteins-table"></table>
-   -->
+<h2 id="participates-in">Participates in</h2>
+
+This protein participates in the following protein complexes and biological processes:
+
+<table class="table table-hover" id="participates-in-table"></table>
+
 
 <h2 id="cofunctional-proteins">Cofunctional proteins</h2>
 
@@ -33,11 +34,11 @@ Proteins sharing molecular function(s).
 <table class="table table-hover" id="cofunctional-proteins-table"></table>
 
 
-<h2 id="participates-in">Participates in</h2>
+<h2 id="cointeracting-proteins">Cointeracting proteins</h2>
 
-This protein participates in the following protein complexes and biological processes:
+Proteins sharing physical interaction(s).
 
-<table class="table table-hover" id="participates-in-table"></table>
+<table class="table table-hover" id="cointeracting-proteins-table"></table>
 
 
 <h2 id="publications-per-year">Publications per year</h2>

@@ -1,0 +1,27 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT
+  ?count
+  ?protein ?proteinLabel (CONCAT("/protein/", SUBSTR(STR(?protein), 32)) AS ?proteinUrl)
+  ?species ?speciesLabel (CONCAT("/taxon/", SUBSTR(STR(?species), 32)) AS ?speciesUrl)
+  ?chemicals
+WITH {
+  SELECT
+    (COUNT(?chemical) AS ?count)
+    ?protein
+    (GROUP_CONCAT(?chemical_label; separator=" // ") AS ?chemicals)
+  WHERE {
+    target: wdt:P129 ?chemical .
+    FILTER (target: != ?protein)
+    ?protein wdt:P129 ?chemical . 
+    ?chemical rdfs:label ?chemical_label FILTER(lang(?chemical_label) = "en")
+  }
+  GROUP BY ?protein
+} AS %result 
+WHERE {
+  INCLUDE %result
+  OPTIONAL { ?protein wdt:P703 ?species . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?count)
+LIMIT 500
