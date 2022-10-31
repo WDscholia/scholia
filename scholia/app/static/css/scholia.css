@@ -76,7 +76,8 @@ a:hover {
 
 .card,
 .page-link,
-.page-item.disabled .page-link {
+.page-item.disabled .page-link,
+hr {
     background-color: var(--background);
     border-color: var(--outline);
 }
