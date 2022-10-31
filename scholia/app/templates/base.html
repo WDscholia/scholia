@@ -406,7 +406,9 @@ askQuery("{{ panel }}", `# tool: scholia
 	       var html = " (<a href=\"" + wikipediaUrl + "\">Read more on English Wikipedia</a>)";
 		 $("#intro").text(data.extract).append(html);
 	     }).catch(error => {
-		 console.error('Error:', error);
+		 var html = "<a href=\"" + wikipediaUrl + "\">View on English Wikipedia</a>";
+         $("#intro").append(html);
+		 console.error('Could not get summary from enwiki: ', error);
 	     });
 	 }
 
