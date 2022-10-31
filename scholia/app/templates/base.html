@@ -344,7 +344,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	             bioschemasAnnotation.smiles = smiles.replace("\"", "\'\'") ;
 		 }
 		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	     } catch(e) { console.log("Exception: " + e)
+	     } catch(e) { console.error("Exception: " + e)
 	     }
 	 } else if (item.claims.P352) { // UniProt ID
 	     try { /* Protein */
@@ -361,7 +361,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	       bioschemasAnnotation.name = item.labels.en.value;
          }
 		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	     } catch(e) { console.log("Exception: " + e)
+	     } catch(e) { console.error("Exception: " + e)
 	     }
 	 } else if (item.claims.P351 || item.claims.P594) { // NCBI Gene or Ensembl
 	     try { /* Gene */
@@ -387,7 +387,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	             bioschemasAnnotation.sameAs[counter] = "http://identifiers.org/ensembl/" + ensembl;
 		 }
 		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	     } catch(e) { console.log("Exception: " + e)
+	     } catch(e) { console.error("Exception: " + e)
 	     }
 	 }
 	 
