@@ -1242,6 +1242,37 @@ def redirect_openalex(openalex):
     return render_template('404.html', error=could_not_find("OpenAlex ID"))
 
 
+@main.route('/ontology/')
+def show_ontology_index():
+    """Return rendered HTML index page for ontology.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML for for ontology.
+
+    """
+    return render_template('ontology-index.html')
+
+
+@main.route('/ontology/' + q_pattern)
+def show_ontology(q):
+    """Return rendered HTML page for a specific ontology.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('ontology.html', q=q)
+
+
 @main.route('/organization/' + q_pattern)
 def show_organization(q):
     """Return rendered HTML page for specific organization.

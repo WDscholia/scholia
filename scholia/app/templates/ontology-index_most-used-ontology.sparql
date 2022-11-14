@@ -1,0 +1,25 @@
+SELECT
+  ?count
+  ?ontology ?ontologyLabel ?ontologyUrl
+  ?described_by_example ?described_by_exampleLabel
+  ?example_use ?example_useLabel
+WITH {
+  SELECT
+    (COUNT(DISTINCT ?work) AS ?count)
+    ?ontology
+    (CONCAT("/ontology/", SUBSTR(STR(?ontology), 32)) AS ?ontologyUrl)
+    (SAMPLE(?described_by) AS ?described_by_example)
+    (SAMPLE(?work) AS ?example_use)
+  WHERE {
+    ?work wdt:P4510 ?ontology . 
+    ?ontology wdt:P31/wdt:P279* wd:Q324254 . 
+    OPTIONAL { ?ontology wdt:P1343 ?described_by . }
+  }
+  GROUP BY ?ontology
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+}
+ORDER BY DESC(?count)
+LIMIT 500    
