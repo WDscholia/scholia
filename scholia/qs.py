@@ -3,7 +3,32 @@
 
 from six import u
 
-from .utils import escape_string
+import re
+
+
+def normalize_string(string):
+    """Normalize string for Quickstatements.
+
+    Strip initial and trailing spaces and convert multiple whitespaces to a
+    single whitespace.
+
+    Parameters
+    ----------
+    string : str
+        String to be normalized.
+
+    Returns
+    -------
+    normalized_string : str
+        Normalized string.
+
+    Examples
+    --------
+    >>> normalize_string(' Finn  Nielsen ')
+    'Finn Nielsen'
+
+    """
+    return re.sub(r'\s+', ' ', string).strip()
 
 
 def paper_to_quickstatements(paper):
@@ -39,34 +64,31 @@ def paper_to_quickstatements(paper):
     """
     qs = u("CREATE\n")
 
+    # Language
+    iso639 = paper.get('iso639', 'en')
+
     if 'title' in paper and paper['title']:
-        title = escape_string(paper['title'])
-
         # "Label must be no more than 250 characters long"
-        short_title = escape_string(title)[:250]
-        while short_title.endswith("\\"):
-            short_title = short_title[:-1]
+        short_title = normalize_string(paper['title'])[:250]
 
+        # Label
         qs += u('LAST\tLen\t"{}"\n').format(short_title)
+
+        # Title property
+        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, short_title)
 
     # Instance of scientific article
     qs += 'LAST\tP31\tQ13442814\n'
 
-    # Title
-    iso639 = 'en'
-    if 'iso639' in paper:
-        iso639 = paper['iso639']
-    if 'title' in paper and paper['title']:
-        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, title)
-
     # DOI
     if 'doi' in paper:
-        qs += u('LAST\tP356\t"{}"\n').format(escape_string(paper['doi']))
+        qs += u('LAST\tP356\t"{}"\n').format(paper['doi'])
 
     # Authors
     if 'authors' in paper:
         for n, author in enumerate(paper['authors'], start=1):
-            qs += u('LAST\tP2093\t"{}"\tP1545\t"{}"\n').format(author, n)
+            qs += u('LAST\tP2093\t"{}"\tP1545\t"{}"\n').format(
+                normalize_string(author), n)
 
     # Published in
     if 'date' in paper:
@@ -90,14 +112,14 @@ def paper_to_quickstatements(paper):
 
     # Volume
     if 'volume' in paper:
-        qs += u('LAST\tP478\t"{}"\n').format(escape_string(paper['volume']))
+        qs += u('LAST\tP478\t"{}"\n').format(paper['volume'])
 
     # Issue
     if 'issue' in paper:
-        qs += u('LAST\tP433\t"{}"\n').format(escape_string(paper['issue']))
+        qs += u('LAST\tP433\t"{}"\n').format(paper['issue'])
 
     if 'pages' in paper:
-        qs += u('LAST\tP304\t"{}"\n').format(escape_string(paper['pages']))
+        qs += u('LAST\tP304\t"{}"\n').format(paper['pages'])
 
     if 'number_of_pages' in paper:
         qs += u('LAST\tP1104\t{}\n').format(paper['number_of_pages'])
@@ -154,25 +176,21 @@ def proceedings_to_quickstatements(proceedings):
     """
     qs = u("CREATE\n")
 
-    if 'title' in proceedings and proceedings['title']:
-        title = escape_string(proceedings['title'])
-
-        # "Label must be no more than 250 characters long"
-        short_title = escape_string(title)[:250]
-        while short_title.endswith("\\"):
-            short_title = short_title[:-1]
-
-        qs += u('LAST\tLen\t"{}"\n').format(short_title)
-
-    # Instance of proceedings
-    qs += 'LAST\tP31\tQ1143604\n'
-
     # Language
     iso639 = proceedings.get('iso639', 'en')
 
-    # Title
     if 'title' in proceedings and proceedings['title']:
-        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, title)
+        # "Label must be no more than 250 characters long"
+        short_title = proceedings['title'][:250]
+
+        # Label
+        qs += u('LAST\tLen\t"{}"\n').format(short_title)
+
+        # Title property
+        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, short_title)
+
+    # Instance of proceedings
+    qs += 'LAST\tP31\tQ1143604\n'
 
     if 'shortname' in proceedings:
         qs += u('LAST\tP1813\t{}:"{}"\n').format(
@@ -184,7 +202,7 @@ def proceedings_to_quickstatements(proceedings):
 
     # DOI
     if 'doi' in proceedings:
-        qs += u('LAST\tP356\t"{}"\n').format(escape_string(proceedings['doi']))
+        qs += u('LAST\tP356\t"{}"\n').format(proceedings['doi'])
 
     # Authors
     if 'authors' in proceedings:
@@ -215,17 +233,14 @@ def proceedings_to_quickstatements(proceedings):
 
     # Volume
     if 'volume' in proceedings:
-        qs += u('LAST\tP478\t"{}"\n').format(
-            escape_string(proceedings['volume']))
+        qs += u('LAST\tP478\t"{}"\n').format(proceedings['volume'])
 
     # Issue
     if 'issue' in proceedings:
-        qs += u('LAST\tP433\t"{}"\n').format(
-            escape_string(proceedings['issue']))
+        qs += u('LAST\tP433\t"{}"\n').format(proceedings['issue'])
 
     if 'pages' in proceedings:
-        qs += u('LAST\tP304\t"{}"\n').format(
-            escape_string(proceedings['pages']))
+        qs += u('LAST\tP304\t"{}"\n').format(proceedings['pages'])
 
     if 'number_of_pages' in proceedings:
         qs += u('LAST\tP1104\t{}\n').format(proceedings['number_of_pages'])
