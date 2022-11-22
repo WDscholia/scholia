@@ -13,10 +13,18 @@ WITH {
   } 
 } AS %researchers
 WITH {
+  SELECT DISTINCT ?researcher ?until WHERE {
+    INCLUDE %researchers
+    MINUS { ?researcher p:P108 ?statement . ?statement ps:P108 target: ; pq:P582 ?until . FILTER ( ?until < NOW() ) }
+    MINUS { ?researcher p:P463 ?statement . ?statement ps:P463 target: ; pq:P582 ?until . FILTER ( ?until < NOW() ) }
+    MINUS { ?researcher p:P1416 ?statement . ?statement ps:P1416 target: ; pq:P582 ?until . FILTER ( ?until < NOW() ) }
+  } 
+} AS %researchers2
+WITH {
   SELECT
     (COUNT(?work) AS ?number_of_works_) ?researcher
   WHERE {
-    INCLUDE %researchers
+    INCLUDE %researchers2
 
     # No biological pathways; they skew the statistics too much 
     MINUS { ?work wdt:P31 wd:Q4915012 } 
@@ -33,5 +41,5 @@ WHERE {
   OPTIONAL { ?researcher wikibase:sitelinks ?wikis_ }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
 }
-GROUP BY ?researcher ?researcherLabel ?researcherDescription 
+GROUP BY ?researcher ?researcherLabel ?researcherDescription
 ORDER BY DESC(?works)
