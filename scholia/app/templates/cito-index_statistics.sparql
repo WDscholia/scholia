@@ -78,7 +78,7 @@ WHERE {
   UNION
   {
     INCLUDE %citoJournalsExplicit
-    BIND("Number of journals with explicit CiTO annotation" AS ?description)
+    BIND("Number of venues with explicit CiTO annotation" AS ?description)
   }
 }
 ORDER BY DESC(?count)
