@@ -1,0 +1,7 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT ?item ?itemLabel ?itemDescription
+WHERE {
+  target: wdt:P859 ?item .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}

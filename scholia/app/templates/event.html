@@ -15,7 +15,8 @@
 {{ sparql_to_table('uses') }}
 {{ sparql_to_iframe('co-authors') }}
 {{ sparql_to_iframe('timeline') }}
- 
+{{ sparql_to_table('sponsors') }}
+
 {% endblock %}
 
 
@@ -38,6 +39,10 @@
 <div class="embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" id="co-authors-iframe"></iframe>
 </div>
+
+<h2 id="sponsors">Sponsors</h2>
+
+<table class="table table-hover" id="sponsors-table"></table>
 
 
 <h2 id="timeline">Timeline</h2>
