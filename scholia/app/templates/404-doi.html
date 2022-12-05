@@ -21,7 +21,7 @@ try {
   if (error.message.includes("status code 404")) {
     $( '#qs' ).append( "DOI does not exist" )
   } else {
-    console.log(error)
+    console.error(error)
   }
 }
 </script>

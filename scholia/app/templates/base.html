@@ -344,7 +344,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	             bioschemasAnnotation.smiles = smiles.replace("\"", "\'\'") ;
 		 }
 		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	     } catch(e) { console.log("Exception: " + e)
+	     } catch(e) { console.error("Exception: " + e)
 	     }
 	 } else if (item.claims.P352) { // UniProt ID
 	     try { /* Protein */
@@ -361,7 +361,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	       bioschemasAnnotation.name = item.labels.en.value;
          }
 		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	     } catch(e) { console.log("Exception: " + e)
+	     } catch(e) { console.error("Exception: " + e)
 	     }
 	 } else if (item.claims.P351 || item.claims.P594) { // NCBI Gene or Ensembl
 	     try { /* Gene */
@@ -387,7 +387,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	             bioschemasAnnotation.sameAs[counter] = "http://identifiers.org/ensembl/" + ensembl;
 		 }
 		 $( '#bioschemas' ).append( JSON.stringify(bioschemasAnnotation) );
-	     } catch(e) { console.log("Exception: " + e)
+	     } catch(e) { console.error("Exception: " + e)
 	     }
 	 }
 	 
@@ -406,7 +406,9 @@ askQuery("{{ panel }}", `# tool: scholia
 	       var html = " (<a href=\"" + wikipediaUrl + "\">Read more on English Wikipedia</a>)";
 		 $("#intro").text(data.extract).append(html);
 	     }).catch(error => {
-		 console.error('Error:', error);
+		 var html = "<a href=\"" + wikipediaUrl + "\">View on English Wikipedia</a>";
+         $("#intro").append(html);
+		 console.error('Could not get summary from enwiki: ', error);
 	     });
 	 }
 
@@ -431,6 +433,8 @@ askQuery("{{ panel }}", `# tool: scholia
 		 }
 		 $("#wikiversity-extract").text(text).append(html);
 	     }).fail(function(d, textStatus, error) {
+		 var html = "Read on the <a href=\"" + wikiversityUrl + "\">English Wikiversity</a>";
+		 $("#wikiversity-extract").append(html);
 		 console.error("getJSON failed, status: " + textStatus + ", error: "+error)
 	     });
 	 }
@@ -546,8 +550,12 @@ askQuery("{{ panel }}", `# tool: scholia
             if (data.results.bindings.length > 1) {
               addDropdownList("aspect-chooser", 'aspectMenuList', currentSubAspect, data)
             }
-          })
+          }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Subaspect chooser failed to generate. " + textStatus + " " + errorThrown)
+          });
         }
+      }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.error("Aspect chooser failed to generate. " + textStatus + " " + errorThrown)
       });
 
       function createDropdownButton(parent, id, currentAspect, data, q) {        
@@ -639,7 +647,10 @@ askQuery("{{ panel }}", `# tool: scholia
 		 });
 	     });
 	     $( '#wembedder' ).append( '<hr>' );
-	 }
+	 },
+	 error: function (jqXHR, textStatus, errorThrown) {
+         console.error("Wembedder failed. " + textStatus + " " + errorThrown)
+	 },
      });
   {% endif %}
 
@@ -688,6 +699,9 @@ askQuery("{{ panel }}", `# tool: scholia
             } else {
               callback([])
             }
+          }).fail(function (jqXHR, textStatus, errorThrown) {
+            callback(["Search failed"])
+            console.error("Search failed. " + textStatus + " " + errorThrown)
           });
         }, 200)
       }
