@@ -432,7 +432,10 @@ function sparqlToIframe(sparql, element, filename) {
                     '</a>' +
                 '</span>'
             );
-        }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error(filename + " iFrame query failed. " + textStatus + " " + errorThrown)
+        },
     });
 }
 
@@ -665,5 +668,12 @@ function askQuery(panel, askQuery, callback) {
                 document.querySelector("li a[href='#" + elem.id + "']").parentElement.classList.add("d-none");
             }
         }
-    });
+     }).fail(function (jqXHR, textStatus, errorThrown) {
+        // hide from table of contents
+        var headings = document.querySelectorAll("#" + panel + " h2, #" + panel + " h3");
+        for (var elem of headings) {
+            document.querySelector("li a[href='#" + elem.id + "']").parentElement.classList.add("d-none");
+        }
+        console.error("Ask query failed. " + textStatus + " " + errorThrown)
+     });
 }
