@@ -1,7 +1,8 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?item ?itemLabel ?itemDescription
+SELECT ?sponsor ?sponsorLabel ?sponsorUrl ?sponsorDescription
 WHERE {
-  target: wdt:P859 ?item .
+  target: wdt:P859 ?sponsor .
+  BIND(CONCAT("/sponsor/", SUBSTR(STR(?sponsor), 32)) AS ?sponsorUrl)
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
