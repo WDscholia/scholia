@@ -39,6 +39,7 @@ WITH {
         [] wdt:P2093 ?author ;
            (wdt:P2283 | wdt:P4510) / wdt:P279* wd:{{ q }} .
       }
+      LIMIT 100000
     }
     UNION
     {
@@ -47,6 +48,7 @@ WITH {
         [] wdt:P2860 / wdt:P2093 ?author ;
            (wdt:P2283 | wdt:P4510) / wdt:P279* wd:{{ q }} .
       }
+      LIMIT 100000
     }
   }
   GROUP BY ?author
