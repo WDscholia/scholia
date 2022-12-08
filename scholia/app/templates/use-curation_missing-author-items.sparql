@@ -17,6 +17,7 @@ WITH {
   SELECT DISTINCT ?work WHERE {
     ?work (wdt:P2283 | wdt:P4510) / wdt:P279* wd:{{ q }} .
   }
+  LIMIT 100000
 } AS %works
 WITH {
   SELECT
@@ -61,5 +62,5 @@ WHERE {
   # Label the result
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
-ORDER BY DESC(?count) DESC(?score)
+ORDER BY DESC(?score) DESC(?count) 
 LIMIT 500
