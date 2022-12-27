@@ -1,0 +1,40 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT ?description ?value ?valueUrl
+WHERE {
+  BIND(target: AS ?work)
+  {
+    BIND(1 AS ?order)
+    BIND("Part of series" AS ?description)
+    ?work wdt:P179 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../event-series/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    BIND(2 AS ?order)
+    BIND("Short name" AS ?description)
+    ?work wdt:P1813 ?value .
+  }
+  UNION
+  {
+    SELECT
+      (3 AS ?order)
+      ("Organizers" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      target: wdt:P664 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      ?iri rdfs:label ?value_string .
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+} 
+ORDER BY ?order
