@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?citations ?work ?workLabel
+SELECT ?citations ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
 WITH {
   SELECT ?work (COUNT(DISTINCT ?statement) AS ?count) WHERE {
     ?work wdt:P50 target: .
