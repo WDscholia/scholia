@@ -15,7 +15,7 @@ WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P235 []. }
 } AS %inchikeys
 WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3636 []. }
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3636 | wdt:P11375 []. }
 } AS %crystalStructures
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6689 []. }
