@@ -108,6 +108,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	 if ('en' in item.labels) {
 	     var title = item.labels.en.value
 	     $("#h1").text(title);
+	     $(".self").text(title);
        $("title").text(title + " - Scholia");
 
 	     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
