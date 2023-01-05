@@ -230,6 +230,13 @@ askQuery("{{ panel }}", `# tool: scholia
 	     socialMediaLink(detailsList, user, site, logo);
 	 }
 
+	 if ("P2037" in item.claims) {
+	     var user = {name: item.claims.P2037[0].mainsnak.datavalue.value, prefix: "@"};
+	     var site = { name: "GitHub", url: "https://github.com/" };
+	     var logo = { src: "{{ url_for('static', filename='images/github.svg') }}" };
+	     socialMediaLink(detailsList, user, site, logo);
+	 }
+
 	 if ("P6782" in item.claims) {
 	     var user = { name: item.claims.P6782[0].mainsnak.datavalue.value, prefix: 'https://ror.org/' };
 	     var site = { name: "Research Organization Registry", url: 'https://ror.org/' };
