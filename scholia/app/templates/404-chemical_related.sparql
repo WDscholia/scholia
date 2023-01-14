@@ -1,5 +1,12 @@
 SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WITH {
   SELECT ?mol ?InChIKey WHERE {
+    SERVICE wikibase:mwapi {
+        bd:serviceParam wikibase:endpoint "www.wikidata.org";
+        wikibase:api "Search";
+        mwapi:srsearch "_shortkey_ haswbstatement:P235";
+        mwapi:srlimit "max".
+        ?mol wikibase:apiOutputItem mwapi:title.
+      }
     ?mol wdt:P235 ?InChIKey .
     FILTER (regex(str(?InChIKey), "^_shortkey_"))
   }
