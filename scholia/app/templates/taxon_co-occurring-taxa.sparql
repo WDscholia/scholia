@@ -1,7 +1,7 @@
 #title: Taxa that co-occur with the target taxon in the literature
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?count (CONCAT("/topics/Q41407,", SUBSTR(STR(?taxon), 32)) AS ?countUrl)
+SELECT ?count (CONCAT("/topics/",SUBSTR(STR(target:), 32), ",", SUBSTR(STR(?taxon), 32)) AS ?countUrl)
        ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl)
        ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
 WITH {
