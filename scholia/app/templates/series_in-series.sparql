@@ -1,13 +1,21 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?publication_date ?number_of_papers ?short_name ?collection ?collectionLabel
+SELECT ?publication_date ?number_of_papers ?short_name ?ordinal ?collection ?collectionLabel
 WITH {
-  SELECT (COUNT(?work) AS ?number_of_papers) (MIN(?datetimes) AS ?publication_datetime) (SAMPLE(?short_name_) AS ?short_name) ?collection
+  SELECT
+    (COUNT(?work) AS ?number_of_papers)
+    (MIN(?datetimes) AS ?publication_datetime)
+    (SAMPLE(?short_name_) AS ?short_name)
+    ?collection
+    (SAMPLE(?ordinal) AS ?ordinal)
   WHERE {
     ?collection wdt:P179 target: .
     OPTIONAL { ?work wdt:P1433 ?collection . }
     OPTIONAL { ?collection wdt:P1813 ?short_name_ . }
     OPTIONAL { ?collection wdt:P577 ?datetimes . }
+    OPTIONAL{
+      ?collection p:P179/pq:P1545 ?ordinal.
+    }
   }
   GROUP BY ?collection
 } AS %result
