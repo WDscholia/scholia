@@ -6,7 +6,7 @@
 
 {{ sparql_to_table_post('data') }}
 {{ sparql_to_table('recent-works') }}
-
+{{ sparql_to_table('used-ontologies') }}
 
 {% endblock %}
 
@@ -23,6 +23,10 @@
 <div id="details"></div>
 
 <table class="table table-hover" id="data-table"></table>
+
+<h2 id="used-ontologies">Used ontologies</h2>
+
+<table class="table table-hover" id="used-ontologies-table"></table>
 
 <h2 id="recent-works">Recent work using the ontology</h2>
 
