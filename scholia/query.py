@@ -1232,6 +1232,23 @@ def q_to_class(q):
         class_ = 'chemical_class'
     elif set(classes).intersection([
             'Q324254',  # ontology
+            'Q1437388',   # formal ontology
+            'Q1925081',   # meta-modeling
+            'Q3882785',   # upper ontology
+            'Q6546616',   # lightweight ontology
+            'Q6822257',   # Meta-ontology
+            'Q7247296',   # process ontology
+            'Q7554009',   # soft ontology
+            'Q7977959',   # weak ontology
+            'Q56316737',  # domain ontology
+            'Q56316739',  # task ontology
+            'Q56316745',  # application ontology
+            'Q62210692',  # OWL ontology
+            'Q81314568',  # OBO Foundry ontology
+            'Q96626931',  # disaster ontology
+            'Q105846678', # unit ontology
+            'Q113006088', # orphaned ontology
+            'Q113006099', # inactive ontology
             ]):
         class_ = 'ontology'
     elif set(classes).intersection([
