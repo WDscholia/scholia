@@ -1,0 +1,48 @@
+# tool: scholia
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT ?description ?value ?valueUrl
+WHERE {
+  BIND(target: AS ?ontology)
+  {
+    BIND(1 AS ?order)
+    BIND("Website" AS ?description)
+    ?ontology wdt:P856 ?value .
+    BIND(?value AS ?valueUrl)
+  }
+  UNION
+  {
+    SELECT
+      (2 AS ?order)
+      ("Authors" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      target: wdt:P50 | wdt:P767 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      ?iri rdfs:label ?value_string . 
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    SELECT
+      (3 AS ?order)
+      ("License" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../topic/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      target: wdt:P275 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      ?iri rdfs:label ?value_string . 
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+} 
+ORDER BY ?order

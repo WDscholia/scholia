@@ -4,6 +4,7 @@
 
 {% block in_ready %}
 
+{{ sparql_to_table_post('data') }}
 {{ sparql_to_table('recent-works') }}
 
 
@@ -18,6 +19,8 @@
 <h1 id="h1">Ontology</h1>
 
 <div id="intro"></div>
+
+<div id="details"></div>
 
 <table class="table table-hover" id="data-table"></table>
 
