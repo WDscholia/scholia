@@ -141,10 +141,11 @@ def metadata_to_quickstatements(metadata):
     # arXiv ID
     qs += u'LAST\tP818\t"{}"'.format(metadata['arxiv'])
 
-    # arXiv classifications such as "cs.LG"
+    # arXiv classifications such as "cs.LG", as qualifier to arXiv ID
     for classification in metadata['arxiv_classifications']:
-        qs += u'\tP820\t"{}"\n'.format(
+        qs += u'\tP820\t"{}"'.format(
             classification.replace('"', '\"'))
+    qs += u"\n"
 
     for n, authorname in enumerate(metadata['authornames'], start=1):
         qs += u'LAST\tP2093\t"{}"\tP1545\t"{}"\n'.format(
