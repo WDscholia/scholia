@@ -14,7 +14,24 @@ WHERE {
   {
     SELECT
       (2 AS ?order)
-      ("Authors" AS ?description)
+      ("Maintainer(s)" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      target: wdt:P126 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q)
+      ?iri rdfs:label ?value_string .
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    SELECT
+      (3 AS ?order)
+      ("Contributors" AS ?description)
       (GROUP_CONCAT(?value_; separator=", ") AS ?value)
       (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
     {
@@ -30,7 +47,7 @@ WHERE {
   UNION
   {
     SELECT
-      (3 AS ?order)
+      (4 AS ?order)
       ("License" AS ?description)
       (GROUP_CONCAT(?value_; separator=", ") AS ?value)
       (CONCAT("../topic/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
@@ -44,5 +61,5 @@ WHERE {
     }
     GROUP BY ?dummy
   }
-} 
+}
 ORDER BY ?order
