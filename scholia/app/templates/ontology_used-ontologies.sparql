@@ -1,4 +1,3 @@
-# tool: scholia
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
