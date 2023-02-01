@@ -1126,22 +1126,22 @@ def q_to_class(q):
             'Q1980247',  # chapter
             'Q3331189',  # edition
             'Q4119870',  # academic writing
-            'Q5707594',  # news article
-            'Q10870555',  # report
-            'Q10885494',  # scientific conference paper
-            'Q13442814',  # scholarly article
-            'Q7318358',  # review article
-            'Q15621286',  # intellectual work
-            'Q17928402',  # blog post
-            'Q21481766',  # academic chapter
-            'Q23927052',  # conference article
-            'Q30070590',  # magazine article
-            'Q47461344',  # written work
-            'Q54670950',  # conference poster
-            'Q56119332',  # tweet
-            'Q58632367',  # conference abstract
-            'Q64548048',  # environmental impact assessment report
-            'Q110716513', # scholarly letter/reply
+            'Q5707594',    # news article
+            'Q10870555',   # report
+            'Q10885494',   # scientific conference paper
+            'Q13442814',   # scholarly article
+            'Q7318358',    # review article
+            'Q15621286',   # intellectual work
+            'Q17928402',   # blog post
+            'Q21481766',   # academic chapter
+            'Q23927052',   # conference article
+            'Q30070590',   # magazine article
+            'Q47461344',   # written work
+            'Q54670950',   # conference poster
+            'Q56119332',   # tweet
+            'Q58632367',   # conference abstract
+            'Q64548048',   # environmental impact assessment report
+            'Q110716513',  # scholarly letter/reply
     ]):
         class_ = 'work'
     elif set(classes).intersection([
