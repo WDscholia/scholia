@@ -94,5 +94,22 @@ WHERE {
     }
     GROUP BY ?dummy
   }
+  UNION
+  {
+    SELECT
+      (7 AS ?order)
+      ("🛑 Replaced by" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      ?iri wdt:P1365 target: .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q)
+      ?iri rdfs:label ?value_string .
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
 }
 ORDER BY ?order
