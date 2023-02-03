@@ -127,8 +127,6 @@ def metadata_to_quickstatements(metadata):
     # No line break, to accommodate the following qualifiers
 
     # arXiv classifications such as "cs.LG", as qualifier to arXiv ID
-    # This does not yet handle errors that may arise when classifications
-    # are missing.
     for classification in metadata['arxiv_classifications']:
         qs += u'\tP820\t"{}"'.format(
             classification.replace('"', '\"'))
