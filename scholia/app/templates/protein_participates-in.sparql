@@ -1,13 +1,13 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?type ?complex ?complexLabel
+SELECT ?type ?complex_or_process ?complex_or_processLabel
 WITH {
-  SELECT DISTINCT ?type ?complex WHERE {
+  SELECT DISTINCT ?type ?complex_or_process WHERE {
     VALUES ?part { target: }
     VALUES ?process { wd:Q2996394 wd:Q4915012 }
-    { ?part ^wdt:P527 ?complex . ?complex wdt:P31 wd:Q22325163 ; BIND ("complex" AS ?type ) }
+    { ?part ^wdt:P527 ?complex_or_process . ?complex_or_process wdt:P31 wd:Q22325163 ; BIND ("complex" AS ?type ) }
     UNION
-    { ?part ^wdt:P527 ?complex . ?complex wdt:P31 ?process ; BIND ("biological process" AS ?type ) }
+    { ?part ^wdt:P527 ?complex_or_process . ?complex_or_process wdt:P31 ?process ; BIND ("biological process" AS ?type ) }
   }
 } AS %result
 WHERE {
