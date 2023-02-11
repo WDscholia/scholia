@@ -70,6 +70,10 @@ def entity_to_smiles(entity):
         smiles = statement['mainsnak']['datavalue']['value']
         return smiles
 
+    for statement in entity['claims'].get('P10718', []):
+        smiles = statement['mainsnak']['datavalue']['value']
+        return smiles
+
     return ''
 
 
