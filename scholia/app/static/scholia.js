@@ -643,7 +643,7 @@ function sparqlToPathWayPageViewer(sparql, filename){
 
 function sparqlToShortInchiKey(sparql, key,  element, filename) {
     var shortkey = key.substring(0,14);
-    var new_sparql = sparql.replace("_shortkey_",shortkey);
+    var new_sparql = sparql.replaceAll("_shortkey_", shortkey);
     sparqlToDataTable(new_sparql, element, filename);
 }
 
