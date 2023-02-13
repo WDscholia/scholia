@@ -1136,6 +1136,7 @@ def q_to_class(q):
             'Q21481766',   # academic chapter
             'Q23927052',   # conference article
             'Q30070590',   # magazine article
+            'Q45182324',  # retracted article
             'Q47461344',   # written work
             'Q54670950',   # conference poster
             'Q56119332',   # tweet
