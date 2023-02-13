@@ -18,8 +18,6 @@
 <h1 id="h1">Chemical</h1>
 <script type="application/ld+json" id="bioschemas"></script>
 
-{% if third_parties_enabled %}
-
 <div class="card-deck mb-3">
     <div class="card mb-4 box-shadow">
 	<div class="card-body">
@@ -29,18 +27,12 @@
 
     <div class="card mb-4 box-shadow">
 	<div class="card-body">
-	    <img src="http://www.simolecule.com/cdkdepict/depict/bow/svg?smi={{smiles}}&abbr=on&hdisp=bridgehead&showtitle=false&zoom=2&annotate=cip" />
+	    <img src="http://cdkdepict.toolforge.org/depict/bow/svg?smi={{smiles|urlencode}}&abbr=on&hdisp=bridgehead&showtitle=false&zoom=2&annotate=cip" />
 	</div>
     </div>
 </div>
 
-{% else %}
-
-<div id="intro"></div>
-
 <div id="wembedder"></div>
-
-{% endif %}
 
 <h2 id="structural-identifiers">Structural Information</h2>
 
