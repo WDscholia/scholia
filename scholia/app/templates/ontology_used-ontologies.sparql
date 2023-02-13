@@ -1,0 +1,12 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT
+  (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+  (CONCAT("../ontology/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+WHERE {
+  target: wdt:P2283 ?usedOntology .
+  BIND(SUBSTR(STR(?usedOntology), 32) AS ?q)
+  ?usedOntology rdfs:label ?value_string .
+  FILTER (LANG(?value_string) = 'en')
+  BIND(COALESCE(?value_string, ?q) AS ?value_)
+} GROUP BY ?usedOntology
