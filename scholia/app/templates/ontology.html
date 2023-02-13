@@ -4,8 +4,11 @@
 
 {% block in_ready %}
 
+{{ sparql_to_table_post('data') }}
 {{ sparql_to_table('recent-works') }}
-
+{{ sparql_to_iframe('reuse-graph') }}
+{{ sparql_to_table('used-ontologies') }}
+{{ sparql_to_table('used-by-ontologies') }}
 
 {% endblock %}
 
@@ -19,7 +22,23 @@
 
 <div id="intro"></div>
 
+<div id="details"></div>
+
 <table class="table table-hover" id="data-table"></table>
+
+<h2 id="ontology-reuse">Ontology reuse</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" id="reuse-graph-iframe"></iframe>
+</div>
+
+<h3 id="used-ontologies">Used ontologies</h3>
+
+<table class="table table-hover" id="used-ontologies-table"></table>
+
+<h3 id="used-by-ontologies">Used by ontologies</h3>
+
+<table class="table table-hover" id="used-by-ontologies-table"></table>
 
 <h2 id="recent-works">Recent work using the ontology</h2>
 
