@@ -7,6 +7,8 @@ Usage:
 
 from collections import OrderedDict
 
+from .query import SPARQL_ENDPOINT
+
 import requests
 
 
@@ -34,7 +36,7 @@ def write_pajek_from_sparql(filename, sparql):
     column1 = 'item1'
     column2 = 'item2'
 
-    url = 'https://query.wikidata.org/sparql'
+    url = SPARQL_ENDPOINT
     params = {'query': sparql, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()['results']['bindings']

@@ -49,6 +49,8 @@ from re import sub
 
 from six import u
 
+from .query import SPARQL_ENDPOINT
+
 
 WORK_ITEM_RSS = u("""
     <item>
@@ -307,7 +309,7 @@ def wb_get_author_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = AUTHOR_WORKS_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/sparql'
+    url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
 
