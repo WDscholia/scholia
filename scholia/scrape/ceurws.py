@@ -30,7 +30,7 @@ from lxml import etree
 import requests
 
 from ..qs import paper_to_quickstatements, proceedings_to_quickstatements
-from ..query import iso639_to_q
+from ..query import iso639_to_q, SPARQL_ENDPOINT as WDQS_URL
 from ..utils import escape_string, pages_to_number_of_pages
 
 
@@ -55,10 +55,6 @@ SELECT ?paper WHERE {{
   BIND(COALESCE(?full_text_url, ?url) AS ?paper)
 }}
 """)
-
-
-# SPARQL Endpoint for Wikidata Query Service
-WDQS_URL = 'https://query.wikidata.org/sparql'
 
 
 def url_to_volume(url):
