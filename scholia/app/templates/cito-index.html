@@ -10,7 +10,7 @@
 {{ sparql_to_table('cited-journal-counts') }}
 {{ sparql_to_table('statistics') }}
 {{ sparql_to_iframe('articles-by-year') }}
-{{ sparql_to_table('articles') }}
+{{ sparql_to_table('recent-articles') }}
 
 {% endblock %}
 
@@ -25,15 +25,17 @@ Page with general info about CiTO annotation in Wikidata.
 
 <table class="table table-hover" id="statistics-table"></table>
 
-<h2 id="articles-by-year">Number of articles with CiTO-annotated citations by year</h2>
+<h2 id="articles">Articles</h2>
+
+<h3 id="articles-by-year">Number of articles with CiTO-annotated citations by year</h3>
 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" id="articles-by-year-iframe"></iframe>
 </div>
 
-<h3 id="articles-header">Recent articles with explicit CiTO-annotation</h2>
+<h3 id="recent-articles">Recent articles with explicit CiTO-annotation</h3>
 
-<table class="table table-hover" id="articles-table"></table>
+<table class="table table-hover" id="recent-articles-table"></table>
 
 <h2 id="article-counts">Use of the various CiTO intentions</h2>
 
@@ -42,11 +44,13 @@ in the total number of citations and in a number of different articles.
 
 <table class="table table-hover" id="article-counts-table"></table>
 
-<h2 id="journal-counts">Journals and how many CiTO-annotated citations they have</h2>
+<h2 id="journals">Journals</h2>
+
+<h3 id="journal-counts">Journals and how many CiTO-annotated citations they have</h3>
 
 <table class="table table-hover" id="journal-counts-table"></table>
 
-<h2 id="cited-journal-counts">Cited journals and how many CiTO-annotated citations they received</h2>
+<h3 id="cited-journal-counts">Cited journals and how many CiTO-annotated citations they received</h3>
 
 <table class="table table-hover" id="cited-journal-counts-table"></table>
 
