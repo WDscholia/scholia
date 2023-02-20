@@ -10,6 +10,7 @@
 {{ sparql_to_table('cited-journal-counts') }}
 {{ sparql_to_table('statistics') }}
 {{ sparql_to_iframe('articles-by-year') }}
+{{ sparql_to_table('articles') }}
 
 {% endblock %}
 
@@ -29,6 +30,10 @@ Page with general info about CiTO annotation in Wikidata.
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" id="articles-by-year-iframe"></iframe>
 </div>
+
+<h3 id="articles-header">Recent articles with explicit CiTO-annotation</h2>
+
+<table class="table table-hover" id="articles-table"></table>
 
 <h2 id="article-counts">Use of the various CiTO intentions</h2>
 

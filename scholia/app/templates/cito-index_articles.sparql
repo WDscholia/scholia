@@ -1,0 +1,9 @@
+select distinct ?date ?work ?workLabel ?venue ?venueLabel where {
+  ?work wdt:P577 ?dates ;
+        p:P2860 / pq:P3712 / wdt:P31 wd:Q96471816 .
+  BIND(xsd:date(?dates) AS ?date)
+  ?work wdt:P31 wd:Q109229154 . bind("explicit" as ?type_)
+  ?work wdt:P1433 ?venue .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY DESC(?date)
+  LIMIT 50
