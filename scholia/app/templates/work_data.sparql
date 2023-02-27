@@ -220,7 +220,7 @@ WHERE {
     BIND(30 AS ?order)
     BIND("⚠️ Preprint of" AS ?description)
     { ?work p:P31 ?statement .
-      ?statement pq:P642 ?pub .
+      ?statement pq:P642 ?pub ; ps:P31 wd:Q580922 .
     BIND(SUBSTR(STR(?pub), 32) AS ?pubqid) 
     ?pub rdfs:label ?value_string . 
     FILTER (LANG(?value_string) = 'en')
@@ -247,9 +247,36 @@ WHERE {
     BIND(32 AS ?order)
     BIND("Preprint" AS ?description)
     { ?preprint p:P31 ?statement .
-      ?statement pq:P642 ?work .
+      ?statement pq:P642 ?work ; ps:P31 wd:Q580922 .
     BIND(SUBSTR(STR(?preprint), 32) AS ?pubqid)
     ?preprint rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?pubqid) AS ?value)
+    BIND(CONCAT("../work/", ?pubqid) AS ?valueUrl)}
+  }
+  UNION
+  {
+    BIND(33 AS ?order)
+    BIND("⚠️ Erratum of" AS ?description)
+    { ?work p:P31 ?statement .
+      ?statement pq:P642 ?pub ; ps:P31 wd:Q1348305 .
+    BIND(SUBSTR(STR(?pub), 32) AS ?pubqid)
+    ?pub rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?pubqid) AS ?value)
+    BIND(CONCAT("../work/", ?pubqid) AS ?valueUrl)}
+  }
+  UNION
+  {
+    BIND(34 AS ?order)
+    BIND("⚠️ Retracts" AS ?description)
+    {
+    { ?work p:P31 ?statement .
+      ?statement pq:P642 ?pub ; ps:P31 wd:Q7316896 . }
+    UNION
+    { ?work ^wdt:P5824 ?pub . }
+    BIND(SUBSTR(STR(?pub), 32) AS ?pubqid)
+    ?pub rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
     BIND(COALESCE(?value_string, ?pubqid) AS ?value)
     BIND(CONCAT("../work/", ?pubqid) AS ?valueUrl)}
