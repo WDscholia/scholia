@@ -120,8 +120,20 @@ def metadata_to_quickstatements(metadata):
 
     """
     qs = u"CREATE\n"
-    qs += u'LAST\tP818\t"{}"\n'.format(metadata['arxiv'])
     qs += u'LAST\tP31\tQ13442814\n'
+
+    # arXiv ID
+    qs += u'LAST\tP818\t"{}"'.format(metadata['arxiv'])
+    # No line break, to accommodate the following qualifiers
+
+    # arXiv classifications such as "cs.LG", as qualifier to arXiv ID
+    for classification in metadata['arxiv_classifications']:
+        qs += u'\tP820\t"{}"'.format(
+            classification.replace('"', '\"'))
+
+    # Line break for the P818 statement
+    qs += u"\n"
+
     qs += u'LAST\tLen\t"{}"\n'.format(metadata['title'].replace('"', '\"'))
     qs += u'LAST\tP1476\ten:"{}"\n'.format(
         metadata['title'].replace('"', '\"'))
@@ -138,11 +150,6 @@ def metadata_to_quickstatements(metadata):
     # DOI based on arXiv identifier
     qs += u'LAST\tP356\t"10.48550/ARXIV.{}"\n'.format(
             metadata['arxiv'])
-
-    # arXiv classifications such as "cs.LG"
-    for classification in metadata['arxiv_classifications']:
-        qs += u'LAST\tP820\t"{}"\n'.format(
-            classification.replace('"', '\"'))
 
     for n, authorname in enumerate(metadata['authornames'], start=1):
         qs += u'LAST\tP2093\t"{}"\tP1545\t"{}"\n'.format(
