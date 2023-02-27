@@ -48,7 +48,7 @@ import requests
 
 from ..qs import paper_to_quickstatements
 from ..utils import escape_string
-
+from ..query import SPARQL_ENDPOINT as WDQS_URL
 
 PAPER_TO_Q_QUERY = u("""
 SELECT ?paper WHERE {{
@@ -63,8 +63,6 @@ SELECT ?paper WHERE {{
 URL_BASE = "https://papers.nips.cc"
 
 USER_AGENT = "Scholia"
-
-WDQS_URL = 'https://query.wikidata.org/sparql'
 
 # Year should be the nominal year, - not the year of publication
 YEAR_TO_Q = {

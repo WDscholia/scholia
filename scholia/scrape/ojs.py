@@ -32,7 +32,7 @@ from lxml import etree
 import requests
 
 from ..qs import paper_to_quickstatements
-from ..query import iso639_to_q, issn_to_qs
+from ..query import iso639_to_q, issn_to_qs, SPARQL_ENDPOINT as WDQS_URL
 from ..utils import escape_string, pages_to_number_of_pages
 
 
@@ -57,10 +57,6 @@ SELECT ?paper WHERE {{
   BIND(COALESCE(?full_text_url, ?url) AS ?paper)
 }}
 """)
-
-
-# SPARQL Endpoint for Wikidata Query Service
-WDQS_URL = 'https://query.wikidata.org/sparql'
 
 
 def issue_url_to_paper_urls(url):
