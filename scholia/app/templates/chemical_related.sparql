@@ -19,6 +19,7 @@ SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WITH {
       }
     ?mol wdt:P235 ?InChIKey .
     FILTER (regex(str(?InChIKey), ?filter))
+    FILTER (?InChIKey != ?queryKey)
   }
 } AS %MOLS2 {
   INCLUDE %MOLS2
