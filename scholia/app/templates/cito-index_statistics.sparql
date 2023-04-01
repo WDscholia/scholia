@@ -40,6 +40,11 @@ WITH {
                  wdt:P1433 ?venue .
   }
 } AS %citoJournalsExplicit
+WITH {
+  SELECT (COUNT(DISTINCT ?citoDataset) AS ?count) WHERE {
+    ?citoDataset wdt:P31 wd:Q117357566 .
+  }
+} AS %citoDatasets
 WHERE {
   {
     INCLUDE %annotions
@@ -74,6 +79,11 @@ WHERE {
   {
     INCLUDE %citoArticles
     BIND("Number of article with explicit CiTO annotation" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %citoDatasets
+    BIND("Number of data sets with explicit CiTO annotation" AS ?description)
   }
   UNION
   {
