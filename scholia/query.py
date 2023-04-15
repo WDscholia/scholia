@@ -1303,6 +1303,10 @@ def q_to_class(q):
                    for item in data['results']['bindings']]
 
         if set(parents).intersection([
+                'Q40050',  # drink
+                ]):
+            class_ = 'topic'
+        elif set(parents).intersection([
                 'Q11173',  # chemical compound
                 'Q79529',  # chemical substance
                 ]):
