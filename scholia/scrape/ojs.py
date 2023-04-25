@@ -96,6 +96,10 @@ def issue_url_to_paper_urls(url):
         # This scheme is also used in version 3.2.1.4 of OJS
         # For instance, for https://tidsskrift.dk/bras/issue/view/9150
         urls = tree.xpath("//h3[@class='media-heading']/a/@href")
+    if len(urls) == 0:
+        # For instance, for
+        # https://www.journals.vu.lt/scandinavistica/issue/view/1153
+        urls = tree.xpath("//div[@class='article-summary-title']/a/@href")
     return urls
 
 
