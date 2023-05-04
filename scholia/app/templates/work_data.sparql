@@ -10,6 +10,16 @@ WHERE {
   }
   UNION
   {
+    BIND(1.5 AS ?order)
+    BIND("Type" AS ?description)
+    ?work wdt:P31 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+  }
+  UNION
+  {
     SELECT
       (2 AS ?order)
       ("Authors" AS ?description)
