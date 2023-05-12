@@ -8,7 +8,7 @@ WITH {
           wdt:P50 ?author .
     FILTER (?author != target: )
     ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
-    ?organization (wdt:P625 | (wdt:P159/wdt:P625)) ?geo .
+    ?organization (wdt:P625 | ((wdt:P276|wdt:P159)/wdt:P625)) ?geo .
   }
   GROUP BY ?organization ?geo ?count
   ORDER BY DESC (?count)
