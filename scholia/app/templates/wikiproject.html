@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% set aspect = 'wikiproject' %}
+
+{% block in_ready %}
+
+{{ sparql_to_table("types") }}
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1 id="h1">WikiProject</h1>
+
+<div id="intro"></div>
+
+<h2 title="types" id="types">Types maintained by this WikiProject</h2>
+
+<table class="table table-hover" id="types-table"></table>
+
+
+{% endblock %}

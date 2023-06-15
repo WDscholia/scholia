@@ -1292,6 +1292,8 @@ def q_to_class(q):
             'Q22325163',  # macromolecular complex
             ]):
         class_ = 'complex'
+    elif ('Q16695773' in classes):  # human
+        class_ = 'wikiproject'
     else:
         query = 'select ?class where {{ wd:{q} wdt:P279+ ?class }}'.format(
             q=escape_string(q))

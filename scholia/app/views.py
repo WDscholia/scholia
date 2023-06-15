@@ -2465,6 +2465,24 @@ def show_about():
     return render_template('about.html')
 
 
+@main.route('/wikiproject/' + q_pattern)
+def show_wikiproject(q):
+    """Return rendered HTML page for specific WikiProject.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page for specific WikiProject.
+
+    """
+    return render_template('wikiproject.html', q=q)
+
+
 @main.route('/favicon.ico')
 def show_favicon():
     """Detect and redirect for the favicon.ico."""
