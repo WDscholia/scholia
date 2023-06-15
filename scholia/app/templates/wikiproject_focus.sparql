@@ -1,0 +1,13 @@
+SELECT ?type ?typeLabel ?count WITH {
+    SELECT DISTINCT ?type (COUNT(?item) AS ?count) WHERE {
+    ?item wdt:P5008 wd:{{ q }};
+            (wdt:P31|wdt:P279) ?type.
+    }
+    GROUP BY ?type ?count
+    ORDER BY DESC (?count)
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,sv,uk,zh". }
+}
+ORDER BY DESC (?count)

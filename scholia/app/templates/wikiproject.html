@@ -4,7 +4,9 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table("types") }}
+{{ sparql_to_table("maintained") }}
+
+{{ sparql_to_table("focus") }}
 
 {% endblock %}
 
@@ -16,9 +18,13 @@
 
 <div id="intro"></div>
 
-<h2 title="types" id="types">Types maintained by this WikiProject</h2>
+<h2 id="types">Types maintained by this WikiProject</h2>
 
-<table class="table table-hover" id="types-table"></table>
+<table class="table table-hover" id="maintained-table"></table>
+
+<h2 id="focus">Types on focus list of this WikiProject</h2>
+
+<table class="table table-hover" id="focus-table"></table>
 
 
 {% endblock %}
