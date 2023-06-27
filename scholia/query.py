@@ -320,7 +320,7 @@ def get_prop_value(q, prop):
     >>> q = "Q20895241"  # E Willighagen
     >>> property = "P1026"  # academic thesis
     >>> v = get_prop_value(q, property)
-    >>> v == ["Q25713029"]
+    >>> v == "Q25713029"
     True
 
     """
@@ -335,10 +335,12 @@ def get_prop_value(q, prop):
     try:
         response = requests.get(url, params=params, headers=HEADERS)
         data = response.json()
-        print(data)
     except Exception:
         return []
-    return data['results']['bindings'][0]['value']['value'][31:]
+    if (len(data['results']['bindings']) > 0):
+        return data['results']['bindings'][0]['value']['value'][31:]
+    else:
+        return ""
 
 
 def count_authorships():
