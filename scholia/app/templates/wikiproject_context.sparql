@@ -1,0 +1,54 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ main_subject }}>
+#defaultView:Graph
+SELECT ?node ?nodeLabel ?nodeImage ?childNode ?childNodeLabel ?childNodeImage ?rgb 
+WITH {
+  SELECT DISTINCT ?property WHERE {
+      ?property a wikibase:Property;
+                wdt:P31 wd:Q18610173 ;
+                wdt:P31 wd:Q26940804 . 
+    }
+} AS %properties
+WITH {
+  SELECT DISTINCT ?node ?childNode WHERE {
+      BIND(target: AS ?node)
+      ?node ?p ?i.
+      ?childNode ?x ?p.
+      ?childNode rdf:type wikibase:Property.
+      FILTER(STRSTARTS(STR(?i), "http://www.wikidata.org/entity/Q"))
+      FILTER(STRSTARTS(STR(?childNode), "http://www.wikidata.org/entity/P"))
+    }
+  LIMIT 5000
+} AS %nodes
+WITH {
+  SELECT DISTINCT ?childNode ?node ?rgb WHERE {
+      BIND("EFFBD8" AS ?rgb)
+      target: ?p ?childNode.
+      ?node ?x ?p.
+      ?node rdf:type wikibase:Property.
+      FILTER(STRSTARTS(STR(?childNode), "http://www.wikidata.org/entity/Q"))
+    }
+  LIMIT 5000
+} AS %childNodes
+WHERE {
+  {
+    INCLUDE %nodes
+  }
+  UNION
+  {
+    INCLUDE %childNodes
+  }
+
+  OPTIONAL { 
+    INCLUDE %properties
+    ?property wikibase:directClaim ?nodeclaim.
+    ?node ?nodeclaim ?nodeImage. 
+  }
+
+  OPTIONAL { 
+    INCLUDE %properties
+    ?property wikibase:directClaim ?childNodeclaim.
+    ?childNode ?childNodeclaim ?childNodeImage. 
+  }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+}

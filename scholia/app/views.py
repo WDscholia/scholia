@@ -16,7 +16,7 @@ from ..arxiv import metadata_to_quickstatements, string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      doi_prefix_to_qs, github_to_qs, biorxiv_to_qs,
-                     chemrxiv_to_qs,
+                     chemrxiv_to_qs, get_prop_value,
                      identifier_to_qs, inchikey_to_qs, issn_to_qs, orcid_to_qs,
                      viaf_to_qs, q_to_class, q_to_dois, random_author,
                      twitter_to_qs, cordis_to_qs, mesh_to_qs, pubmed_to_qs,
@@ -2480,7 +2480,8 @@ def show_wikiproject(q):
         Rendered HTML page for specific WikiProject.
 
     """
-    return render_template('wikiproject.html', q=q)
+    main_subject = get_prop_value(q, "P921")
+    return render_template('wikiproject.html', q=q, main_subject=main_subject)
 
 
 @main.route('/favicon.ico')
