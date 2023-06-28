@@ -2480,8 +2480,7 @@ def show_wikiproject(q):
         Rendered HTML page for specific WikiProject.
 
     """
-    main_subject = get_prop_value(q, "P921")
-    return render_template('wikiproject.html', q=q, main_subject=main_subject)
+    return render_template('wikiproject.html', q=q)
 
 
 @main.route('/favicon.ico')

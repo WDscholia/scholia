@@ -1,6 +1,6 @@
 #defaultView:Table
 
-PREFIX target: <http://www.wikidata.org/entity/{{ main_subject }}>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
   ?count
@@ -11,11 +11,9 @@ WITH {
     ?author
     (count(?work) as ?count)
   WHERE {
-    { ?work wdt:P921/wdt:P31*/wdt:P279* target: . }
-    UNION
-    { ?work wdt:P921/wdt:P361+ target: . }
-    UNION
-    { ?work wdt:P921/wdt:P1269+ target: . }
+    { ?work wdt:P6104 target: .}
+      union 
+    { ?work wdt:P5008 target: .}
     ?work wdt:P50 ?author .
   }
   GROUP BY ?author
@@ -27,6 +25,6 @@ WHERE {
           
   # Include optional ORCID iD
   OPTIONAL { ?author wdt:P496 ?orcid_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
 }
 ORDER BY DESC(?count)

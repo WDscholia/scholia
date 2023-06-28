@@ -1,12 +1,15 @@
 #defaultView:Map
 
-PREFIX target: <http://www.wikidata.org/entity/{{ main_subject }}>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?organization ?organizationLabel ?geo ?count ?layer
 WITH {
   SELECT DISTINCT ?work WHERE {
   # Works on the topic
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
+    { ?work wdt:P6104 target: .}
+      union 
+      { ?work wdt:P5008 target: .}
+      ?work wdt:P50 [].
   }
   LIMIT 20000
 } AS %works

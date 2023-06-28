@@ -7,7 +7,6 @@
 {{ sparql_to_table("maintained") }}
 {{ sparql_to_table("focus") }}
 
-{% if main_subject %}
 {{ sparql_to_iframe('context') }}
 {{ sparql_to_table('recently-published-works') }}
 {{ sparql_to_iframe('publications-per-year') }}
@@ -17,23 +16,6 @@
 {{ sparql_to_table('topics') }}
 {{ sparql_to_table('venues') }}
 {{ sparql_to_iframe('organization-map') }}
-{% endif %}
-
-
-var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-    '{{ main_subject }}' +
-    '&format=json&callback=?';
-  
-$.getJSON(url, function (data) {
-  var item = data.entities["{{ main_subject }}"];
-  if ('en' in item.labels) {
-    $("#main-subject").append(': <a href="/topic/{{ main_subject }}">' + item.labels.en.value + '</a>');
-    $("#main-subject").append(' (<a href="https://www.wikidata.org/wiki/{{ main_subject }}">{{ main_subject }}</a>)');
-  } else {
-    $("#main-subject").append(': <a href="https://www.wikidata.org/wiki/{{ main_subject }}">{{ main_subject }}</a>');
-    $("#main-subject").append(' (<a href="/topic/{{ main_subject }}">Topic</a>)');
-  }
-});
 
 {% endblock %}
 
@@ -53,17 +35,15 @@ $.getJSON(url, function (data) {
 
 <table class="table table-hover" id="focus-table"></table>
 
-{% if main_subject %}
-
-<h2 id="main-subject">Main subject</h2> 
-
-<h3 id="context">The topic in context</h3>
+<h2 id="context">The topic in context</h2>
 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" id="context-iframe"></iframe>
 </div>
 
-<h3 id="recently-published-works">Recently published works on the topic <a
+<h2 id="works">Works</h2>
+
+<h3 id="recently-published-works">Recently published works<a
     href="{{ url_for('app.show_topic_index') }}{{ q }}/latest-works/rss"><img height="24" width="48"
       src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h3>
 
@@ -75,27 +55,31 @@ $.getJSON(url, function (data) {
   <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
 </div>
 
-<h3 id="earliest-published-works">Earliest published works on the topic</h3>
+<h3 id="earliest-published-works">Earliest published works</h3>
 
 <table class="table table-hover" id="earliest-published-works-table"></table>
 
-<h3 id="authors">Authors publishing about the topic</h3>
+<h2 id="authors-heading">Authors</h2>
+
+<h3 id="authors">Related authors</h3>
 
 <table class="table table-hover" id="authors-table"></table>
 
-<h3 id="author-awards">Awards received by authors who published on the topic</h3>
+<h3 id="author-awards">Awards received by authors</h3>
 
 <table class="table table-hover" id="author-awards-table"></table>
 
-<h3 id="topics">Co-occurring topics</h3>
+<h2 id="topics">Topics</h2>
+
+<p>From random sample</p>
 
 <table class="table table-hover" id="topics-table"></table>
 
-<h3 id="venues">Venues and series publishing works about the topic</h3>
+<h2 id="venues">Related venues and series</h2>
 
 <table class="table table-hover" id="venues-table"></table>
 
-<h3 id="organization-map">Map of organizations associated with works about the topic</h3>
+<h2 id="organization-map">Map of organizations associated with related works</h2>
 
 The colours indicate how many publications on the topic are associated with organizations in the given location, as
 detailed in the legend (top right).
@@ -104,6 +88,5 @@ detailed in the legend (top right).
   <iframe class="embed-responsive-item" id="organization-map-iframe">
   </iframe>
 </div>
-{% endif %}
 
 {% endblock %}

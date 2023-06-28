@@ -1,6 +1,6 @@
 #defaultView:Table
 
-PREFIX target: <http://www.wikidata.org/entity/{{ main_subject }}>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
        ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
@@ -8,7 +8,9 @@ SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
 WITH {
   SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
     # Find works for the specific queried topic
-	  ?work wdt:P921/( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) target: .
+	  VALUES ?p { wdt:P6104 wdt:P5008 }
+    # Find works for the specific queried topic
+	  SERVICE bd:sample { ?work ?p target: . bd:serviceParam bd:sample.limit 10000 }
     
     # Find co-occuring topics
     ?work wdt:P921 ?topic .
@@ -21,6 +23,6 @@ WITH {
 WHERE {
   # Label the results
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
 }
 ORDER BY DESC(?count)

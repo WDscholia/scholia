@@ -1,4 +1,4 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ main_subject }}>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?count 
 ?award ?awardLabel (CONCAT("/award/", SUBSTR(STR(?award), 32)) AS ?awardUrl)
@@ -11,7 +11,9 @@ WITH {
     { 
       SELECT DISTINCT ?researcher ?award WHERE {
         hint:Query hint:optimizer "None" .
-        ?work wdt:P921 target: .
+        { ?work wdt:P6104 target: .}
+        union 
+        { ?work wdt:P5008 target: .}
         ?work wdt:P50 ?researcher .
         ?researcher wdt:P166 ?award .
       } 

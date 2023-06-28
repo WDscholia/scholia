@@ -267,7 +267,7 @@ def identifier_to_qs(property, identifier):
 
     Notes
     -----
-    The Wikidata Query Service is queries to resolve the given identifier. If
+    The Wikidata Query Service is queried to resolve the given identifier. If
     an error happens an empty list is returned.
 
     Examples
@@ -296,7 +296,7 @@ def identifier_to_qs(property, identifier):
 
 
 def get_prop_value(q, prop):
-    """Given Q and P, return value (which is a Wikidata item)
+    """Given Q and P, return value (which is a Wikidata item).
 
     Parameters
     ----------
@@ -312,7 +312,7 @@ def get_prop_value(q, prop):
 
     Notes
     -----
-    The Wikidata Query Service is queries to resolve the given identifier. If
+    The Wikidata Query Service is queried to resolve the given identifier. If
     an error happens an empty string is returned.
 
     Examples
@@ -328,7 +328,6 @@ def get_prop_value(q, prop):
         q=q,
         prop=prop,
     )
-    print(query)
 
     url = 'https://query.wikidata.org/sparql'
     params = {'query': query, 'format': 'json'}

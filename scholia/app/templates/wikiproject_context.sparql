@@ -1,4 +1,4 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ main_subject }}>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Graph
 SELECT ?node ?nodeLabel ?nodeImage ?childNode ?childNodeLabel ?childNodeImage ?rgb 
 WITH {
