@@ -295,53 +295,6 @@ def identifier_to_qs(property, identifier):
             for item in data['results']['bindings']]
 
 
-def get_prop_value(q, prop):
-    """Given Q and P, return value (which is a Wikidata item).
-
-    Parameters
-    ----------
-    q : str
-        Given QID
-    prop : str
-        Property
-
-    Returns
-    -------
-    v : str
-        qid of value
-
-    Notes
-    -----
-    The Wikidata Query Service is queried to resolve the given identifier. If
-    an error happens an empty string is returned.
-
-    Examples
-    --------
-    >>> q = "Q20895241"  # E Willighagen
-    >>> property = "P1026"  # academic thesis
-    >>> v = get_prop_value(q, property)
-    >>> v == "Q25713029"
-    True
-
-    """
-    query = 'SELECT ?value {{ wd:{q} wdt:{prop} ?value }}'.format(
-        q=q,
-        prop=prop,
-    )
-
-    url = 'https://query.wikidata.org/sparql'
-    params = {'query': query, 'format': 'json'}
-    try:
-        response = requests.get(url, params=params, headers=HEADERS)
-        data = response.json()
-    except Exception:
-        return []
-    if (len(data['results']['bindings']) > 0):
-        return data['results']['bindings'][0]['value']['value'][31:]
-    else:
-        return ""
-
-
 def count_authorships():
     """Count the number of authorships.
 
