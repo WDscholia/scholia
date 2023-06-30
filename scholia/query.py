@@ -1271,7 +1271,7 @@ def q_to_class(q):
             'Q46855',  # hackathon
             'Q625994',  # conference
             'Q2020153',  # scientific conference
-            'Q40444998',  # akademic workshop
+            'Q40444998',  # academic workshop
             ]):
         class_ = 'event'
     elif set(classes).intersection([
