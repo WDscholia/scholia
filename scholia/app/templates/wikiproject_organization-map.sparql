@@ -1,0 +1,37 @@
+#defaultView:Map
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT ?organization ?organizationLabel ?geo ?count ?layer
+WITH {
+  SELECT DISTINCT ?work WHERE {
+  # Works on the topic
+    { ?work wdt:P6104 target: .}
+      union 
+      { ?work wdt:P5008 target: .}
+      ?work wdt:P50 [].
+  }
+  LIMIT 20000
+} AS %works
+WITH {
+  SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+    INCLUDE %works
+    # Authors who have published works on the topic
+    ?work wdt:P50 ?author . 
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
+    # Use the headquarters location by default but keep the coordinate location as a fallback
+    OPTIONAL{?organization p:P159/pq:P625 ?hq_geo}
+    OPTIONAL{?organization wdt:P625 ?coord_geo}
+    BIND(IF(BOUND(?hq_geo), ?hq_geo, ?coord_geo) AS ?geo) .
+    FILTER(BOUND(?geo)) .
+  }
+  GROUP BY ?organization ?geo
+  ORDER BY DESC (?count)
+  LIMIT 2000
+} AS %organizations
+WHERE {
+  INCLUDE %organizations
+  BIND(IF( (?count < 1), "No results", IF((?count < 2), "1 result", IF((?count < 11), "1 < results ≤ 10", IF((?count < 101), "10 < results ≤ 100", IF((?count < 1001), "100 < results ≤ 1000", IF((?count < 10001), "1000 < results ≤ 10000", "10000 or more results") ) ) ) )) AS ?layer )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ }
+ORDER BY DESC (?count)

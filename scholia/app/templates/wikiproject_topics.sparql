@@ -1,0 +1,28 @@
+#defaultView:Table
+
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
+       ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
+       ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
+    # Find works for the specific queried topic
+	  VALUES ?p { wdt:P6104 wdt:P5008 }
+    # Find works for the specific queried topic
+	  SERVICE bd:sample { ?work ?p target: . bd:serviceParam bd:sample.limit 10000 }
+    
+    # Find co-occuring topics
+    ?work wdt:P921 ?topic .
+    
+    # Avoid listing the queried topic
+      FILTER (target: != ?topic)
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  # Label the results
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+}
+ORDER BY DESC(?count)

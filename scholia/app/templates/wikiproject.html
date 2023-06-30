@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% set aspect = 'wikiproject' %}
+
+{% block in_ready %}
+
+{{ sparql_to_table("maintained") }}
+{{ sparql_to_table("focus") }}
+
+{{ sparql_to_iframe('context') }}
+{{ sparql_to_table('recently-published-works') }}
+{{ sparql_to_iframe('publications-per-year') }}
+{{ sparql_to_table('earliest-published-works') }}
+{{ sparql_to_table('authors') }}
+{{ sparql_to_table('author-awards') }}
+{{ sparql_to_table('topics') }}
+{{ sparql_to_table('venues') }}
+{{ sparql_to_iframe('organization-map') }}
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1 id="h1">WikiProject</h1>
+
+<div id="intro"></div>
+
+<h2 id="types">Types of items maintained by this WikiProject</h2>
+
+<table class="table table-hover" id="maintained-table"></table>
+
+<h2 id="focus">Types of items on focus list of this WikiProject</h2>
+
+<table class="table table-hover" id="focus-table"></table>
+
+<h2 id="context">The topic in context</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" id="context-iframe"></iframe>
+</div>
+
+<h2 id="works">Works</h2>
+
+<h3 id="recently-published-works">Recently published works<a
+    href="{{ url_for('app.show_topic_index') }}{{ q }}/latest-works/rss"><img height="24" width="48"
+      src="{{ url_for('static', filename='images/rss-40674_320.png') }}" alt="RSS icon" /></a></h3>
+
+<table class="table table-hover" id="recently-published-works-table"></table>
+
+<h3 id="publications-per-year">Publications per year</h3>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" id="publications-per-year-iframe"></iframe>
+</div>
+
+<h3 id="earliest-published-works">Earliest published works</h3>
+
+<table class="table table-hover" id="earliest-published-works-table"></table>
+
+<h2 id="authors-heading">Authors</h2>
+
+<h3 id="authors">Related authors</h3>
+
+<table class="table table-hover" id="authors-table"></table>
+
+<h3 id="author-awards">Awards received by authors</h3>
+
+<table class="table table-hover" id="author-awards-table"></table>
+
+<h2 id="topics">Topics</h2>
+
+<p>From random sample</p>
+
+<table class="table table-hover" id="topics-table"></table>
+
+<h2 id="venues">Related venues and series</h2>
+
+<table class="table table-hover" id="venues-table"></table>
+
+<h2 id="organization-map">Map of organizations associated with related works</h2>
+
+The colours indicate how many publications on the topic are associated with organizations in the given location, as
+detailed in the legend (top right).
+
+<div class="embed-responsive embed-responsive-4by3">
+  <iframe class="embed-responsive-item" id="organization-map-iframe">
+  </iframe>
+</div>
+
+{% endblock %}

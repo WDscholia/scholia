@@ -267,7 +267,7 @@ def identifier_to_qs(property, identifier):
 
     Notes
     -----
-    The Wikidata Query Service is queries to resolve the given identifier. If
+    The Wikidata Query Service is queried to resolve the given identifier. If
     an error happens an empty list is returned.
 
     Examples
@@ -1271,7 +1271,7 @@ def q_to_class(q):
             'Q46855',  # hackathon
             'Q625994',  # conference
             'Q2020153',  # scientific conference
-            'Q40444998',  # akademic workshop
+            'Q40444998',  # academic workshop
             ]):
         class_ = 'event'
     elif set(classes).intersection([
@@ -1292,6 +1292,8 @@ def q_to_class(q):
             'Q22325163',  # macromolecular complex
             ]):
         class_ = 'complex'
+    elif ('Q16695773' in classes):  # wikiproject
+        class_ = 'wikiproject'
     else:
         query = 'select ?class where {{ wd:{q} wdt:P279+ ?class }}'.format(
             q=escape_string(q))
