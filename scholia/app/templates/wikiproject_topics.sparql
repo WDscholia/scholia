@@ -9,7 +9,6 @@ WITH {
   SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
     # Find works for the specific queried topic
 	  VALUES ?p { wdt:P6104 wdt:P5008 }
-    # Find works for the specific queried topic
 	  SERVICE bd:sample { ?work ?p target: . bd:serviceParam bd:sample.limit 10000 }
     
     # Find co-occuring topics
