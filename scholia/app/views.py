@@ -2471,6 +2471,21 @@ def show_about():
     return render_template('about.html')
 
 
+
+@main.route('/wikiproject/')
+def show_wikiproject_index():
+    """Return rendered HTML index page for wikiproject.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for wikiproject.
+
+    """
+    return render_template('wikiproject-index.html')
+
+
+
 @main.route('/wikiproject/' + q_pattern)
 def show_wikiproject(q):
     """Return rendered HTML page for specific WikiProject.
