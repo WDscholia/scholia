@@ -1,22 +1,27 @@
-#defaultView:Table
+# tool: scholia
+PREFIX target: <http://www.wikidata.org/entity/Q116464161>
 
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+SELECT
+  ?count
+  ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
+  ("🔎" AS ?zoom)
+  (CONCAT(SUBSTR(STR(target:), 32), "/use/", SUBSTR(STR(?use), 32)) AS ?zoomUrl)
+  ?useDescription
 
-SELECT ?count ?short_name 
-?venue ?venueLabel (CONCAT("/venue/", SUBSTR(STR(?venue), 32)) AS ?venueUrl)
+  ?example_work ?example_workLabel
 WITH {
-  SELECT (count(?work) as ?count) ?venue (SAMPLE(?short_name_) AS ?short_name) WHERE {
-    { ?work wdt:P921/wdt:P31*/wdt:P279* target: . }
-    union { ?work wdt:P921/wdt:P361+ target: . }
-    union { ?work wdt:P921/wdt:P1269+ target: . }
-    ?work wdt:P1433/wdt:P179* ?venue .
-    OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
+  SELECT
+    (COUNT(?work) AS ?count)
+    ?use
+    (SAMPLE(?work) AS ?example_work)
+  {
+    ?work wdt:P921 target: ;
+          wdt:P4510 ?use .
   }
-  GROUP BY ?venue
+  GROUP BY ?use
 } AS %result
 WHERE {
   INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)
-LIMIT 200
