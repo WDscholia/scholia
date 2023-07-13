@@ -5,7 +5,7 @@ SELECT DISTINCT
   (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
 
   ("ORCID search ↗" AS ?orcid_search)
-  (CONCAT("https://orcid.org/orcid-search/quick-search/?searchQuery=", ENCODE_FOR_URI(?authorLabel)) AS ?orcid_searchUrl)
+  (CONCAT("https://orcid.org/orcid-search/search/?searchQuery=", ENCODE_FOR_URI(?authorLabel)) AS ?orcid_searchUrl)
 
 WHERE {
   target: wdt:P50 ?author .
