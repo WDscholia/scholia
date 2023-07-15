@@ -3,23 +3,27 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
-  (MIN(?publication_date_) AS ?publication_date)
+  ?publication_date
   ?work ?workLabel
   (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
   (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
-WHERE {
-  ?work wdt:P1433 target: .
-  OPTIONAL {
-    ?work wdt:P577 ?publication_datetime . 
-    BIND(xsd:date(?publication_datetime) AS ?publication_date_)
-  }
+WITH {
+  SELECT DISTINCT ?work (MIN(?publication_date_) AS ?publication_date) WHERE {
+    ?work wdt:P1433 target: .
+    OPTIONAL {
+      ?work wdt:P577 ?publication_datetime .
+      BIND(xsd:date(?publication_datetime) AS ?publication_date_)
+    }
+  } GROUP BY ?work
+    ORDER BY DESC(?publication_date)
+    LIMIT 1000
+} AS %ARTICLES WHERE {
+  INCLUDE %ARTICLES
   OPTIONAL {
     ?work wdt:P50 ?author .
     ?author rdfs:label ?author_label .
     FILTER (LANG(?author_label) = 'en')
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
-}
-GROUP BY ?work ?workLabel
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+} GROUP BY ?publication_date ?work ?workLabel
 ORDER BY DESC(?publication_date)
-LIMIT 1000
