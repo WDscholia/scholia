@@ -22,7 +22,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      twitter_to_qs, cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
-                     ncbi_gene_to_qs, uniprot_to_qs)
+                     ncbi_gene_to_qs, uniprot_to_qs, random_work)
 from ..utils import sanitize_q, remove_special_characters_url
 from ..wikipedia import q_to_bibliography_templates
 
@@ -2048,6 +2048,20 @@ def show_work_export(q):
 
     """
     return render_template('work-export.html', q=q)
+
+
+@main.route('/work/random')
+def show_work_random():
+    """Redirect to random work.
+
+    Returns
+    -------
+    reponse : werkzeug.wrappers.Response
+        Redirect
+
+    """
+    q = random_work()
+    return redirect(url_for('app.show_work', q=q), code=302)
 
 
 @main.route('/cito/' + q_pattern)

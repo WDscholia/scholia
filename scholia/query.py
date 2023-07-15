@@ -24,6 +24,7 @@ Usage:
   scholia.query q-to-label <q>
   scholia.query q-to-class <q>
   scholia.query random-author
+  scholia.query random-work
   scholia.query ror-to-q <rorid>
   scholia.query twitter-to-q <twitter>
   scholia.query uniprot-to-q <protein>
@@ -1673,6 +1674,50 @@ def random_author():
     return q
 
 
+def random_work():
+    """Return random work.
+
+    Sample a scientific work randomly from Wikidata by a call to the Wikidata
+    Query Service.
+
+    Returns
+    -------
+    q : str
+        Wikidata identifier.
+
+    Notes
+    -----
+    The work returned is not necessarily a scholarly work.
+
+    The algorithm uses a somewhat hopeful randomization and if no work is
+    found it falls back on Q21146099.
+
+    Examples
+    --------
+    >>> q = random_work()
+    >>> q.startswith('Q')
+    True
+
+    """
+    # Generate 100 random Q-items and hope that one of them is a work with an
+    # work
+    values = " ".join("wd:Q{}".format(randrange(1, 100000000))
+                      for _ in range(100))
+
+    query = """SELECT ?work {{
+                 VALUES ?work {{ {values} }}
+                 ?work wdt:P50 ?author .
+               }}
+               LIMIT 1""".format(values=values)
+    bindings = query_to_bindings(query)
+    if len(bindings) > 0:
+        q = bindings[0]['work']['value'][31:]
+    else:
+        # Fallback
+        q = "Q21146099"
+    return q
+
+
 def main():
     """Handle command-line interface."""
     from docopt import docopt
@@ -1807,6 +1852,10 @@ def main():
 
     elif arguments['random-author']:
         q = random_author()
+        print(q)
+
+    elif arguments['random-work']:
+        q = random_work()
         print(q)
 
     elif arguments['twitter-to-q']:
