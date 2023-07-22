@@ -18,6 +18,7 @@ Usage:
   scholia.query mesh-to-q <meshid>
   scholia.query ncbi-gene-to-q <gene>
   scholia.query ncbi-taxon-to-q <taxon>
+  scholia.query omim-to-q <omimID>
   scholia.query orcid-to-q <orcid>
   scholia.query pubchem-to-q <cid>
   scholia.query pubmed-to-q <pmid>
@@ -772,6 +773,37 @@ def issn_to_qs(issn):
     data = response.json()
 
     return [item['author']['value'][31:]
+            for item in data['results']['bindings']]
+
+
+def omim_to_qs(omimID):
+    """Convert OMIM identifier to Wikidata ID.
+
+    Parameters
+    ----------
+    omim : str
+        OMIM identifier
+
+    Returns
+    -------
+    qs : list of str
+        List of strings with Wikidata IDs.
+
+    Examples
+    --------
+    >>> omim_to_qs('181500') == ['Q41112']
+    True
+
+    """
+    query = 'select ?disease where {{ ?disease wdt:P492 "{omimID}" }}'.format(
+        omimID=escape_string(omimID))
+
+    url = 'https://query.wikidata.org/sparql'
+    params = {'query': query, 'format': 'json'}
+    response = requests.get(url, params=params, headers=HEADERS)
+    data = response.json()
+
+    return [item['disease']['value'][31:]
             for item in data['results']['bindings']]
 
 
@@ -1804,6 +1836,11 @@ def main():
 
     elif arguments['ncbi-taxon-to-q']:
         qs = ncbi_taxon_to_qs(arguments['<taxon>'])
+        if len(qs) > 0:
+            print(qs[0])
+
+    elif arguments['omim-to-q']:
+        qs = omim_to_qs(arguments['<omimID>'])
         if len(qs) > 0:
             print(qs[0])
 
