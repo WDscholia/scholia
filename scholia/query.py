@@ -42,7 +42,7 @@ Examples
   $ python -m scholia.query doi-to-q 10.475/123_4
   Q41533080
 
-  $ python -m schoia.query q-to-label Q80
+  $ python -m scholia.query q-to-label Q80
   Tim Berners-Lee
 
 """
