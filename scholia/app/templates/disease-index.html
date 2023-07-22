@@ -4,20 +4,62 @@
 
 {% block page_content %}
 
-<h1>Disease</h1>
+<h1>Diseases</h1>
 
-Diseases.
+<div class="container">
 
-<h2>Examples</h2>
+    <h2>Examples</h2>
 
-<ul>
-    <li><a href="Q41112">Schizophrenia</a></li>
-    <li><a href="Q431643">Microcephaly</a></li>
-    <li><a href="Q917357">Rett syndrome</a></li>
-    <li><a href="Q8071861">Zika fever</a></li>
-    <li><a href="Q10863074">Fatty liver disease</a></li>
-</ul>
+    <div class="card-deck mb-3">
+	<div class="card mb-4 box-shadow">
+
+            <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Single items</h4>
+            </div>
+            <div class="card-body">
+		<dl>
+		    <dt><a href="Q41112">Schizophrenia</a></dt>
+		    <dd>
+			A mental disorder characterized by continuous or relapsing episodes of psychosis.
+		    </dd>
+
+		    <dt><a href="Q431643">Microcephaly</a></dt>
+		    <dd>
+			A medical condition involving a smaller-than-normal head.
+		    </dd>
+
+		    <dt><a href="Q917357">Rett syndrome</a></dt>
+		    <dd>
+			A genetic disorder that typically becomes apparent after 6–18 months of age and almost exclusively in females.
+		    </dd>
+
+		    <dt><a href="Q8071861">Zika fever</a></dt>
+		    <dd>
+			An infectious disease caused by the Zika virus.
+		    </dd>
+
+		    <dt><a href="Q10863074">Fatty liver disease</a></dt>
+		    <dd>
+			A condition where excess fat builds up in the liver.
+		    </dd>
+		</dl>
+            </div>
+
+	</div>
+
+     <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		    <h4 class="my-0 font-weight-normal">Redirecting</h4>
+	    </div>
+	    <div class="card-body">
+		<p>If you know the identifier, then Scholia can make a lookup based on the identifier:</p>
+
+		<dl>
+		    <dt><a href="../omim/137580">omim/137580</a></dt>
+		    <dd>Look up OMIM ID 137580. This will redirect to Tourette syndrome.</dd>
+		</dl>
+	    </div>
+    </div>
+</div>
 
 {% endblock %}
-
-  
