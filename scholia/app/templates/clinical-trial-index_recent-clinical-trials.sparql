@@ -1,4 +1,4 @@
-# title: Clinical trials sorted according to date
+#title: Clinical trials sorted according to date
 SELECT ?start_date ?trial ?trialLabel
 WITH {
   SELECT * WHERE { 

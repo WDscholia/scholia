@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: List of event and proceedings for a specific event series
+#title: List of event and proceedings for a specific event series
 SELECT DISTINCT 
   (SAMPLE(?years) AS ?year)
   (SAMPLE(?ordinal) AS ?ordinal)

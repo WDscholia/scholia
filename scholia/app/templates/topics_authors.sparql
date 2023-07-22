@@ -1,4 +1,4 @@
-# title: Authors for specific topics
+#title: Authors for specific topics
 SELECT
   ?score
   ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)

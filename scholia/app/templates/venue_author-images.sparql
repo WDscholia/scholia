@@ -1,4 +1,4 @@
-# title: Author images for a specific venue
+#title: Author images for a specific venue
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

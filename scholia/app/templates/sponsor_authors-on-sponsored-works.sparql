@@ -1,4 +1,4 @@
-# title: Authors on works sponsored or funded from a specific entity.
+#title: Authors on works sponsored or funded from a specific entity.
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

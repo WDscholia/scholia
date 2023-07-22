@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: Author awards for a specific venue
+#title: Author awards for a specific venue
 SELECT DISTINCT
   ?year 
   ?author ?authorLabel

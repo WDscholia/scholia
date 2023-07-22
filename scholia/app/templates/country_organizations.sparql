@@ -1,4 +1,4 @@
-# title: Organizations for a specific country
+#title: Organizations for a specific country
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT

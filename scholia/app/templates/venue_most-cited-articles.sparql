@@ -1,4 +1,4 @@
-# title: Most cited articles published in specific venue
+#title: Most cited articles published in specific venue
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: identifiers for this chemical
+#title: identifiers for this chemical
 SELECT
   ?Identifier ?IdentifierLabel
   ?Value (SAMPLE(?idUrls) as ?ValueUrl)

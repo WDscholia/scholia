@@ -1,4 +1,4 @@
-# title: Locations as topics for a specific country
+#title: Locations as topics for a specific country
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 #defaultView:Map{"markercluster":true}.

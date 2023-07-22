@@ -1,4 +1,4 @@
-# title: Statistics for projects identifiers
+#title: Statistics for projects identifiers
 SELECT ?count ?description {
   {
     { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3400 []. } }

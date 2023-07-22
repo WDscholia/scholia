@@ -1,4 +1,4 @@
-# title: Employees and affiliated with a specified organization
+#title: Employees and affiliated with a specified organization
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

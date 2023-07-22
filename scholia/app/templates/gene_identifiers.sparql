@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: identifiers for this gene
+#title: identifiers for this gene
 SELECT
   ?Identifier ?IdentifierLabel
   ?Value (SAMPLE(?idUrls) as ?ValueUrl)

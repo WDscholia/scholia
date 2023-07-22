@@ -1,7 +1,7 @@
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: publications per year for this chemical
+#title: publications per year for this chemical
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
 select ?year (count(?work) as ?number_of_publications) where {
