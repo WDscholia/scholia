@@ -1,0 +1,11 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT ?property ?propertyLabel WHERE {
+  VALUES ?property {
+    wdt:P2177 wdt:P2102 wdt:P2101 wdt:p3078 wdt:P2119
+    wdt:P3071 wdt:P2054 wdt:P2128 wdt:P1117
+  }
+  MINUS { target: ?property [] }
+  ?property ^wikibase:directClaim / wdt:P1629 / rdfs:label ?propertyLabel .
+  FILTER (lang(?propertyLabel) = "en")
+}
