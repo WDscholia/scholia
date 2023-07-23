@@ -85,6 +85,8 @@ function convertDataTableData(data, columns) {
         var column = columns[i];
         if (column.slice(-11) == 'Description') {
             convertedColumns.push(column.slice(0, column.length - 11) + ' description');
+        } else if (column.slice(-17) == 'ChemicalStructure') {
+            convertedColumns.push(column.slice(0, column.length - 17) + ' structure');
         } else if (column.slice(-5) == 'Label') {
             // pass
         } else if (column.slice(-3) == 'Url') {
@@ -106,6 +108,13 @@ function convertDataTableData(data, columns) {
             convertedRow[key] = '<a href="' +
 		    data[i][key + 'Url'] +
 		    '">' + data[i][key + 'Label'] + '</a>';
+
+	    } else if (key.slice(-17) == 'ChemicalStructure') {
+            convertedRow[key.slice(0, key.length - 17) + ' structure'] = '<img loading="lazy" src="' +
+            'https://cdkdepict.toolforge.org/depict/bow/svg?smi=' +
+		    encodeURIComponent(data[i][key]) +
+            '&abbr=on&hdisp=bridgehead&showtitle=false&zoom=2&annotate=cip' +
+		    '" />';
 
 	    } else if (
 			key + 'Label' in data[i] &&
