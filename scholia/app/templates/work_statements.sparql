@@ -1,9 +1,9 @@
+#title: Statements referencing the {{ q }} article
 #defaultView:Table
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# Statements referencing this article
-SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel ?unit ?unitLabel
+SELECT ?item ?itemLabel ?property ?propertyLabel ?statement ?a ?value ?valueLabel ?unit ?unitLabel
 WITH {
   SELECT ?statement WHERE { 
 	  ?statement prov:wasDerivedFrom/pr:P248 target: .
@@ -11,14 +11,15 @@ WITH {
   LIMIT 2000
 } AS %statements 
 WITH {
-  SELECT distinct ?item ?property ?value ?unit
+  SELECT distinct ?item ?property ?statement ?a ?value ?unit
   WHERE {
     INCLUDE %statements
     ?item ?p ?statement .
-    ?property wikibase:claim ?p . 
-    ?statement ?a ?value .
-    FILTER (!STRSTARTS(LCASE(STR(?a)), "http://www.wikidata.org/prop/qualifier/"))
-    ?item ?b ?value . 
+    ?property wikibase:claim ?p . OPTIONAL { ?property wikibase:statementValueNormalized ?a1 }
+    ?statement ?a1 ?value1 ; ?a2 ?value2 . BIND (COALESCE(?value1, ?value2) AS ?value) BIND (COALESCE(?a1, ?a2) AS ?a)
+    FILTER (!STRSTARTS(LCASE(STR(?value)), "http://wikiba.se/ontology#"))
+    FILTER (!STRSTARTS(LCASE(STR(?value)), "http://www.wikidata.org/value/"))
+    FILTER (!STRSTARTS(LCASE(STR(?value)), "http://www.wikidata.org/reference/"))
     OPTIONAL {?statement ?psv_statement_predicate ?psv_statement .
     ?statement_predicate_property wikibase:statementValue ?psv_statement_predicate.
     ?psv_statement wikibase:quantityUnit ?unit}
