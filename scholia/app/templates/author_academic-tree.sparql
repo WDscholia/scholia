@@ -72,6 +72,6 @@ WHERE {
   
   BIND( IF( ?student1 = target:, "3080BB", "ffffff") AS ?rgb)
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,sv,jp,zh,ru,fr,de" .  } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .  } 
 }
 

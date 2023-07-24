@@ -31,7 +31,7 @@ WHERE {
   INCLUDE %researchers_and_number_of_works
   OPTIONAL { ?researcher wdt:P496 ?orcid_ . }
   OPTIONAL { ?researcher wikibase:sitelinks ?wikis_ }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
 }
 GROUP BY ?researcher ?researcherLabel ?researcherDescription 
 ORDER BY DESC(?works)

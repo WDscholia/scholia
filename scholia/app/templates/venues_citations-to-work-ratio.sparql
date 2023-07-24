@@ -29,6 +29,6 @@ WITH {
 WHERE {
   INCLUDE %work_counts
   INCLUDE %citation_counts
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY ?year
