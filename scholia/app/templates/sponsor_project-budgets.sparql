@@ -8,5 +8,5 @@ SELECT ?start_time ?budget ?project ?projectLabel WHERE {
   ?project wdt:P2769 ?budget .
   ?project (wdt:P580 | wdt:P571) ?start_time .
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
