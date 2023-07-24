@@ -3,7 +3,7 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?item ?itemLabel ?property ?propertyLabel ?statement ?a ?value ?valueLabel ?unit ?unitLabel
+SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel ?unit ?unitLabel
 WITH {
   SELECT ?statement WHERE { 
 	  ?statement prov:wasDerivedFrom/pr:P248 target: .
@@ -11,7 +11,7 @@ WITH {
   LIMIT 2000
 } AS %statements 
 WITH {
-  SELECT distinct ?item ?property ?statement ?a ?value ?unit
+  SELECT distinct ?item ?property ?value ?unit
   WHERE {
     INCLUDE %statements
     ?item ?p ?statement .
