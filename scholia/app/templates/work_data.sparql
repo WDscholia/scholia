@@ -302,5 +302,16 @@ WHERE {
     BIND(COALESCE(?value_string, ?valueqid) AS ?value)
     BIND(CONCAT("../", ?valueqid) AS ?valueUrl)
   }
+  UNION
+  {
+    BIND(36 AS ?order)
+    BIND("Inspired by" AS ?description)
+    ?work wdt:P941 ?value_ .
+    BIND(SUBSTR(STR(?value_), 32) AS ?valueqid)
+    ?value_ rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?valueqid) AS ?value)
+    BIND(CONCAT("../", ?valueqid) AS ?valueUrl)
+  }
 } 
 ORDER BY ?order
