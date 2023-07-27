@@ -151,7 +151,9 @@ def tree_to_papers(tree, proceedings, proceedings_q, iso639='en'):
 
         # Pages
         pages_element = element.xpath(".//span[@class='CEURPAGES']")
-        if len(pages_element) == 1:
+        if len(pages_element) == 1 and pages_element[0].text:
+            # At least one CEURPAGES element and the first one should be
+            # none-empty
             pages = pages_element[0].text
             paper['pages'] = pages
             number_of_pages = pages_to_number_of_pages(pages)
