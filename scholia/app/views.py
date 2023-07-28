@@ -1896,7 +1896,13 @@ def show_chemical_class(q):
         Rendered HTML.
 
     """
-    return render_template('chemical-class.html', q=q)
+    entities = wb_get_entities([q])
+    smiles = entity_to_smiles(entities[q])
+    return render_template('chemical-class.html',
+      q=q,
+      smiles=smiles,
+        third_parties_enabled=current_app.third_parties_enabled
+    )
 
 
 @main.route('/chemical-class/')

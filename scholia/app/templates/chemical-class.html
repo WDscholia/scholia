@@ -16,7 +16,19 @@
 {% block page_content %}
 <h1 id="h1">Chemical</h1>
 
-<div id="intro"></div>
+<div class="card-deck mb-3">
+    <div class="card mb-4 box-shadow">
+	<div class="card-body">
+	    <div id="intro"></div>
+	</div>
+    </div>
+
+    <div class="card mb-4 box-shadow">
+	<div class="card-body">
+	    <img src="https://cdkdepict.toolforge.org/depict/bow/svg?smi={{smiles|urlencode}}&abbr=on&hdisp=bridgehead&showtitle=false&zoom=2&annotate=cip" />
+	</div>
+    </div>
+</div>
 
 <h2 id="class-hierarchy">Class Hierarchy</h2>
 
