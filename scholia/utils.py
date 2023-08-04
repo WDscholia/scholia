@@ -55,7 +55,7 @@ def sanitize_q(q):
     'Q5'
 
     """
-    if type(q) == int:
+    if type(q) is int:
         if q > 0:
             return 'Q' + str(q)
     else:
