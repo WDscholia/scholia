@@ -23,6 +23,15 @@ WITH {
 WITH {
   SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P9405 []. }
 } AS %nmrSpectra
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2201 []. }
+} AS %dipole
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2260 []. }
+} AS %ionizationPotential
+WITH {
+  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P4952 []. }
+} AS %safetyInfo
 WHERE {
   {
     INCLUDE %meltingpoints
@@ -62,6 +71,21 @@ WHERE {
   {
     INCLUDE %nmrSpectra
     BIND("Total number of chemicals with NMR spectra" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %dipole
+    BIND("Total number of chemicals with a electronic dipole moment" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %ionizationPotential
+    BIND("Total number of chemicals with a ionization potential" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %safetyInfo
+    BIND("Total number of chemicals with a safety classification and labelling" AS ?description)
   }
 }
 ORDER BY DESC(?count)
