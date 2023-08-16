@@ -1211,6 +1211,7 @@ def q_to_class(q):
             'Q79529',  # chemical substance
             'Q407595',  # metabolite
             'Q2393187',  # molecular entity
+            'Q113145171',  # type of a chemical entity
             ]):
         class_ = 'chemical'
     elif set(classes).intersection([
@@ -1218,9 +1219,9 @@ def q_to_class(q):
             ]):
         class_ = 'chemical_element'
     elif set(classes).intersection([
-            'Q15711994',  # family of isomeric compounds
+            'Q15711994',  # group of isomeric compounds
             'Q17339814',  # group or class of chemical substances
-            'Q47154513',  # structural class of chemical compounds
+            'Q47154513',  # structural class of chemical entities
             'Q55499636',  # pharmacological class of chemical compounds
             'Q55640599',  # group of ions
             'Q55662456',  # group of ortho, meta, para isomers
@@ -1312,6 +1313,8 @@ def q_to_class(q):
         elif set(parents).intersection([
                 'Q11173',  # chemical compound
                 'Q79529',  # chemical substance
+                'Q15711994',  # group of isomeric entities
+                'Q47154513',  # structural class of chemical entities
                 ]):
             class_ = 'chemical_class'
         elif set(parents).intersection([
