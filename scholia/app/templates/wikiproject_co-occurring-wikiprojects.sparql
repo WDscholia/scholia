@@ -4,9 +4,9 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?count
        ?wikiproject ?wikiprojectLabel (CONCAT("/wikiproject/", SUBSTR(STR(?wikiproject), 32)) AS ?wikiprojectUrl)
-       ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
+       ?example_entity ?example_entityLabel (CONCAT("/", SUBSTR(STR(?example_entity), 32)) AS ?example_entityUrl)
 WITH {
-  SELECT (COUNT(?work) AS ?count) ?wikiproject (SAMPLE(?work) AS ?example_work) WHERE {
+  SELECT (COUNT(?work) AS ?count) ?wikiproject (SAMPLE(?work) AS ?example_entity) WHERE {
     # Find works for the specific queried wikiproject
 	  VALUES ?p { wdt:P6104 wdt:P5008 }
 	  SERVICE bd:sample { ?work ?p target: . bd:serviceParam bd:sample.limit 100000 }
