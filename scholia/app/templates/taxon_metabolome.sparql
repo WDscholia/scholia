@@ -14,7 +14,7 @@ WITH {
     UNION
     { ?metabolite wdt:P1582 ?children }
     VALUES ?chemical { wd:Q11173 wd:Q59199015 wd:Q56256086 wd:Q15711994 }.
-    ?metabolite wdt:P31|wdt:P279/wdt:P31 ?chemical .
+    ?metabolite wdt:P31|wdt:P279/wdt:P31|wdt:P279 ?chemical .
   }
 } AS %results {
   INCLUDE %results
