@@ -23,7 +23,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
                      ncbi_gene_to_qs, uniprot_to_qs)
-from ..utils import sanitize_q, remove_special_characters_url
+from ..utils import sanitize_q, remove_special_characters_url, string_to_list
 from ..wikipedia import q_to_bibliography_templates
 
 
@@ -253,23 +253,25 @@ def show_arxiv_to_quickstatements():
 
     current_app.logger.debug("query: {}".format(query))
 
-    arxiv = string_to_arxiv(query)
+    input = string_to_list(query)
+
+    arxiv = list(map(string_to_arxiv, input))
+
     if not arxiv:
         # Could not identify an arxiv identifier
         return render_template('arxiv-to-quickstatements.html')
 
-    qs = arxiv_to_qs(arxiv)
+    qs = list(map(arxiv_to_qs, arxiv))
+    qs = [q for q_list in qs for q in q_list] # flatten
+
     if len(qs) > 0:
         # The arxiv is already in Wikidata
-        q = qs[0]
-        return render_template('arxiv-to-quickstatements.html',
-                               arxiv=arxiv, q=q)
+        return render_template('arxiv-to-quickstatements.html', arxiv=query, qs=qs)
 
     try:
         metadata = get_arxiv_metadata(arxiv)
     except Exception:
-        return render_template('arxiv-to-quickstatements.html',
-                               arxiv=arxiv)
+        return render_template('arxiv-to-quickstatements.html', arxiv=query)
 
     quickstatements = metadata_to_quickstatements(metadata)
 

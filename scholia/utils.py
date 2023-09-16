@@ -91,6 +91,46 @@ def string_to_type(string):
         return 'string'
 
 
+def string_to_list(string):
+    """Convert comma/space/tab/pipe separated string to list.
+
+    Parameters
+    ----------
+    string : str
+        Query string.
+
+    Returns
+    -------
+    result : list
+
+    Examples
+    --------
+    >>> string_to_list("1, 2 | 3\t4 |5")
+    ['1', '2', '3', '4', '5']
+    >>> string_to_list("10.10,abc|123")
+    ['10.10', 'abc', '123']
+
+    """
+
+    output = [string]
+    
+    separators = [',', ' ', '\t', '|']
+
+    for separator in separators:
+        new_output = []
+        for s in output:
+            if separator in s:
+                new_output.extend(s.split(separator))
+            else:
+                new_output.append(s)
+        output = new_output
+
+    # remove empty
+    output = [element.strip() for element in output if element.strip()]
+
+    return output
+
+
 def remove_special_characters_url(url):
     """Remove url encoded characters and normalize non-ascii characters.
 

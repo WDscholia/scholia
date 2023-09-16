@@ -11,7 +11,7 @@
 <form action="" id="form" method="GET" class="form-horizontal mb-3">
   <div class="input-group">
     {% if arxiv %}
-    <input type="text" class="form-control" placeholder="Enter arXiv id" value="{{ arxiv | urlencode }}" id="searchterm" name="arxiv"/>
+    <input type="text" class="form-control" placeholder="Enter arXiv id" value="{{ arxiv }}" id="searchterm" name="arxiv"/>
     {% else %}
     <input type="text" class="form-control" placeholder="Enter arXiv id" id="searchterm" name="arxiv"/>
     {% endif %}
@@ -26,19 +26,32 @@
 <p>Copy and paste an ID from the <a href="https://arxiv.org">arXiv</a> preprint repository.
 Bare IDs (such as "1703.06103") and URLs (such as "https://arxiv.org/abs/1703.06103") both work.
 </p>
-<p>The input ID will be queried in Wikidata and Quickstatements will not be generated if the input 
-ID is found in Wikidata. However, note that new items may not be immediately found because of caching.
+<p>The input ID will be queried in Wikidata and Quickstatements will be generated if the input 
+ID is not found in Wikidata. Note that new items may not be immediately found because of caching.
 
 
 <h2>Result</h2>
 
-{% if q %}
+{% if (qs|length) == 1 %}
 
-<div id="searchresult">Already entered as <a href="work/{{ q }}">{{ q }}</div>
+<div id="searchresult">Already entered as <a href="work/{{ qs[0] }}">{{ qs[0] }}</a></div>
 
 {% endif %}
 
-{% if quickstatements %}
+{% if (qs|length) > 1 %}
+
+<div id="searchresult">Already entered as:
+<ul>
+  {% for q in qs %}
+  <li><a href="work/{{ q }}">{{ q }}</a></li>
+  {% endfor %}
+</ul>
+</div>
+  
+
+{% endif %}
+
+{% if (quickstatements|length) == 1 %}
 
 <div id="quickstatements"><pre>{{ quickstatements }}</pre></div>
 
