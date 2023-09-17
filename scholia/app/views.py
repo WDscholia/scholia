@@ -271,7 +271,13 @@ def show_arxiv_to_quickstatements():
     try:
         metadatas = [get_arxiv_metadata(arxiv) for arxiv in missing_arxivs]
     except Exception:
+<<<<<<< HEAD
         return render_template('arxiv-to-quickstatements.html', arxiv=query)
+=======
+        if len(matched) > 0:
+            return render_template('arxiv-to-quickstatements.html', arxiv=query, qs=matched)
+        return render_template('arxiv-to-quickstatements.html', arxiv=query, error=True)
+>>>>>>> 2ced1d1 (add warning message)
 
     quickstatements = "\n\n".join(metadata_to_quickstatements(metadata)
                                   for metadata in metadatas)
@@ -283,7 +289,18 @@ def show_arxiv_to_quickstatements():
     # not encode that character.
     # https://github.com/pallets/jinja/issues/515
     # Here, we let jinja2 handle the encoding rather than adding an extra
+<<<<<<< HEAD
     # parameter
+=======
+
+    if len(matched) > 0:
+        return render_template('arxiv-to-quickstatements.html', arxiv=query,
+                                qs=matched, quickstatements=quickstatements)
+    if len(matched) == 0 and len(quickstatements) == 0:
+        return render_template('arxiv-to-quickstatements.html', arxiv=query,
+                                qs=matched, quickstatements=quickstatements,
+                                error=True)
+>>>>>>> 2ced1d1 (add warning message)
     return render_template('arxiv-to-quickstatements.html',
                            arxiv=query, qs=identified_qs,
                            quickstatements=quickstatements)
