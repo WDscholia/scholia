@@ -31,8 +31,14 @@ ID is not found in Wikidata. Note that new items may not be immediately found be
 
 
 <h2>Result</h2>
+{% if error %}
+<div class="alert alert-warning" role="alert">
+  No results returned, potentially due to the upstream server being down. Please try again later. If the issue persists <a href="https://github.com/WDscholia/scholia/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=">submit a bug report on GitHub</a>.
+</div>
+{% endif %}
 
-{% if (qs|length) == 1 %}
+{% if (qs|length) > 0 %}
+<h2>Found</h2>
 
 <div id="searchresult">Already entered as <a href="work/{{ qs[0] }}">{{ qs[0] }}</a></div>
 
