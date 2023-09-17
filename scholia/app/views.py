@@ -253,9 +253,9 @@ def show_arxiv_to_quickstatements():
 
     current_app.logger.debug("query: {}".format(query))
 
-    input = string_to_list(query)
+    input_list = string_to_list(query)
 
-    arxivs = list(map(string_to_arxiv, input))
+    arxivs = list(map(string_to_arxiv, input_list))
 
     if not arxivs:
         # Could not identify an arxiv identifier
@@ -285,7 +285,7 @@ def show_arxiv_to_quickstatements():
     # not encode that character.
     # https://github.com/pallets/jinja/issues/515
     # Here, we let jinja2 handle the encoding rather than adding an extra
-    # 
+
     if len(matched) > 0:
             return render_template('arxiv-to-quickstatements.html', arxiv=query, 
                                     qs=matched, quickstatements=quickstatements)

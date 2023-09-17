@@ -113,7 +113,7 @@ def string_to_list(string):
     """
 
     output = [string]
-    
+
     separators = [',', ' ', '\t', '|']
 
     for separator in separators:
