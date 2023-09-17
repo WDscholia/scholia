@@ -274,7 +274,7 @@ def show_arxiv_to_quickstatements():
     except Exception:
         if len(matched) > 0:
             return render_template('arxiv-to-quickstatements.html', arxiv=query, qs=matched)
-        return render_template('arxiv-to-quickstatements.html', arxiv=query)
+        return render_template('arxiv-to-quickstatements.html', arxiv=query, error=True)
 
     quickstatements = list(map(metadata_to_quickstatements, metadatas))
 
@@ -287,8 +287,12 @@ def show_arxiv_to_quickstatements():
     # Here, we let jinja2 handle the encoding rather than adding an extra
 
     if len(matched) > 0:
-            return render_template('arxiv-to-quickstatements.html', arxiv=query, 
-                                    qs=matched, quickstatements=quickstatements)
+        return render_template('arxiv-to-quickstatements.html', arxiv=query,
+                                qs=matched, quickstatements=quickstatements)
+    if len(matched) == 0 and len(quickstatements) == 0:
+        return render_template('arxiv-to-quickstatements.html', arxiv=query,
+                                qs=matched, quickstatements=quickstatements,
+                                error=True)
     return render_template('arxiv-to-quickstatements.html',
                            arxiv=query, quickstatements=quickstatements)
 
