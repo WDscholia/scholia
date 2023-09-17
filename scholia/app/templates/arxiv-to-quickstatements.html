@@ -11,23 +11,22 @@
 <form action="" id="form" method="GET" class="form-horizontal mb-3">
   <div class="input-group">
     {% if arxiv %}
-    <input type="text" class="form-control" placeholder="Enter arXiv id" value="{{ arxiv }}" id="searchterm" name="arxiv"/>
+    <input type="text" class="form-control" placeholder="Enter arXiv ID or list of IDs" value="{{ arxiv }}" id="searchterm" name="arxiv"/>
     {% else %}
-    <input type="text" class="form-control" placeholder="Enter arXiv id" id="searchterm" name="arxiv"/>
+    <input type="text" class="form-control" placeholder="Enter arXiv ID or list of IDs" id="searchterm" name="arxiv"/>
     {% endif %}
     <span class="input-group-append">
       <button class="btn btn-primary" type="submit">
-        Extract metadata
+        Submit
       </button>
     </span>
   </div>
 </form>
     
-<p>Copy and paste an ID from the <a href="https://arxiv.org">arXiv</a> preprint repository.
-Bare IDs (such as "1703.06103") and URLs (such as "https://arxiv.org/abs/1703.06103") both work.
-</p>
-<p>The input ID will be queried in Wikidata and Quickstatements will be generated if the input 
-ID is not found in Wikidata. Note that new items may not be immediately found because of caching.
+<p>Enter a single or list of <a href="https://arxiv.org">arXiv</a> identifiers to retrieve their Wikidata items or QuickStatements to create items for them.</p>
+
+<p>Bare IDs (such as "1703.06103") or URLs (such as "https://arxiv.org/abs/1703.06103") can be used and the list can be
+comma, space, pipe or tab separated. Note that new items may not be immediately found because of caching.</p>
 
 {% if (qs|length) > 0 %}
 <h2>Found</h2>
