@@ -198,6 +198,8 @@ def arxiv_to_qs(arxiv):
     --------
     >>> arxiv_to_qs('1507.04180') == ['Q27036443']
     True
+    >>> arxiv_to_qs('not.an.arxiv') == []
+    True
 
     """
     return identifier_to_qs('P818', arxiv)

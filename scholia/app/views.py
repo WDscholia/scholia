@@ -255,25 +255,28 @@ def show_arxiv_to_quickstatements():
 
     input = string_to_list(query)
 
-    arxiv = list(map(string_to_arxiv, input))
+    arxivs = list(map(string_to_arxiv, input))
 
-    if not arxiv:
+    if not arxivs:
         # Could not identify an arxiv identifier
         return render_template('arxiv-to-quickstatements.html')
 
-    qs = list(map(arxiv_to_qs, arxiv))
-    qs = [q for q_list in qs for q in q_list] # flatten
+    qs = [[arxiv, arxiv_to_qs(arxiv)] for arxiv in arxivs]
+    matched = [[q[0], q[1][0]] for q in qs if len(q[1]) > 0]
+    unmatched = [q[0] for q in qs if len(q[1]) == 0]
 
-    if len(qs) > 0:
+    if len(matched) > 0 and len(unmatched) == 0:
         # The arxiv is already in Wikidata
-        return render_template('arxiv-to-quickstatements.html', arxiv=query, qs=qs)
+        return render_template('arxiv-to-quickstatements.html', arxiv=query, qs=matched)
 
     try:
-        metadata = get_arxiv_metadata(arxiv)
+        metadatas = list(map(get_arxiv_metadata, unmatched))
     except Exception:
+        if len(matched) > 0:
+            return render_template('arxiv-to-quickstatements.html', arxiv=query, qs=matched)
         return render_template('arxiv-to-quickstatements.html', arxiv=query)
 
-    quickstatements = metadata_to_quickstatements(metadata)
+    quickstatements = list(map(metadata_to_quickstatements, metadatas))
 
     # For Quickstatements Version 2 in URL components,
     # TAB and newline should be replace by | and ||
@@ -282,9 +285,12 @@ def show_arxiv_to_quickstatements():
     # not encode that character.
     # https://github.com/pallets/jinja/issues/515
     # Here, we let jinja2 handle the encoding rather than adding an extra
-    # parameter
+    # 
+    if len(matched) > 0:
+            return render_template('arxiv-to-quickstatements.html', arxiv=query, 
+                                    qs=matched, quickstatements=quickstatements)
     return render_template('arxiv-to-quickstatements.html',
-                           arxiv=arxiv, quickstatements=quickstatements)
+                           arxiv=query, quickstatements=quickstatements)
 
 
 @main.route('/author/' + q_pattern)

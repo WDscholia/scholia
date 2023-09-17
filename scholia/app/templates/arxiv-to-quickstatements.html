@@ -29,12 +29,13 @@ Bare IDs (such as "1703.06103") and URLs (such as "https://arxiv.org/abs/1703.06
 <p>The input ID will be queried in Wikidata and Quickstatements will be generated if the input 
 ID is not found in Wikidata. Note that new items may not be immediately found because of caching.
 
-
-<h2>Result</h2>
+{% if (qs|length) > 0 %}
+<h2>Found</h2>
+{% endif %}
 
 {% if (qs|length) == 1 %}
 
-<div id="searchresult">Already entered as <a href="work/{{ qs[0] }}">{{ qs[0] }}</a></div>
+<div id="searchresult">{{ qs[0][0] }} already entered as <a href="work/{{ qs[0][1] }}">{{ qs[0][1] }}</a></div>
 
 {% endif %}
 
@@ -43,22 +44,34 @@ ID is not found in Wikidata. Note that new items may not be immediately found be
 <div id="searchresult">Already entered as:
 <ul>
   {% for q in qs %}
-  <li><a href="work/{{ q }}">{{ q }}</a></li>
+  <li>{{ q[0] }}: <a href="work/{{ q[1] }}">{{ q[1] }}</a></li>
   {% endfor %}
 </ul>
 </div>
-  
 
 {% endif %}
 
+{% if (quickstatements|length) > 0 %}
+<h2>Not found</h2>
+{% endif %}
+
 {% if (quickstatements|length) == 1 %}
+<div id="quickstatements"><pre>{{ quickstatements[0] }}</pre></div>
 
-<div id="quickstatements"><pre>{{ quickstatements }}</pre></div>
-
-<a href="https://quickstatements.toolforge.org/#/v1={{ quickstatements | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}">
+<a href="https://quickstatements.toolforge.org/#/v1={{ quickstatements[0] | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}">
   <button class="btn btn-primary">Submit to Quickstatements ↗</button>
 </a>
   
+{% endif %}
+
+{% if (quickstatements|length) > 1 %}
+{% for quickstatement in quickstatements %}
+<div id="quickstatements"><pre>{{ quickstatement }}</pre></div>
+
+<a href="https://quickstatements.toolforge.org/#/v1={{ quickstatement | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}">
+  <button class="btn btn-primary">Submit to Quickstatements ↗</button>
+</a>
+{% endfor %}
 {% endif %}
 
 
