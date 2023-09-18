@@ -230,6 +230,19 @@ def _render_work_qs(qs, name):
     return render_template('404.html', error=could_not_find(name + " ID"))
 
 
+@main.route('/arxiv-to-quickstatements')
+def redirect_arxiv_to_quickstatements():
+    """Redirect to id-to-quickstatements.
+
+    Returns
+    -------
+    reponse : werkzeug.wrappers.Response
+        Redirect
+
+    """
+    return redirect(url_for('app.show_id_to_quickstatements', **request.args), code=301)
+
+
 @main.route('/id-to-quickstatements')
 def show_id_to_quickstatements():
     """Return HTML rendering for arxiv.
