@@ -216,7 +216,7 @@ def show_arxiv(arxiv):
 
     See Also
     --------
-    show_arxiv_to_quickstatements.
+    show_id_to_quickstatements.
 
     """
     qs = arxiv_to_qs(arxiv)
@@ -230,8 +230,8 @@ def _render_work_qs(qs, name):
     return render_template('404.html', error=could_not_find(name + " ID"))
 
 
-@main.route('/arxiv-to-quickstatements')
-def show_arxiv_to_quickstatements():
+@main.route('/id-to-quickstatements')
+def show_id_to_quickstatements():
     """Return HTML rendering for arxiv.
 
     Will look after the 'arxiv' parameter.
@@ -249,7 +249,7 @@ def show_arxiv_to_quickstatements():
     query = request.args.get('arxiv')
 
     if not query:
-        return render_template('arxiv-to-quickstatements.html')
+        return render_template('id-to-quickstatements.html')
 
     current_app.logger.debug("query: {}".format(query))
 
@@ -259,7 +259,7 @@ def show_arxiv_to_quickstatements():
 
     if not arxivs:
         # Could not identify an arxiv identifier
-        return render_template('arxiv-to-quickstatements.html')
+        return render_template('id-to-quickstatements.html')
 
     qs = [[arxiv, arxiv_to_qs(arxiv)] for arxiv in arxivs]
     matched = [[q[0], q[1][0]] for q in qs if len(q[1]) > 0]
@@ -267,14 +267,14 @@ def show_arxiv_to_quickstatements():
 
     if len(matched) > 0 and len(unmatched) == 0:
         # The arxiv is already in Wikidata
-        return render_template('arxiv-to-quickstatements.html', arxiv=query, qs=matched)
+        return render_template('id-to-quickstatements.html', arxiv=query, qs=matched)
 
     try:
         metadatas = list(map(get_arxiv_metadata, unmatched))
     except Exception:
         if len(matched) > 0:
-            return render_template('arxiv-to-quickstatements.html', arxiv=query, qs=matched)
-        return render_template('arxiv-to-quickstatements.html', arxiv=query, error=True)
+            return render_template('id-to-quickstatements.html', arxiv=query, qs=matched)
+        return render_template('id-to-quickstatements.html', arxiv=query, error=True)
 
     quickstatements = list(map(metadata_to_quickstatements, metadatas))
 
@@ -287,13 +287,13 @@ def show_arxiv_to_quickstatements():
     # Here, we let jinja2 handle the encoding rather than adding an extra
 
     if len(matched) > 0:
-        return render_template('arxiv-to-quickstatements.html', arxiv=query,
+        return render_template('id-to-quickstatements.html', arxiv=query,
                                 qs=matched, quickstatements=quickstatements)
     if len(matched) == 0 and len(quickstatements) == 0:
-        return render_template('arxiv-to-quickstatements.html', arxiv=query,
+        return render_template('id-to-quickstatements.html', arxiv=query,
                                 qs=matched, quickstatements=quickstatements,
                                 error=True)
-    return render_template('arxiv-to-quickstatements.html',
+    return render_template('id-to-quickstatements.html',
                            arxiv=query, quickstatements=quickstatements)
 
 
@@ -307,6 +307,7 @@ def show_author(q):
         Wikidata item identifier.
 
     Returns
+
     -------
     html : str
         Rendered HTML.
@@ -1520,7 +1521,7 @@ def show_search():
         if len(qs) > 0:
             q = qs[0]
             return redirect(url_for('app.show_work', q=q), code=302)
-        return redirect(url_for('app.show_arxiv_to_quickstatements',
+        return redirect(url_for('app.show_id_to_quickstatements',
                                 arxiv=arxiv), code=302)
 
     search_results = []
