@@ -83,10 +83,13 @@ def string_to_type(string):
     'issn'
 
     """
-    if search(r'\d{4}-\d{4}', string):
+    if search(r'\d{4}\-\d{3}(\d|X)', string):
         return 'issn'
-    elif search(r'10\.\d{4}', string):
+    elif search(r'(?i)10.\d{4,9}/[^\s]+', string):
         return 'doi'
+    elif search(r'(\d{4}.\d{4,5}|[a-z\-]+(\.[A-Z]{2})?\/\d{7})(v\d+)?', string):
+        # does not handle pre 2007 format
+        return 'arxiv'
     else:
         return 'string'
 
