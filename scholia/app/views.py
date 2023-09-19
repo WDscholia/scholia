@@ -12,9 +12,10 @@ from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works, wb_get_organization_latest_works,
                    wb_get_sponsor_latest_works)
-from ..arxiv import metadata_to_quickstatements, string_to_arxiv
+from ..arxiv import string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
-from ..doi import string_to_doi
+from ..arxiv import metadata_to_quickstatements as arxiv_metadata_to_quickstatements
+from ..doi import string_to_doi, get_doi_metadata, doi_metadata_to_quickstatements
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      doi_prefix_to_qs, github_to_qs, biorxiv_to_qs,
                      chemrxiv_to_qs,
@@ -285,50 +286,67 @@ def show_id_to_quickstatements():
         # Could not identify an identifier
         return render_template('id-to-quickstatements.html')
 
-    to_qs_mapping = {
+    to_qid_mapping = {
         'arxiv': arxiv_to_qs,
         'doi': doi_to_qs,
     }
 
     for identifier, d in ids.items():
-        fun = to_qs_mapping.get(d['type'])
+        fun = to_qid_mapping.get(d['type'])
         if fun:
             ids[identifier]["qid"] = fun(identifier)
 
-    matched = [[v['id'], v['qid'][0]] for v in ids.values() if "qid" in v]
-    unmatched = [v['id'] for v in ids.values() if "qid" not in v]
+    matched = [[v['id'], v['qid'][0]] for v in ids.values() if len(v['qid']) > 0]
+    unmatched = [v['id'] for v in ids.values() if len(v['qid']) == 0]
 
     if len(matched) > 0 and len(unmatched) == 0:
         # The identifiers are already in Wikidata
         return render_template('id-to-quickstatements.html', arxiv=query, qs=matched)
 
-    if False:
-        try:
-            metadatas = list(map(get_arxiv_metadata, unmatched))
-        except Exception:
-            if len(matched) > 0:
-                return render_template('id-to-quickstatements.html', arxiv=query, qs=matched)
-            return render_template('id-to-quickstatements.html', arxiv=query, error=True)
+    get_metadata_mapping = {
+        'arxiv': get_arxiv_metadata,
+        'doi': get_doi_metadata,
+    }
 
-        quickstatements = list(map(metadata_to_quickstatements, metadatas))
+    get_quickstatements_mapping = {
+        'arxiv': arxiv_metadata_to_quickstatements,
+        'doi': doi_metadata_to_quickstatements,
+    }
 
-        # For Quickstatements Version 2 in URL components,
-        # TAB and newline should be replace by | and ||
-        # https://www.wikidata.org/wiki/Help:QuickStatements
-        # Furthermore the '/' also needs to be encoded, but Jinja2 urlencode does
-        # not encode that character.
-        # https://github.com/pallets/jinja/issues/515
-        # Here, we let jinja2 handle the encoding rather than adding an extra
+    for identifier in unmatched:
+        fun = get_metadata_mapping.get(ids[identifier]['type'])
+        if fun:
+            try:
+                metadata = fun(identifier)
+            except Exception:
+                if len(matched) > 0:
+                    return render_template('id-to-quickstatements.html', arxiv=query, qs=matched, error=True)
+                return render_template('id-to-quickstatements.html', arxiv=query, error=True)
+            
+            ids[identifier]["metadata"] = metadata
+            quickstatements_fun =  get_quickstatements_mapping.get(ids[identifier]['type'])
+            ids[identifier]['quickstatements'] = quickstatements_fun(metadata)
 
-        if len(matched) > 0:
-            return render_template('id-to-quickstatements.html', arxiv=query,
-                                    qs=matched, quickstatements=quickstatements)
-        if len(matched) == 0 and len(quickstatements) == 0:
-            return render_template('id-to-quickstatements.html', arxiv=query,
-                                    qs=matched, quickstatements=quickstatements,
-                                    error=True)
-        return render_template('id-to-quickstatements.html',
-                            arxiv=query, quickstatements=quickstatements)
+    quickstatements = [v.get('quickstatements') for v in ids.values()]
+    quickstatements = list(filter(None, quickstatements))
+
+    # For Quickstatements Version 2 in URL components,
+    # TAB and newline should be replace by | and ||
+    # https://www.wikidata.org/wiki/Help:QuickStatements
+    # Furthermore the '/' also needs to be encoded, but Jinja2 urlencode does
+    # not encode that character.
+    # https://github.com/pallets/jinja/issues/515
+    # Here, we let jinja2 handle the encoding rather than adding an extra
+
+    if len(matched) > 0:
+        return render_template('id-to-quickstatements.html', arxiv=query,
+                                qs=matched, quickstatements=quickstatements)
+    if len(matched) == 0 and len(quickstatements) == 0:
+        return render_template('id-to-quickstatements.html', arxiv=query,
+                                qs=matched, quickstatements=quickstatements,
+                                error=True)
+    return render_template('id-to-quickstatements.html',
+                        arxiv=query, quickstatements=quickstatements)
 
 
 @main.route('/author/' + q_pattern)
