@@ -23,7 +23,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
                      ncbi_gene_to_qs, uniprot_to_qs)
-from ..utils import sanitize_q, remove_special_characters_url, string_to_list
+from ..utils import sanitize_q, remove_special_characters_url, string_to_list, string_to_type
 from ..wikipedia import q_to_bibliography_templates
 
 
@@ -268,46 +268,67 @@ def show_id_to_quickstatements():
 
     input_list = string_to_list(query)
 
-    arxivs = list(map(string_to_arxiv, input_list))
+    ids = {string: {'type': string_to_type(string)} for string in input_list}
 
-    if not arxivs:
-        # Could not identify an arxiv identifier
+    to_id_mapping = {
+        'arxiv': string_to_arxiv,
+        # 'doi': string_to_doi,
+    }
+
+    for identifier, d in ids.items():
+        fun = to_id_mapping.get(d['type'])
+        if fun:
+            ids[identifier]["id"] = fun(identifier)
+
+    if all(["id" not in v for v in ids.values()]):
+        # Could not identify an identifier
         return render_template('id-to-quickstatements.html')
 
-    qs = [[arxiv, arxiv_to_qs(arxiv)] for arxiv in arxivs]
-    matched = [[q[0], q[1][0]] for q in qs if len(q[1]) > 0]
-    unmatched = [q[0] for q in qs if len(q[1]) == 0]
+    to_qs_mapping = {
+        'arxiv': arxiv_to_qs,
+        # 'doi': string_to_doi,
+    }
+    
+    for identifier, d in ids.items():
+        fun = to_qs_mapping.get(d['type'])
+        if fun:
+            ids[identifier]["qid"] = fun(identifier)
+
+    print(ids)
+    matched = [[v['id'], v['qid'][0]] for v in ids.values() if "qid" in v]
+    unmatched = [v['id'] for v in ids.values() if "qid" not in v]
 
     if len(matched) > 0 and len(unmatched) == 0:
         # The arxiv is already in Wikidata
         return render_template('id-to-quickstatements.html', arxiv=query, qs=matched)
 
-    try:
-        metadatas = list(map(get_arxiv_metadata, unmatched))
-    except Exception:
+    if False:
+        try:
+            metadatas = list(map(get_arxiv_metadata, unmatched))
+        except Exception:
+            if len(matched) > 0:
+                return render_template('id-to-quickstatements.html', arxiv=query, qs=matched)
+            return render_template('id-to-quickstatements.html', arxiv=query, error=True)
+
+        quickstatements = list(map(metadata_to_quickstatements, metadatas))
+
+        # For Quickstatements Version 2 in URL components,
+        # TAB and newline should be replace by | and ||
+        # https://www.wikidata.org/wiki/Help:QuickStatements
+        # Furthermore the '/' also needs to be encoded, but Jinja2 urlencode does
+        # not encode that character.
+        # https://github.com/pallets/jinja/issues/515
+        # Here, we let jinja2 handle the encoding rather than adding an extra
+
         if len(matched) > 0:
-            return render_template('id-to-quickstatements.html', arxiv=query, qs=matched)
-        return render_template('id-to-quickstatements.html', arxiv=query, error=True)
-
-    quickstatements = list(map(metadata_to_quickstatements, metadatas))
-
-    # For Quickstatements Version 2 in URL components,
-    # TAB and newline should be replace by | and ||
-    # https://www.wikidata.org/wiki/Help:QuickStatements
-    # Furthermore the '/' also needs to be encoded, but Jinja2 urlencode does
-    # not encode that character.
-    # https://github.com/pallets/jinja/issues/515
-    # Here, we let jinja2 handle the encoding rather than adding an extra
-
-    if len(matched) > 0:
-        return render_template('id-to-quickstatements.html', arxiv=query,
-                                qs=matched, quickstatements=quickstatements)
-    if len(matched) == 0 and len(quickstatements) == 0:
-        return render_template('id-to-quickstatements.html', arxiv=query,
-                                qs=matched, quickstatements=quickstatements,
-                                error=True)
-    return render_template('id-to-quickstatements.html',
-                           arxiv=query, quickstatements=quickstatements)
+            return render_template('id-to-quickstatements.html', arxiv=query,
+                                    qs=matched, quickstatements=quickstatements)
+        if len(matched) == 0 and len(quickstatements) == 0:
+            return render_template('id-to-quickstatements.html', arxiv=query,
+                                    qs=matched, quickstatements=quickstatements,
+                                    error=True)
+        return render_template('id-to-quickstatements.html',
+                            arxiv=query, quickstatements=quickstatements)
 
 
 @main.route('/author/' + q_pattern)
