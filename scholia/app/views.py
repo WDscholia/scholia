@@ -14,6 +14,7 @@ from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_sponsor_latest_works)
 from ..arxiv import metadata_to_quickstatements, string_to_arxivs
 from ..arxiv import get_metadata as get_arxiv_metadata
+from ..doi import string_to_doi
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      doi_prefix_to_qs, github_to_qs, biorxiv_to_qs,
                      chemrxiv_to_qs, omim_to_qs,
@@ -272,7 +273,7 @@ def show_id_to_quickstatements():
 
     to_id_mapping = {
         'arxiv': string_to_arxiv,
-        # 'doi': string_to_doi,
+        'doi': string_to_doi,
     }
 
     for identifier, d in ids.items():
@@ -286,20 +287,19 @@ def show_id_to_quickstatements():
 
     to_qs_mapping = {
         'arxiv': arxiv_to_qs,
-        # 'doi': string_to_doi,
+        'doi': doi_to_qs,
     }
-    
+
     for identifier, d in ids.items():
         fun = to_qs_mapping.get(d['type'])
         if fun:
             ids[identifier]["qid"] = fun(identifier)
 
-    print(ids)
     identified_qs = [[v['id'], v['qid'][0]] for v in ids.values() if "qid" in v]
     missing_arxivs = [v['id'] for v in ids.values() if "qid" not in v]
 
     if len(identified_qs) > 0 and len(missing_arxivs) == 0:
-        # The arxiv is already in Wikidata
+        # The identifiers are already in Wikidata
         return render_template('id-to-quickstatements.html', arxiv=query, qs=matched)
 
     if False:
