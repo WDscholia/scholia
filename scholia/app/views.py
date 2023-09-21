@@ -14,8 +14,7 @@ from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_sponsor_latest_works)
 from ..arxiv import string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
-from ..arxiv import metadata_to_quickstatements as arxiv_metadata_to_quickstatements
-from ..doi import string_to_doi, get_doi_metadata, doi_metadata_to_quickstatements
+from ..doi import string_to_doi, get_doi_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      doi_prefix_to_qs, github_to_qs, biorxiv_to_qs,
                      chemrxiv_to_qs, omim_to_qs,
@@ -26,7 +25,9 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs
                      ncbi_gene_to_qs, uniprot_to_qs, random_work,
                      random_podcast)
-from ..utils import sanitize_q, remove_special_characters_url, string_to_list, string_to_type
+from ..utils import (metadata_to_quickstatements,
+                     remove_special_characters_url, sanitize_q, string_to_list,
+                     string_to_type)
 from ..wikipedia import q_to_bibliography_templates
 
 
@@ -308,11 +309,6 @@ def show_id_to_quickstatements():
         'doi': get_doi_metadata,
     }
 
-    get_quickstatements_mapping = {
-        'arxiv': arxiv_metadata_to_quickstatements,
-        'doi': doi_metadata_to_quickstatements,
-    }
-
     for identifier in unmatched:
         fun = get_metadata_mapping.get(ids[identifier]['type'])
         if fun:
@@ -324,8 +320,7 @@ def show_id_to_quickstatements():
                 return render_template('id-to-quickstatements.html', arxiv=query, error=True)
             
             ids[identifier]["metadata"] = metadata
-            quickstatements_fun =  get_quickstatements_mapping.get(ids[identifier]['type'])
-            ids[identifier]['quickstatements'] = quickstatements_fun(metadata)
+            ids[identifier]['quickstatements'] = metadata_to_quickstatements(metadata)
 
     quickstatements = [v.get('quickstatements') for v in ids.values()]
     quickstatements = list(filter(None, quickstatements))
