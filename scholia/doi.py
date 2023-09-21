@@ -88,7 +88,7 @@ def get_doi_metadata(doi):
 
     except Exception as e:
         return {"error": f"An unexpected error occurred: {e}"}
-    
+
 
 def string_to_doi(string):
     """Extract doi id from string.
