@@ -78,7 +78,8 @@ def get_metadata(arxiv):
     metadata = {
         'arxiv': arxiv,
         'authornames': [author.name for author in entry.authors],
-        'full_text_url': 'https://arxiv.org/pdf/' + arxiv + '.pdf',
+        'full_text_url': f'https://arxiv.org/pdf/{arxiv}.pdf',
+        'publication_date_P577': f'+{entry.published[:10]}T00:00:00Z/11',
         'publication_date': entry.published[:10],
 
         # Some titles may have a newline in them. This should be converted to
