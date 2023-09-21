@@ -208,37 +208,37 @@ def metadata_to_quickstatements(metadata):
     - https://wikidata-todo.toolforge.org/quick_statements.php
 
     """
-    qs = u"CREATE\n"
-    qs += u'LAST\tP31\tQ13442814\n'
 
-    if 'arxiv' in metadata:
+    def clean(string):
+        return string.replace('"', '\"')
+
+    qs = "CREATE\n"
+    qs += "LAST\tP31\tQ13442814\n"
+
+    if "arxiv" in metadata:
         # arXiv ID
-        qs += u'LAST\tP818\t"{}"'.format(metadata['arxiv'])
+        qs += f'LAST\tP818\t"{metadata["arxiv"]}"'
         # No line break, to accommodate the following qualifiers
 
-        if 'arxiv_classifications' in metadata:
+        if "arxiv_classifications" in metadata:
             # arXiv classifications such as "cs.LG", as qualifier to arXiv ID
-            for classification in metadata['arxiv_classifications']:
-                qs += u'\tP820\t"{}"'.format(
-                    classification.replace('"', '\"'))
+            for classification in metadata["arxiv_classifications"]:
+                qs += f'\tP820\t"{clean(classification)}"'
 
         # Line break for the P818 statement
-        qs += u"\n"
+        qs += "\n"
 
-    qs += u'LAST\tLen\t"{}"\n'.format(metadata['title'].replace('"', '\"'))
-    qs += u'LAST\tP1476\ten:"{}"\n'.format(
-        metadata['title'].replace('"', '\"'))
-    qs += u'LAST\tP577\t+{}T00:00:00Z/11\n'.format(
-        metadata['publication_date'][:10])
-    if metadata['full_text_url']:
-        qs += u'LAST\tP953\t"{}"\n'.format(
-            metadata['full_text_url'].replace('"', '\"'))
+    qs += f'LAST\tLen\t"{clean(metadata["title"])}"\n'
+    qs += f'LAST\tP1476\ten:"{clean(metadata["title"])}"\n'
+    qs += f'LAST\tP577\t+{metadata["publication_date"][:10]}T00:00:00Z/11\n'
+    if metadata["full_text_url"]:
+        qs += f'LAST\tP953\t"{clean(metadata["full_text_url"])}"\n'
 
     # Optional DOI
-    if 'doi' in metadata:
-        qs += u'LAST\tP356\t"{}"\n'.format(metadata['doi'].replace('"', '\"'))
+    if "doi" in metadata:
+        qs += f'LAST\tP356\t"{clean(metadata["doi"])}"\n'
 
-    for n, authorname in enumerate(metadata['authornames'], start=1):
-        qs += u'LAST\tP2093\t"{}"\tP1545\t"{}"\n'.format(
-            authorname.replace('"', '\"'), n)
+    for n, authorname in enumerate(metadata["authornames"], start=1):
+        qs += f'LAST\tP2093\t"{clean(authorname)}"\tP1545\t"{n}"\n'
+
     return qs
