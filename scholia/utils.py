@@ -166,3 +166,63 @@ def pages_to_number_of_pages(pages):
         except ValueError:
             pass
     return number_of_pages
+
+
+def metadata_to_quickstatements(metadata):
+    """Convert metadata to quickstatements.
+
+    Convert metadata about a ArXiv article represented in a dict to a
+    format so it can copy and pasted into Magnus Manske quickstatement web tool
+    to populate Wikidata.
+
+    This function does not check whether the item already exists.
+
+    Parameters
+    ----------
+    metadata : dict
+        Dictionary with metadata.
+
+    Returns
+    -------
+    quickstatements : str
+        String with quickstatements.
+
+    References
+    ----------
+    - https://wikidata-todo.toolforge.org/quick_statements.php
+
+    """
+    qs = u"CREATE\n"
+    qs += u'LAST\tP31\tQ13442814\n'
+
+    if 'arxiv' in metadata:
+        # arXiv ID
+        qs += u'LAST\tP818\t"{}"'.format(metadata['arxiv'])
+        # No line break, to accommodate the following qualifiers
+
+        if 'arxiv_classifications' in metadata:
+            # arXiv classifications such as "cs.LG", as qualifier to arXiv ID
+            for classification in metadata['arxiv_classifications']:
+                qs += u'\tP820\t"{}"'.format(
+                    classification.replace('"', '\"'))
+
+        # Line break for the P818 statement
+        qs += u"\n"
+
+    qs += u'LAST\tLen\t"{}"\n'.format(metadata['title'].replace('"', '\"'))
+    qs += u'LAST\tP1476\ten:"{}"\n'.format(
+        metadata['title'].replace('"', '\"'))
+    qs += u'LAST\tP577\t+{}T00:00:00Z/11\n'.format(
+        metadata['publication_date'][:10])
+    if metadata['full_text_url']:
+        qs += u'LAST\tP953\t"{}"\n'.format(
+            metadata['full_text_url'].replace('"', '\"'))
+
+    # Optional DOI
+    if 'doi' in metadata:
+        qs += u'LAST\tP356\t"{}"\n'.format(metadata['doi'].replace('"', '\"'))
+
+    for n, authorname in enumerate(metadata['authornames'], start=1):
+        qs += u'LAST\tP2093\t"{}"\tP1545\t"{}"\n'.format(
+            authorname.replace('"', '\"'), n)
+    return qs
