@@ -211,7 +211,7 @@ def metadata_to_quickstatements(metadata):
 
     def clean(string):
         return string.replace('"', '\"')
-    
+
     def getNiceDate(input):
         date = list(map(int, input.split("-")))
         if len(date) == 1:
