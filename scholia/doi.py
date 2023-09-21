@@ -48,6 +48,19 @@ def get_doi_metadata(doi):
     True
 
     """
+    def getDate(input):
+        if len(input) == 1 and input[0] != "None" and input[0] != None:
+            date = f"{input[0]}"
+            return date, f"+{date}-00-00T00:00:00Z/9"
+        if len(input) == 2:
+            date = f"{input[0]}-{input[1]:02d}"
+            return date, f"+{date}-00T00:00:00Z/10"
+        if len(input) == 3:
+            date = f"{input[0]}-{input[1]:02d}-{input[2]:02d}"
+            return date, f"+{date}T00:00:00Z/11"
+
+        return "", ""
+
     doi = doi.strip()
 
     url = CROSSREF_URL + doi
@@ -58,11 +71,7 @@ def get_doi_metadata(doi):
         if response.status_code == 200:
             entry = response.json()["message"]
 
-            d = entry["issued"]["date-parts"][0]
-            if len(d) == 3:
-                date = f"{d[0]}-{d[1]:02d}-{d[2]:02d}"
-            else:
-                date = ""
+            plain_date, date = getDate(entry["issued"]["date-parts"][0])
             
             metadata = {
                 "doi": entry.get("DOI"),
@@ -71,7 +80,8 @@ def get_doi_metadata(doi):
                     for author in entry.get("author", [])
                 ],
                 "full_text_url": entry.get("resource", {}).get("primary", {}).get("URL"),
-                "publication_date": date,
+                "publication_date_P577": date,
+                "publication_date": plain_date,
                 # Some titles may have a newline in them. This should be converted to
                 # an ordinary space character
                 "title": re.sub(r"\s+", " ", entry["title"][0]),
@@ -88,7 +98,6 @@ def get_doi_metadata(doi):
 
     except Exception as e:
         return {"error": f"An unexpected error occurred: {e}"}
-
 
 def string_to_doi(string):
     """Extract doi id from string.

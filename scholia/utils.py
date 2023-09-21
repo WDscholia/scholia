@@ -1,7 +1,7 @@
 """utils."""
 
+import calendar
 import urllib.parse
-
 from re import findall, search
 
 
@@ -211,6 +211,17 @@ def metadata_to_quickstatements(metadata):
 
     def clean(string):
         return string.replace('"', '\"')
+    
+    def getNiceDate(input):
+        date = list(map(int, input.split("-")))
+        if len(date) == 1:
+            return f" published in {date[0]}"
+        if len(date) == 2:
+            return f" published in {calendar.month_name[date[1]]} {date[0]}"
+        if len(date) == 3:
+            return f" published on {date[2]} {calendar.month_name[date[1]]} {date[0]}"
+
+        return ""
 
     qs = "CREATE\n"
     qs += "LAST\tP31\tQ13442814\n"
@@ -229,8 +240,9 @@ def metadata_to_quickstatements(metadata):
         qs += "\n"
 
     qs += f'LAST\tLen\t"{clean(metadata["title"])}"\n'
+    qs += f'LAST\tDen\t"scientific article{getNiceDate(metadata["publication_date"])}"\n'
     qs += f'LAST\tP1476\ten:"{clean(metadata["title"])}"\n'
-    qs += f'LAST\tP577\t+{metadata["publication_date"][:10]}T00:00:00Z/11\n'
+    qs += f'LAST\tP577\t{metadata["publication_date_P577"]}\n'
     if metadata["full_text_url"]:
         qs += f'LAST\tP953\t"{clean(metadata["full_text_url"])}"\n'
 
