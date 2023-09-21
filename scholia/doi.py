@@ -72,7 +72,7 @@ def get_doi_metadata(doi):
             entry = response.json()["message"]
 
             plain_date, date = getDate(entry["issued"]["date-parts"][0])
-            
+
             metadata = {
                 "doi": entry.get("DOI"),
                 "authornames": [
