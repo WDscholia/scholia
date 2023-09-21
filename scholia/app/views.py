@@ -263,7 +263,7 @@ def show_id_to_quickstatements():
     show_arxiv.
 
     """
-    query = request.args.get('arxiv')
+    query = request.args.get('query')
     current_app.logger.debug("query: {}".format(str(query)))
 
     if not query:
@@ -302,7 +302,7 @@ def show_id_to_quickstatements():
 
     if len(identified_qs) > 0 and len(missing_arxivs) == 0:
         # The identifiers are already in Wikidata
-        return render_template('id-to-quickstatements.html', arxiv=query, qs=matched)
+        return render_template('id-to-quickstatements.html', query=query, qs=matched)
 
     get_metadata_mapping = {
         'arxiv': get_arxiv_metadata,
@@ -316,9 +316,9 @@ def show_id_to_quickstatements():
                 metadata = fun(identifier)
             except Exception:
                 if len(matched) > 0:
-                    return render_template('id-to-quickstatements.html', arxiv=query, qs=matched, error=True)
-                return render_template('id-to-quickstatements.html', arxiv=query, error=True)
-            
+                    return render_template('id-to-quickstatements.html', query=query, qs=matched, error=True)
+                return render_template('id-to-quickstatements.html', query=query, error=True)
+
             ids[identifier]["metadata"] = metadata
             ids[identifier]['quickstatements'] = metadata_to_quickstatements(metadata)
 
@@ -334,14 +334,14 @@ def show_id_to_quickstatements():
     # Here, we let jinja2 handle the encoding rather than adding an extra
 
     if len(matched) > 0:
-        return render_template('id-to-quickstatements.html', arxiv=query,
+        return render_template('id-to-quickstatements.html', query=query,
                                 qs=matched, quickstatements=quickstatements)
     if len(matched) == 0 and len(quickstatements) == 0:
-        return render_template('id-to-quickstatements.html', arxiv=query,
+        return render_template('id-to-quickstatements.html', query=query,
                                 qs=matched, quickstatements=quickstatements,
                                 error=True)
     return render_template('id-to-quickstatements.html',
-                        arxiv=query, quickstatements=quickstatements)
+                        query=query, quickstatements=quickstatements)
 
 
 @main.route('/author/' + q_pattern)
