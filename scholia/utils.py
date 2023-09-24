@@ -223,18 +223,24 @@ def metadata_to_quickstatements(metadata):
         # Line break for the P818 statement
         qs += "\n"
 
-    qs += f'LAST\tLen\t"{clean(metadata["title"])}"\n'
-    qs += f'LAST\tDen\t"scientific article{getNiceDate(metadata["publication_date"])}"\n'
-    qs += f'LAST\tP1476\ten:"{clean(metadata["title"])}"\n'
-    qs += f'LAST\tP577\t{metadata["publication_date_P577"]}\n'
-    if metadata["full_text_url"]:
+    if "title" in metadata:
+        qs += f'LAST\tLen\t"{clean(metadata["title"])}"\n'
+        qs += f'LAST\tP1476\ten:"{clean(metadata["title"])}"\n'
+    if "publicatin_date" in metadata:
+        qs += f'LAST\tDen\t"scientific article{getNiceDate(metadata["publication_date"])}"\n'
+    else:
+        qs += f'LAST\tDen\t"scientific article"\n'
+    if "publication_date_P577" in metadata:
+        qs += f'LAST\tP577\t{metadata["publication_date_P577"]}\n'
+    if "full_text_url" in metadata and metadata["full_text_url"]:
         qs += f'LAST\tP953\t"{clean(metadata["full_text_url"])}"\n'
 
     # Optional DOI
     if "doi" in metadata:
         qs += f'LAST\tP356\t"{clean(metadata["doi"])}"\n'
 
-    for n, authorname in enumerate(metadata["authornames"], start=1):
-        qs += f'LAST\tP2093\t"{clean(authorname)}"\tP1545\t"{n}"\n'
+    if "authornames" in metadata:
+        for n, authorname in enumerate(metadata["authornames"], start=1):
+            qs += f'LAST\tP2093\t"{clean(authorname)}"\tP1545\t"{n}"\n'
 
     return qs

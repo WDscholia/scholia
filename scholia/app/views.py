@@ -297,8 +297,8 @@ def show_id_to_quickstatements():
         if fun:
             ids[identifier]["qid"] = fun(identifier)
 
-    identified_qs = [[v['id'], v['qid'][0]] for v in ids.values() if len(v['qid']) > 0]
-    missing_arxivs = [v['id'] for v in ids.values() if len(v['qid']) == 0]
+    identified_qs = [[v['id'], v['qid'][0]] for v in ids.values() if 'qid' in v and len(v['qid']) > 0]
+    missing_arxivs = [v['id'] for v in ids.values() if 'qid' in v and len(v['qid']) == 0]
 
     if len(identified_qs) > 0 and len(missing_arxivs) == 0:
         # The identifiers are already in Wikidata
