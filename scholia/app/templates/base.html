@@ -111,6 +111,12 @@ askQuery("{{ panel }}", `# tool: scholia
 	     $(".self").text(title);
        $("title").text(title + " - Scholia");
 
+       var crossref_button = document.getElementById("check-crossref-button");
+       if (title && crossref_button) {
+        crossref_button.onclick = () => {get_dois_from_crossref(title)}
+        crossref_button.innerHTML = "Check Crossref"
+       }
+
 	     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
 	     $("#h1").text("Improve " + currentAspect + ": " + title);
 
