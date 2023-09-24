@@ -381,11 +381,14 @@ def doi_to_qs(doi):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
-    data = response.json()
+    try:
+        response = requests.get(url, params=params, headers=HEADERS)
+        data = response.json()
 
-    return [item['work']['value'][31:]
-            for item in data['results']['bindings']]
+        return [item['work']['value'][31:]
+                for item in data['results']['bindings']]
+    except:
+        return []
 
 
 def doi_prefix_to_qs(doi):
