@@ -129,7 +129,7 @@ def string_to_doi(string):
     PATTERN = re.compile(r"(?i)10.\d{4,9}/[^\s]+", flags=re.DOTALL | re.UNICODE)
     dois = PATTERN.findall(string)
     if len(dois) > 0:
-        return dois[0].upper()
+        return dois[0]
     return None
 
 
