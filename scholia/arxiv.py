@@ -62,38 +62,51 @@ def get_metadata(arxiv):
     >>> metadata = get_metadata('1503.00759')
     >>> metadata['doi'] == '10.1109/JPROC.2015.2483592'
     True
+    >>> get_metadata('5432.01234')
+    {'error': 'Not found'}
 
     """
     arxiv = arxiv.strip()
 
     url = ARXIV_URL + "api/query?id_list=" + arxiv
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
 
-    if not response.status_code == 200:
-        return None
+        if response.status_code == 200:
+            feed = parse_api(response.content)
+            entry = feed.entries[0]
 
-    feed = parse_api(response.content)
-    entry = feed.entries[0]
+            if "link" not in entry:
+                return {'error': "Not found"}
 
-    metadata = {
-        'arxiv': arxiv,
-        'authornames': [author.name for author in entry.authors],
-        'full_text_url': f'https://arxiv.org/pdf/{arxiv}.pdf',
-        'publication_date_P577': f'+{entry.published[:10]}T00:00:00Z/11',
-        'publication_date': entry.published[:10],
+            metadata = {
+                'arxiv': arxiv,
+                'authornames': [author.name for author in entry.authors],
+                'full_text_url': f'https://arxiv.org/pdf/{arxiv}.pdf',
+                'publication_date_P577': f'+{entry.published[:10]}T00:00:00Z/11',
+                'publication_date': entry.published[:10],
 
-        # Some titles may have a newline in them. This should be converted to
-        # an ordinary space character
-        'title': re.sub(r'\s+', ' ', entry.title),
+                # Some titles may have a newline in them. This should be converted to
+                # an ordinary space character
+                'title': re.sub(r'\s+', ' ', entry.title),
 
-        'arxiv_classifications': [tag.term for tag in entry.tags],
-    }
+                'arxiv_classifications': [tag.term for tag in entry.tags],
+            }
 
-    # Optional DOI
-    if "arxiv_doi" in entry:
-        metadata['doi'] = entry.arxiv_doi.upper()
+            # Optional DOI
+            if "arxiv_doi" in entry:
+                metadata['doi'] = entry.arxiv_doi.upper()
 
-    return metadata
+            return metadata
+        else:
+            # Handle non-200 status codes (e.g., 404, 500) appropriately
+            return {'error': f'Request failed with status code {response.status_code}'}
+
+    except requests.exceptions.RequestException as e:
+        # connection timeout, DNS resolution error, etc
+        return {'error': f'Request failed due to a network error: {e}'}
+    except Exception as e:
+        return {'error': f'An unexpected error occurred: {e}'}
 
 
 def metadata_to_quickstatements(metadata):
