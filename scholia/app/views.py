@@ -298,24 +298,24 @@ def show_id_to_quickstatements():
             ids[identifier]["qid"] = fun(identifier)
 
     identified_qs = [[v['id'], v['qid'][0]] for v in ids.values() if 'qid' in v and len(v['qid']) > 0]
-    missing_arxivs = [v['id'] for v in ids.values() if 'qid' in v and len(v['qid']) == 0]
+    missing_arxivs = [k for k, v in ids.items() if 'qid' in v and len(v['qid']) == 0]
 
     if len(identified_qs) > 0 and len(missing_arxivs) == 0:
         # The identifiers are already in Wikidata
-        return render_template('id-to-quickstatements.html', query=query, qs=matched)
+        return render_template('id-to-quickstatements.html', query=query, qs=identified_qs)
 
     get_metadata_mapping = {
         'arxiv': get_arxiv_metadata,
         'doi': get_doi_metadata,
     }
 
-    for identifier in unmatched:
+    for identifier in missing_arxivs:
         fun = get_metadata_mapping.get(ids[identifier]['type'])
         if fun:
             try:
                 metadata = fun(identifier)
             except Exception:
-                return render_template('id-to-quickstatements.html', query=query, qs=matched, error=True)
+                return render_template('id-to-quickstatements.html', query=query, qs=identified_qs, error=True)
 
             ids[identifier]["metadata"] = metadata
             if "error" not in metadata:
@@ -323,6 +323,8 @@ def show_id_to_quickstatements():
 
     quickstatements = [v.get('quickstatements') for v in ids.values()]
     quickstatements = list(filter(None, quickstatements))
+
+    failed = [[v['id'], v['metadata']['error']] for v in ids.values() if 'metadata' in v and 'error' in v['metadata']]
 
     # For Quickstatements Version 2 in URL components,
     # TAB and newline should be replace by | and ||
@@ -332,12 +334,12 @@ def show_id_to_quickstatements():
     # https://github.com/pallets/jinja/issues/515
     # Here, we let jinja2 handle the encoding rather than adding an extra
 
-    if len(matched) == 0 and len(quickstatements) == 0:
+    if len(identified_qs) == 0 and len(quickstatements) == 0 and len(failed) == 0:
         return render_template('id-to-quickstatements.html', query=query,
-                                qs=matched, quickstatements=quickstatements,
-                                error=True)
+                                qs=identified_qs, quickstatements=quickstatements,
+                                error=True, failures=failed)
     return render_template('id-to-quickstatements.html', query=query,
-                            qs=matched, quickstatements=quickstatements)
+                            qs=identified_qs, quickstatements=quickstatements, failed=failed)
 
 
 @main.route('/author/' + q_pattern)

@@ -196,8 +196,8 @@ def metadata_to_quickstatements(metadata):
     def clean(string):
         return string.replace('"', '\"')
 
-    def getNiceDate(input):
-        date = list(map(int, input.split("-")))
+    def get_nice_date(date_str):
+        date = list(map(int, date_str.split("-")))
         if len(date) == 1:
             return f" published in {date[0]}"
         if len(date) == 2:
@@ -210,37 +210,45 @@ def metadata_to_quickstatements(metadata):
     qs = "CREATE\n"
     qs += "LAST\tP31\tQ13442814\n"
 
-    if "arxiv" in metadata:
-        # arXiv ID
-        qs += f'LAST\tP818\t"{metadata["arxiv"]}"'
-        # No line break, to accommodate the following qualifiers
+    arxiv = metadata.get("arxiv")
+    if arxiv:
+        qs += f'LAST\tP818\t"{arxiv}"' # No line break, to accommodate the following qualifiers
 
-        if "arxiv_classifications" in metadata:
+        arxiv_classifications = metadata.get("arxiv_classifications")
+        if arxiv_classifications:
             # arXiv classifications such as "cs.LG", as qualifier to arXiv ID
-            for classification in metadata["arxiv_classifications"]:
+            for classification in arxiv_classifications:
                 qs += f'\tP820\t"{clean(classification)}"'
 
         # Line break for the P818 statement
         qs += "\n"
 
-    if "title" in metadata:
-        qs += f'LAST\tLen\t"{clean(metadata["title"])}"\n'
-        qs += f'LAST\tP1476\ten:"{clean(metadata["title"])}"\n'
-    if "publicatin_date" in metadata:
-        qs += f'LAST\tDen\t"scientific article{getNiceDate(metadata["publication_date"])}"\n'
+    title = metadata.get("title")
+    if title:
+        qs += f'LAST\tLen\t"{clean(title)}"\n'
+        qs += f'LAST\tP1476\ten:"{clean(title)}"\n'
+    
+    publication_date = metadata.get("publication_date")
+    if publication_date:
+        qs += f'LAST\tDen\t"scientific article{get_nice_date(publication_date)}"\n'
     else:
-        qs += f'LAST\tDen\t"scientific article"\n'
-    if "publication_date_P577" in metadata:
-        qs += f'LAST\tP577\t{metadata["publication_date_P577"]}\n'
-    if "full_text_url" in metadata and metadata["full_text_url"]:
-        qs += f'LAST\tP953\t"{clean(metadata["full_text_url"])}"\n'
+        qs += 'LAST\tDen\t"scientific article"\n'
+    
+    publication_date_P577 = metadata.get("publication_date_P577")
+    if publication_date_P577:
+        qs += f'LAST\tP577\t{publication_date_P577}\n'
+    
+    full_text_url = metadata.get("full_text_url")
+    if full_text_url:
+        qs += f'LAST\tP953\t"{clean(full_text_url)}"\n'
 
-    # Optional DOI
-    if "doi" in metadata:
-        qs += f'LAST\tP356\t"{clean(metadata["doi"])}"\n'
+    doi = metadata.get("doi")
+    if doi:
+        qs += f'LAST\tP356\t"{clean(doi)}"\n'
 
-    if "authornames" in metadata:
-        for n, authorname in enumerate(metadata["authornames"], start=1):
+    authornames = metadata.get(authornames, [])
+    if authornames:
+        for n, authorname in enumerate(authornames, start=1):
             qs += f'LAST\tP2093\t"{clean(authorname)}"\tP1545\t"{n}"\n'
 
     return qs
