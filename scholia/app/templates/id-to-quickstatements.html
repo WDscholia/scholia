@@ -68,5 +68,15 @@ comma, space, pipe or tab separated. Note that new items may not be immediately 
 {% endfor %}
 {% endif %}
 
+{% if (failed|length) > 0 %}
+<h2>Failed</h2>
+
+<ul>
+{% for fail in failed %}
+<li>{{ fail[0] }}: {{ fail[1] }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+
 
 {% endblock %}

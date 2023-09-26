@@ -21,7 +21,7 @@ import re
 
 import requests
 from feedparser import parse as parse_api
-
+from flask import current_app
 
 USER_AGENT = 'Scholia'
 
@@ -104,9 +104,11 @@ def get_metadata(arxiv):
 
     except requests.exceptions.RequestException as e:
         # connection timeout, DNS resolution error, etc
-        return {'error': f'Request failed due to a network error: {e}'}
+        current_app.logger.debug(f'Request failed due to a network error: {e}')
+        return {'error': 'Request failed due to a network error'}
     except Exception as e:
-        return {'error': f'An unexpected error occurred: {e}'}
+        current_app.logger.debug(f'An unexpected error occurred: {e}')
+        return {'error': 'An unexpected error occurred'}
 
 
 def metadata_to_quickstatements(metadata):

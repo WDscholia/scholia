@@ -298,7 +298,7 @@ def show_id_to_quickstatements():
             ids[identifier]["qid"] = fun(identifier)
 
     matched = [[v['id'], v['qid'][0]] for v in ids.values() if 'qid' in v and len(v['qid']) > 0]
-    unmatched = [v['id'] for v in ids.values() if 'qid' in v and len(v['qid']) == 0]
+    unmatched = [k for k, v in ids.items() if 'qid' in v and len(v['qid']) == 0]
 
     if len(matched) > 0 and len(unmatched) == 0:
         # The identifiers are already in Wikidata
@@ -324,6 +324,8 @@ def show_id_to_quickstatements():
     quickstatements = [v.get('quickstatements') for v in ids.values()]
     quickstatements = list(filter(None, quickstatements))
 
+    failed = [[v['id'], v['metadata']['error']] for v in ids.values() if 'metadata' in v and 'error' in v['metadata']]
+
     # For Quickstatements Version 2 in URL components,
     # TAB and newline should be replace by | and ||
     # https://www.wikidata.org/wiki/Help:QuickStatements
@@ -332,12 +334,12 @@ def show_id_to_quickstatements():
     # https://github.com/pallets/jinja/issues/515
     # Here, we let jinja2 handle the encoding rather than adding an extra
 
-    if len(matched) == 0 and len(quickstatements) == 0:
+    if len(matched) == 0 and len(quickstatements) == 0 and len(failed) == 0:
         return render_template('id-to-quickstatements.html', query=query,
                                 qs=matched, quickstatements=quickstatements,
-                                error=True)
+                                error=True, failures=failed)
     return render_template('id-to-quickstatements.html', query=query,
-                            qs=matched, quickstatements=quickstatements)
+                            qs=matched, quickstatements=quickstatements, failed=failed)
 
 
 @main.route('/author/' + q_pattern)

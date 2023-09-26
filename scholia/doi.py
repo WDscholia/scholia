@@ -13,6 +13,7 @@ References
 import re
 
 import requests
+from flask import current_app
 
 USER_AGENT = "Scholia"
 
@@ -98,10 +99,12 @@ def get_doi_metadata(doi):
 
     except requests.exceptions.RequestException as e:
         # connection timeout, DNS resolution error, etc
-        return {"error": f"Request failed due to a network error: {e}"}
+        current_app.logger.debug(f'Request failed due to a network error: {e}')
+        return {'error': 'Request failed due to a network error'}
 
     except Exception as e:
-        return {"error": f"An unexpected error occurred: {e}"}
+        current_app.logger.debug(f'An unexpected error occurred: {e}')
+        return {'error': 'An unexpected error occurred'}
 
 def string_to_doi(string):
     """Extract doi id from string.
