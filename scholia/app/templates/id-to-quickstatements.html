@@ -58,18 +58,7 @@ comma, space, pipe or tab separated. Note that new items may not be immediately 
 
 {% if (quickstatements|length) > 0 %}
 <h2>Not found</h2>
-{% endif %}
 
-{% if (quickstatements|length) == 1 %}
-<div id="quickstatements"><pre>{{ quickstatements[0] }}</pre></div>
-
-<a href="https://quickstatements.toolforge.org/#/v1={{ quickstatements[0] | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}">
-  <button class="btn btn-primary">Submit to Quickstatements ↗</button>
-</a>
-
-{% endif %}
-
-{% if (quickstatements|length) > 1 %}
 {% for quickstatement in quickstatements %}
 <div id="quickstatements"><pre>{{ quickstatement }}</pre></div>
 

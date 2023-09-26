@@ -315,12 +315,11 @@ def show_id_to_quickstatements():
             try:
                 metadata = fun(identifier)
             except Exception:
-                if len(matched) > 0:
-                    return render_template('id-to-quickstatements.html', query=query, qs=matched, error=True)
-                return render_template('id-to-quickstatements.html', query=query, error=True)
+                return render_template('id-to-quickstatements.html', query=query, qs=matched, error=True)
 
             ids[identifier]["metadata"] = metadata
-            ids[identifier]['quickstatements'] = metadata_to_quickstatements(metadata)
+            if "error" not in metadata:
+                ids[identifier]['quickstatements'] = metadata_to_quickstatements(metadata)
 
     quickstatements = [v.get('quickstatements') for v in ids.values()]
     quickstatements = list(filter(None, quickstatements))
@@ -333,15 +332,12 @@ def show_id_to_quickstatements():
     # https://github.com/pallets/jinja/issues/515
     # Here, we let jinja2 handle the encoding rather than adding an extra
 
-    if len(matched) > 0:
-        return render_template('id-to-quickstatements.html', query=query,
-                                qs=matched, quickstatements=quickstatements)
     if len(matched) == 0 and len(quickstatements) == 0:
         return render_template('id-to-quickstatements.html', query=query,
                                 qs=matched, quickstatements=quickstatements,
                                 error=True)
-    return render_template('id-to-quickstatements.html',
-                        query=query, quickstatements=quickstatements)
+    return render_template('id-to-quickstatements.html', query=query,
+                            qs=matched, quickstatements=quickstatements)
 
 
 @main.route('/author/' + q_pattern)
