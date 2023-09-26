@@ -43,9 +43,11 @@ def get_doi_metadata(doi):
 
     Examples
     --------
-    >>> metadata = get_metadata('10.1177/0269216319865414')
+    >>> metadata = get_doi_metadata('10.1177/0269216319865414')
     >>> metadata['publication_date'] == '2019-09-05'
     True
+    >>> metadata = get_doi_metadata('10.1177/123456789')
+    {'error': 'Not found'}
 
     """
     def getDate(input):
@@ -89,6 +91,8 @@ def get_doi_metadata(doi):
 
             return metadata
         else:
+            if response.text == "Resource not found.":
+                return {'error': "Not found"}
             # Handle non-200 status codes (e.g., 404, 500) appropriately
             return {"error": f"Request failed with status code {response.status_code}"}
 
