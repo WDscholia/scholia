@@ -11,7 +11,7 @@ References
 """
 
 import re
-
+import json
 import requests
 from flask import current_app
 
@@ -51,7 +51,7 @@ def get_doi_metadata(doi):
     {'error': 'Not found'}
 
     """
-    def getDate(input):
+    def get_date(input):
         if len(input) == 1 and input[0] != "None" and input[0] != None:
             date = f"{input[0]}"
             return date, f"+{date}-00-00T00:00:00Z/9"
@@ -74,12 +74,12 @@ def get_doi_metadata(doi):
         if response.status_code == 200:
             entry = response.json()["message"]
 
-            plain_date, date = getDate(entry["issued"]["date-parts"][0])
+            plain_date, date = get_date(entry["issued"]["date-parts"][0])
 
             metadata = {
                 "doi": entry.get("DOI"),
                 "authornames": [
-                    author.get("given") + " " + author.get("family")
+                    f"{author.get('name', '')} {author.get('given', '')} {author.get('family', '')}".strip()
                     for author in entry.get("author", [])
                 ],
                 "full_text_url": entry.get("resource", {}).get("primary", {}).get("URL"),
