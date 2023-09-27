@@ -2,8 +2,7 @@
 
 import calendar
 import urllib.parse
-from re import findall, search, split
-
+from re import findall, search, split, IGNORECASE
 
 def escape_string(string):
     r"""Escape string.
@@ -83,15 +82,17 @@ def string_to_type(string):
     'issn'
 
     """
-    if search(r'\d{4}\-\d{3}(\d|X)', string):
+    string = string.strip()
+    if search(r'^\d{4}\-\d{3}(\d|X)$', string):
         return 'issn'
-    elif search(r'(?i)10.\d{4,9}/[^\s]+', string):
+
+    if search(r'^10.\d{4,9}/[^\s]+$', string, flags=IGNORECASE):
         return 'doi'
-    elif search(r'(\d{4}.\d{4,5}|[a-z\-]+(\.[A-Z]{2})?\/\d{7})(v\d+)?', string):
-        # does not handle pre 2007 format
+
+    if search(r'^(arxiv:)?(\d{4}.\d{4,5}|[a-z\-]+(\.[A-Z]{2})?\/\d{7})(v\d+)?$', string, flags=IGNORECASE):
         return 'arxiv'
-    else:
-        return 'string'
+
+    return 'string'
 
 
 def string_to_list(string):
@@ -227,17 +228,17 @@ def metadata_to_quickstatements(metadata):
     if title:
         qs += f'LAST\tLen\t"{clean(title)}"\n'
         qs += f'LAST\tP1476\ten:"{clean(title)}"\n'
-    
+
     publication_date = metadata.get("publication_date")
     if publication_date:
         qs += f'LAST\tDen\t"scientific article{get_nice_date(publication_date)}"\n'
     else:
         qs += 'LAST\tDen\t"scientific article"\n'
-    
+
     publication_date_P577 = metadata.get("publication_date_P577")
     if publication_date_P577:
         qs += f'LAST\tP577\t{publication_date_P577}\n'
-    
+
     full_text_url = metadata.get("full_text_url")
     if full_text_url:
         qs += f'LAST\tP953\t"{clean(full_text_url)}"\n'
@@ -246,7 +247,7 @@ def metadata_to_quickstatements(metadata):
     if doi:
         qs += f'LAST\tP356\t"{clean(doi)}"\n'
 
-    authornames = metadata.get(authornames, [])
+    authornames = metadata.get("authornames", [])
     if authornames:
         for n, authorname in enumerate(authornames, start=1):
             qs += f'LAST\tP2093\t"{clean(authorname)}"\tP1545\t"{n}"\n'
