@@ -384,7 +384,7 @@ def doi_to_qs(doi):
 
         return [item['work']['value'][31:]
                 for item in data['results']['bindings']]
-    except:
+    except Exception:
         return []
 
 

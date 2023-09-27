@@ -11,7 +11,7 @@ References
 """
 
 import re
-import json
+
 import requests
 from flask import current_app
 
@@ -51,15 +51,15 @@ def get_doi_metadata(doi):
     {'error': 'Not found'}
 
     """
-    def get_date(input):
-        if len(input) == 1 and input[0] != "None" and input[0] != None:
-            date = f"{input[0]}"
+    def get_date(date_list):
+        if len(date_list) == 1 and date_list[0] != "None" and date_list[0] != None:
+            date = f"{date_list[0]}"
             return date, f"+{date}-00-00T00:00:00Z/9"
-        if len(input) == 2:
-            date = f"{input[0]}-{input[1]:02d}"
+        if len(date_list) == 2:
+            date = f"{date_list[0]}-{date_list[1]:02d}"
             return date, f"+{date}-00T00:00:00Z/10"
-        if len(input) == 3:
-            date = f"{input[0]}-{input[1]:02d}-{input[2]:02d}"
+        if len(date_list) == 3:
+            date = f"{date_list[0]}-{date_list[1]:02d}-{date_list[2]:02d}"
             return date, f"+{date}T00:00:00Z/11"
 
         return "", ""
@@ -82,7 +82,8 @@ def get_doi_metadata(doi):
                     f"{author.get('name', '')} {author.get('given', '')} {author.get('family', '')}".strip()
                     for author in entry.get("author", [])
                 ],
-                "full_text_url": entry.get("resource", {}).get("primary", {}).get("URL"),
+                # not full text url if the paper is closed source
+                # "full_text_url": entry.get("resource", {}).get("primary", {}).get("URL"),
                 "publication_date_P577": date,
                 "publication_date": plain_date,
                 # Some titles may have a newline in them. This should be converted to
