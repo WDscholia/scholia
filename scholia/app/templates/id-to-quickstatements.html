@@ -26,7 +26,7 @@
 <p>Enter a single or list of <a href="https://arxiv.org">arXiv</a> identifiers or <a href="https://doi.org">DOIs</a> to retrieve their Wikidata items or QuickStatements to create items for them.</p>
 
 <p>Bare IDs (such as "1703.06103" or "10.1371/JOURNAL.PONE.0029797") or URLs (such as "https://arxiv.org/abs/1703.06103" or "https://doi.org/10.1371/JOURNAL.PONE.0029797") can be used and the list can be
-comma, space, pipe or tab separated. Note that new items may not be immediately found because of caching.</p>
+comma, space, pipe or tab separated. Note that new items in Wikidata may not be immediately found because of caching.</p>
 
 <h2>Result</h2>
 {% if error %}
@@ -36,12 +36,21 @@ comma, space, pipe or tab separated. Note that new items may not be immediately 
 {% endif %}
 
 {% if (qs|length) >= 1 %}
-<h2>Found</h2>
+<h2>{{ qs|length}} Found</h2>
+{% endif %}
 
-<div id="searchresult">Already entered as:
+{% if (qs|length) == 1 %}
+
+<div id="searchresult">{{ qs[0][0] }} has been entered as <a href="work/{{ qs[0][1] }}">{{ qs[0][1] }}</a></div>
+
+{% endif %}
+
+{% if (qs|length) > 1 %}
+
+<div id="searchresult">In Wikidata:
 <ul>
   {% for q in qs %}
-  <li><a href="work/{{ q }}">{{ q }}</a></li>
+  <li>{{ q[0] }}: <a href="work/{{ q[1] }}">{{ q[1] }}</a></li>
   {% endfor %}
 </ul>
 </div>
@@ -50,7 +59,7 @@ comma, space, pipe or tab separated. Note that new items may not be immediately 
 {% endif %}
 
 {% if (quickstatements|length) > 0 %}
-<h2>Not found</h2>
+<h2>{{(quickstatements|length)}} Not Found</h2>
 
 {% for quickstatement in quickstatements %}
 <div id="quickstatements"><pre>{{ quickstatement }}</pre></div>
@@ -62,7 +71,7 @@ comma, space, pipe or tab separated. Note that new items may not be immediately 
 {% endif %}
 
 {% if (failed|length) > 0 %}
-<h2>Failed</h2>
+<h2>{{(failed|length)}} Failed</h2>
 
 <ul>
 {% for fail in failed %}
