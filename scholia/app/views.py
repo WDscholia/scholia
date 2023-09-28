@@ -22,7 +22,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      viaf_to_qs, q_to_class, q_to_dois, random_author,
                      twitter_to_qs, cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
-                     pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs
+                     pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
                      ncbi_gene_to_qs, uniprot_to_qs, random_work,
                      random_podcast)
 from ..utils import (metadata_to_quickstatements,
