@@ -61,13 +61,33 @@ comma, space, pipe or tab separated. Note that new items in Wikidata may not be 
 {% if (quickstatements|length) > 0 %}
 <h2>{{(quickstatements|length)}} Not Found</h2>
 
-{% for quickstatement in quickstatements %}
-<div id="quickstatements"><pre>{{ quickstatement }}</pre></div>
+<blockquote>Select statements which you want to contribute and use the buttons at the bottom of the section to complete the action.</blockquote>
 
-<a href="https://quickstatements.toolforge.org/#/v1={{ quickstatement | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}">
-  <button class="btn btn-primary">Submit to Quickstatements ↗</button>
-</a>
+<button class="btn btn-secondary">Select all</button>
+<div class="container">
+{% for quickstatement in quickstatements %}
+  <div class="row">
+      <div class="col-1 align-self-center">
+        <input type="checkbox" class="select-item checkbox large-checkbox" name="select-item" value="{{loop.index}}" />
+      </div>
+    <div class="col-8"><pre>{{ quickstatement }}</pre></div>
+    <div class="d-none" id="qs-{{loop.index}}">{{ quickstatement | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}</div>
+    <div class="col-3 align-self-center">
+      <a href="https://quickstatements.toolforge.org/#/v1={{ quickstatement | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}"><button class="btn btn-outline-secondary">Submit to Quickstatements ↗</button></a>
+      <button class="btn btn-outline-secondary">Copy to clipboard</button></div>
+  </div>
 {% endfor %}
+</div>
+
+<div class="d-flex justify-content-between">
+  <button class="btn btn-primary">Select all</button>
+  <div>
+    <button class="btn btn-primary ml-auto">Submit to Quickstatements ↗</button> <button class="btn btn-primary">Copy to
+      clipboard</button></div>
+  </div>
+</div>
+
+
 {% endif %}
 
 {% if (failed|length) > 0 %}
