@@ -29,6 +29,8 @@ import requests
 
 from six import b, u
 
+from .query import SPARQL_ENDPOINT
+
 
 BIBLIOGRAPHY_SPARQL_QUERY = """
 select ?work ?title ?venueLabel ?date ?volume ?issue ?pages
@@ -103,7 +105,7 @@ def q_to_bibliography_templates(q):
 
     """
     query = BIBLIOGRAPHY_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/sparql'
+    url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
