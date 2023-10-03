@@ -11,9 +11,11 @@
 <form action="" id="form" method="GET" class="form-horizontal mb-3">
   <div class="input-group">
     {% if query %}
-    <input type="text" class="form-control" placeholder="Enter a single or list of arXiv IDs or DOIs" value="{{ query }}" id="searchterm" name="query"/>
+    <input type="text" class="form-control" placeholder="Enter a single or list of arXiv IDs or DOIs"
+      value="{{ query }}" id="searchterm" name="query" />
     {% else %}
-    <input type="text" class="form-control" placeholder="Enter a single or list of arXiv IDs or DOIs" id="searchterm" name="query"/>
+    <input type="text" class="form-control" placeholder="Enter a single or list of arXiv IDs or DOIs" id="searchterm"
+      name="query" />
     {% endif %}
     <span class="input-group-append">
       <button class="btn btn-primary" type="submit">
@@ -23,15 +25,21 @@
   </div>
 </form>
 
-<p>Enter a single or list of <a href="https://arxiv.org">arXiv</a> identifiers or <a href="https://doi.org">DOIs</a> to retrieve their Wikidata items or QuickStatements to create items for them.</p>
+<p>Enter a single or list of <a href="https://arxiv.org">arXiv</a> identifiers or <a href="https://doi.org">DOIs</a> to
+  retrieve their Wikidata items or QuickStatements to create items for them.</p>
 
-<p>Bare IDs (such as "1703.06103" or "10.1371/JOURNAL.PONE.0029797") or URLs (such as "https://arxiv.org/abs/1703.06103" or "https://doi.org/10.1371/JOURNAL.PONE.0029797") can be used and the list can be
-comma, space, pipe or tab separated. Note that new items in Wikidata may not be immediately found because of caching.</p>
+<p>Bare IDs (such as "1703.06103" or "10.1371/JOURNAL.PONE.0029797") or URLs (such as "https://arxiv.org/abs/1703.06103"
+  or "https://doi.org/10.1371/JOURNAL.PONE.0029797") can be used and the list can be
+  comma, space, pipe or tab separated. Note that new items in Wikidata may not be immediately found because of caching.
+</p>
 
 <h2>Result</h2>
 {% if error %}
 <div class="alert alert-warning" role="alert">
-  No results returned, potentially due to the upstream server being down. Please try again later. If the issue persists <a href="https://github.com/WDscholia/scholia/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=">submit a bug report on GitHub</a>.
+  No results returned, potentially due to the upstream server being down. Please try again later. If the issue persists
+  <a
+    href="https://github.com/WDscholia/scholia/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=">submit
+    a bug report on GitHub</a>.
 </div>
 {% endif %}
 
@@ -48,11 +56,11 @@ comma, space, pipe or tab separated. Note that new items in Wikidata may not be 
 {% if (qs|length) > 1 %}
 
 <div id="searchresult">In Wikidata:
-<ul>
-  {% for q in qs %}
-  <li>{{ q[0] }}: <a href="work/{{ q[1] }}">{{ q[1] }}</a></li>
-  {% endfor %}
-</ul>
+  <ul>
+    {% for q in qs %}
+    <li>{{ q[0] }}: <a href="work/{{ q[1] }}">{{ q[1] }}</a></li>
+    {% endfor %}
+  </ul>
 </div>
   
 
@@ -61,30 +69,41 @@ comma, space, pipe or tab separated. Note that new items in Wikidata may not be 
 {% if (quickstatements|length) > 0 %}
 <h2>{{(quickstatements|length)}} Not Found</h2>
 
-<blockquote>Select statements which you want to contribute and use the buttons at the bottom of the section to complete the action.</blockquote>
-
-<button class="btn btn-secondary">Select all</button>
+<blockquote>Select statements which you want to contribute and use the buttons at the bottom of the section to complete
+  the action.</blockquote>
+<input type="checkbox" class="d-none" id="select-all-state" />
+<button class="btn btn-secondary select-all">Select all</button> <button class="btn btn-secondary invert-selection">Invert selection</button>
 <div class="container">
-{% for quickstatement in quickstatements %}
+  {% for quickstatement in quickstatements %}
   <div class="row">
-      <div class="col-1 align-self-center">
-        <input type="checkbox" class="select-item checkbox large-checkbox" name="select-item" value="{{loop.index}}" />
-      </div>
-    <div class="col-8"><pre>{{ quickstatement }}</pre></div>
-    <div class="d-none" id="qs-{{loop.index}}">{{ quickstatement | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}</div>
+    <div class="col-1 align-self-center">
+      <input type="checkbox" class="select-item checkbox large-checkbox" name="select-item" value="{{loop.index}}" />
+    </div>
+    <div class="col-8">
+      <pre>{{ quickstatement }}</pre>
+    </div>
+    <div class="d-none" id="qs-{{loop.index}}">{{ quickstatement | replace('\t', '|') | replace('\n', '||') | urlencode
+      | replace('/','%2F') }}</div>
     <div class="col-3 align-self-center">
-      <a href="https://quickstatements.toolforge.org/#/v1={{ quickstatement | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}"><button class="btn btn-outline-secondary">Submit to Quickstatements ↗</button></a>
-      <button class="btn btn-outline-secondary">Copy to clipboard</button></div>
+      <a
+        href="https://quickstatements.toolforge.org/#/v1={{ quickstatement | replace('\t', '|') | replace('\n', '||') | urlencode | replace('/','%2F') }}"><button
+          class="btn btn-outline-secondary">Submit to Quickstatements ↗</button></a>
+      <button class="btn btn-outline-secondary">Copy to clipboard</button>
+    </div>
   </div>
-{% endfor %}
+  {% endfor %}
 </div>
 
 <div class="d-flex justify-content-between">
-  <button class="btn btn-primary">Select all</button>
+  <div>
+    <button class="btn btn-primary select-all">Select all</button>
+    <button class="btn btn-primary invert-selection">Invert selection</button>
+  </div>
   <div>
     <button class="btn btn-primary ml-auto">Submit to Quickstatements ↗</button> <button class="btn btn-primary">Copy to
-      clipboard</button></div>
+      clipboard</button>
   </div>
+</div>
 </div>
 
 
@@ -94,11 +113,39 @@ comma, space, pipe or tab separated. Note that new items in Wikidata may not be 
 <h2>{{(failed|length)}} Failed</h2>
 
 <ul>
-{% for fail in failed %}
-<li>{{ fail[0] }}: {{ fail[1] }}</a></li>
-{% endfor %}
+  {% for fail in failed %}
+  <li>{{ fail[0] }}: {{ fail[1] }}</a></li>
+  {% endfor %}
 </ul>
 {% endif %}
 
 
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script type="text/javascript">
+  const select_alls = document.getElementsByClassName("select-all");
+  const select_all_state = document.getElementById("select-all-state");
+  for (const select_all of select_alls) {
+    select_all.addEventListener("click", () => {
+      select_all_state.checked = !select_all_state.checked;
+      const checked = select_all_state.checked;
+      const checkboxes = document.getElementsByClassName("checkbox");
+      for (const checkbox of checkboxes) {
+        checkbox.checked = checked;
+      }
+    })
+  }
+
+  const invert_selections = document.getElementsByClassName("invert-selection");
+  for (const invert_selection of invert_selections) {
+    invert_selection.addEventListener("click", () => {
+      const checkboxes = document.getElementsByClassName("checkbox");
+      for (const checkbox of checkboxes) {
+        checkbox.checked = !checkbox.checked;
+      }
+    })
+  }
+</script>
 {% endblock %}
