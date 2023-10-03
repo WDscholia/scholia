@@ -103,7 +103,7 @@
   </div>
   <div>
     <button class="btn btn-primary ml-auto">Submit to Quickstatements ↗</button>
-    <button class="btn btn-primary copy-all-buttton">Copy to clipboard</button>
+    <button class="btn btn-primary" id="copy-all-button">Copy to clipboard</button>
   </div>
 </div>
 </div>
@@ -160,5 +160,25 @@
       }
     })
   }
+
+  const copy_all = document.getElementById("copy-all-button");
+  copy_all.addEventListener("click", () => {
+    var items = [];
+    document.querySelectorAll("input.select-item:checked:checked").forEach((item, index) => { 
+      console.log(index)
+      console.log(item)
+      const qs_id = item["value"];
+      const quickstatements = document.getElementById("qs-" + qs_id + "-plain");
+      items.push(quickstatements.innerText);
+    });
+    if (items.length < 1) {
+      // alert("no selected items!!!");
+    } else {
+      var values = items.join('\n\n');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(values)
+      }
+    }
+  });
 </script>
 {% endblock %}
