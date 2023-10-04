@@ -84,7 +84,7 @@
     </div>
     <div class="d-none" id="qs-{{loop.index}}-url">{{ quickstatement | replace('\t', '|') | replace('\n', '||') | urlencode
       | replace('/','%2F') }}</div>
-    <div class="d-none" id="qs-{{loop.index}}-plain">{{ quickstatement | replace('\t', '|') | replace('\n', '||') 
+    <div class="d-none" id="qs-{{loop.index}}-plain">{{ quickstatement | replace('\t', '|') | replace('\n', '||')
       | replace('/','%2F') }}</div>
     <div class="col-3 align-self-center">
       <a
@@ -105,7 +105,6 @@
     <button class="btn btn-primary ml-auto" id="submit-all-button">Submit to Quickstatements ↗</button>
     <button class="btn btn-primary" id="copy-all-button">Copy to clipboard</button>
   </div>
-</div>
 </div>
 
 
@@ -165,8 +164,6 @@
   copy_all.addEventListener("click", () => {
     var items = [];
     document.querySelectorAll("input.select-item:checked:checked").forEach((item, index) => {
-      console.log(index)
-      console.log(item)
       const qs_id = item["value"];
       const quickstatements = document.getElementById("qs-" + qs_id + "-plain");
       items.push(quickstatements.innerText);
