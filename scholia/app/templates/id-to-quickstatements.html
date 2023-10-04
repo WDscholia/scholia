@@ -102,7 +102,7 @@
     <button class="btn btn-primary invert-selection">Invert selection</button>
   </div>
   <div>
-    <button class="btn btn-primary ml-auto">Submit to Quickstatements ↗</button>
+    <button class="btn btn-primary ml-auto" id="submit-all-button">Submit to Quickstatements ↗</button>
     <button class="btn btn-primary" id="copy-all-button">Copy to clipboard</button>
   </div>
 </div>
@@ -164,7 +164,7 @@
   const copy_all = document.getElementById("copy-all-button");
   copy_all.addEventListener("click", () => {
     var items = [];
-    document.querySelectorAll("input.select-item:checked:checked").forEach((item, index) => { 
+    document.querySelectorAll("input.select-item:checked:checked").forEach((item, index) => {
       console.log(index)
       console.log(item)
       const qs_id = item["value"];
@@ -172,12 +172,30 @@
       items.push(quickstatements.innerText);
     });
     if (items.length < 1) {
-      // alert("no selected items!!!");
+      const parent = copy_all.parentNode.parentNode;
+      parent.insertAdjacentHTML('afterend', `<div class="alert alert-warning" role="alert">Select at least one row using the checkbox on the left</div>`);
     } else {
       var values = items.join('\n\n');
       if (navigator.clipboard) {
         navigator.clipboard.writeText(values)
       }
+    }
+  });
+
+  const submit_all = document.getElementById("submit-all-button");
+  submit_all.addEventListener("click", () => {
+    var items = [];
+    document.querySelectorAll("input.select-item:checked:checked").forEach((item, index) => {
+      const qs_id = item["value"];
+      const quickstatements = document.getElementById("qs-" + qs_id + "-url");
+      items.push(quickstatements.innerText);
+    });
+    if (items.length < 1) {
+      const parent = submit_all.parentNode.parentNode;
+      parent.insertAdjacentHTML('afterend', `<div class="alert alert-warning" role="alert">Select at least one row using the checkbox on the left</div>`);
+    } else {
+      const values = items.join('||');
+      window.location.href = "https://quickstatements.toolforge.org/#/v1=" + values
     }
   });
 </script>
