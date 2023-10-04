@@ -239,6 +239,11 @@ a.dropdown-item.active {
     animation-delay: 2s;
 }
 
+.large-checkbox {
+    width: 18.5px;
+    height: 18.5px;
+}
+
 @keyframes scholia {
     33% {
         border-color: var(--theme-red);
