@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<h1>Check Crossref</h1>
+
+<p>Enter a topic or author to search for papers in Crossref and check for their presence in Wikidata.</p>
+
+<form action="" id="form" method="GET" class="form-horizontal mb-3">
+  <div class="input-group">
+    <input type="text" class="form-control" placeholder="" id="searchterm"
+      name="query" />
+    <span class="input-group-append">
+      <button class="btn btn-primary" type="submit">
+        Submit
+      </button>
+    </span>
+  </div>
+</form>
+<button class="btn btn-secondary select-all">Test query</button>
+
+{% endblock %}
