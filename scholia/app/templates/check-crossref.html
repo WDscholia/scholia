@@ -8,14 +8,65 @@
 
 <form action="" id="form" method="GET" class="form-horizontal mb-3">
   <div class="input-group">
-    <input type="text" class="form-control" placeholder="" id="searchterm"
-      name="query" />
+    <input type="text" class="form-control" placeholder="Search term" id="searchterm" name="query" />
     <span class="input-group-append">
       <button class="btn btn-primary" type="submit">
         Submit
       </button>
     </span>
   </div>
+
+  <h3 class="py-3">Options</h3>
+
+  <div class="form-group row">
+    <label class="col-md-4 control-label" for="selectbasic">Type</label>
+    <div class="col-md-4">
+      <select id="selectbasic" name="selectbasic" class="form-control">
+        <option value="1">journal-article</option>
+        <option value="2">Option two</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-md-4 control-label" for="start">Published until</label>
+    <div class="col-md-4">
+      <input class="form-control" type="date" id="start" name="trip-start" />
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-md-4 control-label" for="radios">Order</label>
+    <div class="col-md-4">
+      <div class="radio">
+        <label for="radios-0">
+          <input type="radio" name="radios" id="radios-0" value="1" checked="checked">
+          Date descending
+        </label>
+      </div>
+      <div class="radio">
+        <label for="radios-1">
+          <input type="radio" name="radios" id="radios-1" value="2">
+          Date ascending
+        </label>
+      </div>
+      <div class="radio">
+        <label for="radios-2">
+          <input type="radio" name="radios" id="radios-2" value="3">
+          Random
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-md-4 control-label" for="textinput">Number of results</label>
+    <div class="col-md-4">
+      <input id="textinput" name="textinput" type="number" placeholder="20" class="form-control input-md">
+    </div>
+  </div>
+
+  </fieldset>
 </form>
 <button class="btn btn-secondary select-all">Test query</button>
 
