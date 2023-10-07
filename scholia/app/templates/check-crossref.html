@@ -1,9 +1,121 @@
-<h2 id="check-crossref">Check Crossref for new papers</h2>
+{% extends "base.html" %}
 
-<p>If you think that Wikidata is missing recent papers published on this topic, you can click the button below to check
-  the 20 most recent papers in Crossref. You will be redirected to the <a
-    href="/id-to-quickstatements">Identifier to Quickstatements</a> tool where you can see the presence of these in
-  Wikidata and have the opportunity to create these items in Wikidata using <a
-    href="https://www.wikidata.org/wiki/Help:QuickStatements">QuickStatements</a>.</p>
+{% block page_content %}
 
-<button type="button" class="btn btn-primary mx-auto d-block" id="check-crossref-button">Loading...</button>
+<h1>Check Crossref</h1>
+
+<p>Enter a topic or author to search for papers in Crossref and check for their presence in Wikidata.</p>
+
+<form action="" id="form" method="GET" class="form-horizontal mb-3">
+  <div class="input-group">
+    <input type="text" class="form-control" placeholder="Search term" id="searchterm" name="query" />
+    <span class="input-group-append">
+      <button class="btn btn-primary" type="submit">
+        Submit
+      </button>
+    </span>
+  </div>
+
+  <h3 class="py-3">Options</h3>
+
+  <div class="form-group row">
+    <label class="col-md-3 control-label" for="selectbasic">Type</label>
+    <div class="col-md-9">
+      <select id="selectbasic" name="selectbasic" class="form-control">
+        <option value="book-chapter">Book Chapter</option>
+        <option value="book-section">Book Section</option>
+        <option value="book-series">Book Series</option>
+        <option value="book-set">Book Set</option>
+        <option value="book-track">Book Track</option>
+        <option value="book">Book</option>
+        <option value="component">Component</option>
+        <option value="database">Database</option>
+        <option value="dataset">Dataset</option>
+        <option value="dissertation">Dissertation</option>
+        <option value="edited-book">Edited Book</option>
+        <option value="grant">Grant</option>
+        <option value="journal-article" selected>Journal Article</option>
+        <option value="journal-issue">Journal Issue</option>
+        <option value="journal-volume">Journal Volume</option>
+        <option value="journal">Journal</option>
+        <option value="monograph">Monograph</option>
+        <option value="other">Other</option>
+        <option value="book-part">Part</option>
+        <option value="peer-review">Peer Review</option>
+        <option value="posted-content">Posted Content</option>
+        <option value="proceedings-article">Proceedings Article</option>
+        <option value="proceedings-series">Proceedings Series</option>
+        <option value="proceedings">Proceedings</option>
+        <option value="reference-book">Reference Book</option>
+        <option value="reference-entry">Reference Entry</option>
+        <option value="report-component">Report Component</option>
+        <option value="report-series">Report Series</option>
+        <option value="report">Report</option>
+        <option value="standard">Standard</option>
+      </select>
+    </div>
+  </div>
+
+
+  <div class="form-group row">
+    <label class="col-md-3 control-label" for="start">Published until</label>
+    <div class="col-md-9">
+      <input class="form-control" type="date" id="start" name="trip-start" />
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-md-3 control-label" for="radios">Order</label>
+    <div class="col-md-9">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"
+          checked>
+        <label class="form-check-label" for="inlineRadio1">Latest</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+        <label class="form-check-label" for="inlineRadio2">Earliest</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
+        <label class="form-check-label" for="inlineRadio3">Random</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-md-3 control-label" for="textinput">Number of results</label>
+    <div class="col-md-9">
+      <input id="textinput" name="textinput" type="number" placeholder="20" class="form-control input-md">
+    </div>
+  </div>
+
+  <details>
+    <summary>
+      <h3 class="d-inline-block">Advanced</h3>
+    </summary>
+
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroupPrepend">/works?</span>
+      </div>
+      <input type="text" class="form-control" placeholder="Search term" id="searchterm1" name="query" />
+      <span class="input-group-append">
+        <button class="btn btn-primary" type="submit">
+          Submit
+        </button>
+      </span>
+    </div>
+  </details>
+
+</form>
+<button class="btn btn-secondary">Test query</button>
+
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script type="text/javascript">
+  document.querySelector('input[type="date"]').valueAsDate = new Date();
+</script>
+{% endblock %}
