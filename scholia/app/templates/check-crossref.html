@@ -54,13 +54,13 @@
         <option value="standard">Standard</option>
       </select>
     </div>
-  </div> 
+  </div>
 
 
   <div class="form-group row">
     <label class="col-md-3 control-label" for="start">Published until</label>
     <div class="col-md-9">
-      <input class="form-control" type="date" id="start" name="trip-start"/>
+      <input class="form-control" type="date" id="start" name="trip-start" />
     </div>
   </div>
 
@@ -68,7 +68,8 @@
     <label class="col-md-3 control-label" for="radios">Order</label>
     <div class="col-md-9">
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" checked>
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"
+          checked>
         <label class="form-check-label" for="inlineRadio1">Latest</label>
       </div>
       <div class="form-check form-check-inline">
@@ -88,6 +89,25 @@
       <input id="textinput" name="textinput" type="number" placeholder="20" class="form-control input-md">
     </div>
   </div>
+
+  <details>
+    <summary>
+      <h3 class="d-inline-block">Advanced</h3>
+    </summary>
+
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroupPrepend">/works?</span>
+      </div>
+      <input type="text" class="form-control" placeholder="Search term" id="searchterm1" name="query" />
+      <span class="input-group-append">
+        <button class="btn btn-primary" type="submit">
+          Submit
+        </button>
+      </span>
+    </div>
+  </details>
+
 </form>
 <button class="btn btn-secondary">Test query</button>
 
