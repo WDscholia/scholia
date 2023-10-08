@@ -4,7 +4,7 @@
 
 <h1>Check Crossref</h1>
 
-<p>Enter a topic or author to search for papers in Crossref and check for their presence in Wikidata.</p>
+<p>Enter a topic to search for papers in Crossref and check for their presence in Wikidata.</p>
 
 <form id="form" class="form-horizontal mb-3">
   <div class="input-group">
@@ -97,7 +97,7 @@
 
   <p>This is the query string which is used to check the Crossref and can be edited directly. For help, see the <a
       href="https://api.crossref.org/swagger-ui/index.html#/Works/get_works">API documentation</a>. Note that using the
-    form buttons above will clear any edits you have manually made.</p>
+    form inputs above will clear any edits you have manually made.</p>
   <div class="input-group">
     <div class="input-group-prepend">
       <span class="input-group-text" id="inputGroupPrepend">/works?</span>
@@ -119,7 +119,7 @@
   const test_query_button = document.getElementById("test-query")
 
   function update_query_string() {
-    // Changing the form updates the query string in the advanced section which is 
+    // Changing the form updates the query string in the advanced section which is
     // the query string which is ultimately used to check crossref
     // User validation not required as API calls are performed locally
     const params = {}
@@ -180,8 +180,8 @@
   function get_dois_from_crossref() {
     // cribbed from q_curation.html. Maybe eventually worth refactoring
     let query_string = "select=DOI&" + document.getElementById("query_string").value
-    // on q_curation.html we need to URIencode the query string but here it breaks 
-    // the ability to select number of rows? 
+    // on q_curation.html we need to URIencode the query string but here it breaks
+    // the ability to select number of rows?
     const url = `https://api.crossref.org/works/?${query_string}`;
     const error_message = "The API failed which could be due to a problem with your connection or with the upstream server. If the issue persists <a href='https://github.com/WDscholia/scholia/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=''>submit a bug report on GitHub</a>"
 
