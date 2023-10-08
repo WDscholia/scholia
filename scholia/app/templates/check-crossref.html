@@ -95,14 +95,14 @@
     <h3 class="d-inline-block">Advanced</h3>
   </summary>
 
-  <p>This is the query string which is used to check the Crossref API. For help, see the <a
-      href="https://api.crossref.org/swagger-ui/index.html#/Works/get_works">API documentation</a>. You can also edit
-    the query string here and use the Submit and Test query buttons as expected.</p>
+  <p>This is the query string which is used to check the Crossref and can be edited directly. For help, see the <a
+      href="https://api.crossref.org/swagger-ui/index.html#/Works/get_works">API documentation</a>. Note that using the
+    form buttons above will clear any edits you have manually made.</p>
   <div class="input-group">
     <div class="input-group-prepend">
       <span class="input-group-text" id="inputGroupPrepend">/works?</span>
     </div>
-    <textarea rows="1" class="form-control" id="query_string" ></textarea>
+    <textarea rows="1" class="form-control" id="query_string"></textarea>
   </div>
 </details>
 
@@ -118,7 +118,7 @@
   const submit_button = document.getElementById("submit")
   const test_query_button = document.getElementById("test-query")
 
-  function updateQueryString() {
+  function update_query_string() {
     // Changing the form updates the query string in the advanced section which is 
     // the query string which is ultimately used to check crossref
     // User validation not required as API calls are performed locally
@@ -177,12 +177,56 @@
     test_query_button.parentNode.href = url
   }
 
+  function get_dois_from_crossref() {
+    // cribbed from q_curation.html. Maybe eventually worth refactoring
+    let query_string = "select=DOI&" + document.getElementById("query_string").value
+    // on q_curation.html we need to URIencode the query string but here it breaks 
+    // the ability to select number of rows? 
+    const url = `https://api.crossref.org/works/?${query_string}`;
+    const error_message = "The API failed which could be due to a problem with your connection or with the upstream server. If the issue persists <a href='https://github.com/WDscholia/scholia/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=''>submit a bug report on GitHub</a>"
+
+    console.log(url)
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data['status'] == 'ok') {
+          if (data["message"]["total-results"] > 0) {
+            items = data.message?.items
+            if (items) {
+              dois = items.map(x => x.DOI).join(" ");
+              window.location.href = "/id-to-quickstatements?query=" + dois;
+            }
+          } else {
+            submit_button.insertAdjacentHTML('afterend', `<div class="alert alert-secondary" role="alert">No results returned for ${data.message.query['status-terms']}</div>`);
+            submit_button.innerHTML = "Submit";
+          }
+        } else {
+          console.error(`API status was ${data.status}`)
+          console.error(data)
+          submit_button.insertAdjacentHTML('afterend', `<div class="alert alert-warning" role="alert">${error_message}</div>`);
+          submit_button.innerHTML = "Submit";
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        submit_button.insertAdjacentHTML('afterend', `<div class="alert alert-warning" role="alert">${error_message}</div>`);
+        submit_button.innerHTML = "Submit";
+      });
+  }
+
+
   document.querySelector('input[type="date"]').valueAsDate = new Date();
 
   const inputs = document.querySelectorAll("#form input,select");
   for (const input of inputs) {
-    input.addEventListener("input", () => { updateQueryString() })
+    input.addEventListener("input", () => { update_query_string() })
   }
+
+  submit_button.addEventListener("click", () => {
+    submit_button.innerHTML = "Loading...";
+    get_dois_from_crossref()
+  })
 
   const query_string_input = document.getElementById("query_string")
   query_string_input.addEventListener("input", () => {
@@ -191,6 +235,6 @@
     test_query_button.parentNode.href = url
   })
 
-  updateQueryString()
+  update_query_string()
 </script>
 {% endblock %}
