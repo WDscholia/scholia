@@ -8,7 +8,7 @@
 
 <form id="form" class="form-horizontal mb-3">
   <div class="input-group">
-    <input type="text" class="form-control" placeholder="Search term" id="searchterm" />
+    <input type="text" class="form-control" placeholder="Search term" id="search-term" />
     <span class="input-group-append">
       <button class="btn btn-primary" type="submit">
         Submit
@@ -68,8 +68,7 @@
     <label class="col-md-3 control-label" for="order">Order</label>
     <div class="col-md-9">
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" id="latest" value="latest" name="order"
-          checked>
+        <input class="form-check-input" type="radio" id="latest" value="latest" name="order" checked>
         <label class="form-check-label" for="latest">Latest</label>
       </div>
       <div class="form-check form-check-inline">
@@ -89,27 +88,29 @@
       <input id="rows" type="number" placeholder="20" class="form-control input-md">
     </div>
   </div>
-
-  <details>
-    <summary>
-      <h3 class="d-inline-block">Advanced</h3>
-    </summary>
-
-    <p>This is the query string which is used to check the Crossref API. For help, see the <a href="https://api.crossref.org/swagger-ui/index.html#/Works/get_works">API documentation</a>. You can also edit the query string here and use the Submit and Test query buttons as expected.</p>
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text" id="inputGroupPrepend">/works?</span>
-      </div>
-      <input type="text" class="form-control" placeholder="Search term" id="query_string" />
-      <span class="input-group-append">
-        <button class="btn btn-primary" type="submit">
-          Submit
-        </button>
-      </span>
-    </div>
-  </details>
-
 </form>
+
+<details class="mb-3">
+  <summary>
+    <h3 class="d-inline-block">Advanced</h3>
+  </summary>
+
+  <p>This is the query string which is used to check the Crossref API. For help, see the <a
+      href="https://api.crossref.org/swagger-ui/index.html#/Works/get_works">API documentation</a>. You can also edit
+    the query string here and use the Submit and Test query buttons as expected.</p>
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text" id="inputGroupPrepend">/works?</span>
+    </div>
+    <input type="text" class="form-control" placeholder="Search term" id="query_string" />
+    <span class="input-group-append">
+      <button class="btn btn-primary" type="submit">
+        Submit
+      </button>
+    </span>
+  </div>
+</details>
+
 <button class="btn btn-secondary d-block ml-auto">Test query</button>
 
 {% endblock %}
@@ -120,7 +121,7 @@
   function updateQueryString() {
     // User validation not required as API calls are performed locally
     const params = { 'select': 'DOI' }
-    const search_term = document.getElementById("searchterm").value
+    const search_term = document.getElementById("search-term").value
     if (search_term) {
       params["query"] = search_term
     }
@@ -173,6 +174,12 @@
   }
 
   document.querySelector('input[type="date"]').valueAsDate = new Date();
+
+  const inputs = document.querySelectorAll("#form input,select");
+  for (const input of inputs) {
+    input.addEventListener("input", () => { updateQueryString() })
+  }
+
   updateQueryString()
 </script>
 {% endblock %}
