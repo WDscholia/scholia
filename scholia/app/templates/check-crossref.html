@@ -10,7 +10,7 @@
   <div class="input-group">
     <input type="text" class="form-control" placeholder="Search term" id="search-term" />
     <span class="input-group-append">
-      <button class="btn btn-primary" type="submit">
+      <button class="btn btn-primary" type="button" id="submit">
         Submit
       </button>
     </span>
@@ -103,21 +103,21 @@
       <span class="input-group-text" id="inputGroupPrepend">/works?</span>
     </div>
     <input type="text" class="form-control" placeholder="Search term" id="query_string" />
-    <span class="input-group-append">
-      <button class="btn btn-primary" type="submit">
-        Submit
-      </button>
-    </span>
   </div>
 </details>
 
-<button class="btn btn-secondary d-block ml-auto">Test query</button>
+<a>
+  <button class="btn btn-secondary d-block ml-auto" type="button" id="test-query">Test query</button>
+</a>
 
 {% endblock %}
 
 {% block scripts %}
 {{super()}}
 <script type="text/javascript">
+  const submit_button = document.getElementById("submit")
+  const test_query_button = document.getElementById("test-query")
+
   function updateQueryString() {
     // User validation not required as API calls are performed locally
     const params = { 'select': 'DOI' }
@@ -169,8 +169,11 @@
     }
 
     // Construct the final URL by appending the search parameters
-    // const url = `https://api.crossref.org/works/?${searchParams.toString()}`;
     document.getElementById("query_string").value = decodeURIComponent(searchParams.toString())
+
+    searchParams.delete("select")
+    const url = `https://api.crossref.org/works/?${searchParams.toString()}`;
+    test_query_button.parentNode.href = url
   }
 
   document.querySelector('input[type="date"]').valueAsDate = new Date();
