@@ -102,7 +102,7 @@
     <div class="input-group-prepend">
       <span class="input-group-text" id="inputGroupPrepend">/works?</span>
     </div>
-    <input type="text" class="form-control" placeholder="Search term" id="query_string" />
+    <textarea rows="1" class="form-control" id="query_string" ></textarea>
   </div>
 </details>
 
@@ -119,8 +119,10 @@
   const test_query_button = document.getElementById("test-query")
 
   function updateQueryString() {
+    // Changing the form updates the query string in the advanced section which is 
+    // the query string which is ultimately used to check crossref
     // User validation not required as API calls are performed locally
-    const params = { 'select': 'DOI' }
+    const params = {}
     const search_term = document.getElementById("search-term").value
     if (search_term) {
       params["query"] = search_term
@@ -171,7 +173,6 @@
     // Construct the final URL by appending the search parameters
     document.getElementById("query_string").value = decodeURIComponent(searchParams.toString())
 
-    searchParams.delete("select")
     const url = `https://api.crossref.org/works/?${searchParams.toString()}`;
     test_query_button.parentNode.href = url
   }
@@ -182,6 +183,13 @@
   for (const input of inputs) {
     input.addEventListener("input", () => { updateQueryString() })
   }
+
+  const query_string_input = document.getElementById("query_string")
+  query_string_input.addEventListener("input", () => {
+    let input = query_string_input.value
+    const url = `https://api.crossref.org/works/?${encodeURIComponent(input)}`;
+    test_query_button.parentNode.href = url
+  })
 
   updateQueryString()
 </script>
