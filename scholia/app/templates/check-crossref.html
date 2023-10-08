@@ -6,9 +6,9 @@
 
 <p>Enter a topic or author to search for papers in Crossref and check for their presence in Wikidata.</p>
 
-<form action="" id="form" method="GET" class="form-horizontal mb-3">
+<form id="form" class="form-horizontal mb-3">
   <div class="input-group">
-    <input type="text" class="form-control" placeholder="Search term" id="searchterm" name="query" />
+    <input type="text" class="form-control" placeholder="Search term" id="searchterm" />
     <span class="input-group-append">
       <button class="btn btn-primary" type="submit">
         Submit
@@ -19,9 +19,9 @@
   <h3 class="py-3">Options</h3>
 
   <div class="form-group row">
-    <label class="col-md-3 control-label" for="selectbasic">Type</label>
+    <label class="col-md-3 control-label" for="type">Type</label>
     <div class="col-md-9">
-      <select id="selectbasic" name="selectbasic" class="form-control">
+      <select id="type" class="form-control">
         <option value="book-chapter">Book Chapter</option>
         <option value="book-section">Book Section</option>
         <option value="book-series">Book Series</option>
@@ -58,35 +58,35 @@
 
 
   <div class="form-group row">
-    <label class="col-md-3 control-label" for="start">Published until</label>
+    <label class="col-md-3 control-label" for="until">Published until</label>
     <div class="col-md-9">
-      <input class="form-control" type="date" id="start" name="trip-start" />
+      <input class="form-control" type="date" id="until" />
     </div>
   </div>
 
   <div class="form-group row">
-    <label class="col-md-3 control-label" for="radios">Order</label>
+    <label class="col-md-3 control-label" for="order">Order</label>
     <div class="col-md-9">
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"
+        <input class="form-check-input" type="radio" id="latest" value="latest" name="order"
           checked>
-        <label class="form-check-label" for="inlineRadio1">Latest</label>
+        <label class="form-check-label" for="latest">Latest</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-        <label class="form-check-label" for="inlineRadio2">Earliest</label>
+        <input class="form-check-input" type="radio" id="earliest" value="earliest" name="order">
+        <label class="form-check-label" for="earliest">Earliest</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
-        <label class="form-check-label" for="inlineRadio3">Random</label>
+        <input class="form-check-input" type="radio" id="relevance" value="relevance" name="order">
+        <label class="form-check-label" for="relevance">Relevance</label>
       </div>
     </div>
   </div>
 
   <div class="form-group row">
-    <label class="col-md-3 control-label" for="textinput">Number of results</label>
+    <label class="col-md-3 control-label" for="rows">Number of results</label>
     <div class="col-md-9">
-      <input id="textinput" name="textinput" type="number" placeholder="20" class="form-control input-md">
+      <input id="rows" type="number" placeholder="20" class="form-control input-md">
     </div>
   </div>
 
@@ -95,11 +95,12 @@
       <h3 class="d-inline-block">Advanced</h3>
     </summary>
 
+    <p>This is the query string which is used to check the Crossref API. For help, see the <a href="https://api.crossref.org/swagger-ui/index.html#/Works/get_works">API documentation</a>. You can also edit the query string here and use the Submit and Test query buttons as expected.</p>
     <div class="input-group">
       <div class="input-group-prepend">
         <span class="input-group-text" id="inputGroupPrepend">/works?</span>
       </div>
-      <input type="text" class="form-control" placeholder="Search term" id="searchterm1" name="query" />
+      <input type="text" class="form-control" placeholder="Search term" id="query_string" />
       <span class="input-group-append">
         <button class="btn btn-primary" type="submit">
           Submit
@@ -109,13 +110,69 @@
   </details>
 
 </form>
-<button class="btn btn-secondary">Test query</button>
+<button class="btn btn-secondary d-block ml-auto">Test query</button>
 
 {% endblock %}
 
 {% block scripts %}
 {{super()}}
 <script type="text/javascript">
+  function updateQueryString() {
+    // User validation not required as API calls are performed locally
+    const params = { 'select': 'DOI' }
+    const search_term = document.getElementById("searchterm").value
+    if (search_term) {
+      params["query"] = search_term
+    }
+
+    const type = document.getElementById("type").value
+    if (type) {
+      params["filter"] = "type:" + type
+    }
+
+    const until = document.getElementById("until").value
+    if (until) {
+      if ("filter" in params) {
+        params["filter"] += ",until-issued-date:" + until
+      }
+      else {
+        params["filter"] = "until-issued-date:" + until
+      }
+    }
+
+    const rows = document.getElementById("rows").value
+    if (rows) {
+      params["rows"] = rows
+    } else {
+      params["rows"] = 20
+    }
+
+    const order = document.querySelector("input[name=order]:checked").value
+    if (order === "relevance") {
+      params["sort"] = "relevance"
+      params["order"] = "desc"
+    } else if (order === "latest") {
+      params["sort"] = "issued"
+      params["order"] = "desc"
+    } else if (order === "earliest") {
+      params["sort"] = "issued"
+      params["order"] = "asc"
+    }
+
+    // Create a URLSearchParams object to construct the query parameters
+    const searchParams = new URLSearchParams();
+
+    // Loop through the dictionary and add each key-value pair to the searchParams
+    for (const [key, value] of Object.entries(params)) {
+      searchParams.append(key, value);
+    }
+
+    // Construct the final URL by appending the search parameters
+    // const url = `https://api.crossref.org/works/?${searchParams.toString()}`;
+    document.getElementById("query_string").value = decodeURIComponent(searchParams.toString())
+  }
+
   document.querySelector('input[type="date"]').valueAsDate = new Date();
+  updateQueryString()
 </script>
 {% endblock %}
