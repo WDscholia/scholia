@@ -12,8 +12,9 @@ from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works, wb_get_organization_latest_works,
                    wb_get_sponsor_latest_works)
-from ..arxiv import metadata_to_quickstatements, string_to_arxiv
+from ..arxiv import string_to_arxiv
 from ..arxiv import get_metadata as get_arxiv_metadata
+from ..doi import string_to_doi, get_doi_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      doi_prefix_to_qs, github_to_qs, biorxiv_to_qs,
                      chemrxiv_to_qs,
@@ -23,7 +24,9 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
                      ncbi_gene_to_qs, uniprot_to_qs)
-from ..utils import sanitize_q, remove_special_characters_url
+from ..utils import (metadata_to_quickstatements,
+                     remove_special_characters_url, sanitize_q, string_to_list,
+                     string_to_type)
 from ..wikipedia import q_to_bibliography_templates
 
 
@@ -216,7 +219,7 @@ def show_arxiv(arxiv):
 
     See Also
     --------
-    show_arxiv_to_quickstatements.
+    show_id_to_quickstatements.
 
     """
     qs = arxiv_to_qs(arxiv)
@@ -231,7 +234,20 @@ def _render_work_qs(qs, name):
 
 
 @main.route('/arxiv-to-quickstatements')
-def show_arxiv_to_quickstatements():
+def redirect_arxiv_to_quickstatements():
+    """Redirect to id-to-quickstatements.
+
+    Returns
+    -------
+    reponse : werkzeug.wrappers.Response
+        Redirect
+
+    """
+    return redirect(url_for('app.show_id_to_quickstatements', **request.args), code=301)
+
+
+@main.route('/id-to-quickstatements')
+def show_id_to_quickstatements():
     """Return HTML rendering for arxiv.
 
     Will look after the 'arxiv' parameter.
@@ -246,32 +262,69 @@ def show_arxiv_to_quickstatements():
     show_arxiv.
 
     """
-    query = request.args.get('arxiv')
+    query = request.args.get('query')
 
     if not query:
-        return render_template('arxiv-to-quickstatements.html')
+        return render_template('id-to-quickstatements.html')
 
     current_app.logger.debug("query: {}".format(query))
 
-    arxiv = string_to_arxiv(query)
-    if not arxiv:
-        # Could not identify an arxiv identifier
-        return render_template('arxiv-to-quickstatements.html')
+    input_list = string_to_list(query)
 
-    qs = arxiv_to_qs(arxiv)
-    if len(qs) > 0:
-        # The arxiv is already in Wikidata
-        q = qs[0]
-        return render_template('arxiv-to-quickstatements.html',
-                               arxiv=arxiv, q=q)
+    ids = {string: {'type': string_to_type(string)} for string in input_list}
 
-    try:
-        metadata = get_arxiv_metadata(arxiv)
-    except Exception:
-        return render_template('arxiv-to-quickstatements.html',
-                               arxiv=arxiv)
+    to_id_mapping = {
+        'arxiv': string_to_arxiv,
+        'doi': string_to_doi,
+    }
 
-    quickstatements = metadata_to_quickstatements(metadata)
+    for identifier, d in ids.items():
+        fun = to_id_mapping.get(d['type'])
+        if fun:
+            ids[identifier]["id"] = fun(identifier)
+
+    if all(["id" not in v for v in ids.values()]):
+        # Could not identify an identifier
+        return render_template('id-to-quickstatements.html')
+
+    to_qid_mapping = {
+        'arxiv': arxiv_to_qs,
+        'doi': doi_to_qs,
+    }
+
+    for identifier, d in ids.items():
+        fun = to_qid_mapping.get(d['type'])
+        if fun:
+            ids[identifier]["qid"] = fun(identifier)
+
+    matched = [[v['id'], v['qid'][0]] for v in ids.values() if 'qid' in v and len(v['qid']) > 0]
+    unmatched = [k for k, v in ids.items() if 'qid' in v and len(v['qid']) == 0]
+
+    if len(matched) > 0 and len(unmatched) == 0:
+        # The identifiers are already in Wikidata
+        return render_template('id-to-quickstatements.html', query=query, qs=matched)
+
+    get_metadata_mapping = {
+        'arxiv': get_arxiv_metadata,
+        'doi': get_doi_metadata,
+    }
+
+    for identifier in unmatched:
+        fun = get_metadata_mapping.get(ids[identifier]['type'])
+        if fun:
+            try:
+                metadata = fun(identifier)
+            except Exception:
+                return render_template('id-to-quickstatements.html', query=query, qs=matched, error=True)
+
+            ids[identifier]["metadata"] = metadata
+            if "error" not in metadata:
+                ids[identifier]['quickstatements'] = metadata_to_quickstatements(metadata)
+
+    quickstatements = [v.get('quickstatements') for v in ids.values()]
+    quickstatements = list(filter(None, quickstatements))
+
+    failed = [[v['id'], v['metadata']['error']] for v in ids.values() if 'metadata' in v and 'error' in v['metadata']]
 
     # For Quickstatements Version 2 in URL components,
     # TAB and newline should be replace by | and ||
@@ -280,9 +333,13 @@ def show_arxiv_to_quickstatements():
     # not encode that character.
     # https://github.com/pallets/jinja/issues/515
     # Here, we let jinja2 handle the encoding rather than adding an extra
-    # parameter
-    return render_template('arxiv-to-quickstatements.html',
-                           arxiv=arxiv, quickstatements=quickstatements)
+
+    if len(matched) == 0 and len(quickstatements) == 0 and len(failed) == 0:
+        return render_template('id-to-quickstatements.html', query=query,
+                                qs=matched, quickstatements=quickstatements,
+                                error=True, failures=failed)
+    return render_template('id-to-quickstatements.html', query=query,
+                            qs=matched, quickstatements=quickstatements, failed=failed)
 
 
 @main.route('/author/' + q_pattern)
@@ -295,6 +352,7 @@ def show_author(q):
         Wikidata item identifier.
 
     Returns
+
     -------
     html : str
         Rendered HTML.
@@ -1508,7 +1566,7 @@ def show_search():
         if len(qs) > 0:
             q = qs[0]
             return redirect(url_for('app.show_work', q=q), code=302)
-        return redirect(url_for('app.show_arxiv_to_quickstatements',
+        return redirect(url_for('app.show_id_to_quickstatements',
                                 arxiv=arxiv), code=302)
 
     search_results = []
