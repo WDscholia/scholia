@@ -200,6 +200,8 @@ def arxiv_to_qs(arxiv):
     --------
     >>> arxiv_to_qs('1507.04180') == ['Q27036443']
     True
+    >>> arxiv_to_qs('not.an.arxiv') == []
+    True
 
     """
     return identifier_to_qs('P818', arxiv)
@@ -378,11 +380,14 @@ def doi_to_qs(doi):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
-    data = response.json()
+    try:
+        response = requests.get(url, params=params, headers=HEADERS)
+        data = response.json()
 
-    return [item['work']['value'][31:]
-            for item in data['results']['bindings']]
+        return [item['work']['value'][31:]
+                for item in data['results']['bindings']]
+    except Exception:
+        return []
 
 
 def doi_prefix_to_qs(doi):

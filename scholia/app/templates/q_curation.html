@@ -22,5 +22,73 @@
 
 {% block curation_panels %}{% endblock %}
 
+<script>
+  function get_dois_from_crossref(query_string) {
+      const button = document.getElementById("check-crossref-button");
+      button.innerHTML = "Loading...";
+      button.classList.remove("d-block");
+      button.classList.add("d-none");
+      button.insertAdjacentHTML('beforebegin',
+        "<div id='check-crossref-loader' class='loader'><div></div><div></div><div></div></div>"
+      )
+      const currentDate = new Date().toISOString().split('T')[0];
+      const params = {
+        'query': query_string,
+        'select': 'DOI',
+        'filter': 'type:journal-article,until-issued-date:' + currentDate,
+        'rows': 20,
+        'sort': 'issued',
+        'order': 'desc',
+      };
+
+      // Create a URLSearchParams object to construct the query parameters
+      const searchParams = new URLSearchParams();
+
+      // Loop through the dictionary and add each key-value pair to the searchParams
+      for (const [key, value] of Object.entries(params)) {
+        searchParams.append(key, value);
+      }
+
+      // Construct the final URL by appending the search parameters
+      const url = `https://api.crossref.org/works/?${searchParams.toString()}`;
+      const error_message = "The API failed which could be due to a problem with your connection or with the upstream server. If the issue persists <a href='https://github.com/WDscholia/scholia/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=''>submit a bug report on GitHub</a>"
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data['status'] == 'ok') {
+            if (data["message"]["total-results"] > 0){
+              items = data.message?.items
+              if (items) {
+                dois = items.map(x => x.DOI).join(" ");
+                window.location.href = "/id-to-quickstatements?query=" + dois;
+              }
+            } else {
+              $('#check-crossref-loader').remove();
+              button.insertAdjacentHTML('afterend', `<div class="alert alert-secondary" role="alert">No results returned for ${data.message.query['status-terms']}</div>`);
+              button.innerHTML = "Check Crossref";
+              button.classList.remove("d-none");
+              button.classList.add("d-block");
+            }
+          } else {
+            console.error(`API status was ${data.status}`)
+            console.error(data)
+            $('#check-crossref-loader').remove();
+            button.insertAdjacentHTML('afterend', `<div class="alert alert-warning" role="alert">${error_message}</div>`);
+            button.innerHTML = "Check Crossref";
+            button.classList.remove("d-none");
+            button.classList.add("d-block");
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          $('#check-crossref-loader').remove();
+          button.insertAdjacentHTML('afterend', `<div class="alert alert-warning" role="alert">${error_message}</div>`);
+          button.innerHTML = "Check Crossref";
+          button.classList.remove("d-none");
+          button.classList.add("d-block");
+        });
+  }
+</script>
 
 {% endblock %}
