@@ -593,6 +593,24 @@ def show_dataset_index():
     return render_template('dataset-index.html')
 
 
+@main.route('/dataset/' + q_pattern + '/export')
+def show_dataset_export(q):
+    """Return HTML rendering for export formats for this dataset.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    return render_template('dataset-export.html', q=q)
+
+
 @main.route('/clinical-trial/')
 def show_clinical_trial_index():
     """Return clinical trial index page.
