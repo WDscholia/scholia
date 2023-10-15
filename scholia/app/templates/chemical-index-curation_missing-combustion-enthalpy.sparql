@@ -1,6 +1,6 @@
 SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
   SELECT ?wikis ?compound WHERE {
-    ?compound wdt:P31 wd:Q11173 ;
+    ?compound wdt:P31 wd:Q113145171 ;
               wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
     FILTER(?wikis >= 40)
     FILTER(NOT EXISTS {?compound wdt:P2117 []})
