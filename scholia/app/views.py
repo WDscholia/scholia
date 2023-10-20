@@ -1097,7 +1097,7 @@ def redirect_omim(omimID):
     qs = omim_to_qs(omimID)
     if len(qs) > 0:
         q = qs[0]
-        return redirect(url_for('app.show_author', q=q), code=302)
+        return redirect(url_for('app.show_disease', q=q), code=302)
     return render_template('404.html', error=could_not_find("OMIM ID"))
 
 
