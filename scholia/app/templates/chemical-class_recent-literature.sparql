@@ -8,7 +8,7 @@ WITH {
     UNION
     { ?work wdt:P921 ?topic . ?topic ((^wdt:P361)+) target: . BIND ("part" AS ?via) }
     UNION
-    { ?work wdt:P921 ?topic . ?topic (wdt:P31* / wdt:P279* ) target: . BIND ("subclass" AS ?via). FILTER (?topic != target:) }
+    { ?work wdt:P921 ?topic . ?topic (wdt:P279* ) target: . BIND ("subclass" AS ?via). FILTER (?topic != target:) }
     UNION
     { ?work wdt:P921 ?topic . ?topic (wdt:P1269+ ) target: . BIND ("facet" AS ?via)}
     UNION
