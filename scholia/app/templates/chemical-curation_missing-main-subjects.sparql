@@ -1,6 +1,7 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT DISTINCT ?work ?workLabel ?chemicalname
+SELECT DISTINCT ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl)
+  ?chemicalname
   (CONCAT(SUBSTR(STR(?work),32), "\tP921\t{{ q }}\tS887\tQ69652283") AS ?quickStatements)
   (CONCAT("https://quickstatements.toolforge.org/#/v1=",
           SUBSTR(STR(?work),32), "%7CP921%7C{{ q }}%7CS887%7CQ69652283") AS ?quickStatementsUrl)
