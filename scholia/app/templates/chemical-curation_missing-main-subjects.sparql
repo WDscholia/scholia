@@ -1,11 +1,12 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT DISTINCT ?item ?itemLabel ?chemicalname
-  (CONCAT(SUBSTR(STR(?item),32), "\tP921\t{{ q }}\tS887\tQ69652283") AS ?quickStatements)
+SELECT DISTINCT ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl)
+  ?chemicalname
+  (CONCAT(SUBSTR(STR(?work),32), "\tP921\t{{ q }}\tS887\tQ69652283") AS ?quickStatements)
   (CONCAT("https://quickstatements.toolforge.org/#/v1=",
-          SUBSTR(STR(?item),32), "%7CP921%7C{{ q }}%7CS887%7CQ69652283") AS ?quickStatementsUrl)
+          SUBSTR(STR(?work),32), "%7CP921%7C{{ q }}%7CS887%7CQ69652283") AS ?quickStatementsUrl)
 WITH {
-  SELECT  ?item ?chemicalname WHERE {
+  SELECT  ?work ?chemicalname WHERE {
     VALUES ?chemicalType {
       wd:Q113145171 # type of a chemical entity
       wd:Q59199015 # group of stereoisomers
@@ -18,13 +19,13 @@ WITH {
       mwapi:generator "search";
       mwapi:gsrsearch ?chemicalname;
       mwapi:gsrlimit "max".
-      ?item wikibase:apiOutputItem mwapi:title.
+      ?work wikibase:apiOutputItem mwapi:title.
     }
-    ?item wdt:P1476 ?title .
-    MINUS {?item wdt:P921 target: }
+    ?work wdt:P1476 ?title .
+    MINUS {?work wdt:P921 target: }
     FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\\\", "b", ?chemicalname ,"\\\\", "b"))))
   } LIMIT 200
-} AS %items WHERE {
-  INCLUDE %items
+} AS %works WHERE {
+  INCLUDE %works
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
