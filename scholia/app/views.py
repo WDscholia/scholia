@@ -2485,6 +2485,10 @@ def show_about():
     return render_template('about.html')
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4969c94 (Add wikiproject index page)
 @main.route('/wikiproject/')
 def show_wikiproject_index():
     """Return rendered HTML index page for wikiproject.
@@ -2498,6 +2502,10 @@ def show_wikiproject_index():
     return render_template('wikiproject-index.html')
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4969c94 (Add wikiproject index page)
 @main.route('/wikiproject/' + q_pattern)
 def show_wikiproject(q):
     """Return rendered HTML page for specific WikiProject.
