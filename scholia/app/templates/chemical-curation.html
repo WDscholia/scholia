@@ -4,8 +4,10 @@
 
 {% block in_ready %}
 
-{{ sparql_to_table('missing-main-subjects') }}
 {{ sparql_to_table('missing-properties') }}
+
+{{ sparql_to_table('missing-main-subjects') }}
+
 
 {% endblock %}
 
@@ -14,6 +16,7 @@
 <h2 id="missing-properties">Missing chemical properties</h2>
 
 <table class="table table-hover" id="missing-properties-table"></table>
+
 
 <h2 id="missing-main-subjects">Articles possibly about the chemical</h2>
 
