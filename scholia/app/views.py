@@ -1090,7 +1090,7 @@ def redirect_omim(omimID):
 
     Parameters
     ----------
-    omim : str
+    omimID : str
         OMIM identifier.
 
     """
