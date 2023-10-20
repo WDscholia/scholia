@@ -1,0 +1,28 @@
+{% extends "q_curation.html" %}
+
+{% set aspect = "chemical-curation" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('missing-main-subjects') }}
+{{ sparql_to_table('missing-properties') }}
+
+{% endblock %}
+
+{% block curation_panels %}
+
+<h2 id="missing-properties">Missing chemical properties</h2>
+
+<table class="table table-hover" id="missing-properties-table"></table>
+
+<h2 id="missing-main-subjects">Articles possibly about the chemical</h2>
+
+The following query looks for articles with the name of the chemical in
+the name. The use is non-trivial and chemical name entity recognition is
+notoriously hard. Look up for misassignments because a search for, for example,
+<i>quassin</i> also matches the more precise <i>(+)-quassin</i>, and
+<i>L-proline</i> also matches the related-but-different <i>l-proline-based amino acid phenolates</i>.
+
+<table class="table table-hover" id="missing-main-subjects-table"></table>
+
+{% endblock %}
