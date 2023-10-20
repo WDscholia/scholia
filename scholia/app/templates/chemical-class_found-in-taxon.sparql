@@ -1,13 +1,9 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl) (COUNT(DISTINCT(?chemical)) AS ?count) WHERE {
-  ?chemical wdt:P31/wdt:P279* target: ;
+  ?chemical wdt:P279+ target: ;
             p:P703 ?taxonStatement .
   ?taxonStatement ps:P703 ?taxon .
-  OPTIONAL {
-      ?taxonStatement prov:wasDerivedFrom/pr:P248 ?source .
-      OPTIONAL { ?source wdt:P356 ?DOI . }
-    }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 } 
   GROUP BY ?taxon ?taxonLabel
