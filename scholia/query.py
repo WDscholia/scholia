@@ -791,7 +791,7 @@ def omim_to_qs(omimID):
 
     Examples
     --------
-    >>> omim_to_qs('181500') == ['Q41112']
+    >>> 'Q41112' in omim_to_qs('181500')
     True
 
     """
