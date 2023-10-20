@@ -2,9 +2,8 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl WITH {
 SELECT DISTINCT ?mol WHERE {
-  { ?mol wdt:P31 target: }
-  UNION
-  { ?mol wdt:P279+ target: }
+  ?mol wdt:P279* target: .
+  MINUS { [] wdt:P279 ?mol }
 } LIMIT 500
 } AS %result
 WHERE {
