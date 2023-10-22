@@ -2,13 +2,13 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl)
 ?source ?sourceLabel (CONCAT("/work/", SUBSTR(STR(?source), 32)) AS ?sourceUrl)
-?DOI WHERE {
+?doi WHERE {
   VALUES ?chemical { target: }
   ?chemical p:P703 ?taxonStatement .
   ?taxonStatement ps:P703 ?taxon .
   OPTIONAL {
       ?taxonStatement prov:wasDerivedFrom/pr:P248 ?source .
-      OPTIONAL { ?source wdt:P356 ?DOI . }
+      OPTIONAL { ?source wdt:P356 ?doi . }
     }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 } ORDER BY ASC(?taxonLabel)
