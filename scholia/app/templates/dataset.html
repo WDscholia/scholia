@@ -12,6 +12,10 @@
 
 {% endblock %}
 
+{% block page_actions %}
+<a href="/dataset/{{ q }}/export" role="button" class="btn btn-outline-secondary">Cite</a>
+{{ super() }}
+{% endblock %}
 
 {% block page_content %}
 <h1 id="h1">Taxon</h1>
