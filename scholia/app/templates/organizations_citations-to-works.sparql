@@ -50,7 +50,7 @@ WHERE {
   INCLUDE %citation_numbers
   INCLUDE %work_numbers
   FILTER (?year_of_citation = ?year_of_cited)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY ?year_of_citation
  

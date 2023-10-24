@@ -14,7 +14,7 @@ WITH {
 WHERE {
   INCLUDE %authors
   ?author wdt:P18 ?image_ .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl.no,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
 }
 GROUP BY ?author ?authorLabel ?count
 ORDER BY DESC(?count)

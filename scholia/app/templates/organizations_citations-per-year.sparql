@@ -38,7 +38,7 @@ WHERE {
   
   # Label the results
   INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY ?year_of_citation
 

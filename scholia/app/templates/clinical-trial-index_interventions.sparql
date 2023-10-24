@@ -18,6 +18,6 @@ SELECT
     LIMIT 500
   }
   BIND(IF(EXISTS { ?intervention wdt:P31 wd:Q11173 }, ?intervention, "") AS ?as_chemical) 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
 }
 ORDER BY DESC(?count)

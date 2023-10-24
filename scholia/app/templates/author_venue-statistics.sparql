@@ -23,7 +23,7 @@ WITH {
 WHERE {
   INCLUDE %result
   OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }  
 } 
 GROUP BY ?count ?venue ?venueLabel ?topics ?topicsUrl
 ORDER BY DESC(?count)
