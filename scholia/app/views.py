@@ -12,7 +12,7 @@ from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works, wb_get_organization_latest_works,
                    wb_get_sponsor_latest_works)
-from ..arxiv import metadata_to_quickstatements, string_to_arxiv
+from ..arxiv import metadata_to_quickstatements, string_to_arxivs
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      doi_prefix_to_qs, github_to_qs, biorxiv_to_qs,
@@ -247,31 +247,34 @@ def show_arxiv_to_quickstatements():
 
     """
     query = request.args.get('arxiv')
+    current_app.logger.debug("arXivs identified: {}".format(str(query)))
 
     if not query:
         return render_template('arxiv-to-quickstatements.html')
 
-    current_app.logger.debug("query: {}".format(query))
+    arxivs = string_to_arxivs(query)
 
-    arxiv = string_to_arxiv(query)
-    if not arxiv:
+    if not arxivs:
         # Could not identify an arxiv identifier
         return render_template('arxiv-to-quickstatements.html')
 
-    qs = arxiv_to_qs(arxiv)
-    if len(qs) > 0:
-        # The arxiv is already in Wikidata
-        q = qs[0]
-        return render_template('arxiv-to-quickstatements.html',
-                               arxiv=arxiv, q=q)
+    # Look up matched arxiv ID in Wikidata
+    missing_arxivs = []
+    identified_qs = []
+    for arxiv in arxivs:
+        qs = arxiv_to_qs(arxiv)
+        if len(qs) > 0:
+            identified_qs.append(qs[0])
+        else:
+            missing_arxivs.append(arxiv)
 
     try:
-        metadata = get_arxiv_metadata(arxiv)
+        metadatas = [get_arxiv_metadata(arxiv) for arxiv in missing_arxivs]
     except Exception:
-        return render_template('arxiv-to-quickstatements.html',
-                               arxiv=arxiv)
+        return render_template('arxiv-to-quickstatements.html', arxiv=query)
 
-    quickstatements = metadata_to_quickstatements(metadata)
+    quickstatements = "\n\n".join(metadata_to_quickstatements(metadata)
+                                  for metadata in metadatas)
 
     # For Quickstatements Version 2 in URL components,
     # TAB and newline should be replace by | and ||
@@ -282,7 +285,8 @@ def show_arxiv_to_quickstatements():
     # Here, we let jinja2 handle the encoding rather than adding an extra
     # parameter
     return render_template('arxiv-to-quickstatements.html',
-                           arxiv=arxiv, quickstatements=quickstatements)
+                           arxiv=query, qs=identified_qs,
+                           quickstatements=quickstatements)
 
 
 @main.route('/author/' + q_pattern)
@@ -1537,14 +1541,10 @@ def show_search():
         doi = dois[0]
         return redirect(url_for('app.redirect_doi', doi=doi), code=302)
 
-    arxiv = string_to_arxiv(query)
-    if arxiv:
-        qs = arxiv_to_qs(arxiv)
-        if len(qs) > 0:
-            q = qs[0]
-            return redirect(url_for('app.show_work', q=q), code=302)
+    arxivs = string_to_arxivs(query)
+    if arxivs:
         return redirect(url_for('app.show_arxiv_to_quickstatements',
-                                arxiv=arxiv), code=302)
+                                arxiv=query), code=302)
 
     search_results = []
     next_page = -1
@@ -1637,8 +1637,6 @@ def show_q_to_bibliography_templates():
 
     if not q_:
         return render_template('q-to-bibliography-templates.html')
-
-    current_app.logger.debug("q: {}".format(q_))
 
     q = sanitize_q(q_)
     if not q:

@@ -2,7 +2,7 @@
 
 import urllib.parse
 
-from re import findall, search
+from re import findall, search, split
 
 
 def escape_string(string):
@@ -89,6 +89,30 @@ def string_to_type(string):
         return 'doi'
     else:
         return 'string'
+
+
+def string_to_list(string):
+    """Convert comma/space/tab/pipe separated string to list.
+
+    Parameters
+    ----------
+    string : str
+        Query string.
+
+    Returns
+    -------
+    elements : list of str
+        List of strings splitted based on separators
+
+    Examples
+    --------
+    >>> string_to_list("1, 2 | 3\t4 |5")
+    ['1', '2', '3', '4', '5']
+    >>> string_to_list(" 10.10,abc|123 ")
+    ['10.10', 'abc', '123']
+
+    """
+    return split(r'[\|,\s]+', string.strip())
 
 
 def remove_special_characters_url(url):
