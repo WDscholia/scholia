@@ -186,7 +186,7 @@ def string_to_arxivs(string):
     True
 
     """
-    PATTERN = re.compile(r'\d+\.\d+', flags=re.DOTALL | re.UNICODE)
+    PATTERN = re.compile(r'\d{4}\.\d+', flags=re.DOTALL | re.UNICODE)
     arxivs = PATTERN.findall(string)
     return arxivs
 
