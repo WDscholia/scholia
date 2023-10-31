@@ -92,7 +92,7 @@ def string_to_type(string):
 
 
 def string_to_list(string):
-    """Convert comma/space/tab/pipe separated string to list.
+    r"""Convert comma/space/tab/pipe separated string to list.
 
     Parameters
     ----------
