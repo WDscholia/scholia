@@ -37,14 +37,8 @@ ID is not found in Wikidata. Note that new items may not be immediately found be
 </div>
 {% endif %}
 
-{% if (qs|length) > 0 %}
+{% if (qs|length) >= 1 %}
 <h2>Found</h2>
-
-<div id="searchresult">Already entered as <a href="work/{{ qs[0] }}">{{ qs[0] }}</a></div>
-
-{% endif %}
-
-{% if (qs|length) > 1 %}
 
 <div id="searchresult">Already entered as:
 <ul>
