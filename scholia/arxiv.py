@@ -21,6 +21,8 @@ import os
 
 import re
 
+import sys
+
 import requests
 
 from feedparser import parse as parse_api
@@ -44,16 +46,14 @@ def get_metadata(arxiv):
 
     Returns
     -------
-    metadata : dict
-        Dictionary with metadata.
+    metadata : dict or None
+        Dictionary with metadata. None is returned if the identifier is not
+        found.
 
     Notes
     -----
     This function queries arXiv. It must not be used to crawl arXiv.
     It does not look at robots.txt.
-
-    This function currently uses 'abs' HTML pages and not the arXiv API or
-    https://arxiv.org/help/oa/index which is the approved way.
 
     References
     ----------
@@ -71,6 +71,9 @@ def get_metadata(arxiv):
 
     url = ARXIV_URL + "api/query?id_list=" + arxiv
     response = requests.get(url)
+
+    if not response.status_code == 200:
+        return None
 
     feed = parse_api(response.content)
     entry = feed.entries[0]
@@ -102,8 +105,6 @@ def metadata_to_quickstatements(metadata):
     format so it can copy and pasted into Magnus Manske quickstatement web tool
     to populate Wikidata.
 
-    This function does not check whether the item already exists.
-
     Parameters
     ----------
     metadata : dict
@@ -113,6 +114,12 @@ def metadata_to_quickstatements(metadata):
     -------
     quickstatements : str
         String with quickstatements.
+
+    Notes
+    -----
+    English is added as the default language.
+
+    This function does not check whether the item already exists.
 
     References
     ----------
@@ -141,6 +148,9 @@ def metadata_to_quickstatements(metadata):
         metadata['publication_date'][:10])
     qs += u'LAST\tP953\t"{}"\n'.format(
         metadata['full_text_url'].replace('"', '\"'))
+
+    # Always add English as the default language
+    qs += u'LAST\tP407\tQ1860\n'
 
     # Optional DOI
     if 'doi' in metadata:
@@ -240,13 +250,23 @@ def main():
     output_encoding = 'utf-8'
 
     if arguments['get-metadata']:
-        arxiv = arguments['<arxiv>']
+        string = arguments['<arxiv>']
+        arxiv = string_to_arxiv(string)
+        if not arxiv:
+            sys.exit("No arXiv identifier matched")
         metadata = get_metadata(arxiv)
+        if not metadata:
+            sys.exit("Could not get metadata for arXix {}".format(arxiv))
         print(json.dumps(metadata))
 
     elif arguments['get-quickstatements']:
-        arxiv = arguments['<arxiv>']
+        string = arguments['<arxiv>']
+        arxiv = string_to_arxiv(string)
+        if not arxiv:
+            sys.exit("No arXiv identifier matched")
         metadata = get_metadata(arxiv)
+        if not metadata:
+            sys.exit("Could not get metadata for arXix {}".format(arxiv))
         quickstatements = metadata_to_quickstatements(metadata)
         os.write(output_file, quickstatements.encode(output_encoding))
 
