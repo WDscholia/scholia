@@ -157,6 +157,40 @@ def metadata_to_quickstatements(metadata):
     return qs
 
 
+def string_to_arxivs(string):
+    """Extract arxiv IDs from string.
+
+    Multiple arXiv identifier part of `string` will be extracted, where the
+    identifier pattern should be in the format of a series of digits
+    followed by a period followed by a series of digits. Other formats
+    will not be matched. If multiple identifier patterns are in the input
+    string then only the first is returned.
+
+    Parameters
+    ----------
+    string : str
+        String with arxiv ID.
+
+    Returns
+    -------
+    arxivs : list of str
+        String with arxiv IDs.
+
+    Examples
+    --------
+    >>> string = "2210.03493 http://arxiv.org/abs/1103.2903"
+    >>> arxivs = string_to_arxivs(string)
+    >>> '1103.2903' in arxivs
+    True
+    >>> "2210.03493" in arxivs
+    True
+
+    """
+    PATTERN = re.compile(r'\d+\.\d+', flags=re.DOTALL | re.UNICODE)
+    arxivs = PATTERN.findall(string)
+    return arxivs
+
+
 def string_to_arxiv(string):
     """Extract arxiv id from string.
 
@@ -184,8 +218,7 @@ def string_to_arxiv(string):
     True
 
     """
-    PATTERN = re.compile(r'\d+\.\d+', flags=re.DOTALL | re.UNICODE)
-    arxivs = PATTERN.findall(string)
+    arxivs = string_to_arxivs(string)
     if len(arxivs) > 0:
         return arxivs[0]
     return None
