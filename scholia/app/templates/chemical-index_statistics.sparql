@@ -21,6 +21,7 @@ WHERE {
     ("isomeric SMILES" "P2017")
     # ("ZINC ID" "P2084") # limit IDs
     ("crystal structure" "haswbstatement:P3636|P11375")
+    ("safety classification and labelling" "P4952")
     ("mass spectrum" "haswbstatement:P4964|P6689")
     # ("SMARTS notation" "P8533") # not for now
     ("NMR spectrum" "P9405")
@@ -30,6 +31,8 @@ WHERE {
     ("solubility" "linksto:Property:P2177")
     ("melting point" "linksto:Property:P2101")
     ("boiling point" "linksto:Property:P2102")
+    ("electric dipole moment" "linksto:Property:P2201")
+    ("ionization energy" "linksto:Property:P2260")
     # ("minimum explosive concentration" "linksto:Property:P2204") # safety
     # ("time-weighted average exposure limit" "linksto:Property:P2404") # safety
     # ("ceiling exposure limit" "linksto:Property:P2405") # safety
