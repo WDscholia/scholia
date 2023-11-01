@@ -1,91 +1,50 @@
-SELECT ?count ?description
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2102 []. }
-} AS %boilingpoints
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2101 []. }
-} AS %meltingpoints
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P1117 []. }
-} AS %pkas
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P231 []. }
-} AS %cas
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P235 []. }
-} AS %inchikeys
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3636 | wdt:P11375 []. }
-} AS %crystalStructures
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6689 []. }
-} AS %massSpectra
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P9405 []. }
-} AS %nmrSpectra
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2201 []. }
-} AS %dipole
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2260 []. }
-} AS %ionizationPotential
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P4952 []. }
-} AS %safetyInfo
+SELECT
+  (xsd:integer(?count_) AS ?count)
+  (CONCAT("Total chemicals with ", ?description_) AS ?description)
 WHERE {
-  {
-    INCLUDE %meltingpoints
-    BIND("Total number of chemicals with a melting point" AS ?description)
+  BIND("haswbstatement:P31=Q113145171|P31=Q59199015" AS ?constraint)
+  VALUES (?description_ ?property_query_term) {
+    ("or without stereochemistry" "")
+    ("fully defined stereochemistry" "P31=Q113145171")
+    ("undefined stereochemistry" "P31=Q59199015")
+    ("CAS registry number" "P231")
+    ("canonical SMILES" "P233")
+    ("InChI" "P234")
+    ("InChIKey" "P235")
+    ("chemical formula" "P274")
+    # ("ChEMBL ID" "P592") # limit IDs
+    # ("ChemSpider ID" "P661") # limit IDs
+    ("PubChem ID" "P662")
+    # ("KEGG ID" "P665") # limit IDs
+    ("ChEBI ID" "P683")
+    ("found in taxon" "P703")
+    ("isomeric SMILES" "P2017")
+    # ("ZINC ID" "P2084") # limit IDs
+    ("crystal structure" "haswbstatement:P3636|P11375")
+    ("mass spectrum" "haswbstatement:P4964|P6689")
+    # ("SMARTS notation" "P8533") # not for now
+    ("NMR spectrum" "P9405")
+    # hacky way to get quantity properties.
+    ("pKa" "linksto:Property:P1117")
+    ("mass" "linksto:Property:P2067")
+    ("solubility" "linksto:Property:P2177")
+    ("melting point" "linksto:Property:P2101")
+    ("boiling point" "linksto:Property:P2102")
+    # ("minimum explosive concentration" "linksto:Property:P2204") # safety
+    # ("time-weighted average exposure limit" "linksto:Property:P2404") # safety
+    # ("ceiling exposure limit" "linksto:Property:P2405") # safety
+    # ("maximum peak exposure limit" "linksto:Property:P2406") # safety
+    # ("short-term exposure limit" "linksto:Property:P2407") # safety
+    # ("solubility product constant" "linksto:Property:P11813") # less than 5 statements
   }
-  UNION
-  {
-    INCLUDE %boilingpoints
-    BIND("Total number of chemicals with a boiling point" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %pkas
-    BIND("Total number of chemicals with a pKa" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %cas
-    BIND("Total number of CAS registry numbers" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %inchikeys
-    BIND("Total number of InChIKeys" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %crystalStructures
-    BIND("Total number of chemicals with crystal structures" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %massSpectra
-    BIND("Total number of chemicals with mass spectra" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %nmrSpectra
-    BIND("Total number of chemicals with NMR spectra" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %dipole
-    BIND("Total number of chemicals with a electronic dipole moment" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %ionizationPotential
-    BIND("Total number of chemicals with a ionization potential" AS ?description)
-  }
-  UNION
-  {
-    INCLUDE %safetyInfo
-    BIND("Total number of chemicals with a safety classification and labelling" AS ?description)
+  BIND(CONCAT(?property_query_term, " ", ?constraint) AS ?search_query)
+  SERVICE wikibase:mwapi {
+    bd:serviceParam wikibase:endpoint "www.wikidata.org" ; 
+                    wikibase:api "Search" ; 
+                    wikibase:limit "once" ; 
+                    mwapi:srsearch ?search_query;
+                    mwapi:srlimit "1".
+    ?count_ wikibase:apiOutput "//searchinfo[1]/@totalhits".
   }
 }
 ORDER BY DESC(?count)
