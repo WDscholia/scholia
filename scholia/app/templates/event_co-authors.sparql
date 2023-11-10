@@ -22,13 +22,23 @@ WITH {
       target:  (^wdt:P4745 / ^wdt:P1433 / wdt:P50) | wdt:P5804 ?author1 .
       BIND ("FFFFFF" AS ?light_rgb_)
     }
+    UNION
+    {
+      # author of article in proceedings, or program committee member
+      ?presentation wdt:P823 ?author1;
+      wdt:P5072 target:
+      BIND ("FFFFFF" AS ?light_rgb_)
+   }
   }
   GROUP BY ?author1
 } AS %authors
 WITH {
   SELECT DISTINCT ?author1 ?author2 ?rgb WHERE {
     INCLUDE %authors
-    target: (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710 | ^wdt:P4745 / ^wdt:P1433 / wdt:P50)  ?author2 .
+    {        
+    target: (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710 | ^wdt:P4745 / ^wdt:P1433 / wdt:P50)  ?author2 .}
+    UNION
+    { ?presentation wdt:P823 ?author2; wdt:P5072 target:    }
             
     # Find co-authors
     ?work wdt:P50 ?author1 , ?author2 .
