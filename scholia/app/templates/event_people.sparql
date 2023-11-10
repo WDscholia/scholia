@@ -10,9 +10,15 @@ WITH {
     (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles) ?person
   WHERE {
     {
-      # speaker
+      # speaker added directly in the target item
       target: wdt:P823 ?person .
       # BIND(wd:Q9379869 AS ?role)
+      BIND("speaker" AS ?role)
+    }
+    UNION
+    {
+      # speaker inferred from presentation items related to the event-target
+      ?presentation wdt:P823 ?person; wdt:P5072 target: 
       BIND("speaker" AS ?role)
     }
     UNION
@@ -56,6 +62,7 @@ WITH {
     ?person (SAMPLE(?work) AS ?example_work)
   WHERE {
     INCLUDE %people .
+    ?person wdt:P31 wd:Q5.
     OPTIONAL { ?work wdt:P50 ?person . }
   }
   GROUP BY ?roles ?person
