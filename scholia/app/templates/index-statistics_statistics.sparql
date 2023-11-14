@@ -26,6 +26,7 @@ WHERE {
 { {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P2427 []} } BIND("Items with a GRID ID" AS ?d)} UNION
 { {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P2860 []} } BIND("Citations" AS ?d)} UNION
 { {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P31 wd:Q13442814.} } BIND("Scholarly articles" AS ?d)} UNION
+{ {SELECT (COUNT(*) AS ?c) WHERE {[] wdt:P31 []} } BIND("Things in Wikidata" AS ?d)} UNION
 { {SELECT (COUNT(DISTINCT ?work) AS ?c) WHERE { { ?work wdt:P31 wd:Q45182324 . } UNION { ?work wdt:P793 wd:Q7316896 . } UNION { ?work wdt:P5824 [] . } } } BIND("Retracted articles" AS ?d)}
 BIND (?c AS ?count)
 BIND (?d AS ?description)
