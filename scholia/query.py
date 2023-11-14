@@ -1201,6 +1201,7 @@ def q_to_class(q):
             'Q3918',  # university
             'Q31855',  # research institute
             'Q38723',  # higher education institution
+            'Q162633',  # academy
             'Q414147',  # academy of sciences
             'Q484652',  # international organization
             'Q748019',  # scientific society
