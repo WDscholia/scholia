@@ -1,11 +1,30 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl) (COUNT(DISTINCT(?chemical)) AS ?count) WHERE {
-  ?chemical wdt:P279+ target: ;
-            p:P703 ?taxonStatement .
-  ?taxonStatement ps:P703 ?taxon .
+SELECT
+  ?chemicals
+
+  ?example_chemical ?example_chemicalLabel
+  (CONCAT("/chemical/", SUBSTR(STR(?example_chemical), 32)) AS ?example_chemicalUrl)
+
+  ?taxon ?taxonLabel
+  (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl)
+  ?taxonDescription
+WITH {
+  SELECT DISTINCT 
+    (COUNT(DISTINCT(?chemical)) AS ?chemicals)
+    ?taxon
+    (SAMPLE(?chemical) AS ?example_chemical)
+  WHERE {
+    ?chemical wdt:P279* target: ;
+              p:P703 ?taxonStatement .
+    ?taxonStatement ps:P703 ?taxon .
+  }
+  GROUP BY ?taxon
+  ORDER BY DESC(?chemicals)
+  LIMIT 250
+} AS %taxons
+WHERE {
+  INCLUDE %taxons
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 } 
-  GROUP BY ?taxon ?taxonLabel
-  ORDER BY DESC(?count)
-  LIMIT 250
+ORDER BY DESC(?chemicals)
