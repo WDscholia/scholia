@@ -1,4 +1,4 @@
-# title: recent literature about this chemical
+#title: recent literature about this chemical
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?date ?work ?workLabel ?type ?via ?topics

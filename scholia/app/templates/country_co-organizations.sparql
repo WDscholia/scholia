@@ -1,4 +1,4 @@
-# title: Co-organizations for a specific country
+#title: Co-organizations for a specific country
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 #defaultView:Map

@@ -1,4 +1,4 @@
-# title: Most cited authors published in venue
+#title: Most cited authors published in venue
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

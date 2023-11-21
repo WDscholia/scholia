@@ -1,4 +1,4 @@
-# title: List of works on any combination of specific uses
+#title: List of works on any combination of specific uses
 SELECT
   ?count 
   (MIN(?publication_date_) AS ?publication_date)

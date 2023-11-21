@@ -1,4 +1,4 @@
-# title: Venues citing articles from this specific journal
+#title: Venues citing articles from this specific journal
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

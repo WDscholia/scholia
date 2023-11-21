@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: Author gender distribution for a specific venue
+#title: Author gender distribution for a specific venue
 SELECT ?count ?gender ?genderLabel 
 WITH {
   SELECT (COUNT(DISTINCT ?author) AS ?count) ?gender WHERE {

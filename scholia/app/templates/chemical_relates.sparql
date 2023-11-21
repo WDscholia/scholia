@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: related chemical structures
+#title: related chemical structures
 SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WHERE {
   target: wdt:P235 ?queryKey .
   ?mol wdt:P235 ?InChIKey .
