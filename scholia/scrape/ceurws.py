@@ -130,7 +130,7 @@ def tree_to_papers(tree, proceedings, proceedings_q, iso639='en'):
         paper['full_text_url'] = os.path.join(
             proceedings['url'],
             element.xpath(".//a")[0].attrib['href'])
-        paper['title'] = re.sub(r'\s+', ' ', title_elements[0].text)
+        paper['title'] = re.sub(r'\s+', ' ', title_elements[0].text).strip()
 
         # Authors
         authors = [
@@ -267,6 +267,9 @@ def paper_to_q(paper):
     response = requests.get(WDQS_URL,
                             params={'query': query, 'format': 'json'},
                             headers=HEADERS)
+    if not response.ok:
+        response.raise_for_status()
+
     data = response.json()['results']['bindings']
 
     if len(data) == 0 or not data[0]:
@@ -355,8 +358,9 @@ def proceedings_url_to_proceedings(url, return_tree=False):
     proceedings['urn'] = \
         tree.xpath("//span[@class='CEURURN']")[0].text
 
-    proceedings['title'] = \
-        tree.xpath("//span[@class='CEURFULLTITLE']")[0].text
+    proceedings['title'] = re.sub(
+        r'\s+', ' ',
+        tree.xpath("//span[@class='CEURFULLTITLE']")[0].text).strip()
 
     proceedings['date'] = \
         tree.xpath("//span[@class='CEURPUBDATE']")[0].text
