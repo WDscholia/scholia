@@ -8,6 +8,7 @@ select ?year (count(?work) as ?number_of_publications) ?role where {
       OPTIONAL {
         ?work wdt:P31 wd:Q109229154 . bind("explicit" as ?type_)
         ?work wdt:P1433 / rdfs:label ?venue . FILTER (LANG(?venue) = "en")
+        MINUS { ?venue_ wdt:P31 wd:Q1143604 }
       }
     }
     group by ?work ?type_ ?venue
