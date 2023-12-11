@@ -1,3 +1,4 @@
+# tool: scholia
 #defaultView:ScatterChart
 # Statistics on number of recipients for award wrt. gender
 SELECT ?males ?females ?award ?awardLabel 
@@ -17,7 +18,13 @@ WITH {
   GROUP BY ?award
 } AS %result
 WHERE {
-  INCLUDE %result
+  {INCLUDE %result}
+  UNION
+  {
+    VALUES (?males ?females ?award ?awardLabel) {
+      (2000 2000 wd:Q10578722 "Fictive Award Label for axis")
+    }
+  }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 } 
 ORDER BY DESC(?males) DESC(?female)
