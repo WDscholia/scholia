@@ -93,7 +93,7 @@ def get_metadata(arxiv):
 
     # Optional DOI
     if "arxiv_doi" in entry:
-        metadata['doi'] = entry.arxiv_doi
+        metadata['doi'] = entry.arxiv_doi.upper()
 
     return metadata
 
