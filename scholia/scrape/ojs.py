@@ -367,7 +367,7 @@ def scrape_paper_from_url(url):
             entry['full_text_url'] = pdf_urls[0]
 
     # There may be inconsistent metadata for the language.
-    # For for instance, https://tidsskrift.dk/sygdomogsamfund/article/view/579
+    # For instance, https://tidsskrift.dk/sygdomogsamfund/article/view/579
     # "DC.Language" is correct, while "citation_language" is wrong.
     language_as_iso639 = _fields_to_content(
         ['DC.Language', 'citation_language'])

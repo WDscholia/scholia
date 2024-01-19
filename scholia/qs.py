@@ -68,14 +68,16 @@ def paper_to_quickstatements(paper):
     iso639 = paper.get('iso639', 'en')
 
     if 'title' in paper and paper['title']:
+        full_title = normalize_string(paper['title'])
+
         # "Label must be no more than 250 characters long"
-        short_title = normalize_string(paper['title'])[:250]
+        short_title = full_title[:250]
 
         # Label
         qs += u('LAST\tLen\t"{}"\n').format(short_title)
 
-        # Title property
-        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, short_title)
+        # Title property, accepts longer strings
+        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, full_title)
 
     # Instance of scientific article
     qs += 'LAST\tP31\tQ13442814\n'
