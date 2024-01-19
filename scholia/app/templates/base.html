@@ -148,34 +148,41 @@ askQuery("{{ panel }}", `# tool: scholia
     {% endif %}
 
 	if ("P18" in item.claims) {
-	    var imageName = item.claims.P18[0].mainsnak.datavalue.value;
-	    // spaces must be replaced by underscores in the file name
-	    imageName = imageName.replaceAll(" ", "_")
-	    var imageNameMd5 = md5(imageName);
-	    var imageURL = "https://upload.wikimedia.org/wikipedia/commons/thumb/" 
-	    imageURL += imageNameMd5[0] + "/" + imageNameMd5.slice(0,2) + "/"
-	    var filetype = imageName.match(/\.(\w+)$/);
-      var extension = filetype[1].toLowerCase()
-	    if (extension === "tif" || extension === "tiff") {
-	      imageURL += encodeURIComponent(imageName) + "/lossy-page1-500px-" + encodeURIComponent(imageName) + ".jpg";
-	    } else if (extension === "svg") {
-	      imageURL += encodeURIComponent(imageName) + "/500px-" + encodeURIComponent(imageName) + ".png";
-	    } else {
-	      imageURL += encodeURIComponent(imageName) + "/500px-" + encodeURIComponent(imageName);
-	    }
-	    var itemImage = document.getElementById("item-image");
-	    if (itemImage) {
-      itemImage.src = imageURL;
-      itemImage.title = imageName.slice(0, imageName.lastIndexOf('.'));
-      itemImage.setAttribute('alt', imageName);
+        // Find P18 claim which is not deprecated
+        const p18Claim = item.claims.P18.find(function (claim) {
+            return claim.rank !== "deprecated";
+        });
 
-      var link = document.createElement('a');
-      link.href = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(imageName);
-      link.style = "max-width: 50%"
-      var parent = itemImage.parentNode;
-      parent.replaceChild(link, itemImage);
-      link.appendChild(itemImage);
-    }
+        if (undefined !== p18Claim) {
+            var imageName = p18Claim.mainsnak.datavalue.value;
+            // spaces must be replaced by underscores in the file name
+            imageName = imageName.replaceAll(" ", "_")
+            var imageNameMd5 = md5(imageName);
+            var imageURL = "https://upload.wikimedia.org/wikipedia/commons/thumb/"
+            imageURL += imageNameMd5[0] + "/" + imageNameMd5.slice(0,2) + "/"
+            var filetype = imageName.match(/\.(\w+)$/);
+            var extension = filetype[1].toLowerCase()
+            if (extension === "tif" || extension === "tiff") {
+              imageURL += encodeURIComponent(imageName) + "/lossy-page1-500px-" + encodeURIComponent(imageName) + ".jpg";
+            } else if (extension === "svg") {
+              imageURL += encodeURIComponent(imageName) + "/500px-" + encodeURIComponent(imageName) + ".png";
+            } else {
+              imageURL += encodeURIComponent(imageName) + "/500px-" + encodeURIComponent(imageName);
+            }
+            var itemImage = document.getElementById("item-image");
+            if (itemImage) {
+              itemImage.src = imageURL;
+              itemImage.title = imageName.slice(0, imageName.lastIndexOf('.'));
+              itemImage.setAttribute('alt', imageName);
+
+              var link = document.createElement('a');
+              link.href = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(imageName);
+              link.style = "max-width: 50%"
+              var parent = itemImage.parentNode;
+              parent.replaceChild(link, itemImage);
+              link.appendChild(itemImage);
+            }
+        }
 	}
 
 	if ("P10286" in item.claims) {
