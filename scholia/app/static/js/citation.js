@@ -2396,49 +2396,30 @@ Translator.CONVERT_TO_SOURCE = Symbol('convert to source');
 Translator.CONVERT_TO_TARGET = Symbol('convert to target');
 },{}],42:[function(require,module,exports){
 module.exports={
-  "_from": "@citation-js/core@0.7.6",
-  "_id": "@citation-js/core@0.7.6",
-  "_inBundle": false,
-  "_integrity": "sha512-qbB6RjwSsx/AjlCSAqoWKN05VxpjADYe8GmnPJnRB7QeNiVmqaRc8NSQDdvQ+4qhCkQOtMH15Sa2Nde4cvlXhw==",
-  "_location": "/@citation-js/core",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "@citation-js/core@0.7.6",
-    "name": "@citation-js/core",
-    "escapedName": "@citation-js%2fcore",
-    "scope": "@citation-js",
-    "rawSpec": "0.7.6",
-    "saveSpec": null,
-    "fetchSpec": "0.7.6"
-  },
-  "_requiredBy": [
-    "#DEV:/"
-  ],
-  "_resolved": "https://registry.npmjs.org/@citation-js/core/-/core-0.7.6.tgz",
-  "_shasum": "b0c1d3bc76cfdc3268ce351f564ab697cda424e7",
-  "_spec": "@citation-js/core@0.7.6",
-  "_where": "/app",
-  "author": {
-    "name": "Lars Willighagen",
-    "email": "lars.willighagen@gmail.com"
-  },
-  "bugs": {
-    "url": "https://github.com/citation-js/citation-js/issues"
-  },
-  "bundleDependencies": false,
-  "dependencies": {
-    "@citation-js/date": "^0.5.0",
-    "@citation-js/name": "^0.4.2",
-    "fetch-ponyfill": "^7.1.0",
-    "sync-fetch": "^0.4.1"
-  },
-  "deprecated": false,
+  "name": "@citation-js/core",
+  "version": "0.7.6",
   "description": "Convert different bibliographic metadata sources",
+  "keywords": [
+    "citation-js",
+    "citation",
+    "bibliography"
+  ],
+  "author": "Lars Willighagen <lars.willighagen@gmail.com>",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "lib-mjs/index.js",
   "directories": {
     "lib": "src",
     "test": "__tests__"
+  },
+  "homepage": "https://citation.js.org/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/citation-js/citation-js.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/citation-js/citation-js/issues"
   },
   "engines": {
     "node": ">=16.0.0"
@@ -2447,26 +2428,16 @@ module.exports={
     "lib",
     "lib-mjs"
   ],
-  "gitHead": "c88a4c1aacf82cfa8f1b55cc8673cb38e807c421",
-  "homepage": "https://citation.js.org/",
-  "keywords": [
-    "citation-js",
-    "citation",
-    "bibliography"
-  ],
-  "license": "MIT",
-  "main": "lib/index.js",
-  "module": "lib-mjs/index.js",
-  "name": "@citation-js/core",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/citation-js/citation-js.git",
-    "directory": "packages/core"
-  },
   "scripts": {
     "test": "mocha -c -R dot test/*.spec.js"
   },
-  "version": "0.7.6"
+  "dependencies": {
+    "@citation-js/date": "^0.5.0",
+    "@citation-js/name": "^0.4.2",
+    "fetch-ponyfill": "^7.1.0",
+    "sync-fetch": "^0.4.1"
+  },
+  "gitHead": "c88a4c1aacf82cfa8f1b55cc8673cb38e807c421"
 }
 
 },{}],43:[function(require,module,exports){
@@ -2957,7 +2928,8 @@ var _default = exports.default = {
     sentenceCase: 'never'
   },
   format: {
-    useIdAsLabel: false
+    useIdAsLabel: false,
+    asciiOnly: true
   }
 };
 },{"./input/constants.js":52,"./mapping/biblatexTypes.json":62,"./mapping/bibtexTypes.json":64}],50:[function(require,module,exports){
@@ -3020,7 +2992,7 @@ exports.text = exports.parse = parseBibTxt;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.sentenceCaseLanguages = exports.required = exports.mathScripts = exports.mathScriptFormatting = exports.ligatures = exports.ligaturePattern = exports.formattingEnvs = exports.formattingCommands = exports.formatting = exports.fieldTypes = exports.diacritics = exports.defaultStrings = exports.commands = exports.argumentCommands = void 0;
+exports.sentenceCaseLanguages = exports.required = exports.mathScripts = exports.mathScriptFormatting = exports.mathCommands = exports.ligatures = exports.ligaturePattern = exports.formattingEnvs = exports.formattingCommands = exports.formatting = exports.fieldTypes = exports.diacritics = exports.defaultStrings = exports.commands = exports.argumentCommands = void 0;
 var _required2 = _interopRequireDefault(require("./required.json"));
 var _fieldTypes2 = _interopRequireDefault(require("./fieldTypes.json"));
 var _unicode = _interopRequireDefault(require("./unicode.json"));
@@ -3029,6 +3001,7 @@ const required = exports.required = _required2.default;
 const fieldTypes = exports.fieldTypes = _fieldTypes2.default;
 const diacritics = exports.diacritics = _unicode.default.diacritics;
 const commands = exports.commands = _unicode.default.commands;
+const mathCommands = exports.mathCommands = _unicode.default.mathCommands;
 const defaultStrings = exports.defaultStrings = {
   jan: '01',
   feb: '02',
@@ -3812,7 +3785,8 @@ function orderNamePieces(pieces) {
 },{}],58:[function(require,module,exports){
 module.exports={"biblatex":{"article":["author","title","journaltitle",["year","date"]],"book":["author","title",["year","date"]],"mvbook":["author","title",["year","date"]],"inbook":["author","title","booktitle",["year","date"]],"booklet":[["author","editor"],"title",["year","date"]],"collection":["editor","title",["year","date"]],"mvcollection":["editor","title",["year","date"]],"incollection":["author","title","booktitle",["year","date"]],"dataset":[["author","editor"],"title",["year","date"]],"online":[["author","editor"],"title",["year","date"],["doi","eprint","url"]],"patent":["author","title","number",["year","date"]],"periodical":["editor","title",["year","date"]],"proceedings":["title",["year","date"]],"mvproceedings":["title",["year","date"]],"inproceedings":["author","title","booktitle",["year","date"]],"report":["author","title","type","institution",["year","date"]],"thesis":["author","title","type","institution",["year","date"]],"unpublished":["author","title",["year","date"]],"conference":["author","title","booktitle",["year","date"]],"electronic":[["author","editor"],"title",["year","date"],["doi","eprint","url"]],"mastersthesis":["author","title","institution",["year","date"]],"phdthesis":["author","title","institution",["year","date"]],"techreport":["author","title","institution",["year","date"]],"www":[["author","editor"],"title",["year","date"],["doi","eprint","url"]]},"bibtex":{"article":["author","title","journal","year"],"book":[["author","editor"],"title","publisher","year"],"booklet":["title"],"inbook":[["author","editor"],"title",["chapter","pages"],"publisher","year"],"incollection":["author","title","booktitle","publisher","year"],"inproceedings":["author","title","booktitle","year"],"mastersthesis":["author","title","school","year"],"phdthesis":["author","title","school","year"],"proceedings":["title","year"],"techreport":["author","title","institution","year"],"unpublished":["author","title","note"]}}
 },{}],59:[function(require,module,exports){
-module.exports={"diacritics":{"`":"̀","'":"́","^":"̂","~":"̃","=":"̄","u":"̆",".":"̇","\"":"̈","r":"̊","H":"̋","v":"̌","b":"̲","d":"̣","c":"̧","k":"̨","t":"͡","textcommabelow":"̦"},"commands":{"textquotesingle":"'","textasciigrave":"`","textquotedbl":"\"","textdollar":"$","textless":"<","textgreater":">","textbackslash":"\\","textasciicircum":"^","textunderscore":"_","textbraceleft":"{","textbar":"|","textbraceright":"}","textasciitilde":"~","textexclamdown":"¡","textcent":"¢","textsterling":"£","textcurrency":"¤","textyen":"¥","textbrokenbar":"¦","textsection":"§","textasciidieresis":"¨","textcopyright":"©","textordfeminine":"ª","guillemetleft":"«","guillemotleft":"«","textlnot":"¬","textregistered":"®","textasciimacron":"¯","textdegree":"°","textpm":"±","texttwosuperior":"²","textthreesuperior":"³","textasciiacute":"´","textmu":"µ","textparagraph":"¶","textperiodcentered":"·","textonesuperior":"¹","textordmasculine":"º","guillemetright":"»","guillemotright":"»","textonequarter":"¼","textonehalf":"½","textthreequarters":"¾","textquestiondown":"¿","AE":"Æ","DH":"Ð","texttimes":"×","O":"Ø","TH":"Þ","ss":"ß","ae":"æ","dh":"ð","textdiv":"÷","o":"ø","th":"þ","DJ":"Đ","dj":"đ","i":"ı","IJ":"Ĳ","ij":"ĳ","L":"Ł","l":"ł","NG":"Ŋ","ng":"ŋ","OE":"Œ","oe":"œ","textflorin":"ƒ","j":"ȷ","textasciicaron":"ˇ","textasciibreve":"˘","textacutedbl":"˝","textgravedbl":"˵","texttildelow":"˷","textbaht":"฿","SS":"ẞ","textcompwordmark":"‌","textendash":"–","textemdash":"—","textbardbl":"‖","textquoteleft":"‘","textquoteright":"’","quotesinglbase":"‚","textquotedblleft":"“","textquotedblright":"”","quotedblbase":"„","textdagger":"†","textdaggerdbl":"‡","textbullet":"•","textellipsis":"…","textperthousand":"‰","textpertenthousand":"‱","guilsinglleft":"‹","guilsinglright":"›","textreferencemark":"※","textinterrobang":"‽","textfractionsolidus":"⁄","textlquill":"⁅","textrquill":"⁆","textdiscount":"⁒","textcolonmonetary":"₡","textlira":"₤","textnaira":"₦","textwon":"₩","textdong":"₫","texteuro":"€","textpeso":"₱","textcelsius":"℃","textnumero":"№","textcircledP":"℗","textrecipe":"℞","textservicemark":"℠","texttrademark":"™","textohm":"Ω","textmho":"℧","textestimated":"℮","textleftarrow":"←","textuparrow":"↑","textrightarrow":"→","textdownarrow":"↓","textminus":"−","Hwithstroke":"Ħ","hwithstroke":"ħ","textasteriskcentered":"∗","textsurd":"√","textlangle":"〈","textrangle":"〉","textblank":"␢","textvisiblespace":"␣","textopenbullet":"◦","textbigcircle":"◯","textmusicalnote":"♪","textmarried":"⚭","textdivorced":"⚮","textinterrobangdown":"⸘","textcommabelow":null,"copyright":"©","Gamma":"Γ","Delta":"Δ","Theta":"Θ","Lambda":"Λ","Xi":"Ξ","Pi":"Π","Sigma":"Σ","Phi":"Φ","Psi":"Ψ","Omega":"Ω","alpha":"α","beta":"β","gamma":"γ","delta":"δ","varepsilon":"ε","zeta":"ζ","eta":"η","theta":"θ","iota":"ι","kappa":"κ","lambda":"λ","mu":"μ","nu":"ν","xi":"ξ","pi":"π","rho":"ρ","varsigma":"ς","sigma":"σ","tau":"τ","upsilon":"υ","varphi":"φ","chi":"χ","psi":"ψ","omega":"ω","vartheta":"ϑ","Upsilon":"ϒ","phi":"ϕ","varpi":"ϖ","varrho":"ϱ","epsilon":"ϵ"}}
+module.exports={"diacritics":{"`":"̀","'":"́","^":"̂","~":"̃","=":"̄","u":"̆",".":"̇","\"":"̈","r":"̊","H":"̋","v":"̌","b":"̲","d":"̣","c":"̧","k":"̨","t":"͡","textcommabelow":"̦"},"commands":{"textquotesingle":"'","textasciigrave":"`","textquotedbl":"\"","textdollar":"$","textless":"<","textgreater":">","textbackslash":"\\","textasciicircum":"^","textunderscore":"_","textbraceleft":"{","textbar":"|","textbraceright":"}","textasciitilde":"~","textexclamdown":"¡","textcent":"¢","textsterling":"£","textcurrency":"¤","textyen":"¥","textbrokenbar":"¦","textsection":"§","textasciidieresis":"¨","textcopyright":"©","textordfeminine":"ª","guillemetleft":"«","guillemotleft":"«","textlnot":"¬","textregistered":"®","textasciimacron":"¯","textdegree":"°","textpm":"±","texttwosuperior":"²","textthreesuperior":"³","textasciiacute":"´","textmu":"µ","textparagraph":"¶","textperiodcentered":"·","textonesuperior":"¹","textordmasculine":"º","guillemetright":"»","guillemotright":"»","textonequarter":"¼","textonehalf":"½","textthreequarters":"¾","textquestiondown":"¿","AE":"Æ","DH":"Ð","texttimes":"×","O":"Ø","TH":"Þ","ss":"ß","ae":"æ","dh":"ð","textdiv":"÷","o":"ø","th":"þ","DJ":"Đ","dj":"đ","i":"ı","IJ":"Ĳ","ij":"ĳ","L":"Ł","l":"ł","NG":"Ŋ","ng":"ŋ","OE":"Œ","oe":"œ","textflorin":"ƒ","j":"ȷ","textasciicaron":"ˇ","textasciibreve":"˘","textacutedbl":"˝","textgravedbl":"˵","texttildelow":"˷","textbaht":"฿","SS":"ẞ","textcompwordmark":"‌","textendash":"–","textemdash":"—","textbardbl":"‖","textquoteleft":"‘","textquoteright":"’","quotesinglbase":"‚","textquotedblleft":"“","textquotedblright":"”","quotedblbase":"„","textdagger":"†","textdaggerdbl":"‡","textbullet":"•","textellipsis":"…","textperthousand":"‰","textpertenthousand":"‱","guilsinglleft":"‹","guilsinglright":"›","textreferencemark":"※","textinterrobang":"‽","textfractionsolidus":"⁄","textlquill":"⁅","textrquill":"⁆","textdiscount":"⁒","textcolonmonetary":"₡","textlira":"₤","textnaira":"₦","textwon":"₩","textdong":"₫","texteuro":"€","textpeso":"₱","textcelsius":"℃","textnumero":"№","textcircledP":"℗","textrecipe":"℞","textservicemark":"℠","texttrademark":"™","textohm":"Ω","textmho":"℧","textestimated":"℮","textleftarrow":"←","textuparrow":"↑","textrightarrow":"→","textdownarrow":"↓","textminus":"−","Hwithstroke":"Ħ","hwithstroke":"ħ","textasteriskcentered":"∗","textsurd":"√","textlangle":"〈","textrangle":"〉","textblank":"␢","textvisiblespace":"␣","textopenbullet":"◦","textbigcircle":"◯","textmusicalnote":"♪","textmarried":"⚭","textdivorced":"⚮","textinterrobangdown":"⸘","textcommabelow":null,"copyright":"©"},"mathCommands":{"Gamma":"Γ","Delta":"Δ","Theta":"Θ","Lambda":"Λ","Xi":"Ξ","Pi":"Π","Sigma":"Σ","Phi":"Φ","Psi":"Ψ","Omega":"Ω","alpha":"α","beta":"β","gamma":"γ","delta":"δ","varepsilon":"ε","zeta":"ζ","eta":"η","theta":"θ","iota":"ι","kappa":"κ","lambda":"λ","mu":"μ","nu":"ν","xi":"ξ","pi":"π","rho":"ρ","varsigma":"ς","sigma":"σ","tau":"τ","upsilon":"υ","varphi":"φ","chi":"χ","psi":"ψ","omega":"ω","vartheta":"ϑ","Upsilon":"ϒ","phi":"ϕ","varpi":"ϖ","varrho":"ϱ","epsilon":"ϵ"}}
+
 },{}],60:[function(require,module,exports){
 "use strict";
 
@@ -4136,6 +4110,8 @@ const valueGrammar = exports.valueGrammar = new _core.util.Grammar({
       return applyFormatting(text, format);
     } else if (command in constants.commands) {
       return constants.commands[command];
+    } else if (command in constants.mathCommands) {
+      return constants.mathCommands[command];
     } else if (command in constants.diacritics && !this.matchEndOfFile()) {
       const text = this.consumeRule('Text');
       const diacritic = text[0] + constants.diacritics[command];
@@ -5759,7 +5735,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.format = format;
+var _config = _interopRequireDefault(require("../config.js"));
 var _constants = require("../input/constants.js");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 const unicode = {};
 for (const command in _constants.commands) {
   unicode[_constants.commands[command]] = command;
@@ -5770,8 +5748,13 @@ for (const diacritic in _constants.diacritics) {
 for (const ligature in _constants.ligatures) {
   unicode[_constants.ligatures[ligature]] = ligature;
 }
+const mathUnicode = {};
+for (const command in _constants.mathCommands) {
+  mathUnicode[_constants.mathCommands[command]] = command;
+}
 const UNSAFE_UNICODE = /[^a-zA-Z0-9\s!"#%&'()*+,\-./:;=?@[\]{}\u0300-\u0308\u030a-\u030c\u0332\u0323\u0327\u0328\u0361\u0326]/g;
 const DIACRITIC_PATTERN = /.[\u0300-\u0308\u030a-\u030c\u0332\u0323\u0327\u0328\u0361\u0326]+/g;
+const LONE_DIACRITIC_PATTERN = /[\u0300-\u0308\u030a-\u030c\u0332\u0323\u0327\u0328\u0361\u0326]/g;
 const listDelimiters = {
   separated: ',',
   list: ' and '
@@ -5785,8 +5768,20 @@ const richTextMappings = {
   'span style="font-variant:small-caps;"': '\\textsc{',
   'span class="nocase"': '{'
 };
+function escapeCharacter(char) {
+  if (char in unicode) {
+    return unicode[char] in _constants.ligatures ? unicode[char] : `\\${unicode[char]}{}`;
+  } else if (char in mathUnicode) {
+    return `$\\${mathUnicode[char]}$`;
+  } else {
+    return '';
+  }
+}
 function escapeValue(value) {
-  return value.normalize('NFKD').replace(UNSAFE_UNICODE, char => char in unicode ? unicode[char] in _constants.ligatures ? unicode[char] : `\\${unicode[char]}{}` : '').replace(DIACRITIC_PATTERN, match => Array.from(match).reduce((subject, diacritic) => `{\\${unicode[diacritic]} ${subject}}`));
+  if (!_config.default.format.asciiOnly) {
+    return value;
+  }
+  return value.normalize('NFKD').replace(UNSAFE_UNICODE, char => escapeCharacter(char)).replace(DIACRITIC_PATTERN, match => Array.from(match).reduce((subject, diacritic) => `{\\${unicode[diacritic]} ${subject}}`)).replace(LONE_DIACRITIC_PATTERN, '');
 }
 function formatRichText(value) {
   const closingTags = [];
@@ -5826,7 +5821,7 @@ function formatName(name) {
   return escapeValue(parts.join(', ').trim());
 }
 function formatTitle(title) {
-  return formatRichText(title).split(/(:\s*)/).map((part, i) => i % 2 ? part : part.replace(/(?!^)\b[a-z]*[A-Z].*?\b/g, '{$&}')).join('');
+  return formatRichText(title).split(/(:\s*)/).map((part, i) => i % 2 ? part : part.replace(/([^\\])\b([a-z]*[A-Z].*?)\b/g, '$1{$2}')).join('');
 }
 function formatSingleValue(value, valueType) {
   switch (valueType) {
@@ -5861,7 +5856,7 @@ function format(field, value) {
     return formatSingleValue(value, valueType);
   }
 }
-},{"../input/constants.js":52}],73:[function(require,module,exports){
+},{"../config.js":49,"../input/constants.js":52}],73:[function(require,module,exports){
 "use strict";
 
 var _core = require("@citation-js/core");
@@ -6701,7 +6696,7 @@ const formats = exports.formats = {
     parseAsync: api.parseAsync,
     parseType: {
       dataType: 'String',
-      predicate: /^\s*(https?:\/\/(?:dx\.)?doi\.org\/(10.\d{4,9}\/[-._;()/:A-Z0-9]+))\s*$/i,
+      predicate: /^\s*(https?:\/\/(?:dx\.)?doi\.org\/(10.\d{4,9}\/[-._;()/:A-Z0-9[\]<>]+))\s*$/i,
       extends: '@else/url'
     }
   },
@@ -6711,21 +6706,21 @@ const formats = exports.formats = {
     },
     parseType: {
       dataType: 'String',
-      predicate: /^\s*((?:dx\.)?doi\.org\/(10.\d{4,9}\/[-._;()/:A-Z0-9]+))\s*$/i
+      predicate: /^\s*((?:dx\.)?doi\.org\/(10.\d{4,9}\/[-._;()/:A-Z0-9[\]<>]+))\s*$/i
     }
   },
   '@doi/id': {
     parse: id.parse,
     parseType: {
       dataType: 'String',
-      predicate: /^\s*(10.\d{4,9}\/[-._;()/:A-Z0-9]+)\s*$/i
+      predicate: /^\s*(10.\d{4,9}\/[-._;()/:A-Z0-9[\]<>]+)\s*$/i
     }
   },
   '@doi/list+text': {
     parse: id.parse,
     parseType: {
       dataType: 'String',
-      tokenList: /^10.\d{4,9}\/[-._;()/:A-Z0-9]+$/i
+      tokenList: /^10.\d{4,9}\/[-._;()/:A-Z0-9[\]<>]+$/i
     }
   },
   '@doi/list+object': {
@@ -16104,8 +16099,14 @@ var _wikidataSdk = _interopRequireDefault(require("wikidata-sdk"));
 var _config = _interopRequireDefault(require("./config.json"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function parseWikidata(data, langs) {
-  const list = [].concat(data);
-  return [].concat(_wikidataSdk.default.getManyEntities(list, langs || _config.default.langs));
+  const ids = Array.isArray(data) ? data : [data];
+  for (const id of ids) {
+    if (!/^Q[1-9][0-9]*$/.test(id)) {
+      throw new Error(`Entity "${id}" not found`);
+    }
+  }
+  const urls = _wikidataSdk.default.getManyEntities(ids, langs || _config.default.langs);
+  return Array.isArray(urls) ? urls : [urls];
 }
 },{"./config.json":111,"wikidata-sdk":190}],115:[function(require,module,exports){
 module.exports={
@@ -16681,13 +16682,22 @@ const FETCH_ADDITIONAL = {
   }
 };
 function collectAdditionalIds(entity, needed) {
+  const additionalIds = [];
   if (!needed) {
-    return [];
+    return additionalIds;
   }
   entity._needed = Object.assign(entity._needed || {}, needed);
-  return Object.keys(entity.claims).filter(prop => prop in needed).flatMap(prop => entity.claims[prop].map(({
-    value
-  }) => value.id || value));
+  for (const prop in entity.claims) {
+    if (prop in needed) {
+      for (const claim of entity.claims[prop]) {
+        if (claim.value) {
+          var _claim$value$id;
+          additionalIds.push((_claim$value$id = claim.value.id) !== null && _claim$value$id !== void 0 ? _claim$value$id : claim.value);
+        }
+      }
+    }
+  }
+  return additionalIds;
 }
 function completeResponse(entities, old) {
   if (!old) {
@@ -16726,6 +16736,9 @@ function completeResponse(entities, old) {
 function simplifyEntities(entities) {
   const simplified = _wikidataSdk.simplify.entities(entities, SIMPLIFY_OPTS);
   for (const id in entities) {
+    if (entities[id].missing === '') {
+      throw new Error(`Entity "${id}" not found`);
+    }
     const claims = entities[id].claims;
     if (claims.P348) {
       simplified[id].claims['P348:all'] = _wikidataSdk.simplify.propertyClaims(claims.P348, _objectSpread(_objectSpread({}, SIMPLIFY_OPTS), {}, {
