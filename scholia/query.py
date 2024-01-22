@@ -277,7 +277,7 @@ def identifier_to_qs(property, identifier):
     Examples
     --------
     >>> property = "P10283"  # Property identifier for OpenAlex ID
-    >>> identifier = "A303257169"  # Corresponding to Q20980928 (E Willighagen)
+    >>> identifier = "a5060194743" # Corresponding to Q20980928 (E Willighagen)
     >>> qs = identifier_to_qs(property, identifier)
     >>> qs == ['Q20895241']
     True
@@ -527,7 +527,7 @@ def openalex_to_qs(openalex):
 
     Examples
     --------
-    >>> openalex_to_qs('A303257169') == ['Q20895241']
+    >>> openalex_to_qs('a5060194743') == ['Q20895241']
     True
 
     """
