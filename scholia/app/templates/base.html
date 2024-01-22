@@ -224,13 +224,6 @@ askQuery("{{ panel }}", `# tool: scholia
 	     }
 	 }
 
-	 if ("P2002" in item.claims) {
-	     var user = {name: item.claims.P2002[0].mainsnak.datavalue.value, prefix: "@"};
-	     var site = { name: "Twitter", url: "https://twitter.com/" };
-	     var logo = { src: "{{ url_for('static', filename='images/twitter.svg') }}" };
-	     socialMediaLink(detailsList, user, site, logo);
-	 }
-
 	 if ("P2037" in item.claims) {
 	     var user = {name: item.claims.P2037[0].mainsnak.datavalue.value, prefix: "@"};
 	     var site = { name: "GitHub", url: "https://github.com/" };
@@ -993,8 +986,7 @@ askQuery("{{ panel }}", `# tool: scholia
     Report technical problems at Scholia's
     <a href="https://github.com/WDscholia/scholia/issues">Issues</a> GitHub page.
     |
-    Follow us on <a href="https://wikis.world/@wdscholia">Mastodon</a> or
-	<a href="https://twitter.com/wdscholia">Twitter</a>.
+    Follow us on <a href="https://wikis.world/@wdscholia">Mastodon</a>.
     <hr>
   </div>
 {% endblock %}
