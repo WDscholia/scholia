@@ -7,7 +7,7 @@ select ?year (count(?work) as ?number_of_publications) ?role where {
       bind(str(year(?dates)) as ?years) .
       OPTIONAL {
         ?work wdt:P31 wd:Q109229154 . bind("explicit" as ?type_)
-        ?work wdt:P1433 / rdfs:label ?venue . FILTER (LANG(?venue) = "en")
+        ?work wdt:P1433 ?venue_ . ?venue_ rdfs:label ?venue . FILTER (LANG(?venue) = "en")
         MINUS { ?venue_ wdt:P31 wd:Q1143604 }
       }
     }
