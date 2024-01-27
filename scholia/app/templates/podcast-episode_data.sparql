@@ -1,0 +1,12 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT ?description ?value ?valueUrl
+WHERE {
+  BIND(target: AS ?podcast)
+  {
+    BIND(1 AS ?order)
+    BIND("Title" AS ?description)
+    ?podcast wdt:P1476 ?value .
+  }
+} 
+ORDER BY ?order

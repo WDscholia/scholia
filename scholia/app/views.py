@@ -22,7 +22,8 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      twitter_to_qs, cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
-                     ncbi_gene_to_qs, uniprot_to_qs, random_work)
+                     ncbi_gene_to_qs, uniprot_to_qs, random_work,
+                     random_podcast)
 from ..utils import sanitize_q, remove_special_characters_url
 from ..wikipedia import q_to_bibliography_templates
 
@@ -1832,6 +1833,93 @@ def show_topics(qs):
         return redirect(url_for('app.show_topic', q=qs[0]), code=301)
     else:
         return render_template('topics.html', qs=qs)
+
+
+@main.route('/podcast/' + q_pattern)
+def show_podcast(q):
+    """Return html render page for a specific podcast.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    entities = wb_get_entities([q])
+    return render_template(
+        'podcast.html', q=q)
+
+
+@main.route('/podcast-season/' + q_pattern)
+def show_podcast_season(q):
+    """Return html render page for a specific podcast season.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    entities = wb_get_entities([q])
+    return render_template(
+        'podcast-season.html', q=q)
+
+
+@main.route('/podcast-episode/' + q_pattern)
+def show_podcast_episode(q):
+    """Return html render page for a specific podcast episode.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    """
+    entities = wb_get_entities([q])
+    return render_template(
+        'podcast-episode.html', q=q)
+
+
+@main.route('/podcast/random')
+def show_podcast_random():
+    """Redirect to random podcast.
+
+    Returns
+    -------
+    reponse : werkzeug.wrappers.Response
+        Redirect
+
+    """
+    q = random_podcast()
+    return redirect(url_for('app.show_podcast', q=q), code=302)
+
+
+@main.route('/podcast/')
+def show_podcast_index():
+    """Return rendered HTML index page for podcasts.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML index page for podcasts.
+
+    """
+    return render_template('podcast-index.html')
 
 
 @main.route('/chemical/' + q_pattern)

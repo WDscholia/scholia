@@ -25,6 +25,7 @@ Usage:
   scholia.query q-to-label <q>
   scholia.query q-to-class <q>
   scholia.query random-author
+  scholia.query random-podcast
   scholia.query random-work
   scholia.query ror-to-q <rorid>
   scholia.query twitter-to-q <twitter>
@@ -1748,6 +1749,43 @@ def random_work():
     else:
         # Fallback
         q = "Q21146099"
+    return q
+
+
+def random_podcast():
+    """Return random podcast.
+
+    Sample a podcast randomly from Wikidata by a call to the Wikidata
+    Query Service.
+
+    Returns
+    -------
+    q : str
+        Wikidata identifier.
+
+    Notes
+    -----
+    The work returned is not necessarily a podcast.
+
+    The algorithm uses a somewhat hopeful randomization and if no work is
+    found it falls back on Q21146099.
+
+    Examples
+    --------
+    >>> q = random_work()
+    >>> q.startswith('Q')
+    True
+
+    """
+    query = """SELECT ?podcast {{
+                 ?podcast wdt:P31 wd:Q24634210 .
+               }}"""
+    bindings = query_to_bindings(query)
+    if len(bindings) > 0:
+        q = bindings[randrange(1, len(bindings))]['podcast']['value'][31:]
+    else:
+        # Fallback
+        q = "Q124363332"
     return q
 
 

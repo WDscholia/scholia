@@ -1,0 +1,8 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT ?episode ?episodeLabel
+  (CONCAT("/podcast-episode/", SUBSTR(STR(?episode), 32)) AS ?episodeUrl)
+WHERE {
+  ?episode wdt:P31 wd:Q61855877 ; wdt:P4908 target: .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}

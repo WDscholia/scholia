@@ -1,0 +1,19 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT ?publication_date ?episode ?episodeLabel
+  (CONCAT("/podcast-episode/", SUBSTR(STR(?episode), 32)) AS ?episodeUrl)
+WITH {
+  SELECT DISTINCT ?episode (MIN(?publication_date_) AS ?publication_date) WHERE {
+    ?episode wdt:P31 wd:Q61855877 ; wdt:P179 target: .
+    OPTIONAL {
+      ?episode wdt:P577 ?publication_datetime .
+      BIND(xsd:date(?publication_datetime) AS ?publication_date_)
+    }
+  } GROUP BY ?episode
+    ORDER BY DESC(?publication_date)
+    LIMIT 50
+} AS %EPISODES WHERE {
+  INCLUDE %EPISODES
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?publication_date ?episode ?episodeLabel
+ORDER BY DESC(?publication_date)
