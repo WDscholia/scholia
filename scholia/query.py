@@ -1330,6 +1330,18 @@ def q_to_class(q):
             'Q22325163',  # macromolecular complex
             ]):
         class_ = 'complex'
+    elif set(classes).intersection([
+            'Q24634210',  # podcast
+            ]):
+        class_ = 'podcast'
+    elif set(classes).intersection([
+            'Q69154911',  # podcast season
+            ]):
+        class_ = 'podcast_season'
+    elif set(classes).intersection([
+            'Q61855877',  # podcast episode
+            ]):
+        class_ = 'podcast_episode'
     elif ('Q16695773' in classes):  # wikiproject
         class_ = 'wikiproject'
     else:
