@@ -5,6 +5,7 @@
 {% block in_ready %}
 
 {{ sparql_to_table_post('data') }}
+{{ sparql_to_table_post('listings') }}
 {{ sparql_to_table_post('guests') }}
 
 {% endblock %}
@@ -18,11 +19,15 @@
 
 <div id="intro"></div>
 
+<div id="wembedder"></div>
+
 <div id="details"></div>
 
 <table class="table table-hover" id="data-table"></table>
 
-<div id="wembedder"></div>
+<h2 id="listings">Listings</h2>
+
+<table class="table table-hover" id="listings-table"></table>
 
 <h2 id="guests">Guests</h2>
 
