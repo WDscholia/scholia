@@ -1906,6 +1906,19 @@ def show_podcast_random():
     return redirect(url_for('app.show_podcast', q=q), code=302)
 
 
+@main.route('/podcast/language/' + q_pattern)
+def show_podcast_in_language(q):
+    """Redirect to random podcast.
+
+    Returns
+    -------
+    reponse : werkzeug.wrappers.Response
+        Redirect
+
+    """
+    return render_template('podcast-language.html', q=q)
+
+
 @main.route('/podcast/')
 def show_podcast_index():
     """Return rendered HTML index page for podcasts.
