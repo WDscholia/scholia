@@ -1850,7 +1850,6 @@ def show_podcast(q):
         Rendered HTML.
 
     """
-    entities = wb_get_entities([q])
     return render_template(
         'podcast.html', q=q)
 
@@ -1870,7 +1869,6 @@ def show_podcast_season(q):
         Rendered HTML.
 
     """
-    entities = wb_get_entities([q])
     return render_template(
         'podcast-season.html', q=q)
 
@@ -1890,7 +1888,6 @@ def show_podcast_episode(q):
         Rendered HTML.
 
     """
-    entities = wb_get_entities([q])
     return render_template(
         'podcast-episode.html', q=q)
 
