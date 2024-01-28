@@ -70,6 +70,14 @@ WHERE {
   }
   UNION
   {
+    BIND(7.5 AS ?order)
+    BIND("Google Podcasts" AS ?description)
+    ?podcast wdt:P9003 ?valueUrl_ .
+    BIND(CONCAT("https://www.deezer.com/show/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
+    BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
+  }
+  UNION
+  {
     BIND(8 AS ?order)
     BIND("Podchaser" AS ?description)
     ?podcast wdt:P7998 ?valueUrl_ .
