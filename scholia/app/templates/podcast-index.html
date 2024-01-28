@@ -5,9 +5,9 @@
 
 {% block in_ready %}
 
+{{ sparql_to_table_post('languages') }}
+
 {% endblock %}
-
-
 
 {% block page_content %}
 
@@ -73,7 +73,16 @@ Audio and video podcasts.
 
         </div>
     </div>
+
+    <h2 id="languages">Languages</h2>
+    
+    This table shows the languages in which the podcasts are spoken.
+    
+    <table class="table table-hover" id="languages-table"></table>
+
 </div>
+
+
 <!--  -->
 {% endblock %}
 
