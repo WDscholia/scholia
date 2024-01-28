@@ -52,45 +52,5 @@ WHERE {
     ?podcast wdt:P1019 ?valueUrl .
     BIND("feed" AS ?value)
   }
-  UNION
-  {
-    BIND(6 AS ?order)
-    BIND("Apple Podcasts" AS ?description)
-    ?podcast wdt:P5842 ?valueUrl_ .
-    BIND(CONCAT("https://podcasts.apple.com/podcast/id", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
-    BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
-  }
-  UNION
-  {
-    BIND(7 AS ?order)
-    BIND("Deezer" AS ?description)
-    ?podcast wdt:P5988 ?valueUrl_ .
-    BIND(CONCAT("https://www.deezer.com/show/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
-    BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
-  }
-  UNION
-  {
-    BIND(7.5 AS ?order)
-    BIND("Google Podcasts" AS ?description)
-    ?podcast wdt:P9003 ?valueUrl_ .
-    BIND(CONCAT("https://www.deezer.com/show/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
-    BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
-  }
-  UNION
-  {
-    BIND(8 AS ?order)
-    BIND("Podchaser" AS ?description)
-    ?podcast wdt:P7998 ?valueUrl_ .
-    BIND(CONCAT("https://www.podchaser.com/podcasts/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
-    BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
-  }
-  UNION
-  {
-    BIND(9 AS ?order)
-    BIND("Spotify" AS ?description)
-    ?podcast wdt:P5916 ?valueUrl_ .
-    BIND(CONCAT("https://open.spotify.com/show/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
-    BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
-  }
 } 
 ORDER BY ?order
