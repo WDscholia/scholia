@@ -28,5 +28,27 @@ WHERE {
       BIND("Number of episodes" AS ?description)
     } GROUP BY ?description ?order
   }
-} 
+  UNION
+  {
+    ?series wdt:P155 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q)
+    ?iri rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(STR(?value_string) AS ?value)
+    BIND(CONCAT("../podcast-season/", ?q) AS ?valueUrl)
+    BIND(6 AS ?order)
+    BIND("Previous season" AS ?description)
+  }
+  UNION
+  {
+    ?series wdt:P156 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q)
+    ?iri rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(STR(?value_string) AS ?value)
+    BIND(CONCAT("../podcast-season/", ?q) AS ?valueUrl)
+    BIND(7 AS ?order)
+    BIND("Next season" AS ?description)
+  }
+}
 ORDER BY ?order
