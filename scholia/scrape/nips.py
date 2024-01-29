@@ -31,6 +31,7 @@ The generated quickstatements from `paper-url-to-quickstatements` can be
 submitted to https://quickstatements.toolforge.org/.
 
 """
+from dateutil.parser import parse
 
 from six import b, print_, u
 
@@ -66,6 +67,9 @@ USER_AGENT = "Scholia"
 
 # Year should be the nominal year, - not the year of publication
 YEAR_TO_Q = {
+    "2023": "Q122813142",
+    "2022": "Q121461824",
+    "2021": "Q109681399",
     "2020": "Q100913796",
     "2019": "Q68600639",
     "2018": "Q56580288",
@@ -296,13 +300,13 @@ def scrape_paper_from_url(url):
 
     dates = tree.xpath("//meta[@name='citation_publication_date']/@content")
     if len(dates) > 0:
-        nominal_year = dates[0]
-        year = int(nominal_year)
+        parsed_date = parse(dates[0])
+        year = parsed_date.year
         if year < 2009:
             year += 1
         entry['year'] = str(year)
 
-        entry['published_in_q'] = YEAR_TO_Q.get(nominal_year, None)
+        entry['published_in_q'] = YEAR_TO_Q.get(str(parsed_date.year), None)
 
     # All NIPS papers are in English
     entry['language_q'] = "Q1860"
