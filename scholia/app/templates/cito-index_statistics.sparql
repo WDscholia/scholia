@@ -78,7 +78,7 @@ WHERE {
   UNION
   {
     INCLUDE %citoArticles
-    BIND("Number of article with explicit CiTO annotation" AS ?description)
+    BIND("Number of articles with explicit CiTO annotation" AS ?description)
   }
   UNION
   {
