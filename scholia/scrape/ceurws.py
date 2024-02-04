@@ -130,6 +130,12 @@ def tree_to_papers(tree, proceedings, proceedings_q, iso639='en'):
         paper['full_text_url'] = os.path.join(
             proceedings['url'],
             element.xpath(".//a")[0].attrib['href'])
+        
+        # Check if title_elements[0].text is None or empty
+        if title_elements[0].text is None or not title_elements[0].text.strip():
+            # Skip this paper if the title is empty
+            continue
+
         paper['title'] = re.sub(r'\s+', ' ', title_elements[0].text).strip()
 
         # Authors
@@ -165,6 +171,7 @@ def tree_to_papers(tree, proceedings, proceedings_q, iso639='en'):
         n += 1
 
     return papers
+
 
 
 def proceedings_url_to_quickstatements(url, iso639='en'):
@@ -350,20 +357,21 @@ def proceedings_url_to_proceedings(url, return_tree=False):
     acronym_elements = tree.xpath("//span[@class='CEURVOLACRONYM']")
     if len(acronym_elements) == 1:
         proceedings['shortname'] = acronym_elements[0].text
-    else:
-        acronym_elements = tree.xpath("//h1/a")
-        if len(acronym_elements) == 1:
-            proceedings['shortname'] = acronym_elements[0].text
 
-    proceedings['urn'] = \
-        tree.xpath("//span[@class='CEURURN']")[0].text
+    # Add a check to ensure the list is not empty before accessing elements
+    urn_elements = tree.xpath("//span[@class='CEURURN']")
+    if urn_elements:
+        proceedings['urn'] = urn_elements[0].text
 
-    proceedings['title'] = re.sub(
-        r'\s+', ' ',
-        tree.xpath("//span[@class='CEURFULLTITLE']")[0].text).strip()
+    title_elements = tree.xpath("//span[@class='CEURFULLTITLE']")
+    if title_elements:
+        proceedings['title'] = re.sub(
+            r'\s+', ' ',
+            title_elements[0].text).strip()
 
-    proceedings['date'] = \
-        tree.xpath("//span[@class='CEURPUBDATE']")[0].text
+    date_elements = tree.xpath("//span[@class='CEURPUBDATE']")
+    if date_elements:
+        proceedings['date'] = date_elements[0].text
 
     proceedings['published_in_q'] = 'Q27230297'
 
@@ -371,6 +379,7 @@ def proceedings_url_to_proceedings(url, return_tree=False):
         return (proceedings, tree)
     else:
         return proceedings
+
 
 
 def main():
