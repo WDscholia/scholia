@@ -93,13 +93,13 @@ def issue_url_to_paper_urls(url):
         # For instance, for https://tidsskrift.dk/bras/issue/view/9150
         urls = tree.xpath("//h3[@class='media-heading']/a/@href")
     if len(urls) == 0:
-        # For instance, for https://www.journals.vu.lt/scandinavistica/issue/view/1153
+        # For instance, for
+        # https://www.journals.vu.lt/scandinavistica/issue/view/1153
         urls = tree.xpath("//div[@class='article-summary-title']/a/@href")
     if len(urls) == 0:
         # Targeting specific class 'summary_title'
         urls = tree.xpath("//a[@class='summary_title']/@href")
     return urls
-
 
 
 def issue_url_to_quickstatements(url, iso639=None):
