@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% set aspect = "podcast-index" %}
+{% block title %}Podcast - Scholia{% endblock %}
+
+{% block in_ready %}
+
+{{ sparql_to_table_post('languages') }}
+
+{% endblock %}
+
+{% block page_content %}
+
+<h1>Podcast</h1>
+
+Audio and video podcasts.
+
+<p>
+    <div class="btn-group">
+	<a title="Sample a random work among all works. This query takes several seconds."
+	   href="random"
+	   class="btn btn-primary">Random podcast</a>
+    </div>
+    <div class="btn-group">
+</p>
+
+<div class="container">
+
+    <h2>Examples</h2>
+
+    <div class="card-deck mb-3">
+	<div class="card mb-4 box-shadow">
+            <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Podcasts</h4>
+            </div>
+            <div class="card-body">
+
+	  <ul>
+	    <li><a href="Q124363332">Science, Quickly</a> (English)</li>
+	    <li><a href="Q124360854">JOSSCast: Open Source for Researchers</a> (English)</li>
+	    <li><a href="Q64023922">Wikipediapodden</a> (Swedish)</li>
+	    <li><a href="Q124262264">De Nedersaksen</a> (Dutch)</li>
+	  </ul>
+
+      </div>
+
+	</div>
+	    
+        <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Podcast Seasons</h4>
+	    </div>
+	    <div class="card-body">
+
+	  <ul>
+	    <li><a href="../podcast-season/Q69152103">Within the Wires season 1</a> (English)</li>
+	    <li><a href="../podcast-season/Q116869651">Das kleine Fernsehballett, season 12</a> (German)</li>
+	  </ul>
+
+	    </div>
+	</div>
+
+        <div class="card mb-4 box-shadow">
+	    <div class="card-header">
+		<h4 class="my-0 font-weight-normal">Podcast Episodes</h4>
+	    </div>
+	    <div class="card-body">
+	  <ul>
+	    <li><a href="../podcast-episode/Q61041513">#46 - Entropy</a> (Polish)</li>
+	    <li><a href="../podcast-episode/Q67590634">Wiki Loves Monuments, kvinnoprojekt, skrivstugor</a> (Swedish)</li>
+	  </ul>
+	    </div>
+
+        </div>
+    </div>
+
+    <h2 id="languages">Languages</h2>
+    
+    This table shows the languages in which the podcasts are spoken.
+    
+    <table class="table table-hover" id="languages-table"></table>
+
+</div>
+
+
+<!--  -->
+{% endblock %}
+

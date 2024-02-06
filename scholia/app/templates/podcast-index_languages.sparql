@@ -1,0 +1,10 @@
+SELECT ?language ?languageLabel (CONCAT("/podcast/language/", SUBSTR(STR(?language), 32)) AS ?languageUrl)
+  (COUNT(DISTINCT ?podcast) AS ?podcasts)
+WHERE {
+  ?podcast wdt:P31 wd:Q24634210 ; wdt:P407 ?language .
+  BIND(SUBSTR(STR(?language), 32) AS ?q)
+  ?language rdfs:label ?value_string . 
+  FILTER (LANG(?value_string) = 'en')
+  BIND(COALESCE(?value_string, ?q) AS ?languageLabel)
+} GROUP BY ?language ?languageLabel
+  ORDER BY DESC(?podcasts)

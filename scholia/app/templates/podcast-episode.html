@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% set aspect = "podcast-episode" %}
+
+{% block in_ready %}
+
+{{ sparql_to_table_post('data') }}
+{{ sparql_to_table_post('listings') }}
+{{ sparql_to_table_post('guests') }}
+
+{% endblock %}
+
+{% block page_actions %}
+{{ super() }}
+{% endblock %}
+
+{% block page_content %}
+<h1 id="h1">Podcast Episode</h1>
+
+<div id="intro"></div>
+
+<div id="wembedder"></div>
+
+<div id="details"></div>
+
+<table class="table table-hover" id="data-table"></table>
+
+<h2 id="listings">Listings</h2>
+
+<table class="table table-hover" id="listings-table"></table>
+
+<h2 id="guests">Guests</h2>
+
+<table class="table table-hover" id="guests-table"></table>
+
+{% endblock %}
+    

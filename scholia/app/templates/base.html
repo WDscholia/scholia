@@ -178,6 +178,14 @@ askQuery("{{ panel }}", `# tool: scholia
     }
 	}
 
+	if ("P10286" in item.claims) {
+	    var imageURL = item.claims.P10286[0].mainsnak.datavalue.value;
+	    var itemImage = document.getElementById("item-image");
+	    if (itemImage) {
+            itemImage.src = imageURL;
+        }
+    }
+
 	function socialMediaLink(detailsList, user, site, logo = '') {
 	     var html = '';
 	     if (logo) {

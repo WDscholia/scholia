@@ -1,0 +1,12 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT ?season ?seasonLabel
+  (CONCAT("/podcast-season/", SUBSTR(STR(?season), 32)) AS ?seasonUrl)
+  (MAX(?count) AS ?episodeCount)
+WHERE {
+  ?season wdt:P31 wd:Q69154911 ; wdt:P179 target: .
+  OPTIONAL {
+    ?season wdt:P1113 ?count .
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} GROUP BY ?season ?seasonLabel ?seasonUrl

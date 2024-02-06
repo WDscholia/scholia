@@ -1,0 +1,54 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT ?description ?value ?valueUrl
+WHERE {
+  BIND(target: AS ?series)
+  {
+    BIND(1 AS ?order)
+    BIND("Title" AS ?description)
+    ?series wdt:P1476 ?value .
+  }
+  UNION
+  {
+    ?series wdt:P179 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(STR(?value_string) AS ?value)
+    BIND(CONCAT("../podcast/", ?q) AS ?valueUrl)
+    BIND(2 AS ?order)
+    BIND("Podcast" AS ?description)
+  }
+  UNION
+  {
+    SELECT ?description ?order (MAX(?value_) AS ?value) WHERE {
+      BIND(target: AS ?series)
+      ?series wdt:P1113 ?value_ .
+      BIND(3 AS ?order)
+      BIND("Number of episodes" AS ?description)
+    } GROUP BY ?description ?order
+  }
+  UNION
+  {
+    ?series wdt:P155 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q)
+    ?iri rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(STR(?value_string) AS ?value)
+    BIND(CONCAT("../podcast-season/", ?q) AS ?valueUrl)
+    BIND(6 AS ?order)
+    BIND("Previous season" AS ?description)
+  }
+  UNION
+  {
+    ?series wdt:P156 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q)
+    ?iri rdfs:label ?value_string .
+    FILTER (LANG(?value_string) = 'en')
+    BIND(STR(?value_string) AS ?value)
+    BIND(CONCAT("../podcast-season/", ?q) AS ?valueUrl)
+    BIND(7 AS ?order)
+    BIND("Next season" AS ?description)
+  }
+}
+ORDER BY ?order
