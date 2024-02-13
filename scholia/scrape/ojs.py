@@ -319,7 +319,20 @@ def scrape_paper_from_url(url):
     title = _fields_to_content(['citation_title', 'DC.Title',
                                 'DC.Title.Alternative'])
     if title is not None:
-        entry['title'] = title
+        original_title = title  # Store the original title
+        q = paper_to_q(entry)
+        if not q:  # If not identified before modification
+            # Replace dash or colon without altering surrounding spaces
+            title = title.replace(" –", ":").replace("– ", ":")
+            entry['title'] = title
+            q = paper_to_q(entry)
+            if q:  # If identified after modification
+                entry['title'] = title  # Plug in the modified title
+            else:
+                entry['title'] = original_title  # Plug in the original title
+        else:
+            entry['title'] = original_title
+
 
     citation_date = _fields_to_content(['citation_date', 'DC.Date.issued'])
     if citation_date is not None:
