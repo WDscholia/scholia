@@ -332,7 +332,7 @@ def scrape_paper_from_url(url):
                 else:
                     entry['title'] = original_title  # Plug in the original title
             else:
-                entry['title'] = original_title  
+                entry['title'] = original_title
         else:
             entry['title'] = original_title
 
