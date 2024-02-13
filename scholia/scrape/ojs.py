@@ -323,13 +323,16 @@ def scrape_paper_from_url(url):
         q = paper_to_q(entry)
         if not q:  # If not identified before modification
             # Replace dash or colon without altering surrounding spaces
-            title = title.replace(" –", ":").replace("– ", ":")
-            entry['title'] = title
-            q = paper_to_q(entry)
-            if q:  # If identified after modification
-                entry['title'] = title  # Plug in the modified title
+            modified_title = title.replace(" –", ":").replace("– ", ":")
+            if modified_title != title:  # Check if replacement is made
+                entry['title'] = modified_title
+                q = paper_to_q(entry)
+                if q:  # If identified after modification
+                    entry['title'] = modified_title  # Plug in the modified title
+                else:
+                    entry['title'] = original_title  # Plug in the original title
             else:
-                entry['title'] = original_title  # Plug in the original title
+                entry['title'] = original_title  
         else:
             entry['title'] = original_title
 
