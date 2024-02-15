@@ -436,7 +436,7 @@ function sparqlToIframe(sparql, element, filename) {
         entries.forEach(entry => {
             // If the iframe enters the viewport, load its content
             if (entry.isIntersecting) {
-                const src = $iframe.attr('data-src');
+                const src = $iframe.data('src');
                 if (src) {
                     $iframe.attr('src', src);
                     // Unobserve the iframe to stop observing once loaded
