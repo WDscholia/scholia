@@ -418,11 +418,36 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 function sparqlToIframe(sparql, element, filename) {
     let $iframe = $(element);
     var url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
-    $iframe.attr('src', url);
+    $iframe.attr('data-src', url);
     $iframe.attr('loading', 'lazy');
 
     const wikidata_sparql = "https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparql);
     const wikidata_query = "https://query.wikidata.org/#" + encodeURIComponent(sparql);
+
+    // Define the options for the Intersection Observer
+    const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1 // Trigger when 10% of the element is visible
+    };
+
+    // Create a new Intersection Observer instance
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            // If the iframe enters the viewport, load its content
+            if (entry.isIntersecting) {
+                const src = $iframe.attr('data-src');
+                if (src) {
+                    $iframe.attr('src', src);
+                    // Unobserve the iframe to stop observing once loaded
+                    observer.unobserve($iframe[0]);
+                }
+            }
+        });
+    }, options);
+
+    // Start observing the iframe
+    observer.observe($iframe[0]);
 
     $.ajax({
         url: wikidata_sparql,
