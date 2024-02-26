@@ -34,7 +34,7 @@ WHERE {
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
     BIND(STR(?value_string) AS ?value)
-    BIND(CONCAT("../podcast/language/", ?q) AS ?valueUrl)
+    BIND(CONCAT("../language/", ?q, "/podcast") AS ?valueUrl)
   }
   UNION
   {
