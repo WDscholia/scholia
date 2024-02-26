@@ -1,4 +1,4 @@
-SELECT ?language ?languageLabel (CONCAT("/podcast/language/", SUBSTR(STR(?language), 32)) AS ?languageUrl)
+SELECT ?language ?languageLabel (CONCAT("/language/", SUBSTR(STR(?language), 32), "/podcast") AS ?languageUrl)
   (COUNT(DISTINCT ?podcast) AS ?podcasts)
 WHERE {
   ?podcast wdt:P31 wd:Q24634210 ; wdt:P407 ?language .
