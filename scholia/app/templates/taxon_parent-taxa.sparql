@@ -1,10 +1,12 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
+  (COUNT(?middle) AS ?distance)
   (GROUP_CONCAT(DISTINCT ?rank_label_; separator=", ") AS ?rank)
   ?parent ?parentLabel ?parentDescription
 {
-  target: wdt:P171+ ?parent .
+  target: wdt:P171* ?middle .
+  ?middle wdt:P171+ ?parent .
   ?parent wdt:P105 ?rank .
   OPTIONAL {
     ?rank rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
@@ -12,3 +14,4 @@ SELECT
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 GROUP BY ?parent ?parentLabel ?parentDescription
+ORDER BY ?distance
