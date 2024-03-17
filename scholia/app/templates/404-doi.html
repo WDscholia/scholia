@@ -5,11 +5,11 @@
 
 <script src="{{ url_for('static', filename='js/citation.js') }}"></script>
 <script>
-const c = require('citation-js')
+const Cite = require('citation-js').Cite
 try {
-  let example = new c.Cite([ '{{ doi }}' ])
+  let example = new Cite('https://doi.org/{{ doi }}', { forceType: '@doi/api' })
   let output = example.format('quickstatements')
-  $( '#qs' ).append( output );
+  $( '#qs' ).text( output );
   output = encodeURIComponent(
     output.replaceAll('\t', '|')
           .replaceAll('\n', '||'))
