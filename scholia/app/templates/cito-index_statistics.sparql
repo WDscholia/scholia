@@ -49,7 +49,7 @@ WITH {
   SELECT (COUNT(DISTINCT ?citoNanopub) AS ?count) WHERE {
     ?citoNanopub p:P2860 ?citationStatement .
     ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 ;
-      prov:wasDerivedFrom / pr:P854 ?referenceURL .
+      prov:wasDerivedFrom / ( pr:P854 | pr:P12545 ) ?referenceURL .
     FILTER (
       strstarts(str(?referenceURL), "https://w3id.org/np/") ||
       strstarts(str(?referenceURL), "http://purl.org/np/")
