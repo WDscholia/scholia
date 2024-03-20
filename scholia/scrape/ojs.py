@@ -327,14 +327,14 @@ def scrape_paper_from_url(url):
                 entry['title'] = modified_title
                 q = paper_to_q(entry)
                 if q:  # If identified after modification
-                    entry['title'] = modified_title  # Plug in the modified title
+                    # Plug in the modified title
+                    entry['title'] = modified_title
                 else:
                     entry['title'] = title  # Plug in the original title
             else:
                 entry['title'] = title
         else:
             entry['title'] = title
-
 
     citation_date = _fields_to_content(['citation_date', 'DC.Date.issued'])
     if citation_date is not None:
