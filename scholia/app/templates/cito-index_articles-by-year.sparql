@@ -3,12 +3,22 @@ select ?year (count(?work) as ?number_of_publications) ?role where {
   {
     select ?work (min(?years) as ?year) ?type_ ?venue where {
       ?work wdt:P577 ?dates ;
-            p:P2860 / pq:P3712 / wdt:P31 wd:Q96471816 .
+            p:P2860 ?citesStatement .
+      ?citesStatement pq:P3712 / wdt:P31 wd:Q96471816 .
       bind(str(year(?dates)) as ?years) .
       OPTIONAL {
         ?work wdt:P31 wd:Q109229154 . bind("explicit" as ?type_)
         ?work wdt:P1433 ?venue_ . ?venue_ rdfs:label ?venue . FILTER (LANG(?venue) = "en")
         MINUS { ?venue_ wdt:P31 wd:Q1143604 }
+      }
+      OPTIONAL {
+        bind("nanopub" as ?type_) bind("Nanopublication" as ?venue)
+        ?citesStatement prov:wasDerivedFrom ?reference .
+        ?reference pr:P854 ?referenceURL .
+        FILTER (
+          strstarts(str(?referenceURL), "https://w3id.org/np/") ||
+          strstarts(str(?referenceURL), "http://purl.org/np/")
+        )
       }
     }
     group by ?work ?type_ ?venue
