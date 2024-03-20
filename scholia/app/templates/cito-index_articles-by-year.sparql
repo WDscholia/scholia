@@ -14,7 +14,7 @@ select ?year (count(?work) as ?number_of_publications) ?role where {
       OPTIONAL {
         bind("nanopub" as ?type_) bind("Nanopublication" as ?venue)
         ?citesStatement prov:wasDerivedFrom ?reference .
-        ?reference pr:P854 ?referenceURL .
+        ?reference pr:P854 | pr:P12545 ?referenceURL .
         FILTER (
           strstarts(str(?referenceURL), "https://w3id.org/np/") ||
           strstarts(str(?referenceURL), "http://purl.org/np/")
