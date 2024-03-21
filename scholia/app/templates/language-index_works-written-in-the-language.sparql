@@ -1,6 +1,9 @@
 SELECT
   ?count
-  ?language ?languageLabel ?languageDescription (CONCAT("/language/", SUBSTR(STR(?language), 32)) AS ?languageUrl)
+  
+  ?language ?languageLabel
+  (CONCAT("/language/", SUBSTR(STR(?language), 32)) AS ?languageUrl)
+   ?languageDescription 
 WITH {
   SELECT
     (COUNT(*) AS ?count)
@@ -12,6 +15,10 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
+
+  # This is to get rid of a language number of unknown values
+  FILTER EXISTS { ?language ?p [] }
+
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?count)
