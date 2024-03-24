@@ -10,7 +10,7 @@ WITH {
 WITH {
   SELECT DISTINCT ?metabolite ?metaboliteChemicalStructure WHERE {
     INCLUDE %taxa
-            { ?metabolite wdt:P703 ?children }
+    { ?metabolite wdt:P703 ?children }
     VALUES ?chemical { wd:Q113145171 wd:Q59199015 }
     ?metabolite wdt:P31 ?chemical .
     OPTIONAL { ?metabolite wdt:P233 ?canSmiles }
