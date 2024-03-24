@@ -46,7 +46,18 @@ WITH {
   }
 } AS %citoDatasets
 WITH {
-  SELECT (COUNT(DISTINCT ?citoNanopub) AS ?count) WHERE {
+  SELECT (COUNT(DISTINCT ?citationStatement) AS ?count) WHERE {
+    ?citoNanopub p:P2860 ?citationStatement .
+    ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 ;
+      prov:wasDerivedFrom / ( pr:P854 | pr:P12545 ) ?referenceURL .
+    FILTER (
+      strstarts(str(?referenceURL), "https://w3id.org/np/") ||
+      strstarts(str(?referenceURL), "http://purl.org/np/")
+    )
+  }
+} AS %citoCitationFromNanopubs
+WITH {
+  SELECT (COUNT(DISTINCT ?referenceURL) AS ?count) WHERE {
     ?citoNanopub p:P2860 ?citationStatement .
     ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 ;
       prov:wasDerivedFrom / ( pr:P854 | pr:P12545 ) ?referenceURL .
@@ -56,6 +67,17 @@ WITH {
     )
   }
 } AS %citoNanopubs
+WITH {
+  SELECT (COUNT(DISTINCT ?citoNanopub) AS ?count) WHERE {
+    ?citoNanopub p:P2860 ?citationStatement .
+    ?citationStatement pq:P3712 / wdt:P31 wd:Q96471816 ;
+      prov:wasDerivedFrom / ( pr:P854 | pr:P12545 ) ?referenceURL .
+    FILTER (
+      strstarts(str(?referenceURL), "https://w3id.org/np/") ||
+      strstarts(str(?referenceURL), "http://purl.org/np/")
+    )
+  }
+} AS %artsWithcitoNanopubs
 WHERE {
   {
     INCLUDE %annotions
@@ -103,8 +125,18 @@ WHERE {
   }
   UNION
   {
+    INCLUDE %citoCitationFromNanopubs
+    BIND("Number of annotations defined in nanopublications" AS ?description)
+  }
+  UNION
+  {
+    INCLUDE %artsWithcitoNanopubs
+    BIND("Number of articles with annotations defined in nanopublications" AS ?description)
+  }
+  UNION
+  {
     INCLUDE %citoNanopubs
-    BIND("Number of nanopublications with explicit CiTO annotation" AS ?description)
+    BIND("Number of nanopublications that define explicit CiTO annotations" AS ?description)
   }
 }
 ORDER BY DESC(?count)
