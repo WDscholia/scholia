@@ -4,6 +4,7 @@ import calendar
 import urllib.parse
 from re import findall, search, split, IGNORECASE
 
+
 def escape_string(string):
     r"""Escape string.
 
@@ -89,7 +90,11 @@ def string_to_type(string):
     if search(r'^10.\d{4,9}/[^\s]+$', string, flags=IGNORECASE):
         return 'doi'
 
-    if search(r'^(arxiv:)?(\d{4}.\d{4,5}|[a-z\-]+(\.[A-Z]{2})?\/\d{7})(v\d+)?$', string, flags=IGNORECASE):
+    if search(
+        r"^(arxiv:)?(\d{4}.\d{4,5}|[a-z\-]+(\.[A-Z]{2})?\/\d{7})(v\d+)?$",
+        string,
+        flags=IGNORECASE,
+    ):
         return 'arxiv'
 
     return 'string'
@@ -199,12 +204,15 @@ def metadata_to_quickstatements(metadata):
 
     def get_nice_date(date_str):
         date = list(map(int, date_str.split("-")))
+        if len(date) == 0:
+            return ""
         if len(date) == 1:
             return f" published in {date[0]}"
+        month = calendar.month_name[date[1]]
         if len(date) == 2:
-            return f" published in {calendar.month_name[date[1]]} {date[0]}"
+            return f" published in {month} {date[0]}"
         if len(date) == 3:
-            return f" published on {date[2]} {calendar.month_name[date[1]]} {date[0]}"
+            return f" published on {date[2]} {month} {date[0]}"
 
         return ""
 
@@ -213,7 +221,9 @@ def metadata_to_quickstatements(metadata):
 
     arxiv = metadata.get("arxiv")
     if arxiv:
-        qs += f'LAST\tP818\t"{arxiv}"' # No line break, to accommodate the following qualifiers
+        qs += (
+            f'LAST\tP818\t"{arxiv}"'
+        )  # No line break, to accommodate the following qualifiers
 
         arxiv_classifications = metadata.get("arxiv_classifications")
         if arxiv_classifications:
@@ -229,9 +239,9 @@ def metadata_to_quickstatements(metadata):
         qs += f'LAST\tLen\t"{clean(title)}"\n'
         qs += f'LAST\tP1476\ten:"{clean(title)}"\n'
 
-    publication_date = metadata.get("publication_date")
-    if publication_date:
-        qs += f'LAST\tDen\t"scientific article{get_nice_date(publication_date)}"\n'
+    pub_date = metadata.get("publication_date")
+    if pub_date:
+        qs += f'LAST\tDen\t"scientific article{get_nice_date(pub_date)}"\n'
     else:
         qs += 'LAST\tDen\t"scientific article"\n'
 

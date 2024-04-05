@@ -78,16 +78,16 @@ def get_metadata(arxiv):
 
             if "link" not in entry:
                 return {'error': "Not found"}
-
+            publication_date = entry.published[:10]
             metadata = {
                 'arxiv': arxiv,
                 'authornames': [author.name for author in entry.authors],
                 'full_text_url': f'https://arxiv.org/pdf/{arxiv}.pdf',
-                'publication_date_P577': f'+{entry.published[:10]}T00:00:00Z/11',
-                'publication_date': entry.published[:10],
+                'publication_date_P577': f'+{publication_date}T00:00:00Z/11',
+                'publication_date': publication_date,
 
-                # Some titles may have a newline in them. This should be converted to
-                # an ordinary space character
+                # Some titles may have a newline in them. This should be
+                # converted to an ordinary space character
                 'title': re.sub(r'\s+', ' ', entry.title),
 
                 'arxiv_classifications': [tag.term for tag in entry.tags],
@@ -100,7 +100,8 @@ def get_metadata(arxiv):
             return metadata
         else:
             # Handle non-200 status codes (e.g., 404, 500) appropriately
-            return {'error': f'Request failed with status code {response.status_code}'}
+            status_code = response.status_code
+            return {'error': f'Request failed with status code {status_code}'}
 
     except requests.exceptions.RequestException as e:
         # connection timeout, DNS resolution error, etc
