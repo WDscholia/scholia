@@ -52,7 +52,11 @@ def get_doi_metadata(doi):
 
     """
     def get_date(date_list):
-        if len(date_list) == 1 and date_list[0] != "None" and date_list[0] != None:
+        if (
+            len(date_list) == 1
+            and date_list[0] != "None"
+            and date_list[0] is not None
+        ):
             date = f"{date_list[0]}"
             return date, f"+{date}-00-00T00:00:00Z/9"
         if len(date_list) == 2:
@@ -63,6 +67,13 @@ def get_doi_metadata(doi):
             return date, f"+{date}T00:00:00Z/11"
 
         return "", ""
+
+    def get_author_name(author_dict):
+        name = author_dict.get('name', '')
+        given_name = author_dict.get('given', '')
+        family_name = author_dict.get('family', '')
+        formatted_name = f"{name} {given_name} {family_name}".strip()
+        return formatted_name
 
     doi = doi.strip()
 
@@ -79,15 +90,16 @@ def get_doi_metadata(doi):
             metadata = {
                 "doi": entry.get("DOI"),
                 "authornames": [
-                    f"{author.get('name', '')} {author.get('given', '')} {author.get('family', '')}".strip()
+                    get_author_name(author)
                     for author in entry.get("author", [])
                 ],
                 # not full text url if the paper is closed source
-                # "full_text_url": entry.get("resource", {}).get("primary", {}).get("URL"),
+                # "full_text_url":
+                #      entry.get("resource", {}).get("primary", {}).get("URL"),
                 "publication_date_P577": date,
                 "publication_date": plain_date,
-                # Some titles may have a newline in them. This should be converted to
-                # an ordinary space character
+                # Some titles may have a newline in them. This should be
+                # converted to an ordinary space character
                 "title": re.sub(r"\s+", " ", entry["title"][0]),
             }
 
@@ -96,7 +108,8 @@ def get_doi_metadata(doi):
             if response.text == "Resource not found.":
                 return {'error': "Not found"}
             # Handle non-200 status codes (e.g., 404, 500) appropriately
-            return {"error": f"Request failed with status code {response.status_code}"}
+            status_code = response.status_code
+            return {"error": f"Request failed with status code {status_code}"}
 
     except requests.exceptions.RequestException as e:
         # connection timeout, DNS resolution error, etc
@@ -106,6 +119,7 @@ def get_doi_metadata(doi):
     except Exception as e:
         current_app.logger.debug(f'An unexpected error occurred: {e}')
         return {'error': 'An unexpected error occurred'}
+
 
 def string_to_doi(string):
     """Extract doi id from string.
@@ -134,7 +148,9 @@ def string_to_doi(string):
     >>>
 
     """
-    PATTERN = re.compile(r"(?i)10.\d{4,9}/[^\s]+", flags=re.DOTALL | re.UNICODE)
+    PATTERN = re.compile(
+        r"(?i)10.\d{4,9}/[^\s]+", flags=re.DOTALL | re.UNICODE
+    )
     dois = PATTERN.findall(string)
     if len(dois) > 0:
         return dois[0]
