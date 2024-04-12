@@ -22,7 +22,7 @@ WHERE {
     # ("ZINC ID" "P2084") # limit IDs
     ("crystal structure" "haswbstatement:P3636|P11375")
     ("safety classification and labelling" "P4952")
-    ("mass spectrum" "haswbstatement:P4964|P6689")
+    ("mass spectrum" "haswbstatement:P4964|P6689|P12472")
     # ("SMARTS notation" "P8533") # not for now
     ("NMR spectrum" "P9405")
     # hacky way to get quantity properties.
