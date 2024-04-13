@@ -23,7 +23,6 @@ import sys
 
 import requests
 from feedparser import parse as parse_api
-from flask import current_app
 
 USER_AGENT = 'Scholia'
 
@@ -103,12 +102,10 @@ def get_metadata(arxiv):
             status_code = response.status_code
             return {'error': f'Request failed with status code {status_code}'}
 
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException:
         # connection timeout, DNS resolution error, etc
-        current_app.logger.debug(f'Request failed due to a network error: {e}')
         return {'error': 'Request failed due to a network error'}
-    except Exception as e:
-        current_app.logger.debug(f'An unexpected error occurred: {e}')
+    except Exception:
         return {'error': 'An unexpected error occurred'}
 
 
