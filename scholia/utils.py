@@ -174,6 +174,25 @@ def pages_to_number_of_pages(pages):
     return number_of_pages
 
 
+def _clean(string):
+    return string.replace('"', '\"')
+
+
+def _get_nice_date(date_str):
+    date = list(map(int, date_str.split("-")))
+    if len(date) == 0:
+        return ""
+    if len(date) == 1:
+        return f" published in {date[0]}"
+    month = calendar.month_name[date[1]]
+    if len(date) == 2:
+        return f" published in {month} {date[0]}"
+    if len(date) == 3:
+        return f" published on {date[2]} {month} {date[0]}"
+
+    return ""
+
+
 def metadata_to_quickstatements(metadata):
     """Convert metadata to quickstatements.
 
@@ -199,23 +218,6 @@ def metadata_to_quickstatements(metadata):
 
     """
 
-    def clean(string):
-        return string.replace('"', '\"')
-
-    def get_nice_date(date_str):
-        date = list(map(int, date_str.split("-")))
-        if len(date) == 0:
-            return ""
-        if len(date) == 1:
-            return f" published in {date[0]}"
-        month = calendar.month_name[date[1]]
-        if len(date) == 2:
-            return f" published in {month} {date[0]}"
-        if len(date) == 3:
-            return f" published on {date[2]} {month} {date[0]}"
-
-        return ""
-
     qs = "CREATE\n"
     qs += "LAST\tP31\tQ13442814\n"
 
@@ -229,19 +231,19 @@ def metadata_to_quickstatements(metadata):
         if arxiv_classifications:
             # arXiv classifications such as "cs.LG", as qualifier to arXiv ID
             for classification in arxiv_classifications:
-                qs += f'\tP820\t"{clean(classification)}"'
+                qs += f'\tP820\t"{_clean(classification)}"'
 
         # Line break for the P818 statement
         qs += "\n"
 
     title = metadata.get("title")
     if title:
-        qs += f'LAST\tLen\t"{clean(title)}"\n'
-        qs += f'LAST\tP1476\ten:"{clean(title)}"\n'
+        qs += f'LAST\tLen\t"{_clean(title)}"\n'
+        qs += f'LAST\tP1476\ten:"{_clean(title)}"\n'
 
     pub_date = metadata.get("publication_date")
     if pub_date:
-        qs += f'LAST\tDen\t"scientific article{get_nice_date(pub_date)}"\n'
+        qs += f'LAST\tDen\t"scientific article{_get_nice_date(pub_date)}"\n'
     else:
         qs += 'LAST\tDen\t"scientific article"\n'
 
@@ -251,15 +253,15 @@ def metadata_to_quickstatements(metadata):
 
     full_text_url = metadata.get("full_text_url")
     if full_text_url:
-        qs += f'LAST\tP953\t"{clean(full_text_url)}"\n'
+        qs += f'LAST\tP953\t"{_clean(full_text_url)}"\n'
 
     doi = metadata.get("doi")
     if doi:
-        qs += f'LAST\tP356\t"{clean(doi)}"\n'
+        qs += f'LAST\tP356\t"{_clean(doi)}"\n'
 
     authornames = metadata.get("authornames", [])
     if authornames:
         for n, authorname in enumerate(authornames, start=1):
-            qs += f'LAST\tP2093\t"{clean(authorname)}"\tP1545\t"{n}"\n'
+            qs += f'LAST\tP2093\t"{_clean(authorname)}"\tP1545\t"{n}"\n'
 
     return qs
