@@ -87,11 +87,11 @@ def string_to_type(string):
     if search(r'^\d{4}\-\d{3}(\d|X)$', string):
         return 'issn'
 
-    if search(r'^10.\d{4,9}/[^\s]+$', string, flags=IGNORECASE):
+    if search(r'10.\d{4,9}/[^\s]+', string, flags=IGNORECASE):
         return 'doi'
 
     if search(
-        r"^(arxiv:)?(\d{4}.\d{4,5}|[a-z\-]+(\.[A-Z]{2})?\/\d{7})(v\d+)?$",
+        r"(arxiv:)?(\d{4}.\d{4,5}|[a-z\-]+(\.[A-Z]{2})?\/\d{7})(v\d+)?",
         string,
         flags=IGNORECASE,
     ):

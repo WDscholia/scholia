@@ -284,14 +284,14 @@ def show_id_to_quickstatements():
 
     if all(["id" not in v for v in ids.values()]):
         # Could not identify an identifier
-        return render_template("id-to-quickstatements.html")
+        return render_template("id-to-quickstatements.html", query=query)
 
     to_qid_mapping = {"arxiv": arxiv_to_qs, "doi": doi_to_qs}
 
     for identifier, d in ids.items():
         fun = to_qid_mapping.get(d["type"])
         if fun:
-            ids[identifier]["qid"] = fun(identifier)
+            ids[identifier]["qid"] = fun(d["id"])
 
     identified_qs = [
         [v["id"], v["qid"][0]]
@@ -317,7 +317,7 @@ def show_id_to_quickstatements():
         fun = get_metadata_mapping.get(ids[identifier]["type"])
         if fun:
             try:
-                metadata = fun(identifier)
+                metadata = fun(ids[identifier]["id"])
             except Exception:
                 return render_template(
                     "id-to-quickstatements.html",
