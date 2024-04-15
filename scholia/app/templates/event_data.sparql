@@ -1,31 +1,31 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT DISTINCT ?description ?value ?valueUrl
+SELECT
+  ?description ?descriptionLabel ?descriptionUrl
+
+  ?value ?valueLabel ?valueUrl
+
 WHERE {
-  BIND(target: AS ?work)
   {
     BIND(1 AS ?order)
-    BIND("Part of series" AS ?description)
-    ?work wdt:P179 ?iri .
-    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
-    ?iri rdfs:label ?value_string . 
-    FILTER (LANG(?value_string) = 'en')
-    BIND(COALESCE(?value_string, ?q) AS ?value)
-    BIND(CONCAT("../event-series/", ?q) AS ?valueUrl)
+    BIND("Event series" AS ?description)
+    BIND("/event-series" AS ?descriptionUrl)
+    target: wdt:P179 ?value .
+    BIND(CONCAT("/event-series/", SUBSTR(STR(?value), 32)) AS ?valueUrl)
   }
   UNION
   {
     BIND(2 AS ?order)
     BIND("Short name" AS ?description)
-    ?work wdt:P1813 ?value .
+    target: wdt:P1813 ?value .
   }
   UNION
   {
     SELECT
-      (3 AS ?order)
+      (5 AS ?order)
       ("Organizers" AS ?description)
       (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+      (CONCAT("/authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)      
     {
       BIND(1 AS ?dummy)
       target: wdt:P664 ?iri .
@@ -36,5 +36,27 @@ WHERE {
     }
     GROUP BY ?dummy
   }
+  UNION
+  {
+    BIND(10 AS ?order)
+    BIND("Number of participants" AS ?description)
+    
+    target: wdt:P1132 ?value .
+  }
+  UNION
+  {
+    BIND(11 AS ?order)
+    BIND("Acceptance&nbsp;rate" AS ?description)
+    
+    target: p:P5822 ?value_statement .
+    ?value_statement ps:P5822 ?acceptance_rate .
+    OPTIONAL {
+      ?value_statement  pq:P518 / rdfs:label ?track .
+      FILTER (LANG(?track) = "en")
+    }
+    BIND(IF(BOUND(?track), CONCAT(STR(?acceptance_rate * 100), " % (", ?track, ")"), STR(?acceptance_rate * 100)) AS ?value)
+  }
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 } 
 ORDER BY ?order
