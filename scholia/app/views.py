@@ -286,11 +286,11 @@ def show_id_to_quickstatements():
         # Could not identify an identifier
         return render_template("id-to-quickstatements.html", query=query)
 
+    # Match identifier to Q-identifier if found
     to_qid_mapping = {"arxiv": arxiv_to_qs, "doi": doi_to_qs}
-
     for identifier, d in ids.items():
         fun = to_qid_mapping.get(d["type"])
-        if fun:
+        if fun and "id" in d and d["id"] is not None:
             ids[identifier]["qid"] = fun(d["id"])
 
     identified_qs = [
