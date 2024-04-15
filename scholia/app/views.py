@@ -381,7 +381,6 @@ def show_author(q):
         Wikidata item identifier.
 
     Returns
-
     -------
     html : str
         Rendered HTML.

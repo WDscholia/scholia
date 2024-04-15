@@ -217,7 +217,6 @@ def metadata_to_quickstatements(metadata):
     - https://wikidata-todo.toolforge.org/quick_statements.php
 
     """
-
     qs = "CREATE\n"
     qs += "LAST\tP31\tQ13442814\n"
 
