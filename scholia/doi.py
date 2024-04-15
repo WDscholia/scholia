@@ -39,24 +39,20 @@ def get_doi_metadata(doi):
     -----
     Works with raw DOIs and doi.org URLs
 
-    References
-    ----------
-
     Examples
     --------
     >>> metadata = get_doi_metadata('10.1177/0269216319865414')
     >>> metadata['publication_date'] == '2019-09-05'
     True
-    >>> metadata = get_doi_metadata('10.1177/123456789')
+
+    >>> get_doi_metadata('10.1177/123456789')
     {'error': 'Not found'}
 
     """
+
     def get_date(date_list):
-        if (
-            len(date_list) == 1
-            and date_list[0] != "None"
-            and date_list[0] is not None
-        ):
+        if (len(date_list) == 1 and date_list[0] != "None" and
+                date_list[0] is not None):
             date = f"{date_list[0]}"
             return date, f"+{date}-00-00T00:00:00Z/9"
         if len(date_list) == 2:
@@ -102,8 +98,8 @@ def get_doi_metadata(doi):
                 # converted to an ordinary space character
                 "title": re.sub(r"\s+", " ", entry["title"][0]),
             }
-
             return metadata
+
         else:
             if response.text == "Resource not found.":
                 return {'error': "Not found"}
@@ -142,10 +138,12 @@ def string_to_doi(string):
     --------
     >>> string_to_doi('10.1371/JOURNAL.PONE.0029797')
     '10.1371/JOURNAL.PONE.0029797'
+
     >>> string_to_doi('https://doi.org/10.12987/YALE/9780300197051.003.0010')
     '10.12987/YALE/9780300197051.003.0010'
-    >>> doi.string_to_doi('https://doi.org/10')
-    >>>
+
+    >>> string_to_doi('https://doi.org/10') is None
+    True
 
     """
     PATTERN = re.compile(
