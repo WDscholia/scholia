@@ -125,13 +125,18 @@ def paper_to_quickstatements(paper):
     title = paper.get('title')
     if title:
         # "Label must be no more than 250 characters long"
-        short_title = normalize_string(title)[:250]
+        normalized_title = normalize_string(title)
+        short_title = normalized_title[:250]
+
+        # String datatype support 1,500 characters
+        # https://www.wikidata.org/wiki/Help:Data_type#String-based_data_types
+        long_title = normalized_title[:1500]
 
         # Label
         qs += u('LAST\tLen\t"{}"\n').format(short_title)
 
         # Title property
-        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, short_title)
+        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, long_title)
 
     # Description
     date = paper.get('date')
