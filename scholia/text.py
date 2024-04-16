@@ -50,7 +50,7 @@ WITH {
           wdt:P921 [] .
   }
   # The arbitratry limit here is to avoid timeout
-  LIMIT 100000
+  LIMIT 50000
 } AS %works
 WITH {
   SELECT DISTINCT ?topic WHERE {
