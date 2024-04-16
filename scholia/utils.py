@@ -200,8 +200,6 @@ def metadata_to_quickstatements(metadata):
     format so it can copy and pasted into Magnus Manske quickstatement web tool
     to populate Wikidata.
 
-    This function does not check whether the item already exists.
-
     Parameters
     ----------
     metadata : dict
@@ -211,6 +209,12 @@ def metadata_to_quickstatements(metadata):
     -------
     quickstatements : str
         String with quickstatements.
+
+    Notes
+    -----
+    This function does not check whether the item already exists.
+
+    Letters in DOI are uppercased in accordance with Wikidata convention.
 
     References
     ----------
@@ -256,6 +260,8 @@ def metadata_to_quickstatements(metadata):
 
     doi = metadata.get("doi")
     if doi:
+        # By Wikidata convention letters in a DOI should be uppercase
+        doi = doi.upper()
         qs += f'LAST\tP356\t"{_clean(doi)}"\n'
 
     authornames = metadata.get("authornames", [])
