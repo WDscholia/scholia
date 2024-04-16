@@ -47,14 +47,13 @@ def get_doi_metadata(doi):
     Examples
     --------
     >>> metadata = get_doi_metadata('10.1177/0269216319865414')
-    >>> metadata['publication_date'] == '2019-09-05'
+    >>> metadata['date'] == '2019-09-05'
     True
 
     >>> get_doi_metadata('10.1177/123456789')
     {'error': 'Not found'}
 
     """
-
     def get_date(date_list):
         if (len(date_list) == 1 and date_list[0] != "None" and
                 date_list[0] is not None):
@@ -86,8 +85,6 @@ def get_doi_metadata(doi):
         if response.status_code == 200:
             entry = response.json()["message"]
 
-            import json
-            print(json.dumps(entry, indent=4))
             plain_date, date = get_date(entry["issued"]["date-parts"][0])
 
             paper = {
@@ -115,13 +112,13 @@ def get_doi_metadata(doi):
                     qs = issn_to_qs(issn)
                     if qs and len(qs) > 0:
                         paper['published_in_q'] = qs[0]
-                except Exception as e:
+                except Exception:
                     pass
-            
+
             issue = entry.get('issue')
             if issue:
                 paper['issue'] = issue
-            
+
             pages = entry.get('page')
             if pages:
                 paper['pages'] = pages
@@ -134,7 +131,7 @@ def get_doi_metadata(doi):
             volume = entry.get('volume')
             if volume:
                 paper['volume'] = volume
-            
+
             return paper
 
         else:

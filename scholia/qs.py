@@ -46,7 +46,7 @@ def escape_quote(string):
     -------
     escaped_string : str
         Escaped string.
-    
+
     """
     return string.replace('"', '\"')
 
@@ -114,12 +114,11 @@ def paper_to_quickstatements(paper):
     Letters in DOI are uppercased in accordance with Wikidata convention.
 
     """
-    print(paper)
     qs = u("CREATE\n")
 
     # Instance of scientific article
     qs += 'LAST\tP31\tQ13442814\n'
-    
+
     # Language
     iso639 = paper.get('iso639', 'en')
 
@@ -137,10 +136,11 @@ def paper_to_quickstatements(paper):
     # Description
     date = paper.get('date')
     if date:
-        qs += f'LAST\tDen\t"scientific article{format_date_for_description(date)}"\n'
+        qs += ('LAST\tDen\t"scientific article'
+               f'{format_date_for_description(date)}"\n')
     else:
         qs += 'LAST\tDen\t"scientific article"\n'
-    
+
     arxiv = paper.get("arxiv")
     if arxiv:
         qs += (
@@ -158,7 +158,7 @@ def paper_to_quickstatements(paper):
 
         # DOI based on arXiv identifier
         qs += u'LAST\tP356\t"10.48550/ARXIV.{}"\n'.format(arxiv)
-        
+
     # DOI
     doi = paper.get('doi')
     if doi:
