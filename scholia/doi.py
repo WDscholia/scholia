@@ -113,7 +113,8 @@ def get_doi_metadata(doi):
                     if qs and len(qs) > 0:
                         paper['published_in_q'] = qs[0]
                 except Exception:
-                    pass
+                    # pass
+                    qs = None
 
             issue = entry.get('issue')
             if issue:
