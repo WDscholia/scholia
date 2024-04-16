@@ -51,6 +51,8 @@ def get_metadata(arxiv):
     This function queries arXiv. It must not be used to crawl arXiv.
     It does not look at robots.txt.
 
+    The language is set to English.
+
     References
     ----------
     - https://arxiv.org
@@ -80,14 +82,17 @@ def get_metadata(arxiv):
             publication_date = entry.published[:10]
             metadata = {
                 'arxiv': arxiv,
-                'authornames': [author.name for author in entry.authors],
+                'authors': [author.name for author in entry.authors],
                 'full_text_url': f'https://arxiv.org/pdf/{arxiv}.pdf',
-                'publication_date_P577': f'+{publication_date}T00:00:00Z/11',
-                'publication_date': publication_date,
+                'date_P577': f'+{publication_date}T00:00:00Z/11',
+                'date': publication_date,
 
                 # Some titles may have a newline in them. This should be
                 # converted to an ordinary space character
                 'title': re.sub(r'\s+', ' ', entry.title),
+
+                # Take that arXiv articles are always in English
+                'language_q': "Q1860", 
 
                 'arxiv_classifications': [tag.term for tag in entry.tags],
             }
@@ -156,7 +161,7 @@ def metadata_to_quickstatements(metadata):
     qs += u'LAST\tP1476\ten:"{}"\n'.format(
         metadata['title'].replace('"', '\"'))
     qs += u'LAST\tP577\t+{}T00:00:00Z/11\n'.format(
-        metadata['publication_date'][:10])
+        metadata['date'][:10])
     qs += u'LAST\tP953\t"{}"\n'.format(
         metadata['full_text_url'].replace('"', '\"'))
 
@@ -172,9 +177,9 @@ def metadata_to_quickstatements(metadata):
     qs += u'LAST\tP356\t"10.48550/ARXIV.{}"\n'.format(
             metadata['arxiv'])
 
-    for n, authorname in enumerate(metadata['authornames'], start=1):
+    for n, author in enumerate(metadata['authors'], start=1):
         qs += u'LAST\tP2093\t"{}"\tP1545\t"{}"\n'.format(
-            authorname.replace('"', '\"'), n)
+            author.replace('"', '\"'), n)
     return qs
 
 
