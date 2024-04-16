@@ -61,6 +61,8 @@ def paper_to_quickstatements(paper):
     The label is shortened to 250 characters due if the title is longer than
     that due to a limitation in Wikidata.
 
+    Letters in DOI are uppercased in accordance with Wikidata convention.
+
     """
     qs = u("CREATE\n")
 
@@ -82,7 +84,9 @@ def paper_to_quickstatements(paper):
 
     # DOI
     if 'doi' in paper:
-        qs += u('LAST\tP356\t"{}"\n').format(paper['doi'])
+        # By Wikidata convention letters in a DOI should be uppercase
+        doi = paper['doi'].upper()
+        qs += u('LAST\tP356\t"{}"\n').format(doi)
 
     # Authors
     if 'authors' in paper:
