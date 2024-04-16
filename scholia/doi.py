@@ -15,6 +15,10 @@ import re
 import requests
 from flask import current_app
 
+from .query import issn_to_qs
+from .utils import pages_to_number_of_pages
+
+
 USER_AGENT = "Scholia"
 
 CROSSREF_URL = "https://api.crossref.org/v1/works/"
@@ -32,8 +36,9 @@ def get_doi_metadata(doi):
 
     Returns
     -------
-    metadata : dict
-        Dictionary with metadata.
+    paper : dict
+        Dictionary with metadata about a paper with fields: `doi`, `authors`,
+        `date_P577`, `date` and `title`.
 
     Notes
     -----
@@ -81,24 +86,56 @@ def get_doi_metadata(doi):
         if response.status_code == 200:
             entry = response.json()["message"]
 
+            import json
+            print(json.dumps(entry, indent=4))
             plain_date, date = get_date(entry["issued"]["date-parts"][0])
 
-            metadata = {
+            paper = {
                 "doi": entry.get("DOI"),
-                "authornames": [
+                "authors": [
                     get_author_name(author)
                     for author in entry.get("author", [])
                 ],
                 # not full text url if the paper is closed source
                 # "full_text_url":
                 #      entry.get("resource", {}).get("primary", {}).get("URL"),
-                "publication_date_P577": date,
-                "publication_date": plain_date,
+                "date_P577": date,
+                "date": plain_date,
                 # Some titles may have a newline in them. This should be
                 # converted to an ordinary space character
                 "title": re.sub(r"\s+", " ", entry["title"][0]),
             }
-            return metadata
+
+            # Extract ISSN and query Wikidata to get Q-identifier for journal
+            issns = entry.get('ISSN')
+            if issns and len(issns) > 0:
+                # Just take the first ISSN
+                issn = issns[0]
+                try:
+                    qs = issn_to_qs(issn)
+                    if qs and len(qs) > 0:
+                        paper['published_in_q'] = qs[0]
+                except Exception as e:
+                    pass
+            
+            issue = entry.get('issue')
+            if issue:
+                paper['issue'] = issue
+            
+            pages = entry.get('page')
+            if pages:
+                paper['pages'] = pages
+
+                # Compute number of pages from pages
+                number_of_pages = pages_to_number_of_pages(pages)
+                if number_of_pages:
+                    paper['number_of_pages'] = number_of_pages
+
+            volume = entry.get('volume')
+            if volume:
+                paper['volume'] = volume
+            
+            return paper
 
         else:
             if response.text == "Resource not found.":
