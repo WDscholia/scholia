@@ -1,0 +1,16 @@
+#defaultView:LineChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{q}}>
+
+SELECT 
+  ?year
+  ?number_of_participants
+WHERE {
+  ?event wdt:P179 target: ;
+         wdt:P580 ?datetime ;
+         wdt:P1132 ?number_of_participants .
+  
+  BIND(STR(YEAR(?datetime)) AS ?year)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY ?year
