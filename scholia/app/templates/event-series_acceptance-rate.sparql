@@ -1,0 +1,20 @@
+#defaultView:LineChart
+
+PREFIX target: <http://www.wikidata.org/entity/{{q}}>
+
+SELECT 
+  ?year
+  ?acceptance_rate 
+  ?trackLabel
+WHERE {
+  ?event wdt:P179 target: ;
+         wdt:P580 ?datetime ;
+         p:P5822 ?acceptance_rate_statement .
+  ?acceptance_rate_statement ps:P5822 ?acceptance_rate .
+  OPTIONAL { ?acceptance_rate_statement pq:P518 ?track_ . }
+  BIND(COALESCE(?track_, "total") AS ?track)
+  
+  BIND(STR(YEAR(?datetime)) AS ?year)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY ?year

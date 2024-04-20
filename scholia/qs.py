@@ -1,5 +1,6 @@
 """Quickstatements."""
 
+import calendar
 
 from six import u
 
@@ -29,6 +30,55 @@ def normalize_string(string):
 
     """
     return re.sub(r'\s+', ' ', string).strip()
+
+
+def escape_quote(string):
+    """Escape quotation mark.
+
+    Escape the quotation mark in a string.
+
+    Parameters
+    ----------
+    string : str
+        String to be escaped.
+
+    Returns
+    -------
+    escaped_string : str
+        Escaped string.
+
+    """
+    return string.replace('"', '\"')
+
+
+def format_date_for_description(date_str):
+    """Format date string for description.
+
+    Format date string for description.
+
+    Parameters
+    ----------
+    date_str : str
+        Date as DD-MM-YYYY.
+
+    Returns
+    -------
+    formatted_string : str
+        String formatted for description
+
+    """
+    date = list(map(int, date_str.split("-")))
+    if len(date) == 0:
+        return ""
+    if len(date) == 1:
+        return f" published in {date[0]}"
+    month = calendar.month_name[date[1]]
+    if len(date) == 2:
+        return f" published in {month} {date[0]}"
+    if len(date) == 3:
+        return f" published on {date[2]} {month} {date[0]}"
+
+    return ""
 
 
 def paper_to_quickstatements(paper):
@@ -66,26 +116,59 @@ def paper_to_quickstatements(paper):
     """
     qs = u("CREATE\n")
 
+    # Instance of scientific article
+    qs += 'LAST\tP31\tQ13442814\n'
+
     # Language
     iso639 = paper.get('iso639', 'en')
 
-    if 'title' in paper and paper['title']:
+    title = paper.get('title')
+    if title:
         # "Label must be no more than 250 characters long"
-        short_title = normalize_string(paper['title'])[:250]
+        normalized_title = normalize_string(title)
+        short_title = normalized_title[:250]
+
+        # String datatype support 1,500 characters
+        # https://www.wikidata.org/wiki/Help:Data_type#String-based_data_types
+        long_title = normalized_title[:1500]
 
         # Label
         qs += u('LAST\tLen\t"{}"\n').format(short_title)
 
         # Title property
-        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, short_title)
+        qs += u('LAST\tP1476\t{}:"{}"\n').format(iso639, long_title)
 
-    # Instance of scientific article
-    qs += 'LAST\tP31\tQ13442814\n'
+    # Description
+    date = paper.get('date')
+    if date:
+        qs += ('LAST\tDen\t"scientific article'
+               f'{format_date_for_description(date)}"\n')
+    else:
+        qs += 'LAST\tDen\t"scientific article"\n'
+
+    arxiv = paper.get("arxiv")
+    if arxiv:
+        qs += (
+            f'LAST\tP818\t"{arxiv}"'
+        )  # No line break, to accommodate the following qualifiers
+
+        arxiv_classifications = paper.get("arxiv_classifications")
+        if arxiv_classifications:
+            # arXiv classifications such as "cs.LG", as qualifier to arXiv ID
+            for classification in arxiv_classifications:
+                qs += f'\tP820\t"{escape_quote(classification)}"'
+
+        # Line break for the P818 statement
+        qs += "\n"
+
+        # DOI based on arXiv identifier
+        qs += u'LAST\tP356\t"10.48550/ARXIV.{}"\n'.format(arxiv)
 
     # DOI
-    if 'doi' in paper:
+    doi = paper.get('doi')
+    if doi:
         # By Wikidata convention letters in a DOI should be uppercase
-        doi = paper['doi'].upper()
+        doi = doi.upper()
         qs += u('LAST\tP356\t"{}"\n').format(doi)
 
     # Authors
@@ -94,7 +177,7 @@ def paper_to_quickstatements(paper):
             qs += u('LAST\tP2093\t"{}"\tP1545\t"{}"\n').format(
                 normalize_string(author), n)
 
-    # Published in
+    # Date
     if 'date' in paper:
         # Day precision
         if len(paper['date']) == 4:
@@ -109,7 +192,6 @@ def paper_to_quickstatements(paper):
         else:
             # Unknown date format
             pass
-
     elif 'year' in paper:
         # Year precision
         qs += 'LAST\tP577\t+{}-00-00T00:00:00Z/9\n'.format(paper['year'])

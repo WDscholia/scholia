@@ -15,6 +15,7 @@ from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
 from ..arxiv import string_to_arxiv, string_to_arxivs
 from ..arxiv import get_metadata as get_arxiv_metadata
 from ..doi import string_to_doi, get_doi_metadata
+from ..qs import paper_to_quickstatements
 from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      doi_prefix_to_qs, github_to_qs, biorxiv_to_qs,
                      chemrxiv_to_qs, omim_to_qs,
@@ -25,8 +26,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
                      ncbi_gene_to_qs, uniprot_to_qs, random_work,
                      random_podcast)
-from ..utils import (metadata_to_quickstatements,
-                     remove_special_characters_url, sanitize_q, string_to_list,
+from ..utils import (remove_special_characters_url, sanitize_q, string_to_list,
                      string_to_type)
 from ..wikipedia import q_to_bibliography_templates
 
@@ -330,7 +330,7 @@ def show_id_to_quickstatements():
             if "error" not in metadata:
                 ids[identifier][
                     "quickstatements"
-                ] = metadata_to_quickstatements(metadata)
+                ] = paper_to_quickstatements(metadata)
 
     quickstatements = [v.get("quickstatements") for v in ids.values()]
     quickstatements = list(filter(None, quickstatements))
