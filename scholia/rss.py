@@ -49,8 +49,9 @@ from re import sub
 
 from six import u
 
-from .query import SPARQL_ENDPOINT
+from .query import get_config
 
+SPARQL_ENDPOINT = get_config()['server']['sparql_endpoint']
 
 WORK_ITEM_RSS = u("""
     <item>
@@ -358,7 +359,7 @@ def wb_get_venue_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = VENUE_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+    url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
@@ -402,7 +403,7 @@ def wb_get_topic_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = TOPIC_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+    url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
@@ -448,7 +449,7 @@ def wb_get_organization_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = ORGANIZATION_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+    url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()
@@ -494,7 +495,7 @@ def wb_get_sponsor_latest_works(q):
                 'type="application/rss+xml" />\n'
 
     query = SPONSOR_SPARQL_QUERY.format(q=q)
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+    url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params)
     data = response.json()

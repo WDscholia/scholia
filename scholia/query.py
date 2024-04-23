@@ -835,7 +835,7 @@ def omim_to_qs(omimID):
     query = 'select ?disease where {{ ?disease wdt:P492 "{omimID}" }}'.format(
         omimID=escape_string(omimID))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
@@ -1835,6 +1835,34 @@ def random_podcast():
         # Fallback
         q = "Q124363332"
     return q
+
+
+def get_config():
+    """Return the Scholia configuration.
+
+    ConfigParser instance with the default configuration or the configuration
+    from one of the following files: scholia.cfg, ~/etc/scholia.cfg, or ~/scholia.cfg.
+
+    Notes
+    -----
+    The default configuration file looks like this:
+
+    [server]
+    sparql_endpoint = https://query.wikidata.org/sparql
+
+    Returns
+    -------
+    config : ConfigParser
+        ConfigParser object.
+
+    Examples
+    --------
+    >>> config = get_config()
+    >>> SPARQL_ENDPOINT = config['server']['sparql_endpoint']
+    https://query.wikidata.org/sparql
+
+    """
+    return config
 
 
 def main():
