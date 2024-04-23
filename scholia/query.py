@@ -61,7 +61,40 @@ from simplejson import JSONDecodeError
 
 from six import u
 
-SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
+try:
+    import ConfigParser as configparser
+except ImportError:
+    import configparser
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+from os.path import exists, expanduser
+
+CONFIG_FILENAMES = [
+    'scholia.cfg',
+    '~/etc/scholia.cfg',
+    '~/scholia.cfg']
+
+DEFAULTS = """
+[server]
+sparql_endpoint = https://query.wikidata.org/sparql
+"""
+
+config = configparser.ConfigParser()
+
+config.read_file(StringIO(DEFAULTS))
+
+for filename in CONFIG_FILENAMES:
+    full_filename = expanduser(filename)
+    if exists(full_filename):
+        print('Reading configuration file from {}'.format(full_filename))
+        config.read(full_filename)
+        break
+
+SPARQL_ENDPOINT = config['server']['sparql_endpoint']
 
 USER_AGENT = 'Scholia'
 
