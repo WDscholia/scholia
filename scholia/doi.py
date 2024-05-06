@@ -93,7 +93,7 @@ def get_doi_metadata(doi):
                     get_author_name(author)
                     for author in entry.get("author", [])
                 ],
-                # not full text url if the paper is closed source
+                # not full text URL if the paper is closed source
                 # "full_text_url":
                 #      entry.get("resource", {}).get("primary", {}).get("URL"),
                 "date_P577": date,
