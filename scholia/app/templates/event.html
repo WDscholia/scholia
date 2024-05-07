@@ -5,7 +5,7 @@
  
 {% block in_ready %}
 
-{{ sparql_to_table_post('data') }}
+{{ sparql_to_table_post('data', options={"paging": false}) }}
 {{ sparql_to_table('people') }}
 {{ sparql_to_table('proceedings') }}
 {{ sparql_to_table('presentations') }}
