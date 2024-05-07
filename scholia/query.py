@@ -57,8 +57,6 @@ from random import randrange
 
 import requests
 
-from simplejson import JSONDecodeError
-
 from six import u
 
 SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
@@ -1104,7 +1102,7 @@ def q_to_class(q):
     response = requests.get(url, params=params, headers=HEADERS)
     try:
         data = response.json()
-    except JSONDecodeError:
+    except requests.exceptions.JSONDecodeError:
         # If the Wikidata MediaWiki API does not return a proper
         # response, then fallback on nothing.
         classes = []
