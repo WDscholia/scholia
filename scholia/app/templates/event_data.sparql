@@ -21,8 +21,17 @@ WHERE {
   }
   UNION
   {
+    BIND(5 AS ?order)
+    BIND(wd:Q34770 AS ?description)
+    BIND("/language" AS ?descriptionUrl)
+    
+    target: wdt:P2936 ?value .
+    BIND(CONCAT("/language/", SUBSTR(STR(?value), 32)) AS ?valueUrl)
+  }
+  UNION
+  {
     SELECT
-      (5 AS ?order)
+      (10 AS ?order)
       ("Organizers" AS ?description)
       (GROUP_CONCAT(?value_; separator=", ") AS ?value)
       (CONCAT("/authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)      
@@ -38,14 +47,42 @@ WHERE {
   }
   UNION
   {
-    BIND(10 AS ?order)
+    BIND(20 AS ?order)
     BIND("Number of participants" AS ?description)
     
     target: wdt:P1132 ?value .
   }
   UNION
   {
-    BIND(11 AS ?order)
+    # number of submissions
+    BIND(21 AS ?order)
+    BIND("number of submissions"  AS ?description)
+    
+    target: p:P12655 ?value_statement .
+    ?value_statement ps:P12655 ?submissions.
+    OPTIONAL {
+      ?value_statement  pq:P518 / rdfs:label ?track .
+      FILTER (LANG(?track) = "en")
+    }
+    BIND(IF(BOUND(?track), CONCAT(STR(?submissions), " (", ?track, ")"), STR(?submissions)) AS ?value)
+  }
+  UNION
+  {
+    # number of accepted contributions
+    BIND(22 AS ?order)
+    BIND("number of accepted contributions"  AS ?description)
+    
+    target: p:P12649 ?value_statement .
+    ?value_statement ps:P12649 ?accepted .
+    OPTIONAL {
+      ?value_statement  pq:P518 / rdfs:label ?track .
+      FILTER (LANG(?track) = "en")
+    }
+    BIND(IF(BOUND(?track), CONCAT(STR(?accepted), " (", ?track, ")"), STR(?accepted)) AS ?value)
+  }
+  UNION
+  {
+    BIND(23 AS ?order)
     BIND("Acceptance&nbsp;rate" AS ?description)
     
     target: p:P5822 ?value_statement .
@@ -54,7 +91,7 @@ WHERE {
       ?value_statement  pq:P518 / rdfs:label ?track .
       FILTER (LANG(?track) = "en")
     }
-    BIND(IF(BOUND(?track), CONCAT(STR(?acceptance_rate * 100), " % (", ?track, ")"), STR(?acceptance_rate * 100)) AS ?value)
+    BIND(IF(BOUND(?track), CONCAT(STR(?acceptance_rate * 100), " % (", ?track, ")"), CONCAT(STR(?acceptance_rate * 100), " %")) AS ?value)
   }
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
