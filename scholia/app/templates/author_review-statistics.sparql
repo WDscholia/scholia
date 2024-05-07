@@ -12,11 +12,27 @@ WITH {
     (GROUP_CONCAT(DISTINCT ?topic_label; separator=", ") AS ?topics)
     (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl)
   WHERE {
-    ?work wdt:P4032 target: .
-    ?work wdt:P1433 ?venue .
+    {
+      ?work wdt:P4032 target: ;
+            wdt:P1433 ?venue .
+    }
+    UNION
+    {
+      # program committee member for event in a series (work is here the event)
+      ?work wdt:P179 ?venue ;
+            wdt:P5804 target: 
+    }
+    UNION
+    {
+      # program committee member for event not in a series
+      ?venue wdt:P5804 target: .
+      MINUS { ?venue wdt:P179 [] }
+      BIND("dummy" AS ?work)
+    }
     OPTIONAL {
       ?venue wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = 'en') }
+      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = 'en')
+    }
   }
   GROUP BY ?venue
 } AS %result
