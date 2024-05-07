@@ -1,22 +1,26 @@
 SELECT
   ?date
+  ?deadline ?deadlineLabel
   ?short_name
   ?event ?eventLabel (CONCAT("/event/", SUBSTR(STR(?event), 32)) AS ?eventUrl)
   ?location ?locationLabel (CONCAT("/location/", SUBSTR(STR(?location), 32)) AS ?locationUrl)
 WITH {
   SELECT
-    ?datetime ?event
+    ?datetime ?deadline ?event
     (SAMPLE(?location_) AS ?location) 
     (SAMPLE(?short_name_) AS ?short_name)
   WHERE {
     ?event p:P793 ?key_event_statement . 
-    ?key_event_statement ps:P793 / wdt:P279 wd:Q2404808 ;
-                         pq:P585 ?datetime . 
-    FILTER (NOW() < ?datetime)
+    ?key_event_statement ps:P793 ?deadline ; 
+                         pq:P585 ?datetime .
+    ?deadline wdt:P279* wd:Q2404808 .
+
+    # Subtract a day from now to get events on the now date
+    FILTER (NOW() - "P1DT0H0M0.000S"^^xsd:duration < ?datetime)
     OPTIONAL { ?event wdt:P276 ?location_ }
     OPTIONAL { ?event wdt:P1813 ?short_name_ }
   }
-  GROUP BY ?datetime ?event
+  GROUP BY ?datetime ?deadline ?event
   ORDER BY(?datetime)
   LIMIT 200  
 } AS %events
