@@ -3,7 +3,7 @@ docopt
 Flask>=3.0.0
 Flask-Bootstrap
 lxml>=4.6.5
-requests
+requests>=2.31.0
 werkzeug>=3.0.3
 urllib3>=1.25.1
 certifi>=2022.12.7
