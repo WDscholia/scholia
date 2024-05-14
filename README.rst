@@ -91,7 +91,7 @@ See file `CONTRIBUTING.rst`_ for technical details on how to improve Scholia.
 .. _runserver.py: https://github.com/WDscholia/scholia/blob/master/runserver.py
 
 References
----------
+----------
 - Scholia's page about itself: https://scholia.toolforge.org/topic/Q45340488
 - Wikidata overview page about Scholia: https://www.wikidata.org/wiki/Wikidata:Scholia
 - Lane Rasberry, Egon Willighagen, Finn Nielsen, Daniel Mietchen, "Robustifying Scholia: paving the way for knowledge discovery and research assessment through Wikidata. Research Ideas and Outcomes", 2019, RIO Journal, 5: e35820. https://doi.org/10.3897/rio.5.e35820
