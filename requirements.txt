@@ -8,4 +8,4 @@ werkzeug>=3.0.3
 urllib3>=1.25.1
 certifi>=2022.12.7
 feedparser
-Jinja2>=3.1.3
+Jinja2>=3.1.4
