@@ -1,29 +1,28 @@
-.. image:: scholia/app/static/images/scholia_logo.svg
-   :width: 100%
+|logo|
+
+|website| |gitpod| |github| |issues| |license| |docs|
+
+.. |logo| image:: scholia/app/static/images/scholia_logo.svg
+   :width: 10%
    :alt: Scholia
 
+.. |website| image:: https://img.shields.io/website-up-down-green-red/http/scholia.toolforge.org.svg
+           :target: https://scholia.toolforge.org/
+           :alt: Website
 
-.. image:: https://img.shields.io/website-up-down-green-red/http/scholia.toolforge.org.svg
-   :target: https://scholia.toolforge.org/
-   :alt: Website
-
-.. image:: https://img.shields.io/badge/Gitpod-Open%20in%20Gitpod-%230092CF.svg
-   :target: https://gitpod.io/#https://github.com/WDscholia/scholia
-   :alt: Gitpod
-
-.. image:: https://img.shields.io/github/last-commit/WDscholia/scholia.svg
+.. |gitpod| image:: https://img.shields.io/badge/Gitpod-Open%20in%20Gitpod-%230092CF.svg
+           :target: https://gitpod.io/#https://github.com/WDscholia/scholia
+           :alt: Gitpod
+.. |github| image:: https://img.shields.io/github/last-commit/WDscholia/scholia.svg
    :target: https://github.com/WDscholia/scholia
    :alt: Github last commit
-   
-.. image:: https://img.shields.io/github/issues/WDScholia/scholia.svg
+.. |issues| image:: https://img.shields.io/github/issues/WDScholia/scholia.svg
    :target: https://github.com/WDscholia/scholia/issues
    :alt: GitHub issues
-
-.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+.. |licence| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
    :target: https://github.com/WDscholia/scholia/blob/master/LICENSE
    :alt: License
-
-.. image:: https://readthedocs.org/projects/scholia/badge/?version=latest
+.. |docs| image:: https://readthedocs.org/projects/scholia/badge/?version=latest
    :target: https://scholia.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
