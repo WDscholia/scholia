@@ -69,7 +69,9 @@ Script
 ------
 
 It is possible to use methods of the scholia package as a script:
-::
+
+.. code-block:: sh
+
     $ python -m scholia.query twitter-to-q fnielsen
     Q20980928
 
