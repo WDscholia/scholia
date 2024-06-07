@@ -31,12 +31,15 @@ from lxml import etree
 
 import requests
 
+from ..config import config
 from ..qs import paper_to_quickstatements
-from ..query import iso639_to_q, issn_to_qs, SPARQL_ENDPOINT as WDQS_URL
+from ..query import iso639_to_q, issn_to_qs
 from ..utils import escape_string, pages_to_number_of_pages
 
 
-USER_AGENT = 'Scholia'
+SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
+
+USER_AGENT = config['requests'].get('user_agent')
 
 HEADERS = {'User-Agent': USER_AGENT}
 
@@ -173,7 +176,7 @@ def paper_to_q(paper):
         query = SHORT_TITLED_PAPER_TO_Q_QUERY.format(
             url=paper['url'])
 
-    response = requests.get(WDQS_URL,
+    response = requests.get(SPARQL_ENDPOINT,
                             params={'query': query, 'format': 'json'},
                             headers=HEADERS)
     data = response.json()['results']['bindings']

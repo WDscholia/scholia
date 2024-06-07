@@ -29,7 +29,10 @@ import requests
 
 from six import b, u
 
-from .query import SPARQL_ENDPOINT
+from .config import config
+
+
+SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 
 
 BIBLIOGRAPHY_SPARQL_QUERY = """

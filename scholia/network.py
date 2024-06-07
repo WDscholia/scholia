@@ -7,10 +7,12 @@ Usage:
 
 from collections import OrderedDict
 
-from .query import SPARQL_ENDPOINT
+from .config import config
 
 import requests
 
+
+SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 
 EXAMPLE_SPARQL_QUERY = """
 SELECT ?item1 ?item1Label ?item2 ?item2Label ?weight

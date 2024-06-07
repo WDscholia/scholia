@@ -49,7 +49,9 @@ from re import sub
 
 from six import u
 
-from .query import SPARQL_ENDPOINT
+from .config import config
+
+SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 
 
 WORK_ITEM_RSS = u("""
