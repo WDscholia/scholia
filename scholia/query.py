@@ -59,9 +59,12 @@ import requests
 
 from six import u
 
-SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
+from .config import config
 
-USER_AGENT = 'Scholia'
+
+SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
+
+USER_AGENT = config['requests'].get('user_agent')
 
 HEADERS = {'User-Agent': USER_AGENT}
 
