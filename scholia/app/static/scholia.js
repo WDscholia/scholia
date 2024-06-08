@@ -243,14 +243,17 @@ function sparqlDataToSimpleData(response) {
 
 function sparqlToDataTablePost(sparql, element, filename, options = {}) {
     sparqlToDataTablePost(
-        "https://query.wikidata.org/sparql", sparql, element, filename, options
+        "https://query.wikidata.org/sparql",
+        "https://query.wikidata.org/",
+        sparql, element, filename, options
     );
 }
 
 
-function sparqlToDataTablePost(url, sparql, element, filename, options = {}) {
+function sparqlToDataTablePost(url, editURL, sparql, element, filename, options = {}) {
     // Options: paging=
     if (!url) url = "https://query.wikidata.org/sparql";
+    if (!editURL) editURL = "https://query.wikidata.org/";
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
 
@@ -288,7 +291,7 @@ function sparqlToDataTablePost(url, sparql, element, filename, options = {}) {
         });
 
         $(element).append(
-            '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
+            '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
                 encodeURIComponent(sparql) +
                 '">Wikidata Query Service</a></span>' +
                 '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
@@ -302,20 +305,23 @@ function sparqlToDataTablePost(url, sparql, element, filename, options = {}) {
 
 function sparqlToDataTable(sparql, element, filename, options = {}) {
     sparqlToDataTablePost(
-        "https://query.wikidata.org/sparql", sparql, element, filename, options
+        "https://query.wikidata.org/sparql",
+        "https://query.wikidata.org/",
+        sparql, element, filename, options
     );
 }
 
 
-function sparqlToDataTable(url, sparql, element, filename, options = {}) {
+function sparqlToDataTable(url, editURL, sparql, element, filename, options = {}) {
     // Options: paging=true
     if (!url) url = "https://query.wikidata.org/sparql";
+    if (!editURL) editURL = "https://query.wikidata.org/";
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var url = url + "?query=" + encodeURIComponent(sparql) + '&format=json';
 
     const datatableFooter =
-        '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
+        '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
         encodeURIComponent(sparql) +
         '">Wikidata Query Service</a></span>' +
         '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +

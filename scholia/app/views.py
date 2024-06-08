@@ -111,7 +111,8 @@ def index_statistics():
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('index-statistics.html', sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('index-statistics.html', sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route("/" + l_pattern)
@@ -389,6 +390,7 @@ def show_author(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
     entities = wb_get_entities([q])
     name = entity_to_name(entities[q])
     if name:
@@ -396,7 +398,7 @@ def show_author(q):
     else:
         first_initial, last_name = '', ''
     return render_template('author.html', q=q, first_initial=first_initial,
-                           last_name=last_name, sparql_endpoint=ep))
+                           last_name=last_name, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/author/' + q_pattern + '/latest-works/rss')
@@ -432,7 +434,8 @@ def show_author_index():
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('author-index.html', sparql_endpoint=ep))
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('author-index.html', sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/author/random')
@@ -467,7 +470,8 @@ def show_author_use(q1, q2):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('author-use.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('author-use.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/authors/' + qs_pattern)
@@ -495,7 +499,8 @@ def show_authors(qs):
         return redirect(url_for('app.show_author', q=qs[0]), code=301)
     else:
         ep = config['query-server'].get('sparql_endpoint')
-        return render_template('authors.html', qs=qs, sparql_endpoint=ep)
+        editurl = config['query-server'].get('sparql_editurl')
+        return render_template('authors.html', qs=qs, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/award/' + q_pattern)
@@ -514,7 +519,8 @@ def show_award(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('award.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('award.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/award/')
@@ -528,7 +534,8 @@ def show_award_index():
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('award-index.html', sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('award-index.html', sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/cas/<cas>')
@@ -641,7 +648,8 @@ def show_catalogue(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('catalogue.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('catalogue.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/catalogue/')
@@ -673,7 +681,8 @@ def show_dataset(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('dataset.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('dataset.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/dataset/')
@@ -705,7 +714,8 @@ def show_dataset_export(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('dataset-export.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('dataset-export.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/clinical-trial/')
@@ -737,7 +747,8 @@ def show_clinical_trial(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('clinical-trial.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('clinical-trial.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/countries/' + qs_pattern)
@@ -757,7 +768,8 @@ def show_countries(qs):
     """
     qs = Q_PATTERN.findall(qs)
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('countries.html', qs=qs, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('countries.html', qs=qs, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/country/')
@@ -789,7 +801,8 @@ def show_country(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('country.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('country.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/country/' + q1_pattern + '/topic/' + q2_pattern)
@@ -810,7 +823,8 @@ def show_country_topic(q1, q2):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('country-topic.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('country-topic.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/disease/' + q_pattern)
@@ -829,7 +843,8 @@ def show_disease(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('disease.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('disease.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/disease/')
@@ -861,7 +876,8 @@ def redirect_doi(doi):
         q = qs[0]
         return redirect(url_for('app.show_work', q=q), code=302)
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('404-doi.html', doi=doi, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('404-doi.html', doi=doi, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/doi-prefix/<path:doi>')
@@ -880,7 +896,8 @@ def redirect_doi_prefix(doi):
         q = qs[0]
         return redirect(url_for('app.show_publisher', q=q), code=302)
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('404.html', doi=doi, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('404.html', doi=doi, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/event/' + q_pattern)
@@ -899,7 +916,8 @@ def show_event(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('event.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('event.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/event/')
@@ -931,7 +949,8 @@ def show_event_series(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('event-series.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('event-series.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/event-series/')
@@ -1026,7 +1045,8 @@ def redirect_inchikey(inchikey):
         q = qs[0]
         return redirect(url_for('app.show_chemical', q=q), code=302)
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('404-chemical.html', inchikey=inchikey, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('404-chemical.html', inchikey=inchikey, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/issn/<issn>')
@@ -1062,7 +1082,8 @@ def show_language(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('language.html', q=q, datetime=datetime, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('language.html', q=q, datetime=datetime, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/language')
@@ -1107,7 +1128,8 @@ def show_lexeme(lexeme):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('lexeme.html', lexeme=lexeme, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('lexeme.html', lexeme=lexeme, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/license/' + q_pattern)
@@ -1126,7 +1148,8 @@ def show_license(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('license.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('license.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/license/')
@@ -1171,7 +1194,8 @@ def show_location(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('location.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('location.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/location/' + q1_pattern + '/topic/' + q2_pattern)
@@ -1192,7 +1216,8 @@ def show_location_topic(q1, q2):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('location-topic.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('location-topic.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/mesh/<meshid>')
@@ -1418,7 +1443,8 @@ def show_ontology(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('ontology.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('ontology.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/organization/' + q_pattern)
@@ -1437,7 +1463,8 @@ def show_organization(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('organization.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('organization.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/organization/')
@@ -1493,7 +1520,8 @@ def show_organization_topic(q1, q2):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('organization-topic.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('organization-topic.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/organization/' + q1_pattern + '/use/' + q2_pattern)
@@ -1514,7 +1542,8 @@ def show_organization_use(q1, q2):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('organization-use.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('organization-use.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/organizations/' + qs_pattern)
@@ -1534,7 +1563,8 @@ def show_organizations(qs):
     """
     qs = Q_PATTERN.findall(qs)
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('organizations.html', qs=qs, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('organizations.html', qs=qs, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/printer/' + q_pattern)
@@ -1553,7 +1583,8 @@ def show_printer(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('printer.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('printer.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/printer/')
@@ -1585,7 +1616,8 @@ def show_protein(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('protein.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('protein.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/protein/')
@@ -1617,7 +1649,8 @@ def show_project(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('project.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('project.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/project/')
@@ -1693,7 +1726,8 @@ def show_gene(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('gene.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('gene.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/gene/')
@@ -1725,6 +1759,7 @@ def show_taxon(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
     return render_template('taxon.html', q=q)
 
 
@@ -1764,9 +1799,10 @@ def show_q_to_bibliography_templates():
     wikitext = q_to_bibliography_templates(q)
 
     ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
     return render_template('q-to-bibliography-templates.html',
                            q=q,
-                           wikitext=wikitext, sparql_endpoint=ep)
+                           wikitext=wikitext, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/software/' + q_pattern)
@@ -1785,7 +1821,8 @@ def show_software(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('software.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('software.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/software/')
@@ -1817,7 +1854,8 @@ def show_software_export(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('software-export.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('software-export.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/text-to-topics', methods=['POST', 'GET'])
@@ -1869,7 +1907,8 @@ def show_topic(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('topic.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('topic.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/topic/' + q_pattern + '/latest-works/rss')
@@ -1925,7 +1964,8 @@ def show_topic_use(q1, q2):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('topic-use.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('topic-use.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/topics/' + qs_pattern)
@@ -1953,7 +1993,8 @@ def show_topics(qs):
         return redirect(url_for('app.show_topic', q=qs[0]), code=301)
     else:
         ep = config['query-server'].get('sparql_endpoint')
-        return render_template('topics.html', qs=qs, sparql_endpoint=ep)
+        editurl = config['query-server'].get('sparql_editurl')
+        return render_template('topics.html', qs=qs, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/podcast/' + q_pattern)
@@ -1972,8 +2013,9 @@ def show_podcast(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
     return render_template(
-        'podcast.html', q=q, sparql_endpoint=ep)
+        'podcast.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/podcast-season/' + q_pattern)
@@ -1992,8 +2034,9 @@ def show_podcast_season(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
     return render_template(
-        'podcast-season.html', q=q, sparql_endpoint=ep)
+        'podcast-season.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/podcast-episode/' + q_pattern)
@@ -2012,8 +2055,9 @@ def show_podcast_episode(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
     return render_template(
-        'podcast-episode.html', q=q, sparql_endpoint=ep)
+        'podcast-episode.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/podcast/random')
@@ -2041,7 +2085,8 @@ def show_podcast_in_language(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('podcast-language.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('podcast-language.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/podcast/')
@@ -2075,6 +2120,7 @@ def show_chemical(q):
     entities = wb_get_entities([q])
     smiles = entity_to_smiles(entities[q])
     ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
     return render_template(
         'chemical.html',
         q=q, sparql_endpoint=ep,
@@ -2125,7 +2171,8 @@ def show_chemical_element(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('chemical-element.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('chemical-element.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/chemical-element/')
@@ -2159,6 +2206,7 @@ def show_chemical_class(q):
     entities = wb_get_entities([q])
     smiles = entity_to_smiles(entities[q])
     ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
     return render_template(
         'chemical-class.html',
         q=q, sparql_endpoint=ep,
@@ -2215,7 +2263,8 @@ def show_venue(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('venue.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('venue.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/venue/' + q_pattern + '/cito')
@@ -2254,7 +2303,8 @@ def show_venue_use(q1, q2):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('venue-use.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('venue-use.html', q1=q1, q2=q2, q=q1, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/work/' + q_pattern + '/cito')
@@ -2293,7 +2343,8 @@ def show_work_cito_intention(q, q2):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('work-cito-intention.html', q=q, q2=q2, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('work-cito-intention.html', q=q, q2=q2, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/work/' + q_pattern + '/export')
@@ -2312,7 +2363,8 @@ def show_work_export(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('work-export.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('work-export.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/work/random')
@@ -2345,7 +2397,8 @@ def show_cito(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('cito.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('cito.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/cito/')
@@ -2417,7 +2470,8 @@ def show_venues(qs):
     """
     qs = Q_PATTERN.findall(qs)
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('venues.html', qs=qs, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('venues.html', qs=qs, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/series/' + q_pattern)
@@ -2436,7 +2490,8 @@ def show_series(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('series.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('series.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/series/')
@@ -2468,7 +2523,8 @@ def show_complex(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('complex.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('complex.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/complex/')
@@ -2500,7 +2556,8 @@ def show_pathway(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('pathway.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('pathway.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/pathway/')
@@ -2527,7 +2584,8 @@ def show_publisher(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('publisher.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('publisher.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/publisher/')
@@ -2594,7 +2652,8 @@ def show_sponsor(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('sponsor.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('sponsor.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/sponsor/')
@@ -2648,7 +2707,8 @@ def show_use(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('use.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('use.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/use/')
@@ -2689,7 +2749,8 @@ def show_uses(qs):
         return redirect(url_for('app.show_use', q=qs[0]), code=301)
     else:
         ep = config['query-server'].get('sparql_endpoint')
-        return render_template('uses.html', qs=qs, sparql_endpoint=ep)
+        editurl = config['query-server'].get('sparql_editurl')
+        return render_template('uses.html', qs=qs, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/work/' + q_pattern)
@@ -2712,7 +2773,8 @@ def show_work(q):
     except Exception:
         dois = []
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('work.html', q=q, dois=dois, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('work.html', q=q, dois=dois, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/work/')
@@ -2745,7 +2807,8 @@ def show_works(qs):
     """
     qs = Q_PATTERN.findall(qs)
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('works.html', qs=qs, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('works.html', qs=qs, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/about')
@@ -2790,7 +2853,8 @@ def show_wikiproject(q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
-    return render_template('wikiproject.html', q=q, sparql_endpoint=ep)
+    editurl = config['query-server'].get('sparql_editurl')
+    return render_template('wikiproject.html', q=q, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 @main.route('/favicon.ico')
@@ -2818,11 +2882,12 @@ def show_aspect_missing(aspect, q):
 
     """
     ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
     try:
         return render_template('{aspect}-curation.html'.format(aspect=aspect),
-                               q=q, sparql_endpoint=ep)
+                               q=q, sparql_endpoint=ep, sparql_editURL=editurl)
     except TemplateNotFound:
-        return render_template('q_curation.html', q=q, aspect=aspect, sparql_endpoint=ep)
+        return render_template('q_curation.html', q=q, aspect=aspect, sparql_endpoint=ep, sparql_editURL=editurl)
 
 
 def page_not_found(e):
