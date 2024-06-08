@@ -29,6 +29,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
 from ..utils import (remove_special_characters_url, sanitize_q, string_to_list,
                      string_to_type)
 from ..wikipedia import q_to_bibliography_templates
+from ..config import config
 
 
 class RegexConverter(BaseConverter):
@@ -109,7 +110,7 @@ def index_statistics():
         Rederende HTML for main statistics page.
 
     """
-    return render_template('index-statistics.html')
+    return render_template('index-statistics.html', sparql_endpoint=config['query-server'].get('sparql_endpoint'))
 
 
 @main.route("/" + l_pattern)
