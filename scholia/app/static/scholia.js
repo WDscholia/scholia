@@ -208,13 +208,20 @@ function addReloadButton(element, callback) {
     }
 }
 
-function sparqlToResponse(sparql, doneCallback) {
-    var endpointUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
+function sparqlToResponse(endpointUrl, sparql, doneCallback) {
     var settings = {
         headers: { Accept: "application/sparql-results+json" },
         data: { query: sparql },
     };
     return $.ajax(endpointUrl, settings).then(doneCallback);
+}
+
+
+function sparqlToResponse(sparql, doneCallback) {
+    return sparqlToResponse(
+        "https://query.wikidata.org/bigdata/namespace/wdq/sparql",
+        sparql, doneCallback
+    );
 }
 
 
@@ -235,10 +242,17 @@ function sparqlDataToSimpleData(response) {
 
 
 function sparqlToDataTablePost(sparql, element, filename, options = {}) {
+    sparqlToDataTablePost(
+        "https://query.wikidata.org/sparql", sparql, element, filename, options
+    );
+}
+
+
+function sparqlToDataTablePost(url, sparql, element, filename, options = {}) {
     // Options: paging=
+    if (!url) url = "https://query.wikidata.org/sparql";
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
-    var url = "https://query.wikidata.org/sparql";
 
     $(element).html("<div class='loader'><div></div><div></div><div></div></div>");
 
@@ -287,11 +301,18 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
 
 
 function sparqlToDataTable(sparql, element, filename, options = {}) {
+    sparqlToDataTablePost(
+        "https://query.wikidata.org/sparql", sparql, element, filename, options
+    );
+}
+
+
+function sparqlToDataTable(url, sparql, element, filename, options = {}) {
     // Options: paging=true
+    if (!url) url = "https://query.wikidata.org/sparql";
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
-    var url = "https://query.wikidata.org/sparql?query=" +
-        encodeURIComponent(sparql) + '&format=json';
+    var url = url + "?query=" + encodeURIComponent(sparql) + '&format=json';
 
     const datatableFooter =
         '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
