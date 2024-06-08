@@ -443,13 +443,26 @@ function sparqlToDataTable(url, editURL, sparql, element, filename, options = {}
 
 
 function sparqlToIframe(sparql, element, filename) {
+    sparqlToIframe(
+        "https://query.wikidata.org/sparql",
+        "https://query.wikidata.org/",
+        "https://query.wikidata.org/embed.html#",
+        sparql, element, filename, options
+    );
+}
+
+
+function sparqlToIframe(url, editURL, embedURL, sparql, element, filename) {
     let $iframe = $(element);
-    var url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
+    if (!url) url = "https://query.wikidata.org/sparql";
+    if (!editURL) editURL = "https://query.wikidata.org/";
+    if (!embedURL) embedURL = "https://query.wikidata.org/embed.html#";
+
+    const wikidata_sparql = url + "?query=" + encodeURIComponent(sparql);
+    const wikidata_query = editURL + encodeURIComponent(sparql);
+    var url = embedURL + encodeURIComponent(sparql);
     $iframe.attr('data-src', url);
     $iframe.attr('loading', 'lazy');
-
-    const wikidata_sparql = "https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparql);
-    const wikidata_query = "https://query.wikidata.org/#" + encodeURIComponent(sparql);
 
     // Define the options for the Intersection Observer
     const options = {
