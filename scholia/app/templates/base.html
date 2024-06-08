@@ -478,7 +478,7 @@ askQuery("{{ panel }}", `# tool: scholia
     curationElement.classList.remove("d-none");
 
      // this query opens the Wikidata item as a different aspect
-     var endpointUrl = 'https://query.wikidata.org/sparql';
+     var endpointUrl = '{{ sparql_endpoint }}';
     if ("{{q2}}".length) {
         var query = `
     SELECT DISTINCT ?aspect 
@@ -555,7 +555,7 @@ askQuery("{{ panel }}", `# tool: scholia
         }
       }).then(function () {
         if ("{{q2}}".length) {
-          var endpointUrl = 'https://query.wikidata.org/sparql';
+          var endpointUrl = '{{ sparql_endpoint }}';
           var query = "SELECT DISTINCT ?aspect WHERE {"
           query += '{ [] wdt:P921 wd:{{ q }} . BIND("topic" AS ?aspect) }    }';
 
