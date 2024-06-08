@@ -22,7 +22,8 @@ options={{ options | tojson }});
 
 {% macro sparql_to_iframe(panel) -%}
 // {{ panel }} iframe
-sparqlToIframe(`# tool: scholia
+sparqlToIframe("{{ sparql_endpoint }}", "{{ sparql_editURL }}",
+"{{ sparql_embedURL }}", `# tool: scholia
 {% include aspect + '_' + panel + '.sparql' %}`,
 "#{{ panel }}-iframe", "{{ aspect }}_{{ panel }}.sparql");
 {%- endmacro %}

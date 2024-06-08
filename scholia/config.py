@@ -21,6 +21,7 @@ DEFAULTS = """
 [query-server]
 sparql_endpoint = https://query.wikidata.org/sparql
 sparql_editurl = https://query.wikidata.org/#
+sparql_embedurl = https://query.wikidata.org/embed.html#
 
 [requests]
 user_agent = Scholia
