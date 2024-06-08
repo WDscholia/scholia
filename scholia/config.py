@@ -20,6 +20,7 @@ CONFIG_FILENAMES = [
 DEFAULTS = """
 [query-server]
 sparql_endpoint = https://query.wikidata.org/sparql
+sparql_editurl = https://query.wikidata.org/#
 
 [requests]
 user_agent = Scholia

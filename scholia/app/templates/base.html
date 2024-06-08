@@ -2,7 +2,7 @@
 
 {% macro sparql_to_table_post(panel, options={}) -%}
 // {{ panel }} table
-sparqlToDataTablePost("{{ sparql_endpoint }}",
+sparqlToDataTablePost("{{ sparql_endpoint }}", "{{ sparql_editURL }}",
 `# tool: scholia
 {% include aspect + '_' + panel + '.sparql' %}
 `,
@@ -12,7 +12,7 @@ options={{ options | tojson }});
 
 {% macro sparql_to_table(panel, options={}) -%}
 // {{ panel }} table
-sparqlToDataTable("{{ sparql_endpoint }}",
+sparqlToDataTable("{{ sparql_endpoint }}", "{{ sparql_editURL }}",
 `# tool: scholia
 {% include aspect + '_' + panel + '.sparql' %}
 `,
