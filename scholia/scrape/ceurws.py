@@ -355,15 +355,19 @@ def proceedings_url_to_proceedings(url, return_tree=False):
         if len(acronym_elements) == 1:
             proceedings['shortname'] = acronym_elements[0].text
 
-    proceedings['urn'] = \
-        tree.xpath("//span[@class='CEURURN']")[0].text
+    urn_elements = tree.xpath("//span[@class='CEURURN']")
+    if len(urn_elements) == 1:
+        proceedings['urn'] = urn_elements[0].text
 
-    proceedings['title'] = re.sub(
-        r'\s+', ' ',
-        tree.xpath("//span[@class='CEURFULLTITLE']")[0].text).strip()
+    title_elements = tree.xpath("//span[@class='CEURFULLTITLE']")
+    if len(title_elements) == 1:
+        proceedings['title'] = re.sub(
+            r'\s+', ' ',
+            title_elements[0].text).strip()
 
-    proceedings['date'] = \
-        tree.xpath("//span[@class='CEURPUBDATE']")[0].text
+    date_elements = tree.xpath("//span[@class='CEURPUBDATE']")
+    if len(date_elements) == 1:
+        proceedings['date'] = date_elements[0].text
 
     proceedings['published_in_q'] = 'Q27230297'
 
