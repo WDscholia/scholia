@@ -371,6 +371,23 @@ def show_id_to_quickstatements():
     )
 
 
+@main.route('/check-crossref')
+def show_check_crossref():
+    """Return HTML rendering for Check Crossref tool.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML.
+
+    See Also
+    --------
+    show_arxiv.
+
+    """
+    return render_template('check-crossref.html')
+
+
 @main.route('/author/' + q_pattern)
 def show_author(q):
     """Return HTML rendering for specific author.
