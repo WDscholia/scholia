@@ -1,4 +1,4 @@
-# title: Citation distribution for a venue
+#title: Citation distribution for a venue
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
