@@ -151,7 +151,7 @@ Researcher with a published record.
         resolver: 'custom',
         events: {
             search: debounce((searchTerm, callback) => {
-                var url = "https://query.wikidata.org/sparql";
+                var url = "{{ sparql_endpoint }}";
                 var settings = {
                     data: {
                     query: `
@@ -211,7 +211,7 @@ Researcher with a published record.
         multiple: true,
         ajax: {
             delay: 300,
-            url: "https://query.wikidata.org/sparql",
+            url: "{{ sparql_endpoint }}",
             data: function (params) {
                 let search_author = params.term
                 return {

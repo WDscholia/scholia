@@ -30,7 +30,7 @@ from os.path import exists, expanduser, join
 
 from six.moves import cPickle as pickle
 
-from .query import SPARQL_ENDPOINT
+from .config import config
 
 import re
 
@@ -38,6 +38,8 @@ import json
 
 import requests
 
+
+SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 
 TOPIC_LABELS_SPARQL = """
 SELECT ?topic ?topic_label

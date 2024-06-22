@@ -47,9 +47,14 @@ from lxml import etree
 
 import requests
 
+from ..config import config
 from ..qs import paper_to_quickstatements
 from ..utils import escape_string
-from ..query import SPARQL_ENDPOINT as WDQS_URL
+
+
+SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
+
+USER_AGENT = config['requests'].get('user_agent')
 
 PAPER_TO_Q_QUERY = u("""
 SELECT ?paper WHERE {{
@@ -63,7 +68,6 @@ SELECT ?paper WHERE {{
 
 URL_BASE = "https://papers.nips.cc"
 
-USER_AGENT = "Scholia"
 
 # Year should be the nominal year, - not the year of publication
 YEAR_TO_Q = {
@@ -146,9 +150,9 @@ def paper_to_q(paper):
         label=title, title=title,
         url=paper['url'], full_text_url=paper['full_text_url'])
 
-    response = requests.get(
-        WDQS_URL, params={'query': query, 'format': 'json'},
-        headers={'User-Agent': USER_AGENT})
+    response = requests.get(SPARQL_ENDPOINT,
+                            params={'query': query, 'format': 'json'},
+                            headers={'User-Agent': USER_AGENT})
     if not response.ok:
         raise Exception("Wikidata API response error: {}".format(
             response.status_code))

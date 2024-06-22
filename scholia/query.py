@@ -59,9 +59,12 @@ import requests
 
 from six import u
 
-SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
+from .config import config
 
-USER_AGENT = 'Scholia'
+
+SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
+
+USER_AGENT = config['requests'].get('user_agent')
 
 HEADERS = {'User-Agent': USER_AGENT}
 
@@ -800,7 +803,7 @@ def omim_to_qs(omimID):
     query = 'select ?disease where {{ ?disease wdt:P492 "{omimID}" }}'.format(
         omimID=escape_string(omimID))
 
-    url = 'https://query.wikidata.org/sparql'
+    url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     response = requests.get(url, params=params, headers=HEADERS)
     data = response.json()
