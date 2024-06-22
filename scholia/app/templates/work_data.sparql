@@ -207,7 +207,7 @@ WHERE {
   {
     SELECT (COUNT(DISTINCT ?citationStatement) AS ?value) ?order ?description ?valueUrl WHERE {
       VALUES ?work { wd:{{ q }} }
-      VALUES ?intention { wd:Q96472102 wd:Q101149476 }
+      VALUES ?intention { wd:Q96472102 wd:Q101149476 wd:Q96471820 }
       ?work ^ps:P2860 ?citationStatement . ?citationStatement pq:P3712 ?intention .
       BIND(20 AS ?order)
       BIND("Data or method used by" AS ?description)
@@ -218,7 +218,7 @@ WHERE {
   {
     SELECT (COUNT(DISTINCT ?citationStatement) AS ?value) ?order ?description ?valueUrl WHERE {
       VALUES ?work { wd:{{ q }} }
-      VALUES ?intention { wd:Q107687829 wd:Q107710355 }
+      VALUES ?intention { wd:Q107687829 wd:Q107710355 wd:Q117121923 wd:Q117121932 }
       ?work ^ps:P2860 ?citationStatement . ?citationStatement pq:P3712 ?intention .
       BIND(21 AS ?order)
       BIND("Disagreed with by" AS ?description)
