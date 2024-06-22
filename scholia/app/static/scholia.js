@@ -208,7 +208,7 @@ function addReloadButton(element, callback) {
     }
 }
 
-function sparqlToResponse(endpointUrl, sparql, doneCallback) {
+function sparqlToResponse2(endpointUrl, sparql, doneCallback) {
     var settings = {
         headers: { Accept: "application/sparql-results+json" },
         data: { query: sparql },
@@ -218,7 +218,7 @@ function sparqlToResponse(endpointUrl, sparql, doneCallback) {
 
 
 function sparqlToResponse(sparql, doneCallback) {
-    return sparqlToResponse(
+    return sparqlToResponse2(
         "https://query.wikidata.org/bigdata/namespace/wdq/sparql",
         sparql, doneCallback
     );
@@ -242,7 +242,7 @@ function sparqlDataToSimpleData(response) {
 
 
 function sparqlToDataTablePost(sparql, element, filename, options = {}) {
-    sparqlToDataTablePost(
+    sparqlToDataTablePost2(
         "https://query.wikidata.org/sparql",
         "https://query.wikidata.org/",
         sparql, element, filename, options
@@ -250,7 +250,7 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
 }
 
 
-function sparqlToDataTablePost(url, editURL, sparql, element, filename, options = {}) {
+function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options = {}) {
     // Options: paging=
     if (!url) url = "https://query.wikidata.org/sparql";
     if (!editURL) editURL = "https://query.wikidata.org/";
@@ -304,7 +304,7 @@ function sparqlToDataTablePost(url, editURL, sparql, element, filename, options 
 
 
 function sparqlToDataTable(sparql, element, filename, options = {}) {
-    sparqlToDataTablePost(
+    sparqlToDataTablePost2(
         "https://query.wikidata.org/sparql",
         "https://query.wikidata.org/",
         sparql, element, filename, options
@@ -312,7 +312,7 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 }
 
 
-function sparqlToDataTable(url, editURL, sparql, element, filename, options = {}) {
+function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {}) {
     // Options: paging=true
     if (!url) url = "https://query.wikidata.org/sparql";
     if (!editURL) editURL = "https://query.wikidata.org/";
@@ -443,7 +443,7 @@ function sparqlToDataTable(url, editURL, sparql, element, filename, options = {}
 
 
 function sparqlToIframe(sparql, element, filename) {
-    sparqlToIframe(
+    sparqlToIframe2(
         "https://query.wikidata.org/sparql",
         "https://query.wikidata.org/",
         "https://query.wikidata.org/embed.html#",
@@ -452,7 +452,7 @@ function sparqlToIframe(sparql, element, filename) {
 }
 
 
-function sparqlToIframe(url, editURL, embedURL, sparql, element, filename) {
+function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
     let $iframe = $(element);
     if (!url) url = "https://query.wikidata.org/sparql";
     if (!editURL) editURL = "https://query.wikidata.org/";
