@@ -1,0 +1,10 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT ?pathway ?pathwayLabel (CONCAT("/pathway/", SUBSTR(STR(?pathway), 32)) AS ?pathwayUrl) WHERE {
+  VALUES ?chemical { target: }
+  ?chemical wdt:P361 ?pathway.
+  ?pathway wdt:P527 ?chemical.
+  ?pathway wdt:P31 wd:Q2996394.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+} ORDER BY ASC(?pathwayLabel)
+  LIMIT 250
