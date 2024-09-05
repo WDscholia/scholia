@@ -208,13 +208,20 @@ function addReloadButton(element, callback) {
     }
 }
 
-function sparqlToResponse(sparql, doneCallback) {
-    var endpointUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
+function sparqlToResponse2(endpointUrl, sparql, doneCallback) {
     var settings = {
         headers: { Accept: "application/sparql-results+json" },
         data: { query: sparql },
     };
     return $.ajax(endpointUrl, settings).then(doneCallback);
+}
+
+
+function sparqlToResponse(sparql, doneCallback) {
+    return sparqlToResponse2(
+        "https://query.wikidata.org/bigdata/namespace/wdq/sparql",
+        sparql, doneCallback
+    );
 }
 
 
@@ -235,10 +242,20 @@ function sparqlDataToSimpleData(response) {
 
 
 function sparqlToDataTablePost(sparql, element, filename, options = {}) {
+    sparqlToDataTablePost2(
+        "https://query.wikidata.org/sparql",
+        "https://query.wikidata.org/",
+        sparql, element, filename, options
+    );
+}
+
+
+function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options = {}) {
     // Options: paging=
+    if (!url) url = "https://query.wikidata.org/sparql";
+    if (!editURL) editURL = "https://query.wikidata.org/";
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
-    var url = "https://query.wikidata.org/sparql";
 
     $(element).html("<div class='loader'><div></div><div></div><div></div></div>");
 
@@ -274,7 +291,7 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
         });
 
         $(element).append(
-            '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
+            '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
                 encodeURIComponent(sparql) +
                 '">Wikidata Query Service</a></span>' +
                 '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
@@ -287,14 +304,24 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
 
 
 function sparqlToDataTable(sparql, element, filename, options = {}) {
+    sparqlToDataTablePost2(
+        "https://query.wikidata.org/sparql",
+        "https://query.wikidata.org/",
+        sparql, element, filename, options
+    );
+}
+
+
+function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {}) {
     // Options: paging=true
+    if (!url) url = "https://query.wikidata.org/sparql";
+    if (!editURL) editURL = "https://query.wikidata.org/";
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
-    var url = "https://query.wikidata.org/sparql?query=" +
-        encodeURIComponent(sparql) + '&format=json';
+    var url = url + "?query=" + encodeURIComponent(sparql) + '&format=json';
 
     const datatableFooter =
-        '<caption><span style="float:left; font-size:smaller;"><a href="https://query.wikidata.org/#' +
+        '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
         encodeURIComponent(sparql) +
         '">Wikidata Query Service</a></span>' +
         '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
@@ -416,13 +443,26 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 
 
 function sparqlToIframe(sparql, element, filename) {
+    sparqlToIframe2(
+        "https://query.wikidata.org/sparql",
+        "https://query.wikidata.org/",
+        "https://query.wikidata.org/embed.html#",
+        sparql, element, filename, options
+    );
+}
+
+
+function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
     let $iframe = $(element);
-    var url = "https://query.wikidata.org/embed.html#" + encodeURIComponent(sparql);
+    if (!url) url = "https://query.wikidata.org/sparql";
+    if (!editURL) editURL = "https://query.wikidata.org/";
+    if (!embedURL) embedURL = "https://query.wikidata.org/embed.html#";
+
+    const wikidata_sparql = url + "?query=" + encodeURIComponent(sparql);
+    const wikidata_query = editURL + encodeURIComponent(sparql);
+    var url = embedURL + encodeURIComponent(sparql);
     $iframe.attr('data-src', url);
     $iframe.attr('loading', 'lazy');
-
-    const wikidata_sparql = "https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparql);
-    const wikidata_query = "https://query.wikidata.org/#" + encodeURIComponent(sparql);
 
     // Define the options for the Intersection Observer
     const options = {
