@@ -94,5 +94,15 @@ WHERE {
     BIND(CONCAT("🏆 ",?award_label) AS ?label)
     ?award_statement pq:P585 ?beginning .
   }
-
+  UNION
+  {
+    target: wdt:P569 ?beginning .
+    BIND(CONCAT("👶 born ") AS ?label) .
+  }
+  UNION
+  {
+    target: wdt:P570 ?beginning .
+    BIND(CONCAT("💀 died") AS ?label) .
+  }
+			    
 } 
