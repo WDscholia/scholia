@@ -102,7 +102,7 @@ WHERE {
   UNION
   {
     target: wdt:P570 ?beginning .
-    BIND(CONCAT("💀 died") AS ?label) .
+    BIND(CONCAT("🥀 died") AS ?label) .
   }
 			    
 } 
