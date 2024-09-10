@@ -110,7 +110,8 @@ def q_to_bibliography_templates(q):
     query = BIBLIOGRAPHY_SPARQL_QUERY.format(q=q)
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    headers = {'User-Agent': config['requests'].get('user_agent')}
+    response = requests.get(url, params=params, headers=headers)
     data = response.json()
 
     wikitext = ('<!-- Generated with scholia.wikipedia '

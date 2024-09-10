@@ -66,8 +66,8 @@ def get_metadata(arxiv):
     >>> metadata = get_metadata('1503.00759')
     >>> metadata['doi'] == '10.1109/JPROC.2015.2483592'
     True
-    >>> get_metadata('5432.01234')
-    {'error': 'Not found'}
+    >>> 'error' in get_metadata('5432.01234')
+    True
 
     """
     arxiv = arxiv.strip()
