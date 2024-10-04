@@ -1,9 +1,240 @@
-<h2 id="check-crossref">Check Crossref for new papers</h2>
+{% extends "base.html" %}
 
-<p>If you think that Wikidata is missing recent papers published on this topic, you can click the button below to check
-  the 20 most recent papers in Crossref. You will be redirected to the <a
-    href="/id-to-quickstatements">Identifier to Quickstatements</a> tool where you can see the presence of these in
-  Wikidata and have the opportunity to create these items in Wikidata using <a
-    href="https://www.wikidata.org/wiki/Help:QuickStatements">QuickStatements</a>.</p>
+{% block page_content %}
 
-<button type="button" class="btn btn-primary mx-auto d-block" id="check-crossref-button">Loading...</button>
+<h1>Check Crossref</h1>
+
+<p>Enter a topic to search for papers in Crossref and check for their presence in Wikidata.</p>
+
+<form id="form" class="form-horizontal mb-3">
+  <div class="input-group">
+    <input type="text" class="form-control" placeholder="Search term" id="search-term" />
+    <span class="input-group-append">
+      <button class="btn btn-primary" type="button" id="submit">
+        Submit
+      </button>
+    </span>
+  </div>
+
+  <h3 class="py-3">Options</h3>
+
+  <div class="form-group row">
+    <label class="col-md-3 control-label" for="type">Type</label>
+    <div class="col-md-9">
+      <select id="type" class="form-control">
+        <option value="book-chapter">Book Chapter</option>
+        <option value="book-section">Book Section</option>
+        <option value="book-series">Book Series</option>
+        <option value="book-set">Book Set</option>
+        <option value="book-track">Book Track</option>
+        <option value="book">Book</option>
+        <option value="component">Component</option>
+        <option value="database">Database</option>
+        <option value="dataset">Dataset</option>
+        <option value="dissertation">Dissertation</option>
+        <option value="edited-book">Edited Book</option>
+        <option value="grant">Grant</option>
+        <option value="journal-article" selected>Journal Article</option>
+        <option value="journal-issue">Journal Issue</option>
+        <option value="journal-volume">Journal Volume</option>
+        <option value="journal">Journal</option>
+        <option value="monograph">Monograph</option>
+        <option value="other">Other</option>
+        <option value="book-part">Part</option>
+        <option value="peer-review">Peer Review</option>
+        <option value="posted-content">Posted Content</option>
+        <option value="proceedings-article">Proceedings Article</option>
+        <option value="proceedings-series">Proceedings Series</option>
+        <option value="proceedings">Proceedings</option>
+        <option value="reference-book">Reference Book</option>
+        <option value="reference-entry">Reference Entry</option>
+        <option value="report-component">Report Component</option>
+        <option value="report-series">Report Series</option>
+        <option value="report">Report</option>
+        <option value="standard">Standard</option>
+      </select>
+    </div>
+  </div>
+
+
+  <div class="form-group row">
+    <label class="col-md-3 control-label" for="until">Published until</label>
+    <div class="col-md-9">
+      <input class="form-control" type="date" id="until" />
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-md-3 control-label" for="order">Order</label>
+    <div class="col-md-9">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" id="latest" value="latest" name="order" checked>
+        <label class="form-check-label" for="latest">Latest</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" id="earliest" value="earliest" name="order">
+        <label class="form-check-label" for="earliest">Earliest</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" id="relevance" value="relevance" name="order">
+        <label class="form-check-label" for="relevance">Relevance</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-md-3 control-label" for="rows">Number of results</label>
+    <div class="col-md-9">
+      <input id="rows" type="number" placeholder="20" class="form-control input-md">
+    </div>
+  </div>
+</form>
+
+<details class="mb-3">
+  <summary>
+    <h3 class="d-inline-block">Advanced</h3>
+  </summary>
+
+  <p>This is the query string which is used to check the Crossref and can be edited directly. For help, see the <a
+      href="https://api.crossref.org/swagger-ui/index.html#/Works/get_works">API documentation</a>. Note that using the
+    form inputs above will clear any edits you have manually made.</p>
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text" id="inputGroupPrepend">/works?</span>
+    </div>
+    <textarea rows="1" class="form-control" id="query_string"></textarea>
+  </div>
+</details>
+
+<a>
+  <button class="btn btn-secondary d-block ml-auto" type="button" id="test-query">Test query</button>
+</a>
+
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script type="text/javascript">
+  const submit_button = document.getElementById("submit")
+  const test_query_button = document.getElementById("test-query")
+
+  function update_query_string() {
+    // Changing the form updates the query string in the advanced section which is
+    // the query string which is ultimately used to check crossref
+    // User validation not required as API calls are performed locally
+    const params = {}
+    const search_term = document.getElementById("search-term").value
+    if (search_term) {
+      params["query"] = search_term
+    }
+
+    const type = document.getElementById("type").value
+    if (type) {
+      params["filter"] = "type:" + type
+    }
+
+    const until = document.getElementById("until").value
+    if (until) {
+      if ("filter" in params) {
+        params["filter"] += ",until-issued-date:" + until
+      }
+      else {
+        params["filter"] = "until-issued-date:" + until
+      }
+    }
+
+    const rows = document.getElementById("rows").value
+    if (rows) {
+      params["rows"] = rows
+    } else {
+      params["rows"] = 20
+    }
+
+    const order = document.querySelector("input[name=order]:checked").value
+    if (order === "relevance") {
+      params["sort"] = "relevance"
+      params["order"] = "desc"
+    } else if (order === "latest") {
+      params["sort"] = "issued"
+      params["order"] = "desc"
+    } else if (order === "earliest") {
+      params["sort"] = "issued"
+      params["order"] = "asc"
+    }
+
+    // Create a URLSearchParams object to construct the query parameters
+    const searchParams = new URLSearchParams();
+
+    // Loop through the dictionary and add each key-value pair to the searchParams
+    for (const [key, value] of Object.entries(params)) {
+      searchParams.append(key, value);
+    }
+
+    // Construct the final URL by appending the search parameters
+    document.getElementById("query_string").value = decodeURIComponent(searchParams.toString())
+
+    const url = `https://api.crossref.org/works/?${searchParams.toString()}`;
+    test_query_button.parentNode.href = url
+  }
+
+  function get_dois_from_crossref() {
+    // cribbed from q_curation.html. Maybe eventually worth refactoring
+    let query_string = "select=DOI&" + document.getElementById("query_string").value
+    // on q_curation.html we need to URIencode the query string but here it breaks
+    // the ability to select number of rows?
+    const url = `https://api.crossref.org/works/?${query_string}`;
+    const error_message = "The API failed which could be due to a problem with your connection or with the upstream server. If the issue persists <a href='https://github.com/WDscholia/scholia/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=''>submit a bug report on GitHub</a>"
+
+    console.log(url)
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data['status'] == 'ok') {
+          if (data["message"]["total-results"] > 0) {
+            items = data.message?.items
+            if (items) {
+              dois = items.map(x => x.DOI).join(" ");
+              window.location.href = "/id-to-quickstatements?query=" + dois;
+            }
+          } else {
+            submit_button.insertAdjacentHTML('afterend', `<div class="alert alert-secondary" role="alert">No results returned for ${data.message.query['status-terms']}</div>`);
+            submit_button.innerHTML = "Submit";
+          }
+        } else {
+          console.error(`API status was ${data.status}`)
+          console.error(data)
+          submit_button.insertAdjacentHTML('afterend', `<div class="alert alert-warning" role="alert">${error_message}</div>`);
+          submit_button.innerHTML = "Submit";
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        submit_button.insertAdjacentHTML('afterend', `<div class="alert alert-warning" role="alert">${error_message}</div>`);
+        submit_button.innerHTML = "Submit";
+      });
+  }
+
+
+  document.querySelector('input[type="date"]').valueAsDate = new Date();
+
+  const inputs = document.querySelectorAll("#form input,select");
+  for (const input of inputs) {
+    input.addEventListener("input", () => { update_query_string() })
+  }
+
+  submit_button.addEventListener("click", () => {
+    submit_button.innerHTML = "Loading...";
+    get_dois_from_crossref()
+  })
+
+  const query_string_input = document.getElementById("query_string")
+  query_string_input.addEventListener("input", () => {
+    let input = query_string_input.value
+    const url = `https://api.crossref.org/works/?${encodeURIComponent(input)}`;
+    test_query_button.parentNode.href = url
+  })
+
+  update_query_string()
+</script>
+{% endblock %}
