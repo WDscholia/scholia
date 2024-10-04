@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: Articles in a specific venue citing retracted articles
+#title: Articles in a specific venue citing retracted articles
 SELECT DISTINCT
   ?retracted_work ?retracted_workLabel
   ?date
