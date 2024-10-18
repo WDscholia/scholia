@@ -10,6 +10,6 @@ SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) A
       ?taxonStatement prov:wasDerivedFrom/pr:P248 ?source .
       OPTIONAL { ?source wdt:P356 ?doi . }
     }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } ORDER BY ASC(?taxonLabel)
   LIMIT 250

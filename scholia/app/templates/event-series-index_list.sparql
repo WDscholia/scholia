@@ -14,6 +14,6 @@ WITH {
 WHERE {
   INCLUDE %events
   OPTIONAL { ?event_series wdt:P1813 ?short_name }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,fr". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,fr". }
 }
 ORDER BY DESC(?events)

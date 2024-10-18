@@ -29,7 +29,7 @@ WHERE {
   OPTIONAL { ?author wdt:P496 ?orcid . }
   
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)
 LIMIT 100

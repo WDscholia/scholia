@@ -8,6 +8,6 @@ SELECT ?intention ?intentionLabel (COUNT(DISTINCT ?citingArticle) AS ?count) WHE
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?CITEDARTICLE .
   ?intention wdt:P31 wd:Q96471816 .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } GROUP BY ?intention ?intentionLabel
   ORDER BY DESC(?count)

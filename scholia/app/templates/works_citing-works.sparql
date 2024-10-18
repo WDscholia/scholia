@@ -21,7 +21,7 @@ WHERE {
     BIND(xsd:date(?datetimes) AS ?dates)
   }
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
   }
 GROUP BY ?count ?citing_work ?citing_workLabel
 ORDER BY DESC(?count) DESC(?date)

@@ -6,6 +6,6 @@ SELECT (COUNT(DISTINCT ?citingArticle) AS ?count)
   ?citingArticle p:P2860 ?citationStatement ;
                  wdt:P1433 ?journal .
   ?citationStatement pq:P3712 ?INTENTION .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } GROUP BY ?journal ?journalLabel
   ORDER BY DESC(?count)

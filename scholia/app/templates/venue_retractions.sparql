@@ -8,7 +8,7 @@ SELECT DISTINCT ?work ?workLabel ?doi (COUNT(DISTINCT ?citing) AS ?citations) WH
   { ?work wdt:P5824 [] . }
   OPTIONAL { ?citing wdt:P2860 ?work . }
   ?work wdt:P1433 target: ; wdt:P356 ?doi .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } GROUP BY ?work ?workLabel ?doi
   ORDER BY DESC(?citations)
   LIMIT 100

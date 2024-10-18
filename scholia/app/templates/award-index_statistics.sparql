@@ -25,6 +25,6 @@ WHERE {
       (2000 2000 wd:Q10578722 "Fictive Award Label for axis")
     }
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 } 
 ORDER BY DESC(?males) DESC(?female)

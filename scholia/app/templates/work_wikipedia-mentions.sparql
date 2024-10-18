@@ -84,5 +84,5 @@ WHERE {
   }
   hint:Prior hint:runFirst "true" .
   BIND(CONCAT(?title_, "&nbsp;↗") AS ?title)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 } 

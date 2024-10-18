@@ -17,7 +17,7 @@ WITH {
 } AS %RESULTS {
   INCLUDE %RESULTS
   BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?idLit))) AS ?idUrls).
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 GROUP BY ?Structural_identifier ?Structural_identifierLabel ?idLit
 ORDER BY ASC(?ID_TypeLabel)

@@ -16,7 +16,7 @@ WHERE {
   BIND(xsd:integer(?code) AS ?number)
 
   # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,es,fr,jp,nl,no,ru,sv,zh". }
 }
 ORDER BY ?number ?code
 LIMIT 1000

@@ -16,7 +16,7 @@ WITH {
 } AS %intentions
 WHERE {
   INCLUDE %intentions
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 GROUP BY ?intention ?intentionLabel ?count ?example_work_for_intention ?example_work_for_intentionLabel
 ORDER BY DESC(?count)

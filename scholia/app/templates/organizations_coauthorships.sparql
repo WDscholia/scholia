@@ -9,7 +9,7 @@ SELECT DISTINCT ?author1 ?author1Label ?author2 ?author2Label ?work ?workLabel W
   ?author2 ?v2 ?organization2 . 
   ?work wdt:P50 ?author1, ?author2 .  
   FILTER (STR(?author1) < STR(?author2) && ?organization1 != ?organization2)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY ?author1Label
 LIMIT 500

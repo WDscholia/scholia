@@ -15,6 +15,6 @@ WHERE {
   }
   OPTIONAL { ?trial wdt:P4844 ?intervention }
   OPTIONAL { ?trial wdt:P859 ?sponsor }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,pl,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?starttime)

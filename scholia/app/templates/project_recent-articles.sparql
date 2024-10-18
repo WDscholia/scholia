@@ -47,7 +47,7 @@ WHERE {
   INCLUDE %result
   BIND(xsd:date(?datetime) AS ?date)
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
   }
 }
 ORDER BY DESC(?date)

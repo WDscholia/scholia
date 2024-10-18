@@ -11,7 +11,7 @@ SELECT
   OPTIONAL {
     ?rank rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 GROUP BY ?parent ?parentLabel ?parentDescription
 ORDER BY ?distance

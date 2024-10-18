@@ -13,7 +13,7 @@ SELECT DISTINCT ?datetime ?venue ?venueLabel WHERE {
   ?venue wdt:P571 ?datetime.
   
   # Label the journal
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?datetime)
 LIMIT 50
