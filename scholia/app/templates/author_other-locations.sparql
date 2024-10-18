@@ -7,7 +7,7 @@ WHERE {
   ?item p:P159/pq:P625 | wdt:P276*/wdt:P625 ?geo .
   ?property_item wikibase:directClaim ?property .
   OPTIONAL { ?item wdt:P18 ?image . } 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
   
   # No automatic labeling on the property, - for some reason.
   ?property_item rdfs:label ?property_item_label . FILTER(LANG(?property_item_label) = 'en')

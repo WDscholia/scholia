@@ -29,6 +29,6 @@ WITH {
 } AS %results
 WHERE {
   INCLUDE %results
-  service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+  service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?number_of_citing_works) 

@@ -36,6 +36,6 @@ WITH {
 WHERE {
   INCLUDE %researchers_and_number_of_works
           
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,nl,no,ru,sv,zh" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,nl,no,ru,sv,zh" . } 
 }
 ORDER BY DESC(?works)

@@ -28,7 +28,7 @@ WHERE {
     ?work wdt:P577 ?publication_datetime .
     BIND(xsd:date(?publication_datetime) AS ?publication_date_)
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 GROUP BY ?count ?work ?workLabel ?uses ?usesUrl
 ORDER BY DESC(?count) DESC(?publication_date)

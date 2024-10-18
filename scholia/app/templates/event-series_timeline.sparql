@@ -43,6 +43,6 @@ WHERE {
           
   OPTIONAL { ?event wdt:P18 ?image . }
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" .
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
   }
 }

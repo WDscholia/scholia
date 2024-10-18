@@ -94,6 +94,6 @@ WHERE {
     BIND(IF(BOUND(?track), CONCAT(STR(?acceptance_rate * 100), " % (", ?track, ")"), CONCAT(STR(?acceptance_rate * 100), " %")) AS ?value)
   }
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } 
 ORDER BY ?order

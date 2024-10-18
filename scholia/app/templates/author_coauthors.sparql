@@ -36,5 +36,5 @@ WITH {
 WHERE {
   INCLUDE %result
   # Label the results 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

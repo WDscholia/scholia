@@ -33,7 +33,7 @@ WHERE {
       BIND(YEAR(?datetime) AS ?years)    
     }
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
   }
 GROUP BY ?event ?year ?eventLabel ?proceedings ?proceedingsLabel
 ORDER BY DESC(?year)

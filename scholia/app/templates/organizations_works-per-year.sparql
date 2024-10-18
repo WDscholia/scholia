@@ -12,7 +12,7 @@ WHERE {
     }
     GROUP BY ?work ?year ?organization
   } 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 GROUP BY ?year ?organization ?organizationLabel
 ORDER BY ?year

@@ -5,6 +5,6 @@ SELECT DISTINCT ?matrix ?matrixLabel ?taxon ?taxonLabel (CONCAT("/taxon/", SUBST
   ?chemical wdt:P361 ?matrix.
   ?matrix (wdt:P279*/wdt:P1582) ?taxon .
   ?matrix wdt:P527 ?chemical.
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } ORDER BY ASC(?taxonLabel)
   LIMIT 250

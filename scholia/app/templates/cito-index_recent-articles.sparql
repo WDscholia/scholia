@@ -4,6 +4,6 @@ select distinct ?date ?work ?workLabel ?venue ?venueLabel where {
   BIND(xsd:date(?dates) AS ?date)
   ?work wdt:P31 wd:Q109229154 . bind("explicit" as ?type_)
   ?work wdt:P1433 ?venue .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } ORDER BY DESC(?date)
   LIMIT 50

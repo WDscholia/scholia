@@ -37,5 +37,5 @@ OPTIONAL {
   }
   BIND(IRI(REPLACE(?PCformatterurl, '\\\\$1', str(?PubChem_CID))) AS ?PubChem_CIDUrl).
 }
-SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

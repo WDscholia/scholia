@@ -14,6 +14,6 @@ WITH {
     LIMIT 50
 } AS %EPISODES WHERE {
   INCLUDE %EPISODES
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } GROUP BY ?publication_date ?episode ?episodeLabel
 ORDER BY DESC(?publication_date)

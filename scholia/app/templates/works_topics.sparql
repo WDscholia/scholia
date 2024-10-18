@@ -17,6 +17,6 @@ WITH {
 WHERE {
   INCLUDE %results
   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
   }
 ORDER BY DESC(?count)

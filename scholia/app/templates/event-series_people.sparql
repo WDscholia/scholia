@@ -64,7 +64,7 @@ WITH {
 } AS %results
 WHERE {
   INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
 ORDER BY DESC(?number_of_roles)
 LIMIT 500
