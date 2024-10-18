@@ -30,6 +30,7 @@ from ..utils import (remove_special_characters_url, sanitize_q, string_to_list,
                      string_to_type)
 from ..wikipedia import q_to_bibliography_templates
 from ..config import config
+from ..snap import get_snapquery_records
 
 
 class RegexConverter(BaseConverter):
@@ -400,9 +401,19 @@ def show_author(q):
         first_initial, last_name = name[0], name.split()[-1]
     else:
         first_initial, last_name = '', ''
-    return render_template('author.html', q=q, first_initial=first_initial,
-                           last_name=last_name, sparql_endpoint=ep,
-                           sparql_editURL=editurl, sparql_embedURL=embedurl)
+
+    list_of_publications = get_snapquery_records("author_list-of-publications", q=q)
+
+    return render_template(
+        'author.html',
+        q=q,
+        first_initial=first_initial,
+        last_name=last_name,
+        sparql_endpoint=ep,
+        sparql_editURL=editurl,
+        sparql_embedURL=embedurl,
+        list_of_publications=list_of_publications,
+    )
 
 
 @main.route('/author/' + q_pattern + '/latest-works/rss')
