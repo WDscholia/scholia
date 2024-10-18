@@ -402,7 +402,12 @@ def show_author(q):
     else:
         first_initial, last_name = '', ''
 
-    list_of_publications = get_snapquery_records("author_list-of-publications", q=q)
+    endpoint_name = request.args.get("endpoint_name", default="wikidata")
+    list_of_publications = get_snapquery_records(
+        "author_list-of-publications",
+        q=q,
+        endpoint_name=endpoint_name,
+    )
 
     return render_template(
         'author.html',
