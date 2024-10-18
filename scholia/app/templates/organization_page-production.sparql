@@ -6,29 +6,36 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 SELECT
   ?year
   (SUM(?pages_per_author) AS ?number_of_pages)
-  ?researcher_label
-WHERE {
-  {
+  ?researcher ?researcherLabel
+WITH {
+  SELECT 
+    DISTINCT ?researcher
+  WHERE {
+    ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) target: .
+  }
+} AS %researchers
+WITH {
     SELECT
-      ?researcher_label ?work ?year
+      ?researcher ?work ?year
       (SAMPLE(?pages) / COUNT(?researcher_of_paper) AS ?pages_per_author)
     WHERE {
-      # Find authors associated with organization
-      FILTER EXISTS { ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) target: . }
+      INCLUDE %researchers
       
-      ?work (wdt:P50|wdt:P2093) ?researcher_of_paper .
+      ?work (wdt:P50 | wdt:P2093) ?researcher_of_paper .
       
       # Disabled to only look on scholarly articles
       # ?work wdt:P31 wd:Q13442814 .
       
-      ?work wdt:P50 ?researcher .
-      ?work wdt:P1104 ?pages .
-      ?work wdt:P577 ?date . 
+      ?work wdt:P50 ?researcher ;
+            wdt:P1104 ?pages ;
+            wdt:P577 ?date . 
       BIND(STR(YEAR(?date)) AS ?year) 
-      ?researcher rdfs:label ?researcher_label . FILTER(LANG(?researcher_label) = 'en')
     } 
-    GROUP BY ?work ?researcher_label ?year
-  }
+    GROUP BY ?work ?researcher ?year
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
-GROUP BY ?year ?researcher_label 
+GROUP BY ?year ?researcher ?researcherLabel
 ORDER BY ?year
