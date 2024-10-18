@@ -13,12 +13,15 @@ type Result = dict[str, Any]
 type Results = list[Result]
 
 
-def get_snapquery_records(name: str, q: str) -> Results:
+def get_snapquery_records(
+    name: str, q: str, *, endpoint_name: str | None = None,
+) -> Results:
     return from_programmatic_api(
         name=name,
         domain="scholia.toolforge.org",
         namespace="named_queries",
         params={"q": q},
+        endpoint_name=endpoint_name,
     )
 
 
@@ -27,7 +30,7 @@ def from_programmatic_api(
     namespace: str,
     domain: str,
     *,
-    endpoint_name: str = "wikidata",
+    endpoint_name: str | None = None,
     params: dict[str, Any] | None = None,
     limit: int | None = None,
 ) -> Results:
@@ -35,13 +38,21 @@ def from_programmatic_api(
         raise NotImplementedError("can only support a single parameter, `q`")
 
     query_manager = NamedQueryManager.from_samples()
-    query_name: QueryName = QueryName.from_query_id(query_id=name, namespace=namespace, domain=domain)
+    query_name: QueryName = QueryName.from_query_id(
+        query_id=name,
+        namespace=namespace,
+        domain=domain,
+    )
     query_bundle: QueryBundle = query_manager.get_query(
         query_name=query_name,
-        endpoint_name=endpoint_name,
+        endpoint_name=endpoint_name or "wikidata",
         limit=limit,
     )
-    rv = query_bundle.sparql.queryAsListOfDicts(query_bundle.query.query, param_dict=params)
+    rv = query_bundle.sparql.queryAsListOfDicts(
+        query_bundle.query.query,
+        param_dict=params,
+        # {"q": "Q80"}  # Tim Berners-Lee
+    )
     # would be nice to extend get_lod to
     # rv = query_bundle.get_lod(param_dict=params)
     return rv
