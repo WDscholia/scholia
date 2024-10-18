@@ -59,7 +59,7 @@
     <td>{{ publication.date }}</td>
     <td><a href="{{ publication.work }}">{{ publication.workLabel }}</a></td>
     <td>{{ publication.type }}</td>
-    <td>{% if publication.pages %}{{ publication.pages|int }}{% endif %}</td>
+    <td align="right">{% if publication.pages %}{{ publication.pages|int }}{% endif %}</td>
     <td><a href="{{ publication.venue }}">{{ publication.venueLabel }}</a></td>
     <td><a href="{{ publication.authorsUrl }}">{{ publication.authors }}</a></td>
 </tr>
