@@ -1,4 +1,4 @@
-# title: Authors for specific uses
+#title: Authors for specific uses
 SELECT
   ?uses ?works
   ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)

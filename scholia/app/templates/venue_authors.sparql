@@ -1,4 +1,4 @@
-# title: Prolific authors for a specific journal
+#title: Prolific authors for a specific journal
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

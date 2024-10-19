@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: Cited venues from specific journal
+#title: Cited venues from specific journal
 SELECT
   ?count
   ?short_name
