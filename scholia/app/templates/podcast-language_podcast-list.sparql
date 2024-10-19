@@ -11,6 +11,6 @@ WHERE {
     FILTER (LANG(?value_string) = 'en')
     BIND(COALESCE(?value_string, ?q) AS ?genreWDLabel)
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } GROUP BY ?podcast ?podcastLabel
   ORDER BY DESC(?podcastLabel)

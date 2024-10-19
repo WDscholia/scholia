@@ -23,7 +23,7 @@ WHERE {
     FILTER (LANG(?themes_labels) = 'en')
   }
   OPTIONAL { ?journal wdt:P1240 ?bfi . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 } 
 GROUP BY ?journal ?journalLabel
 ORDER BY DESC(?number_of_works)

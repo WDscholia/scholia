@@ -15,6 +15,6 @@ WHERE {
   BIND(COALESCE(?track_, "total") AS ?track)
   
   BIND(STR(YEAR(?datetime)) AS ?year)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY ?year

@@ -18,5 +18,5 @@ SELECT DISTINCT ?allotrope ?allotropeLabel ?density ?densityUnit ?densityUnitLab
     ?densityValNode wikibase:quantityAmount ?density ;
                     wikibase:quantityUnit ?densityUnit .
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } ORDER BY ASC(?allotropeLabel)

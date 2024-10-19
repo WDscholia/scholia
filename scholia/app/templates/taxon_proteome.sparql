@@ -11,5 +11,5 @@ WITH {
 } AS %results {
   INCLUDE %results
   ?protein wdt:P702 ?gene .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

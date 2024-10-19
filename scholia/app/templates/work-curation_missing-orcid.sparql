@@ -10,5 +10,5 @@ SELECT DISTINCT
 WHERE {
   target: wdt:P50 ?author .
   FILTER NOT EXISTS { ?author wdt:P496 ?orcid . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

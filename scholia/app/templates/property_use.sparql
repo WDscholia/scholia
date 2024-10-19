@@ -2,6 +2,6 @@ PREFIX target: <http://www.wikidata.org/prop/direct/{{ p }}>
 
 SELECT ?item ?itemLabel ?property_value ?property_valueLabel WHERE {
   ?item target: ?property_value .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 LIMIT 500

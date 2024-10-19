@@ -5,5 +5,5 @@ SELECT DISTINCT ?guest ?guestLabel
 WHERE {
   BIND(target: AS ?episode)
   ?episode wdt:P5030 ?guest .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

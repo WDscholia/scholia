@@ -22,7 +22,7 @@ WHERE {
   BIND(xsd:date(?datetimes) AS ?dates)
   OPTIONAL { ?work wdt:P1104 ?pages_ }
   OPTIONAL { ?work wdt:P1433 ?venue }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 GROUP BY ?work ?workLabel ?venue ?venueLabel
 ORDER BY DESC(?date)

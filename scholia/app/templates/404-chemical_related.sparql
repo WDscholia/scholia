@@ -15,5 +15,5 @@ SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WITH {
   OPTIONAL { ?mol wdt:P231 ?CAS }
   OPTIONAL { ?mol wdt:P661 ?ChemSpider }
   OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

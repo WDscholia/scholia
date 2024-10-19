@@ -27,5 +27,5 @@ WITH {
   } LIMIT 200
 } AS %works WHERE {
   INCLUDE %works
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

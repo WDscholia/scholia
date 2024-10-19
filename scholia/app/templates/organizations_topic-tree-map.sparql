@@ -32,7 +32,7 @@ WITH {
 WHERE {
   # Join the work and citation counts
   INCLUDE %work_numbers
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?number_of_works)
 LIMIT 100

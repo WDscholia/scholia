@@ -6,6 +6,6 @@ SELECT ?citedJournal ?citedJournalLabel (CONCAT("/venue/", SUBSTR(STR(?citedJour
                      ps:P2860 ?citedArticle .
   ?citedArticle wdt:P1433 ?citedJournal .
   ?intention wdt:P31 wd:Q96471816 .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } GROUP BY ?citedJournal ?citedJournalLabel
   ORDER BY DESC(?citations)
