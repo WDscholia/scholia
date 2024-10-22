@@ -244,7 +244,7 @@ function sparqlDataToSimpleData(response) {
 function sparqlToDataTablePost(sparql, element, filename, options = {}) {
     sparqlToDataTablePost2(
         "https://query.wikidata.org/sparql",
-        "https://query.wikidata.org/",
+        "https://query.wikidata.org/#",
         sparql, element, filename, options
     );
 }
@@ -253,7 +253,10 @@ function sparqlToDataTablePost(sparql, element, filename, options = {}) {
 function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options = {}) {
     // Options: paging=
     if (!url) url = "https://query.wikidata.org/sparql";
-    if (!editURL) editURL = "https://query.wikidata.org/";
+
+    /* The edit URL needs a hashmark.  */
+    if (!editURL) editURL = "https://query.wikidata.org/#";
+    
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
 
@@ -315,15 +318,17 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {}) {
     // Options: paging=true
     if (!url) url = "https://query.wikidata.org/sparql";
-    if (!editURL) editURL = "https://query.wikidata.org/";
+
+    /* The edit URL needs a hashmark.  */
+    if (!editURL) editURL = "https://query.wikidata.org/#";
+
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var url = url + "?query=" + encodeURIComponent(sparql) + '&format=json';
 
     const datatableFooter =
         '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
-        encodeURIComponent(sparql) +
-        '">Wikidata Query Service</a></span>' +
+        encodeURIComponent(sparql) + '">Wikidata Query Service</a></span>' +
         '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/master/scholia/app/templates/' +
         filename +
         '">' +
@@ -445,7 +450,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
 function sparqlToIframe(sparql, element, filename) {
     sparqlToIframe2(
         "https://query.wikidata.org/sparql",
-        "https://query.wikidata.org/",
+        "https://query.wikidata.org/#",
         "https://query.wikidata.org/embed.html#",
         sparql, element, filename, options
     );
@@ -455,7 +460,10 @@ function sparqlToIframe(sparql, element, filename) {
 function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
     let $iframe = $(element);
     if (!url) url = "https://query.wikidata.org/sparql";
-    if (!editURL) editURL = "https://query.wikidata.org/";
+
+    /* The edit URL needs a hashmark.  */
+    if (!editURL) editURL = "https://query.wikidata.org/#";
+
     if (!embedURL) embedURL = "https://query.wikidata.org/embed.html#";
 
     const wikidata_sparql = url + "?query=" + encodeURIComponent(sparql);
