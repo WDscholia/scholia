@@ -1,7 +1,11 @@
 SELECT DISTINCT
-  ?retracted_work ?retracted_workLabel (CONCAT("/work/", SUBSTR(STR(?retracted_work), 32)) AS ?retracted_workUrl)
+  ?retracted_work ?retracted_workLabel
+  (CONCAT("/work/", SUBSTR(STR(?retracted_work), 32)) AS ?retracted_workUrl)
+  
   ?date
-  ?retraction ?retractionLabel (CONCAT("/work/", SUBSTR(STR(?retraction), 32)) AS ?retractionUrl)
+  
+  ?retraction ?retractionLabel
+  (CONCAT("/work/", SUBSTR(STR(?retraction), 32)) AS ?retractionUrl)
 WITH {
   # Find retracted papers indicated by instance of retracted paper, 
   # by retraction notice property or by significant event
@@ -26,3 +30,4 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?date)
+LIMIT 500
