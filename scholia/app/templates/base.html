@@ -635,13 +635,25 @@ askQuery("{{ panel }}", `# tool: scholia
       }
 
 
-     /* Wembedder */
-     var wembedderUrl = "https://wembedder.toolforge.org/api/most-similar/{{ q }}";
-     $.ajax({
-	 url: wembedderUrl,
-	 success: function (data) {
-	     var html = `<hr><span data-toogle="tooltip" title="Related items from Wembedder knowledge graph embedding.">Related:</span> `; 
-	     $( '#wembedder' ).append(html);
+   /* Wembedder */
+var wembedderUrl = "https://wembedder.toolforge.org/api/most-similar/{{ q }}";
+
+$.ajax({
+    url: wembedderUrl,
+    success: function (data) {
+        var html = `
+            <hr>
+            <span data-toggle="tooltip" 
+                  title="Related items from Wembedder knowledge graph embedding.">
+                <a href="https://arxiv.org/abs/1710.04099" target="_blank">Related</a>
+            </span>`;
+        $('#wembedder').append(html);
+    },
+    error: function () {
+        console.error("Failed to fetch Wembedder data.");
+    }
+});
+
 
 	     // Make list with results
 	     data.most_similar.forEach(function(entry, idx, array) {
