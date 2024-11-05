@@ -640,7 +640,11 @@ askQuery("{{ panel }}", `# tool: scholia
      $.ajax({
 	 url: wembedderUrl,
 	 success: function (data) {
-	     var html = `<hr><span data-toogle="tooltip" title="Related items from Wembedder knowledge graph embedding.">Related:</span> `; 
+	     var html = `<hr>` + 
+		 `<span data-toogle="tooltip" ` +
+		 `title="Related items from Wembedder knowledge graph embedding.">` +
+		 `<a alt="Wembedder about page" ` +
+		 `href="https://wembedder.toolforge.org/about">Related</a>:</span> `; 
 	     $( '#wembedder' ).append(html);
 
 	     // Make list with results
