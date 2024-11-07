@@ -9,4 +9,4 @@ urllib3>=1.26.19
 certifi>=2022.12.7
 feedparser
 Jinja2>=3.1.4
-zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned to avoid vulnerabilities CVE-2024-5569 and CVE-2024-37891
