@@ -1,7 +1,7 @@
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 
-# title: Nearby researchers that work with a specific topic and near a specified geographical entity
+#title: Nearby researchers that work with a specific topic and near a specified geographical entity
 SELECT
   ?score
   ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)

@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: Nearby academic institutions around a specified geographic entity.
+#title: Nearby academic institutions around a specified geographic entity.
 SELECT
   ?distance ?unit ?unitLabel
   ?organization ?organizationLabel ?organizationDescription (CONCAT("/organization/", SUBSTR(STR(?organization), 32)) AS ?organizationUrl)

@@ -1,4 +1,4 @@
-# title: Count of topics in published work in specified venue
+#title: Count of topics in published work in specified venue
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

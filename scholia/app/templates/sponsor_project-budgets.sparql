@@ -1,4 +1,4 @@
-# title: Scatterplot of project budgets associated with a funder
+#title: Scatterplot of project budgets associated with a funder
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

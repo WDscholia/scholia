@@ -1,6 +1,6 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-# title: structural identifiers for this chemical structure
+#title: structural identifiers for this chemical structure
 SELECT
   ?Structural_identifier ?Structural_identifierLabel
   ?idLit (SAMPLE(?idUrls) as ?idUrl)

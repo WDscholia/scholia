@@ -1,4 +1,4 @@
-# title: Authorship gender distribution for a specific venue
+#title: Authorship gender distribution for a specific venue
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
