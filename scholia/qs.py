@@ -104,7 +104,8 @@ def paper_to_quickstatements(paper):
     Notes
     -----
     title, authors (list), date, doi, year, language_q, volume, issue, pages,
-    number_of_pages, url, full_text_url, published_in_q are recognized.
+    number_of_pages, url, full_text_url, published_in_q, openreview_id are
+    recognized.
 
     `date` takes precedence over `year`.
 
@@ -225,6 +226,9 @@ def paper_to_quickstatements(paper):
     # Published in
     if 'published_in_q' in paper and paper['published_in_q']:
         qs += 'LAST\tP1433\t{}\n'.format(paper['published_in_q'])
+
+    if 'openreview_id' in paper and paper['openreview_id']:
+        qs += 'LAST\tP8968\t"{}"\n'.format(paper['openreview_id'])
 
     return qs
 
