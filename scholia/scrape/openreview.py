@@ -4,7 +4,8 @@ Module for scraping metadata from OpenReview.net submissions.
 This module can be used as a script or imported as a module to extract metadata
 from OpenReview.net submissions. It downloads the submission page and extracts
 metadata such as title, authors, date of publication, OpenReview submission ID,
-PDF link, and license (if available) and output it in the QuickStatement format.
+PDF link, and license (if available) and output it in the QuickStatement
+format.
 
 Usage:
   scholia.scrape.openreview paper-url-to-quickstatements <url>
@@ -22,7 +23,7 @@ from lxml import etree
 
 import requests
 
-from ..config import config 
+from ..config import config
 from ..qs import paper_to_quickstatements
 
 
@@ -87,7 +88,9 @@ def html_to_paper(html):
         json_text = script_elements[0].text
         json_data = json.loads(json_text)
         # Navigate through the JSON to get to the content
-        content = json_data.get('props', {}).get('pageProps', {}).get('forumNote', {}).get('content', {})
+        content = json_data.get(
+            'props', {}).get(
+                'pageProps', {}).get('forumNote', {}).get('content', {})
 
         if 'title' in content and 'value' in content['title']:
             data['title'] = content['title']['value']
@@ -95,12 +98,14 @@ def html_to_paper(html):
             data['authors'] = content['authors']['value']
         if 'abstract' in content and 'value' in content['abstract']:
             data['abstract'] = content['abstract']['value']
-       
-        forum_note = json_data.get('props', {}).get('pageProps', {}).get('forumNote', {})
+
+        forum_note = json_data.get('props', {}).get('pageProps',
+                                                    {}).get('forumNote', {})
         if 'id' in forum_note:
             data['openreview_id'] = forum_note['id']
             data['url'] = 'https://openreview.net/forum?id=' + forum_note['id']
-            data['full_text_url'] = 'https://openreview.net/pdf?id=' + forum_note['id']
+            data['full_text_url'] = 'https://openreview.net/pdf?id=' + \
+                forum_note['id']
         if 'pdate' in forum_note:
             pdate = forum_note['pdate']
             # pdate is in milliseconds since epoch
@@ -108,7 +113,7 @@ def html_to_paper(html):
             data['date'] = dt.date().isoformat()
         if 'licence' in forum_note:
             data['license'] = forum_note['license']
-            
+
     return data
 
 
@@ -117,18 +122,19 @@ def main():
     from docopt import docopt
 
     arguments = docopt(__doc__)
-    
+
     if arguments['paper-url-to-quickstatements']:
         url = arguments['<url>']
         html = paper_url_to_html(url)
         paper = html_to_paper(html)
-    
+
         # Output the data in QuickStatement format or as needed
         qs = paper_to_quickstatements(paper)
         print(qs)
-        
+
     else:
         assert False
+
 
 if __name__ == '__main__':
     main()
