@@ -3,7 +3,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: List of event and proceedings for a specific event series
 SELECT DISTINCT 
   (SAMPLE(?years) AS ?year)
-  (SAMPLE(?ordinal) AS ?ordinal)
+  (SAMPLE(?ordinal_) AS ?ordinal)
   (SAMPLE(?short_names) AS ?short_name)
   ?event ?eventLabel (CONCAT("/event/", SUBSTR(STR(?event), 32)) AS ?eventUrl)
   ?proceedings ?proceedingsLabel (CONCAT("/venue/", SUBSTR(STR(?proceedings), 32)) AS ?proceedingsUrl)
@@ -21,7 +21,7 @@ WHERE {
       ?proceedings wdt:P4745 ?event
     }
     OPTIONAL{
-      ?event p:P179/pq:P1545 ?ordinal
+      ?event p:P179/pq:P1545 ?ordinal_
     }
   }
   UNION

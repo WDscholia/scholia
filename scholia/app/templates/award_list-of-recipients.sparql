@@ -23,3 +23,4 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh" . }  
 }
 ORDER BY DESC(?year)
+LIMIT 10000
