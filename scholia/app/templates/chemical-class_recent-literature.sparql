@@ -2,7 +2,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?date ?work ?workLabel ?type ?via ?topics
 WITH {
-  SELECT DISTINCT (MAX(?dates) as ?datetime) ?work ?via WHERE {
+  SELECT DISTINCT (MAX(?dates) as ?datetime_) ?work ?via WHERE {
     { VALUES ?topic { target:}
       ?work wdt:P921 ?topic . BIND ("main topic" AS ?via) }
     UNION
@@ -21,7 +21,7 @@ WITH {
     OPTIONAL { ?work wdt:P577 ?dateLits . BIND(xsd:date(?dateLits) AS ?dates) }
   }
   GROUP BY ?work ?via
-  ORDER BY DESC(?datetime)
+  ORDER BY DESC(?datetime_)
   LIMIT 250
 } AS %works
 WITH {
@@ -36,7 +36,7 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
-  BIND(xsd:date(?datetime) AS ?date)
+  BIND(xsd:date(?datetime_) AS ?date)
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?date)

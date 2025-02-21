@@ -7,9 +7,9 @@ SELECT
 {
   target: wdt:P171* ?middle .
   ?middle wdt:P171+ ?parent .
-  ?parent wdt:P105 ?rank .
+  ?parent wdt:P105 ?rank_ .
   OPTIONAL {
-    ?rank rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
+    ?rank_ rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

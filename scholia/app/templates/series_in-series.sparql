@@ -7,14 +7,14 @@ WITH {
     (MIN(?datetimes) AS ?publication_datetime)
     (SAMPLE(?short_name_) AS ?short_name)
     ?collection
-    (SAMPLE(?ordinal) AS ?ordinal)
+    (SAMPLE(?ordinal_) AS ?ordinal)
   WHERE {
     ?collection wdt:P179 target: .
     OPTIONAL { ?work wdt:P1433 ?collection . }
     OPTIONAL { ?collection wdt:P1813 ?short_name_ . }
     OPTIONAL { ?collection wdt:P577 ?datetimes . }
     OPTIONAL{
-      ?collection p:P179/pq:P1545 ?ordinal.
+      ?collection p:P179/pq:P1545 ?ordinal_.
     }
   }
   GROUP BY ?collection
