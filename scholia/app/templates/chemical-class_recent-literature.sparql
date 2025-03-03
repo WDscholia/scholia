@@ -1,44 +1,74 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?date ?work ?workLabel ?type ?via ?topics
+SELECT
+  ?publication_date
+  ?work ?workLabel
+  ?type
+  ?via
+  ?topics
 WITH {
-  SELECT DISTINCT (MAX(?dates) as ?datetime_) ?work ?via WHERE {
-    { VALUES ?topic { target:}
-      ?work wdt:P921 ?topic . BIND ("main topic" AS ?via) }
-    UNION
-    { ?work wdt:P921 ?topic . ?topic ((^wdt:P361)+) target: . BIND ("part" AS ?via) }
-    UNION
-    { ?work wdt:P921 ?topic . ?topic (wdt:P279* ) target: . BIND ("subclass" AS ?via). FILTER (?topic != target:) }
-    UNION
-    { ?work wdt:P921 ?topic . ?topic (wdt:P1269+ ) target: . BIND ("facet" AS ?via)}
+  SELECT DISTINCT
+    (MAX(?publication_datetime_) AS ?publication_datetime)
+    ?work ?via
+  WHERE {
+    {
+      ?work wdt:P921 target: .
+      BIND ("main topic" AS ?via)
+    }
     UNION
     {
-      target: ?propp ?statement .
-      ?statement a wikibase:BestRank ;
-                 prov:wasDerivedFrom/pr:P248 ?work .
-      BIND ("statement" AS ?via)
+      ?work wdt:P921 / wdt:P361+ target: .
+      BIND ("part" AS ?via)
     }
-    OPTIONAL { ?work wdt:P577 ?dateLits . BIND(xsd:date(?dateLits) AS ?dates) }
+    UNION
+    {
+      ?work wdt:P921 / wdt:P279+ target: .
+      BIND ("subclass" AS ?via)
+      FILTER (?topic != target:)
+    }
+    UNION
+    {
+      ?work wdt:P921 / wdt:P1269+ target: .
+      BIND ("facet" AS ?via)
+    }
+    
+    # This seems to be expensive
+    # UNION
+    # {
+    #    target: ?propp ?statement .
+    #    ?statement a wikibase:BestRank ;
+    #               prov:wasDerivedFrom / pr:P248 ?work .
+    #    BIND ("statement" AS ?via)
+    # }
+    
+    # Force the UNION before the publication datetime
+    hint:Prior hint:runFirst true .
+    
+    ?work wdt:P577 ?publication_datetime_ .
   }
   GROUP BY ?work ?via
-  ORDER BY DESC(?datetime_)
+  ORDER BY DESC(?publication_datetime)
   LIMIT 250
 } AS %works
 WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) ?via (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
+  SELECT
+    ?publication_date
+    ?work
+    (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
+    ?via
+    (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics)
+  WHERE {
     INCLUDE %works
     ?work wdt:P921 ?topic . 
+    BIND(xsd:date(?publication_datetime) AS ?publication_date)
     OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
-    OPTIONAL { ?work wdt:P577 ?dates . }
     ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
   }
-  GROUP BY ?work ?via
+  GROUP BY ?publication_date ?work ?via
 } AS %result
 WHERE {
   INCLUDE %result
-  BIND(xsd:date(?datetime_) AS ?date)
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
-ORDER BY DESC(?date)
+ORDER BY DESC(?publication_date)
 LIMIT 500
-
