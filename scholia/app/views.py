@@ -2751,20 +2751,28 @@ def show_robots_txt():
     User-agent: *
     Disallow: /
 
-    Scholia's function returns a robots.txt with 'Allow' for all. We would like
-    bots to index, but not crawl Scholia. Crawling is also controlled by the
-    HTML meta tag 'robots' thatis set to the content: noindex, nofollow on all
-    pages. So Scholia's robots.txt is:
+    We would like bots to index, but not crawl Scholia. Crawling is
+    also controlled by the HTML meta tag 'robots' that is set to the
+    content: noindex, nofollow on all pages.
 
     User-agent: *
     Allow: /
 
-    If this results in too much crawling or load on the Toolforge
+    This results in too much crawling or load on the Toolforge
     infrastructure then it should be changed.
+
+    Given that most of the content on Scholia does not get indexed,
+    there are little reason to index Scholia's pages, perhaps other
+    than the main page and the about page.
+
+    Thus for now the `robots.txt` is set to
+
+    User-agent: *
+    Disallow: /
 
     """
     ROBOTS_TXT = ('User-agent: *\n'
-                  'Allow: /\n')
+                  'Disallow: /\n')
     return Response(ROBOTS_TXT, mimetype="text/plain")
 
 
