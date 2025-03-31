@@ -134,7 +134,7 @@ def _field_to_content(tree, field):
 
 def _fields_to_content(tree, fields):
     for field in fields:
-        content = _field_to_content(field)
+        content = _field_to_content(tree, field)
         if content is not None and content != '':
             return content
 
