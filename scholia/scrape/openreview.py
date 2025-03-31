@@ -124,6 +124,23 @@ def paper_to_q(paper):
     return str(data[0]['paper']['value'][31:])
 
 
+def _field_to_content(tree, field):
+    elements = tree.xpath("//meta[@name='{}']".format(field))
+    if len(elements) == 0:
+        return None
+    content = elements[0].attrib['content']
+    return content
+
+
+def _fields_to_content(tree, fields):
+    for field in fields:
+        content = _field_to_content(field)
+        if content is not None and content != '':
+            return content
+
+    return None
+
+
 def html_to_paper(html):
     """Extract metadata from the OpenReview.net submission page HTML.
 
@@ -156,21 +173,6 @@ def html_to_paper(html):
     True
 
     """
-    def _field_to_content(field):
-        elements = tree.xpath("//meta[@name='{}']".format(field))
-        if len(elements) == 0:
-            return None
-        content = elements[0].attrib['content']
-        return content
-
-    def _fields_to_content(fields):
-        for field in fields:
-            content = _field_to_content(field)
-            if content is not None and content != '':
-                return content
-
-        return None
-
     tree = etree.HTML(html)
     data = {}
 
@@ -227,8 +229,8 @@ def html_to_paper(html):
                 data['authors'] = authors
 
     if 'title' not in data:
-        title = _fields_to_content(['citation_title', 'DC.Title',
-                                    'DC.Title.Alternative'])
+        title = _fields_to_content(tree, ['citation_title', 'DC.Title',
+                                          'DC.Title.Alternative'])
         if title:
             data['title'] = title
 
