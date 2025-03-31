@@ -40,7 +40,7 @@ WITH {
   WHERE {
     INCLUDE %organizations
 
-    BIND(1 / ?distance AS ?inverse_distance_)
+    BIND(1 / (?distance + 1) AS ?inverse_distance_)
     ?author wdt:P108 | wdt:P1416 ?organization .  
   }
   GROUP BY ?author
@@ -53,8 +53,10 @@ WITH {
   WHERE {
     INCLUDE %authors_with_distance
     {
+      # A score of 3 for each authorship in the topic
       ?work wdt:P50 ?author .
-      ?work wdt:P921 / wdt:P279* target2: . BIND(3 AS ?topic_score)
+      FILTER EXISTS { ?work wdt:P921 / wdt:P279* target2: . }
+      BIND(3 AS ?topic_score)
     }
     UNION
     { ?author wdt:P101 target2: . BIND(20 AS ?topic_score) }
