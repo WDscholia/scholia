@@ -987,7 +987,8 @@ askQuery("{{ panel }}", `# tool: scholia
 
 {% block content %}
 <div class="content">
-<div class="container d-flex justify-content-between">
+
+  <div class="container d-flex justify-content-between">
     <div class="dropdown" id="aspect-chooser">
     </div>
     <div>
@@ -995,32 +996,37 @@ askQuery("{{ panel }}", `# tool: scholia
       <a id='curation-link' role="button" class="btn btn-outline-secondary d-none">Improve data</a>
       {% endblock %}
     </div>
-</div>
-<div class="container">
-    {% block page_content %}{% endblock %}
-</div>
-</div>
-<div class="container footer">
-    <hr>
-    Data from <a href="https://www.wikidata.org">Wikidata</a> and
-    <a href="https://en.wikipedia.org">English Wikipedia</a>
-    |
-    Code from
-    <a href="https://github.com/WDscholia/scholia">GitHub repository</a>
-    |
-    Hosted on   <a href="https://toolforge.org/">Wikimedia Toolforge</a>,
-    a <a href="https://wikimediafoundation.org">Wikimedia Foundation</a> service
-    |
-    License for content: CC0 for data, CC-BY-SA for text and media
-    |
-    Report technical problems at Scholia's
-    <a href="https://github.com/WDscholia/scholia/issues">Issues</a> GitHub page.
-    |
-    Follow us on <a href="https://wikis.world/@wdscholia">Mastodon</a>.
-    <hr>
   </div>
+  
+  <div class="container mt-3">
+    
+    <div class="alert alert-warning" role="alert">
+      As of April 2025, Scholia is affected by <a href="https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/WDQS_graph_split">the graph split of the Wikidata Query Service</a>. Scholia will not necessary show updates or all data from Wikidata. We will work on updating Scholia in April.
+    </div>
+    
+    {% block page_content %}{% endblock %}
+  </div>
+</div>
+
+<div class="container footer">
+  <hr>
+  Data from <a href="https://www.wikidata.org">Wikidata</a> and
+  <a href="https://en.wikipedia.org">English Wikipedia</a>
+  |
+  Code from
+  <a href="https://github.com/WDscholia/scholia">GitHub repository</a>
+  |
+  Hosted on   <a href="https://toolforge.org/">Wikimedia Toolforge</a>,
+  a <a href="https://wikimediafoundation.org">Wikimedia Foundation</a> service
+  |
+  License for content: CC0 for data, CC-BY-SA for text and media
+  |
+  Report technical problems at Scholia's
+  <a href="https://github.com/WDscholia/scholia/issues">Issues</a> GitHub page.
+  |
+  Follow us on <a href="https://wikis.world/@wdscholia">Mastodon</a>.
+  <hr>
+</div>
 {% endblock %}
 
-<script type="text/javascript">
-    
-</script>
+<script type="text/javascript"></script>
