@@ -14,184 +14,177 @@
 {% block page_content %}
 
 
-<div class="container">
-    <div class="card my-3">
-      <div class="card-body">
-	Scholia is a service that creates visual scholarly profiles for
-	<a href="topic/">topics</a>,
-	<a href="author/">people</a>,
-	<a href="organization/">organizations</a>,
-	<a href="taxon">species</a>,
-	<a href="chemical">chemicals</a>, etc
-	using bibliographic and other information in Wikidata.
-        <a href="about">More info...</a></div>
-    </div>
+<div class="card my-3">
+  <div class="card-body">
+    Scholia is a service that creates visual scholarly profiles for
+    <a href="topic/">topics</a>,
+    <a href="author/">people</a>,
+    <a href="organization/">organizations</a>,
+    <a href="taxon">species</a>,
+    <a href="chemical">chemicals</a>, etc
+    using bibliographic and other information in Wikidata.
+    <a href="about">More info...</a></div>
 </div>
 
-<div class="container">
-  <div class="alert alert-warning" role="alert">
-    Scholia relies on Wikidata, and Wikidata contains only a limited albeit growing subset of the corpus of scholarly literature, its authors and citations.
-    Read more about the limitations in the <a href="faq">FAQ</a> or check the <a href="{{ url_for('app.index_statistics') }}">statistics</a>.
+
+<div class="alert alert-info" role="alert">
+  Scholia relies on Wikidata, and Wikidata contains only a limited albeit growing subset of the corpus of scholarly literature, its authors and citations.
+  Read more about the limitations in the <a href="faq">FAQ</a> or check the <a href="{{ url_for('app.index_statistics') }}">statistics</a>.
+</div>
+
+
+<h2>Search</h2>
+
+<div class="input-group">
+  <input type="text" class="form-control"
+	 placeholder="Search for a scientist, topic, publication, organization, award, event, etc." id="searchterm"/>
+  <div class="input-group-append">
+    <button id='searchbutton' class="btn btn-outline-secondary" type="button">Search</button>
   </div>
 </div>
 
-<div class="container">
-    <h2>Search</h2>
+<div id="searchresult"></div>
+
+
+<h2>Examples</h2>
+
+<div class="card-deck mb-3">
+  <div class="card mb-4 box-shadow">
     
-    <div class="input-group">
-	    <input type="text" class="form-control"
-	       placeholder="Search for a scientist, topic, publication, organization, award, event, etc." id="searchterm"/>
-      <div class="input-group-append">
-          <button id='searchbutton' class="btn btn-outline-secondary" type="button">Search</button>
-      </div>
+    <div class="card-header">
+      <h4 class="my-0 font-weight-normal">Profiles</h4>
     </div>
-
-    <div id="searchresult"></div>
-
-</div>
-
-
-<div class="container">
-
-    <h2>Examples</h2>
-
-    <div class="card-deck mb-3">
-	<div class="card mb-4 box-shadow">
-	    
-            <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Profiles</h4>
-            </div>
-            <div class="card-body">
-		<dl>
-		    <dt><a href="author/Q18618629">Denny Vrandečić</a></dt>
-		    <dd>
-			View the researcher profile for the Semantic Web researcher Denny Vrandečić.
-			It shows his papers, co-authors, etc.
-		    </dd>
-		    
-		    <dt><a href="organization/Q1269766">Technical University of Denmark</a></dt>
-		    <dd>
-			View the profile for an organization: People associated with the organization, 
-			their publications, the co-author patterns, etc.
-		    </dd>
-		    
-		    <dt>
-			<a href="venue/Q1981225">NeuroImage</a>
-		    </dt>
-		    <dd>
-			View information about a venue, e.g., a scientific journal or scientific conference.
-			Here, the <em>NeuroImage</em> journal, its recently published papers, 
-			authors, topics, citation pattern, etc.
-		    </dd>
-		    
-		    <dt>
-			<a href="publisher/Q233358">Public Library of Science</a>
-		    </dt>
-		    <dd>
-			View information about a publisher, here
-			<em>Public Library of Science</em>, with, e.g., the journals it publishes.
-		    </dd>
-
-		    <dt>
-			<a href="topic/Q84263196">COVID-19</a>
-		    </dt>
-		    <dd>
-			View information about the authors or journals publishing on <em>COVID-19</em>.
-		    </dd>
-
-            <dt>
-			<a href="topic/Q202864">Zika virus</a>
-		    </dt>
-		    <dd>
-			View information about the authors or journals publishing on <em>Zika virus</em>.
-		    </dd>
-		</dl>
-            </div>
-
-	</div>
-	    
-        <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Combinations</h4>
-	    </div>
-	    <div class="card-body">
-		<p>Scholia can show multiple items together.</p>
-		
-		<dl>
-		    <dt>
-			<a href="organizations/Q1269766,Q193196">Technical University of Denmark and University College London</a>
-		    </dt>
-		    <dd>
-			Compare two or more organizations. Here a comparison between two universities with
-			collaborating researchers, number of publications and citations.
-		    </dd>
-		</dl>
-
-		<dl>
-		    <dt>
-		        <a href="authors/Q80,Q6135847,Q30085536">Tim Berners-Lee, James Hendler and Ruben Verborgh</a></dt>
-            <dd>
-		    Compare three Semantic Web researchers. 
-		    </dd>
-		</dl>
-
-		<dl>
-		    <dt>
-		        <a href="organization/Q1305486/topic/Q68854">University of Costa Rica and snakebites</a></dt>
-            <dd>
-		    Explore what people affiliated with this institution have published on the topic. 
-		    </dd>
-		</dl>
-
-		<dl>
-		    <dt>
-		        <a href="organization/Q319078/use/Q326489">University of Melbourne and ggplot2</a></dt>
-            <dd>
-		    Explore what people affiliated with this institution have published using this open-source data visualization software. 
-		    </dd>
-		</dl>
-
-
-
-
-	    </div>
-        </div>
+    <div class="card-body">
+      <dl>
+	<dt><a href="author/Q18618629">Denny Vrandečić</a></dt>
+	<dd>
+	  View the researcher profile for the Semantic Web researcher Denny Vrandečić.
+	  It shows his papers, co-authors, etc.
+	</dd>
 	
-        <div class="card mb-4 box-shadow">
-	    <div class="card-header">
-		<h4 class="my-0 font-weight-normal">Redirects</h4>
-	    </div>
-	    <div class="card-body">
-		<p>If you know the external identifier of a concept, then Scholia can make a lookup based on it:</p>
-		
-		<dl>
-		    <dt><a href="twitter/utafrith">twitter/utafrith</a></dt>
-		    <dd>Look up by Twitter username @utafrith. This will identify
-			the London-based researcher Uta Frith and redirect to her Scholia page.</dd>
-		  
-		    <dt><a href="twitter/mitpress">twitter/mitpress</a></dt>
-		    <dd>Redirect also works for organizations, here MIT Press</dd>
-
-		    <dt><a href="orcid/0000-0002-5494-8126">orcid/0000-0002-5494-8126</a></dt>
-		    <dd>Lookup 0000-0002-5494-8126 that is identifying Carol Greider.</dd>
-
-		    <dt><a href="github/vedina">github/vedina</a></dt>
-		    <dd>
-			Redirect via GitHub username, here @vedina to Nina Jeliazkova.
-		    </dd>
-
-		    <dt><a href="doi/10.1186/S13321-016-0161-3">doi/10.1186/S13321-016-0161-3</a></dt>
-		    <dd>Redirect via a DOI.</dd>
-		    
-		    <dt><a href="viaf/59976288">viaf/59976288</a></dt>
-		    <dd>Redirect via VIAF identifier, here to Ben Feringa</dd>
-
-		</dl>
-
-	    </div>
-        </div>
+	<dt><a href="organization/Q1269766">Technical University of Denmark</a></dt>
+	<dd>
+	  View the profile for an organization: People associated with the organization, 
+	  their publications, the co-author patterns, etc.
+	</dd>
+	
+	<dt>
+	  <a href="venue/Q1981225">NeuroImage</a>
+	</dt>
+	<dd>
+	  View information about a venue, e.g., a scientific journal or scientific conference.
+	  Here, the <em>NeuroImage</em> journal, its recently published papers, 
+	  authors, topics, citation pattern, etc.
+	</dd>
+	
+	<dt>
+	  <a href="publisher/Q233358">Public Library of Science</a>
+	</dt>
+	<dd>
+	  View information about a publisher, here
+	  <em>Public Library of Science</em>, with, e.g., the journals it publishes.
+	</dd>
+	
+	<dt>
+	  <a href="topic/Q84263196">COVID-19</a>
+	</dt>
+	<dd>
+	  View information about the authors or journals publishing on <em>COVID-19</em>.
+	</dd>
+	
+        <dt>
+	  <a href="topic/Q202864">Zika virus</a>
+	</dt>
+	<dd>
+	  View information about the authors or journals publishing on <em>Zika virus</em>.
+	</dd>
+      </dl>
     </div>
+    
+  </div>
+  
+  <div class="card mb-4 box-shadow">
+    <div class="card-header">
+      <h4 class="my-0 font-weight-normal">Combinations</h4>
+    </div>
+    <div class="card-body">
+      <p>Scholia can show multiple items together.</p>
+      
+      <dl>
+	<dt>
+	  <a href="organizations/Q1269766,Q193196">Technical University of Denmark and University College London</a>
+	</dt>
+	<dd>
+	  Compare two or more organizations. Here a comparison between two universities with
+	  collaborating researchers, number of publications and citations.
+	</dd>
+      </dl>
+      
+      <dl>
+	<dt>
+	  <a href="authors/Q80,Q6135847,Q30085536">Tim Berners-Lee, James Hendler and Ruben Verborgh</a></dt>
+        <dd>
+	  Compare three Semantic Web researchers. 
+	</dd>
+      </dl>
+      
+      <dl>
+	<dt>
+	  <a href="organization/Q1305486/topic/Q68854">University of Costa Rica and snakebites</a></dt>
+        <dd>
+	  Explore what people affiliated with this institution have published on the topic. 
+	</dd>
+      </dl>
+
+      <dl>
+	<dt>
+	  <a href="organization/Q319078/use/Q326489">University of Melbourne and ggplot2</a></dt>
+        <dd>
+	  Explore what people affiliated with this institution have published using this open-source data visualization software. 
+	</dd>
+      </dl>
+
+
+
+
+    </div>
+  </div>
+  
+  <div class="card mb-4 box-shadow">
+    <div class="card-header">
+      <h4 class="my-0 font-weight-normal">Redirects</h4>
+    </div>
+    <div class="card-body">
+      <p>If you know the external identifier of a concept, then Scholia can make a lookup based on it:</p>
+      
+      <dl>
+	<dt><a href="twitter/utafrith">twitter/utafrith</a></dt>
+	<dd>Look up by Twitter username @utafrith. This will identify
+	  the London-based researcher Uta Frith and redirect to her Scholia page.</dd>
+	
+	<dt><a href="twitter/mitpress">twitter/mitpress</a></dt>
+	<dd>Redirect also works for organizations, here MIT Press</dd>
+
+	<dt><a href="orcid/0000-0002-5494-8126">orcid/0000-0002-5494-8126</a></dt>
+	<dd>Lookup 0000-0002-5494-8126 that is identifying Carol Greider.</dd>
+
+	<dt><a href="github/vedina">github/vedina</a></dt>
+	<dd>
+	  Redirect via GitHub username, here @vedina to Nina Jeliazkova.
+	</dd>
+
+	<dt><a href="doi/10.1186/S13321-016-0161-3">doi/10.1186/S13321-016-0161-3</a></dt>
+	<dd>Redirect via a DOI.</dd>
+	
+	<dt><a href="viaf/59976288">viaf/59976288</a></dt>
+	<dd>Redirect via VIAF identifier, here to Ben Feringa</dd>
+
+      </dl>
+
+    </div>
+  </div>
 </div>
+
 
 {% endblock %}
 
