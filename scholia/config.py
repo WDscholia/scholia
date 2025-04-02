@@ -19,9 +19,9 @@ CONFIG_FILENAMES = [
 
 DEFAULTS = """
 [query-server]
-sparql_endpoint = https://query.wikidata.org/sparql
+sparql_endpoint = https://query-legacy-full.wikidata.org/sparql
 sparql_editurl = https://query.wikidata.org/#
-sparql_embedurl = https://query.wikidata.org/embed.html#
+sparql_embedurl = https://query-legacy-full.wikidata.org/embed.html#
 
 [requests]
 user_agent = Scholia
