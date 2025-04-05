@@ -20,7 +20,7 @@
    :target: https://github.com/WDscholia/scholia/issues
    :alt: GitHub issues
 .. |licence| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
-   :target: https://github.com/WDscholia/scholia/blob/master/LICENSE
+   :target: https://github.com/WDscholia/scholia/blob/main/LICENSE
    :alt: License
 .. |docs| image:: https://readthedocs.org/projects/scholia/badge/?version=latest
    :target: https://scholia.readthedocs.io/en/latest/?badge=latest
@@ -87,9 +87,9 @@ See file `CONTRIBUTING.rst`_ for technical details on how to improve Scholia.
 .. _Wikimedia Foundation: https://wikimediafoundation.org
 .. _Wikimedia Toolforge: https://toolforge.org/
 .. _launch Scholia via Gitpod: https://gitpod.io/#https://github.com/WDscholia/scholia
-.. _CONTRIBUTING.rst: https://github.com/WDscholia/scholia/blob/master/CONTRIBUTING.rst
-.. _requirements.txt: https://github.com/WDscholia/scholia/blob/master/requirements.txt
-.. _runserver.py: https://github.com/WDscholia/scholia/blob/master/runserver.py
+.. _CONTRIBUTING.rst: https://github.com/WDscholia/scholia/blob/main/CONTRIBUTING.rst
+.. _requirements.txt: https://github.com/WDscholia/scholia/blob/main/requirements.txt
+.. _runserver.py: https://github.com/WDscholia/scholia/blob/main/runserver.py
 
 References
 ----------
