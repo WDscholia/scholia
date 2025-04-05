@@ -124,5 +124,5 @@ And iframe formatting:
    </div>
 
 5. Add the whole thing to your version/fork of the file
-   https://github.com/WDscholia/scholia/tree/master/scholia/[…].
-   Pull request to master branch.
+   https://github.com/WDscholia/scholia/tree/main/scholia/[…].
+   Pull request to the main branch.
