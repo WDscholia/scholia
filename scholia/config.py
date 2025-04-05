@@ -20,7 +20,7 @@ CONFIG_FILENAMES = [
 DEFAULTS = """
 [query-server]
 sparql_endpoint = https://query-legacy-full.wikidata.org/sparql
-sparql_editurl = https://query.wikidata.org/#
+sparql_editurl = https://query-legacy-full.wikidata.org/#
 sparql_embedurl = https://query-legacy-full.wikidata.org/embed.html#
 
 [requests]
