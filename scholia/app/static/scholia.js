@@ -226,7 +226,7 @@ function sparqlToResponse(sparql, doneCallback) {
 
 
 function sparqlDataToSimpleData(response) {
-    // Convert long JSON data from from SPARQL endpoint to short form
+    // Convert long JSON data from SPARQL endpoint to short form
     let data = response.results.bindings;
     let columns = response.head.vars;
     var convertedData = [];
