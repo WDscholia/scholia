@@ -19,7 +19,7 @@
 .. |issues| image:: https://img.shields.io/github/issues/WDScholia/scholia.svg
    :target: https://github.com/WDscholia/scholia/issues
    :alt: GitHub issues
-.. |licence| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+.. |license| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
    :target: https://github.com/WDscholia/scholia/blob/master/LICENSE
    :alt: License
 .. |docs| image:: https://readthedocs.org/projects/scholia/badge/?version=latest
