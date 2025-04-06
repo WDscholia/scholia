@@ -1,3 +1,4 @@
+# title: identifiers for this chemical class
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT

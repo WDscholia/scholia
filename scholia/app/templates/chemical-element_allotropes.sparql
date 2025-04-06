@@ -1,3 +1,4 @@
+# title: list known allotropes
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT ?allotrope ?allotropeLabel ?density ?densityUnit ?densityUnitLabel WITH {

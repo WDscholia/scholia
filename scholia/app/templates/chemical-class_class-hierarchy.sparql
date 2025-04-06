@@ -1,3 +1,4 @@
+# title: network depiction of the class hierarchy
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

@@ -1,3 +1,4 @@
+# title: recent literature about this chemical element
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?date ?work ?workLabel ?type ?topics

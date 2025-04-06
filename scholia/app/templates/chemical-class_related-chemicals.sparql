@@ -1,3 +1,4 @@
+# title: lists related chemicals for this class
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl WITH {

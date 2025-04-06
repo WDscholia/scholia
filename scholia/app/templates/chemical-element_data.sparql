@@ -1,3 +1,4 @@
+# title: data for this chemical element
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT ?description ?value ?valueUrl

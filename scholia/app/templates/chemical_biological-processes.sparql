@@ -1,3 +1,4 @@
+# title: biological processes in which this chemical is involved
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT
