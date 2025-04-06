@@ -1,3 +1,4 @@
+# title: list the isotopes for this chemical element
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT ?isotope ?isotopeLabel ?protons ?neutrons ?mass ?massUnit ?massUnitLabel ?halflife ?halflifeUnit?halflifeUnitLabel

@@ -1,3 +1,4 @@
+# title: histogram of the number of articles per year about this chemical class
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 

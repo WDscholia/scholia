@@ -1,3 +1,4 @@
+# title: lists the taxons in which this chemical is found
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl)
