@@ -32,6 +32,21 @@ from ..wikipedia import q_to_bibliography_templates
 from ..config import config
 
 
+ROBOTS_TXT = """User-agent: *
+Allow: /$
+Allow: /about
+Allow: /faq
+Allow: /author/$
+Allow: /organization/$
+Allow: /publisher/$
+Allow: /series/$
+Allow: /topic/$
+Allow: /venue/$
+Allow: /work/$
+Disallow: /
+"""
+
+
 class RegexConverter(BaseConverter):
     """Converter for regular expression routes.
 
@@ -2788,8 +2803,6 @@ def show_robots_txt():
     Disallow: /
 
     """
-    ROBOTS_TXT = ('User-agent: *\n'
-                  'Disallow: /\n')
     return Response(ROBOTS_TXT, mimetype="text/plain")
 
 
