@@ -2,7 +2,8 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?score ?topic ?topicLabel ?topicDescription
+ SELECT ?score ?topic ?topicLabel ?topicDescription
+  (CONCAT("/topic/", STRAFTER(STR(?topic), "http://www.wikidata.org/entity/")) AS ?topicUrl)
 WITH {
   SELECT
     DISTINCT ?person
