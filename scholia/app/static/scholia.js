@@ -259,7 +259,9 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
     
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
-
+    var sparqlEndpointName = (typeof options.sparqlEndpointName === 'undefined')
+	? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
+    
     $(element).html("<div class='loader'><div></div><div></div><div></div></div>");
 
     $.post(url, data = { query: sparql }, function (response, textStatus) {
@@ -296,7 +298,7 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
         $(element).append(
             '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
                 encodeURIComponent(sparql) +
-                '">Wikidata Query Service</a></span>' +
+                '">' + sparqlEndpointName + '</a></span>' +
                 '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' +
                 filename + '">' +
                 filename.replace("_", ": ") +
@@ -325,10 +327,12 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var url = url + "?query=" + encodeURIComponent(sparql) + '&format=json';
+    var sparqlEndpointName = (typeof options.sparqlEndpointName === 'undefined')
+	? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
 
     const datatableFooter =
         '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
-        encodeURIComponent(sparql) + '">Wikidata Query Service</a></span>' +
+        encodeURIComponent(sparql) + '">' + sparqlEndpointName + '</a></span>' +
         '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' +
         filename +
         '">' +

@@ -102,6 +102,22 @@ DOI_PATTERN = re.compile(r'10\.\d{4,9}/[\[\]\-._;()/:A-Z0-9]+', re.IGNORECASE)
 ASPECT_PATTERN = '<regex("[a-zA-Z]+"):aspect>'
 
 
+@main.context_processor
+def inject_js_config():
+    """Return configuration for Javascript.
+
+    Returns
+    -------
+    js_config : dict
+        Configuration to Javascript as a dict.
+
+    """
+    return dict(js_config={
+        "sparqlEndpointName":
+        config['query-server'].get('sparql_endpoint_name'),
+    })
+
+
 @main.route("/")
 def index():
     """Return rendered index page.
@@ -122,7 +138,7 @@ def index_statistics():
     Returns
     -------
     html : str
-        Rederende HTML for main statistics page.
+        Renderende HTML for main statistics page.
 
     """
     ep = config['query-server'].get('sparql_endpoint')
