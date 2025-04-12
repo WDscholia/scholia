@@ -34,10 +34,24 @@ function {{ panel | replace("-", "") }}HandleIntersection(entries, observer){
 
 {% macro sparql_to_iframe(panel) -%}
 // {{ panel }} iframe
-sparqlToIframe2("{{ sparql_endpoint }}", "{{ sparql_editURL }}",
-"{{ sparql_embedURL }}", `# tool: scholia
-{% include aspect + '_' + panel + '.sparql' %}`,
-"#{{ panel }}-iframe", "{{ aspect }}_{{ panel }}.sparql");
+console.log('adding an observer to: #{{ panel }}-iframe');
+const {{ panel | replace("-", "") }}Observer = new IntersectionObserver({{ panel | replace("-", "") }}HandleIntersection);
+{{ panel | replace("-", "") }}Observer.observe(document.querySelector('#{{ panel }}-iframe'));
+function {{ panel | replace("-", "") }}HandleIntersection(entries, observer){
+  entries.forEach(entry => {
+    if (entry.intersectionRatio > 0) {
+      console.log('Element is in the viewport! #{{ panel }}-iframe');
+      sparqlToIframe2("{{ sparql_endpoint }}", "{{ sparql_editURL }}",
+        "{{ sparql_embedURL }}", `# tool: scholia
+        {% include aspect + '_' + panel + '.sparql' %}`,
+        "#{{ panel }}-iframe", "{{ aspect }}_{{ panel }}.sparql"
+      );
+      {{ panel | replace("-", "") }}Observer.unobserve(entry.target);
+    }
+  });
+}
+
+
 {%- endmacro %}
 
 {% macro sparql_to_matrix(panel) -%}
