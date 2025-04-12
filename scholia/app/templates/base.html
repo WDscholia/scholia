@@ -12,12 +12,24 @@ options={{ options | tojson }});
 
 {% macro sparql_to_table(panel, options={}) -%}
 // {{ panel }} table
-sparqlToDataTable2("{{ sparql_endpoint }}", "{{ sparql_editURL }}",
-`# tool: scholia
-{% include aspect + '_' + panel + '.sparql' %}
-`,
-"#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",
-options={{ options | tojson }});
+console.log('adding an observer to: #{{ panel }}-table');
+const {{ panel | replace("-", "") }}Observer = new IntersectionObserver({{ panel | replace("-", "") }}HandleIntersection);
+{{ panel | replace("-", "") }}Observer.observe(document.querySelector('#{{ panel }}-table'));
+function {{ panel | replace("-", "") }}HandleIntersection(entries, observer){
+  entries.forEach(entry => {
+    if (entry.intersectionRatio > 0) {
+      console.log('Element is in the viewport! #{{ panel }}-table');
+      sparqlToDataTable2("{{ sparql_endpoint }}", "{{ sparql_editURL }}",
+        `# tool: scholia
+        {% include aspect + '_' + panel + '.sparql' %}
+        `,
+        "#{{ panel }}-table", "{{ aspect }}_{{ panel }}.sparql",
+        options={{ options | tojson }}
+      );
+      {{ panel | replace("-", "") }}Observer.unobserve(entry.target);
+    }
+  });
+}
 {%- endmacro %}
 
 {% macro sparql_to_iframe(panel) -%}
@@ -106,7 +118,7 @@ askQuery("{{ panel }}", `# tool: scholia
 	       '&format=json&callback=?';
     
     const currentAspect = window.location.pathname.split("/")[1];
-     
+
     $.getJSON(url, function (data) {
 	 var item = data.entities["{{ q }}"];
 	 if ('en' in item.labels) {
