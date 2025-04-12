@@ -395,9 +395,11 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
                 }
 
                 $("#" + loaderID).remove(); // remove loader
+                // remove old content, like a 'time out' error message:
+                tableElement = document.getElementById(element.slice(1))
+                if (tableElement) tableElement.innerHTML = ''
 
                 if ($.fn.dataTable.isDataTable(element)) {
-                    // $(element).DataTable().clear();
                     $(element).DataTable().rows.add(convertedData.data).draw();
                 } else {
                     $(element).DataTable({
@@ -420,6 +422,9 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
                 }
             } else {
                 $('#' + loaderID).remove(); // remove loader
+                // remove old content, like a 'time out' error message:
+                tableElement = document.getElementById(element.slice(1))
+                if (tableElement) tableElement.innerHTML = ''
 
                 if (!$.fn.dataTable.isDataTable(element)) {
                     $(element).DataTable({
