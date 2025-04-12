@@ -138,7 +138,7 @@ def index_statistics():
     Returns
     -------
     html : str
-        Renderende HTML for main statistics page.
+        Rendered HTML for main statistics page.
 
     """
     ep = config['query-server'].get('sparql_endpoint')
