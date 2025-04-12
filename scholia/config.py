@@ -22,6 +22,7 @@ DEFAULTS = """
 sparql_endpoint = https://query-legacy-full.wikidata.org/sparql
 sparql_editurl = https://query-legacy-full.wikidata.org/#
 sparql_embedurl = https://query-legacy-full.wikidata.org/embed.html#
+sparql_endpoint_name = WDQS legacy-full-graph
 
 [requests]
 user_agent = Scholia
