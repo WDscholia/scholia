@@ -12,13 +12,13 @@ options={{ options | tojson }});
 
 {% macro sparql_to_table(panel, options={}) -%}
 // {{ panel }} table
-console.log('adding an observer to: #{{ panel }}-table');
+// console.log('adding an observer to: #{{ panel }}-table');
 const {{ panel | replace("-", "") }}Observer = new IntersectionObserver({{ panel | replace("-", "") }}HandleIntersection);
 {{ panel | replace("-", "") }}Observer.observe(document.querySelector('#{{ panel }}-table'));
 function {{ panel | replace("-", "") }}HandleIntersection(entries, observer){
   entries.forEach(entry => {
     if (entry.intersectionRatio > 0) {
-      console.log('Element is in the viewport! #{{ panel }}-table');
+      // console.log('Element is in the viewport! #{{ panel }}-table');
       sparqlToDataTable2("{{ sparql_endpoint }}", "{{ sparql_editURL }}",
         `# tool: scholia
         {% include aspect + '_' + panel + '.sparql' %}
@@ -34,13 +34,13 @@ function {{ panel | replace("-", "") }}HandleIntersection(entries, observer){
 
 {% macro sparql_to_iframe(panel) -%}
 // {{ panel }} iframe
-console.log('adding an observer to: #{{ panel }}-iframe');
+// console.log('adding an observer to: #{{ panel }}-iframe');
 const {{ panel | replace("-", "") }}Observer = new IntersectionObserver({{ panel | replace("-", "") }}HandleIntersection);
 {{ panel | replace("-", "") }}Observer.observe(document.querySelector('#{{ panel }}-iframe'));
 function {{ panel | replace("-", "") }}HandleIntersection(entries, observer){
   entries.forEach(entry => {
     if (entry.intersectionRatio > 0) {
-      console.log('Element is in the viewport! #{{ panel }}-iframe');
+      // console.log('Element is in the viewport! #{{ panel }}-iframe');
       sparqlToIframe2("{{ sparql_endpoint }}", "{{ sparql_editURL }}",
         "{{ sparql_embedURL }}", `# tool: scholia
         {% include aspect + '_' + panel + '.sparql' %}`,
