@@ -3,7 +3,8 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # List of works that is cited by the specified work
-SELECT ?citations ?publication_date ?cited_work ?cited_workLabel 
+SELECT ?citations ?publication_date ?cited_work ?cited_workLabel
+  (GROUP_CONCAT(DISTINCT ?intentionLabel;separator=", ") AS ?intentions)
 WITH {
   SELECT (MIN(?date) AS ?publication_date) (COUNT(DISTINCT ?citing_cited_work) AS ?citations) ?cited_work 
   WHERE {
@@ -18,6 +19,12 @@ WITH {
 } AS %result
 WHERE {
   INCLUDE %result
+  OPTIONAL {
+    target: p:P2860 ?citationStatement .
+    ?citationStatement pq:P3712 ?intention ;
+                       ps:P2860 ?cited_work .
+    ?intention rdfs:label ?intentionLabel . FILTER (lang(?intentionLabel) = "en")
+  }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
-} 
+} GROUP BY ?citations ?publication_date ?cited_work ?cited_workLabel
 ORDER BY DESC(?citations) DESC(?date)
