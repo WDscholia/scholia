@@ -532,10 +532,17 @@ function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
 
 
 function sparqlToMatrix(sparql, element, filename){
-    
+    sparqlToMatrix2(
+        "https://query.wikidata.org/sparql",
+        sparql, element, filename
+    );
+}
+
+
+function sparqlToMatrix2(endpointUrl, sparql, element, filename){
     window.onresize = resize(element);
 
-    sparqlToResponse(sparql, function(response) {
+    sparqlToResponse2(endpointUrl, sparql, function(response) {
         var data = response.results.bindings;
 
         var qToLabel = new Object();
