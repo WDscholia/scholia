@@ -78,7 +78,7 @@ sparqlToShortInchiKey(`# tool: scholia
 
 {% macro ask_query_callback(panel) -%}
 // {{ panel }} ask query
-askQuery("{{ panel }}", `# tool: scholia
+askQuery2("{{ sparql_endpoint }}", "{{ panel }}", `# tool: scholia
 {% include 'ask_' + aspect + '_' + panel + '.sparql' %}`, 
 () => {
     {{ caller() }};

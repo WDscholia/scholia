@@ -749,7 +749,15 @@ function sparqlToShortInchiKey(sparql, key,  element, filename) {
 
 
 function askQuery(panel, askQuery, callback) {
-     var endpointUrl = 'https://query.wikidata.org/sparql';
+    askQuery2(
+        "https://query.wikidata.org/sparql",
+        panel, askQuery, callback
+    );
+}
+
+
+function askQuery2(endpointUrl, panel, askQuery, callback) {
+     if (!endpointUrl) endpointUrl = "https://query.wikidata.org/sparql";
      
      var settings = {
        headers: { Accept: 'application/sparql-results+json' },
