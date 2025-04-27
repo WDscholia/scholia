@@ -56,7 +56,7 @@ function {{ panel | replace("-", "") }}HandleIntersection(entries, observer){
 
 {% macro sparql_to_matrix(panel) -%}
 // {{ panel }} matrix
-sparqlToMatrix(`# tool: scholia
+sparqlToMatrix2("{{ sparql_endpoint }}", `# tool: scholia
 {% include aspect + '_' + panel + '.sparql' %}`,
 "#{{ panel }}", "{{ aspect }}_{{ panel }}.sparql");
 {%- endmacro %}
