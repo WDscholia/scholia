@@ -11,6 +11,7 @@ WITH {
     FILTER (target: != ?work)
   }
   GROUP BY ?work
+  ORDER BY DESC(?count)
   LIMIT 500
 } AS %result
 WHERE {
