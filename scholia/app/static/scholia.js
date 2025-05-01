@@ -420,6 +420,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
                         },
                     });
                 }
+                $(element).append(datatableFooter);
             } else {
                 $('#' + loaderID).remove(); // remove loader
                 // remove old content, like a 'time out' error message:
@@ -442,6 +443,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
                         },
                     });
                 }
+                $(element).append(datatableFooter);
             }
         }).fail(function () {
             $('#' + loaderID).remove(); // remove loader
