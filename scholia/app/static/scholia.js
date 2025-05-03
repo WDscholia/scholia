@@ -317,6 +317,38 @@ function sparqlToDataTable(sparql, element, filename, options = {}) {
 }
 
 
+// helper method to extract config information from the SPARQL files.
+function extractConfig(sparql) {
+    config = {};
+    lines = sparql.split(/\r?\n/);
+    lines.forEach(function(line, i) {
+        line = line.replace(/ /g,'')
+        if (line.startsWith("#sparql_endpoint=")) {
+            // SPARQL endpoint against which this query should be executed
+            var list = line.split("=")
+            list.shift()
+            config["url"] = list.join("=")
+        } else if (line.startsWith("#sparql_endpoint_name=")) {
+            // name of the SPARQL endpoint (to show up in the output)
+            var list = line.split("=")
+            list.shift()
+            config["endpointName"] = list.join("=")
+        } else if (line.startsWith("#sparql_editurl=")) {
+            // URL pattern to give the SPARQL query in the endpoint editor
+            var list = line.split("=")
+            list.shift()
+            config["editURL"] = list.join("=")
+        } else if (line.startsWith("#sparql_embedurl=")) {
+            // URL pattern for embeddable SPARQL endpoint results, e.g. for iframes
+            var list = line.split("=")
+            list.shift()
+            config["embedURL"] = list.join("=")
+        }
+    });
+    return config;
+}
+
+
 function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {}) {
     // Options: paging=true
     if (!url) url = "https://query.wikidata.org/sparql";
@@ -326,9 +358,16 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
 
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
-    var url = url + "?query=" + encodeURIComponent(sparql) + '&format=json';
     var sparqlEndpointName = (typeof options.sparqlEndpointName === 'undefined')
 	? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
+
+    // overwrite the central URLs of SPARQL specific URLs are found
+    configFromSPARQL = extractConfig(sparql);
+    if (configFromSPARQL["url"]) url = configFromSPARQL["url"];
+    if (configFromSPARQL["editURL"]) editURL = configFromSPARQL["editURL"];
+    if (configFromSPARQL["endpointName"]) sparqlEndpointName = configFromSPARQL["endpointName"];
+
+    var url = url + "?query=" + encodeURIComponent(sparql) + '&format=json';
 
     const datatableFooter =
         '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
