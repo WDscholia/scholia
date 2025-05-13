@@ -7,23 +7,49 @@ SELECT
   ?work ?workLabel
   ?researchers ?researchersUrl
 WITH {
-  SELECT 
-    (MIN(?publication_datetimes) AS ?publication_datetime) ?work 
-    (GROUP_CONCAT(DISTINCT ?researcher_label; separator=', ') AS ?researchers)
-    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?researchersUrl)
-  WHERE {                                                         
+  SELECT DISTINCT
+    ?researcher
+  WHERE {
     ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
-    ?work wdt:P50 ?researcher .
-    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
-    OPTIONAL {
-      ?work wdt:P577 ?publication_datetimes .
-    }
+  }
+} AS %researchers
+WITH {
+  SELECT
+    ?work
+    (MIN(?publication_datetime_) AS ?publication_datetime)
+  WHERE {
+    INCLUDE %researchers
+    ?work wdt:P50 ?researcher ;
+          wdt:P577 ?publication_datetime_ .
   }
   GROUP BY ?work
   ORDER BY DESC(?publication_datetime)
-  LIMIT 200  
+  LIMIT 200
+} AS %works
+WITH {
+  SELECT 
+    ?work 
+    (GROUP_CONCAT(?researcher_label; separator=', ') AS ?researchers)
+    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?researchersUrl)
+  WHERE {
+    INCLUDE %researchers
+    INCLUDE %works
+    {
+      # GROUP_CONCAT cannot honor sorting, but this was an attempt
+      SELECT
+        ?work ?researcher ?researcher_label
+      WHERE {
+        ?work p:P50 [ ps:P50 ?researcher ; pq:P1545 ?order ] .
+        BIND(xsd:integer(?order) AS ?n)
+       ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
+      }
+      ORDER BY ?n
+    }
+  }
+  GROUP BY ?work 
 } AS %results
 WHERE {
+  INCLUDE %works
   INCLUDE %results
   BIND(xsd:date(?publication_datetime) AS ?publication_date)
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }

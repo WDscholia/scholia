@@ -27,11 +27,23 @@ WHERE {
       (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
     {
       BIND(1 AS ?dummy)
-      target: wdt:P50 ?iri .
-      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
-      ?iri rdfs:label ?value_string . 
-      FILTER (LANG(?value_string) = 'en')
-      BIND(COALESCE(?value_string, ?q) AS ?value_)
+      {
+        # GROUP_CONCAT does not order by standard but BlazeGraph seems to order
+	# so we are hoping the sorting is correct here.
+        SELECT 
+          ?value_ ?q
+        WHERE {
+          target: p:P50 ?author_statement .
+          ?author_statement ps:P50 ?author .
+          BIND(SUBSTR(STR(?author), 32) AS ?q) 
+          ?author_statement pq:P1545 ?order .
+          BIND(xsd:integer(?order) AS ?n)
+          ?author rdfs:label ?value_string . 
+          FILTER (LANG(?value_string) = 'en')
+          BIND(COALESCE(?value_string, ?q) AS ?value_)
+        }
+        ORDER BY ?n
+      }
     }
     GROUP BY ?dummy
   }

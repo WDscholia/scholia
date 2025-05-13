@@ -9,13 +9,25 @@ SELECT
   ?venue ?venueLabel
   (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
   (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
+WITH {
+  # By standard GROUP_CONCAT does not sort, but BlazeGraph seems to sort.
+  SELECT
+    ?work ?author ?author_label
+  WHERE {
+    ?work wdt:P50 target: .
+    ?work p:P50 [ ps:P50 ?author ; pq:P1545 ?order ] .
+    BIND(xsd:integer(?order) AS ?n)
+    OPTIONAL {
+      ?author rdfs:label ?author_label_ . FILTER (LANG(?author_label_) = 'en')
+    }
+    BIND(COALESCE(?author_label_, SUBSTR(STR(?author), 32)) AS ?author_label)
+  }
+  ORDER BY ?n
+} AS %authors  
 WHERE {
   ?work wdt:P50 target: .
-  ?work wdt:P50 ?author .
-  OPTIONAL {
-    ?author rdfs:label ?author_label_ . FILTER (LANG(?author_label_) = 'en')
-  }
-  BIND(COALESCE(?author_label_, SUBSTR(STR(?author), 32)) AS ?author_label)
+  INCLUDE %authors 
+  
   OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
   ?work wdt:P577 ?datetimes .
   BIND(xsd:date(?datetimes) AS ?dates)
