@@ -47,28 +47,83 @@ SELECT ?paper WHERE {{
 """
 
 
-def paper_url_to_html(identifier):
+def paper_url_to_identifier(url):
+    """Extract OpenReview identifier from URL.
+
+    Parameters
+    ----------
+    url : str
+        String with OpenReview URL.
+
+    Returns
+    -------
+    identifier : str
+        String with OpenReview identifier or empty if no identifier is found.
+
+    Raises
+    ------
+    ValueError
+        If the OpenReview identifier cannot be found in the URL.
+
+    Examples
+    --------
+    >>> paper_url_to_identifier("https://openreview.net/forum?id=aVh9KRZdRk")
+    'aVh9KRZdRk'
+    >>> paper_url_to_identifier("https://openreview.net/pdf?id=aVh9KRZdRk")
+    'aVh9KRZdRk'
+    >>> paper_url_to_identifier("https://www.wikidata.org")
+    Traceback (most recent call last):
+      ...
+    ValueError: URL does not contain an 'id=' parameter
+
+    """
+    url = url.strip()
+    lower_url = url.lower()
+    if 'id=' in lower_url:
+        # Find the position of 'id=' (case-insensitive match)
+        id_pos = lower_url.find('id=')
+
+        # Find the actual key in the original string (preserves case of value)
+        after_id = url[id_pos + 3:]
+        return after_id.split('&')[0]
+    raise ValueError("URL does not contain an 'id=' parameter")
+
+
+def paper_url_to_html(url_or_identifier):
     """Download the HTML content from an OpenReview.net submission page.
 
     Parameters
     ----------
-    identifier : str
+    url_or_identifier : str
         The URL or the submission ID of the OpenReview.net submission.
+        The URL could be both the URL to the PDF or the HTML of the submission.
 
     Returns
     -------
-    str
+    html : str
         The HTML content of the page.
+
+    Raises
+    ------
+    ValueError
+        If the OpenReview identifier cannot be found in the URL.
+    requests.exceptions.HTTPError
+        If URL not found on the OpenReview website.
 
     Examples
     --------
+    >>> # HTML of "Learning to grok" paper
     >>> html = paper_url_to_html('https://openreview.net/forum?id=aVh9KRZdRk')
+    >>> "Learning to grok" in html
+    True
 
     """
-    if identifier.startswith('http'):
-        url = identifier
+    if url_or_identifier.startswith('http'):
+        identifier = paper_url_to_identifier(url_or_identifier)
     else:
-        url = f'https://openreview.net/forum?id={identifier}'
+        identifier = url_or_identifier
+
+    url = f'https://openreview.net/forum?id={identifier}'
     headers = {'User-Agent': USER_AGENT}
     response = requests.get(url, headers=headers)
     response.raise_for_status()
