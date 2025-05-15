@@ -3,6 +3,8 @@
 import re
 import requests
 
+from scholia.config import config
+
 USER_AGENT = "Scholia"
 HEADERS = {"User-Agent": USER_AGENT}
 
@@ -44,7 +46,7 @@ def ask_query(file_name, q_number):
 
     query = re.sub(r"\{\{ ?q ?\}\}", q_number, query)
 
-    url = "https://query.wikidata.org/sparql"
+    url = config['query-server']['sparql_endpoint']
     params = {"query": query, "format": "json"}
     response = requests.get(url, params=params, headers=HEADERS)
 
