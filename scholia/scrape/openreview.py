@@ -209,14 +209,14 @@ def html_to_paper(html):
 
     Returns
     -------
-    dict
+    paper : dict
         A dictionary containing metadata about the submission.
 
     Notes
     -----
     The function with look at the JSON in the HTML. If title and author are not
-    found in JSON the the metatags are examined, citation_title and
-    citation_author.
+    found in JSON the the metatags are examined, citation_title,
+    citation_author, citation_online_date, description and citation_pdf_url.
 
     The paper is not matched to proceedings.
 
@@ -226,6 +226,9 @@ def html_to_paper(html):
     >>> paper = html_to_paper(html)
     >>> paper['title'].startswith('Learning to grok')
     True
+
+    >>> paper['url']
+    'https://openreview.net/forum?id=aVh9KRZdRk'
 
     """
     tree = etree.HTML(html)
@@ -267,6 +270,11 @@ def html_to_paper(html):
     # For instance https://openreview.net/forum?id=0g0X4H8yN4I
     # Instead we at the metadags
 
+    if 'abstract' not in data:
+        abstract = _field_to_content(tree, 'description')
+        if abstract:
+            data['abstract'] = abstract
+
     if 'authors' not in data:
         authors = [
             author_element.attrib['content']
@@ -283,11 +291,32 @@ def html_to_paper(html):
             if len(authors) > 0:
                 data['authors'] = authors
 
+    if 'date' not in data:
+        date = _field_to_content(tree, 'citation_online_date')
+        if date:
+            data['date'] = date.replace('/', '-')
+
+    if 'full_text_url' not in data:
+        full_text_url = _field_to_content(tree, 'citation_pdf_url')
+        if full_text_url:
+            data['full_text_url'] = full_text_url
+
+    if 'openreview_id' not in data:
+        if 'full_text_url' in data:
+            openreview_id = paper_url_to_identifier(data['full_text_url'])
+            if openreview_id:
+                data['openreview_id'] = openreview_id
+
     if 'title' not in data:
         title = _fields_to_content(tree, ['citation_title', 'DC.Title',
                                           'DC.Title.Alternative'])
         if title:
             data['title'] = title
+
+    if 'url' not in data:
+        if 'openreview_id' in data:
+            data['url'] = 'https://openreview.net/forum?id=' + \
+                data['openreview_id']
 
     return data
 
