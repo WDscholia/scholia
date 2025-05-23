@@ -1160,6 +1160,7 @@ def q_to_class(q):
             'Q253623',  # patent
             'Q580922',  # preprint
             'Q685935',  # trade magazine
+            'Q947859',  # research proposal
             'Q1266946',  # thesis
             'Q1778788',  # cohort study
             'Q1907875',  # master's thesis
