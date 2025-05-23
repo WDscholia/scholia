@@ -24,10 +24,13 @@ import sys
 import requests
 from feedparser import parse as parse_api
 
+from .config import config
 from .qs import paper_to_quickstatements
 
 
-USER_AGENT = 'Scholia'
+USER_AGENT = config['requests'].get('user_agent')
+
+HEADERS = {'User-Agent': USER_AGENT}
 
 ARXIV_URL = 'https://export.arxiv.org/'
 
@@ -74,7 +77,7 @@ def get_metadata(arxiv):
 
     url = ARXIV_URL + "api/query?id_list=" + arxiv
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=HEADERS)
 
         if response.status_code == 200:
             feed = parse_api(response.content)
