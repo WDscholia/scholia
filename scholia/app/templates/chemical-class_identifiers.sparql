@@ -1,4 +1,8 @@
 # title: identifiers for this chemical class
+#sparql_endpoint = https://query.wikidata.org/sparql
+#sparql_endpoint_name= WDQS main
+#sparql_editurl = https://query.wikidata.org/#
+#sparql_embedurl = https://query.wikidata.org/embed.html#
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT
