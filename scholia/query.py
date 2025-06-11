@@ -1110,21 +1110,21 @@ def q_to_class(q):
         # response, then fallback on nothing.
         classes = []
     else:
-        classes = [item['class']['value'][31:]
-                   for item in data['results']['bindings']]
+        classes = set([item['class']['value'][31:]
+                       for item in data['results']['bindings']])
 
     # Hard-coded matching match
     if ('Q5' in classes):  # human
         class_ = 'author'
     elif ('Q30612' in classes):  # clinical trial
         class_ = 'clinical_trial'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q277759',  # book series
             'Q2217301',  # serial (publication series)
             'Q27785883',  # conference proceedings series
     ]):
         class_ = 'series'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q41298',  # magazine
             'Q737498',  # academic journal
             'Q5633421',  # scientific journal
@@ -1141,16 +1141,16 @@ def q_to_class(q):
             'Q8054',  # protein
     ]):
         class_ = 'protein'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q170584',  # project
             'Q1298668',  # research project
     ]):
         class_ = 'project'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q7187',  # gene
     ]):
         class_ = 'gene'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q571',  # book
             'Q49848',  # document
             'Q187685',  # doctoral thesis
@@ -1187,7 +1187,7 @@ def q_to_class(q):
             'Q110716513',  # scholarly letter/reply
     ]):
         class_ = 'work'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q7191',  # Nobel prize
             'Q193622',  # order
             'Q230788',  # grant
@@ -1203,7 +1203,7 @@ def q_to_class(q):
             'Q15383322',  # culture award
     ]):
         class_ = 'award'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q3918',  # university
             'Q31855',  # research institute
             'Q38723',  # higher education institution
@@ -1224,14 +1224,14 @@ def q_to_class(q):
             'Q29300714',  # international association
             ]):
         class_ = 'organization'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q15275719',  # recurrent event
             'Q15900647',  # conference series
             'Q47258130',  # scientific conference series
             'Q47459256',  # academic workshop series
             ]):
         class_ = 'event_series'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q1543677',  # online conference
             'Q1656682',  # event
             'Q27968055',  # recurrent event edition (event in a series)
@@ -1241,7 +1241,7 @@ def q_to_class(q):
             'Q112748789',  # hybrid scholarly conference
             ]):
         class_ = 'event'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q12136',  # disease
             'Q389735',  # cardiovascular system disease
             'Q18965518',  # artery disease
@@ -1256,11 +1256,11 @@ def q_to_class(q):
             'Q113145171',  # type of a chemical entity
             ]):
         class_ = 'chemical'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q11344',  # chemical element
             ]):
         class_ = 'chemical_element'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q15711994',  # group of isomeric compounds
             'Q17339814',  # group or class of chemical substances
             'Q47154513',  # structural class of chemical entities
@@ -1276,7 +1276,7 @@ def q_to_class(q):
             'Q59199015',  # group of stereoisomers
             ]):
         class_ = 'chemical_class'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q324254',  # ontology
             'Q1437388',  # formal ontology
             'Q1925081',  # meta-modeling
@@ -1297,27 +1297,27 @@ def q_to_class(q):
             'Q113006099',  # inactive ontology
             ]):
         class_ = 'ontology'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q2996394',  # biological process (Reactome pathway)
             'Q4915012',  # biological pathway
             ]):
         class_ = 'pathway'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q16521',  # taxon
             ]):
         class_ = 'taxon'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q1172284',  # data set
             ]):
         class_ = 'dataset'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q46855',  # hackathon
             'Q625994',  # conference
             'Q2020153',  # scientific conference
             'Q40444998',  # academic workshop
             ]):
         class_ = 'event'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q341',  # free software
             'Q7397',  # software
             'Q1639024',  # mathematical software
@@ -1326,24 +1326,24 @@ def q_to_class(q):
             'Q24529812',  # statistical package
             ]):
         class_ = 'software'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q22811662',  # image database
             ]):
         class_ = 'use'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q420927',  # protein complex
             'Q22325163',  # macromolecular complex
             ]):
         class_ = 'complex'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q24634210',  # podcast
             ]):
         class_ = 'podcast'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q69154911',  # podcast season
             ]):
         class_ = 'podcast_season'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q61855877',  # podcast episode
             ]):
         class_ = 'podcast_episode'
@@ -1355,23 +1355,29 @@ def q_to_class(q):
 
         url = SPARQL_ENDPOINT
         params = {'query': query, 'format': 'json'}
-        response = requests.get(url, params=params, headers=HEADERS)
-        data = response.json()
-        parents = [item['class']['value'][31:]
-                   for item in data['results']['bindings']]
+        try:
+            response = requests.get(url, params=params, headers=HEADERS)
+            data = response.json()
+            parents = set([item['class']['value'][31:]
+                           for item in data['results']['bindings']])
+        except Exception:
+            # There may be an an error calling the Wikidata API.
+            # RequestsJSONDecodeError may occur
+            # Fallback to empty parent
+            parents = set()
 
-        if set(parents).intersection([
+        if parents.intersection([
                 'Q40050',  # drink
                 ]):
             class_ = 'topic'
-        elif set(parents).intersection([
+        elif parents.intersection([
                 'Q11173',  # chemical compound
                 'Q79529',  # chemical substance
                 'Q15711994',  # group of isomeric entities
                 'Q47154513',  # structural class of chemical entities
                 ]):
             class_ = 'chemical_class'
-        elif set(parents).intersection([
+        elif parents.intersection([
                 'Q1172284',  # data set
                 ]):
             class_ = 'dataset'
