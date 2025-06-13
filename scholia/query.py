@@ -1108,7 +1108,7 @@ def q_to_class(q):
     except requests.exceptions.JSONDecodeError:
         # If the Wikidata MediaWiki API does not return a proper
         # response, then fallback on nothing.
-        classes = []
+        classes = set([])
     else:
         classes = set([item['class']['value'][31:]
                        for item in data['results']['bindings']])
@@ -1137,7 +1137,7 @@ def q_to_class(q):
     elif ('Q2085381' in classes or  # publisher
           'Q479716' in classes):  # university publisher
         class_ = 'publisher'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q8054',  # protein
     ]):
         class_ = 'protein'
@@ -1247,7 +1247,7 @@ def q_to_class(q):
             'Q18965518',  # artery disease
             ]):
         class_ = 'disease'
-    elif set(classes).intersection([
+    elif classes.intersection([
             'Q11173',  # chemical compound
             'Q36496',  # ion
             'Q79529',  # chemical substance
