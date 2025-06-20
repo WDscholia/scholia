@@ -369,9 +369,8 @@ def classes_to_aspect(classes):
     return aspect
 
 
-@main.context_processor
-def inject_js_config():
-    """Return configuration for Javascript.
+def get_js_config():
+    """Return dictionary with Javascript configuration.
 
     Returns
     -------
@@ -379,10 +378,23 @@ def inject_js_config():
         Configuration to Javascript as a dict.
 
     """
-    return dict(js_config={
+    return {
         "sparqlEndpointName":
         config['query-server'].get('sparql_endpoint_name'),
-    })
+    }
+
+
+@main.context_processor
+def inject_js_config():
+    """Return configuration for Javascript for injection.
+
+    Returns
+    -------
+    js_config : dict
+        Configuration to Javascript as a dict.
+
+    """
+    return dict(js_config=get_js_config())
 
 
 @main.route("/")
@@ -3385,7 +3397,8 @@ def page_not_found(e):
     This function can be used as 404 error handler.
 
     """
-    return render_template("404.html", error=""), 404
+    return (render_template("404.html", js_config=get_js_config(), error=""),
+            404)
 
 
 def could_not_find(name):
