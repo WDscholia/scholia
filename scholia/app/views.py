@@ -8,7 +8,8 @@ from flask import (Blueprint, current_app, redirect, render_template, request,
 from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
 
-from ..api import entity_to_name, entity_to_smiles, search, wb_get_entities
+from ..api import (entity_to_classes, entity_to_name, entity_to_smiles, search,
+                   wb_get_entities)
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works, wb_get_organization_latest_works,
                    wb_get_sponsor_latest_works)
@@ -20,7 +21,7 @@ from ..query import (arxiv_to_qs, cas_to_qs, atomic_symbol_to_qs, doi_to_qs,
                      doi_prefix_to_qs, github_to_qs, biorxiv_to_qs,
                      chemrxiv_to_qs, omim_to_qs,
                      identifier_to_qs, inchikey_to_qs, issn_to_qs, orcid_to_qs,
-                     viaf_to_qs, q_to_class, q_to_dois, random_author,
+                     viaf_to_qs, q_to_dois, random_author,
                      twitter_to_qs, cordis_to_qs, mesh_to_qs, pubmed_to_qs,
                      lipidmaps_to_qs, ror_to_qs, wikipathways_to_qs,
                      pubchem_to_qs, atomic_number_to_qs, ncbi_taxon_to_qs,
@@ -102,6 +103,272 @@ DOI_PATTERN = re.compile(r'10\.\d{4,9}/[\[\]\-._;()/:A-Z0-9]+', re.IGNORECASE)
 ASPECT_PATTERN = '<regex("[a-zA-Z]+"):aspect>'
 
 
+def classes_to_aspect(classes):
+    """Suggest an aspect for a set of classes.
+
+    Parameters
+    ----------
+    classes : list or set or str
+        Wikidata identifiers for classes for an entity
+
+    Returns
+    -------
+    aspect : str
+        Scholia aspect appropriate for an entity
+
+    Examples
+    --------
+    >>> classes_to_aspect(['Q5'])
+    'author'
+
+    """
+    classes = set(classes)
+
+    # Hard-coded matching match
+    if ('Q5' in classes):  # human
+        aspect = 'author'
+    elif ('Q30612' in classes):  # clinical trial
+        aspect = 'clinical_trial'
+    elif classes.intersection([
+            'Q277759',  # book series
+            'Q2217301',  # serial (publication series)
+            'Q27785883',  # conference proceedings series
+    ]):
+        aspect = 'series'
+    elif classes.intersection([
+            'Q41298',  # magazine
+            'Q737498',  # academic journal
+            'Q5633421',  # scientific journal
+            'Q1143604',  # proceedings
+    ]):
+        aspect = 'venue'
+    elif ('Q157031' in classes or  # foundation
+          'Q10498148' in classes):  # research council
+        aspect = 'sponsor'
+    elif classes.intersection([
+            'Q479716',   # book publisher
+            'Q2085381',  # publisher
+            'Q1320047'   # university publisher
+    ]):
+        aspect = 'publisher'
+    elif classes.intersection([
+            'Q8054',  # protein
+    ]):
+        aspect = 'protein'
+    elif classes.intersection([
+            'Q170584',  # project
+            'Q1298668',  # research project
+    ]):
+        aspect = 'project'
+    elif classes.intersection([
+            'Q7187',  # gene
+    ]):
+        aspect = 'gene'
+    elif classes.intersection([
+            'Q571',  # book
+            'Q49848',  # document
+            'Q187685',  # doctoral thesis
+            'Q191067',  # article
+            'Q815382',  # meta-analysis
+            'Q871232',  # editorial
+            'Q253623',  # patent
+            'Q580922',  # preprint
+            'Q685935',  # trade magazine
+            'Q947859',  # research proposal
+            'Q1266946',  # thesis
+            'Q1778788',  # cohort study
+            'Q1907875',  # master's thesis
+            'Q1980247',  # chapter
+            'Q3331189',  # edition
+            'Q4119870',  # academic writing
+            'Q5707594',    # news article
+            'Q10870555',   # report
+            'Q10885494',   # scientific conference paper
+            'Q13442814',   # scholarly article
+            'Q7318358',    # review article
+            'Q15621286',   # intellectual work
+            'Q17928402',   # blog post
+            'Q21481766',   # academic chapter
+            'Q23927052',   # conference article
+            'Q30070590',   # magazine article
+            'Q43305660',  # United States patent
+            'Q45182324',  # retracted article
+            'Q47461344',   # written work
+            'Q54670950',   # conference poster
+            'Q56119332',   # tweet
+            'Q58632367',   # conference abstract
+            'Q64548048',   # environmental impact assessment report
+            'Q110716513',  # scholarly letter/reply
+    ]):
+        aspect = 'work'
+    elif classes.intersection([
+            'Q7191',  # Nobel prize
+            'Q193622',  # order
+            'Q230788',  # grant
+            'Q378427',  # litarary award
+            'Q618779',  # award
+            'Q1364556',  # music award
+            'Q1407225',  # television award
+            'Q1709894',  # journalism award
+            'Q1792571',  # art prize
+            'Q1829324',  # architecture award
+            'Q4220917',  # film award
+            'Q11448906',  # science prize
+            'Q15383322',  # culture award
+    ]):
+        aspect = 'award'
+    elif classes.intersection([
+            'Q3918',  # university
+            'Q31855',  # research institute
+            'Q38723',  # higher education institution
+            'Q162633',  # academy
+            'Q414147',  # academy of sciences
+            'Q484652',  # international organization
+            'Q748019',  # scientific society
+            'Q875538',  # public university
+            'Q902104',  # private university
+            'Q955824',  # learned society
+            'Q1371037',  # technical university
+            'Q2467461',  # university department
+            'Q3354859',  # collegiate university
+            'Q4358176',  # council
+            'Q7315155',  # research center
+            'Q15936437',  # research university
+            'Q23002054',  # "private not-for-profit educational"
+            'Q29300714',  # international association
+            ]):
+        aspect = 'organization'
+    elif classes.intersection([
+            'Q15275719',  # recurrent event
+            'Q15900647',  # conference series
+            'Q47258130',  # scientific conference series
+            'Q47459256',  # academic workshop series
+            ]):
+        aspect = 'event_series'
+    elif classes.intersection([
+            'Q1543677',  # online conference
+            'Q1656682',  # event
+            'Q27968055',  # recurrent event edition (event in a series)
+            'Q52260246',  # scientific event
+            'Q98381855',  # online scholar conference
+            'Q98381912',  # online scholarly workshop
+            'Q112748789',  # hybrid scholarly conference
+            ]):
+        aspect = 'event'
+    elif classes.intersection([
+            'Q12136',  # disease
+            'Q389735',  # cardiovascular system disease
+            'Q18965518',  # artery disease
+            ]):
+        aspect = 'disease'
+    elif classes.intersection([
+            'Q11173',  # chemical compound
+            'Q36496',  # ion
+            'Q79529',  # chemical substance
+            'Q407595',  # metabolite
+            'Q2393187',  # molecular entity
+            'Q113145171',  # type of a chemical entity
+            ]):
+        aspect = 'chemical'
+    elif classes.intersection([
+            'Q11344',  # chemical element
+            ]):
+        aspect = 'chemical_element'
+    elif classes.intersection([
+            'Q15711994',  # group of isomeric compounds
+            'Q17339814',  # group or class of chemical substances
+            'Q47154513',  # structural class of chemical entities
+            'Q55499636',  # pharmacological class of chemical compounds
+            'Q55640599',  # group of ions
+            'Q55662456',  # group of ortho, meta, para isomers
+            'Q55662548',  # pair of cis-trans isomers
+            'Q55662747',  # pair of enantiomers
+            'Q55663030',  # pair of enantiomeric ions
+            'Q56256086',  # group of chemical compounds
+            'Q56256173',  # class of chemical compounds with similar
+                          # applications or functions
+            'Q59199015',  # group of stereoisomers
+            ]):
+        aspect = 'chemical_class'
+    elif classes.intersection([
+            'Q324254',  # ontology
+            'Q1437388',  # formal ontology
+            'Q1925081',  # meta-modeling
+            'Q3882785',  # upper ontology
+            'Q6546616',  # lightweight ontology
+            'Q6822257',  # Meta-ontology
+            'Q7247296',  # process ontology
+            'Q7554009',  # soft ontology
+            'Q7977959',  # weak ontology
+            'Q56316737',  # domain ontology
+            'Q56316739',  # task ontology
+            'Q56316745',  # application ontology
+            'Q62210692',  # OWL ontology
+            'Q81314568',  # OBO Foundry ontology
+            'Q96626931',  # disaster ontology
+            'Q105846678',  # unit ontology
+            'Q113006088',  # orphaned ontology
+            'Q113006099',  # inactive ontology
+            ]):
+        aspect = 'ontology'
+    elif classes.intersection([
+            'Q2996394',  # biological process (Reactome pathway)
+            'Q4915012',  # biological pathway
+            ]):
+        aspect = 'pathway'
+    elif classes.intersection([
+            'Q16521',  # taxon
+            ]):
+        aspect = 'taxon'
+    elif classes.intersection([
+            'Q1172284',  # data set
+            ]):
+        aspect = 'dataset'
+    elif classes.intersection([
+            'Q46855',  # hackathon
+            'Q625994',  # conference
+            'Q2020153',  # scientific conference
+            'Q40444998',  # academic workshop
+            ]):
+        aspect = 'event'
+    elif classes.intersection([
+            'Q341',  # free software
+            'Q7397',  # software
+            'Q1639024',  # mathematical software
+            'Q21127166',  # Java software library
+            'Q21129801',  # natural language processing toolkit
+            'Q24529812',  # statistical package
+            ]):
+        aspect = 'software'
+    elif classes.intersection([
+            'Q22811662',  # image database
+            ]):
+        aspect = 'use'
+    elif classes.intersection([
+            'Q420927',  # protein complex
+            'Q22325163',  # macromolecular complex
+            ]):
+        aspect = 'complex'
+    elif classes.intersection([
+            'Q24634210',  # podcast
+            ]):
+        aspect = 'podcast'
+    elif classes.intersection([
+            'Q69154911',  # podcast season
+            ]):
+        aspect = 'podcast_season'
+    elif classes.intersection([
+            'Q61855877',  # podcast episode
+            ]):
+        aspect = 'podcast_episode'
+    elif ('Q16695773' in classes):  # wikiproject
+        aspect = 'wikiproject'
+    else:
+        aspect = 'topic'
+
+    return aspect
+
+
 @main.context_processor
 def inject_js_config():
     """Return configuration for Javascript.
@@ -171,8 +438,20 @@ def redirect_q(q):
         Wikidata item identifier
 
     """
-    class_ = q_to_class(q)
-    method = 'app.show_' + class_
+    try:
+        # Use the API to get entity information
+        entities = wb_get_entities([q])
+
+        # Extract 'instance of' information
+        classes = entity_to_classes(entities[q])
+
+        # match classes to aspect
+        aspect = classes_to_aspect(classes)
+    except Exception:
+        # fallback
+        aspect = 'topic'
+
+    method = 'app.show_' + aspect
     return redirect(url_for(method, q=q), code=302)
 
 
@@ -1337,9 +1616,7 @@ def redirect_mesh(meshid):
     qs = mesh_to_qs(meshid)
     if len(qs) > 0:
         q = qs[0]
-        class_ = q_to_class(q)
-        method = 'app.show_' + class_
-        return redirect(url_for(method, q=q), code=302)
+        return redirect(url_for('app.show_topic', q=q), code=302)
     return render_template('404.html', error=could_not_find("MeSH ID"))
 
 

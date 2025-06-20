@@ -23,16 +23,14 @@ Examples
 """
 
 
-from __future__ import print_function
-
 import requests
 
-from six import u
+from .config import config
 
 
-HEADERS = {
-    'User-Agent': 'Scholia',
-}
+USER_AGENT = config['requests'].get('user_agent')
+
+HEADERS = {'User-Agent': USER_AGENT}
 
 # Must be indexed from zero
 MONTH_NUMBER_TO_MONTH = {
@@ -157,12 +155,9 @@ def wb_get_entities(qs):
         'ids': ids,
         'format': 'json',
     }
-    headers = {
-        'User-Agent': 'Scholia',
-    }
     response_data = requests.get(
         'https://www.wikidata.org/w/api.php',
-        headers=headers, params=params).json()
+        headers=HEADERS, params=params).json()
     if 'entities' in response_data:
         return response_data['entities']
 
@@ -431,6 +426,8 @@ def entity_to_name(entity):
         labels = entity['labels']
         if 'en' in labels:
             return labels['en']['value']
+        elif 'mul' in labels:
+            return labels['mul']['value']
         else:
             for label in labels.values():
                 return label['value']
@@ -534,14 +531,14 @@ def entity_to_year(entity):
     return None
 
 
-def search(query, page, limit=10):
+def search(query, page=0, limit=10):
     """Search Wikidata.
 
     Parameters
     ----------
     query : str
         Query string.
-    page : int
+    page : int, optional
         Number of current page.
     limit : int, optional
         Number of maximum search results to return.
@@ -551,18 +548,21 @@ def search(query, page, limit=10):
     result : dict
 
     """
+    params = {
+        'action': 'wbsearchentities',
+        'limit': limit,
+        'format': 'json',
+        'language': "en",
+        'search': query,
+        'continue': page,
+    }
+
     # Query the Wikidata API
     response = requests.get(
         "https://www.wikidata.org/w/api.php",
-        params={
-            'action': 'wbsearchentities',
-            'limit': limit,
-            'format': 'json',
-            'language': "en",
-            'search': query,
-            'continue': page
-        },
+        params=params,
         headers=HEADERS)
+
     # Convert the response
     response_data = response.json()
     items = response_data['search']
@@ -612,9 +612,9 @@ def main():
     elif arguments['search']:
         query = arguments['<query>']
         limit = int(arguments['--limit'])
-        results = search(query, limit=limit)
+        results = search(query, limit=limit)['results']
         for item in results:
-            print(u("{q} {description}").format(**item).encode('utf-8'))
+            print("{q} {description}".format(**item))
 
 
 if __name__ == '__main__':
