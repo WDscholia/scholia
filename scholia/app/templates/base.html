@@ -117,7 +117,7 @@ askQuery2("{{ sparql_endpoint }}", "{{ panel }}", `# tool: scholia
 {% block scripts %}
 {{super()}}
 
-<script type="text/javascript">window.jsConfig = {{ js_config | tojson }};</script>
+<script type="text/javascript">window.jsConfig = {{ js_config | default({}) | tojson | safe }};</script>
 <script type="text/javascript" src="{{ url_for('static', filename='d3.v5.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='d3-scale-chromatic.v1.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.dataTables.min.js') }}"></script>
