@@ -7,7 +7,7 @@
 <script>
 const Cite = require('citation-js').Cite
 try {
-  let example = new Cite('https://doi.org/{{ doi }}', { forceType: '@doi/api' })
+  let example = new Cite('https://doi.org/{{ doi | urlencode }}', { forceType: '@doi/api' })
   let output = example.format('quickstatements')
   $( '#qs' ).text( output );
   output = encodeURIComponent(
