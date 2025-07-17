@@ -13,7 +13,6 @@ services:
     # RUN SCHOLIA WITH NGINX
     webapp_proxy:
         image: scholia
-        build: .
         volumes: 
             - .:/scholia
 
