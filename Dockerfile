@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM python:3.9-slim-bullseye
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 
@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apt-get update -qq \
     && apt-get install -qq -y --no-install-recommends \
     dumb-init gosu unzip curl build-essential \
-    && rm -rf /var/lib/apt/list/* /usr/share/doc /usr/share/man \
+    && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
     && apt-get clean
 
 
