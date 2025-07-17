@@ -376,6 +376,10 @@ def doi_to_qs(doi):
     >>> doi_to_qs('10.1016/j.stem.2016.02.016') == ['Q23008981']
     True
 
+    >>> doi = '10.1002/1521-3951(200209)233:1<10::aid-pssb10>3.0.co;2-v'
+    >>> doi_to_qs(doi) == ['Q135403558']
+    True
+
     """
     query = 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
         doi=escape_string(doi.upper()))

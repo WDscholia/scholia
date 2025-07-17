@@ -97,7 +97,8 @@ P_PATTERN = re.compile(r'P[1-9]\d*')
 qs_pattern = r'<regex(r"Q[1-9]\d*(?:[^0-9]+Q[1-9]\d*)*"):qs>'
 
 # https://www.crossref.org/blog/dois-and-matching-regular-expressions/
-DOI_PATTERN = re.compile(r'10\.\d{4,9}/[\[\]\-._;()/:A-Z0-9]+', re.IGNORECASE)
+DOI_PATTERN = re.compile(r'10\.\d{4,9}/[\[\]\-._;()/:A-Z0-9<>]+',
+                         re.IGNORECASE)
 
 # pattern for aspects
 ASPECT_PATTERN = '<regex("[a-zA-Z]+"):aspect>'
@@ -1242,8 +1243,7 @@ def redirect_doi(doi):
         DOI identifier.
 
     """
-    normalize_doi = remove_special_characters_url(doi)
-    qs = doi_to_qs(normalize_doi)
+    qs = doi_to_qs(doi)
     if len(qs) > 0:
         q = qs[0]
         return redirect(url_for('app.show_work', q=q), code=302)
