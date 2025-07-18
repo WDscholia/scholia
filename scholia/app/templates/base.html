@@ -126,27 +126,31 @@ askQuery2("{{ sparql_endpoint }}", "{{ panel }}", `# tool: scholia
 <script type="text/javascript" src="{{ url_for('static', filename='bootstrap-autocomplete.min.js')}}"></script>
 
 <script type="text/javascript">
-    {% if q %}
-    var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
-	       '{{ q }}' + 
-	       '&format=json&callback=?';
-    
-    const currentAspect = window.location.pathname.split("/")[1];
-
-    $.getJSON(url, function (data) {
-	 var item = data.entities["{{ q }}"];
-	 if ('en' in item.labels) {
-	     var title = item.labels.en.value;
-	     var wdtitle = item.labels.en.value;
-	     $("#h1").text(title);
-	     $(".self").text(title);
-       $("title").text(title + " - Scholia");
-
-       var crossref_button = document.getElementById("check-crossref-button");
-       if (title && crossref_button) {
+  {% if q %}
+  var url = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' +
+	    '{{ q }}' + 
+	    '&format=json&callback=?';
+  
+  const currentAspect = window.location.pathname.split("/")[1];
+  
+  $.getJSON(url, function (data) {
+    var item = data.entities["{{ q }}"];
+    var title = '';
+    if ('en' in item.labels) {
+	    title = item.labels.en.value;
+    } else if ('mul' in item.labels) {
+	    title = item.labels.mul.value;
+    }
+    if (title) {
+      $("#h1").text(title);
+      $(".self").text(title);
+      $("title").text(title + " - Scholia");
+      
+	    var crossref_button = document.getElementById("check-crossref-button");
+	    if (title && crossref_button) {
         crossref_button.onclick = () => {get_dois_from_crossref(wdtitle)}
         crossref_button.innerHTML = "Check Crossref"
-       }
+	    }
 
 	     {% if request.path.endswith("curation") or request.path.endswith("curation/") %}
 	     $("#h1").text("Improve " + currentAspect + ": " + title);
