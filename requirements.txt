@@ -5,7 +5,6 @@ Flask-Bootstrap
 lxml>=4.6.5
 requests>=2.32.2
 werkzeug>=3.0.6
-urllib3>=1.26.19
 certifi>=2022.12.7
 feedparser
 Jinja2>=3.1.4
