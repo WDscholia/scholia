@@ -408,7 +408,11 @@ def index():
         Rederende HTML for index page.
 
     """
-    return render_template('index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route("/statistics")
@@ -1020,7 +1024,11 @@ def show_catalogue_index():
         Rendered HTML index page for catalogue.
 
     """
-    return render_template('catalogue-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('catalogue-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/dataset/' + q_pattern)
@@ -1055,7 +1063,11 @@ def show_dataset_index():
         Rendered HTML index page for a dataset.
 
     """
-    return render_template('dataset-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('dataset-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/dataset/' + q_pattern + '/export')
@@ -1090,7 +1102,11 @@ def show_clinical_trial_index():
         Rendered index page for clinical trials.
 
     """
-    return render_template('clinical-trial-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('clinical-trial-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/clinical-trial/' + q_pattern)
@@ -1148,7 +1164,11 @@ def show_country_index():
         Rendered index page for country view.
 
     """
-    return render_template('country-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('country-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/country/' + q_pattern)
@@ -1230,7 +1250,11 @@ def show_disease_index():
         Rendered index page for author view.
 
     """
-    return render_template('disease-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('disease-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/doi/<path:doi>')
@@ -1308,7 +1332,11 @@ def show_event_index():
         Rendered index page for event view.
 
     """
-    return render_template('event-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('event-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/event-series/' + q_pattern)
@@ -1343,7 +1371,11 @@ def show_event_series_index():
         Rendered index page for event series view.
 
     """
-    return render_template('event-series-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('event-series-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/faq')
@@ -1482,7 +1514,11 @@ def show_language_index():
         Rendered index page for language view.
 
     """
-    return render_template('language-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('language-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/lexeme/')
@@ -1495,7 +1531,11 @@ def show_lexeme_index():
         Rendered index page for lexeme view.
 
     """
-    return render_template('lexeme-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('lexeme-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/lexeme/' + l_pattern)
@@ -1552,7 +1592,11 @@ def show_license_index():
         Rendered index page for license view.
 
     """
-    return render_template('license-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('license-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/location/')
@@ -1565,7 +1609,11 @@ def show_location_index():
         Rendered index page for location view.
 
     """
-    return render_template('location-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('location-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/location/' + q_pattern)
@@ -1817,7 +1865,11 @@ def show_ontology_index():
         Rendered HTML for for ontology.
 
     """
-    return render_template('ontology-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('ontology-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/ontology/' + q_pattern)
@@ -1874,7 +1926,11 @@ def show_organization_index():
         Rendered HTML for for organization.
 
     """
-    return render_template('organization-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('organization-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/organization/' + q_pattern + '/latest-works/rss')
@@ -2005,7 +2061,11 @@ def show_printer_index():
         Rendered index page for printer view.
 
     """
-    return render_template('printer-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('printer-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/protein/' + q_pattern)
@@ -2040,7 +2100,11 @@ def show_protein_index():
         Rendered index page for protein view.
 
     """
-    return render_template('protein-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('protein-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/project/' + q_pattern)
@@ -2075,7 +2139,11 @@ def show_project_index():
         Rendered index page for search view.
 
     """
-    return render_template('project-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('project-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/search')
@@ -2154,7 +2222,11 @@ def show_gene_index():
         Rendered index page for gene view.
 
     """
-    return render_template('gene-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('gene-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/taxon/' + q_pattern)
@@ -2189,7 +2261,11 @@ def show_taxon_index():
         Rendered index page for taxon view.
 
     """
-    return render_template('taxon-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('taxon-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/q-to-bibliography-templates')
@@ -2255,7 +2331,11 @@ def show_software_index():
         Rendered index page for author view.
 
     """
-    return render_template('software-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('software-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/software/' + q_pattern + '/export')
@@ -2368,7 +2448,11 @@ def show_topic_index():
         Rendered HTML index page for topic.
 
     """
-    return render_template('topic-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('topic-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/topic/' + q1_pattern + '/use/' + q2_pattern)
@@ -2538,7 +2622,11 @@ def show_podcast_index():
         Rendered HTML index page for podcasts.
 
     """
-    return render_template('podcast-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('podcast-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/chemical/' + q_pattern)
@@ -2578,7 +2666,11 @@ def show_chemical_index():
         Rendered HTML index page for chemical.
 
     """
-    return render_template('chemical-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('chemical-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/chemical/missing')
@@ -2592,7 +2684,11 @@ def show_chemical_index_curation():
         Rendered HTML index page for curation page for chemicals.
 
     """
-    return render_template('chemical-index-curation.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('chemical-index-curation.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/chemical-element/' + q_pattern)
@@ -2627,7 +2723,11 @@ def show_chemical_element_index():
         Rendered HTML index page for chemical element.
 
     """
-    return render_template('chemical-element-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('chemical-element-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/chemical-class/' + q_pattern)
@@ -2667,7 +2767,11 @@ def show_chemical_class_index():
         Rendered HTML index page for a specific class of chemicals.
 
     """
-    return render_template('chemical-class-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('chemical-class-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/twitter/<twitter>')
@@ -2909,7 +3013,11 @@ def show_venue_index():
         Rendered HTML index page for venue.
 
     """
-    return render_template('venue-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('venue-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/venues/' + qs_pattern)
@@ -2967,7 +3075,11 @@ def show_series_index():
         Rendered HTML index page for series.
 
     """
-    return render_template('series-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('series-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/complex/' + q_pattern)
@@ -3002,7 +3114,11 @@ def show_complex_index():
         Rendered HTML index page for complex.
 
     """
-    return render_template('complex-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('complex-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/pathway/' + q_pattern)
@@ -3037,7 +3153,11 @@ def show_pathway_index():
         Rendered HTML index page for pathway.
 
     """
-    return render_template('pathway-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('pathway-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/publisher/' + q_pattern)
@@ -3067,7 +3187,11 @@ def show_publisher_index():
         Rendered HTML for publisher index page.
 
     """
-    return render_template('publisher-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('publisher-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/robots.txt')
@@ -3200,7 +3324,11 @@ def show_use_index():
         Rendered index page for author view.
 
     """
-    return render_template('use-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('use-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/uses/' + qs_pattern)
@@ -3271,7 +3399,11 @@ def show_work_index():
         Rendered HTML page for work index page.
 
     """
-    return render_template('work-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('work-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/works/' + qs_pattern)
@@ -3320,7 +3452,11 @@ def show_wikiproject_index():
         Rendered HTML index page for wikiproject.
 
     """
-    return render_template('wikiproject-index.html')
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('wikiproject-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
 @main.route('/wikiproject/' + q_pattern)
