@@ -7,6 +7,7 @@
 
 {{ sparql_to_table('list-of-authors') }}
 {{ sparql_to_iframe('citations-per-year') }}
+{{ sparql_to_table('statements-with-retracted-references') }}
 
 {% endblock %}
 
@@ -29,6 +30,10 @@ before and after the retraction.
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" id="citations-per-year-iframe"></iframe>
 </div>
+
+<h2 id="statements-with-retracted-references">Wikidata statements citing retracted references</h2>
+
+<table class="table table-hover" id="statements-with-retracted-references-table"></table>
 
 {% endblock %}
 
