@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% set aspect = "retraction-index" %}
+{% block title %}Retractions - Scholia{% endblock %}
+
+{% block in_ready %}
+
+{{ sparql_to_table('most-cited-retracted-works') }}
+{{ sparql_to_table('authors_with_many_retractions') }}
+{{ sparql_to_table('venues_with_many_retractions') }}
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1>Retractions</h1>
+
+<h2 id="most-cited-retracted-works">Most cited retracted works</h2>
+
+<table class="table table-hover" id="most-cited-retracted-works-table"></table>
+
+<h2 id="authors_with_many_retractions">Authors with the most retractions</h2>
+
+<table class="table table-hover" id="authors_with_many_retractions-table"></table>
+
+<h2 id="venues_with_many_retractions">Venues with the most retractions</h2>
+
+<table class="table table-hover" id="venues_with_many_retractions-table"></table>
+
+
+{% endblock %}
+

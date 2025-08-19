@@ -1,0 +1,18 @@
+#sparql_endpoint = https://query-scholarly.wikidata.org/sparql
+#sparql_endpoint_name= WDQS&nbsp;scholarly
+#sparql_editurl = https://query-scholarly.wikidata.org/#
+#sparql_embedurl = https://query-scholarly.wikidata.org/embed.html#
+SELECT ?work ?workLabel (CONCAT("../retraction/", SUBSTR(STR(?work), 32)) AS ?workUrl)
+  ?count WITH {
+  SELECT ?work (COUNT(DISTINCT ?citation) AS ?count) WHERE {
+    hint:Query hint:optimizer "None" .
+    { ?work wdt:P31 wd:Q45182324 . } UNION
+    { ?work wdt:P793 wd:Q7316896 . } UNION
+    { ?work wdt:P5824 [] . }
+    { SERVICE wdsubgraph:wikidata_main { ?citation wdt:P2860 ?work . } } UNION
+    { ?citation wdt:P2860 ?work . }
+  } GROUP BY ?work ORDER BY DESC(?count) LIMIT 100
+} AS %RETRACTIONS WHERE {
+  INCLUDE %RETRACTIONS
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+} ORDER BY DESC(?count)

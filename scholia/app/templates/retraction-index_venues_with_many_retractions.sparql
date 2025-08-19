@@ -1,0 +1,27 @@
+#sparql_endpoint = https://query.wikidata.org/sparql
+#sparql_endpoint_name= WDQS&nbsp;main
+#sparql_editurl = https://query.wikidata.org/#
+#sparql_embedurl = https://query.wikidata.org/embed.html#
+SELECT 
+  ?works
+  ?venue ?venueLabel
+  (CONCAT("../venue/", SUBSTR(STR(?venue), 32)) AS ?venueUrl)
+  ?venueDescription
+WHERE {
+  SERVICE wdsubgraph:scholarly_articles {
+    {
+      SELECT
+        (COUNT(?work) AS ?works)
+        ?venue
+      WHERE {
+        ?work wdt:P31 wd:Q45182324 ;
+              wdt:P1433 ?venue .
+      }
+      GROUP BY ?venue
+      ORDER BY DESC(?works)
+      LIMIT 200
+    }
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+} 
+ORDER BY DESC(?works)
