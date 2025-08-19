@@ -1,0 +1,24 @@
+#sparql_endpoint = https://query-scholarly.wikidata.org/sparql
+#sparql_endpoint_name= WDQS&nbsp;scholarly
+#sparql_editurl = https://query-scholarly.wikidata.org/#
+#sparql_embedurl = https://query-scholarly.wikidata.org/embed.html#
+#defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (SUM(?count_) AS ?count)
+WHERE {
+  {
+    SELECT
+      ?year_
+      (COUNT(DISTINCT ?retractedArticle) AS ?count_)
+    WHERE {
+      ?retractedArticle p:P31 ?isRetractedPaperStatement .
+      ?isRetractedPaperStatement ps:P31 wd:Q45182324 .
+      ?isRetractedPaperStatement pq:P580 ?date .
+      BIND(YEAR(?date) AS ?year_)
+    }
+    GROUP BY ?year_
+  }
+}
+GROUP BY ?year_
+ORDER BY DESC(?year_)

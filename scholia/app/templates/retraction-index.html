@@ -5,6 +5,7 @@
 
 {% block in_ready %}
 
+{{ sparql_to_iframe('retractions-per-year') }}
 {{ sparql_to_table('most-cited-retracted-works') }}
 {{ sparql_to_table('authors_with_many_retractions') }}
 {{ sparql_to_table('venues_with_many_retractions') }}
@@ -16,6 +17,12 @@
 {% block page_content %}
 
 <h1>Retractions</h1>
+
+<h2 id="retractions-per-year">Retractions per year</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" id="retractions-per-year-iframe"></iframe>
+</div>
 
 <h2 id="most-cited-retracted-works">Most cited retracted works</h2>
 
