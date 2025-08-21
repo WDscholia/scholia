@@ -24,7 +24,7 @@ WHERE {
         ?author_statement pq:P1545 ?order_ .
         BIND(xsd:integer(?order_) AS ?order)
       }
-      ?work wdt:P50 ?author_ .
+      ?work wdt:P50 ?author_ ; wdt:P31 wd:Q45182324 .
     }
     UNION
     {
