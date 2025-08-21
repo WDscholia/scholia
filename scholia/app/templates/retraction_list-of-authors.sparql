@@ -1,0 +1,47 @@
+#sparql_endpoint = https://query.wikidata.org/sparql
+#sparql_endpoint_name= WDQS&nbsp;main
+#sparql_editurl = https://query.wikidata.org/#
+#sparql_embedurl = https://query.wikidata.org/embed.html#
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+# List of authors for a work
+SELECT DISTINCT
+  # Author order
+  ?order
+
+  # Author item and label
+  ?author ?authorUrl
+
+  (COUNT(DISTINCT ?work) AS ?retractions)
+WHERE {
+  hint:Query hint:optimizer "None" .
+  SERVICE wdsubgraph:scholarly_articles {
+    {
+      target: p:P50 ?author_statement .
+      ?author_statement ps:P50 ?author_ .
+      BIND(CONCAT("../author/", SUBSTR(STR(?author_), 32)) AS ?authorUrl)
+      OPTIONAL {
+        ?author_statement pq:P1545 ?order_ .
+        BIND(xsd:integer(?order_) AS ?order)
+      }
+      ?work wdt:P50 ?author_ .
+    }
+    UNION
+    {
+      target: p:P2093 ?authorstring_statement .
+      ?authorstring_statement ps:P2093 ?author_
+      BIND(CONCAT(?author_, " ↗") AS ?author)
+      OPTIONAL {
+        ?authorstring_statement pq:P1545 ?order_ .
+        BIND(xsd:integer(?order_) AS ?order)
+      }
+      BIND(CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_)) AS ?authorUrl)
+      BIND(target: AS ?work)
+    }
+  }
+  OPTIONAL {
+    ?author_ rdfs:label ?author .
+    FILTER (LANG(?author) = 'en')
+  }
+} GROUP BY ?order ?author ?authorUrl
+  ORDER BY ?order

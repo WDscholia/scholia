@@ -3406,6 +3406,45 @@ def show_work_index():
                            sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
+@main.route('/retraction/' + q_pattern)
+def show_retraction(q):
+    """Return rendered HTML page for retracted work.
+
+    Parameters
+    ----------
+    q : str
+        Wikidata item identifier
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page for retracted work.
+
+    """
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('retraction.html', q=q, sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
+
+
+@main.route('/retraction/')
+def show_retraction_index():
+    """Return rendered index page for retractions.
+
+    Returns
+    -------
+    html : str
+        Rendered HTML page for retraction index page.
+
+    """
+    ep = config['query-server'].get('sparql_endpoint')
+    editurl = config['query-server'].get('sparql_editurl')
+    embedurl = config['query-server'].get('sparql_embedurl')
+    return render_template('retraction-index.html', sparql_endpoint=ep,
+                           sparql_editURL=editurl, sparql_embedURL=embedurl)
+
+
 @main.route('/works/' + qs_pattern)
 def show_works(qs):
     """Return HTML rendering for specific authors.

@@ -1,0 +1,103 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT DISTINCT ?description ?value ?valueUrl
+WHERE {
+  BIND(target: AS ?work)
+  {
+    BIND(1 AS ?order)
+    BIND("Title" AS ?description)
+    ?work wdt:P1476 ?value .
+  }
+  UNION
+  {
+    SELECT
+      (2 AS ?order)
+      ("Reviewers" AS ?description)
+      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
+      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
+    {
+      BIND(1 AS ?dummy)
+      target: wdt:P4032 ?iri .
+      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      ?iri rdfs:label ?value_string . 
+      FILTER (LANG(?value_string) = 'en')
+      BIND(COALESCE(?value_string, ?q) AS ?value_)
+    }
+    GROUP BY ?dummy
+  }
+  UNION
+  {
+    BIND(3 AS ?order)
+    BIND("Published in" AS ?description)
+    ?work wdt:P1433 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../venue/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    BIND(4 AS ?order)
+    BIND("Publication date" AS ?description)
+    ?work p:P577 / psv:P577 ?publication_date_value .
+    ?publication_date_value wikibase:timePrecision ?time_precision ;
+                            wikibase:timeValue ?publication_date .
+    BIND(IF(?time_precision = 9, YEAR(?publication_date), xsd:date(?publication_date)) AS ?value)
+  }
+  UNION
+  {
+    BIND(5 AS ?order)
+    BIND("Retraction date" AS ?description)
+    ?work p:P31 ?isRetractedPaperStatement .
+    ?isRetractedPaperStatement ps:P31 wd:Q45182324 .
+    ?isRetractedPaperStatement pq:P580 ?retraction_date_value .
+    BIND(xsd:date(?retraction_date_value) AS ?value)
+  }
+  UNION
+  {
+    BIND(6 AS ?order)
+    BIND("Publisher" AS ?description)
+    ?work wdt:P123 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../publisher/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    BIND(7 AS ?order)
+    BIND("DOI" AS ?description)
+    ?work wdt:P356 ?valueUrl_ .
+    BIND(CONCAT("https://doi.org/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
+    BIND(CONCAT(?valueUrl_, " ↗") AS ?value)
+  }
+  UNION
+  {
+    BIND(8 AS ?order)
+    BIND("🛑 Retracted by" AS ?description)
+    ?work wdt:P5824 ?iri .
+    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    ?iri rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../work/", ?q) AS ?valueUrl)
+  }
+  UNION
+  {
+    BIND(9 AS ?order)
+    BIND("⚠️ Cites retracted article" AS ?description)
+    { ?work wdt:P2860 ?retracted . ?retracted wdt:P31 wd:Q45182324 . }
+    UNION
+    { ?work wdt:P2860 ?retracted . ?retracted wdt:P793 wd:Q7316896 . }
+    UNION
+    { ?work wdt:P2860 ?retracted . ?retracted wdt:P5824 [] . }
+    ?retracted rdfs:label ?value_string . 
+    FILTER (LANG(?value_string) = 'en')
+    BIND(SUBSTR(STR(?retracted), 32) AS ?q) 
+    BIND(COALESCE(?value_string, ?q) AS ?value)
+    BIND(CONCAT("../work/", ?q) AS ?valueUrl)
+  }
+} 
+ORDER BY ?order

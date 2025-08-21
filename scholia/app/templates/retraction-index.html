@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% set aspect = "retraction-index" %}
+{% block title %}Retractions - Scholia{% endblock %}
+
+{% block in_ready %}
+
+{{ sparql_to_iframe('retractions-per-year') }}
+{{ sparql_to_table('most-cited-retracted-works') }}
+{{ sparql_to_table('authors_with_many_retractions') }}
+{{ sparql_to_table('venues_with_many_retractions') }}
+{{ sparql_to_table('statements-with-retracted-references') }}
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+<h1>Retractions</h1>
+
+<h2 id="retractions-per-year">Retractions per year</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item" id="retractions-per-year-iframe"></iframe>
+</div>
+
+<h2 id="most-cited-retracted-works">Most cited retracted works</h2>
+
+<table class="table table-hover" id="most-cited-retracted-works-table"></table>
+
+<h2 id="authors_with_many_retractions">Authors with the most retractions</h2>
+
+<table class="table table-hover" id="authors_with_many_retractions-table"></table>
+
+<h2 id="venues_with_many_retractions">Venues with the most retractions</h2>
+
+<table class="table table-hover" id="venues_with_many_retractions-table"></table>
+
+<h2 id="statements-with-retracted-references">Wikidata statements citing retracted references</h2>
+
+<table class="table table-hover" id="statements-with-retracted-references-table"></table>
+
+{% endblock %}
+

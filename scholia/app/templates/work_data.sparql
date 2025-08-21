@@ -197,6 +197,9 @@ WHERE {
     { ?work wdt:P31 wd:Q45182324 . }
     UNION
     { ?work wdt:P793 wd:Q7316896 . }
+    BIND("open as retraction" AS ?value)
+    BIND(SUBSTR(STR(?work), 32) AS ?q)
+    BIND(CONCAT("../retraction/", ?q) AS ?valueUrl)
   }
   UNION
   {
