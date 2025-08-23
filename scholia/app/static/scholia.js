@@ -803,6 +803,10 @@ function askQuery2(endpointUrl, panel, askQuery, callback) {
        data: { query: askQuery },
      };
 
+     // overwrite the central URLs of SPARQL specific URLs are found
+     configFromSPARQL = extractConfig(askQuery);
+     if (configFromSPARQL["url"]) endpointUrl = configFromSPARQL["url"];
+
      $.ajax(endpointUrl, settings).then((data) => {
         if (data.boolean) {
             // unhide panels

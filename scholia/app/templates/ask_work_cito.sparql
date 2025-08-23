@@ -1,3 +1,6 @@
+#sparql_endpoint = https://query-scholarly.wikidata.org/sparql
 ASK {
-    [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 wd:{{q}} . BIND("work-cito" AS ?aspectsubpage)
+    [] pq:P3712 ?intent ; ps:P2860 wd:Q28264479 .
+    SERVICE wdsubgraph:wikidata_main { ?intent wdt:P31 wd:Q96471816 }
+    BIND("work-cito" AS ?aspectsubpage)
 }
