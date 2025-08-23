@@ -525,6 +525,13 @@ function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
 
     if (!embedURL) embedURL = "https://query.wikidata.org/embed.html#";
 
+    // overwrite the central URLs of SPARQL specific URLs are found
+    configFromSPARQL = extractConfig(sparql);
+    if (configFromSPARQL["url"]) url = configFromSPARQL["url"];
+    if (configFromSPARQL["editURL"]) editURL = configFromSPARQL["editURL"];
+    if (configFromSPARQL["embedURL"]) embedURL = configFromSPARQL["embedURL"];
+    if (configFromSPARQL["endpointName"]) sparqlEndpointName = configFromSPARQL["endpointName"];
+
     const wikidata_sparql = url + "?query=" + encodeURIComponent(sparql);
     const wikidata_query = editURL + encodeURIComponent(sparql);
     var url = embedURL + encodeURIComponent(sparql);
