@@ -19,7 +19,7 @@ WHERE {
     {
       target: p:P50 ?author_statement .
       ?author_statement ps:P50 ?author_ .
-      BIND(CONCAT("../author/", SUBSTR(STR(?author_), 32)) AS ?authorUrl)
+      BIND(CONCAT("../author/", SUBSTR(STR(?author_), 32), "#list-of-retracted-articles") AS ?authorUrl)
       OPTIONAL {
         ?author_statement pq:P1545 ?order_ .
         BIND(xsd:integer(?order_) AS ?order)
