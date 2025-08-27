@@ -1,0 +1,37 @@
+#sparql_endpoint= https://query-scholarly.wikidata.org/sparql
+#sparql_endpoint_name= WDQS&nbsp;scholarly
+#sparql_editurl= https://query-scholarly.wikidata.org/#
+#sparql_embedurl= https://query-scholarly.wikidata.org/embed.html#
+#defaultView:BarChart
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+
+SELECT
+  (STR(?year_) AS ?year)
+  (SUM(?count_) AS ?count)
+  ?intentionLabel
+WHERE {
+  {
+    SELECT
+      ?year_
+      ?intention ?intentionLabel
+      (COUNT(DISTINCT ?citing_work) AS ?count_)
+    WHERE {
+      ?citing_work p:P2860 ?citationStatement .
+      ?citationStatement pq:P3712 ?intention ;
+                         ps:P2860 target: .
+      SERVICE wdsubgraph:wikidata_main {
+        ?intention wdt:P31 wd:Q96471816 ;
+          rdfs:label ?intentionLabel .
+        FILTER (lang(?intentionLabel) = "en")
+      }
+  
+      # Year of citation
+      ?citing_work wdt:P577 ?date .
+      BIND(YEAR(?date) AS ?year_)
+      BIND(xsd:date(?date) AS ?pubDate_)
+    }
+    GROUP BY ?year_ ?intention ?intentionLabel
+  }
+}
+GROUP BY ?year_ ?intention ?intentionLabel
+ORDER BY DESC(?year_)

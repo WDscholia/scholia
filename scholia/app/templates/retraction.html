@@ -11,6 +11,12 @@
 {{ sparql_to_iframe('citations-per-year') }}
 {{ sparql_to_table('statements-with-retracted-references') }}
 
+{% call ask_query_callback('cito') %}
+
+{{ sparql_to_iframe('cito-incoming-chart') }}
+
+{% endcall %}
+
 {% endblock %}
 
 
@@ -33,6 +39,14 @@ before and after the retraction.
 
 <div class="embed-responsive embed-responsive-16by9">
     <iframe class="embed-responsive-item" id="citations-per-year-iframe"></iframe>
+</div>
+
+<div id="cito" class="d-none">
+<h2 id="cito-incoming">Reasons why this retracted article is cited</h2>
+
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" id="cito-incoming-chart-iframe"></iframe>
+</div>
 </div>
 
 <h2 id="statements-with-retracted-references">Wikidata statements citing retracted references</h2>
