@@ -8,6 +8,6 @@ app.config['APPLICATION_ROOT'] = '/'
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
-        app.run(debug=True, port=sys.argv[1])
+        app.run(debug=True, host='tajo', port=sys.argv[1])
     else:
-        app.run(debug=True, port=8100)
+        app.run(debug=True, host='tajo', port=8100)
