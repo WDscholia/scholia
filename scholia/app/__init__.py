@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function
 
 from flask import Flask
 from flask_bootstrap import Bootstrap, StaticCDN
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from ..text import TextToTopicQText
 
@@ -32,6 +33,9 @@ def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
 
     """
     app = Flask(__name__)
+
+    # Configure for proxy deployment
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
     Bootstrap(app)
 
