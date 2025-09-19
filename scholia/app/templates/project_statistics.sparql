@@ -1,4 +1,6 @@
 # title: Statistics for projects identifiers
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT ?count ?description {
   {
     { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3400 []. } }

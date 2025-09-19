@@ -1,10 +1,20 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?publication_date ?number_of_citations 
 ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
 ?quote
-WITH {
-  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_work) as ?number_of_citations) ?work (SAMPLE(?quote_) AS ?quote)
+
+WHERE {
+  { SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_work) as ?number_of_citations) ?work (SAMPLE(?quote_) AS ?quote)
   WHERE {
     ?work p:P859+ ?sponsor_statement .
     ?sponsor_statement ps:P859+ target: .
@@ -15,11 +25,8 @@ WITH {
     }
     OPTIONAL { ?citing_work wdt:P2860 ?work }
   } 
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+  GROUP BY ?work }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
 } 
 ORDER BY DESC(?publication_date) DESC(?number_of_citations)
 LIMIT 1000

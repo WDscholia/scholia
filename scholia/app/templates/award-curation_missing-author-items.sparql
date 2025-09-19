@@ -1,24 +1,18 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT
 (COUNT(?work) AS ?count) 
 ?string
 (CONCAT(
   'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
   ENCODE_FOR_URI(?string)) AS ?author_resolver_url)
-WITH {
-  SELECT DISTINCT ?author_name {
-    ?recipient p:P166 ?award_statement . 
-    ?award_statement ps:P166 target: .
 
-    ?recipient skos:altLabel | rdfs:label ?author_name_ .
-
-    # The SELECT-DISTINCT-BIND trick here is due to Stanislav Kralin
-    # https://stackoverflow.com/questions/53933564
-    BIND (STR(?author_name_) AS ?author_name)
-  }
-  LIMIT 2000
-} AS %RAWstrings
 WITH
 # This part is due to Dipsacus fullonum, as per https://w.wiki/5Brk
 {
@@ -29,17 +23,47 @@ WITH
   WHERE
   {
     {
-      INCLUDE %RAWstrings
+      { SELECT DISTINCT ?author_name {
+    ?recipient p:P166 ?award_statement . 
+    ?award_statement ps:P166 target: .
+
+    ?recipient skos:altLabel | rdfs:label ?author_name_ .
+
+    # The SELECT-DISTINCT-BIND trick here is due to Stanislav Kralin
+    # https://stackoverflow.com/questions/53933564
+    BIND (STR(?author_name_) AS ?author_name)
+  }
+  LIMIT 2000 }
       BIND(STR(?author_name) AS ?string) # the raw strings
     }
     UNION
     {
-      INCLUDE %RAWstrings
+      { SELECT DISTINCT ?author_name {
+    ?recipient p:P166 ?award_statement . 
+    ?award_statement ps:P166 target: .
+
+    ?recipient skos:altLabel | rdfs:label ?author_name_ .
+
+    # The SELECT-DISTINCT-BIND trick here is due to Stanislav Kralin
+    # https://stackoverflow.com/questions/53933564
+    BIND (STR(?author_name_) AS ?author_name)
+  }
+  LIMIT 2000 }
       BIND(UCASE(STR(?author_name)) AS ?string) # uppercased versions of the raw strings
     }
     UNION
     {
-      INCLUDE %RAWstrings
+      { SELECT DISTINCT ?author_name {
+    ?recipient p:P166 ?award_statement . 
+    ?award_statement ps:P166 target: .
+
+    ?recipient skos:altLabel | rdfs:label ?author_name_ .
+
+    # The SELECT-DISTINCT-BIND trick here is due to Stanislav Kralin
+    # https://stackoverflow.com/questions/53933564
+    BIND (STR(?author_name_) AS ?author_name)
+  }
+  LIMIT 2000 }
       BIND(LCASE(STR(?author_name)) AS ?string) # lowercased versions of the raw strings
     }
   }

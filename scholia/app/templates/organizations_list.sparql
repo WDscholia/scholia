@@ -1,9 +1,14 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?organization ?organizationLabel ?organizationDescription
   ?location ?locationLabel
   ?country ?countryLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     ?organization
     (SAMPLE(?location_) AS ?location)
     (SAMPLE(?country_) AS ?country)
@@ -12,9 +17,6 @@ WITH {
     OPTIONAL { ?organization wdt:P131 | wdt:P159 ?location_ }
     OPTIONAL { ?organization wdt:P17 ?country_ }
   }
-  GROUP BY ?organization
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  GROUP BY ?organization }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

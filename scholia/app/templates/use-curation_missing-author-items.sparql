@@ -1,3 +1,7 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   # Number of works with the author
   ?count
@@ -13,26 +17,21 @@ SELECT
       'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
       ENCODE_FOR_URI(?author)) AS ?resolver_url)
 
-WITH {
-  SELECT DISTINCT ?work WHERE {
-    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* wd:{{ q }} .
-  }
-  LIMIT 100000
-} AS %works
-WITH {
-  SELECT
+# Generate a score for each author
+
+WHERE {
+  { SELECT
     (COUNT(?work) AS ?count)
     ?author
   WHERE {
-    INCLUDE %works
+    { SELECT DISTINCT ?work WHERE {
+    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* wd:{{ q }} .
+  }
+  LIMIT 100000 }
     ?work wdt:P2093 ?author .
   }
-  GROUP BY ?author
-} AS %counts
-
-# Generate a score for each author
-WITH {
-  SELECT (SUM(?score_) AS ?score) ?author
+  GROUP BY ?author }
+  { SELECT (SUM(?score_) AS ?score) ?author
   WHERE {
     {
       # Assign them 3 points if they are an author of a work using the resource
@@ -52,15 +51,10 @@ WITH {
       LIMIT 10000
     }
   }
-  GROUP BY ?author
-} AS %scores
-
-WHERE {
-  INCLUDE %counts
-  INCLUDE %scores
+  GROUP BY ?author }
 
   # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?score) DESC(?count) 
 LIMIT 500

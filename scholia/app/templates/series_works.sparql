@@ -1,11 +1,17 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   ?number_of_citations
   ?publication_date
   ?work ?workLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (MIN(?datetimes) AS ?publication_datetime)
     (COUNT(DISTINCT ?citing_work) AS ?number_of_citations)
     ?work
@@ -15,11 +21,8 @@ WITH {
     OPTIONAL { ?work wdt:P577 ?datetimes . }
     OPTIONAL { ?citing_work wdt:P2860 ?work . }
   }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
+  GROUP BY ?work }
   BIND(xsd:date(?publication_datetime) AS ?publication_date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
 }
 ORDER BY DESC(?number_of_citations) DESC(?publication_date)

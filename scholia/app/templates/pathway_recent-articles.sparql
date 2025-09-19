@@ -1,21 +1,25 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?date ?work ?workLabel ?type ?topics
-WITH {
-  SELECT DISTINCT ?work 
-    WHERE {
-      { ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: . }
-      UNION { target: wdt:P2860 ?work . }
-    }
-} AS %works
-WITH {
-  SELECT 
+
+WHERE {
+  { SELECT 
     (MAX(?dates) as ?datetime)
     ?work
     (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
     (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics) 
   WHERE {
-    INCLUDE %works
+    { SELECT DISTINCT ?work 
+    WHERE {
+      { ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: . }
+      UNION { target: wdt:P2860 ?work . }
+    } }
     OPTIONAL {
       ?work wdt:P921 ?topic .
       ?topic rdfs:label ?topic_label .
@@ -28,12 +32,9 @@ WITH {
     }
     OPTIONAL { ?work wdt:P577 ?dates . }
   }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
+  GROUP BY ?work }
   BIND(xsd:date(?datetime) AS ?date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?date)
 LIMIT 500

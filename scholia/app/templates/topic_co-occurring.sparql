@@ -2,10 +2,15 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(DISTINCT ?work) AS ?count) ?topic1 ?topic2
   WHERE {
     # Find works that are marked with main subject of the topic.
@@ -22,14 +27,10 @@ WITH {
 
   # There a performance problems in the browser: We cannot show large graphs,
   # so we put a limit on the number of links displayed.
-  LIMIT 400
-
-} AS %results
-WHERE {
-  INCLUDE %results
+  LIMIT 400 }
   
   # Label the results
-  SERVICE wikibase:label {
+#   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
   }
 }

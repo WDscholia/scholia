@@ -2,11 +2,17 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT 
   ?author1 ?author1Label (SAMPLE(?image1_) AS ?image1) ?rgb
   ?author2 ?author2Label (SAMPLE(?image2_) AS ?image2)
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT DISTINCT ?author1 ?author2 ?rgb WHERE {
+    { SELECT
     ?author1
     (SAMPLE(?dark_rgb_) AS ?dark_rgb)
     (SAMPLE(?light_rgb_) AS ?light_rgb)
@@ -30,11 +36,7 @@ WITH {
       BIND ("FFFFFF" AS ?light_rgb_)
    }
   }
-  GROUP BY ?author1
-} AS %authors
-WITH {
-  SELECT DISTINCT ?author1 ?author2 ?rgb WHERE {
-    INCLUDE %authors
+  GROUP BY ?author1 }
     {        
     target: (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710 | ^wdt:P4745 / ^wdt:P1433 / wdt:P50) | wdt:P5804 ?author2 .}
     UNION
@@ -45,14 +47,11 @@ WITH {
     FILTER (?author1 != ?author2)
 
     BIND(COALESCE(?dark_rgb, ?light_rgb) AS ?rgb)
-  }
-} AS %result
-WHERE {
-  INCLUDE %result
+  } }
     
   OPTIONAL { ?author1 wdt:P18 ?image1_ . }
   OPTIONAL { ?author2 wdt:P18 ?image2_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
   }
 }
 GROUP BY ?author1 ?author1Label ?rgb ?author2 ?author2Label  

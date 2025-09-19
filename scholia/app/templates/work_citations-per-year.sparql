@@ -2,6 +2,8 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT
   (STR(?year_) AS ?year)
   (SUM(?count_) AS ?count)

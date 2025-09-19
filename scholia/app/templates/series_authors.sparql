@@ -2,12 +2,17 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?number_of_works ?number_of_citations
   ?author ?authorLabel
   ?example_work ?example_workLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(DISTINCT ?work) AS ?number_of_works) 
     (COUNT(?citing_work) AS ?number_of_citations)
     (SAMPLE(?work) AS ?example_work)
@@ -18,10 +23,7 @@ WITH {
     ?work wdt:P50 ?author .
     OPTIONAL { ?citing_work wdt:P2860 ?work . }
   }
-  GROUP BY ?author
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+  GROUP BY ?author }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
 }
 ORDER BY DESC(?number_of_works) DESC(?number_of_citations)

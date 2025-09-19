@@ -4,6 +4,10 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # Doctoral student/advisor network with a source from a spectific researcher
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT ?student1 ?student1Label ?rgb ?supervisor1 ?supervisor1Label
 WHERE {
   { 
@@ -72,6 +76,6 @@ WHERE {
   
   BIND( IF( ?student1 = target:, "3080BB", "ffffff") AS ?rgb)
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .  } 
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .  } 
 }
 

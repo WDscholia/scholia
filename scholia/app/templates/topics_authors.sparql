@@ -1,10 +1,15 @@
 # title: Authors for specific topics
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ((?distinct_topics + ?topics / (?topics + 100)) AS ?score)
   ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
   ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(DISTINCT ?topic) AS ?distinct_topics)
     (COUNT(?topic) AS ?topics)
     ?author
@@ -19,10 +24,7 @@ WITH {
   }
   GROUP BY ?author
   ORDER BY DESC(?distinct_topics) DESC(?topics)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  LIMIT 200 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?score)

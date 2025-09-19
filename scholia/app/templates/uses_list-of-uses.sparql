@@ -1,17 +1,19 @@
 # title: List of uses
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?use ?useLabel ?useDescription (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
   ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT ?use (SAMPLE(?work) AS ?example_work) WHERE {
+
+WHERE {
+  { SELECT ?use (SAMPLE(?work) AS ?example_work) WHERE {
     VALUES ?use { {% for q in qs %} wd:{{ q }} {% endfor %} }
     OPTIONAL { 
       ?work wdt:P4510 ?use .
     }
   }
-  GROUP BY ?use
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  GROUP BY ?use }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

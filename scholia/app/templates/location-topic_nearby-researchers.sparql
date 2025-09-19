@@ -2,18 +2,34 @@ PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 
 # title: Nearby researchers that work with a specific topic and near a specified geographical entity
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?score
   ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
   ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  # Universities, research centers, etc.
+
+WHERE {
+  { SELECT
+    ?author
+    (SUM(?topic_score) * MAX(?inverse_distance) AS ?score)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    { # Compute distance for authors
+  SELECT
+    (MAX(?inverse_distance_) AS ?inverse_distance)
+    ?author
+  WHERE {
+    { # Academic institutions on all levels
+  SELECT DISTINCT ?organization ?other_geo ?distance WHERE {
+    { # Universities, research centers, etc.
   SELECT ?university WHERE {
     VALUES ?university { wd:Q3918 wd:Q1371037 wd:Q7315155 wd:Q31855 wd:Q2385804 }
-  }
-} AS %universities
-WITH {
-  SELECT ?organization ?distance ?other_geo {
+  } }
+    { SELECT ?organization ?distance ?other_geo {
     target1: wdt:P625 ?geo .
     SERVICE wikibase:around { 
       ?organization wdt:P625 ?other_geo .
@@ -21,37 +37,15 @@ WITH {
       bd:serviceParam wikibase:radius "50" .
       bd:serviceParam wikibase:distance ?distance .
     }
-  }
-} AS %near_organizations
-WITH {
-  # Academic institutions on all levels
-  SELECT DISTINCT ?organization ?other_geo ?distance WHERE {
-    INCLUDE %universities
-    INCLUDE %near_organizations
+  } }
             
     ?organization wdt:P361* / wdt:P31 / wdt:P279* ?university .
-  }
-} AS %organizations
-WITH {
-  # Compute distance for authors
-  SELECT
-    (MAX(?inverse_distance_) AS ?inverse_distance)
-    ?author
-  WHERE {
-    INCLUDE %organizations
+  } }
 
     BIND(1 / (?distance + 1) AS ?inverse_distance_)
     ?author wdt:P108 | wdt:P1416 ?organization .  
   }
-  GROUP BY ?author
-} AS %authors_with_distance
-WITH {
-  SELECT
-    ?author
-    (SUM(?topic_score) * MAX(?inverse_distance) AS ?score)
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    INCLUDE %authors_with_distance
+  GROUP BY ?author }
     {
       # A score of 3 for each authorship in the topic
       ?work wdt:P50 ?author .
@@ -61,10 +55,7 @@ WITH {
     UNION
     { ?author wdt:P101 target2: . BIND(20 AS ?topic_score) }
   }
-  GROUP BY ?author
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  GROUP BY ?author }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?score) 

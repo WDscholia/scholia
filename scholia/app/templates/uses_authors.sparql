@@ -1,10 +1,15 @@
 # title: Authors for specific uses
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?uses ?works
   ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
   ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(DISTINCT ?use) AS ?uses)
     (COUNT(DISTINCT ?work) AS ?works)
     ?author (SAMPLE(?work) AS ?example_work)
@@ -16,10 +21,7 @@ WITH {
   }
   GROUP BY ?author
   ORDER BY DESC(?uses)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  LIMIT 200 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?uses) DESC(?works)

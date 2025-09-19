@@ -1,3 +1,11 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 select distinct ?date ?work ?workLabel ?venue ?venueLabel where {
   {
     select distinct ?date ?work (SAMPLE(?venue_) AS ?venue) where {
@@ -8,6 +16,6 @@ select distinct ?date ?work ?workLabel ?venue ?venueLabel where {
       ?work wdt:P1433 ?venue_ .
     } GROUP BY ?date ?work
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } ORDER BY DESC(?date)
   LIMIT 50

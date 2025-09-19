@@ -7,9 +7,14 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 #defaultView:Graph
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?resource1 ?resource1Label ?image1 ?rgb ?resource2 ?resource2Label ?image2
-WITH {
-  SELECT
+
+{
+  { SELECT
     ?resource1 (SAMPLE(?image1_) AS ?image1) ?rgb
     ?resource2 (SAMPLE(?image2_) AS ?image2)
     {
@@ -28,9 +33,6 @@ WITH {
       OPTIONAL { ?resource2 wdt:P18 ?image2_ }
       ?resource1 ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275 ) ?resource2 .
     }
-    GROUP BY ?resource1 ?resource2 ?rgb
-} AS %result
-{
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+    GROUP BY ?resource1 ?resource2 ?rgb }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

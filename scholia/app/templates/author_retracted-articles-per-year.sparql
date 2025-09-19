@@ -3,6 +3,13 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 select ?year (count(?work) as ?number_of_publications) ?role where {
   {
     select (str(?year_) as ?year) (0 as ?pages) ("_" as ?role) where {

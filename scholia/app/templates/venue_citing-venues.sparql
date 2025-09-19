@@ -3,12 +3,17 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 #defaultView:Table
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?short_name
   ?citing_journal ?citing_journalLabel 
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(?citing_work) AS ?count)
     ?citing_journal
     (SAMPLE(?short_name_) AS ?short_name)
@@ -20,11 +25,8 @@ WITH {
   }
   GROUP BY ?citing_journal
   ORDER BY DESC(?count)
-  LIMIT 1000
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label {
+  LIMIT 1000 }
+#   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

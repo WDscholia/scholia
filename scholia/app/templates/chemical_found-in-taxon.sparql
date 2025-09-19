@@ -1,6 +1,14 @@
 # title: lists the taxons in which this chemical is found
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl)
 ?source ?sourceLabel (CONCAT("/work/", SUBSTR(STR(?source), 32)) AS ?sourceUrl)
 ?doi WHERE {
@@ -11,6 +19,6 @@ SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) A
       ?taxonStatement prov:wasDerivedFrom/pr:P248 ?source .
       OPTIONAL { ?source wdt:P356 ?doi . }
     }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } ORDER BY ASC(?taxonLabel)
   LIMIT 250

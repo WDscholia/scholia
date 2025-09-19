@@ -512,6 +512,8 @@ askQuery2("{{ sparql_endpoint }}", "{{ panel }}", `# tool: scholia
      var endpointUrl = '{{ sparql_endpoint }}';
     if ("{{q2}}".length) {
         var query = `
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX wd: <http://www.wikidata.org/entity/>
     SELECT DISTINCT ?aspect 
     WHERE {
     { [] wdt:P17 wd:{{ q }} . BIND("country" AS ?aspect) }
@@ -523,6 +525,8 @@ askQuery2("{{ sparql_endpoint }}", "{{ panel }}", `# tool: scholia
     `;
     } else {
      var query = `
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX wd: <http://www.wikidata.org/entity/>
     SELECT DISTINCT ?aspect 
     WHERE {
     { [] wdt:P50 wd:{{ q }} . BIND("author" AS ?aspect) }

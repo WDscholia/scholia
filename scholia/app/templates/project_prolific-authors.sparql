@@ -1,9 +1,21 @@
 # Prolific authors for a specific project
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?count ?author ?authorLabel ?orcid ?example_work ?example_workLabel
-WITH {
-  SELECT DISTINCT ?work WHERE {
+
+WHERE {
+  { SELECT
+    ?author
+    (COUNT(?work) AS ?count)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    { SELECT DISTINCT ?work WHERE {
     {
       ?work wdt:P921 / (wdt:P527+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
     } UNION { ?work wdt:P859/(wdt:P1344|^wdt:P710)* target: .
@@ -12,27 +24,16 @@ WITH {
       ?statement a wikibase:BestRank ;
                  prov:wasDerivedFrom/pr:P248 ?work .
     }
-  }
-} AS %works
-WITH {
-  SELECT
-    ?author
-    (COUNT(?work) AS ?count)
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    INCLUDE %works
+  } }
     ?work wdt:P50 ?author .
   }
-  GROUP BY ?author
-} AS %result
-WHERE {
-  INCLUDE %result
+  GROUP BY ?author }
           
   # Include optional ORCID iD
   OPTIONAL { ?author wdt:P496 ?orcid . }
   
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)
 LIMIT 50

@@ -2,9 +2,14 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 #defaultView:Map
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?coorganization ?coorganizationLabel ?geocoordinates ?example_coauthor ?example_coauthorLabel ?example_work ?example_workLabel
-WITH {  
-  SELECT
+
+WHERE {
+  { SELECT
     ?coorganization
     (SAMPLE(?geocoordinates_) AS ?geocoordinates)
     (SAMPLE(?coauthor) AS ?example_coauthor)
@@ -17,9 +22,6 @@ WITH {
     FILTER NOT EXISTS { ?coorganization wdt:P17 target: }
     ?coorganization wdt:P625 ?geocoordinates_ .
   }
-  GROUP BY ?coorganization 
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  GROUP BY ?coorganization }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

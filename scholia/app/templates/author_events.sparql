@@ -1,5 +1,11 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   (xsd:date(MIN(?start)) AS ?date)  
   ?event ?eventLabel
@@ -30,7 +36,7 @@ WHERE {
     OPTIONAL { ?event wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
     OPTIONAL { ?event wdt:P580 | wdt:P585 ?start }
  
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+#     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
 GROUP BY ?event ?eventLabel
 ORDER BY DESC(?date) 

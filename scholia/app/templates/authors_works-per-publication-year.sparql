@@ -1,4 +1,7 @@
 #defaultView:BarChart
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT ?year ?number_of_works ?author_label WHERE {
   {
     SELECT ?year ?number_of_works ?author ?author_label_

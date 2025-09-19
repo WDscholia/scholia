@@ -2,12 +2,17 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?location ?locationLabel
   ?geo
   ?example_work ?example_workLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     ?location ?geo
     (SAMPLE(?work) AS ?example_work)
   WHERE {
@@ -18,13 +23,10 @@ WITH {
     ?work wdt:P921 ?location .
     ?location wdt:P625 ?geo .
   }
-  GROUP BY ?location ?geo
-} AS %results
-WHERE {
-  INCLUDE %results
+  GROUP BY ?location ?geo }
   
   # Label the results
-  SERVICE wikibase:label {
+#   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
   }
 }

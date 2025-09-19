@@ -1,6 +1,10 @@
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?number_of_works
   
@@ -9,8 +13,9 @@ SELECT
   ?authorDescription
   
   ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT 
+
+WHERE {
+  { SELECT 
     (COUNT(?work) AS ?number_of_works)
     ?author 
     (SAMPLE(?work) AS ?example_work)
@@ -21,10 +26,7 @@ WITH {
   }
   GROUP BY ?author
   ORDER BY DESC(?number_of_works)
-  LIMIT 500
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,it,sv,uk,zh". }
+  LIMIT 500 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,it,sv,uk,zh". }
 }
 ORDER BY DESC(?number_of_works)

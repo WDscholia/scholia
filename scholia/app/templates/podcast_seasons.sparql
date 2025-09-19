@@ -1,5 +1,10 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT ?season ?seasonLabel
   (CONCAT("/podcast-season/", SUBSTR(STR(?season), 32)) AS ?seasonUrl)
   (MAX(?count) AS ?episodeCount)
@@ -8,5 +13,5 @@ WHERE {
   OPTIONAL {
     ?season wdt:P1113 ?count .
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } GROUP BY ?season ?seasonLabel ?seasonUrl

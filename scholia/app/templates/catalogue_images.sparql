@@ -1,11 +1,15 @@
 #defaultView:ImageGrid
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?image
   ?item ?itemLabel
 WHERE {
   ?item wdt:P972 target: ;
         wdt:P18 ?image .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,es,fr,jp,nl,no,ru,sv,zh". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,es,fr,jp,nl,no,ru,sv,zh". }
 }

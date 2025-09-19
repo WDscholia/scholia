@@ -4,6 +4,12 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 select ?year (count(?work) as ?number_of_publications) ?intention where {
   {
     select (str(?year_) as ?year) (0 as ?pages) ("_" as ?intention) where {

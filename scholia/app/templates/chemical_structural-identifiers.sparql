@@ -1,11 +1,16 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # title: structural identifiers for this chemical structure
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?Structural_identifier ?Structural_identifierLabel
   ?idLit (SAMPLE(?idUrls) as ?idUrl)
-WITH {
-  SELECT ?Structural_identifier ?idLit ?formatterurl WHERE {
+ {
+  { SELECT ?Structural_identifier ?idLit ?formatterurl WHERE {
     VALUES ?Structural_identifier { wd:P233 wd:P234 wd:P2017 }
     target: ?IDdir ?idLit .
     ?Structural_identifier wikibase:directClaim ?IDdir ;
@@ -13,11 +18,9 @@ WITH {
     OPTIONAL {
       ?Structural_identifier wdt:P1630 ?formatterurl .
     }
-  } LIMIT 500
-} AS %RESULTS {
-  INCLUDE %RESULTS
+  } LIMIT 500 }
   BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?idLit))) AS ?idUrls).
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 GROUP BY ?Structural_identifier ?Structural_identifierLabel ?idLit
 ORDER BY ASC(?ID_TypeLabel)

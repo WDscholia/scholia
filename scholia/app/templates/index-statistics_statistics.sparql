@@ -1,3 +1,7 @@
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?count ?description
 WHERE {
 { {SELECT (COUNT(*) AS ?c) WHERE {?s ?p ?o} } BIND("Total number of triples" AS ?d)} UNION

@@ -1,6 +1,15 @@
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   (MIN(?dates) AS ?date)
   ?work ?workLabel
@@ -9,8 +18,10 @@ SELECT
   ?venue ?venueLabel
   (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
   (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
-WITH {
-  # By standard GROUP_CONCAT does not sort, but BlazeGraph seems to sort.
+  
+WHERE {
+  ?work wdt:P50 target: .
+  { # By standard GROUP_CONCAT does not sort, but BlazeGraph seems to sort.
   SELECT
     ?work ?author ?author_label
   WHERE {
@@ -22,18 +33,14 @@ WITH {
     }
     BIND(COALESCE(?author_label_, SUBSTR(STR(?author), 32)) AS ?author_label)
   }
-  ORDER BY ?n
-} AS %authors  
-WHERE {
-  ?work wdt:P50 target: .
-  INCLUDE %authors 
+  ORDER BY ?n } 
   
   OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
   ?work wdt:P577 ?datetimes .
   BIND(xsd:date(?datetimes) AS ?dates)
   OPTIONAL { ?work wdt:P1104 ?pages_ }
   OPTIONAL { ?work wdt:P1433 ?venue }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
 }
 GROUP BY ?work ?workLabel ?venue ?venueLabel
 ORDER BY DESC(?date)  

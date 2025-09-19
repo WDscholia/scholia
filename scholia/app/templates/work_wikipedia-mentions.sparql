@@ -1,3 +1,7 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?title ?titleUrl
   ?wikipedia ?wikipediaLabel
@@ -84,5 +88,5 @@ WHERE {
   }
   hint:Prior hint:runFirst "true" .
   BIND(CONCAT(?title_, "&nbsp;↗") AS ?title)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 } 

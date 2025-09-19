@@ -2,13 +2,19 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   ?publication_date
   ?work ?workLabel
   (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
   (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
-WITH {
-  SELECT DISTINCT ?work (MIN(?publication_date_) AS ?publication_date) WHERE {
+ WHERE {
+  { SELECT DISTINCT ?work (MIN(?publication_date_) AS ?publication_date) WHERE {
     ?work wdt:P1433 target: .
     OPTIONAL {
       ?work wdt:P577 ?publication_datetime .
@@ -16,14 +22,12 @@ WITH {
     }
   } GROUP BY ?work
     ORDER BY DESC(?publication_date)
-    LIMIT 1000
-} AS %ARTICLES WHERE {
-  INCLUDE %ARTICLES
+    LIMIT 1000 }
   OPTIONAL {
     ?work wdt:P50 ?author .
     ?author rdfs:label ?author_label .
     FILTER (LANG(?author_label) = 'en')
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 } GROUP BY ?publication_date ?work ?workLabel
 ORDER BY DESC(?publication_date)

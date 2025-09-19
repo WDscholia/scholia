@@ -1,6 +1,9 @@
 #defaultView:ImageGrid
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT DISTINCT ?image WHERE {
   {
     # Images of the person

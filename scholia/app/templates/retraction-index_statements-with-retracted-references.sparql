@@ -1,18 +1,23 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT ?entity ?entityLabel ?entityUrl
   ?property ?propertyLabel ?value ?valueLabel
   ?retracted ?retractedLabel
   (CONCAT("/retraction/", SUBSTR(STR(?retracted), 32)) AS ?retractedUrl)
-WITH {
-  SELECT DISTINCT ?entity ?p ?statement ?retracted WHERE {
+ WHERE {
+  { SELECT DISTINCT ?entity ?p ?statement ?retracted WHERE {
     ?retracted wdt:P31 wd:Q45182324 .
     ?entity ?p ?statement .
     ?statement prov:wasDerivedFrom / pr:P248 ?retracted .
-  }
-} AS %STATEMENTS WHERE {
-  INCLUDE %STATEMENTS
+  } }
   ?p ^wikibase:claim ?property .
   ?statement ?ps ?value .
   ?ps ^wikibase:statementProperty ?property .
   BIND(?statement AS ?entityUrl)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }

@@ -1,11 +1,20 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   (ROUND(1000 * ?distance_) / 1000 AS ?distance)
   ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
   ?location ?locationLabel (CONCAT("/topic/", SUBSTR(STR(?location), 32)) AS ?locationUrl)
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     ?work ?location
     (min(?distances) AS ?distance_)
   WHERE {
@@ -28,12 +37,9 @@ WITH {
   }
   GROUP BY ?work ?location
   ORDER BY ?distance_
-  LIMIT 500
-} AS %results
-WHERE {
-  INCLUDE %results
+  LIMIT 500 }
           
   # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY ?distance

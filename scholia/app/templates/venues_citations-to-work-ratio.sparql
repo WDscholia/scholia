@@ -1,34 +1,34 @@
 #defaultView:LineChart
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?year (?citation_count / ?work_count AS ?citations_to_works_ratio) ?venue ?venueLabel 
-WITH {
-  SELECT ?work ?venue
+
+WHERE {
+  { SELECT ?year (COUNT(?work) AS ?work_count) ?venue 
+  WHERE {
+    { SELECT ?work ?venue
   WHERE {
     VALUES ?venue {    {% for q in qs %} wd:{{ q }} {% endfor %}    }
     ?work wdt:P1433 ?venue .
-  }
-} AS %works
-WITH {
-  SELECT ?year (COUNT(?work) AS ?work_count) ?venue 
-  WHERE {
-    INCLUDE %works
+  } }
     ?work wdt:P577 ?publication_datetime .
     BIND(STR(YEAR(?publication_datetime)) AS ?year)
   }
-  GROUP BY ?year ?venue
-} AS %work_counts
-WITH {
-  SELECT ?year (COUNT(?work) AS ?citation_count) ?venue 
+  GROUP BY ?year ?venue }
+  { SELECT ?year (COUNT(?work) AS ?citation_count) ?venue 
   WHERE {
-    INCLUDE %works
+    { SELECT ?work ?venue
+  WHERE {
+    VALUES ?venue {    {% for q in qs %} wd:{{ q }} {% endfor %}    }
+    ?work wdt:P1433 ?venue .
+  } }
     ?citing_work wdt:P2860 ?work .
     ?citing_work wdt:P577 ?publication_datetime .
     BIND(STR(YEAR(?publication_datetime)) AS ?year)
   }
-  GROUP BY ?year ?venue
-} AS %citation_counts
-WHERE {
-  INCLUDE %work_counts
-  INCLUDE %citation_counts
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  GROUP BY ?year ?venue }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY ?year

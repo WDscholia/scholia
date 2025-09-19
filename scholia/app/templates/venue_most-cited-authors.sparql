@@ -2,14 +2,19 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?author ?authorLabel
   ?orcid
   ?example_cited_work ?example_cited_workLabel
   ?example_citing_work ?example_citing_workLabel
-WITH {
-  # Count the number of citations
+
+WHERE {
+  { # Count the number of citations
   SELECT
     ?author
     (COUNT(?cited_work) AS ?count)
@@ -20,16 +25,13 @@ WITH {
     ?citing_work wdt:P2860 ?cited_work .
     ?cited_work wdt:P50 ?author .
   }
-  GROUP BY ?author
-} AS %result
-WHERE {
-  INCLUDE %result 
+  GROUP BY ?author } 
           
   # Include optional ORCID iD
   OPTIONAL { ?author wdt:P496 ?orcid . }
   
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)
 LIMIT 100

@@ -1,10 +1,15 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?type ?typeLabel ?typeDescription
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(*) AS ?count)
     ?type
  
@@ -12,10 +17,7 @@ WITH {
     [] wdt:P275 target: ; 
        wdt:P31 ?type .
   }
-  GROUP BY ?type
-} AS %types
-WHERE {
-  INCLUDE %types
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  GROUP BY ?type }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?count)

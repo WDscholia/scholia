@@ -1,23 +1,24 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT
   ?metabolite ?metaboliteLabel ?metaboliteChemicalStructure ?metaboliteDescription
-WITH {
-  SELECT DISTINCT ?children WHERE {
+ 
+ {
+  { SELECT DISTINCT ?metabolite ?metaboliteChemicalStructure WHERE {
+    { SELECT DISTINCT ?children WHERE {
       ?children (wdt:P171*) target:.
-  }
-} AS %taxa 
-WITH {
-  SELECT DISTINCT ?metabolite ?metaboliteChemicalStructure WHERE {
-    INCLUDE %taxa
+  } }
     { ?metabolite wdt:P703 ?children }
     VALUES ?chemical { wd:Q113145171 wd:Q59199015 }
     ?metabolite wdt:P31 ?chemical .
     OPTIONAL { ?metabolite wdt:P233 ?canSmiles }
     OPTIONAL { ?metabolite wdt:P2017 ?isoSmiles }
     BIND(COALESCE(?isoSmiles, ?canSmiles) AS ?metaboliteChemicalStructure)
-  }
-} AS %results {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  } }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

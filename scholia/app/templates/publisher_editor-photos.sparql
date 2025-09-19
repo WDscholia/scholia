@@ -2,12 +2,18 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?image
   ?editor ?editorLabel 
   ?venues
-WITH {
-  SELECT DISTINCT
+
+WHERE {
+  { SELECT DISTINCT
     (SAMPLE(?image_) AS ?image)
     ?editor 
     (GROUP_CONCAT(?venue_label; separator=" // ") AS ?venues)
@@ -20,9 +26,6 @@ WITH {
       ?venue_ rdfs:label ?venue_label . FILTER(LANG(?venue_label) = 'en')
     }
   }
-  GROUP BY ?editor
-} AS %result
-WHERE {
-  INCLUDE %result 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  GROUP BY ?editor } 
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }

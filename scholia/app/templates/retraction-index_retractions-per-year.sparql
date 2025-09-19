@@ -3,6 +3,11 @@
 #sparql_editurl = https://query-scholarly.wikidata.org/#
 #sparql_embedurl = https://query-scholarly.wikidata.org/embed.html#
 #defaultView:BarChart
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+
 SELECT
   (STR(?year_) AS ?year)
   (SUM(?count_) AS ?count)

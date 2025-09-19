@@ -4,6 +4,12 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 select ?year (count(?work) as ?number_of_publications) where {
   {
     select (str(?year_) as ?year) (0 as ?pages) where {

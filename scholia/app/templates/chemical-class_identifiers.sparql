@@ -5,6 +5,11 @@
 #sparql_embedurl = https://query.wikidata.org/embed.html#
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?IDpred ?IDpredLabel
   ?id ?idUrl
@@ -17,7 +22,7 @@ SELECT
     ?IDpred wdt:P1630 ?formatterurl .
   }
   BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?id))) AS ?idUrl).
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY ASC(?IDpredLabel)
 LIMIT 500

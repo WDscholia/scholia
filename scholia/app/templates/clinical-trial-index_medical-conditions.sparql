@@ -1,3 +1,8 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?medical_condition ?medical_conditionLabel (CONCAT("/disease/", SUBSTR(STR(?medical_condition), 32)) AS ?medical_conditionUrl)
@@ -16,6 +21,6 @@ WHERE {
     ORDER BY DESC(?count)
     LIMIT 500
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)

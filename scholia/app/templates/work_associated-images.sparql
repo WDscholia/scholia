@@ -1,6 +1,8 @@
 #defaultView:ImageGrid
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT DISTINCT ?image WHERE {
   {
     # Images from whatever property value is linked.

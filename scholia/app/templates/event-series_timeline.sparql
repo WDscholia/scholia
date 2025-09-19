@@ -2,11 +2,20 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?time ?endtime ?event ?eventLabel ?image
   ?description
-WITH {
-  SELECT DISTINCT ?event ?time ?endtime WHERE {
+
+WHERE {
+  { { SELECT DISTINCT ?event ?time ?endtime WHERE {
     # It seems to be necessary to have this line together with the 
     # optional event time triples here.
     ?event wdt:P179 | wdt:P31 target: .
@@ -23,10 +32,9 @@ WITH {
     
     # If start time is defined the disregard timepoint
     BIND(COALESCE(?starttime, ?timepoint) AS ?time)
-  }
-} AS %events1
-WITH {
-  # Include significant events
+  } } }
+  UNION
+  { { # Include significant events
   SELECT ?event ?time ?description WHERE {
     ?event wdt:P179 | wdt:P31 target: .
     ?event p:P793 [ ps:P793 ?item ; pq:P585 ?time ] .
@@ -34,15 +42,10 @@ WITH {
       ?item rdfs:label ?description .
       FILTER (LANG(?description) = "en")
     }
-  }
-} AS %events2
-WHERE {
-  { INCLUDE %events1 }
-  UNION
-  { INCLUDE %events2 }
+  } } }
           
   OPTIONAL { ?event wdt:P18 ?image . }
-  SERVICE wikibase:label {
+#   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
   }
 }

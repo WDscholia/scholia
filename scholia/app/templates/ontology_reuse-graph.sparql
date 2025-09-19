@@ -1,6 +1,9 @@
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT
   ?source ?sourceLabel (CONCAT("../ontology/", ?qs) AS ?sourceUrl)
   ?target ?targetLabel (CONCAT("../ontology/", ?qt) AS ?targetUrl)

@@ -1,9 +1,14 @@
 #defaultView:BubbleChart
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?topic ?topicLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(?work) AS ?count)
     ?topic 
   WHERE {
@@ -12,11 +17,8 @@ WITH {
   }
   GROUP BY ?topic
   ORDER BY ?count  
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label {
+  LIMIT 200 }
+#   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
   }
 ORDER BY DESC(?count)

@@ -3,11 +3,16 @@
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?author1 ?author1Label
   ?author2 ?author2Label
-WITH {  
-  SELECT
+
+WHERE {
+  { SELECT
     DISTINCT 
     ?author1
     ?author2
@@ -18,9 +23,6 @@ WITH {
     ?work wdt:P50 ?author1 .  
     ?work wdt:P50 ?author2 .
     FILTER (?author1 != ?author2)
-  }
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  } }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

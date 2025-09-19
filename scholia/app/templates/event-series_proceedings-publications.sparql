@@ -1,12 +1,19 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   ?date
   ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
   ?authors ?authorsUrl
   ?topics ?topicsUrl
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (MIN(?date_) AS ?date) 
     ?work
     (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
@@ -30,10 +37,7 @@ WITH {
   }
   GROUP BY ?work
   ORDER BY DESC(?date)
-  LIMIT 500
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  LIMIT 500 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?date)

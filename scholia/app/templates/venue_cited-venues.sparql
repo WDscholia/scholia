@@ -1,12 +1,18 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # title: Cited venues from specific journal
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   ?count
   ?short_name
   ?cited_journal ?cited_journalLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(?cited_work) AS ?count)
     ?cited_journal
     (SAMPLE(?short_name_) AS ?short_name)
@@ -20,11 +26,8 @@ WITH {
     }
     OPTIONAL { ?cited_journal wdt:P1813 ?short_name_ . }
   }
-  GROUP BY ?cited_journal
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label {
+  GROUP BY ?cited_journal }
+#   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

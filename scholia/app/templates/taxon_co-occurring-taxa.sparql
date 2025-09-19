@@ -1,11 +1,17 @@
 #title: Taxa that co-occur with the target taxon in the literature
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?count (CONCAT("/topics/",SUBSTR(STR(target:), 32), ",", SUBSTR(STR(?taxon), 32)) AS ?countUrl)
        ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl)
        ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT (COUNT(?work) AS ?count) ?taxon (SAMPLE(?work) AS ?example_work) WHERE {
+
+WHERE {
+  # Label the results
+  { SELECT (COUNT(?work) AS ?count) ?taxon (SAMPLE(?work) AS ?example_work) WHERE {
     # Find works for the specific queried topic
 	?work wdt:P921 target: .
     
@@ -18,12 +24,8 @@ WITH {
     # Avoid listing the queried topic itself
     FILTER (target: != ?taxon)
   }
-  GROUP BY ?taxon
-} AS %result
-WHERE {
-  # Label the results
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  GROUP BY ?taxon }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)
 LIMIT 200

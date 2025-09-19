@@ -1,10 +1,19 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT 
   (ROUND(10000 * ?mean_acceptance_rate) / 100 AS ?mean_acceptance_percentage)
   ?track ?trackLabel
   ?event_series ?event_seriesLabel
   (CONCAT("/event-series/", SUBSTR(STR(?event_series), 32)) AS ?event_seriesUrl)
-WITH {
-  SELECT 
+
+WHERE {
+  { SELECT 
     (SUM(?acceptance_rate)/COUNT(?acceptance_rate) AS ?mean_acceptance_rate)
     ?event_series
     ?track
@@ -17,10 +26,7 @@ WITH {
     BIND(COALESCE(?track_, "-") AS ?track)
     BIND(STR(YEAR(?datetime)) AS ?year)
   }
-  GROUP BY ?event_series ?track
-} AS %event_series
-WHERE {
-  INCLUDE %event_series
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  GROUP BY ?event_series ?track }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY ?mean_acceptance_rate

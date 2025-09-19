@@ -1,7 +1,13 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?count ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
 ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(DISTINCT ?work) AS ?count)
     ?use
     (SAMPLE(?described_by) AS ?described_by_example)
@@ -13,11 +19,8 @@ WITH {
     # ?work wdt:P31/wdt:P279* wd:Q386724 .
     OPTIONAL { ?use wdt:P1343 ?described_by . }
   }
-  GROUP BY ?use
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  GROUP BY ?use }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)
 LIMIT 500

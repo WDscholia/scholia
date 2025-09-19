@@ -3,9 +3,16 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # List of works that is cited by the specified work
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?citations ?publication_date ?citing_work ?citing_workLabel 
-WITH {
-  SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work 
+
+WHERE {
+  # Label the result
+  { SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work 
   WHERE {
     # Find works that cite the queried work
     ?citing_work wdt:P2860 target: .
@@ -22,11 +29,7 @@ WITH {
   
   # Limit the number of results to avoid downloading too much data
   ORDER BY DESC(?citations) DESC(?date) 
-  LIMIT 1000
-} AS %result
-WHERE {
-  # Label the result
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  LIMIT 1000 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 } 
 ORDER BY DESC(?citations) DESC(?publication_date) 

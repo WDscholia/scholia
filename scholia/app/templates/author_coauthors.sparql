@@ -2,9 +2,16 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # Egocentric co-author graph for an author
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
-WITH {
-  SELECT (COUNT(?work) AS ?count) ?author1 ?author2 WHERE {
+
+WHERE {
+  { SELECT ?author1 ?author2 ?rgb WHERE {
+    { SELECT (COUNT(?work) AS ?count) ?author1 ?author2 WHERE {
     # Find co-authors
     ?work wdt:P50 target:, ?author1, ?author2 .
 
@@ -17,11 +24,7 @@ WITH {
   ORDER BY DESC(?count)
                     
   # Limit the size of the graph, to avoid overburdening the browser
-  LIMIT 1000
-} AS %authors
-WITH {
-  SELECT ?author1 ?author2 ?rgb WHERE {
-    INCLUDE %authors
+  LIMIT 1000 }
     
     # Exclude self-links
     FILTER (?author1 != ?author2)
@@ -31,10 +34,7 @@ WITH {
       ?author1 wdt:P21 ?gender1 . 
       BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
     }
-  }
-} AS %result
-WHERE {
-  INCLUDE %result
+  } }
   # Label the results 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

@@ -1,5 +1,9 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   # Number of works with the coauthor
   ?count
@@ -14,8 +18,9 @@ SELECT
 
   ?example_citing_work ?example_citing_workLabel
   (CONCAT("/work/", SUBSTR(STR(?example_citing_work), 32)) AS ?example_citing_workUrl)
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(?work) as ?count)
     ?citing_author
     (SAMPLE(?citing_work) AS ?example_citing_work) 
@@ -24,12 +29,9 @@ WITH {
     ?citing_work wdt:P2860 ?work .
     ?citing_work wdt:P2093 ?citing_author .
   }
-  GROUP BY ?citing_author
-} AS %result
-WHERE {
-  INCLUDE %result
+  GROUP BY ?citing_author }
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)
 LIMIT 1000
