@@ -488,7 +488,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
             $('#' + loaderID).remove(); // remove loader
             let error_message = "";
             try {
-              error_message = JSON.parse(jqXHR.responseText).exception;
+              error_message = "QLever execption: " + JSON.parse(jqXHR.responseText).exception;
             } catch (e) {
               error_message = "getJSON query failed: " + textStatus + " " + errorThrown;
             }

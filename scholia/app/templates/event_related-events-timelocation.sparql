@@ -4,6 +4,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
 
 SELECT
   (ROUND(1000 * ?score_) / 1000 AS ?score)

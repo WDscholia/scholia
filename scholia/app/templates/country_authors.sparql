@@ -6,9 +6,9 @@ PREFIX wikibase: <http://wikiba.se/ontology#>
 
 SELECT
   ?number_of_citing_works
-  ?author ?authorLabel
-  ?organization ?organizationLabel
-  ?example_work ?example_workLabel
+  ?author (REPLACE(STR(?author), "*./", "") AS ?authorLabel)
+  ?organization (REPLACE(STR(?organization), "*./", "") AS ?organizationLabel)
+  ?example_work (REPLACE(STR(?example_work), "*./", "") AS ?example_workLabel)
 
 WHERE {
   { SELECT
@@ -28,7 +28,7 @@ WHERE {
     }
   }
   GROUP BY ?author }
-  service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?number_of_citing_works) 
 LIMIT 10000
