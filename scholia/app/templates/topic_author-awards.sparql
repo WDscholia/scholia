@@ -1,10 +1,14 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT ?count 
 ?award ?awardLabel (CONCAT("/award/", SUBSTR(STR(?award), 32)) AS ?awardUrl)
 ?recipients ?recipientsUrl
-WITH {
-  SELECT (COUNT(?researcher) AS ?count) ?award 
+
+WHERE {
+  { SELECT (COUNT(?researcher) AS ?count) ?award 
   (GROUP_CONCAT(DISTINCT ?researcher_label; separator=", ") AS ?recipients) 
   (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?recipientsUrl)
   WHERE {
@@ -19,10 +23,7 @@ WITH {
     }
     ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
   }
-  GROUP BY ?award 
-} AS %result
-WHERE {
-  INCLUDE %result
+  GROUP BY ?award }
     ?award rdfs:label ?awardLabel . FILTER (LANG(?awardLabel) = 'en')
 }
 GROUP BY ?count ?award ?awardLabel ?recipients ?recipientsUrl

@@ -1,3 +1,5 @@
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 ASK {
   wd:{{q}} wdt:P373 ?gallery  .
 }

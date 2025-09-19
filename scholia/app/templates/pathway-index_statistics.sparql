@@ -1,29 +1,23 @@
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT ?count ?description
-WITH {
-  SELECT (COUNT(DISTINCT ?article) AS ?count) WHERE {
-    VALUES ?database { wdt:P2410 wdt:P3937 }
-    [] ?database [] ; wdt:P2860 ?article .
-  }
-} AS %literature
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2410 []. }
-} AS %wikipathways
-WITH {
-  SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3937 []. }
-} AS %reactome
+
 WHERE {
   {
-    INCLUDE %wikipathways
+    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P2410 []. } }
     BIND("Total number of WikiPathways pathways" AS ?description)
   }
   UNION
   {
-    INCLUDE %literature
+    { SELECT (COUNT(DISTINCT ?article) AS ?count) WHERE {
+    VALUES ?database { wdt:P2410 wdt:P3937 }
+    [] ?database [] ; wdt:P2860 ?article .
+  } }
     BIND("Total number of articles cited by pathways" AS ?description)
   }
   UNION
   {
-    INCLUDE %reactome
+    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3937 []. } }
     BIND("Total number of Reactome pathways" AS ?description)
   }
 }

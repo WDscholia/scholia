@@ -1,9 +1,13 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT ?guest ?guestLabel
   (CONCAT("/", SUBSTR(STR(?guest), 32)) AS ?guestUrl)
 WHERE {
   BIND(target: AS ?episode)
   ?episode wdt:P5030 ?guest .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

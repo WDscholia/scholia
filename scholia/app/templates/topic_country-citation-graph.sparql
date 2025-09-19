@@ -1,9 +1,14 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}> 
 
 #defaultView:Graph
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT ?citing_country ?citing_countryLabel ?citing_flag ?cited_country ?cited_countryLabel ?cited_flag
-WITH {
-  SELECT DISTINCT ?cited_country ?citing_country (COUNT(?citing_country) AS ?count)
+
+WHERE {
+  { SELECT DISTINCT ?cited_country ?citing_country (COUNT(?citing_country) AS ?count)
                                   WHERE {
     ?citing_work wdt:P50 ?citing_author . 
     ?citing_work wdt:P921 target: .
@@ -24,11 +29,8 @@ WITH {
   }
   GROUP BY ?cited_country ?citing_country
   ORDER BY DESC(?count)
-  LIMIT 42 # Adjust number of connections to display
-} AS %results
-WHERE {
-  INCLUDE %results
+  LIMIT 42 # Adjust number of connections to display }
   ?cited_country wdt:P41 ?cited_flag . 
   ?citing_country wdt:P41 ?citing_flag . 
- SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
+#  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
  }

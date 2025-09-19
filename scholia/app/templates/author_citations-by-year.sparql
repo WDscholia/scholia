@@ -1,6 +1,8 @@
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
   ?work wdt:P50 target: .
   ?citing_work wdt:P2860 ?work .

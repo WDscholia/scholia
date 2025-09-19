@@ -2,12 +2,18 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?work ?workLabel
   ?authors ?authorsUrl
   ?topics ?topicsUrl
-WITH {
-  SELECT 
+
+WHERE {
+  { SELECT 
     ?work
     (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
     (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)    
@@ -24,9 +30,6 @@ WITH {
       ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = "en")
     }
   }
-  GROUP BY ?work
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  GROUP BY ?work }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

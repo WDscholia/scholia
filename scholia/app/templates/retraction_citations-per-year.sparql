@@ -5,6 +5,13 @@
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   (STR(?year_) AS ?year)
   (SUM(?count_) AS ?count)

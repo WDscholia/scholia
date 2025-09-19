@@ -2,28 +2,28 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # Timeline for an author
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT ?label ?beginning ?ending ?education_degree_label
-WITH {
-  SELECT ?work (MIN(?publication_date) AS ?beginning) WHERE {
-    ?work wdt:P50 target: .
-    ?work wdt:P577 ?publication_date . 
-  }
-  GROUP BY ?work
-} AS %works_with_publication_date
-WITH {
-  
-  SELECT ?work ?beginning (COUNT(?citing_article) AS ?number_of_citations) WHERE {
-    INCLUDE %works_with_publication_date
-    OPTIONAL { ?citing_article wdt:P2860 ?work . }
-  }
-  GROUP BY ?work ?beginning 
-} AS %works
+
 WHERE {
   # { Birth target: wdt:P569 ?beginning . BIND("Birth" AS ?label) } UNION
   {
     { 
       SELECT ?work ?beginning WHERE {
-        INCLUDE %works
+        { SELECT ?work ?beginning (COUNT(?citing_article) AS ?number_of_citations) WHERE {
+    { SELECT ?work (MIN(?publication_date) AS ?beginning) WHERE {
+    ?work wdt:P50 target: .
+    ?work wdt:P577 ?publication_date . 
+  }
+  GROUP BY ?work }
+    OPTIONAL { ?citing_article wdt:P2860 ?work . }
+  }
+  GROUP BY ?work ?beginning }
       }
       ORDER BY DESC(?number_of_citations)
       LIMIT 1        
@@ -34,7 +34,15 @@ WHERE {
   {
     { 
       SELECT ?work ?beginning WHERE {
-        INCLUDE %works
+        { SELECT ?work ?beginning (COUNT(?citing_article) AS ?number_of_citations) WHERE {
+    { SELECT ?work (MIN(?publication_date) AS ?beginning) WHERE {
+    ?work wdt:P50 target: .
+    ?work wdt:P577 ?publication_date . 
+  }
+  GROUP BY ?work }
+    OPTIONAL { ?citing_article wdt:P2860 ?work . }
+  }
+  GROUP BY ?work ?beginning }
       }
       ORDER BY ?beginning
       LIMIT 1        
@@ -45,7 +53,15 @@ WHERE {
   {
     { 
       SELECT ?work ?beginning WHERE {
-        INCLUDE %works
+        { SELECT ?work ?beginning (COUNT(?citing_article) AS ?number_of_citations) WHERE {
+    { SELECT ?work (MIN(?publication_date) AS ?beginning) WHERE {
+    ?work wdt:P50 target: .
+    ?work wdt:P577 ?publication_date . 
+  }
+  GROUP BY ?work }
+    OPTIONAL { ?citing_article wdt:P2860 ?work . }
+  }
+  GROUP BY ?work ?beginning }
       }
       ORDER BY DESC(?beginning)
       LIMIT 1        

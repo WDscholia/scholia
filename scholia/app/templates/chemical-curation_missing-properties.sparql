@@ -1,5 +1,9 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?property ?propertyLabel WHERE {
   VALUES ?property {
     wdt:P2177 wdt:P2102 wdt:P2101 wdt:p3078 wdt:P2119

@@ -1,32 +1,33 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
 ?topicsUrl ?topics
-WITH {
-  SELECT DISTINCT ?work WHERE {
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
-  }
-} AS %works
-WITH {
-  SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
+
+WHERE {
+  { SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
                                     (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl) 
                                     WHERE {
-    INCLUDE %works
+    { SELECT DISTINCT ?work WHERE {
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
+  } }
     ?work wdt:P921 ?topic . 
     ?work wdt:P577 ?dates . 
 	FILTER (!isBLANK(?dates)) .
     ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
   }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
+  GROUP BY ?work }
 
   # There is a problem with BC dates
   # BIND(xsd:date(?datetime) AS ?date)
   BIND(REPLACE(STR(?datetime), 'T.*', '') AS ?date)
     
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 GROUP BY ?date ?work ?workLabel ?topicsUrl ?topics
 ORDER BY ASC(?date)

@@ -1,11 +1,18 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?cites_per_million
   ?citations 
   ?budget ?currency ?currencyLabel
   ?short_name
   ?project ?projectLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(?citing_work) / ?budget * 1000000 AS ?cites_per_million)
     (COUNT(?citing_work) AS ?citations)
     ?budget ?currency
@@ -17,12 +24,9 @@ WITH {
     ?work wdt:P859 ?project .
     ?citing_work wdt:P2860 ?work .
   } 
-  GROUP BY ?project ?budget ?currency
-} AS %results
-WHERE {
-  INCLUDE %results
+  GROUP BY ?project ?budget ?currency }
   OPTIONAL { ?project wdt:P1813 ?short_name }
-  SERVICE wikibase:label {
+#   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?cites_per_million)

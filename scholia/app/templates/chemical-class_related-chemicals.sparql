@@ -5,14 +5,16 @@
 #sparql_embedurl = https://query.wikidata.org/embed.html#
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
-SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl WITH {
-SELECT DISTINCT ?mol WHERE {
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
+SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl 
+WHERE {
+{ SELECT DISTINCT ?mol WHERE {
   ?mol wdt:P279* target: .
   MINUS { [] wdt:P279 ?mol }
-} LIMIT 500
-} AS %result
-WHERE {
-INCLUDE %result
+} LIMIT 500 }
 OPTIONAL { ?mol wdt:P235 ?InChIKey }
 OPTIONAL {
   VALUES ?CASIDdir { wdt:P231 }
@@ -42,5 +44,5 @@ OPTIONAL {
   }
   BIND(IRI(REPLACE(?PCformatterurl, '\\\\$1', str(?PubChem_CID))) AS ?PubChem_CIDUrl).
 }
-SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+# SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

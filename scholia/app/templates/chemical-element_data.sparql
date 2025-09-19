@@ -1,6 +1,9 @@
 # title: data for this chemical element
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT DISTINCT ?description ?value ?valueUrl
 WHERE {
   {

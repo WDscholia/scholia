@@ -1,30 +1,29 @@
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?works
   ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
   ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT DISTINCT ?author WHERE {
-    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target1: .
-  } 
-} AS %researchers
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     ?author
     (COUNT(DISTINCT ?work) AS ?works)
     (SAMPLE(?work) AS ?example_work)
   WHERE {
-    INCLUDE %researchers
+    { SELECT DISTINCT ?author WHERE {
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target1: .
+  } }
     ?work wdt:P50 ?author ;
           wdt:P4510 target2: .
   }
-  GROUP BY ?author
-} AS %researchers_and_works
-WHERE {
-  INCLUDE %researchers_and_works
+  GROUP BY ?author }
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }
 ORDER BY DESC (?works)

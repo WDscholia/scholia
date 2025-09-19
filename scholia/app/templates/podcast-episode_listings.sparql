@@ -1,32 +1,42 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # title: listings for this podcast
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?Identifier ?IdentifierLabel
   ?value (SAMPLE(?idUrls) as ?valueUrl)
   ?IdentifierDescription
-WITH {
-  SELECT ?Identifier ?Value ?formatterurl WHERE {
+ {
+  { SELECT * WHERE {
+      { SELECT ?Identifier ?Value ?formatterurl WHERE {
     target: ?IDdir ?Value .
     ?Identifier wikibase:directClaim ?IDdir ;
             wdt:P31 wd:Q84574746 .
     OPTIONAL { 
       ?Identifier wdt:P1630 ?formatterurl .
     }
-  } LIMIT 500
-} AS %RESULTS {
-  { SELECT * WHERE {
-      INCLUDE %RESULTS
+  } LIMIT 500 }
       BIND(IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(str(?Value)))) AS ?idUrls).
     }
   } UNION {
     SELECT * WHERE {
-      INCLUDE %RESULTS
+      { SELECT ?Identifier ?Value ?formatterurl WHERE {
+    target: ?IDdir ?Value .
+    ?Identifier wikibase:directClaim ?IDdir ;
+            wdt:P31 wd:Q84574746 .
+    OPTIONAL { 
+      ?Identifier wdt:P1630 ?formatterurl .
+    }
+  } LIMIT 500 }
       BIND(IRI(REPLACE(?formatterurl, '\\\\$1', str(?Value))) AS ?idUrls).
     }
   }
   BIND(CONCAT(?Value, " ↗") AS ?value)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 GROUP BY ?Identifier ?IdentifierLabel ?IdentifierDescription ?value
 ORDER BY ASC(?IdentifierLabel)

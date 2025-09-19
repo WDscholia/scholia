@@ -2,36 +2,40 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   ?citing_work ?citing_workLabel ?rgb 
   ?cited_work ?cited_workLabel
-WITH { 
-  SELECT (COUNT(*) AS ?count) ?citing_work WHERE {
+
+WHERE {
+  { SELECT (COUNT(*) AS ?count) ?citing_work WHERE {
     target: (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?citing_work .
   }
   GROUP BY ?citing_work
   ORDER BY DESC(?count)
-  LIMIT 40
-} AS %citing_works
-WITH { 
-  SELECT (COUNT(*) AS ?count_) ?cited_work WHERE {
+  LIMIT 40 }
+  { SELECT (MAX(?count) AS ?max_count) WHERE {
+    { SELECT (COUNT(*) AS ?count) ?citing_work WHERE {
+    target: (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?citing_work .
+  }
+  GROUP BY ?citing_work
+  ORDER BY DESC(?count)
+  LIMIT 40 }
+    BIND(1 AS ?dummy)
+  } 
+  GROUP BY ?dummy }
+  { SELECT (COUNT(*) AS ?count_) ?cited_work WHERE {
     target: (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?cited_work .
   }
   GROUP BY ?cited_work
   ORDER BY DESC(?count_)
-  LIMIT 40
-} AS %cited_works
-WITH {
-  SELECT (MAX(?count) AS ?max_count) WHERE {
-    INCLUDE %citing_works
-    BIND(1 AS ?dummy)
-  } 
-  GROUP BY ?dummy
-} AS %max_count
-WHERE {
-  INCLUDE %citing_works
-  INCLUDE %max_count
-  INCLUDE %cited_works
+  LIMIT 40 }
   
   ?citing_work wdt:P2860 ?cited_work .
   

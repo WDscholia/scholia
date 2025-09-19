@@ -1,17 +1,20 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?ortholog ?orthologLabel ?orthologDescription
   ?taxon ?taxonLabel ?taxonDescription
-WITH {
-  SELECT ?ortholog ?taxon
+ 
+WHERE {
+  { SELECT ?ortholog ?taxon
   WHERE {
     target: wdt:P31 wd:Q7187;
          wdt:P684 ?ortholog .
     ?ortholog wdt:P703 ?taxon .
-  }
-} AS %result 
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  } }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

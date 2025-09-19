@@ -1,9 +1,15 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?coauthor_count
   ?work ?workLabel
   ?authors ?authorsUrl
-WITH {
-  SELECT 
+
+WHERE {
+  { SELECT 
     (COUNT(?author) AS ?coauthor_count)
     ?work 
     (GROUP_CONCAT(?author_label; separator=", ") AS ?authors)
@@ -14,10 +20,7 @@ WITH {
     OPTIONAL { ?author rdfs:label ?author_label . FILTER(LANG(?author_label) = 'en') }
   }
   GROUP BY ?work
-  HAVING(?coauthor_count > 1)
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  HAVING(?coauthor_count > 1) }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?coauthor_count)

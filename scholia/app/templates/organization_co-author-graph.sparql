@@ -2,11 +2,17 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?author1 ?author1Label ?image1 ?rgb
   ?author2 ?author2Label ?image2 
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     ?author1 (SAMPLE(?image1_) AS ?image1)
     ?author2 (SAMPLE(?image2_) AS ?image2)
     (SAMPLE(?rgb_) AS ?rgb)
@@ -29,11 +35,8 @@ WITH {
     # Coloring of the nodes
     BIND("FFFFFF" AS ?rgb_)
   }
-  GROUP BY ?author1 ?author2
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
+  GROUP BY ?author1 ?author2 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
   }
 }
 

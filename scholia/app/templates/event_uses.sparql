@@ -2,12 +2,22 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?number_of_persons
   ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl) ?useDescription
   ?example_person ?example_personLabel (CONCAT("/author/", SUBSTR(STR(?example_person), 32)) AS ?example_personUrl)
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
+    (COUNT(DISTINCT ?person) AS ?number_of_persons)
+    ?use
+    (SAMPLE(?person) AS ?example_person)
+  WHERE {
+    { SELECT
     DISTINCT ?person
   WHERE {
     {
@@ -24,22 +34,11 @@ WITH {
       # author
       ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 target: .
     }
-  }
-} AS %people  
-WITH {
-  SELECT
-    (COUNT(DISTINCT ?person) AS ?number_of_persons)
-    ?use
-    (SAMPLE(?person) AS ?example_person)
-  WHERE {
-    INCLUDE %people
+  } }
     ?person ^wdt:P50 / wdt:P4510 ?use .
   }
-  GROUP BY ?use
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+  GROUP BY ?use }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
 ORDER BY DESC(?number_of_persons)
 LIMIT 200

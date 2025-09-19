@@ -1,5 +1,10 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT ?work ?workLabel ?doi (COUNT(DISTINCT ?citing) AS ?citations) WHERE {
   { ?work wdt:P31 wd:Q45182324 . }
   UNION
@@ -8,7 +13,7 @@ SELECT DISTINCT ?work ?workLabel ?doi (COUNT(DISTINCT ?citing) AS ?citations) WH
   { ?work wdt:P5824 [] . }
   OPTIONAL { ?citing wdt:P2860 ?work . }
   ?work wdt:P1433 target: ; wdt:P356 ?doi .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } GROUP BY ?work ?workLabel ?doi
   ORDER BY DESC(?citations)
   LIMIT 100

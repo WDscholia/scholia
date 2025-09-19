@@ -2,12 +2,16 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT
   ?child ?childLabel
   ?rgb 
   ?parent ?parentLabel
-WITH {
-  SELECT ?child ?rgb ?parent WHERE {
+
+WHERE {
+  { SELECT ?child ?rgb ?parent WHERE {
     { 
       # Parent taxa
       SELECT ?child ?rgb ?parent  WHERE {
@@ -36,10 +40,7 @@ WITH {
       }
       LIMIT 100
     }
-  }
-} AS %results
-WHERE {
-  INCLUDE %results 
+  } } 
           
   ?child rdfs:label ?child_label . FILTER(LANG(?child_label) = 'en')
   ?parent rdfs:label ?parent_label . FILTER(LANG(?parent_label) = 'en')

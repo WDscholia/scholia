@@ -1,6 +1,12 @@
 # title: list the isotopes for this chemical element
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?isotope ?isotopeLabel ?protons ?neutrons ?mass ?massUnit ?massUnitLabel ?halflife ?halflifeUnit?halflifeUnitLabel
 WHERE {
   VALUES ?element { target: }
@@ -15,5 +21,5 @@ WHERE {
   ?halflifeStat psv:P2114 ?halflifeValNode .
   ?halflifeValNode wikibase:quantityAmount ?halflife ;
                    wikibase:quantityUnit ?halflifeUnit .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } ORDER BY ?neutrons

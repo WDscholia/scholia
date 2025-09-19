@@ -1,17 +1,19 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT 
   ?count 
   ?license ?licenseLabel ?licenseDescription (CONCAT("/license/", SUBSTR(STR(?license), 32)) AS ?licenseUrl)
-WITH {
-  SELECT 
+
+WHERE {
+  { SELECT 
     (COUNT(*) AS ?count)
     ?license
   WHERE {
     [] wdt:P275 ?license .
   }
-  GROUP BY ?license
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  GROUP BY ?license }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?count)

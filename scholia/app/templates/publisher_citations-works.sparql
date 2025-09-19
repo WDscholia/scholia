@@ -2,9 +2,14 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?work_count ?citation_count ?journal ?journalLabel 
-WITH {
-  SELECT ?work_count ?citation_count ?journal {
+
+WHERE {
+  { SELECT ?work_count ?citation_count ?journal {
     {
       SELECT ?journal (COUNT(?work) AS ?work_count) {
   	    ?journal wdt:P123 target: .
@@ -20,9 +25,6 @@ WITH {
       }
       GROUP BY ?journal 
     } 
-  }
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  } }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }

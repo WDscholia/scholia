@@ -1,9 +1,15 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
 ?citations  ?work ?workLabel (?work AS ?wikidata_url)
-WITH {
-  SELECT (COUNT(?author) as ?count) ?work WHERE {
+
+WHERE {
+  { SELECT (COUNT(?work1) as ?citations) ?work WHERE {
+  { SELECT (COUNT(?author) as ?count) ?work WHERE {
   # Works by author
     ?work wdt:P50 ?author .
   # Author who received an award
@@ -13,22 +19,15 @@ WITH {
   }
   GROUP BY ?work
   ORDER BY DESC(?count)
-  LIMIT 2000
-} AS %works
-WITH {
-  SELECT (COUNT(?work1) as ?citations) ?work WHERE {
-  INCLUDE %works
+  LIMIT 2000 }
   # Works cited
     OPTIONAL { ?work1 wdt:P2860 ?work }.
   }
   GROUP BY ?work
   ORDER BY DESC(?citations)
-  LIMIT 200
-} AS %result
-WHERE {
-  INCLUDE %result
+  LIMIT 200 }
   
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?citations)

@@ -1,3 +1,7 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?printer ?printerLabel ?printerDescription (CONCAT("/printer/", SUBSTR(STR(?printer), 32)) AS ?printerUrl)
@@ -13,7 +17,7 @@ WHERE {
     }
     GROUP BY ?printer
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)
 LIMIT 1000

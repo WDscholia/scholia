@@ -1,12 +1,18 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?protein ?proteinLabel (CONCAT("/protein/", SUBSTR(STR(?protein), 32)) AS ?proteinUrl)
   ?species ?speciesLabel (CONCAT("/taxon/", SUBSTR(STR(?species), 32)) AS ?speciesUrl)
   ?chemicals
-WITH {
-  SELECT
+ 
+WHERE {
+  { SELECT
     (COUNT(?chemical) AS ?count)
     ?protein
     (GROUP_CONCAT(?chemical_label; separator=" // ") AS ?chemicals)
@@ -16,12 +22,9 @@ WITH {
     ?protein wdt:P129 ?chemical . 
     ?chemical rdfs:label ?chemical_label FILTER(lang(?chemical_label) = "en")
   }
-  GROUP BY ?protein
-} AS %result 
-WHERE {
-  INCLUDE %result
+  GROUP BY ?protein }
   OPTIONAL { ?protein wdt:P703 ?species . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)
 LIMIT 500

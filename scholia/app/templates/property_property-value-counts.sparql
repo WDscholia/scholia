@@ -2,17 +2,18 @@
 
 PREFIX target: <http://www.wikidata.org/prop/direct/{{ p }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?count ?o ?oLabel 
-WITH {
-  SELECT (COUNT(?s) AS ?count) ?o WHERE {
+
+WHERE {
+  { SELECT (COUNT(?s) AS ?count) ?o WHERE {
     ?s target: ?o .
   }
   GROUP BY ?o
   ORDER BY DESC(?count)
-  LIMIT 100
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language  "[AUTO_LANGUAGE],mul,en" . }
+  LIMIT 100 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language  "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)

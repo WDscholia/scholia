@@ -1,14 +1,30 @@
 # title: recent literature for this chemical class
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   ?publication_date
   ?work ?workLabel
   ?type
   ?via
   ?topics
-WITH {
-  SELECT DISTINCT
+
+WHERE {
+  { SELECT
+    ?publication_date
+    ?work
+    (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
+    ?via
+    (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics)
+  WHERE {
+    { SELECT DISTINCT
     (MAX(?publication_datetime_) AS ?publication_datetime)
     ?work ?via
   WHERE {
@@ -49,27 +65,14 @@ WITH {
   }
   GROUP BY ?work ?via
   ORDER BY DESC(?publication_datetime)
-  LIMIT 250
-} AS %works
-WITH {
-  SELECT
-    ?publication_date
-    ?work
-    (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
-    ?via
-    (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics)
-  WHERE {
-    INCLUDE %works
+  LIMIT 250 }
     ?work wdt:P921 ?topic . 
     BIND(xsd:date(?publication_datetime) AS ?publication_date)
     OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
     ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
   }
-  GROUP BY ?publication_date ?work ?via
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  GROUP BY ?publication_date ?work ?via }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?publication_date)
 LIMIT 500

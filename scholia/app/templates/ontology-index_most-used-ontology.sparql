@@ -1,10 +1,16 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?ontology ?ontologyLabel ?ontologyUrl
   ?described_by_example ?described_by_exampleLabel
   ?example_use ?example_useLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(DISTINCT ?work) AS ?count)
     ?ontology
     (CONCAT("/ontology/", SUBSTR(STR(?ontology), 32)) AS ?ontologyUrl)
@@ -15,11 +21,8 @@ WITH {
     ?ontology wdt:P31/wdt:P279* wd:Q324254 . 
     OPTIONAL { ?ontology wdt:P1343 ?described_by . }
   }
-  GROUP BY ?ontology
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  GROUP BY ?ontology }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)
 LIMIT 500    

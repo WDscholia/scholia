@@ -2,9 +2,14 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?count ?topic ?topicLabel ?example_work ?example_workLabel
-WITH {
-  SELECT 
+
+WHERE {
+  { SELECT 
     (COUNT(?work) as ?count)
     ?topic
     (SAMPLE(?work) AS ?example_work)
@@ -12,10 +17,7 @@ WITH {
     ?work wdt:P1433 target: .
     ?work wdt:P921 ?topic .
   }
-  GROUP BY ?topic
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  GROUP BY ?topic }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

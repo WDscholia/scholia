@@ -1,35 +1,32 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # title: Nearby academic institutions around a specified geographic entity.
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?distance ?unit ?unitLabel
   ?organization ?organizationLabel ?organizationDescription (CONCAT("/organization/", SUBSTR(STR(?organization), 32)) AS ?organizationUrl)
-WITH {
-  # Universities, research centers, etc.
+
+WHERE {
+  { # Compute distance.
+  SELECT ?organization ?distance ?unit WHERE {
+    { # Academic institutions on all levels
+  SELECT DISTINCT ?organization ?other_geo WHERE {
+    { # Universities, research centers, etc.
   SELECT ?university WHERE {
     VALUES ?university { wd:Q3918 wd:Q1371037 wd:Q7315155  wd:Q31855 }
-  }
-} AS %universities
-WITH {
-  # Academic institutions on all levels
-  SELECT DISTINCT ?organization ?other_geo WHERE {
-    INCLUDE %universities
+  } }
     ?organization wdt:P361* / wdt:P31 / wdt:P279* ?university .
     ?organization wdt:P625 ?other_geo .
-  }
-} AS %organizations
-WITH {
-  # Compute distance.
-  SELECT ?organization ?distance ?unit WHERE {
-    INCLUDE %organizations
+  } }
     target: wdt:P159* / wdt:P625 ?geo .
     BIND(geof:distance(?other_geo, ?geo) AS ?distance)
     BIND(wd:Q828224 AS ?unit)
     FILTER(?distance < 250)
-  }
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  } }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY ?distance

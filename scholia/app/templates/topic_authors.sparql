@@ -2,12 +2,17 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
   (COALESCE(?orcid_, CONCAT("orcid-search/search/?searchQuery=", ?authorLabel)) AS ?orcid) 
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     ?author
     (count(?work) as ?count)
   WHERE {
@@ -20,13 +25,10 @@ WITH {
   }
   GROUP BY ?author
   ORDER BY DESC(?count)
-  LIMIT 200
-} AS %result
-WHERE {
-  INCLUDE %result
+  LIMIT 200 }
           
   # Include optional ORCID iD
   OPTIONAL { ?author wdt:P496 ?orcid_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

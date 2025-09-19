@@ -1,9 +1,14 @@
 #defaultView:Graph
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?author ?authorLabel ?work ?workLabel 
-WITH {
- SELECT ?work ?author WHERE { 
+ 
+WHERE {
+ { SELECT ?work ?author WHERE { 
   { }
   {% for q1 in qs %} {% for q2 in qs %} {% if q1 < q2 %} UNION {
    SELECT ?work ?author WHERE {
@@ -19,9 +24,6 @@ WITH {
     ?work wdt:P50 ?author
    }
   } # UNION END
-  {% endif %} {% endfor %}  {% endfor %}  } 
-} AS %result 
-WHERE {
- INCLUDE %result 
- SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {% endif %} {% endfor %}  {% endfor %}  } } 
+#  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

@@ -5,6 +5,9 @@ PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?date
   ?deadline ?deadlineLabel

@@ -1,8 +1,14 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?count ?protein ?proteinLabel ?species ?speciesLabel ?functions
-WITH {
-  SELECT ?protein (COUNT(?function) AS ?count)
+ 
+WHERE {
+  { SELECT ?protein (COUNT(?function) AS ?count)
          (GROUP_CONCAT(?function_label; separator=" // ") AS ?functions)
   WHERE {
     BIND(target: AS ?query_protein)
@@ -11,12 +17,9 @@ WITH {
     ?protein wdt:P680 ?function . 
     ?function rdfs:label ?function_label FILTER(lang(?function_label) = "en")
   }
-  GROUP BY ?protein
-} AS %result 
-WHERE {
-  INCLUDE %result
+  GROUP BY ?protein }
   OPTIONAL { ?protein wdt:P703 ?species . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)
 LIMIT 500

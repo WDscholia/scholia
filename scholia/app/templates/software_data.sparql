@@ -4,6 +4,13 @@
 #sparql_embedurl = https://query.wikidata.org/embed.html#
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT DISTINCT ?description ?value ?valueUrl
 WHERE {
   BIND(target: AS ?software)

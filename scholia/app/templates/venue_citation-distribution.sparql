@@ -3,6 +3,8 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 #defaultView:LineChart
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT
   ?number_of_citations (COUNT(?work) AS ?count)
 WHERE {

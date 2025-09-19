@@ -1,3 +1,6 @@
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 ASK {
     ?work wdt:P50 wd:{{q}} . BIND("author-retractions" AS ?aspectsubpage)
     { ?work wdt:P31 wd:Q45182324 } UNION { ?work wdt:P793 wd:Q7316896 . } UNION { ?work wdt:P5824 [] . }

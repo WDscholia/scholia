@@ -1,4 +1,8 @@
 #defaultView:BarChart
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   (STR(?year_) AS ?year)
   ?count
@@ -16,5 +20,5 @@ WHERE {
     }
     GROUP BY ?year_ ?phase
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

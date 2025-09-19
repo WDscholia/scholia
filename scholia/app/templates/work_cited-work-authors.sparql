@@ -3,6 +3,10 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # List of authors with works that are cited by the specified work
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?cited_works
 
@@ -11,8 +15,10 @@ SELECT
 
   ?cited_work_example ?cited_work_exampleLabel
    (CONCAT("/work/", SUBSTR(STR(?cited_work_example), 32)) AS ?cited_work_exampleUrl)
-WITH {
-  SELECT
+
+WHERE {
+  # Label the result
+  { SELECT
     (COUNT(?cited_work) AS ?cited_works)
     ?author
     (SAMPLE(?cited_work) AS ?cited_work_example)
@@ -24,11 +30,7 @@ WITH {
   GROUP BY ?author
   # Limit the number of results to avoid downloading too much data
   ORDER BY DESC(?cited_works)
-  LIMIT 1000
-} AS %result
-WHERE {
-  # Label the result
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  LIMIT 1000 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?cited_works)

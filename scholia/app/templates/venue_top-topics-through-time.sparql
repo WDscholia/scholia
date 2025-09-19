@@ -2,45 +2,45 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?year
   ?works
   ?topic ?topicLabel
-WITH {
-  SELECT 
-    ?work
-  WHERE {
-    ?work wdt:P1433 target: .
-  }
-} AS %works
-WITH {
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?topic
-  WHERE {
-    INCLUDE %works
-    ?work wdt:P921 ?topic .
-  }
-  GROUP BY ?topic
-  ORDER BY DESC(?count)
-  LIMIT 5
-} AS %topics
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     ?year 
     (COUNT(?work) AS ?works)
     ?topic
   WHERE {
-    INCLUDE %works
-    INCLUDE %topics
+    { SELECT 
+    ?work
+  WHERE {
+    ?work wdt:P1433 target: .
+  } }
+    { SELECT
+    (COUNT(?work) AS ?count)
+    ?topic
+  WHERE {
+    { SELECT 
+    ?work
+  WHERE {
+    ?work wdt:P1433 target: .
+  } }
+    ?work wdt:P921 ?topic .
+  }
+  GROUP BY ?topic
+  ORDER BY DESC(?count)
+  LIMIT 5 }
     ?work wdt:P921 ?topic ;
           wdt:P577 ?publication_datetime .
     BIND(STR(YEAR(?publication_datetime)) AS ?year)
   }
-  GROUP BY ?year ?topic
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  GROUP BY ?year ?topic }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY ?year

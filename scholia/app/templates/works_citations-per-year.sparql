@@ -1,7 +1,12 @@
 #defaultView:LineChart
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT ?year ?number_of_citations ?work 
-WITH {
-  SELECT ?year (COUNT(DISTINCT ?citing_work) AS ?number_of_citations) ?work1 WHERE {
+
+WHERE {
+  { SELECT ?year ?number_of_citations ?work1 (SAMPLE(?work1Labels) AS ?work1Label) WHERE {
+    { SELECT ?year (COUNT(DISTINCT ?citing_work) AS ?number_of_citations) ?work1 WHERE {
     VALUES ?work1 {   {% for q in qs %} wd:{{ q }} {% endfor %}   }
     ?citing_work wdt:P2860 ?work1 .
 
@@ -9,16 +14,9 @@ WITH {
     ?citing_work wdt:P577 ?date .
     BIND(STR(YEAR(?date)) AS ?year)
   }
-  GROUP BY ?year ?work1
-} AS %counts
-WITH {
-  SELECT ?year ?number_of_citations ?work1 (SAMPLE(?work1Labels) AS ?work1Label) WHERE {
-    INCLUDE %counts
+  GROUP BY ?year ?work1 }
     ?work1 rdfs:label ?work1Labels .
   }
-  GROUP BY ?year ?number_of_citations ?work1
-} AS %results
-WHERE {
-  INCLUDE %results
+  GROUP BY ?year ?number_of_citations ?work1 }
   BIND(CONCAT(?work1Label, " (", SUBSTR(STR(?work1), 32), ")") AS ?work) 
 }

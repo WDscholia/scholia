@@ -1,5 +1,10 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT 
 ?item ?itemLabel (CONCAT("/work/", SUBSTR(STR(?item), 32)) AS ?itemUrl) ?taxonname
   (REPLACE(STR(?item), ".*Q", "Q") AS ?work) 
@@ -8,8 +13,8 @@ SELECT DISTINCT
   ("S887" AS ?heuristic)
   ("Q69652283" AS ?deduced)
 
-WITH
-{ SELECT  ?item ?taxonname WHERE {
+WHERE {
+  { SELECT  ?item ?taxonname WHERE {
   target: wdt:P225 ?taxonname .
   target: wdt:P105 wd:Q7432 . # this filters for species-level (Q7432) taxon names; comment out or adapt as necessary
 
@@ -27,13 +32,9 @@ WITH
   MINUS {?item wdt:P921 target: }
   MINUS {?item wdt:P921 [wdt:P171* target: ] } # this filters out works about subspecies of the target
 
-  FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\\\", "b", ?taxonname ,"\\\\", "b"))))
+  FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\", "b", ?taxonname ,"\\", "b"))))
   }
-  LIMIT 200
-}
-AS %items
-WHERE {
-  INCLUDE %items
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  LIMIT 200 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 LIMIT 200

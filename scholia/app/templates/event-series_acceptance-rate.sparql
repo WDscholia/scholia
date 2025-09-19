@@ -2,6 +2,13 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{q}}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT 
   ?year
   ?acceptance_rate 
@@ -15,6 +22,6 @@ WHERE {
   BIND(COALESCE(?track_, "total") AS ?track)
   
   BIND(STR(YEAR(?datetime)) AS ?year)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY ?year

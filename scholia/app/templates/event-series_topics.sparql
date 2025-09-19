@@ -1,9 +1,29 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?score ?topic ?topicLabel ?topicDescription
 (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
+    (SUM(?score_) AS ?score) ?topic
+  WHERE {
+
+    # For some reason a path query does not work here.
+    { ?event wdt:P179 target: . }
+    UNION
+    { ?event wdt:P31 target: . }
+
+    {
+      ?event wdt:P921 ?topic .
+      BIND(50 AS ?score_)
+    }
+    UNION
+    {
+      { SELECT
     DISTINCT ?person
   WHERE {
     ?event (wdt:P179 | wdt:P31) target: .
@@ -26,25 +46,7 @@ WITH {
       # author
       ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event .
     }
-  }
-} AS %people  
-WITH {
-  SELECT
-    (SUM(?score_) AS ?score) ?topic
-  WHERE {
-
-    # For some reason a path query does not work here.
-    { ?event wdt:P179 target: . }
-    UNION
-    { ?event wdt:P31 target: . }
-
-    {
-      ?event wdt:P921 ?topic .
-      BIND(50 AS ?score_)
-    }
-    UNION
-    {
-      INCLUDE %people
+  } }
       ?person ^wdt:P50 / wdt:P921 ?topic .
       BIND(1 AS ?score_)
     }
@@ -54,11 +56,8 @@ WITH {
       BIND(7 AS ?score_)
     }
   }
-  GROUP BY ?topic
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+  GROUP BY ?topic }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
 ORDER BY DESC(?score)
 LIMIT 200

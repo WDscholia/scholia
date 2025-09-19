@@ -2,12 +2,18 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?award ?awardLabel
   ?recipients ?recipientsUrl
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(?researcher) AS ?count)
     ?award
     (GROUP_CONCAT(?researcher_label; separator=", ") AS ?recipients)
@@ -22,10 +28,7 @@ WITH {
     ?researcher wdt:P166 ?award .
     ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
   }
-  GROUP BY ?award
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  GROUP BY ?award }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

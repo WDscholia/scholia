@@ -1,18 +1,20 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?number_of_corecipients
   ?award ?awardLabel ?awardDescription
-WITH {
-     SELECT DISTINCT ?award (COUNT(?recipient) AS ?number_of_corecipients) WHERE {
+
+WHERE {
+  { SELECT DISTINCT ?award (COUNT(?recipient) AS ?number_of_corecipients) WHERE {
     ?recipient wdt:P166 target: .
 	?recipient wdt:P166 ?award .
 			       FILTER (?award != target:)
      }
-     GROUP BY ?award
-} AS %result
-WHERE {
-  INCLUDE %result 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+     GROUP BY ?award } 
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh" . }  
 }
 ORDER BY DESC(?number_of_corecipients)

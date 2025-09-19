@@ -1,13 +1,16 @@
-SELECT ?wikis ?compound ?compoundLabel ?formula WITH {
-  SELECT ?wikis ?compound WHERE {
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
+SELECT ?wikis ?compound ?compoundLabel ?formula  WHERE {
+  { SELECT ?wikis ?compound WHERE {
     ?compound wdt:P31 wd:Q113145171 ;
               wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
     FILTER(?wikis >= 40)
     FILTER(NOT EXISTS {?compound wdt:P3071 []})
   } ORDER BY DESC(?wikis)
-  LIMIT 100
-} AS %CHEMICALS WHERE {
-  INCLUDE %CHEMICALS
+  LIMIT 100 }
   OPTIONAL { ?compound wdt:P274 ?formula }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } ORDER BY DESC(?wikis)

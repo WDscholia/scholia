@@ -2,6 +2,9 @@
 
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
 SELECT DISTINCT ?start_time ?end_time ?description WHERE {
   {  
     target: (wdt:P571 | wdt:P580) ?start_time ;

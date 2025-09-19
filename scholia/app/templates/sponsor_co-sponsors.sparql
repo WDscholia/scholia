@@ -1,21 +1,23 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # title: Co-funders to a specific funder including an example funded work
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?count 
 ?sponsor ?sponsorLabel (CONCAT("/sponsor/", SUBSTR(STR(?sponsor), 32)) AS ?sponsorUrl)
 ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT (COUNT(?work) AS ?count) ?sponsor (SAMPLE(?work) AS ?example_work)
+
+WHERE {
+  # Label the result
+  { SELECT (COUNT(?work) AS ?count) ?sponsor (SAMPLE(?work) AS ?example_work)
   WHERE {
     ?work wdt:P859+ target: .
     ?work wdt:P859+ ?sponsor .
     FILTER (target: != ?sponsor)
   }
-  GROUP BY ?sponsor
-} AS %result
-WHERE {
-  # Label the result
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+  GROUP BY ?sponsor }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
 }
 ORDER BY DESC(?count)

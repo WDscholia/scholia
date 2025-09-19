@@ -1,8 +1,16 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?publication_date ?number_of_papers ?short_name ?ordinal ?collection ?collectionLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(?work) AS ?number_of_papers)
     (MIN(?datetimes) AS ?publication_datetime)
     (SAMPLE(?short_name_) AS ?short_name)
@@ -17,11 +25,8 @@ WITH {
       ?collection p:P179/pq:P1545 ?ordinal_.
     }
   }
-  GROUP BY ?collection
-} AS %result
-WHERE {
-  INCLUDE %result
+  GROUP BY ?collection }
   BIND(xsd:date(?publication_datetime) AS ?publication_date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
 }
 ORDER BY DESC(?publication_date) DESC(?number_of_papers)

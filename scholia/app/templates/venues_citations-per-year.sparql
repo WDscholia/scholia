@@ -1,7 +1,12 @@
 #defaultView:LineChart
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?year ?count ?venue ?venueLabel 
-WITH {
-  SELECT ?year (COUNT(?work) AS ?count) ?venue 
+
+WHERE {
+  { SELECT ?year (COUNT(?work) AS ?count) ?venue 
   WHERE {
     VALUES ?venue {   {% for q in qs %} wd:{{ q }} {% endfor %}   }
     ?work wdt:P1433 ?venue .
@@ -9,10 +14,7 @@ WITH {
     ?citing_work wdt:P577 ?publication_datetime .
   BIND(STR(YEAR(?publication_datetime)) AS ?year)
   }
-  GROUP BY ?year ?venue
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  GROUP BY ?year ?venue }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY ?year

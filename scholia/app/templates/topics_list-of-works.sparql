@@ -1,11 +1,18 @@
 # title: List of works on any combination of specific topics
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   ?count 
   (MIN(?publication_date_) AS ?publication_date)
   ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
   ?topics ?topicsUrl
-WITH {
-  SELECT (COUNT(?topic) AS ?count) ?work
+
+WHERE {
+  { SELECT (COUNT(?topic) AS ?count) ?work
     (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
     (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl)                                    
   WHERE {
@@ -20,15 +27,12 @@ WITH {
   GROUP BY ?work ?topics
   HAVING(?count > 1)
   ORDER BY DESC(?count)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
+  LIMIT 200 }
   OPTIONAL {
     ?work wdt:P577 ?publication_datetime .
     BIND(xsd:date(?publication_datetime) AS ?publication_date_)
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 GROUP BY ?count ?work ?workLabel ?topics ?topicsUrl
 ORDER BY DESC(?count) DESC(?publication_date)

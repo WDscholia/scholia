@@ -1,9 +1,15 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT
   ?count
   (MIN(?dates) AS ?date)
   ?citing_work ?citing_workLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(?work) AS ?count)
     ?citing_work 
   WHERE {
@@ -12,15 +18,12 @@ WITH {
   }
   GROUP BY ?citing_work
   ORDER BY DESC(?count)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
+  LIMIT 200 }
   OPTIONAL {
     ?citing_work wdt:P577 ?datetimes .
     BIND(xsd:date(?datetimes) AS ?dates)
   }
-  SERVICE wikibase:label {
+#   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
   }
 GROUP BY ?count ?citing_work ?citing_workLabel

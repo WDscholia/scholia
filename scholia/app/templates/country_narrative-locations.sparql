@@ -2,13 +2,20 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 #defaultView:Map{"markercluster":true}.
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT 
   ?location ?locationLabel 
   ?work ?workLabel 
   ?geo
   ?layer
-WITH {
-  SELECT DISTINCT ?location ?work ?geo ?layer WHERE {
+
+WHERE {
+  { SELECT DISTINCT ?location ?work ?geo ?layer WHERE {
     ?location wdt:P17 target: .
     
     # Geocoordinates may possible be under a headquarter property
@@ -19,10 +26,7 @@ WITH {
     FILTER NOT EXISTS { ?work wdt:P31 wd:Q17329259 }
 
     OPTIONAL { ?work wdt:P31 / rdfs:label ?layer . FILTER (LANG(?layer) = 'en') }
-  }
-} AS %results
-WHERE {
-  INCLUDE %results 
+  } } 
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }

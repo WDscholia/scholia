@@ -2,6 +2,11 @@
 #sparql_endpoint_name= WDQS&nbsp;main
 #sparql_editurl = https://query.wikidata.org/#
 #sparql_embedurl = https://query.wikidata.org/embed.html#
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT 
   ?works
   ?venue ?venueLabel
@@ -22,6 +27,6 @@ WHERE {
       LIMIT 200
     }
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } 
 ORDER BY DESC(?works)

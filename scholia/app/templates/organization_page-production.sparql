@@ -3,23 +3,26 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 # Pages per year bar chart of an organization
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?year
   (SUM(?pages_per_author) AS ?number_of_pages)
   ?researcher ?researcherLabel
-WITH {
-  SELECT 
-    DISTINCT ?researcher
-  WHERE {
-    ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) target: .
-  }
-} AS %researchers
-WITH {
-    SELECT
+
+WHERE {
+  { SELECT
       ?researcher ?work ?year
       (SAMPLE(?pages) / COUNT(?researcher_of_paper) AS ?pages_per_author)
     WHERE {
-      INCLUDE %researchers
+      { SELECT 
+    DISTINCT ?researcher
+  WHERE {
+    ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) target: .
+  } }
       
       ?work (wdt:P50 | wdt:P2093) ?researcher_of_paper .
       
@@ -31,11 +34,8 @@ WITH {
             wdt:P577 ?date . 
       BIND(STR(YEAR(?date)) AS ?year) 
     } 
-    GROUP BY ?work ?researcher ?year
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+    GROUP BY ?work ?researcher ?year }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 GROUP BY ?year ?researcher ?researcherLabel
 ORDER BY ?year

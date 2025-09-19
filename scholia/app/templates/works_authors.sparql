@@ -1,9 +1,14 @@
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT
   ?count
   ?author ?authorLabel
   ?example_work ?example_workLabel
-WITH {
-  SELECT
+
+WHERE {
+  { SELECT
     (COUNT(?work) AS ?count)
     ?author
     (SAMPLE(?work) AS ?example_work)
@@ -13,11 +18,8 @@ WITH {
   }
   GROUP BY ?author
   ORDER BY DESC(?count)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label {
+  LIMIT 200 }
+#   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
   }
 ORDER BY DESC(?count)

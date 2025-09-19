@@ -1,10 +1,15 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT ?score 
 ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
 ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT
+ 
+WHERE {
+  { SELECT
     (SUM(?score_) AS ?score)
     ?author
     (SAMPLE(?work) AS ?example_work)
@@ -31,10 +36,7 @@ WITH {
   }
   GROUP BY ?author
   ORDER BY DESC(?score)
-  LIMIT 200
-} AS %results 
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,jp,no,ru,sv,zh". }
+  LIMIT 200 }
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,jp,no,ru,sv,zh". }
 }
 ORDER BY DESC(?score)
