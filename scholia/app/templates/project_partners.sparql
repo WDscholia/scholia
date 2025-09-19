@@ -6,7 +6,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?partner ?partnerLabel ?location
+SELECT ?partner (REPLACE(STR(?partner), ".*/", "") AS ?partnerLabel) ?location
 
 WHERE {
   { SELECT DISTINCT ?partner ?location WHERE {

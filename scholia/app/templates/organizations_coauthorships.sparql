@@ -2,7 +2,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?author1 ?author1Label ?author2 ?author2Label ?work ?workLabel WHERE {
+SELECT DISTINCT ?author1 (REPLACE(STR(?author1), ".*/", "") AS ?author1Label) ?author2 (REPLACE(STR(?author2), ".*/", "") AS ?author2Label) ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) WHERE {
   VALUES ?organization1 { 
     {% for q in qs %} wd:{{ q }} {% endfor %}
   }

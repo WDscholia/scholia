@@ -9,7 +9,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl 
+SELECT ?mol (REPLACE(STR(?mol), ".*/", "") AS ?molLabel) ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl 
 WHERE {
 { SELECT DISTINCT ?mol WHERE {
   ?mol wdt:P279* target: .

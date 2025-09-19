@@ -12,7 +12,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?citations ?publication_date ?cited_work ?cited_workLabel
+SELECT ?citations ?publication_date ?cited_work (REPLACE(STR(?cited_work), ".*/", "") AS ?cited_workLabel)
   (GROUP_CONCAT(DISTINCT ?intentionLabel;separator=", ") AS ?intentions)
 
 WHERE {

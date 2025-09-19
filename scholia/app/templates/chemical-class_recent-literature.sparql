@@ -59,7 +59,7 @@ WHERE {
     # }
     
     # Force the UNION before the publication datetime
-    hint:Prior hint:runFirst true .
+    # hint:Prior hint:runFirst true .
     
     ?work wdt:P577 ?publication_datetime_ .
   }

@@ -7,7 +7,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?publication_date ?number_of_papers ?short_name ?ordinal ?collection ?collectionLabel
+SELECT ?publication_date ?number_of_papers ?short_name ?ordinal ?collection (REPLACE(STR(?collection), ".*/", "") AS ?collectionLabel)
 
 WHERE {
   { SELECT

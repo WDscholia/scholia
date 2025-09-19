@@ -6,7 +6,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?coorganization ?coorganizationLabel ?geocoordinates ?example_coauthor ?example_coauthorLabel ?example_work ?example_workLabel
+SELECT ?coorganization (REPLACE(STR(?coorganization), ".*/", "") AS ?coorganizationLabel) ?geocoordinates ?example_coauthor (REPLACE(STR(?example_coauthor), ".*/", "") AS ?example_coauthorLabel) ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel)
 
 WHERE {
   { SELECT

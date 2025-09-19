@@ -8,7 +8,7 @@ SELECT ?year ?number_of_works ?author_label WHERE {
     WHERE {
       {
         SELECT ?author ?year (COUNT(DISTINCT ?work) AS ?number_of_works) WHERE {
-          hint:Query hint:optimizer "None".
+          # hint:Query hint:optimizer "None".
           VALUES ?author {   {% for q in qs %} wd:{{ q }} {% endfor %}   }
           ?work wdt:P50 ?author .
           ?work wdt:P577 ?publication_date .

@@ -6,7 +6,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?year ?count ?organization ?organizationLabel
+SELECT ?year ?count ?organization (REPLACE(STR(?organization), ".*/", "") AS ?organizationLabel)
 
 WHERE {
  { SELECT ?year (COUNT(?work) AS ?count) ?organization

@@ -6,7 +6,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl)
+SELECT ?intention (REPLACE(STR(?intention), ".*/", "") AS ?intentionLabel) (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl)
 (COUNT(DISTINCT ?citationStatement) AS ?citations) 
 (COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
   ?citingArticle p:P2860 ?citationStatement .

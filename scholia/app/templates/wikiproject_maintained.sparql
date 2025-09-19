@@ -2,7 +2,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?type ?typeLabel ?count 
+SELECT ?type (REPLACE(STR(?type), ".*/", "") AS ?typeLabel) ?count 
 WHERE {
   { SELECT DISTINCT ?type (COUNT(?item) AS ?count) WHERE {
     ?item wdt:P6104 wd:{{ q }};

@@ -4,7 +4,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?guest ?guestLabel
+SELECT DISTINCT ?guest (REPLACE(STR(?guest), ".*/", "") AS ?guestLabel)
   (CONCAT("/", SUBSTR(STR(?guest), 32)) AS ?guestUrl)
 WHERE {
   BIND(target: AS ?episode)

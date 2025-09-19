@@ -8,7 +8,7 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?organization ?organizationLabel ?geo ?count ?layer
+SELECT ?organization (REPLACE(STR(?organization), ".*/", "") AS ?organizationLabel) ?geo ?count ?layer
 
 WHERE {
   { SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {

@@ -3,7 +3,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?year (?citation_count / ?work_count AS ?citations_to_works_ratio) ?venue ?venueLabel 
+SELECT ?year (?citation_count / ?work_count AS ?citations_to_works_ratio) ?venue (REPLACE(STR(?venue), ".*/", "") AS ?venueLabel) 
 
 WHERE {
   { SELECT ?year (COUNT(?work) AS ?work_count) ?venue 

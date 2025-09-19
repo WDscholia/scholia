@@ -6,7 +6,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?count ?topic ?topicLabel ?example_work ?example_workLabel
+SELECT ?count ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel)
 
 WHERE {
   { SELECT 

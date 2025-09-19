@@ -6,7 +6,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
+SELECT ?date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
   ?topicsUrl ?topics 
 
 WHERE {

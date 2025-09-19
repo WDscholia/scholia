@@ -6,7 +6,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?part ?partLabel ?partDescription ?type
+SELECT ?part (REPLACE(STR(?part), ".*/", "") AS ?partLabel) ?partDescription ?type
 
 WHERE {
   { SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)

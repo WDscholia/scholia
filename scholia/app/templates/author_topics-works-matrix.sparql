@@ -4,7 +4,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?work ?workLabel ?topic ?topicLabel WHERE {
+SELECT ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) WHERE {
 ?work wdt:P50 target: .
 ?work wdt:P921 ?topic .
 OPTIONAL { ?work wdt:P577 ?publication_date }

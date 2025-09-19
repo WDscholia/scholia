@@ -4,7 +4,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?sponsor ?sponsorLabel ?sponsorUrl ?sponsorDescription
+SELECT ?sponsor (REPLACE(STR(?sponsor), ".*/", "") AS ?sponsorLabel) ?sponsorUrl ?sponsorDescription
 WHERE {
   target: wdt:P859 ?sponsor .
   BIND(CONCAT("/sponsor/", SUBSTR(STR(?sponsor), 32)) AS ?sponsorUrl)

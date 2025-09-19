@@ -484,11 +484,15 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
                 }
                 $(element).append(datatableFooter);
             }
-        }).fail(function () {
+        }).fail(function (jqXHR, textStatus, errorThrown) {
             $('#' + loaderID).remove(); // remove loader
-            $(element).prepend(
-                '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> '
-            );
+            let error_message = "";
+            try {
+              error_message = JSON.parse(jqXHR.responseText).exception;
+            } catch (e) {
+              error_message = "getJSON query failed: " + textStatus + " " + errorThrown;
+            }
+            $(element).prepend("<p style='color:red;'>" + escapeHTML(error_message) + "</p>");
             const reloadButton = document.getElementById(element.slice(1) + '-reload');
             reloadButton.classList.add('btn-secondary');
             reloadButton.classList.remove('btn-outline-secondary');
@@ -549,6 +553,7 @@ function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
 
     $.ajax({
         url: wikidata_sparql,
+        headers: { Accept: "application/sparql-results+xml" },
         success: function (data) {
             let $xml = $(data);
             let results = $xml.find('results');

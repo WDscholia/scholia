@@ -5,7 +5,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?count ?gender ?genderLabel 
+SELECT ?count ?gender (REPLACE(STR(?gender), ".*/", "") AS ?genderLabel) 
 
 WHERE {
   { SELECT (COUNT(DISTINCT ?author) AS ?count) ?gender WHERE {

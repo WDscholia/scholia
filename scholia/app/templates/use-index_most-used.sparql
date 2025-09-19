@@ -3,7 +3,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?count ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
+SELECT ?count ?use (REPLACE(STR(?use), ".*/", "") AS ?useLabel) (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
 ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
 
 WHERE {

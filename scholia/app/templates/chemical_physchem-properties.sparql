@@ -9,7 +9,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?propEntity ?propEntityLabel ?value ?units ?unitsLabel ?qualifiers ?source ?sourceLabel ?doi
+SELECT DISTINCT ?propEntity (REPLACE(STR(?propEntity), ".*/", "") AS ?propEntityLabel) ?value ?units (REPLACE(STR(?units), ".*/", "") AS ?unitsLabel) ?qualifiers ?source (REPLACE(STR(?source), ".*/", "") AS ?sourceLabel) ?doi
 
 WHERE {
   { SELECT DISTINCT ?propEntity ?value ?units ?source ?doi (GROUP_CONCAT(?qualifierStr; separator=", ") AS ?qualifiers) WHERE {

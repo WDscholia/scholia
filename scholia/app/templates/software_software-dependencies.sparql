@@ -11,7 +11,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?resource1 ?resource1Label ?image1 ?rgb ?resource2 ?resource2Label ?image2
+SELECT ?resource1 (REPLACE(STR(?resource1), ".*/", "") AS ?resource1Label) ?image1 ?rgb ?resource2 (REPLACE(STR(?resource2), ".*/", "") AS ?resource2Label) ?image2
 
 {
   { SELECT

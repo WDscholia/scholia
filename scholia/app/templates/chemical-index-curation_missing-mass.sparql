@@ -3,10 +3,10 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?wikis ?compound ?compoundLabel ?formula  WHERE {
+SELECT ?wikis ?compound (REPLACE(STR(?compound), ".*/", "") AS ?compoundLabel) ?formula  WHERE {
   { SELECT ?wikis ?compound WHERE {
     ?compound wdt:P31 wd:Q113145171 ;
-              wikibase:sitelinks ?wikis . hint:Prior hint:rangeSafe true .
+              wikibase:sitelinks ?wikis . # hint:Prior hint:rangeSafe true .
     FILTER(?wikis >= 30)
     FILTER(NOT EXISTS {?compound wdt:P2067 []})
   } ORDER BY DESC(?wikis)

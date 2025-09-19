@@ -7,7 +7,7 @@ PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?isotope ?isotopeLabel ?protons ?neutrons ?mass ?massUnit ?massUnitLabel ?halflife ?halflifeUnit?halflifeUnitLabel
+SELECT ?isotope (REPLACE(STR(?isotope), ".*/", "") AS ?isotopeLabel) ?protons ?neutrons ?mass ?massUnit (REPLACE(STR(?massUnit), ".*/", "") AS ?massUnitLabel) ?halflife ?halflifeUnit?halflifeUnitLabel
 WHERE {
   VALUES ?element { target: }
   ?element wdt:P1086 ?protons .

@@ -5,7 +5,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?publication_date ?work ?workLabel ?recipient ?recipientLabel
+SELECT ?publication_date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?recipient (REPLACE(STR(?recipient), ".*/", "") AS ?recipientLabel)
 
 WHERE {
   { SELECT

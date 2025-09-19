@@ -5,7 +5,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?work ?workLabel ?doi (COUNT(DISTINCT ?citing) AS ?citations) WHERE {
+SELECT DISTINCT ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?doi (COUNT(DISTINCT ?citing) AS ?citations) WHERE {
   { ?work wdt:P31 wd:Q45182324 . }
   UNION
   { ?work wdt:P793 wd:Q7316896 . }

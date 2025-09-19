@@ -5,7 +5,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?citing_country ?citing_countryLabel ?citing_flag ?cited_country ?cited_countryLabel ?cited_flag
+SELECT DISTINCT ?citing_country (REPLACE(STR(?citing_country), ".*/", "") AS ?citing_countryLabel) ?citing_flag ?cited_country (REPLACE(STR(?cited_country), ".*/", "") AS ?cited_countryLabel) ?cited_flag
 
 WHERE {
   { SELECT DISTINCT ?cited_country ?citing_country (COUNT(?citing_country) AS ?count)

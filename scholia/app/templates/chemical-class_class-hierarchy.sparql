@@ -50,7 +50,7 @@ WHERE {
     wd:Q72070508 # group or class of chemical entities
     wd:Q74892521 # imprecise class of chemical entities
   }
-  ?parent wdt:P31 ?classes. hint:Prior hint:runFirst TRUE.
+  ?parent wdt:P31 ?classes. # hint:Prior hint:runFirst TRUE.
   ?child rdfs:label ?childLabel . FILTER(LANG(?childLabel) = "en")
   ?parent rdfs:label ?parentLabel . FILTER(LANG(?parentLabel) = "en")
 }

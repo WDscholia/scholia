@@ -2,7 +2,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 
-SELECT ?language ?languageLabel (CONCAT("/language/", SUBSTR(STR(?language), 32), "/podcast") AS ?languageUrl)
+SELECT ?language (REPLACE(STR(?language), ".*/", "") AS ?languageLabel) (CONCAT("/language/", SUBSTR(STR(?language), 32), "/podcast") AS ?languageUrl)
   (COUNT(DISTINCT ?podcast) AS ?podcasts)
 WHERE {
   ?podcast wdt:P31 wd:Q24634210 ; wdt:P407 ?language .
