@@ -5,7 +5,7 @@ PREFIX target: <http://www.wikidata.org/prop/direct/{{ p }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?count ?s ?sLabel 
+SELECT ?count ?s (REPLACE(STR(?s), ".*/", "") AS ?sLabel) 
 
 WHERE {
   { SELECT (COUNT(?o) AS ?count) ?s WHERE {

@@ -6,7 +6,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?publication_date ?episode ?episodeLabel
+SELECT ?publication_date ?episode (REPLACE(STR(?episode), ".*/", "") AS ?episodeLabel)
   (CONCAT("/podcast-episode/", SUBSTR(STR(?episode), 32)) AS ?episodeUrl)
  WHERE {
   { SELECT DISTINCT ?episode (MIN(?publication_date_) AS ?publication_date) WHERE {

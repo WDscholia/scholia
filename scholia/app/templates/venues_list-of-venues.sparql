@@ -2,7 +2,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?venue ?venueLabel ?publisher ?publisherLabel ?number_of_works ?number_of_citations
+SELECT ?venue (REPLACE(STR(?venue), ".*/", "") AS ?venueLabel) ?publisher (REPLACE(STR(?publisher), ".*/", "") AS ?publisherLabel) ?number_of_works ?number_of_citations
 
 WHERE {
   { SELECT ?venue (COUNT(DISTINCT ?work) AS ?number_of_works) (COUNT(?citing_work) AS ?number_of_citations)

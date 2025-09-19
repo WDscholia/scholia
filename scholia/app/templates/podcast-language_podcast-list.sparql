@@ -6,7 +6,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?podcast ?podcastLabel (CONCAT("/podcast/", SUBSTR(STR(?podcast), 32)) AS ?podcastUrl)
+SELECT ?podcast (REPLACE(STR(?podcast), ".*/", "") AS ?podcastLabel) (CONCAT("/podcast/", SUBSTR(STR(?podcast), 32)) AS ?podcastUrl)
   (GROUP_CONCAT(?genreWDLabel; separator=", ") AS ?genre)
 WHERE {
   ?podcast wdt:P31 wd:Q24634210 ; wdt:P407 target: .

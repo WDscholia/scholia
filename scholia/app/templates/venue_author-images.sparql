@@ -7,7 +7,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT (SAMPLE(?image_) AS ?image) ?author ?authorLabel ?count
+SELECT (SAMPLE(?image_) AS ?image) ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?count
 
 WHERE {
   { SELECT ?author (COUNT(?work) AS ?count) WHERE {

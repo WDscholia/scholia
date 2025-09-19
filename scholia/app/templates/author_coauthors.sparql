@@ -7,7 +7,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+SELECT ?author1 (REPLACE(STR(?author1), ".*/", "") AS ?author1Label) ?rgb ?author2 (REPLACE(STR(?author2), ".*/", "") AS ?author2Label)
 
 WHERE {
   { SELECT ?author1 ?author2 ?rgb WHERE {

@@ -7,7 +7,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?start_time ?budget ?project ?projectLabel WHERE {
+SELECT ?start_time ?budget ?project (REPLACE(STR(?project), ".*/", "") AS ?projectLabel) WHERE {
   ?project wdt:P859+ target: .
   ?project wdt:P2769 ?budget .
   ?project (wdt:P580 | wdt:P571) ?start_time .

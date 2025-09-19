@@ -6,7 +6,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?count ?author ?authorLabel ?orcid ?example_work ?example_workLabel
+SELECT ?count ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?orcid ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel)
 
 WHERE {
   { # Count the number of works author by the author publishing in the journal

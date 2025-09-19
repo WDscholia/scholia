@@ -5,7 +5,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?season ?seasonLabel
+SELECT DISTINCT ?season (REPLACE(STR(?season), ".*/", "") AS ?seasonLabel)
   (CONCAT("/podcast-season/", SUBSTR(STR(?season), 32)) AS ?seasonUrl)
   (MAX(?count) AS ?episodeCount)
 WHERE {

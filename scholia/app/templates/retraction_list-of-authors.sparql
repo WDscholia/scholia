@@ -22,7 +22,7 @@ SELECT DISTINCT
 
   (COUNT(DISTINCT ?work) AS ?retractions)
 WHERE {
-  hint:Query hint:optimizer "None" .
+  # hint:Query hint:optimizer "None" .
   SERVICE wdsubgraph:scholarly_articles {
     {
       target: p:P50 ?author_statement .

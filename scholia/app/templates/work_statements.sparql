@@ -8,7 +8,7 @@ PREFIX pr: <http://www.wikidata.org/prop/reference/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel ?unit ?unitLabel
+SELECT ?item (REPLACE(STR(?item), ".*/", "") AS ?itemLabel) ?property (REPLACE(STR(?property), ".*/", "") AS ?propertyLabel) ?value (REPLACE(STR(?value), ".*/", "") AS ?valueLabel) ?unit (REPLACE(STR(?unit), ".*/", "") AS ?unitLabel)
 
 WHERE {
   { SELECT distinct ?item ?property ?value ?unit

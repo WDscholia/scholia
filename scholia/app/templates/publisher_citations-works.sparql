@@ -6,7 +6,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?work_count ?citation_count ?journal ?journalLabel 
+SELECT ?work_count ?citation_count ?journal (REPLACE(STR(?journal), ".*/", "") AS ?journalLabel) 
 
 WHERE {
   { SELECT ?work_count ?citation_count ?journal {

@@ -6,7 +6,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?citedJournal ?citedJournalLabel (CONCAT("/venue/", SUBSTR(STR(?citedJournal), 32), "#cito") AS ?journalUrl)
+SELECT ?citedJournal (REPLACE(STR(?citedJournal), ".*/", "") AS ?citedJournalLabel) (CONCAT("/venue/", SUBSTR(STR(?citedJournal), 32), "#cito") AS ?journalUrl)
 (COUNT(DISTINCT ?citationStatement) AS ?citations) 
 (COUNT(DISTINCT ?citedArticle) AS ?articles) WHERE {
   ?citingArticle p:P2860 ?citationStatement .

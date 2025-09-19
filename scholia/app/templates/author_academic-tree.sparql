@@ -8,7 +8,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?student1 ?student1Label ?rgb ?supervisor1 ?supervisor1Label
+SELECT DISTINCT ?student1 (REPLACE(STR(?student1), ".*/", "") AS ?student1Label) ?rgb ?supervisor1 (REPLACE(STR(?supervisor1), ".*/", "") AS ?supervisor1Label)
 WHERE {
   { 
     SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)

@@ -4,7 +4,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?wpid ?organism ?organismLabel ?pathwayDescription
+SELECT ?wpid ?organism (REPLACE(STR(?organism), ".*/", "") AS ?organismLabel) ?pathwayDescription
 WHERE {
   VALUES ?pathway { target: }
   OPTIONAL {

@@ -14,7 +14,7 @@ WHERE {
   WHERE {
     { 
       SELECT DISTINCT ?researcher ?award WHERE {
-        hint:Query hint:optimizer "None" .
+        # hint:Query hint:optimizer "None" .
         ?work wdt:P921 target: .
         ?work wdt:P50 ?researcher .
         ?researcher wdt:P166 ?award .

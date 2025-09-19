@@ -4,7 +4,7 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?citingArticle ?citingArticleLabel 
+SELECT ?citingArticle (REPLACE(STR(?citingArticle), ".*/", "") AS ?citingArticleLabel) 
 ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl) WHERE {
   VALUES ?CITEDARTICLE { wd:{{ q }} }
   VALUES ?intention { wd:{{ q2 }} }

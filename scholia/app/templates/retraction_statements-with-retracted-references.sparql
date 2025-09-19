@@ -5,7 +5,7 @@ PREFIX pr: <http://www.wikidata.org/prop/reference/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?entity ?entityLabel ?entityUrl
+SELECT DISTINCT ?entity (REPLACE(STR(?entity), ".*/", "") AS ?entityLabel) ?entityUrl
   ?property ?propertyLabel ?value ?valueLabel
  WHERE {
   { SELECT DISTINCT ?entity ?p ?statement ?retracted WHERE {

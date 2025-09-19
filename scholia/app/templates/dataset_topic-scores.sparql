@@ -6,7 +6,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?score ?topic ?topicLabel
+SELECT ?score ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel)
  
 WHERE {
   { SELECT

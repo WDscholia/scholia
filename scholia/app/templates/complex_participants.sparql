@@ -8,7 +8,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?quantity ?part ?partLabel ?partDescription ?type
+SELECT ?quantity ?part (REPLACE(STR(?part), ".*/", "") AS ?partLabel) ?partDescription ?type
 
 WHERE {
   { SELECT ?part ?quantity (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)

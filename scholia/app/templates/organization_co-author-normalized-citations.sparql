@@ -6,7 +6,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?year (SUM(?citations_per_author_) AS ?citations_per_author) ?researcherLabel
+SELECT ?year (SUM(?citations_per_author_) AS ?citations_per_author) (REPLACE(STR(?researcher), ".*/", "") AS ?researcherLabel)
 
 WHERE {
   # Label the results

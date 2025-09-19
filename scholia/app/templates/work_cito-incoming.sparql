@@ -8,7 +8,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl)  
+SELECT ?intention (REPLACE(STR(?intention), ".*/", "") AS ?intentionLabel) (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl)  
 ?count ?example_work_for_intention ?example_work_for_intentionLabel 
 
 WHERE {

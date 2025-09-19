@@ -5,13 +5,13 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?start_date ?trial ?trialLabel
+SELECT ?start_date ?trial (REPLACE(STR(?trial), ".*/", "") AS ?trialLabel)
 
 WHERE {
   { SELECT * WHERE { 
     ?trial wdt:P31 wd:Q30612 .
     ?trial wdt:P580 ?start_datetime .
-    hint:Prior hint:rangeSafe true .
+    # hint:Prior hint:rangeSafe true .
   }
   ORDER BY DESC(?start_datetime)
   LIMIT 500 }

@@ -7,7 +7,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?citations ?publication_date ?citing_work ?citing_workLabel
+SELECT ?citations ?publication_date ?citing_work (REPLACE(STR(?citing_work), ".*/", "") AS ?citing_workLabel)
 
 WHERE {
   { SELECT

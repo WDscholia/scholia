@@ -2,7 +2,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?author ?authorLabel ?authorDescription ?example_work ?example_workLabel
+SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?authorDescription ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel)
 
 WHERE {
   { SELECT ?author (SAMPLE(?work) AS ?example_work) WHERE {

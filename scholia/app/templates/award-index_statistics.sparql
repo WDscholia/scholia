@@ -6,7 +6,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?males ?females ?award ?awardLabel 
+SELECT ?males ?females ?award (REPLACE(STR(?award), ".*/", "") AS ?awardLabel) 
 
 WHERE {
   {{ SELECT (COUNT(?recipient_male) AS ?males) (COUNT(?recipient_female) AS ?females) ?award WHERE {

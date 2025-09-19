@@ -7,8 +7,8 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?author ?authorLabel ?count WHERE {
-  hint:Query hint:optimizer "None" .
+SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?count WHERE {
+  # hint:Query hint:optimizer "None" .
   SERVICE wdsubgraph:scholarly_articles {
     SELECT ?author (COUNT(DISTINCT ?work) AS ?count) WHERE {
       { ?work wdt:P31 wd:Q45182324 . } UNION

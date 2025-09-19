@@ -6,7 +6,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?recipient ?recipientLabel ?image ?item ?itemLabel ?geo ?layer
+SELECT DISTINCT ?recipient (REPLACE(STR(?recipient), ".*/", "") AS ?recipientLabel) ?image ?item (REPLACE(STR(?item), ".*/", "") AS ?itemLabel) ?geo ?layer
 
 WHERE {
   { SELECT DISTINCT ?recipient ?image ?item ?geo (?property_item_label AS ?layer) WHERE {

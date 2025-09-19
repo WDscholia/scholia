@@ -6,7 +6,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT DISTINCT ?publication_date ?citing_work ?citing_workLabel ?work ?workLabel
+SELECT DISTINCT ?publication_date ?citing_work (REPLACE(STR(?citing_work), ".*/", "") AS ?citing_workLabel) ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel)
 WHERE {
   ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
   ?work wdt:P50 ?researcher .

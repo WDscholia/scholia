@@ -5,7 +5,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?node ?nodeLabel ?nodeImage ?childNode ?childNodeLabel ?childNodeImage ?rgb 
+SELECT ?node (REPLACE(STR(?node), ".*/", "") AS ?nodeLabel) ?nodeImage ?childNode (REPLACE(STR(?childNode), ".*/", "") AS ?childNodeLabel) ?childNodeImage ?rgb 
 
 WHERE {
   {

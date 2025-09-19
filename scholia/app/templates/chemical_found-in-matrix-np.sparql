@@ -4,7 +4,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT DISTINCT ?matrix ?matrixLabel ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl) WHERE {
+SELECT DISTINCT ?matrix (REPLACE(STR(?matrix), ".*/", "") AS ?matrixLabel) ?taxon (REPLACE(STR(?taxon), ".*/", "") AS ?taxonLabel) (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl) WHERE {
   VALUES ?chemical { target: }
   ?chemical wdt:P361 ?matrix.
   ?matrix (wdt:P279*/wdt:P1582) ?taxon .

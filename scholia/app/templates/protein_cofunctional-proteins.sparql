@@ -5,7 +5,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 
-SELECT ?count ?protein ?proteinLabel ?species ?speciesLabel ?functions
+SELECT ?count ?protein (REPLACE(STR(?protein), ".*/", "") AS ?proteinLabel) ?species (REPLACE(STR(?species), ".*/", "") AS ?speciesLabel) ?functions
  
 WHERE {
   { SELECT ?protein (COUNT(?function) AS ?count)
