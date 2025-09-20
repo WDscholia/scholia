@@ -1,40 +1,30 @@
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT
-  ?publication_date
-  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-  ?authors ?authorsUrl
-
-WHERE {
-  { SELECT 
-    (xsd:date(MAX(?publication_date_)) AS ?publication_date)
-    ?work
-    (GROUP_CONCAT(DISTINCT ?author_; separator=", ") AS ?authors)
-    (CONCAT("../../../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
+SELECT ?publication_date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) ?authors ?authorsUrl WHERE {
   {
-    { ?author ?p1 target1: . }
-    UNION
-    {
-      ?author ?p2 ?something .
-      ?something wdt:P361 target1: .
+    SELECT (xsd:date(MAX(?publication_date_)) AS ?publication_date) ?work (GROUP_CONCAT(DISTINCT ?author_; SEPARATOR=", ") AS ?authors) (CONCAT("../../../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author),32); SEPARATOR=",")) AS ?authorsUrl) {
+      {
+        ?author ?p1 target1: .
+      }
+      UNION {
+        ?author ?p2 ?something .
+        ?something wdt:P361 target1: .
+      }
+      ?work wdt:P50 ?author ;
+            wdt:P921 target2: .
+      ?author rdfs:label ?author_ .
+      FILTER (LANG(?author_) = 'en')
+      ?work wdt:P577 ?publication_date_ .
     }
-    ?work wdt:P50 ?author;
-          wdt:P921 target2: .
-    ?author rdfs:label ?author_ .
-    FILTER (LANG(?author_) = 'en')
-    
-    ?work wdt:P577 ?publication_date_ .
+    GROUP BY ?work
+    ORDER BY DESC(?publication_date)
+    LIMIT 200
   }
-  GROUP BY ?work
-  ORDER BY DESC (?publication_date)
-  LIMIT 200 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
-ORDER BY DESC (?publication_date)
+ORDER BY DESC(?publication_date)

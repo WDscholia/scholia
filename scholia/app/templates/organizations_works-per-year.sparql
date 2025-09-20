@@ -1,23 +1,21 @@
 #defaultView:LineChart
 PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?year (COUNT(?work) AS ?number_of_works) ?organization (REPLACE(STR(?organization), ".*/", "") AS ?organizationLabel)  
-WHERE {
+SELECT ?year (COUNT(?work) AS ?number_of_works) ?organization (REPLACE(STR(?organization), ".*/", "") AS ?organizationLabel) WHERE {
   {
     SELECT DISTINCT ?year ?work ?organization WHERE {
       # hint:Query hint:optimizer "None".
-      VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
-      ?author wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*) ?organization . 
+      #      VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+      ?author wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*) ?organization .
       ?work wdt:P50 ?author .
       ?work wdt:P577 ?publication_date .
-      BIND(STR(YEAR(?publication_date)) AS ?year)
+      BIND (STR(YEAR(?publication_date)) AS ?year)
     }
     GROUP BY ?work ?year ?organization
-  } 
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 GROUP BY ?year ?organization ?organizationLabel
 ORDER BY ?year
-

@@ -1,81 +1,67 @@
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # Doctoral student/advisor network with a source from a spectific researcher
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT DISTINCT ?student1 (REPLACE(STR(?student1), ".*/", "") AS ?student1Label) ?rgb ?supervisor1 (REPLACE(STR(?supervisor1), ".*/", "") AS ?supervisor1Label)
-WHERE {
-  { 
-    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
-    WHERE {
+SELECT DISTINCT ?student1 (REPLACE(STR(?student1), ".*/", "") AS ?student1Label) ?rgb ?supervisor1 (REPLACE(STR(?supervisor1), ".*/", "") AS ?supervisor1Label) WHERE {
+  {
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) AS ?depth) WHERE {
       SERVICE gas:service {
         gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                gas:in target: ;
-                gas:traversalDirection "Forward" ;
-                gas:out ?student1 ;
-                gas:out1 ?depth1 ;
-                gas:out2 ?supervisor1 ;
-                gas:linkType wdt:P185 ;
+                    gas:in target: ;
+                    gas:traversalDirection "Forward" ;
+                    gas:out ?student1 ;
+                    gas:out1 ?depth1 ;
+                    gas:out2 ?supervisor1 ;
+                    gas:linkType wdt:P185 ;
       }
     }
     GROUP BY ?student1 ?supervisor1
   }
-  UNION
-  { 
-    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
-    WHERE {
-      service gas:service {
-        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                gas:in target: ;
-                gas:traversalDirection "Forward" ;
-                gas:out ?supervisor1 ;
-                gas:out1 ?depth1 ;
-                gas:out2 ?student1 ;
-                gas:linkType wdt:P184 ;
-      }
-    }
-    GROUP BY ?student1 ?supervisor1
-  }
-  UNION
-  { 
-    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
-    WHERE {
+  UNION {
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) AS ?depth) WHERE {
       SERVICE gas:service {
         gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                gas:in target: ;
-                gas:traversalDirection "Reverse" ;
-                gas:out ?student1 ;
-                gas:out1 ?depth1 ;
-                gas:out2 ?supervisor1 ;
-                gas:linkType wdt:P184 ;
+                    gas:in target: ;
+                    gas:traversalDirection "Forward" ;
+                    gas:out ?supervisor1 ;
+                    gas:out1 ?depth1 ;
+                    gas:out2 ?student1 ;
+                    gas:linkType wdt:P184 ;
       }
     }
     GROUP BY ?student1 ?supervisor1
   }
-  UNION
-  { 
-    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
-    WHERE {
+  UNION {
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) AS ?depth) WHERE {
       SERVICE gas:service {
         gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                gas:in target: ;
-                gas:traversalDirection "Reverse" ;
-                gas:out ?supervisor1 ;
-                gas:out1 ?depth1 ;
-                gas:out2 ?student1 ;
-                gas:linkType wdt:P185 ;
+                    gas:in target: ;
+                    gas:traversalDirection "Reverse" ;
+                    gas:out ?student1 ;
+                    gas:out1 ?depth1 ;
+                    gas:out2 ?supervisor1 ;
+                    gas:linkType wdt:P184 ;
       }
     }
     GROUP BY ?student1 ?supervisor1
   }
-  
-  BIND( IF( ?student1 = target:, "3080BB", "ffffff") AS ?rgb)
-
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .  } 
+  UNION {
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) AS ?depth) WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                    gas:in target: ;
+                    gas:traversalDirection "Reverse" ;
+                    gas:out ?supervisor1 ;
+                    gas:out1 ?depth1 ;
+                    gas:out2 ?student1 ;
+                    gas:linkType wdt:P185 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  BIND (IF(?student1 = target:,"3080BB","ffffff") AS ?rgb)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .  } 
 }
-

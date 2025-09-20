@@ -1,20 +1,22 @@
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?venue (REPLACE(STR(?venue), ".*/", "") AS ?venueLabel) ?publisher (REPLACE(STR(?publisher), ".*/", "") AS ?publisherLabel) ?number_of_works ?number_of_citations
-
-WHERE {
-  { SELECT ?venue (COUNT(DISTINCT ?work) AS ?number_of_works) (COUNT(?citing_work) AS ?number_of_citations)
-  WHERE {
-    VALUES ?venue {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
-    OPTIONAL {
-      ?work wdt:P1433 ?venue .
-      OPTIONAL { ?citing_work wdt:P2860 ?work }
+SELECT ?venue (REPLACE(STR(?venue), ".*/", "") AS ?venueLabel) ?publisher (REPLACE(STR(?publisher), ".*/", "") AS ?publisherLabel) ?number_of_works ?number_of_citations WHERE {
+  {
+    SELECT ?venue (COUNT(DISTINCT ?work) AS ?number_of_works) (COUNT(?citing_work) AS ?number_of_citations) WHERE {
+      #    VALUES ?venue {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
+      OPTIONAL {
+        ?work wdt:P1433 ?venue .
+        OPTIONAL {
+          ?citing_work wdt:P2860 ?work
+        }
+      }
     }
-  } 
-  GROUP BY ?venue }
-  OPTIONAL { ?venue wdt:P123 ?publisher }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+    GROUP BY ?venue
+  }
+  OPTIONAL {
+    ?venue wdt:P123 ?publisher
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY ?venueLabel

@@ -2,19 +2,9 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?intervention ?interventionLabel
-  ?as_chemical ?as_chemicalLabel
-  ?example_trial ?example_trialLabel
- WHERE {
+SELECT ?count ?intervention ?interventionLabel ?as_chemical ?as_chemicalLabel ?example_trial ?example_trialLabel WHERE {
   {
-    SELECT
-      (COUNT(?trial) AS ?count)
-      ?intervention
-      (SAMPLE(?trial) AS ?example_trial)
-    WHERE {
+    SELECT (COUNT(?trial) AS ?count) ?intervention (SAMPLE(?trial) AS ?example_trial) WHERE {
       ?trial wdt:P31 wd:Q30612 .
       ?trial wdt:P4844 ?intervention
     }
@@ -22,7 +12,9 @@ SELECT
     ORDER BY DESC(?count)
     LIMIT 500
   }
-  BIND(IF(EXISTS { ?intervention wdt:P31 wd:Q11173 }, ?intervention, "") AS ?as_chemical) 
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  BIND (IF(EXISTS {
+    ?intervention wdt:P31 wd:Q11173
+  },?intervention,"") AS ?as_chemical)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)

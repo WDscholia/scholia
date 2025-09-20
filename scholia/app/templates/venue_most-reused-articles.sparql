@@ -1,5 +1,4 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
@@ -7,15 +6,14 @@ PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?citedArticle (REPLACE(STR(?citedArticle), ".*/", "") AS ?citedArticleLabel) (CONCAT("/work/", SUBSTR(STR(?citedArticle), 32), "#cito") AS ?citedArticleUrl)
-(COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
+SELECT ?citedArticle (REPLACE(STR(?citedArticle), ".*/", "") AS ?citedArticleLabel) (CONCAT("/work/", SUBSTR(STR(?citedArticle),32), "#cito") AS ?citedArticleUrl) (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
   VALUES ?JOURNAL { target: }
   VALUES ?INTENTION { wd:Q96472102 wd:Q96471820 wd:Q101149476 }
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?INTENTION ;
                      ps:P2860 ?citedArticle .
   ?citedArticle wdt:P1433 ?JOURNAL .
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} GROUP BY ?citedArticle ?citedArticleLabel
-  ORDER BY DESC(?count)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}
+GROUP BY ?citedArticle ?citedArticleLabel
+ORDER BY DESC(?count)

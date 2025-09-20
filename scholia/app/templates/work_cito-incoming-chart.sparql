@@ -1,7 +1,5 @@
 #defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
@@ -9,13 +7,13 @@ PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
 SELECT ?intention (REPLACE(STR(?intention), ".*/", "") AS ?intentionLabel) (COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
   VALUES ?CITEDARTICLE { target: }
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?CITEDARTICLE .
   ?intention wdt:P31 wd:Q96471816 .
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} GROUP BY ?intention ?intentionLabel
-  ORDER BY DESC(?count)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}
+GROUP BY ?intention ?intentionLabel
+ORDER BY DESC(?count)

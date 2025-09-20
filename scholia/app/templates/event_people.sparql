@@ -1,75 +1,62 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  (?number_of_publications AS ?works)
-  ?person ?personLabel ?personDescription
-  ?roles
-  ?example_work ?example_workLabel
-
-WHERE {
-  { SELECT
-    (COUNT(?work) AS ?number_of_publications)
-    ?roles
-    ?person (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    { SELECT
-    (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles) ?person
-  WHERE {
-    {
-      # speaker added directly in the target item
-      target: wdt:P823 ?person .
-      # BIND(wd:Q9379869 AS ?role)
-      BIND("speaker" AS ?role)
+SELECT (?number_of_publications AS ?works) ?person ?personLabel ?personDescription ?roles ?example_work ?example_workLabel WHERE {
+  {
+    SELECT (COUNT(?work) AS ?number_of_publications) ?roles ?person (SAMPLE(?work) AS ?example_work) WHERE {
+      {
+        SELECT (GROUP_CONCAT(DISTINCT ?role; SEPARATOR=", ") AS ?roles) ?person WHERE {
+          {
+            # speaker added directly in the target item
+            target: wdt:P823 ?person .
+            # BIND(wd:Q9379869 AS ?role)
+            BIND ("speaker" AS ?role)
+          }
+          UNION {
+            # speaker inferred from presentation items related to the event-target
+            ?presentation wdt:P823 ?person ;
+                          wdt:P5072 target:
+            BIND ("speaker" AS ?role)
+          }
+          UNION {
+            # organizer
+            target: wdt:P664 ?person .
+            #BIND(wd:Q2029941 AS ?role)
+            BIND ("organizer" AS ?role)
+          }
+          UNION {
+            # participant
+            ?person wdt:P1344 | ^wdt:P710 target: .
+            BIND ("participant" AS ?role)
+          }
+          UNION {
+            # editor
+            ?person ^wdt:P98/wdt:P4745 target: .
+            BIND ("editor of proceedings" AS ?role)
+          }
+          UNION {
+            # author
+            ?person ^wdt:P50/wdt:P1433/wdt:P4745 target: .
+            BIND ("author" AS ?role)
+          }
+          UNION {
+            # program committee member
+            target: wdt:P5804 ?person .
+            BIND ("program committee member" AS ?role)
+          }
+        }
+        GROUP BY ?person
+      } .
+      ?person wdt:P31 wd:Q5.
+      OPTIONAL {
+        ?work wdt:P50 ?person .
+      }
     }
-    UNION
-    {
-      # speaker inferred from presentation items related to the event-target
-      ?presentation wdt:P823 ?person; wdt:P5072 target: 
-      BIND("speaker" AS ?role)
-    }
-    UNION
-    {
-      # organizer
-      target: wdt:P664 ?person .
-      #BIND(wd:Q2029941 AS ?role)
-      BIND("organizer" AS ?role)
-    }
-    UNION
-    {
-      # participant
-      ?person wdt:P1344 | ^wdt:P710 target: .
-      BIND("participant" AS ?role)
-    }
-    UNION
-    {
-      # editor
-      ?person ^wdt:P98 / wdt:P4745 target: .
-      BIND("editor of proceedings" AS ?role)
-    }
-    UNION
-    {
-      # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 target: .
-      BIND("author" AS ?role)
-    }
-    UNION
-    {
-      # program committee member
-      target: wdt:P5804 ?person .
-      BIND("program committee member" AS ?role)
-    }
+    GROUP BY ?roles ?person
   }
-  GROUP BY ?person } .
-    ?person wdt:P31 wd:Q5.
-    OPTIONAL { ?work wdt:P50 ?person . }
-  }
-  GROUP BY ?roles ?person }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
 }
 ORDER BY DESC(?number_of_publications)
 LIMIT 10000

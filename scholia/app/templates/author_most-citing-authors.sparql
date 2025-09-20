@@ -1,37 +1,32 @@
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?citing_author ?citing_authorLabel
-
-  # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
-  (COALESCE(?orcid_, CONCAT("orcid-search/search/?searchQuery=", ENCODE_FOR_URI(?citing_authorLabel))) AS ?orcid)
-
-WHERE {
+SELECT ?count ?citing_author ?citing_authorLabel
+# Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
+(COALESCE(?orcid_, CONCAT("orcid-search/search/?searchQuery=", ENCODE_FOR_URI(?citing_authorLabel))) AS ?orcid) WHERE {
   { # An author might have multiple ORCID iDs
-  SELECT
-    ?count
-    ?citing_author
-    (SAMPLE(?orcids) AS ?orcid_)
-  WHERE {
-    { SELECT (COUNT(?citing_work) AS ?count) ?citing_author WHERE {
-    ?work wdt:P50 target: .
-    ?citing_work wdt:P2860 ?work . 
-    MINUS { ?citing_work wdt:P50 target: }
-    ?citing_work wdt:P50 ?citing_author .
+    SELECT ?count ?citing_author (SAMPLE(?orcids) AS ?orcid_) WHERE {
+      {
+        SELECT (COUNT(?citing_work) AS ?count) ?citing_author WHERE {
+          ?work wdt:P50 target: .
+          ?citing_work wdt:P2860 ?work .
+          MINUS {
+            ?citing_work wdt:P50 target:
+          }
+          ?citing_work wdt:P50 ?citing_author .
+        }
+        GROUP BY ?citing_author
+        ORDER BY DESC(?count)
+        LIMIT 500
+      }
+      OPTIONAL {
+        ?citing_author wdt:P496 ?orcids
+      }
+    }
+    GROUP BY ?count ?citing_author
   }
-  GROUP BY ?citing_author 
-  ORDER BY DESC(?count)
-  LIMIT 500 }
-    OPTIONAL { ?citing_author wdt:P496 ?orcids }
-  }
-  GROUP BY ?count ?citing_author }
-  
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
-} 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+}
 ORDER BY DESC(?count)

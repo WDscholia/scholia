@@ -1,31 +1,20 @@
 # title: Most cited articles published in specific venue
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 #defaultView:Table
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?work ?workLabel
-  ?example_citing_work ?example_citing_workLabel
-
-WHERE {
+SELECT ?count ?work ?workLabel ?example_citing_work ?example_citing_workLabel WHERE {
   # Label results
   { # Count citations
-  SELECT
-    (COUNT(?citing_work) AS ?count)
-    ?work
-    (SAMPLE(?citing_work) AS ?example_citing_work)
-  WHERE {
-    ?work wdt:P1433 target: .
-    ?citing_work wdt:P2860 ?work.
+    SELECT (COUNT(?citing_work) AS ?count) ?work (SAMPLE(?citing_work) AS ?example_citing_work) WHERE {
+      ?work wdt:P1433 target: .
+      ?citing_work wdt:P2860 ?work .
+    }
+    GROUP BY ?work
+    ORDER BY DESC(?count)
+    LIMIT 1000
   }
-  GROUP BY ?work
-  ORDER BY DESC(?count)
-  LIMIT 1000 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

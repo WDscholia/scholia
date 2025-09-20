@@ -1,25 +1,22 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?variant ?variantLabel ?variantDescription
-  ?types
-
-WHERE {
-  { SELECT ?variant (GROUP_CONCAT(?type_label; separator=" // ") AS ?types) WHERE {
-    { SELECT ?variant ?type
-  WHERE {
-    ?variant wdt:P3433 target:
-  } }
-    OPTIONAL {
-      ?variant wdt:P279 ?variantType . 
-      ?variantType rdfs:label ?type_label .  FILTER (lang(?type_label) = 'en')
+SELECT ?variant ?variantLabel ?variantDescription ?types WHERE {
+  {
+    SELECT ?variant (GROUP_CONCAT(?type_label; SEPARATOR=" // ") AS ?types) WHERE {
+      {
+        SELECT ?variant ?type WHERE {
+          ?variant wdt:P3433 target:
+        }
+      }
+      OPTIONAL {
+        ?variant wdt:P279 ?variantType .
+        ?variantType rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en')
+      }
     }
+    GROUP BY ?variant
   }
-  GROUP BY ?variant }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

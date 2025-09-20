@@ -3,28 +3,21 @@
 #sparql_editurl = https://query.wikidata.org/#
 #sparql_embedurl = https://query.wikidata.org/embed.html#
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT 
-  ?count 
-  ?software ?softwareLabel ?softwareDescription (CONCAT("/software/", SUBSTR(STR(?software), 32)) AS ?softwareUrl)
-
-WHERE {
-  { SELECT 
-    (COUNT(?other_software) AS ?count)
-    ?software 
+SELECT ?count ?software ?softwareLabel ?softwareDescription (CONCAT("/software/", SUBSTR(STR(?software),32)) AS ?softwareUrl) WHERE {
   {
-    ?software wdt:P1547+ target: .
-    OPTIONAL {
-      ?other_software wdt:P1547+ ?software .
-    } 
+    SELECT (COUNT(?other_software) AS ?count) ?software {
+      ?software wdt:P1547+ target: .
+      OPTIONAL {
+        ?other_software wdt:P1547+ ?software .
+      }
+    }
+    GROUP BY ?software
+    ORDER BY DESC(?count)
+    LIMIT 500
   }
-  GROUP BY ?software
-  ORDER BY DESC(?count)
-  LIMIT 500 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?count)

@@ -1,19 +1,25 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?type ?complex_or_process (REPLACE(STR(?complex_or_process), ".*/", "") AS ?complex_or_processLabel)
-
-WHERE {
-  { SELECT DISTINCT ?type ?complex_or_process WHERE {
-    VALUES ?part { target: }
-    VALUES ?process { wd:Q2996394 wd:Q4915012 }
-    { ?part ^wdt:P527 ?complex_or_process . ?complex_or_process wdt:P31 wd:Q22325163 ; BIND ("complex" AS ?type ) }
-    UNION
-    { ?part ^wdt:P527 ?complex_or_process . ?complex_or_process wdt:P31 ?process ; BIND ("biological process" AS ?type ) }
-  } }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
-} ORDER BY ASC(?partLabel)
+SELECT ?type ?complex_or_process (REPLACE(STR(?complex_or_process), ".*/", "") AS ?complex_or_processLabel) WHERE {
+  {
+    SELECT DISTINCT ?type ?complex_or_process WHERE {
+      VALUES ?part { target: }
+      VALUES ?process { wd:Q2996394 wd:Q4915012 }
+      {
+        ?part ^wdt:P527 ?complex_or_process .
+        ?complex_or_process wdt:P31 wd:Q22325163 ;
+        BIND ("complex" AS ?type)
+      }
+      UNION {
+        ?part ^wdt:P527 ?complex_or_process .
+        ?complex_or_process wdt:P31 ?process ;
+        BIND ("biological process" AS ?type)
+      }
+    }
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+}
+ORDER BY ASC(?partLabel)

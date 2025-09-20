@@ -1,24 +1,23 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?part (REPLACE(STR(?part), ".*/", "") AS ?partLabel) ?partDescription ?type
-
-WHERE {
-  { SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
-  WHERE {
-    VALUES ?process { wd:Q4915012 wd:Q2996394 }
-    target: wdt:P31 ?process ;
-             wdt:P527 ?part .
-    OPTIONAL { 
-      ?part wdt:P31 ?type_ .
-      ?type_ rdfs:label ?type_label .
-      FILTER (LANG(?type_label) = 'en')
+SELECT ?part (REPLACE(STR(?part), ".*/", "") AS ?partLabel) ?partDescription ?type WHERE {
+  {
+    SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; SEPARATOR=", ") AS ?type) WHERE {
+      VALUES ?process { wd:Q4915012 wd:Q2996394 }
+      target: wdt:P31 ?process ;
+              wdt:P527 ?part .
+      OPTIONAL {
+        ?part wdt:P31 ?type_ .
+        ?type_ rdfs:label ?type_label .
+        FILTER (LANG(?type_label) = 'en')
+      }
     }
-  } GROUP BY ?part }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
-} ORDER BY ASC(?partLabel)
+    GROUP BY ?part
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+}
+ORDER BY ASC(?partLabel)

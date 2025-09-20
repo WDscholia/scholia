@@ -1,18 +1,14 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?protein ?proteinLabel ?proteinDescription
- 
-WHERE {
-  { SELECT ?protein
-  WHERE {
-    target: wdt:P31 wd:Q7187 ;
-      wdt:P688 ?protein .
-  } }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+SELECT ?protein ?proteinLabel ?proteinDescription WHERE {
+  {
+    SELECT ?protein WHERE {
+      target: wdt:P31 wd:Q7187 ;
+              wdt:P688 ?protein .
+    }
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

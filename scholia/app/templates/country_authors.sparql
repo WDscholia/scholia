@@ -1,34 +1,27 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?number_of_citing_works
-  ?author (REPLACE(STR(?author), "*./", "") AS ?authorLabel)
-  ?organization (REPLACE(STR(?organization), "*./", "") AS ?organizationLabel)
-  ?example_work (REPLACE(STR(?example_work), "*./", "") AS ?example_workLabel)
-
-WHERE {
-  { SELECT
-    ?author 
-    (COUNT(DISTINCT ?citing_work) AS ?number_of_citing_works)
-    (SAMPLE(?organization_) AS ?organization)
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    { SELECT DISTINCT ?author WHERE {
-    ?author wdt:P27 | wdt:P1416/wdt:P17 | wdt:P108/wdt:P17 target: .
-  } }
-    ?work wdt:P50 ?author .
-    OPTIONAL { ?citing_work wdt:P2860 ?work . }
-    OPTIONAL {
-      ?author wdt:P1416 | wdt:P108 ?organization_ .
-      ?organization_ wdt:P17 target:
+SELECT ?number_of_citing_works ?author (REPLACE(STR(?author), "*./", "") AS ?authorLabel) ?organization (REPLACE(STR(?organization), "*./", "") AS ?organizationLabel) ?example_work (REPLACE(STR(?example_work), "*./", "") AS ?example_workLabel) WHERE {
+  {
+    SELECT ?author (COUNT(DISTINCT ?citing_work) AS ?number_of_citing_works) (SAMPLE(?organization_) AS ?organization) (SAMPLE(?work) AS ?example_work) WHERE {
+      {
+        SELECT DISTINCT ?author WHERE {
+          ?author wdt:P27 | wdt:P1416/wdt:P17 | wdt:P108/wdt:P17 target: .
+        }
+      }
+      ?work wdt:P50 ?author .
+      OPTIONAL {
+        ?citing_work wdt:P2860 ?work .
+      }
+      OPTIONAL {
+        ?author wdt:P1416 | wdt:P108 ?organization_ .
+        ?organization_ wdt:P17 target:
+      }
     }
+    GROUP BY ?author
   }
-  GROUP BY ?author }
   # service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
-ORDER BY DESC(?number_of_citing_works) 
+ORDER BY DESC(?number_of_citing_works)
 LIMIT 10000

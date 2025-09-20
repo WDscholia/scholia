@@ -1,28 +1,29 @@
 #defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?count ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel)
-
-WHERE {
-  { SELECT (COUNT(*) AS ?count) ?topic
-  WHERE {
-    # Topics of series
-    { target: wdt:P921 ?topic . }
-    
-    # Topics of collections in series
-    UNION { ?collection wdt:P179 target: ; wdt:P921 ?topic . }
-    
-    # Topics of works in collections in series
-    UNION { ?work wdt:P1433/wdt:P179 target: ; wdt:P921 ?topic . }
+SELECT ?count ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) WHERE {
+  {
+    SELECT (COUNT(*) AS ?count) ?topic WHERE {
+      # Topics of series
+      {
+        target: wdt:P921 ?topic .
+      }
+      # Topics of collections in series
+      UNION {
+        ?collection wdt:P179 target: ;
+                    wdt:P921 ?topic .
+      }
+      # Topics of works in collections in series
+      UNION {
+        ?work wdt:P1433/wdt:P179 target: ;
+              wdt:P921 ?topic .
+      }
+    }
+    GROUP BY ?topic
   }
-  GROUP BY ?topic }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
-ORDER BY DESC(?count)
-DESC(?count)
+ORDER BY DESC(?count) DESC(?count)
 LIMIT 100

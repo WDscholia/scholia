@@ -1,14 +1,13 @@
 #defaultView:Map
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
 SELECT ?event (REPLACE(STR(?event), ".*/", "") AS ?eventLabel) ?geo ?image WHERE {
   ?event (wdt:P179 | wdt:P31) target: .
-  ?event wdt:P276? / wdt:P625 ?geo .
-  OPTIONAL { ?event wdt:P18 ?image . }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  ?event wdt:P276?/wdt:P625 ?geo .
+  OPTIONAL {
+    ?event wdt:P18 ?image .
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

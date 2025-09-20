@@ -1,32 +1,38 @@
 #title: Statements referencing the {{ q }} article
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX pr: <http://www.wikidata.org/prop/reference/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?item (REPLACE(STR(?item), ".*/", "") AS ?itemLabel) ?property (REPLACE(STR(?property), ".*/", "") AS ?propertyLabel) ?value (REPLACE(STR(?value), ".*/", "") AS ?valueLabel) ?unit (REPLACE(STR(?unit), ".*/", "") AS ?unitLabel)
-
-WHERE {
-  { SELECT distinct ?item ?property ?value ?unit
-  WHERE {
-    { SELECT ?statement WHERE { 
-	  ?statement prov:wasDerivedFrom/pr:P248 target: .
+SELECT ?item (REPLACE(STR(?item), ".*/", "") AS ?itemLabel) ?property (REPLACE(STR(?property), ".*/", "") AS ?propertyLabel) ?value (REPLACE(STR(?value), ".*/", "") AS ?valueLabel) ?unit (REPLACE(STR(?unit), ".*/", "") AS ?unitLabel) WHERE {
+  {
+    SELECT DISTINCT ?item ?property ?value ?unit WHERE {
+      {
+        SELECT ?statement WHERE {
+          ?statement prov:wasDerivedFrom/pr:P248 target: .
+        }
+        LIMIT 2000
+      }
+      ?item ?p ?statement .
+      ?property wikibase:claim ?p .
+      OPTIONAL {
+        ?property wikibase:statementValueNormalized ?a1
+      }
+      ?statement ?a1 ?value1 ;
+                 ?a2 ?value2 .
+      BIND (COALESCE(?value1, ?value2) AS ?value)
+      BIND (COALESCE(?a1, ?a2) AS ?a)
+      FILTER (!STRSTARTS(LCASE(STR(?value)),"http://wikiba.se/ontology#"))
+      FILTER (!STRSTARTS(LCASE(STR(?value)),"http://www.wikidata.org/value/"))
+      FILTER (!STRSTARTS(LCASE(STR(?value)),"http://www.wikidata.org/reference/"))
+      OPTIONAL {
+        ?statement ?psv_statement_predicate ?psv_statement .
+        ?statement_predicate_property wikibase:statementValue ?psv_statement_predicate .
+        ?psv_statement wikibase:quantityUnit ?unit
+      }
+    }
   }
-  LIMIT 2000 }
-    ?item ?p ?statement .
-    ?property wikibase:claim ?p . OPTIONAL { ?property wikibase:statementValueNormalized ?a1 }
-    ?statement ?a1 ?value1 ; ?a2 ?value2 . BIND (COALESCE(?value1, ?value2) AS ?value) BIND (COALESCE(?a1, ?a2) AS ?a)
-    FILTER (!STRSTARTS(LCASE(STR(?value)), "http://wikiba.se/ontology#"))
-    FILTER (!STRSTARTS(LCASE(STR(?value)), "http://www.wikidata.org/value/"))
-    FILTER (!STRSTARTS(LCASE(STR(?value)), "http://www.wikidata.org/reference/"))
-    OPTIONAL {?statement ?psv_statement_predicate ?psv_statement .
-    ?statement_predicate_property wikibase:statementValue ?psv_statement_predicate.
-    ?psv_statement wikibase:quantityUnit ?unit}
-  } }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
-} 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+}
 ORDER BY DESC(?itemLabel)

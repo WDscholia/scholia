@@ -1,24 +1,29 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT DISTINCT
-  ?metabolite ?metaboliteLabel ?metaboliteChemicalStructure ?metaboliteDescription
- 
- {
-  { SELECT DISTINCT ?metabolite ?metaboliteChemicalStructure WHERE {
-    { SELECT DISTINCT ?children WHERE {
-      ?children (wdt:P171*) target:.
-  } }
-    { ?metabolite wdt:P703 ?children }
-    VALUES ?chemical { wd:Q113145171 wd:Q59199015 }
-    ?metabolite wdt:P31 ?chemical .
-    OPTIONAL { ?metabolite wdt:P233 ?canSmiles }
-    OPTIONAL { ?metabolite wdt:P2017 ?isoSmiles }
-    BIND(COALESCE(?isoSmiles, ?canSmiles) AS ?metaboliteChemicalStructure)
-  } }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+SELECT DISTINCT ?metabolite ?metaboliteLabel ?metaboliteChemicalStructure ?metaboliteDescription {
+  {
+    SELECT DISTINCT ?metabolite ?metaboliteChemicalStructure WHERE {
+      {
+        SELECT DISTINCT ?children WHERE {
+          ?children (wdt:P171*) target: .
+        }
+      }
+      {
+        ?metabolite wdt:P703 ?children
+      }
+      VALUES ?chemical { wd:Q113145171 wd:Q59199015 }
+      ?metabolite wdt:P31 ?chemical .
+      OPTIONAL {
+        ?metabolite wdt:P233 ?canSmiles
+      }
+      OPTIONAL {
+        ?metabolite wdt:P2017 ?isoSmiles
+      }
+      BIND (COALESCE(?isoSmiles, ?canSmiles) AS ?metaboliteChemicalStructure)
+    }
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

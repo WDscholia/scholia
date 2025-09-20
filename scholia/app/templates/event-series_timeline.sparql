@@ -1,7 +1,5 @@
 #defaultView:Timeline
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
@@ -9,43 +7,50 @@ PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?time ?endtime ?event ?eventLabel ?image
-  ?description
-
-WHERE {
-  { { SELECT DISTINCT ?event ?time ?endtime WHERE {
-    # It seems to be necessary to have this line together with the 
-    # optional event time triples here.
-    ?event wdt:P179 | wdt:P31 target: .
-    
-    OPTIONAL { ?event wdt:P580 ?starttime . }
-
-    # If the endtime is not set, then use now as the end time
-    # However this does not show well if the event is in the future
-    # and no end date has been set.
-    OPTIONAL { ?event wdt:P582 ?endtime . }
-    # BIND(COALESCE(?endtime_, NOW()) AS ?endtime)
-    
-    OPTIONAL { ?event wdt:P585 ?timepoint . }
-    
-    # If start time is defined the disregard timepoint
-    BIND(COALESCE(?starttime, ?timepoint) AS ?time)
-  } } }
-  UNION
-  { { # Include significant events
-  SELECT ?event ?time ?description WHERE {
-    ?event wdt:P179 | wdt:P31 target: .
-    ?event p:P793 [ ps:P793 ?item ; pq:P585 ?time ] .
-    OPTIONAL {
-      ?item rdfs:label ?description .
-      FILTER (LANG(?description) = "en")
+SELECT ?time ?endtime ?event ?eventLabel ?image ?description WHERE {
+  {
+    {
+      SELECT DISTINCT ?event ?time ?endtime WHERE {
+        # It seems to be necessary to have this line together with the 
+        # optional event time triples here.
+        ?event wdt:P179 | wdt:P31 target: .
+        OPTIONAL {
+          ?event wdt:P580 ?starttime .
+        }
+        # If the endtime is not set, then use now as the end time
+        # However this does not show well if the event is in the future
+        # and no end date has been set.
+        OPTIONAL {
+          ?event wdt:P582 ?endtime .
+        }
+        # BIND(COALESCE(?endtime_, NOW()) AS ?endtime)
+        OPTIONAL {
+          ?event wdt:P585 ?timepoint .
+        }
+        # If start time is defined the disregard timepoint
+        BIND (COALESCE(?starttime, ?timepoint) AS ?time)
+      }
     }
-  } } }
-          
-  OPTIONAL { ?event wdt:P18 ?image . }
-#   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
   }
+  UNION {
+    { # Include significant events
+      SELECT ?event ?time ?description WHERE {
+        ?event wdt:P179 | wdt:P31 target: .
+        ?event p:P793 [
+          ps:P793 ?item ;
+          pq:P585 ?time
+        ] .
+        OPTIONAL {
+          ?item rdfs:label ?description .
+          FILTER (LANG(?description) = "en")
+        }
+      }
+    }
+  }
+  OPTIONAL {
+    ?event wdt:P18 ?image .
+  }
+  # SERVICE wikibase:label {
+  bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
+}
 }

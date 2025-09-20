@@ -1,37 +1,22 @@
 # title: Most cited authors published in venue
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?author ?authorLabel
-  ?orcid
-  ?example_cited_work ?example_cited_workLabel
-  ?example_citing_work ?example_citing_workLabel
-
-WHERE {
+SELECT ?count ?author ?authorLabel ?orcid ?example_cited_work ?example_cited_workLabel ?example_citing_work ?example_citing_workLabel WHERE {
   { # Count the number of citations
-  SELECT
-    ?author
-    (COUNT(?cited_work) AS ?count)
-    (SAMPLE(?cited_work) AS ?example_cited_work)
-    (SAMPLE(?citing_work) AS ?example_citing_work)
-  WHERE {
-    ?cited_work wdt:P1433 target: .
-    ?citing_work wdt:P2860 ?cited_work .
-    ?cited_work wdt:P50 ?author .
+    SELECT ?author (COUNT(?cited_work) AS ?count) (SAMPLE(?cited_work) AS ?example_cited_work) (SAMPLE(?citing_work) AS ?example_citing_work) WHERE {
+      ?cited_work wdt:P1433 target: .
+      ?citing_work wdt:P2860 ?cited_work .
+      ?cited_work wdt:P50 ?author .
+    }
+    GROUP BY ?author
   }
-  GROUP BY ?author } 
-          
   # Include optional ORCID iD
-  OPTIONAL { ?author wdt:P496 ?orcid . }
-  
-  # Label the results
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  OPTIONAL {
+    ?author wdt:P496 ?orcid .
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)
 LIMIT 100

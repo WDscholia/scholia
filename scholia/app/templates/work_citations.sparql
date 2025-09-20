@@ -1,35 +1,30 @@
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # List of works that is cited by the specified work
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT ?citations ?publication_date ?citing_work (REPLACE(STR(?citing_work), ".*/", "") AS ?citing_workLabel) 
-
-WHERE {
+SELECT ?citations ?publication_date ?citing_work (REPLACE(STR(?citing_work), ".*/", "") AS ?citing_workLabel) WHERE {
   # Label the result
-  { SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work 
-  WHERE {
-    # Find works that cite the queried work
-    ?citing_work wdt:P2860 target: .
-
-    OPTIONAL {
-      ?citing_work wdt:P577 ?datetime .
-      
-      # Simplify the datetime to one with day, month and year only
-      BIND(xsd:date(?datetime) AS ?date)
+  {
+    SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work WHERE {
+      # Find works that cite the queried work
+      ?citing_work wdt:P2860 target: .
+      OPTIONAL {
+        ?citing_work wdt:P577 ?datetime .
+        # Simplify the datetime to one with day, month and year only
+        BIND (xsd:date(?datetime) AS ?date)
+      }
+      OPTIONAL {
+        ?citing_citing_work wdt:P2860 ?citing_work
+      }
     }
-    OPTIONAL { ?citing_citing_work wdt:P2860 ?citing_work }
+    GROUP BY ?citing_work
+    # Limit the number of results to avoid downloading too much data
+    ORDER BY DESC(?citations) DESC(?date)
+    LIMIT 1000
   }
-  GROUP BY ?citing_work
-  
-  # Limit the number of results to avoid downloading too much data
-  ORDER BY DESC(?citations) DESC(?date) 
-  LIMIT 1000 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
-} 
-ORDER BY DESC(?citations) DESC(?publication_date) 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+}
+ORDER BY DESC(?citations) DESC(?publication_date)

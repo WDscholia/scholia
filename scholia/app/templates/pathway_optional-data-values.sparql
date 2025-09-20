@@ -1,15 +1,12 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?wpid ?organism (REPLACE(STR(?organism), ".*/", "") AS ?organismLabel) ?pathwayDescription
-WHERE {
+SELECT ?wpid ?organism (REPLACE(STR(?organism), ".*/", "") AS ?organismLabel) ?pathwayDescription WHERE {
   VALUES ?pathway { target: }
   OPTIONAL {
     target: wdt:P2410 ?wpid ;
-    wdt:P703 ?organism .
+            wdt:P703 ?organism .
   }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

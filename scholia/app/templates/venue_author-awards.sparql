@@ -1,5 +1,4 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # title: Author awards for a specific venue
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -7,23 +6,21 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT DISTINCT
-  ?year 
-  ?author ?authorLabel
-  ?award ?awardLabel ?awardDescription
-WHERE {
+SELECT DISTINCT ?year ?author ?authorLabel ?award ?awardLabel ?awardDescription WHERE {
   [] wdt:P1433 target: ;
      wdt:P50 ?author .
   ?author p:P166 ?award_statement .
   ?award_statement ps:P166 ?award .
   OPTIONAL {
-    { ?award_statement pq:P585 ?time }
-    UNION
-    { ?award_statement pq:P580 ?time }
-    BIND(YEAR(?time) AS ?year)
+    {
+      ?award_statement pq:P585 ?time
+    }
+    UNION {
+      ?award_statement pq:P580 ?time
+    }
+    BIND (YEAR(?time) AS ?year)
   }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
 }
 ORDER BY DESC(?year)
 LIMIT 500

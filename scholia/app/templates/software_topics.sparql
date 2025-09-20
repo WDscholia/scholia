@@ -1,24 +1,18 @@
 #defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count ?topic ?topicLabel
-
-WHERE {
-  { SELECT
-    (COUNT(?work) AS ?count) ?topic
-  WHERE {
-    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* target: .
-    ?work wdt:P921 ?topic .
+SELECT ?count ?topic ?topicLabel WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?topic WHERE {
+      ?work (wdt:P2283 | wdt:P4510)/wdt:P279* target: .
+      ?work wdt:P921 ?topic .
+    }
+    GROUP BY ?topic
+    ORDER BY DESC(?count)
+    LIMIT 100
   }
-  GROUP BY ?topic
-  ORDER BY DESC(?count)
-  LIMIT 100 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)

@@ -1,37 +1,36 @@
 # title: Employees and affiliated with a specified organization
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  (SAMPLE(?number_of_works_) AS ?works)
-  (SAMPLE(?wikis_) AS ?wikis)
-  ?researcher ?researcherLabel ?researcherDescription
-  (SAMPLE(?orcid_) AS ?orcid)
-
-WHERE {
-  { SELECT
-    (COUNT(?work) AS ?number_of_works_) ?researcher
-  WHERE {
-    { SELECT DISTINCT ?researcher WHERE {
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
-  } }
-
-    # No biological pathways; they skew the statistics too much 
-    MINUS { ?work wdt:P31 wd:Q4915012 } 
-
-    # This OPTIONAL query should be after the MINUS query, otherwise
-    # researchers might not show if they do not have any papers.
-    OPTIONAL { ?work wdt:P50 ?researcher . }
-  } 
-  GROUP BY ?researcher }
-  OPTIONAL { ?researcher wdt:P496 ?orcid_ . }
-  OPTIONAL { ?researcher wikibase:sitelinks ?wikis_ }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+SELECT (SAMPLE(?number_of_works_) AS ?works) (SAMPLE(?wikis_) AS ?wikis) ?researcher ?researcherLabel ?researcherDescription (SAMPLE(?orcid_) AS ?orcid) WHERE {
+  {
+    SELECT (COUNT(?work) AS ?number_of_works_) ?researcher WHERE {
+      {
+        SELECT DISTINCT ?researcher WHERE {
+          ?researcher (wdt:P108 | wdt:P463 | wdt:P1416)/wdt:P361* target: .
+        }
+      }
+      # No biological pathways; they skew the statistics too much 
+      MINUS {
+        ?work wdt:P31 wd:Q4915012
+      }
+      # This OPTIONAL query should be after the MINUS query, otherwise
+      # researchers might not show if they do not have any papers.
+      OPTIONAL {
+        ?work wdt:P50 ?researcher .
+      }
+    }
+    GROUP BY ?researcher
+  }
+  OPTIONAL {
+    ?researcher wdt:P496 ?orcid_ .
+  }
+  OPTIONAL {
+    ?researcher wikibase:sitelinks ?wikis_
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
-GROUP BY ?researcher ?researcherLabel ?researcherDescription 
+GROUP BY ?researcher ?researcherLabel ?researcherDescription
 ORDER BY DESC(?works)

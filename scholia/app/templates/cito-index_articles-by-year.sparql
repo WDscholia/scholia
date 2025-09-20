@@ -6,37 +6,33 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-
-select ?year (count(?work) as ?number_of_publications) ?role where {
+SELECT ?year (COUNT(?work) AS ?number_of_publications) ?role WHERE {
   {
-    select ?work (min(?years) as ?year) ?type_ ?venue where {
+    SELECT ?work (MIN(?years) AS ?year) ?type_ ?venue WHERE {
       ?work wdt:P577 ?dates ;
             p:P2860 ?citesStatement .
-      ?citesStatement pq:P3712 / wdt:P31 wd:Q96471816 .
-      bind(str(year(?dates)) as ?years) .
+      ?citesStatement pq:P3712/wdt:P31 wd:Q96471816 .
+      BIND (STR(YEAR(?dates)) AS ?years) .
       OPTIONAL {
-        ?work wdt:P31 wd:Q109229154 . bind("explicit" as ?type_)
-        ?work wdt:P1433 ?venue_ . ?venue_ rdfs:label ?venue . FILTER (LANG(?venue) = "en")
-        MINUS { ?venue_ wdt:P31 wd:Q1143604 }
+        ?work wdt:P31 wd:Q109229154 .
+        BIND ("explicit" AS ?type_)
+        ?work wdt:P1433 ?venue_ .
+        ?venue_ rdfs:label ?venue . FILTER (LANG(?venue) = "en")
+        MINUS {
+          ?venue_ wdt:P31 wd:Q1143604
+        }
       }
       OPTIONAL {
-        bind("nanopub" as ?type_) bind("Nanopublication" as ?venue)
+        BIND ("nanopub" AS ?type_)
+        BIND ("Nanopublication" AS ?venue)
         ?citesStatement prov:wasDerivedFrom ?reference .
         ?reference pr:P854 | pr:P12545 ?referenceURL .
-        FILTER (
-          strstarts(str(?referenceURL), "https://w3id.org/np/") ||
-          strstarts(str(?referenceURL), "http://purl.org/np/")
-        )
+        FILTER (STRSTARTS(STR(?referenceURL),"https://w3id.org/np/") || STRSTARTS(STR(?referenceURL),"http://purl.org/np/"))
       }
     }
-    group by ?work ?type_ ?venue
+    GROUP BY ?work ?type_ ?venue
   }
-  bind(
-    coalesce(
-      if(bound(?type_), ?venue,
-      'other source')
-    ) as ?role
-  )
+  BIND (COALESCE(IF(BOUND(?type_),?venue,'other source')) AS ?role)
 }
-group by ?year ?role
-order by ?year
+GROUP BY ?year ?role
+ORDER BY ?year

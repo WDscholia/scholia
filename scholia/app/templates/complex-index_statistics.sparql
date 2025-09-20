@@ -1,17 +1,23 @@
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-
-SELECT ?count ?description
-
-WHERE {
+SELECT ?count ?description WHERE {
   {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31/wdt:P279* wd:Q22325163 ; wdt:P7718 []. } }
-    BIND("Total number of Complex Portal complexes" AS ?description)
+    {
+      SELECT (COUNT(*) AS ?count) WHERE {
+        [] wdt:P31/wdt:P279* wd:Q22325163 ;
+           wdt:P7718 [] .
+      }
+    }
+    BIND ("Total number of Complex Portal complexes" AS ?description)
   }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31/wdt:P279* wd:Q22325163 ; wdt:P3937 []. } }
-    BIND("Total number of Reactome complexes" AS ?description)
+  UNION {
+    {
+      SELECT (COUNT(*) AS ?count) WHERE {
+        [] wdt:P31/wdt:P279* wd:Q22325163 ;
+           wdt:P3937 [] .
+      }
+    }
+    BIND ("Total number of Reactome complexes" AS ?description)
   }
 }
 ORDER BY DESC(?count)

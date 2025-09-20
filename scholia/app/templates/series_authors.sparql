@@ -1,29 +1,20 @@
 # Statistics for a serial grouped by author
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?number_of_works ?number_of_citations
-  ?author ?authorLabel
-  ?example_work ?example_workLabel
-
-WHERE {
-  { SELECT
-    (COUNT(DISTINCT ?work) AS ?number_of_works) 
-    (COUNT(?citing_work) AS ?number_of_citations)
-    (SAMPLE(?work) AS ?example_work)
-    ?author
-  WHERE {
-    ?collection wdt:P179 target: .
-    ?work wdt:P1433 ?collection .
-    ?work wdt:P50 ?author .
-    OPTIONAL { ?citing_work wdt:P2860 ?work . }
+SELECT ?number_of_works ?number_of_citations ?author ?authorLabel ?example_work ?example_workLabel WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?work) AS ?number_of_works) (COUNT(?citing_work) AS ?number_of_citations) (SAMPLE(?work) AS ?example_work) ?author WHERE {
+      ?collection wdt:P179 target: .
+      ?work wdt:P1433 ?collection .
+      ?work wdt:P50 ?author .
+      OPTIONAL {
+        ?citing_work wdt:P2860 ?work .
+      }
+    }
+    GROUP BY ?author
   }
-  GROUP BY ?author }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
 }
 ORDER BY DESC(?number_of_works) DESC(?number_of_citations)

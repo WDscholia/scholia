@@ -5,17 +5,19 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-select distinct ?date ?work ?workLabel ?venue ?venueLabel where {
+SELECT DISTINCT ?date ?work ?workLabel ?venue ?venueLabel WHERE {
   {
-    select distinct ?date ?work (SAMPLE(?venue_) AS ?venue) where {
+    SELECT DISTINCT ?date ?work (SAMPLE(?venue_) AS ?venue) WHERE {
       ?work wdt:P577 ?dates ;
-            p:P2860 / pq:P3712 / wdt:P31 wd:Q96471816 .
-      BIND(xsd:date(?dates) AS ?date)
-      ?work wdt:P31 wd:Q109229154 . bind("explicit" as ?type_)
+            p:P2860/pq:P3712/wdt:P31 wd:Q96471816 .
+      BIND (xsd:date(?dates) AS ?date)
+      ?work wdt:P31 wd:Q109229154 .
+      BIND ("explicit" AS ?type_)
       ?work wdt:P1433 ?venue_ .
-    } GROUP BY ?date ?work
+    }
+    GROUP BY ?date ?work
   }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} ORDER BY DESC(?date)
-  LIMIT 50
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}
+ORDER BY DESC(?date)
+LIMIT 50

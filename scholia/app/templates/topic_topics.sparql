@@ -1,28 +1,21 @@
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
-       ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
-       ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-
-WHERE {
+SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic),32)) AS ?countUrl) ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic),32)) AS ?topicUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
   # Label the results
-  { SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
-    # Find works for the specific queried topic
-	  ?work wdt:P921/( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) target: .
-    
-    # Find co-occuring topics
-    ?work wdt:P921 ?topic .
-    
-    # Avoid listing the queried topic
+  {
+    SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
+      # Find works for the specific queried topic
+      ?work wdt:P921/(wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) target: .
+      # Find co-occuring topics
+      ?work wdt:P921 ?topic .
+      # Avoid listing the queried topic
       FILTER (target: != ?topic)
+    }
+    GROUP BY ?topic
   }
-  GROUP BY ?topic }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

@@ -2,23 +2,16 @@
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?topic ?topicLabel
-
-WHERE {
-  { SELECT
-    (COUNT(?work) AS ?count)
-    ?topic 
-  WHERE {
-    VALUES ?work {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
-    ?work wdt:P921 ?topic .
+SELECT ?count ?topic ?topicLabel WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?topic WHERE {
+      VALUES ?work {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
+      ?work wdt:P921 ?topic .
+    }
+    GROUP BY ?topic
+    ORDER BY ?count
+    LIMIT 200
   }
-  GROUP BY ?topic
-  ORDER BY ?count  
-  LIMIT 200 }
-#   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+}
 ORDER BY DESC(?count)

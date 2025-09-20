@@ -1,25 +1,17 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?score ?event ?eventLabel ?eventDescription
-  ?example_person ?example_personLabel
-WHERE {
-  { 
-    SELECT
-      (COUNT(DISTINCT ?person) AS ?score) ?event
-      (SAMPLE(?person) AS ?example_person)
-    WHERE {
-      ?person ^wdt:P823 | ^wdt:P664 | wdt:P1344 | ^wdt:P710 | (^wdt:P98 / wdt:P4745) | (^wdt:P50 / wdt:P1433 / wdt:P4745 ) | ^wdt:P5804 target: , ?event .
+SELECT ?score ?event ?eventLabel ?eventDescription ?example_person ?example_personLabel WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?person) AS ?score) ?event (SAMPLE(?person) AS ?example_person) WHERE {
+      ?person ^wdt:P823 | ^wdt:P664 | wdt:P1344 | ^wdt:P710 | (^wdt:P98/wdt:P4745) | (^wdt:P50/wdt:P1433/wdt:P4745) | ^wdt:P5804 target:, ?event .
       FILTER (?event != target:)
     }
     GROUP BY ?event
     ORDER BY DESC(?score)
     LIMIT 200
-  } 
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?score)

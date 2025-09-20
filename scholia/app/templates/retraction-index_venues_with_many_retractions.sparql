@@ -6,19 +6,10 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT 
-  ?works
-  ?venue ?venueLabel
-  (CONCAT("../venue/", SUBSTR(STR(?venue), 32)) AS ?venueUrl)
-  ?venueDescription
-WHERE {
+SELECT ?works ?venue ?venueLabel (CONCAT("../venue/", SUBSTR(STR(?venue),32)) AS ?venueUrl) ?venueDescription WHERE {
   SERVICE wdsubgraph:scholarly_articles {
     {
-      SELECT
-        (COUNT(?work) AS ?works)
-        ?venue
-      WHERE {
+      SELECT (COUNT(?work) AS ?works) ?venue WHERE {
         ?work wdt:P31 wd:Q45182324 ;
               wdt:P1433 ?venue .
       }
@@ -27,6 +18,6 @@ WHERE {
       LIMIT 200
     }
   }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}
 ORDER BY DESC(?works)

@@ -1,26 +1,18 @@
 #defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?author ?authorLabel
-
-WHERE {
-  { SELECT
-    (COUNT(?work) AS ?count)
-    ?author
-  WHERE {
-    ?work wdt:P4510 / wdt:P279* target: ;
-          wdt:P50 ?author .
+SELECT ?count ?author ?authorLabel WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?author WHERE {
+      ?work wdt:P4510/wdt:P279* target: ;
+            wdt:P50 ?author .
+    }
+    GROUP BY ?author
+    ORDER BY DESC(?count)
+    LIMIT 200
   }
-  GROUP BY ?author
-  ORDER BY DESC(?count)
-  LIMIT 200 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)

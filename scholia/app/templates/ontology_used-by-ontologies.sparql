@@ -1,15 +1,11 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-
-SELECT
-  (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-  (CONCAT("../ontology/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
-WHERE {
+SELECT (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../ontology/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) WHERE {
   ?usedByOntology wdt:P2283 target: .
-  BIND(SUBSTR(STR(?usedByOntology), 32) AS ?q)
+  BIND (SUBSTR(STR(?usedByOntology),32) AS ?q)
   ?usedByOntology rdfs:label ?value_string .
   FILTER (LANG(?value_string) = 'en')
-  BIND(COALESCE(?value_string, ?q) AS ?value_)
-} GROUP BY ?usedByOntology
+  BIND (COALESCE(?value_string, ?q) AS ?value_)
+}
+GROUP BY ?usedByOntology

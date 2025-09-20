@@ -1,29 +1,33 @@
 #defaultView:Graph
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) 
- 
-WHERE {
- { SELECT ?work ?author WHERE { 
-  { }
-  {% for q1 in qs %} {% for q2 in qs %} {% if q1 < q2 %} UNION {
-   SELECT ?work ?author WHERE {
-    SERVICE gas:service {
-     gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-           gas:in wd:{{ q1 }} ;
-           gas:target wd:{{ q2 }} ;
-           gas:traversalDirection "Undirected" ;
-           gas:out ?work ;
-           gas:linkType wdt:P50 ;
-          gas:maxVisited 5000 .
+SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) WHERE {
+  {
+    SELECT ?work ?author WHERE {
+      {}
+      { % for q1 IN qs %}
+      { % for q2 IN qs %}
+      { % IF q1 < q2 %}
+      UNION {
+        SELECT ?work ?author WHERE {
+          SERVICE gas:service {
+            gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+            #           gas:in wd:{{ q1 }} ;
+            #           gas:target wd:{{ q2 }} ;
+                        gas:traversalDirection "Undirected" ;
+                        gas:out ?work ;
+                        gas:linkType wdt:P50 ;
+                        gas:maxVisited 5000 .
+          }
+          ?work wdt:P50 ?author
+        }
+      } # UNION END
+      { % endif %}
+      { % endfor %}
+      { % endfor %}
     }
-    ?work wdt:P50 ?author
-   }
-  } # UNION END
-  {% endif %} {% endfor %}  {% endfor %}  } } 
-#  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

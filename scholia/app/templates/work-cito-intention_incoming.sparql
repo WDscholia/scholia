@@ -3,13 +3,11 @@ PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?citingArticle (REPLACE(STR(?citingArticle), ".*/", "") AS ?citingArticleLabel) 
-?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl) WHERE {
-  VALUES ?CITEDARTICLE { wd:{{ q }} }
-  VALUES ?intention { wd:{{ q2 }} }
+SELECT ?citingArticle (REPLACE(STR(?citingArticle), ".*/", "") AS ?citingArticleLabel) ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention),32)) AS ?intentionUrl) WHERE {
+  #  VALUES ?CITEDARTICLE { wd:{{ q }} }
+  #  VALUES ?intention { wd:{{ q2 }} }
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?CITEDARTICLE .
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

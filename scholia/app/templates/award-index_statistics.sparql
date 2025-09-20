@@ -5,30 +5,26 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?males ?females ?award ?awardLabel
-
-WHERE {
-  { SELECT (COUNT(?recipient_male) AS ?males) (COUNT(?recipient_female) AS ?females) ?award (REPLACE(STR(?award), ".*/", "") AS ?awardLabel) 
-  WHERE {
-    ?award wdt:P31 wd:Q11448906 .
-    { 
-      ?recipient_male wdt:P166 ?award .
-      ?recipient_male wdt:P21 wd:Q6581097 .
-    }
-    UNION 
-    {
-      ?recipient_female wdt:P166 ?award .
-      ?recipient_female wdt:P21 wd:Q6581072 .
-    }  
-  }
-  GROUP BY ?award }
-  UNION
+SELECT ?males ?females ?award ?awardLabel WHERE {
   {
+    SELECT (COUNT(?recipient_male) AS ?males) (COUNT(?recipient_female) AS ?females) ?award (REPLACE(STR(?award), ".*/", "") AS ?awardLabel) WHERE {
+      ?award wdt:P31 wd:Q11448906 .
+      {
+        ?recipient_male wdt:P166 ?award .
+        ?recipient_male wdt:P21 wd:Q6581097 .
+      }
+      UNION {
+        ?recipient_female wdt:P166 ?award .
+        ?recipient_female wdt:P21 wd:Q6581072 .
+      }
+    }
+    GROUP BY ?award
+  }
+  UNION {
     VALUES (?males ?females ?award ?awardLabel) {
       (2000 2000 wd:Q10578722 "Fictive Award Label for axis")
     }
   }
   # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
-} 
+}
 ORDER BY DESC(?males) DESC(?female)

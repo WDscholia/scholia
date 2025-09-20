@@ -1,30 +1,38 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # title: related chemical structures
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?mol (REPLACE(STR(?mol), ".*/", "") AS ?molLabel) ?InChIKey ?CAS ?ChemSpider ?PubChem_CID   {
-  { SELECT ?mol ?InChIKey WHERE {
-    { SELECT ?queryKey ?srsearch ?filter WHERE {
-    target: wdt:P235 ?queryKey .
-    BIND (CONCAT(substr($queryKey,1,14), " haswbstatement:P235") AS ?srsearch)
-    BIND (CONCAT("^", substr($queryKey,1,14)) AS ?filter)
-  } }
-    SERVICE wikibase:mwapi {
-        bd:serviceParam wikibase:endpoint "www.wikidata.org";
-        wikibase:api "Search";
-        mwapi:srsearch ?srsearch;
-        mwapi:srlimit "max".
+SELECT ?mol (REPLACE(STR(?mol), ".*/", "") AS ?molLabel) ?InChIKey ?CAS ?ChemSpider ?PubChem_CID {
+  {
+    SELECT ?mol ?InChIKey WHERE {
+      {
+        SELECT ?queryKey ?srsearch ?filter WHERE {
+          target: wdt:P235 ?queryKey .
+          BIND (CONCAT(SUBSTR($queryKey,1,14), " haswbstatement:P235") AS ?srsearch)
+          BIND (CONCAT("^", SUBSTR($queryKey,1,14)) AS ?filter)
+        }
+      }
+      SERVICE wikibase:mwapi {
+        bd:serviceParam wikibase:endpoint "www.wikidata.org" ;
+                        wikibase:api "Search" ;
+                        mwapi:srsearch ?srsearch ;
+                        mwapi:srlimit "max" .
         ?mol wikibase:apiOutputItem mwapi:title.
       }
-    ?mol wdt:P235 ?InChIKey .
-    FILTER (regex(str(?InChIKey), ?filter))
-    FILTER (?InChIKey != ?queryKey)
-  } }
-  OPTIONAL { ?mol wdt:P231 ?CAS }
-  OPTIONAL { ?mol wdt:P661 ?ChemSpider }
-  OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+      ?mol wdt:P235 ?InChIKey .
+      FILTER (REGEX(STR(?InChIKey),?filter))
+      FILTER (?InChIKey != ?queryKey)
+    }
+  }
+  OPTIONAL {
+    ?mol wdt:P231 ?CAS
+  }
+  OPTIONAL {
+    ?mol wdt:P661 ?ChemSpider
+  }
+  OPTIONAL {
+    ?mol wdt:P662 ?PubChem_CID
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

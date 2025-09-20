@@ -1,23 +1,16 @@
 # title: Count of topics in published work in specified venue
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?count ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel)
-
-WHERE {
-  { SELECT 
-    (COUNT(?work) as ?count)
-    ?topic
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work wdt:P1433 target: .
-    ?work wdt:P921 ?topic .
+SELECT ?count ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel) WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
+      ?work wdt:P1433 target: .
+      ?work wdt:P921 ?topic .
+    }
+    GROUP BY ?topic
   }
-  GROUP BY ?topic }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

@@ -1,18 +1,11 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT DISTINCT
-  ?author ?authorLabel ?authorDescription
-  (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-
-  ("ORCID search ↗" AS ?orcid_search)
-  (CONCAT("https://orcid.org/orcid-search/search/?searchQuery=", ENCODE_FOR_URI(?authorLabel)) AS ?orcid_searchUrl)
-
-WHERE {
+SELECT DISTINCT ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ("ORCID search ↗" AS ?orcid_search) (CONCAT("https://orcid.org/orcid-search/search/?searchQuery=", ENCODE_FOR_URI(?authorLabel)) AS ?orcid_searchUrl) WHERE {
   target: wdt:P50 ?author .
-  FILTER NOT EXISTS { ?author wdt:P496 ?orcid . }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  FILTER NOT EXISTS {
+    ?author wdt:P496 ?orcid .
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

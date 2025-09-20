@@ -1,19 +1,16 @@
 #defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/prop/direct/{{ p }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?count ?s (REPLACE(STR(?s), ".*/", "") AS ?sLabel) 
-
-WHERE {
-  { SELECT (COUNT(?o) AS ?count) ?s WHERE {
-    ?s target: ?o .
+SELECT ?count ?s (REPLACE(STR(?s), ".*/", "") AS ?sLabel) WHERE {
+  {
+    SELECT (COUNT(?o) AS ?count) ?s WHERE {
+      ?s target: ?o .
+    }
+    GROUP BY ?s
+    ORDER BY DESC(?count)
+    LIMIT 100
   }
-  GROUP BY ?s
-  ORDER BY DESC(?count)
-  LIMIT 100 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language  "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language  "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)

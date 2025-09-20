@@ -1,5 +1,4 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
@@ -8,101 +7,77 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?description ?descriptionLabel ?descriptionUrl
-
-  ?value ?valueLabel ?valueUrl
-
-WHERE {
+SELECT ?description ?descriptionLabel ?descriptionUrl ?value ?valueLabel ?valueUrl WHERE {
   {
-    BIND(1 AS ?order)
-    BIND("Event series" AS ?description)
-    BIND("/event-series" AS ?descriptionUrl)
+    BIND (1 AS ?order)
+    BIND ("Event series" AS ?description)
+    BIND ("/event-series" AS ?descriptionUrl)
     target: wdt:P179 ?value .
-    BIND(CONCAT("/event-series/", SUBSTR(STR(?value), 32)) AS ?valueUrl)
+    BIND (CONCAT("/event-series/", SUBSTR(STR(?value),32)) AS ?valueUrl)
   }
-  UNION
-  {
-    BIND(2 AS ?order)
-    BIND("Short name" AS ?description)
+  UNION {
+    BIND (2 AS ?order)
+    BIND ("Short name" AS ?description)
     target: wdt:P1813 ?value .
   }
-  UNION
-  {
-    BIND(5 AS ?order)
-    BIND(wd:Q34770 AS ?description)
-    BIND("/language" AS ?descriptionUrl)
-    
+  UNION {
+    BIND (5 AS ?order)
+    BIND (wd:Q34770 AS ?description)
+    BIND ("/language" AS ?descriptionUrl)
     target: wdt:P2936 ?value .
-    BIND(CONCAT("/language/", SUBSTR(STR(?value), 32)) AS ?valueUrl)
+    BIND (CONCAT("/language/", SUBSTR(STR(?value),32)) AS ?valueUrl)
   }
-  UNION
-  {
-    SELECT
-      (10 AS ?order)
-      ("Organizers" AS ?description)
-      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-      (CONCAT("/authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)      
-    {
-      BIND(1 AS ?dummy)
+  UNION {
+    SELECT (10 AS ?order) ("Organizers" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("/authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
+      BIND (1 AS ?dummy)
       target: wdt:P664 ?iri .
-      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+      BIND (SUBSTR(STR(?iri),32) AS ?q)
       ?iri rdfs:label ?value_string .
       FILTER (LANG(?value_string) = 'en')
-      BIND(COALESCE(?value_string, ?q) AS ?value_)
+      BIND (COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
   }
-  UNION
-  {
-    BIND(20 AS ?order)
-    BIND("Number of participants" AS ?description)
-    
+  UNION {
+    BIND (20 AS ?order)
+    BIND ("Number of participants" AS ?description)
     target: wdt:P1132 ?value .
   }
-  UNION
-  {
+  UNION {
     # number of submissions
-    BIND(21 AS ?order)
-    BIND("number of submissions"  AS ?description)
-    
+    BIND (21 AS ?order)
+    BIND ("number of submissions" AS ?description)
     target: p:P12655 ?value_statement .
-    ?value_statement ps:P12655 ?submissions.
+    ?value_statement ps:P12655 ?submissions .
     OPTIONAL {
-      ?value_statement  pq:P518 / rdfs:label ?track .
+      ?value_statement pq:P518/rdfs:label ?track .
       FILTER (LANG(?track) = "en")
     }
-    BIND(IF(BOUND(?track), CONCAT(STR(?submissions), " (", ?track, ")"), STR(?submissions)) AS ?value)
+    BIND (IF(BOUND(?track),CONCAT(STR(?submissions), " (", ?track, ")"),STR(?submissions)) AS ?value)
   }
-  UNION
-  {
+  UNION {
     # number of accepted contributions
-    BIND(22 AS ?order)
-    BIND("number of accepted contributions"  AS ?description)
-    
+    BIND (22 AS ?order)
+    BIND ("number of accepted contributions" AS ?description)
     target: p:P12649 ?value_statement .
     ?value_statement ps:P12649 ?accepted .
     OPTIONAL {
-      ?value_statement  pq:P518 / rdfs:label ?track .
+      ?value_statement pq:P518/rdfs:label ?track .
       FILTER (LANG(?track) = "en")
     }
-    BIND(IF(BOUND(?track), CONCAT(STR(?accepted), " (", ?track, ")"), STR(?accepted)) AS ?value)
+    BIND (IF(BOUND(?track),CONCAT(STR(?accepted), " (", ?track, ")"),STR(?accepted)) AS ?value)
   }
-  UNION
-  {
-    BIND(23 AS ?order)
-    BIND("Acceptance&nbsp;rate" AS ?description)
-    
+  UNION {
+    BIND (23 AS ?order)
+    BIND ("Acceptance&nbsp;rate" AS ?description)
     target: p:P5822 ?value_statement .
     ?value_statement ps:P5822 ?acceptance_rate .
     OPTIONAL {
-      ?value_statement  pq:P518 / rdfs:label ?track .
+      ?value_statement pq:P518/rdfs:label ?track .
       FILTER (LANG(?track) = "en")
     }
-    BIND(IF(BOUND(?track), CONCAT(STR(?acceptance_rate * 100), " % (", ?track, ")"), CONCAT(STR(?acceptance_rate * 100), " %")) AS ?value)
+    BIND (IF(BOUND(?track),CONCAT(STR(?acceptance_rate * 100), " % (", ?track, ")"),CONCAT(STR(?acceptance_rate * 100), " %")) AS ?value)
   }
-
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}
 ORDER BY ?order

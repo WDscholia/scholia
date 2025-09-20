@@ -1,56 +1,49 @@
 # title: network depiction of the class hierarchy
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-
-SELECT
-  ?child ?childLabel
-  ?rgb 
-  ?parent ?parentLabel
-
-WHERE {
-  { SELECT ?child ?rgb ?parent WHERE {
-    { 
-      SELECT ?child ?rgb ?parent  WHERE {
-        SERVICE gas:service {
-          gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                  gas:in target: ;
-                  gas:traversalDirection "Forward" ;
-                  gas:out ?child ;
-                  gas:out1 ?depth ;
-                  gas:out2 ?parent1 ;
-                  gas:linkType wdt:P279 ;
+SELECT ?child ?childLabel ?rgb ?parent ?parentLabel WHERE {
+  {
+    SELECT ?child ?rgb ?parent WHERE {
+      {
+        SELECT ?child ?rgb ?parent WHERE {
+          SERVICE gas:service {
+            gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                        gas:in target: ;
+                        gas:traversalDirection "Forward" ;
+                        gas:out ?child ;
+                        gas:out1 ?depth ;
+                        gas:out2 ?parent1 ;
+                        gas:linkType wdt:P279 ;
+          }
+          ?child wdt:P279 ?parent .
+          BIND (IF(?child = target:,"FF0000","FFFFFF") AS ?rgb)
         }
-        ?child wdt:P279 ?parent .
-        BIND(IF(?child = target:, "FF0000", "FFFFFF") AS ?rgb)
+      }
+      UNION {
+        SELECT ?child ?rgb ?parent WHERE {
+          BIND (target: AS ?parent)
+          ?child wdt:P279 ?parent .
+          BIND ("DDDDDD" AS ?rgb)
+        }
+        LIMIT 10
       }
     }
-    UNION
-    {
-      SELECT ?child ?rgb ?parent WHERE {
-        BIND(target: AS ?parent)
-        ?child wdt:P279 ?parent . 
-        BIND("DDDDDD" AS ?rgb)
-      }
-      LIMIT 10
-    }
-  } }   
-  VALUES ?classes {
-    wd:Q15711994 # group of isomeric entities
-    wd:Q17339814 # group or class of chemical substances
-    wd:Q47154513 # structural class of chemical entities
-    wd:Q55640599 # group of chemical entities
-    wd:Q56256173 # class of chemical entities with similar applications or functions
-    wd:Q56256178 # class of chemical entities with similar source or occurrence
-    wd:Q55662456 # group of ortho, meta, para isomers
-    wd:Q59199015 # group of stereoisomers
-    wd:Q72070508 # group or class of chemical entities
-    wd:Q74892521 # imprecise class of chemical entities
   }
-  ?parent wdt:P31 ?classes. # hint:Prior hint:runFirst TRUE.
-  ?child rdfs:label ?childLabel . FILTER(LANG(?childLabel) = "en")
-  ?parent rdfs:label ?parentLabel . FILTER(LANG(?parentLabel) = "en")
+  VALUES ?classes { wd:Q15711994 # group of isomeric entities
+  wd:Q17339814 # group or class of chemical substances
+  wd:Q47154513 # structural class of chemical entities
+  wd:Q55640599 # group of chemical entities
+  wd:Q56256173 # class of chemical entities with similar applications or functions
+  wd:Q56256178 # class of chemical entities with similar source or occurrence
+  wd:Q55662456 # group of ortho, meta, para isomers
+  wd:Q59199015 # group of stereoisomers
+  wd:Q72070508 # group or class of chemical entities
+  wd:Q74892521 # imprecise class of chemical entities
+}
+  ?parent wdt:P31 ?classes . # hint:Prior hint:runFirst TRUE.
+  ?child rdfs:label ?childLabel . FILTER (LANG(?childLabel) = "en")
+  ?parent rdfs:label ?parentLabel . FILTER (LANG(?parentLabel) = "en")
 }

@@ -1,23 +1,20 @@
 # title: Author images for a specific venue
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 #defaultView:ImageGrid
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT (SAMPLE(?image_) AS ?image) ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?count
-
-WHERE {
-  { SELECT ?author (COUNT(?work) AS ?count) WHERE {
-    ?work wdt:P1433 target:;
-          wdt:P50 ?author .
+SELECT (SAMPLE(?image_) AS ?image) ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?count WHERE {
+  {
+    SELECT ?author (COUNT(?work) AS ?count) WHERE {
+      ?work wdt:P1433 target: ;
+            wdt:P50 ?author .
+    }
+    GROUP BY ?author
   }
-  GROUP BY ?author }
   ?author wdt:P18 ?image_ .
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 GROUP BY ?author ?authorLabel ?count
 ORDER BY DESC(?count)
-LIMIT 50  
+LIMIT 50

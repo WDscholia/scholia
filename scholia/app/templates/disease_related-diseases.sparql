@@ -1,44 +1,30 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?gene_count
-  ?symptom_count
-  ?disease ?diseaseLabel
-  ?genes
-  ?symptoms
-{
+SELECT ?count ?gene_count ?symptom_count ?disease ?diseaseLabel ?genes ?symptoms {
   {
-    SELECT ?disease (COUNT(?gene) AS ?gene_count) (GROUP_CONCAT(?gene_label; separator=" // ") AS ?genes) WHERE {
+    SELECT ?disease (COUNT(?gene) AS ?gene_count) (GROUP_CONCAT(?gene_label; SEPARATOR=" // ") AS ?genes) WHERE {
       target: wdt:P2293 ?gene .
-      ?gene wdt:P2293 ?disease . 
+      ?gene wdt:P2293 ?disease .
       FILTER (target: != ?disease)
       ?gene rdfs:label ?gene_label
-      FILTER(lang(?gene_label) = "en")
+      FILTER (LANG(?gene_label) = "en")
     }
     GROUP BY ?disease
   }
-  UNION
-  {
-    SELECT
-      ?disease (COUNT(?symptom) AS ?symptom_count) (GROUP_CONCAT(?symptom_label; separator=" // ") AS ?symptoms)
-    {
+  UNION {
+    SELECT ?disease (COUNT(?symptom) AS ?symptom_count) (GROUP_CONCAT(?symptom_label; SEPARATOR=" // ") AS ?symptoms) {
       target: wdt:P780 ?symptom .
-      ?disease wdt:P780 ?symptom . 
+      ?disease wdt:P780 ?symptom .
       FILTER (target: != ?disease)
-      ?symptom rdfs:label ?symptom_label . FILTER(lang(?symptom_label) = "en")
+      ?symptom rdfs:label ?symptom_label . FILTER (LANG(?symptom_label) = "en")
     }
     GROUP BY ?disease
   }
-
   # Aggregate count
-  BIND((COALESCE(?symptom_count, 0) + COALESCE(?gene_count, 0)) AS ?count)
-
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  BIND ((COALESCE(?symptom_count, 0) + COALESCE(?gene_count, 0)) AS ?count)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)

@@ -1,27 +1,21 @@
 #defaultView:LineChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{q}}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT 
-  ?year
-  ?acceptance_rate 
-  ?trackLabel
-WHERE {
+SELECT ?year ?acceptance_rate ?trackLabel WHERE {
   ?event wdt:P179 target: ;
          wdt:P580 ?datetime ;
          p:P5822 ?acceptance_rate_statement .
   ?acceptance_rate_statement ps:P5822 ?acceptance_rate .
-  OPTIONAL { ?acceptance_rate_statement pq:P518 ?track_ . }
-  BIND(COALESCE(?track_, "total") AS ?track)
-  
-  BIND(STR(YEAR(?datetime)) AS ?year)
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  OPTIONAL {
+    ?acceptance_rate_statement pq:P518 ?track_ .
+  }
+  BIND (COALESCE(?track_, "total") AS ?track)
+  BIND (STR(YEAR(?datetime)) AS ?year)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY ?year

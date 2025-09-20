@@ -2,7 +2,6 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-
 ASK {
-    [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 / wdt:P1433 wd:{{q}} . BIND("venue-cito" AS ?aspectsubpage)
+  [] pq:P3712 / wdt:P31 wd:Q96471816 ; ps:P2860 / wdt:P1433 wd:{{q}} . BIND("venue-cito" AS ?aspectsubpage)
 }

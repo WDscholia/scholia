@@ -1,5 +1,4 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # title: Articles in a specific venue citing retracted articles
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -9,36 +8,43 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT DISTINCT
-  ?retracted_work ?retracted_workLabel
-  ?date
-  ?citing_work ?citing_workLabel
-
-WHERE {
+SELECT DISTINCT ?retracted_work ?retracted_workLabel ?date ?citing_work ?citing_workLabel WHERE {
   { # Find retracted papers indicated by instance of retracted paper, 
-  # by retraction notice property or by significant event
-  SELECT DISTINCT ?retracted_work WHERE {
-    # articles marked as "retracted"
-    { ?retracted_work wdt:P31 wd:Q45182324 }
-    UNION
-    # articles linked to a retraction notice
-    { ?retracted_work wdt:P5824 [] }
-    UNION
-    # articles with a 'retraction' event
-    { ?retracted_work wdt:P793 wd:Q45203135 }
-  } }
-  ?citing_work wdt:P2860 ?retracted_work ; wdt:P1433 target: .
+    # by retraction notice property or by significant event
+    SELECT DISTINCT ?retracted_work WHERE {
+      # articles marked as "retracted"
+      {
+        ?retracted_work wdt:P31 wd:Q45182324
+      }
+      UNION
+      # articles linked to a retraction notice
+      {
+        ?retracted_work wdt:P5824 []
+      }
+      UNION
+      # articles with a 'retraction' event
+      {
+        ?retracted_work wdt:P793 wd:Q45203135
+      }
+    }
+  }
+  ?citing_work wdt:P2860 ?retracted_work ;
+               wdt:P1433 target: .
   OPTIONAL {
     ?retracted_work wdt:P5824 ?retraction .
     ?retraction wdt:P577 ?retraction_datetime
-    FILTER ( ?citing_work != ?retraction )
+    FILTER (?citing_work != ?retraction)
   }
-  MINUS { ?citing_work wdt:P31 wd:Q1348305 }
+  MINUS {
+    ?citing_work wdt:P31 wd:Q1348305
+  }
   OPTIONAL {
-    ?retracted_work p:P793 [ ps:P793 wd:Q45203135 ; pq:P585 ?keyevent_datetime ]
+    ?retracted_work p:P793 [
+      ps:P793 wd:Q45203135 ;
+      pq:P585 ?keyevent_datetime
+    ]
   }
-  BIND(COALESCE(xsd:date(COALESCE(?retraction_datetime, ?keyevent_datetime)), "Unknown date") AS ?date)
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  BIND (COALESCE(xsd:date(COALESCE(?retraction_datetime, ?keyevent_datetime)), "Unknown date") AS ?date)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?date)

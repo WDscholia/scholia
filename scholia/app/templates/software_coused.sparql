@@ -1,23 +1,18 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?count ?coused (REPLACE(STR(?coused), ".*/", "") AS ?cousedLabel) ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel)
-
-WHERE {
+SELECT ?count ?coused (REPLACE(STR(?coused), ".*/", "") AS ?cousedLabel) ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel) WHERE {
   # Label the result
   { # Find works that are using a specific software,
-  # and find other software used in the found works
-  SELECT
-    ?coused (COUNT(?work) as ?count) (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work wdt:P4510 / wdt:P279* target: ;
-          wdt:P4510 ?coused .
-    FILTER (?coused != target:)
+    # and find other software used in the found works
+    SELECT ?coused (COUNT(?work) AS ?count) (SAMPLE(?work) AS ?example_work) WHERE {
+      ?work wdt:P4510/wdt:P279* target: ;
+            wdt:P4510 ?coused .
+      FILTER (?coused != target:)
+    }
+    GROUP BY ?coused
   }
-  GROUP BY ?coused }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
-ORDER BY DESC(?count)  
+ORDER BY DESC(?count)

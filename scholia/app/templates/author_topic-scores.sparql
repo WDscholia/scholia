@@ -1,39 +1,35 @@
 #defaultView:BubbleChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?score ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel)
- 
-WHERE {
-  { SELECT
-    (SUM(?score_) AS ?score)
-    ?topic
-  WHERE {
-    { 
-      target: wdt:P101 ?topic .
-      BIND(20 AS ?score_)
-    }
-    UNION
-    {
-      SELECT (3 AS ?score_) ?topic WHERE {
-        ?work wdt:P50 target: ;
-              wdt:P921 ?topic . 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?score ?topic (COALESCE(?topicLabel_, REPLACE(STR(?topic), ".*/", "")) AS ?topicLabel) WHERE {
+  {
+    SELECT (SUM(?score_) AS ?score) ?topic WHERE {
+      {
+        target: wdt:P101 ?topic .
+        BIND (20 AS ?score_)
+      }
+      UNION {
+        SELECT (3 AS ?score_) ?topic WHERE {
+          ?work wdt:P50 target: ;
+                wdt:P921 ?topic .
+        }
+      }
+      UNION {
+        SELECT (1 AS ?score_) ?topic WHERE {
+          ?work wdt:P50 target: .
+          ?citing_work wdt:P2860 ?work .
+          ?citing_work wdt:P921 ?topic .
+        }
       }
     }
-    UNION
-    {
-      SELECT (1 AS ?score_) ?topic WHERE {
-        ?work wdt:P50 target: .
-        ?citing_work wdt:P2860 ?work .
-        ?citing_work wdt:P921 ?topic . 
-      }
-    }
+    GROUP BY ?topic
   }
-  GROUP BY ?topic }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,jp,no,ru,sv,zh". }
+  OPTIONAL {
+    ?topic rdfs:label ?topicLabel_ FILTER (LANG(?topicLabel_) = "en")
+  }
 }
 ORDER BY DESC(?score)
 LIMIT 200

@@ -1,28 +1,22 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
 SELECT
-  # Number of works with the coauthor
-  ?count
-
-  # The coauthor as a string, - rather than as an item
-  ?coauthor
-
-  # Build URL to the Author disambiguator tool
-  (CONCAT(
-      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
-      ENCODE_FOR_URI(?coauthor)) AS ?resolver_url)
-
-WHERE {
-  { SELECT (COUNT(?work) as ?count) ?coauthor WHERE {
-    ?work wdt:P50 target: .
-    ?work wdt:P2093 ?coauthor .
+# Number of works with the coauthor
+?count
+# The coauthor as a string, - rather than as an item
+?coauthor
+# Build URL to the Author disambiguator tool
+(CONCAT('https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=', ENCODE_FOR_URI(?coauthor)) AS ?resolver_url) WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?coauthor WHERE {
+      ?work wdt:P50 target: .
+      ?work wdt:P2093 ?coauthor .
+    }
+    GROUP BY ?coauthor
   }
-  GROUP BY ?coauthor }
   # Label the results
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count)

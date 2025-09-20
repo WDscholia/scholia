@@ -1,23 +1,19 @@
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # List of related works by co-citation analysis
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?count ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel)
-
-WHERE {
-  { SELECT ?work (COUNT(?work) AS ?count)
-  WHERE {
-    target: (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?work .
-    FILTER (target: != ?work)
+SELECT ?count ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) WHERE {
+  {
+    SELECT ?work (COUNT(?work) AS ?count) WHERE {
+      target: (^wdt:P2860 | wdt:P2860)/(^wdt:P2860 | wdt:P2860)? ?work .
+      FILTER (target: != ?work)
+    }
+    GROUP BY ?work
+    ORDER BY DESC(?count)
+    LIMIT 500
   }
-  GROUP BY ?work
-  ORDER BY DESC(?count)
-  LIMIT 500 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
-} 
-ORDER BY DESC(?count) 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+}
+ORDER BY DESC(?count)
