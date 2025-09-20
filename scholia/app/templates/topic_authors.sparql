@@ -1,34 +1,30 @@
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-  (COALESCE(?orcid_, CONCAT("orcid-search/search/?searchQuery=", ?authorLabel)) AS ?orcid) 
-
-WHERE {
-  { SELECT
-    ?author
-    (count(?work) as ?count)
-  WHERE {
-    { ?work wdt:P921/wdt:P31*/wdt:P279* target: . }
-    UNION
-    { ?work wdt:P921/wdt:P361+ target: . }
-    UNION
-    { ?work wdt:P921/wdt:P1269+ target: . }
-    ?work wdt:P50 ?author .
+SELECT ?count ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) (COALESCE(?orcid_, CONCAT("orcid-search/search/?searchQuery=", ?authorLabel)) AS ?orcid) WHERE {
+  {
+    SELECT ?author (COUNT(?work) AS ?count) WHERE {
+      {
+        ?work wdt:P921/wdt:P31*/wdt:P279* target: .
+      }
+      UNION {
+        ?work wdt:P921/wdt:P361+ target: .
+      }
+      UNION {
+        ?work wdt:P921/wdt:P1269+ target: .
+      }
+      ?work wdt:P50 ?author .
+    }
+    GROUP BY ?author
+    ORDER BY DESC(?count)
+    LIMIT 200
   }
-  GROUP BY ?author
-  ORDER BY DESC(?count)
-  LIMIT 200 }
-          
   # Include optional ORCID iD
-  OPTIONAL { ?author wdt:P496 ?orcid_ . }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  OPTIONAL {
+    ?author wdt:P496 ?orcid_ .
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

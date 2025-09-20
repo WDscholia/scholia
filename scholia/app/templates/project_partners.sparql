@@ -1,17 +1,14 @@
 #defaultView:Map
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?partner (REPLACE(STR(?partner), ".*/", "") AS ?partnerLabel) ?location
-
-WHERE {
-  { SELECT DISTINCT ?partner ?location WHERE {
-    target: (^wdt:P1344 | wdt:P710)* / (wdt:P527 | wdt:P710 | wdt:P1416) ?partner .
-    ?partner wdt:P159* / wdt:P625 ?location .
-  } }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+SELECT ?partner (REPLACE(STR(?partner), ".*/", "") AS ?partnerLabel) ?location WHERE {
+  {
+    SELECT DISTINCT ?partner ?location WHERE {
+      target: (^wdt:P1344 | wdt:P710)*/(wdt:P527 | wdt:P710 | wdt:P1416) ?partner .
+      ?partner wdt:P159*/wdt:P625 ?location .
+    }
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

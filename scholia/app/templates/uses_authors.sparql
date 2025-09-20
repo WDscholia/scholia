@@ -2,26 +2,17 @@
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?uses ?works
-  ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-
-WHERE {
-  { SELECT
-    (COUNT(DISTINCT ?use) AS ?uses)
-    (COUNT(DISTINCT ?work) AS ?works)
-    ?author (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    VALUES ?use { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    
-    ?work wdt:P4510 / wdt:P279* ?use ;
-          wdt:P50 ?author .
+SELECT ?uses ?works ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?use) AS ?uses) (COUNT(DISTINCT ?work) AS ?works) ?author (SAMPLE(?work) AS ?example_work) WHERE {
+      #    VALUES ?use { {% for q in qs %} wd:{{ q }} {% endfor %} }
+      ?work wdt:P4510/wdt:P279* ?use ;
+            wdt:P50 ?author .
+    }
+    GROUP BY ?author
+    ORDER BY DESC(?uses)
+    LIMIT 200
   }
-  GROUP BY ?author
-  ORDER BY DESC(?uses)
-  LIMIT 200 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?uses) DESC(?works)

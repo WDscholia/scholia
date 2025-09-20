@@ -7,20 +7,13 @@ PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wd: <http://www.wikidata.org/entity/>
-
-SELECT
-  (STR(?year_) AS ?year)
-  (SUM(?count_) AS ?count)
-WHERE {
+SELECT (STR(?year_) AS ?year) (SUM(?count_) AS ?count) WHERE {
   {
-    SELECT
-      ?year_
-      (COUNT(DISTINCT ?retractedArticle) AS ?count_)
-    WHERE {
+    SELECT ?year_ (COUNT(DISTINCT ?retractedArticle) AS ?count_) WHERE {
       ?retractedArticle p:P31 ?isRetractedPaperStatement .
       ?isRetractedPaperStatement ps:P31 wd:Q45182324 .
       ?isRetractedPaperStatement pq:P580 ?date .
-      BIND(YEAR(?date) AS ?year_)
+      BIND (YEAR(?date) AS ?year_)
     }
     GROUP BY ?year_
   }

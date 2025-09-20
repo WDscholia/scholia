@@ -1,30 +1,24 @@
 # List of printed works by date
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT
-  ?date
-  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-  ?example_author ?example_authorLabel (CONCAT("/author/", SUBSTR(STR(?example_author), 32)) AS ?example_authorUrl)
-WHERE {
+SELECT ?date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) ?example_author ?example_authorLabel (CONCAT("/author/", SUBSTR(STR(?example_author),32)) AS ?example_authorUrl) WHERE {
   {
-    SELECT
-      (MIN(?date_) AS ?date)
-      ?work
-      (SAMPLE(?author) AS ?example_author)
-    WHERE {
+    SELECT (MIN(?date_) AS ?date) ?work (SAMPLE(?author) AS ?example_author) WHERE {
       ?work wdt:P872 target: .
-      OPTIONAL { ?work wdt:P577 ?datetime . BIND(xsd:date(?datetime) AS ?date_) }
-      OPTIONAL { ?work wdt:P50 ?author }
+      OPTIONAL {
+        ?work wdt:P577 ?datetime .
+        BIND (xsd:date(?datetime) AS ?date_)
+      }
+      OPTIONAL {
+        ?work wdt:P50 ?author
+      }
     }
     GROUP BY ?work
   }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?date)
 LIMIT 1000

@@ -1,27 +1,19 @@
 #defaultView:BarChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?year
-  (COUNT(?work) AS ?number_of_works)
-  ?useLabel
-
-WHERE {
-  { SELECT
-    (MIN(?year_) AS ?year) ?work ?use
-  WHERE {
-    ?use wdt:P279* target: .
-    ?work wdt:P4510 ?use ; 
-          wdt:P577 ?publication_datetime .
-    BIND(STR(YEAR(?publication_datetime)) AS ?year_)
+SELECT ?year (COUNT(?work) AS ?number_of_works) ?useLabel WHERE {
+  {
+    SELECT (MIN(?year_) AS ?year) ?work ?use WHERE {
+      ?use wdt:P279* target: .
+      ?work wdt:P4510 ?use ;
+            wdt:P577 ?publication_datetime .
+      BIND (STR(YEAR(?publication_datetime)) AS ?year_)
+    }
+    GROUP BY ?work ?use
   }
-  GROUP BY ?work ?use }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 GROUP BY ?year ?useLabel
 ORDER BY ?year

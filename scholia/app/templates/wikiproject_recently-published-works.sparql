@@ -1,34 +1,34 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT ?date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-  ?topicsUrl ?topics 
-
-WHERE {
-  { SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) 
-                                    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl) 
-  WHERE {
-    { SELECT DISTINCT ?work WHERE {
-    { ?work wdt:P6104 target: .}
-      union 
-      { ?work wdt:P5008 target: .}
-  } }
-    ?work wdt:P921 ?topic . 
-    OPTIONAL { ?work wdt:P577 ?dates . }
-    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
+SELECT ?date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) ?topicsUrl ?topics WHERE {
+  {
+    SELECT (MAX(?dates) AS ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; SEPARATOR=" // ") AS ?topics) (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic),32); SEPARATOR=",")) AS ?topicsUrl) WHERE {
+      {
+        SELECT DISTINCT ?work WHERE {
+          {
+            ?work wdt:P6104 target: .
+          }
+          UNION {
+            ?work wdt:P5008 target: .
+          }
+        }
+      }
+      ?work wdt:P921 ?topic .
+      OPTIONAL {
+        ?work wdt:P577 ?dates .
+      }
+      ?topic rdfs:label ?topic_label . FILTER (LANG(?topic_label) = 'en')
+    }
+    GROUP BY ?work
   }
-  GROUP BY ?work }
-
   # There is a problem with BC dates
   # BIND(xsd:date(?datetime) AS ?date)
-  BIND(REPLACE(STR(?datetime), 'T.*', '') AS ?date)
-    
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  BIND (REPLACE(STR(?datetime), 'T.*', '') AS ?date)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 GROUP BY ?date ?work ?workLabel ?topicsUrl ?topics
 ORDER BY DESC(?date)

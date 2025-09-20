@@ -1,35 +1,38 @@
 #defaultView:Map
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?organization (REPLACE(STR(?organization), ".*/", "") AS ?organizationLabel) ?geo ?count ?layer
-
-WHERE {
-  { SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
-    { SELECT DISTINCT ?work WHERE {
-  # Works on the topic
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
+SELECT ?organization (REPLACE(STR(?organization), ".*/", "") AS ?organizationLabel) ?geo ?count ?layer WHERE {
+  {
+    SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+      {
+        SELECT DISTINCT ?work WHERE {
+          # Works on the topic
+          ?work wdt:P921/(wdt:P361+ | wdt:P1269+ | (wdt:P31*/wdt:P279*)) target: .
+        }
+        LIMIT 20000
+      }
+      # Authors who have published works on the topic
+      ?work wdt:P50 ?author .
+      ?author (wdt:P108 | wdt:P463 | wdt:P1416)/wdt:P361* ?organization .
+      # Use the headquarters location by default but keep the coordinate location as a fallback
+      OPTIONAL {
+        ?organization p:P159/pq:P625 ?hq_geo
+      }
+      OPTIONAL {
+        ?organization wdt:P625 ?coord_geo
+      }
+      BIND (IF(BOUND(?hq_geo),?hq_geo,?coord_geo) AS ?geo) .
+      FILTER (BOUND(?geo)) .
+    }
+    GROUP BY ?organization ?geo
+    ORDER BY DESC(?count)
+    LIMIT 2000
   }
-  LIMIT 20000 }
-    # Authors who have published works on the topic
-    ?work wdt:P50 ?author . 
-    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
-    # Use the headquarters location by default but keep the coordinate location as a fallback
-    OPTIONAL{?organization p:P159/pq:P625 ?hq_geo}
-    OPTIONAL{?organization wdt:P625 ?coord_geo}
-    BIND(IF(BOUND(?hq_geo), ?hq_geo, ?coord_geo) AS ?geo) .
-    FILTER(BOUND(?geo)) .
-  }
-  GROUP BY ?organization ?geo
-  ORDER BY DESC (?count)
-  LIMIT 2000 }
-  BIND(IF( (?count < 1), "No results", IF((?count < 2), "1 result", IF((?count < 11), "1 < results ≤ 10", IF((?count < 101), "10 < results ≤ 100", IF((?count < 1001), "100 < results ≤ 1000", IF((?count < 10001), "1000 < results ≤ 10000", "10000 or more results") ) ) ) )) AS ?layer )
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
- }
-ORDER BY DESC (?count)
+  BIND (IF((?count < 1),"No results",IF((?count < 2),"1 result",IF((?count < 11),"1 < results ≤ 10",IF((?count < 101),"10 < results ≤ 100",IF((?count < 1001),"100 < results ≤ 1000",IF((?count < 10001),"1000 < results ≤ 10000","10000 or more results")))))) AS ?layer)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
+}
+ORDER BY DESC(?count)

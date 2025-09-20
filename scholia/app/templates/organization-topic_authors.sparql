@@ -1,33 +1,25 @@
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?works
-  ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-
-WHERE {
-  { SELECT
-    (COUNT(DISTINCT ?work) AS ?works)
-    ?author
-    (SAMPLE(?work) AS ?example_work)
+SELECT ?works ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
   {
-    { ?author ?p1 target1: . }
-    UNION
-    {
-      ?author ?p2 ?something .
-      ?something wdt:P361 target1: .
+    SELECT (COUNT(DISTINCT ?work) AS ?works) ?author (SAMPLE(?work) AS ?example_work) {
+      {
+        ?author ?p1 target1: .
+      }
+      UNION {
+        ?author ?p2 ?something .
+        ?something wdt:P361 target1: .
+      }
+      ?work wdt:P50 ?author ;
+            wdt:P921/wdt:P279* target2: .
     }
-    ?work wdt:P50 ?author;
-          wdt:P921 / wdt:P279* target2: .
+    GROUP BY ?author
+    ORDER BY DESC(?works)
+    LIMIT 200
   }
-  GROUP BY ?author
-  ORDER BY DESC (?works)
-  LIMIT 200 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
-ORDER BY DESC (?works)
+ORDER BY DESC(?works)

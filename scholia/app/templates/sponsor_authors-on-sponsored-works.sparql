@@ -1,23 +1,16 @@
 # title: Authors on works sponsored or funded from a specific entity.
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?publication_count
-  ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-
-WHERE {
-  { SELECT ?author (count(?work) as ?publication_count) (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work wdt:P859+ target: .
-    ?work wdt:P50 ?author .
+SELECT ?publication_count ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
+  {
+    SELECT ?author (COUNT(?work) AS ?publication_count) (SAMPLE(?work) AS ?example_work) WHERE {
+      ?work wdt:P859+ target: .
+      ?work wdt:P50 ?author .
+    }
+    GROUP BY ?author
   }
-  GROUP BY ?author }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
-} 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+}
 ORDER BY DESC(?publication_count)

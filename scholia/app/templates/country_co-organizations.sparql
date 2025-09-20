@@ -1,27 +1,22 @@
 # title: Co-organizations for a specific country
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 #defaultView:Map
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?coorganization (REPLACE(STR(?coorganization), ".*/", "") AS ?coorganizationLabel) ?geocoordinates ?example_coauthor (REPLACE(STR(?example_coauthor), ".*/", "") AS ?example_coauthorLabel) ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel)
-
-WHERE {
-  { SELECT
-    ?coorganization
-    (SAMPLE(?geocoordinates_) AS ?geocoordinates)
-    (SAMPLE(?coauthor) AS ?example_coauthor)
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?organization wdt:P17 target: .
-    ?author wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?organization .
-    ?work wdt:P50 ?author, ?coauthor .
-    ?coauthor wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?coorganization .
-    FILTER NOT EXISTS { ?coorganization wdt:P17 target: }
-    ?coorganization wdt:P625 ?geocoordinates_ .
+SELECT ?coorganization (REPLACE(STR(?coorganization), ".*/", "") AS ?coorganizationLabel) ?geocoordinates ?example_coauthor (REPLACE(STR(?example_coauthor), ".*/", "") AS ?example_coauthorLabel) ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel) WHERE {
+  {
+    SELECT ?coorganization (SAMPLE(?geocoordinates_) AS ?geocoordinates) (SAMPLE(?coauthor) AS ?example_coauthor) (SAMPLE(?work) AS ?example_work) WHERE {
+      ?organization wdt:P17 target: .
+      ?author wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?organization .
+      ?work wdt:P50 ?author, ?coauthor .
+      ?coauthor wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?coorganization .
+      FILTER NOT EXISTS {
+        ?coorganization wdt:P17 target:
+      }
+      ?coorganization wdt:P625 ?geocoordinates_ .
+    }
+    GROUP BY ?coorganization
   }
-  GROUP BY ?coorganization }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }

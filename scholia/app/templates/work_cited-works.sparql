@@ -1,7 +1,5 @@
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # List of works that is cited by the specified work
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -11,27 +9,27 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT ?citations ?publication_date ?cited_work (REPLACE(STR(?cited_work), ".*/", "") AS ?cited_workLabel)
-  (GROUP_CONCAT(DISTINCT ?intentionLabel;separator=", ") AS ?intentions)
-
-WHERE {
-  { SELECT (MIN(?date) AS ?publication_date) (COUNT(DISTINCT ?citing_cited_work) AS ?citations) ?cited_work 
-  WHERE {
-    target: wdt:P2860 ?cited_work .
-    OPTIONAL {
-      ?cited_work wdt:P577 ?datetime .
-      BIND(xsd:date(?datetime) AS ?date)
+SELECT ?citations ?publication_date ?cited_work (REPLACE(STR(?cited_work), ".*/", "") AS ?cited_workLabel) (GROUP_CONCAT(DISTINCT ?intentionLabel; SEPARATOR=", ") AS ?intentions) WHERE {
+  {
+    SELECT (MIN(?date) AS ?publication_date) (COUNT(DISTINCT ?citing_cited_work) AS ?citations) ?cited_work WHERE {
+      target: wdt:P2860 ?cited_work .
+      OPTIONAL {
+        ?cited_work wdt:P577 ?datetime .
+        BIND (xsd:date(?datetime) AS ?date)
+      }
+      OPTIONAL {
+        ?citing_cited_work wdt:P2860 ?cited_work
+      }
     }
-    OPTIONAL { ?citing_cited_work wdt:P2860 ?cited_work }
+    GROUP BY ?cited_work
   }
-  GROUP BY ?cited_work }
   OPTIONAL {
     target: p:P2860 ?citationStatement .
     ?citationStatement pq:P3712 ?intention ;
                        ps:P2860 ?cited_work .
-    ?intention rdfs:label ?intentionLabel . FILTER (lang(?intentionLabel) = "en")
+    ?intention rdfs:label ?intentionLabel . FILTER (LANG(?intentionLabel) = "en")
   }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
-} GROUP BY ?citations ?publication_date ?cited_work ?cited_workLabel
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+}
+GROUP BY ?citations ?publication_date ?cited_work ?cited_workLabel
 ORDER BY DESC(?citations) DESC(?date)

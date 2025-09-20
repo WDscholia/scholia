@@ -1,35 +1,26 @@
 # tool: scholia
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?number_of_topics
-  ?citing_works
-  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-
-WHERE {
+SELECT ?number_of_topics ?citing_works ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) WHERE {
   # Label results
   { # Count citations
-  SELECT
-    (COUNT(DISTINCT ?citing_work) AS ?citing_works)
-    ?work
-    (SAMPLE(?citing_work) AS ?example_citing_work)
-    (COUNT(DISTINCT ?topic) AS ?number_of_topics)
-  WHERE {
-    # subclasses included to get version of resources
-    ?work wdt:P4510 / wdt:P279* target: .
-    
-    OPTIONAL { ?work wdt:P921 ?topic . }
-    OPTIONAL { ?citing_work wdt:P2860 ?work. }
+    SELECT (COUNT(DISTINCT ?citing_work) AS ?citing_works) ?work (SAMPLE(?citing_work) AS ?example_citing_work) (COUNT(DISTINCT ?topic) AS ?number_of_topics) WHERE {
+      # subclasses included to get version of resources
+      ?work wdt:P4510/wdt:P279* target: .
+      OPTIONAL {
+        ?work wdt:P921 ?topic .
+      }
+      OPTIONAL {
+        ?citing_work wdt:P2860 ?work .
+      }
+    }
+    GROUP BY ?work
+    # HAVING (?topics < 1)
+    ORDER BY DESC(?count)
+    LIMIT 200
   }
-  GROUP BY ?work
-  # HAVING (?topics < 1)
-  ORDER BY DESC(?count)
-  LIMIT 200 }
-#   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY ?number_of_topics DESC(?citing_works)

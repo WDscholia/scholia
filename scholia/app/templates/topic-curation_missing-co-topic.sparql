@@ -1,31 +1,24 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-
-WHERE {
+SELECT ?count ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) WHERE {
   # Label results
   { # Count citations
-  SELECT
-    (COUNT(?citing_work) AS ?count)
-    ?work
-    (SAMPLE(?citing_work) AS ?example_citing_work)
-    (COUNT(DISTINCT ?topic) AS ?topics)
-  WHERE {
-    ?work wdt:P921 target: .
-    OPTIONAL { ?work wdt:P921 ?topic . FILTER (?topic != target: )}
-    OPTIONAL { ?citing_work wdt:P2860 ?work. }
+    SELECT (COUNT(?citing_work) AS ?count) ?work (SAMPLE(?citing_work) AS ?example_citing_work) (COUNT(DISTINCT ?topic) AS ?topics) WHERE {
+      ?work wdt:P921 target: .
+      OPTIONAL {
+        ?work wdt:P921 ?topic . FILTER (?topic != target:)
+      }
+      OPTIONAL {
+        ?citing_work wdt:P2860 ?work .
+      }
+    }
+    GROUP BY ?work
+    HAVING (?topics < 1)
+    ORDER BY DESC(?count)
+    LIMIT 100
   }
-  GROUP BY ?work
-  HAVING (?topics < 1)
-  ORDER BY DESC(?count)
-  LIMIT 100 }
-#   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count) ?topics

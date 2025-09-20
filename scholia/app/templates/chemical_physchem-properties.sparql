@@ -1,5 +1,4 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # title: physicochemical properties of this chemical
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX pr: <http://www.wikidata.org/prop/reference/>
@@ -8,43 +7,44 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT DISTINCT ?propEntity (REPLACE(STR(?propEntity), ".*/", "") AS ?propEntityLabel) ?value ?units (REPLACE(STR(?units), ".*/", "") AS ?unitsLabel) ?qualifiers ?source (REPLACE(STR(?source), ".*/", "") AS ?sourceLabel) ?doi
-
-WHERE {
-  { SELECT DISTINCT ?propEntity ?value ?units ?source ?doi (GROUP_CONCAT(?qualifierStr; separator=", ") AS ?qualifiers) WHERE {
-    target: ?propp ?statement .
-    ?statement a wikibase:BestRank ;
-      ?proppsv [
-        wikibase:quantityAmount ?value ;
-        wikibase:quantityUnit ?units
+SELECT DISTINCT ?propEntity (REPLACE(STR(?propEntity), ".*/", "") AS ?propEntityLabel) ?value ?units (REPLACE(STR(?units), ".*/", "") AS ?unitsLabel) ?qualifiers ?source (REPLACE(STR(?source), ".*/", "") AS ?sourceLabel) ?doi WHERE {
+  {
+    SELECT DISTINCT ?propEntity ?value ?units ?source ?doi (GROUP_CONCAT(?qualifierStr; SEPARATOR=", ") AS ?qualifiers) WHERE {
+      target: ?propp ?statement .
+      ?statement a wikibase:BestRank ;
+                 ?proppsv [
+        wikibase:quantityAmount ?value ; wikibase:quantityUnit ?units
       ] .
-    OPTIONAL {
-      ?statement prov:wasDerivedFrom/pr:P248 ?source .
-      OPTIONAL { ?source wdt:P356 ?doi . }
-    }
-    ?property wikibase:claim ?propp ;
-            wikibase:statementValue ?proppsv ;
-            wdt:P1629 ?propEntity ;
-            wdt:P31 wd:Q21077852 .
-    OPTIONAL {
-      {
-        ?qualifierProp wikibase:qualifier ?qualifier ;
-                       rdfs:label ?qProplabel; FILTER (lang(?qProplabel) = "en") .
-        ?qualifier a owl:DatatypeProperty .
-        ?statement ?qualifier ?qualifierVal .
-        BIND (CONCAT(str(?qProplabel), ": ", str(?qualifierVal)) AS ?qualifierStr)
-      } UNION {
-        ?qualifierProp wikibase:qualifier ?qualifier ;
-                       rdfs:label ?qProplabel; FILTER (lang(?qProplabel) = "en") .
-        ?qualifier a owl:ObjectProperty .
-        ?statement ?qualifier ?qualifierVal .
-        ?qualifierVal rdfs:label ?qVallabel; FILTER (lang(?qVallabel) = "en") .
-        BIND (CONCAT(str(?qProplabel), ": ", str(?qVallabel)) AS ?qualifierStr)
+      OPTIONAL {
+        ?statement prov:wasDerivedFrom/pr:P248 ?source .
+        OPTIONAL {
+          ?source wdt:P356 ?doi .
+        }
+      }
+      ?property wikibase:claim ?propp ;
+                wikibase:statementValue ?proppsv ;
+                wdt:P1629 ?propEntity ;
+                wdt:P31 wd:Q21077852 .
+      OPTIONAL {
+        {
+          ?qualifierProp wikibase:qualifier ?qualifier ;
+                         rdfs:label ?qProplabel ; FILTER (LANG(?qProplabel) = "en") .
+          ?qualifier a owl:DatatypeProperty .
+          ?statement ?qualifier ?qualifierVal .
+          BIND (CONCAT(STR(?qProplabel), ": ", STR(?qualifierVal)) AS ?qualifierStr)
+        }
+        UNION {
+          ?qualifierProp wikibase:qualifier ?qualifier ;
+                         rdfs:label ?qProplabel ; FILTER (LANG(?qProplabel) = "en") .
+          ?qualifier a owl:ObjectProperty .
+          ?statement ?qualifier ?qualifierVal .
+          ?qualifierVal rdfs:label ?qVallabel ; FILTER (LANG(?qVallabel) = "en") .
+          BIND (CONCAT(STR(?qProplabel), ": ", STR(?qVallabel)) AS ?qualifierStr)
+        }
       }
     }
-  } GROUP BY ?propEntity ?value ?units ?source ?doi }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} 
+    GROUP BY ?propEntity ?value ?units ?source ?doi
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}
 ORDER BY ASC(?propEntityLabel)
-

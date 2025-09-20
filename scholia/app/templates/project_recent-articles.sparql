@@ -1,5 +1,4 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX pr: <http://www.wikidata.org/prop/reference/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
@@ -7,51 +6,53 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT ?date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?type ?topics
-
-WHERE {
-  { SELECT
-    (MAX(?dates) as ?datetime)
-    ?work
-    (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
-    (GROUP_CONCAT(?topic_label; separator=" // ") AS ?topics)
-  WHERE {
-    { SELECT DISTINCT ?work WHERE {
-    {
-      ?work wdt:P921 / (wdt:P527+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target: .
+SELECT ?date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?type ?topics WHERE {
+  {
+    SELECT (MAX(?dates) AS ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; SEPARATOR=", ") AS ?type) (GROUP_CONCAT(?topic_label; SEPARATOR=" // ") AS ?topics) WHERE {
+      {
+        SELECT DISTINCT ?work WHERE {
+          {
+            ?work wdt:P921/(wdt:P527+ | wdt:P1269+ | (wdt:P31*/wdt:P279*)) target: .
+          }
+          UNION {
+            # Works funded by the project, - recursively
+            ?work wdt:P859+ target: .
+          }
+          UNION {
+            # Works funded by the project, - recursively
+            ?work wdt:P859/(wdt:P1344 | ^wdt:P710)* target: .
+          }
+          UNION {
+            target: ?propp ?statement .
+            ?statement a wikibase:BestRank ;
+                       prov:wasDerivedFrom/pr:P248 ?work .
+          }
+        }
+      }
+      OPTIONAL {
+        ?work wdt:P31 ?type_ .
+        ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en')
+      }
+      OPTIONAL {
+        ?work wdt:P577 ?dates .
+      }
+      OPTIONAL {
+        ?work wdt:P921 ?topic .
+        ?topic rdfs:label ?topic_label . FILTER (LANG(?topic_label) = 'en')
+      }
     }
-    UNION
-    {
-      # Works funded by the project, - recursively
-      ?work wdt:P859+ target: .
-    }
-    UNION
-    {
-      # Works funded by the project, - recursively
-      ?work wdt:P859/(wdt:P1344|^wdt:P710)* target: .
-    }
-    UNION {
-      target: ?propp ?statement .
-      ?statement a wikibase:BestRank ;
-                 prov:wasDerivedFrom/pr:P248 ?work .
-    }
-  } }
-    OPTIONAL {
-       ?work wdt:P31 ?type_ .
-       ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en')
-    }
-    OPTIONAL { ?work wdt:P577 ?dates . }
-    OPTIONAL {
-      ?work wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label . FILTER (lang(?topic_label) = 'en')
-    }
+    GROUP BY ?work
   }
-  GROUP BY ?work }
-  BIND(xsd:date(?datetime) AS ?date)
-#   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
-  }
+  BIND (xsd:date(?datetime) AS ?date)
+  # SERVICE wikibase:label {
+  bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
 }
-ORDER BY DESC(?date)
-LIMIT 500
+}
+ORDER
+BY
+DESC
+(
+?date
+)
+LIMIT
+500

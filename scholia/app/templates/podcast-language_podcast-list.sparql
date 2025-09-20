@@ -1,22 +1,20 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?podcast (REPLACE(STR(?podcast), ".*/", "") AS ?podcastLabel) (CONCAT("/podcast/", SUBSTR(STR(?podcast), 32)) AS ?podcastUrl)
-  (GROUP_CONCAT(?genreWDLabel; separator=", ") AS ?genre)
-WHERE {
-  ?podcast wdt:P31 wd:Q24634210 ; wdt:P407 target: .
+SELECT ?podcast (REPLACE(STR(?podcast), ".*/", "") AS ?podcastLabel) (CONCAT("/podcast/", SUBSTR(STR(?podcast),32)) AS ?podcastUrl) (GROUP_CONCAT(?genreWDLabel; SEPARATOR=", ") AS ?genre) WHERE {
+  ?podcast wdt:P31 wd:Q24634210 ;
+           wdt:P407 target: .
   OPTIONAL {
     ?podcast wdt:P136 ?iri
-    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
-    ?iri rdfs:label ?value_string . 
+    BIND (SUBSTR(STR(?iri),32) AS ?q)
+    ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
-    BIND(COALESCE(?value_string, ?q) AS ?genreWDLabel)
+    BIND (COALESCE(?value_string, ?q) AS ?genreWDLabel)
   }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} GROUP BY ?podcast ?podcastLabel
-  ORDER BY DESC(?podcastLabel)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}
+GROUP BY ?podcast ?podcastLabel
+ORDER BY DESC(?podcastLabel)

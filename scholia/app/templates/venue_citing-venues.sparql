@@ -1,32 +1,23 @@
 # title: Venues citing articles from this specific journal
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 #defaultView:Table
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?short_name
-  ?citing_journal ?citing_journalLabel 
-
-WHERE {
-  { SELECT
-    (COUNT(?citing_work) AS ?count)
-    ?citing_journal
-    (SAMPLE(?short_name_) AS ?short_name)
-  WHERE {
-    ?work wdt:P1433 target: .
-    ?citing_work wdt:P2860 ?work .
-    ?citing_work wdt:P1433 ?citing_journal .
-    OPTIONAL { ?citing_journal wdt:P1813 ?short_name_ . }
+SELECT ?count ?short_name ?citing_journal ?citing_journalLabel WHERE {
+  {
+    SELECT (COUNT(?citing_work) AS ?count) ?citing_journal (SAMPLE(?short_name_) AS ?short_name) WHERE {
+      ?work wdt:P1433 target: .
+      ?citing_work wdt:P2860 ?work .
+      ?citing_work wdt:P1433 ?citing_journal .
+      OPTIONAL {
+        ?citing_journal wdt:P1813 ?short_name_ .
+      }
+    }
+    GROUP BY ?citing_journal
+    ORDER BY DESC(?count)
+    LIMIT 1000
   }
-  GROUP BY ?citing_journal
-  ORDER BY DESC(?count)
-  LIMIT 1000 }
-#   SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 ORDER BY DESC(?count)

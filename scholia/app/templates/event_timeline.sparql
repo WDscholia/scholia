@@ -1,7 +1,5 @@
 #defaultView:Timeline
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
@@ -9,22 +7,26 @@ PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?time ?item (REPLACE(STR(?item), ".*/", "") AS ?itemLabel) ?image
-WHERE {
+SELECT ?time ?item (REPLACE(STR(?item), ".*/", "") AS ?itemLabel) ?image WHERE {
   {
     target: wdt:P580 | wdt:P585 ?time .
-    OPTIONAL { target: wdt:P18 ?image . }
-    BIND(wd:Q24575110 AS ?item)
+    OPTIONAL {
+      target: wdt:P18 ?image .
+    }
+    BIND (wd:Q24575110 AS ?item)
   }
-  UNION
-  {
+  UNION {
     target: wdt:P582 ?time .
-    OPTIONAL { target: wdt:P18 ?image . }
-    BIND(wd:Q24575125 AS ?item)
+    OPTIONAL {
+      target: wdt:P18 ?image .
+    }
+    BIND (wd:Q24575125 AS ?item)
   }
-  UNION 
-  { target: p:P793 [ ps:P793 ?item ; pq:P585 ?time ] . }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  UNION {
+    target: p:P793 [
+      ps:P793 ?item ;
+      pq:P585 ?time
+    ] .
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
-

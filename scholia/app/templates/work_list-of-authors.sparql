@@ -1,5 +1,4 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # List of authors for a work
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
@@ -9,51 +8,44 @@ PREFIX schema: <http://schema.org/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
 SELECT DISTINCT
-  # Author order
-  ?order
-
-  ?academic_age
-
-  # Author item and label
-  ?author ?authorUrl ?authorDescription
-
-WHERE {
+# Author order
+?order ?academic_age
+# Author item and label
+?author ?authorUrl ?authorDescription WHERE {
   {
     target: p:P50 ?author_statement .
     ?author_statement ps:P50 ?author_ .
     ?author_ rdfs:label ?author .
     FILTER (LANG(?author) = 'en')
-    BIND(CONCAT("../author/", SUBSTR(STR(?author_), 32)) AS ?authorUrl)
+    BIND (CONCAT("../author/", SUBSTR(STR(?author_),32)) AS ?authorUrl)
     OPTIONAL {
       ?author_statement pq:P1545 ?order_ .
-      BIND(xsd:integer(?order_) AS ?order)
+      BIND (xsd:integer(?order_) AS ?order)
     }
     OPTIONAL {
       ?author_ schema:description ?authorDescription .
       FILTER (LANG(?authorDescription) = "en")
     }
   }
-  UNION
-  {
+  UNION {
     target: p:P2093 ?authorstring_statement .
     ?authorstring_statement ps:P2093 ?author_
-    BIND(CONCAT(?author_, " ↗") AS ?author)
+    BIND (CONCAT(?author_, " ↗") AS ?author)
     OPTIONAL {
       ?authorstring_statement pq:P1545 ?order_ .
-      BIND(xsd:integer(?order_) AS ?order)
+      BIND (xsd:integer(?order_) AS ?order)
     }
-    BIND(CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_)) AS ?authorUrl)
+    BIND (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_)) AS ?authorUrl)
   }
   OPTIONAL {
     SELECT ?author_ (MAX(?academic_age_) AS ?academic_age) {
       target: wdt:P50 ?author_ ;
-                 wdt:P577 ?publication_date .
-      [] wdt:P31 / wdt:P279* wd:Q55915575 ;
+              wdt:P577 ?publication_date .
+      [] wdt:P31/wdt:P279* wd:Q55915575 ;
          wdt:P50 ?author_ ;
          wdt:P577 ?other_publication_date .
-      BIND(YEAR(?publication_date) - YEAR(?other_publication_date) AS ?academic_age_)
+      BIND (YEAR(?publication_date) - YEAR(?other_publication_date) AS ?academic_age_)
     }
     GROUP BY ?author_
   }

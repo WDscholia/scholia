@@ -1,20 +1,14 @@
 # title: biological processes in which this chemical is involved
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT DISTINCT
-  ?pathway ?pathwayLabel
-  (CONCAT("/pathway/", SUBSTR(STR(?pathway), 32)) AS ?pathwayUrl)
-  ?pathwayDescription
-WHERE {
+SELECT DISTINCT ?pathway ?pathwayLabel (CONCAT("/pathway/", SUBSTR(STR(?pathway),32)) AS ?pathwayUrl) ?pathwayDescription WHERE {
   ?pathway wdt:P527 target: ;
            wdt:P31 wd:Q2996394 .
   target: wdt:P361 ?pathway .
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY ASC(?pathwayLabel)
 LIMIT 250

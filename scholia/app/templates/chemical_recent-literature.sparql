@@ -1,6 +1,5 @@
 # title: recent literature about this chemical
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX pr: <http://www.wikidata.org/prop/reference/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
@@ -8,36 +7,54 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT ?date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?type ?via ?topics
-
-WHERE {
-  { SELECT (MAX(?dates) as ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type) ?via (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics) WHERE {
-    { SELECT DISTINCT ?work  ?via ?topic WHERE {
-    { VALUES ?topic { target:}
-      ?work wdt:P921 ?topic . BIND ("main topic" AS ?via) }
-    UNION
-    { ?work wdt:P921 ?topic . ?topic ((^wdt:P361)+) target: . BIND ("part" AS ?via) }
-    UNION
-    { ?work wdt:P921 ?topic . ?topic (wdt:P31* / wdt:P279* ) target: . BIND ("subclass" AS ?via). FILTER (?topic != target:) }
-    UNION
-    { ?work wdt:P921 ?topic . ?topic (wdt:P1269+ ) target: . BIND ("facet" AS ?via)}
-    UNION
-    {
-      target: ?propp ?statement .
-      ?statement a wikibase:BestRank ;
-                 prov:wasDerivedFrom/pr:P248 ?work .
-      BIND ("statement" AS ?via)
+SELECT ?date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?type ?via ?topics WHERE {
+  {
+    SELECT (MAX(?dates) AS ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; SEPARATOR=", ") AS ?type) ?via (GROUP_CONCAT(DISTINCT ?topic_label; SEPARATOR=" // ") AS ?topics) WHERE {
+      {
+        SELECT DISTINCT ?work ?via ?topic WHERE {
+          {
+            VALUES ?topic { target: }
+            ?work wdt:P921 ?topic .
+            BIND ("main topic" AS ?via)
+          }
+          UNION {
+            ?work wdt:P921 ?topic .
+            ?topic ((^wdt:P361)+) target: .
+            BIND ("part" AS ?via)
+          }
+          UNION {
+            ?work wdt:P921 ?topic .
+            ?topic (wdt:P31*/wdt:P279*) target: .
+            BIND ("subclass" AS ?via) .
+            FILTER (?topic != target:)
+          }
+          UNION {
+            ?work wdt:P921 ?topic .
+            ?topic (wdt:P1269+) target: .
+            BIND ("facet" AS ?via)
+          }
+          UNION {
+            target: ?propp ?statement .
+            ?statement a wikibase:BestRank ;
+                       prov:wasDerivedFrom/pr:P248 ?work .
+            BIND ("statement" AS ?via)
+          }
+        }
+      }
+      ?work wdt:P921 ?topic .
+      OPTIONAL {
+        ?work wdt:P31 ?type_ .
+        ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en')
+      }
+      OPTIONAL {
+        ?work wdt:P577 ?dates .
+      }
+      ?topic rdfs:label ?topic_label . FILTER (LANG(?topic_label) = 'en')
     }
-  } }
-    ?work wdt:P921 ?topic . 
-    OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
-    OPTIONAL { ?work wdt:P577 ?dates . }
-    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
+    GROUP BY ?work ?via
   }
-  GROUP BY ?work ?via }
-  BIND(xsd:date(?datetime) AS ?date)
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  BIND (xsd:date(?datetime) AS ?date)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?date)
 LIMIT 500

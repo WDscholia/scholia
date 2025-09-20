@@ -1,28 +1,17 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?count
-  ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
-  ("🔎" AS ?zoom)
+SELECT ?count ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use),32)) AS ?useUrl) ("🔎" AS ?zoom)
   (CONCAT("{{ q }}/use/", SUBSTR(STR(?use), 32)) AS ?zoomUrl)
-  ?useDescription
-
-  ?example_work ?example_workLabel
-
-WHERE {
-  { SELECT
-    (COUNT(?work) AS ?count)
-    ?use
-    (SAMPLE(?work) AS ?example_work)
+?useDescription ?example_work ?example_workLabel WHERE {
   {
-    ?work wdt:P50 target: ;
-          wdt:P4510 ?use .
+    SELECT (COUNT(?work) AS ?count) ?use (SAMPLE(?work) AS ?example_work) {
+      ?work wdt:P50 target: ;
+            wdt:P4510 ?use .
+    }
+    GROUP BY ?use
   }
-  GROUP BY ?use }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?count)

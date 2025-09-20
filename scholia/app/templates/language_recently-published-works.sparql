@@ -1,36 +1,26 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT
-  ?publication_date
-  ?work ?workLabel ?workDescription (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-
-WHERE {
-  { SELECT
-    (xsd:date(MAX(?publication_date_)) AS ?publication_date)
-    ?work
-  WHERE {
-    { SELECT
-    ?publication_date_
-    ?work
-  WHERE {
-    VALUES ?publication_date_ {
-      {% for day in range(-32, 1) %} {{ '"{}T00:00:00Z"^^xsd:dateTime'.format((datetime.datetime.now().date() + datetime.timedelta(day)).isoformat()) }} {% endfor %} 
+SELECT ?publication_date ?work ?workLabel ?workDescription (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) WHERE {
+  {
+    SELECT (xsd:date(MAX(?publication_date_)) AS ?publication_date) ?work WHERE {
+      {
+        SELECT ?publication_date_ ?work WHERE {
+          VALUES ?publication_date_ {
+          #      {% for day in range(-32, 1) %} {{ '"{}T00:00:00Z"^^xsd:dateTime'.format((datetime.datetime.now().date() + datetime.timedelta(day)).isoformat()) }} {% endfor %} 
+        }
+          ?work wdt:P407 target: ;
+                wdt:P577 ?publication_date_ ;
+        }
+        LIMIT 1000
+      }
     }
-    ?work wdt:P407 target: ;
-          wdt:P577 ?publication_date_ ;
+    GROUP BY ?work
+    ORDER BY DESC(?publication_date)
+    LIMIT 500
   }
-  LIMIT 1000 }
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?publication_date)
-  LIMIT 500 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?publication_date)
-
-  

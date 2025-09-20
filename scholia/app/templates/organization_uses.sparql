@@ -1,32 +1,25 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  ?researchers
-  ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
-  ("🔎" AS ?zoom)
+SELECT ?researchers ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use),32)) AS ?useUrl) ("🔎" AS ?zoom)
   (CONCAT("{{ q }}/use/", SUBSTR(STR(?use), 32)) AS ?zoomUrl)
-  ?useDescription
-  ?samplework ?sampleworkLabel (CONCAT("/work/", SUBSTR(STR(?samplework), 32)) AS ?sampleworkUrl)
-
-WHERE {
-  { SELECT DISTINCT ?use
-    (COUNT(DISTINCT ?researcher) AS ?researchers)
-    (SAMPLE(?work) AS ?samplework)
-  WHERE {
-    { SELECT DISTINCT ?researcher WHERE {
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
-  } }
-    ?work wdt:P50 ?researcher . 
-    ?work wdt:P4510 ?use . 
-  } 
-  GROUP BY ?use
-  ORDER BY DESC(?researchers)
-  LIMIT 500 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+?useDescription ?samplework ?sampleworkLabel (CONCAT("/work/", SUBSTR(STR(?samplework),32)) AS ?sampleworkUrl) WHERE {
+  {
+    SELECT DISTINCT ?use (COUNT(DISTINCT ?researcher) AS ?researchers) (SAMPLE(?work) AS ?samplework) WHERE {
+      {
+        SELECT DISTINCT ?researcher WHERE {
+          ?researcher (wdt:P108 | wdt:P463 | wdt:P1416)/wdt:P361* target: .
+        }
+      }
+      ?work wdt:P50 ?researcher .
+      ?work wdt:P4510 ?use .
+    }
+    GROUP BY ?use
+    ORDER BY DESC(?researchers)
+    LIMIT 500
+  }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
 }
 GROUP BY ?researchers ?use ?useLabel ?useDescription ?samplework ?sampleworkLabel
 ORDER BY DESC(?researchers)

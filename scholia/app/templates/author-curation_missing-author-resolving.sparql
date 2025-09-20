@@ -1,81 +1,72 @@
 #title: Variants of author name strings
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-
-SELECT 
-  (COUNT(?work) AS ?count)
-  ?string
-  (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", 
-        ENCODE_FOR_URI(?string)) AS ?author_resolver_url) 
-
-WITH
-# This part is due to Dipsacus fullonum, as per https://w.wiki/5Brk
-{
-  # Calculate capitalization variants of these raw strings
-  SELECT DISTINCT ?string
-  WHERE
+SELECT (COUNT(?work) AS ?count) ?string (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?string)) AS ?author_resolver_url) WHERE {
+  # Find works that have "author name string" values equal to these normalized strings
+  # This part is due to Dipsacus fullonum, as per https://w.wiki/5Brk
   {
-    {
-      { # Find strings associated with the target author
-  SELECT DISTINCT ?string_
-  WHERE
-  {
-    { target: rdfs:label ?string_. } # in label
-    UNION
-    { target: skos:altLabel ?string_. } # in alias
-    UNION
-    {
-      ?author_statement ps:P50 target: ; 
-                        pq:P1932 ?string_. # in "stated as" strings for "author" statements on work items
-    }
-  } }
-      BIND(STR(?string_) AS ?string) # the raw strings
-    }
-    UNION
-    {
-      { # Find strings associated with the target author
-  SELECT DISTINCT ?string_
-  WHERE
-  {
-    { target: rdfs:label ?string_. } # in label
-    UNION
-    { target: skos:altLabel ?string_. } # in alias
-    UNION
-    {
-      ?author_statement ps:P50 target: ; 
-                        pq:P1932 ?string_. # in "stated as" strings for "author" statements on work items
-    }
-  } }
-      BIND(UCASE(STR(?string_)) AS ?string) # uppercased versions of the raw strings
-    }
-    UNION
-    {
-      { # Find strings associated with the target author
-  SELECT DISTINCT ?string_
-  WHERE
-  {
-    { target: rdfs:label ?string_. } # in label
-    UNION
-    { target: skos:altLabel ?string_. } # in alias
-    UNION
-    {
-      ?author_statement ps:P50 target: ; 
-                        pq:P1932 ?string_. # in "stated as" strings for "author" statements on work items
-    }
-  } }
-      BIND(LCASE(STR(?string_)) AS ?string) # lowercased versions of the raw strings
+    # Calculate capitalization variants of these raw strings
+    SELECT DISTINCT ?string WHERE {
+      {
+        { # Find strings associated with the target author
+          SELECT DISTINCT ?string_ WHERE {
+            {
+              target: rdfs:label ?string_ .
+            } # in label
+            UNION {
+              target: skos:altLabel ?string_ .
+            } # in alias
+            UNION {
+              ?author_statement ps:P50 target: ;
+                                pq:P1932 ?string_ . # in "stated as" strings for "author" statements on work items
+            }
+          }
+        }
+        BIND (STR(?string_) AS ?string) # the raw strings
+      }
+      UNION {
+        { # Find strings associated with the target author
+          SELECT DISTINCT ?string_ WHERE {
+            {
+              target: rdfs:label ?string_ .
+            } # in label
+            UNION {
+              target: skos:altLabel ?string_ .
+            } # in alias
+            UNION {
+              ?author_statement ps:P50 target: ;
+                                pq:P1932 ?string_ . # in "stated as" strings for "author" statements on work items
+            }
+          }
+        }
+        BIND (UCASE(STR(?string_)) AS ?string) # uppercased versions of the raw strings
+      }
+      UNION {
+        { # Find strings associated with the target author
+          SELECT DISTINCT ?string_ WHERE {
+            {
+              target: rdfs:label ?string_ .
+            } # in label
+            UNION {
+              target: skos:altLabel ?string_ .
+            } # in alias
+            UNION {
+              ?author_statement ps:P50 target: ;
+                                pq:P1932 ?string_ . # in "stated as" strings for "author" statements on work items
+            }
+          }
+        }
+        BIND (LCASE(STR(?string_)) AS ?string) # lowercased versions of the raw strings
+      }
     }
   }
-} AS %NORMALIZEDstrings
-WHERE {
-  # Find works that have "author name string" values equal to these normalized strings
-  INCLUDE %NORMALIZEDstrings
-  OPTIONAL { ?work wdt:P2093 ?string. }
+  OPTIONAL {
+    ?work wdt:P2093 ?string .
+  }
 }
 GROUP BY ?string
-ORDER BY DESC (?count)
+ORDER BY DESC(?count)

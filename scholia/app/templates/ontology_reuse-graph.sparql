@@ -1,36 +1,30 @@
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-
-SELECT
-  ?source ?sourceLabel (CONCAT("../ontology/", ?qs) AS ?sourceUrl)
-  ?target ?targetLabel (CONCAT("../ontology/", ?qt) AS ?targetUrl)
-WHERE {
+SELECT ?source ?sourceLabel (CONCAT("../ontology/", ?qs) AS ?sourceUrl) ?target ?targetLabel (CONCAT("../ontology/", ?qt) AS ?targetUrl) WHERE {
   { # Ontologies that are used by the target: ontology
     BIND (target: AS ?source)
     ?source wdt:P2283 ?target .
-    BIND(SUBSTR(STR(?source), 32) AS ?qs)
-    BIND(SUBSTR(STR(?target), 32) AS ?qt)
+    BIND (SUBSTR(STR(?source),32) AS ?qs)
+    BIND (SUBSTR(STR(?target),32) AS ?qt)
     ?source rdfs:label ?source_string .
     FILTER (LANG(?source_string) = 'en')
-    BIND(COALESCE(?source_string, ?qt) AS ?sourceLabel)
+    BIND (COALESCE(?source_string, ?qt) AS ?sourceLabel)
     ?target rdfs:label ?target_string .
     FILTER (LANG(?target_string) = 'en')
-    BIND(COALESCE(?target_string, ?qt) AS ?targetLabel)
+    BIND (COALESCE(?target_string, ?qt) AS ?targetLabel)
   }
-  UNION
-  { # Ontologies that use the target: ontology
+  UNION { # Ontologies that use the target: ontology
     BIND (target: AS ?target)
     ?source wdt:P2283 ?target .
-    BIND(SUBSTR(STR(?source), 32) AS ?qs)
-    BIND(SUBSTR(STR(?target), 32) AS ?qt)
+    BIND (SUBSTR(STR(?source),32) AS ?qs)
+    BIND (SUBSTR(STR(?target),32) AS ?qt)
     ?source rdfs:label ?source_string .
     FILTER (LANG(?source_string) = 'en')
-    BIND(COALESCE(?source_string, ?qt) AS ?sourceLabel)
+    BIND (COALESCE(?source_string, ?qt) AS ?sourceLabel)
     ?target rdfs:label ?target_string .
     FILTER (LANG(?target_string) = 'en')
-    BIND(COALESCE(?target_string, ?qt) AS ?targetLabel)
-  }  
+    BIND (COALESCE(?target_string, ?qt) AS ?targetLabel)
+  }
 }

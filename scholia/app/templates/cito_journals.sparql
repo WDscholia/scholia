@@ -1,17 +1,15 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) 
-?journal ?journalLabel (CONCAT("/venue/", SUBSTR(STR(?journal), 32)) AS ?journalUrl) WHERE {
+SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) ?journal ?journalLabel (CONCAT("/venue/", SUBSTR(STR(?journal),32)) AS ?journalUrl) WHERE {
   VALUES ?INTENTION { target: }
   ?citingArticle p:P2860 ?citationStatement ;
                  wdt:P1433 ?journal .
   ?citationStatement pq:P3712 ?INTENTION .
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} GROUP BY ?journal ?journalLabel
-  ORDER BY DESC(?count)
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}
+GROUP BY ?journal ?journalLabel
+ORDER BY DESC(?count)

@@ -1,28 +1,23 @@
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT ?citations ?publication_date ?citing_work (REPLACE(STR(?citing_work), ".*/", "") AS ?citing_workLabel)
-
-WHERE {
-  { SELECT
-    (MIN(?date) AS ?publication_date)
-    (COUNT(?citing_citing_work) AS ?citations)
-    ?citing_work
-  WHERE {
-    ?citing_work wdt:P2860 target: .
-    OPTIONAL {
-      ?citing_work wdt:P577 ?datetime .
-      BIND(xsd:date(?datetime) AS ?date)
+SELECT ?citations ?publication_date ?citing_work (REPLACE(STR(?citing_work), ".*/", "") AS ?citing_workLabel) WHERE {
+  {
+    SELECT (MIN(?date) AS ?publication_date) (COUNT(?citing_citing_work) AS ?citations) ?citing_work WHERE {
+      ?citing_work wdt:P2860 target: .
+      OPTIONAL {
+        ?citing_work wdt:P577 ?datetime .
+        BIND (xsd:date(?datetime) AS ?date)
+      }
+      OPTIONAL {
+        ?citing_citing_work wdt:P2860 ?citing_work
+      }
     }
-    OPTIONAL { ?citing_citing_work wdt:P2860 ?citing_work }
+    GROUP BY ?citing_work
   }
-  GROUP BY ?citing_work }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?citations) DESC(?date)

@@ -1,56 +1,56 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 #defaultView:Graph
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT ?node (REPLACE(STR(?node), ".*/", "") AS ?nodeLabel) ?nodeImage ?childNode (REPLACE(STR(?childNode), ".*/", "") AS ?childNodeLabel) ?childNodeImage ?rgb 
-
-WHERE {
+SELECT ?node (REPLACE(STR(?node), ".*/", "") AS ?nodeLabel) ?nodeImage ?childNode (REPLACE(STR(?childNode), ".*/", "") AS ?childNodeLabel) ?childNodeImage ?rgb WHERE {
   {
-    { SELECT DISTINCT ?node ?childNode WHERE {
-      BIND(target: AS ?node)
-      ?node ?p ?i.
-      ?childNode ?x ?p.
-      ?childNode rdf:type wikibase:Property.
-      FILTER(STRSTARTS(STR(?i), "http://www.wikidata.org/entity/Q"))
-      FILTER(STRSTARTS(STR(?childNode), "http://www.wikidata.org/entity/P"))
+    {
+      SELECT DISTINCT ?node ?childNode WHERE {
+        BIND (target: AS ?node)
+        ?node ?p ?i .
+        ?childNode ?x ?p .
+        ?childNode rdf:type wikibase:Property.
+        FILTER (STRSTARTS(STR(?i),"http://www.wikidata.org/entity/Q"))
+        FILTER (STRSTARTS(STR(?childNode),"http://www.wikidata.org/entity/P"))
+      }
+      LIMIT 5000
     }
-  LIMIT 5000 }
   }
-  UNION
-  {
-    { SELECT DISTINCT ?childNode ?node ?rgb WHERE {
-      BIND("EFFBD8" AS ?rgb)
-      target: ?p ?childNode.
-      ?node ?x ?p.
-      ?node rdf:type wikibase:Property.
-      FILTER(STRSTARTS(STR(?childNode), "http://www.wikidata.org/entity/Q"))
+  UNION {
+    {
+      SELECT DISTINCT ?childNode ?node ?rgb WHERE {
+        BIND ("EFFBD8" AS ?rgb)
+        target: ?p ?childNode .
+        ?node ?x ?p .
+        ?node rdf:type wikibase:Property.
+        FILTER (STRSTARTS(STR(?childNode),"http://www.wikidata.org/entity/Q"))
+      }
+      LIMIT 5000
     }
-  LIMIT 5000 }
   }
-
-  OPTIONAL { 
-    { SELECT DISTINCT ?property WHERE {
-      ?property a wikibase:Property;
-                wdt:P31 wd:Q18610173 ;
-                wdt:P31 wd:Q26940804 . 
-    } }
-    ?property wikibase:directClaim ?nodeclaim.
-    ?node ?nodeclaim ?nodeImage. 
+  OPTIONAL {
+    {
+      SELECT DISTINCT ?property WHERE {
+        ?property a wikibase:Property ;
+                  wdt:P31 wd:Q18610173 ;
+                  wdt:P31 wd:Q26940804 .
+      }
+    }
+    ?property wikibase:directClaim ?nodeclaim .
+    ?node ?nodeclaim ?nodeImage .
   }
-
-  OPTIONAL { 
-    { SELECT DISTINCT ?property WHERE {
-      ?property a wikibase:Property;
-                wdt:P31 wd:Q18610173 ;
-                wdt:P31 wd:Q26940804 . 
-    } }
-    ?property wikibase:directClaim ?childNodeclaim.
-    ?childNode ?childNodeclaim ?childNodeImage. 
+  OPTIONAL {
+    {
+      SELECT DISTINCT ?property WHERE {
+        ?property a wikibase:Property ;
+                  wdt:P31 wd:Q18610173 ;
+                  wdt:P31 wd:Q26940804 .
+      }
+    }
+    ?property wikibase:directClaim ?childNodeclaim .
+    ?childNode ?childNodeclaim ?childNodeImage .
   }
-  
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
 }

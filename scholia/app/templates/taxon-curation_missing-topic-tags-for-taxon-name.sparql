@@ -1,40 +1,32 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT DISTINCT 
-?item ?itemLabel (CONCAT("/work/", SUBSTR(STR(?item), 32)) AS ?itemUrl) ?taxonname
-  (REPLACE(STR(?item), ".*Q", "Q") AS ?work) 
-  ("P921" AS ?main_subject)
-  (REPLACE(STR(target: ), ".*Q", "Q") AS ?taxon)
-  ("S887" AS ?heuristic)
-  ("Q69652283" AS ?deduced)
-
-WHERE {
-  { SELECT  ?item ?taxonname WHERE {
-  target: wdt:P225 ?taxonname .
-  target: wdt:P105 wd:Q7432 . # this filters for species-level (Q7432) taxon names; comment out or adapt as necessary
-
-  SERVICE wikibase:mwapi
+SELECT DISTINCT ?item ?itemLabel (CONCAT("/work/", SUBSTR(STR(?item),32)) AS ?itemUrl) ?taxonname (REPLACE(STR(?item), ".*Q", "Q") AS ?work) ("P921" AS ?main_subject) (REPLACE(STR(target:), ".*Q", "Q") AS ?taxon) ("S887" AS ?heuristic) ("Q69652283" AS ?deduced) WHERE {
   {
-    bd:serviceParam wikibase:endpoint "www.wikidata.org";
-      wikibase:api "Generator";
-      mwapi:generator "search";
-      mwapi:gsrsearch ?taxonname;
-      mwapi:gsrlimit "max".
-    ?item wikibase:apiOutputItem mwapi:title.
+    SELECT ?item ?taxonname WHERE {
+      target: wdt:P225 ?taxonname .
+      target: wdt:P105 wd:Q7432 . # this filters for species-level (Q7432) taxon names; comment out or adapt as necessary
+      SERVICE wikibase:mwapi {
+        bd:serviceParam wikibase:endpoint "www.wikidata.org" ;
+                        wikibase:api "Generator" ;
+                        mwapi:generator "search" ;
+                        mwapi:gsrsearch ?taxonname ;
+                        mwapi:gsrlimit "max" .
+        ?item wikibase:apiOutputItem mwapi:title.
+      }
+      ?item wdt:P1476 ?title .
+      MINUS {
+        ?item wdt:P921 target:
+      }
+      MINUS {
+        ?item wdt:P921 [ wdt:P171* target: ]
+      } # this filters out works about subspecies of the target
+      FILTER (REGEX(LCASE(?title),LCASE(CONCAT("\\", "b", ?taxonname, "\\", "b"))))
+    }
+    LIMIT 200
   }
-  ?item wdt:P1476 ?title .
-  
-  MINUS {?item wdt:P921 target: }
-  MINUS {?item wdt:P921 [wdt:P171* target: ] } # this filters out works about subspecies of the target
-
-  FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\", "b", ?taxonname ,"\\", "b"))))
-  }
-  LIMIT 200 }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 LIMIT 200

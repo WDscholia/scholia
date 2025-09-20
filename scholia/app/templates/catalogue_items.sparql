@@ -1,29 +1,22 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-SELECT
-  ?number
-  ?code
-  ?item ?itemLabel ?itemDescription
-WHERE {
+SELECT ?number ?code ?item ?itemLabel ?itemDescription WHERE {
   # Find catalogue items
   ?item p:P972 ?catalogue_statement .
   ?catalogue_statement ps:P972 target: .
-
   # Optionally the catalogue code or the serial order
-  OPTIONAL { ?catalogue_statement pq:P528 | pq:P1545 ?code }
-
+  OPTIONAL {
+    ?catalogue_statement pq:P528 | pq:P1545 ?code
+  }
   # For numerical sorting the catalogue code should be converted to an integer
-  BIND(xsd:integer(?code) AS ?number)
-
+  BIND (xsd:integer(?code) AS ?number)
   # Label the result
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,es,fr,jp,nl,no,ru,sv,zh". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,es,fr,jp,nl,no,ru,sv,zh". }
 }
 ORDER BY ?number ?code
 LIMIT 1000

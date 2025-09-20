@@ -1,22 +1,16 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-
-SELECT
-  (COUNT(?middle) AS ?distance)
-  (GROUP_CONCAT(DISTINCT ?rank_label_; separator=", ") AS ?rank)
-  ?parent ?parentLabel ?parentDescription
-{
+SELECT (COUNT(?middle) AS ?distance) (GROUP_CONCAT(DISTINCT ?rank_label_; SEPARATOR=", ") AS ?rank) ?parent ?parentLabel ?parentDescription {
   target: wdt:P171* ?middle .
   ?middle wdt:P171+ ?parent .
   ?parent wdt:P105 ?rank_ .
   OPTIONAL {
     ?rank_ rdfs:label ?rank_label_ . FILTER (LANG(?rank_label_) = 'en')
   }
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 GROUP BY ?parent ?parentLabel ?parentDescription
 ORDER BY ?distance
