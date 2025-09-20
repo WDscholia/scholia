@@ -20,8 +20,8 @@ CONFIG_FILENAMES = [
 DEFAULTS = """
 [query-server]
 sparql_endpoint = https://qlever.dev/api/wikidata
-sparql_editurl = http://ad-research.cs.uni-freiburg.de:18101/#
-sparql_embedurl = http://ad-research.cs.uni-freiburg.de:18101/embed.html#
+sparql_editurl = https://wikidata-query-gui.scholia.wiki/#
+sparql_embedurl = https://wikidata-query-gui.scholia.wiki/embed.html#
 sparql_endpoint_name = QLever via local Wikidata Query GUI
 
 [requests]
