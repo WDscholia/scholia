@@ -4,6 +4,8 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
 SELECT ?node (REPLACE(STR(?node), ".*/", "") AS ?nodeLabel) ?nodeImage ?childNode (REPLACE(STR(?childNode), ".*/", "") AS ?childNodeLabel) ?childNodeImage ?rgb WHERE {
   {
     {
