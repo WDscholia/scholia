@@ -1,12 +1,14 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: physicochemical properties of this chemical
 PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX pr: <http://www.wikidata.org/prop/reference/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
+
 SELECT DISTINCT ?propEntity (REPLACE(STR(?propEntity), ".*/", "") AS ?propEntityLabel) ?value ?units (REPLACE(STR(?units), ".*/", "") AS ?unitsLabel) ?qualifiers ?source (REPLACE(STR(?source), ".*/", "") AS ?sourceLabel) ?doi WHERE {
   {
     SELECT DISTINCT ?propEntity ?value ?units ?source ?doi (GROUP_CONCAT(?qualifierStr; SEPARATOR=", ") AS ?qualifiers) WHERE {
