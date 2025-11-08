@@ -79,6 +79,19 @@ HEADERS = {'User-Agent': USER_AGENT}
 # GROUP BY ?dummy
 #
 # cu, el and iu has multiple values
+
+# Provisional place for the prefixes - this should probably go into a configuraiton file
+SPARQL_PREFIXES = """
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+"""
+
 ISO639_TO_Q = {
     'ab': 'Q5111', 'af': 'Q14196', 'ak': 'Q28026', 'am': 'Q28244',
     'an': 'Q8765', 'ar': 'Q13955', 'as': 'Q29401', 'av': 'Q29561',
@@ -285,7 +298,7 @@ def identifier_to_qs(property, identifier):
     True
 
     """
-    query = 'SELECT ?work {{ ?work wdt:{property} "{identifier}" }}'.format(
+    query = SPARQL_PREFIXES + 'SELECT ?work {{ ?work wdt:{property} "{identifier}" }}'.format(
         property=property,
         identifier=escape_string(identifier),
     )
@@ -324,7 +337,7 @@ def count_authorships():
     True
 
     """
-    query = "SELECT (COUNT(*) AS ?count) { [] wdt:P50 [] }"
+    query = SPARQL_PREFIXES + "SELECT (COUNT(*) AS ?count) { [] wdt:P50 [] }"
     bindings = query_to_bindings(query)
     count = int(bindings[0]['count']['value'])
     return count
@@ -339,7 +352,7 @@ def count_scientific_articles():
         #Number of scientific articles in Wikidata.
 
     """
-    query = """
+    query = SPARQL_PREFIXES + """
         SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31 wd:Q13442814 }"""
 
     url = SPARQL_ENDPOINT
@@ -381,7 +394,7 @@ def doi_to_qs(doi):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
         doi=escape_string(doi.upper()))
 
     url = SPARQL_ENDPOINT
@@ -423,7 +436,7 @@ def doi_prefix_to_qs(doi):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P1662 "{doi}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P1662 "{doi}" }}'.format(
         doi=escape_string(doi.upper()))
 
     url = SPARQL_ENDPOINT
@@ -462,9 +475,9 @@ def iso639_to_q(language):
 
     # Fallback on query
     if len(language) == 2:
-        query = "SELECT * {{ ?language wdt:P218 '{}' }}".format(language)
+        query = SPARQL_PREFIXES + "SELECT * {{ ?language wdt:P218 '{}' }}".format(language)
     elif len(language) == 3:
-        query = "SELECT * {{ ?language wdt:P219 '{}' }}".format(language)
+        query = SPARQL_PREFIXES + "SELECT * {{ ?language wdt:P219 '{}' }}".format(language)
     else:
         raise ValueError('ISO639 language code not recognized')
 
@@ -506,7 +519,7 @@ def pubchem_to_qs(cid):
     True
 
     """
-    query = 'select ?chemical where {{ ?chemical wdt:P662 "{cid}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?chemical where {{ ?chemical wdt:P662 "{cid}" }}'.format(
         cid=cid)
 
     url = SPARQL_ENDPOINT
@@ -567,7 +580,7 @@ def pubmed_to_qs(pmid):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(
         pmid=pmid)
 
     url = SPARQL_ENDPOINT
@@ -600,7 +613,7 @@ def ror_to_qs(rorid):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P6782 "{rorid}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P6782 "{rorid}" }}'.format(
         rorid=rorid)
 
     url = SPARQL_ENDPOINT
@@ -636,7 +649,7 @@ def uniprot_to_qs(protein):
     True
 
     """
-    query = 'select ?protein where {{ ?protein wdt:P352 "{protein}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?protein where {{ ?protein wdt:P352 "{protein}" }}'.format(
         protein=protein)
 
     url = SPARQL_ENDPOINT
@@ -672,7 +685,7 @@ def ncbi_gene_to_qs(gene):
     True
 
     """
-    query = 'select ?gene where {{ ?gene wdt:P351 "{gene}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?gene where {{ ?gene wdt:P351 "{gene}" }}'.format(
         gene=gene)
 
     url = SPARQL_ENDPOINT
@@ -708,7 +721,7 @@ def ncbi_taxon_to_qs(taxon):
     True
 
     """
-    query = 'select ?work where {{ ?work wdt:P685 "{taxon}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P685 "{taxon}" }}'.format(
         taxon=taxon)
 
     url = SPARQL_ENDPOINT
@@ -741,7 +754,7 @@ def wikipathways_to_qs(wpid):
     True
 
     """
-    query = ('select ?work where {{ VALUES ?wpid {{ "{wpid}" }} '
+    query = SPARQL_PREFIXES + ('select ?work where {{ VALUES ?wpid {{ "{wpid}" }} '
              '?work wdt:P2410 ?wpid }}').format(
                  wpid=wpid)
 
@@ -773,7 +786,7 @@ def issn_to_qs(issn):
     True
 
     """
-    query = 'select ?author where {{ ?author wdt:P236 "{issn}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?author where {{ ?author wdt:P236 "{issn}" }}'.format(
         issn=escape_string(issn))
 
     url = SPARQL_ENDPOINT
@@ -804,7 +817,7 @@ def omim_to_qs(omimID):
     True
 
     """
-    query = 'select ?disease where {{ ?disease wdt:P492 "{omimID}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?disease where {{ ?disease wdt:P492 "{omimID}" }}'.format(
         omimID=escape_string(omimID))
 
     url = SPARQL_ENDPOINT
@@ -835,7 +848,7 @@ def orcid_to_qs(orcid):
     True
 
     """
-    query = 'select ?author where {{ ?author wdt:P496 "{orcid}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?author where {{ ?author wdt:P496 "{orcid}" }}'.format(
         orcid=escape_string(orcid))
 
     url = SPARQL_ENDPOINT
@@ -866,7 +879,7 @@ def mesh_to_qs(meshid):
     True
 
     """
-    query = 'select ?cmp where {{ ?cmp wdt:P486 "{meshid}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?cmp where {{ ?cmp wdt:P486 "{meshid}" }}'.format(
         meshid=meshid)
 
     url = SPARQL_ENDPOINT
@@ -901,7 +914,7 @@ def q_to_dois(q):
     True
 
     """
-    query = """SELECT ?doi {{ wd:{q} wdt:P356 ?doi }}""".format(q=q)
+    query = SPARQL_PREFIXES + """SELECT ?doi {{ wd:{q} wdt:P356 ?doi }}""".format(q=q)
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
@@ -934,7 +947,7 @@ def q_to_label(q, language='en'):
     True
 
     """
-    query = """SELECT ?label WHERE {{ wd:{q} rdfs:label ?label .
+    query = SPARQL_PREFIXES + """SELECT ?label WHERE {{ wd:{q} rdfs:label ?label .
         FILTER (LANG(?label) = "{language}") }}""".format(
         q=q, language=language)
 
@@ -1067,7 +1080,7 @@ def viaf_to_qs(viaf):
     True
 
     """
-    query = 'select ?author where {{ ?author wdt:P214 "{viaf}" }}'.format(
+    query = SPARQL_PREFIXES + 'select ?author where {{ ?author wdt:P214 "{viaf}" }}'.format(
         viaf=escape_string(viaf))
 
     url = SPARQL_ENDPOINT
@@ -1101,7 +1114,7 @@ def q_to_class(q):
     is compared against a set of hardcoded matches.
 
     """
-    query = 'SELECT ?class {{ wd:{q} wdt:P31 ?class }}'.format(
+    query = SPARQL_PREFIXES + 'SELECT ?class {{ wd:{q} wdt:P31 ?class }}'.format(
         q=escape_string(q))
 
     url = SPARQL_ENDPOINT
@@ -1354,7 +1367,7 @@ def q_to_class(q):
     elif ('Q16695773' in classes):  # wikiproject
         class_ = 'wikiproject'
     else:
-        query = 'select ?class where {{ wd:{q} wdt:P279+ ?class }}'.format(
+        query = SPARQL_PREFIXES + 'select ?class where {{ wd:{q} wdt:P279+ ?class }}'.format(
             q=escape_string(q))
 
         url = SPARQL_ENDPOINT
@@ -1411,7 +1424,7 @@ def twitter_to_qs(twitter):
 
     """
     # This query matches exact and lowercased version of username
-    query = """SELECT DISTINCT ?item
+    query = SPARQL_PREFIXES + """SELECT DISTINCT ?item
                WHERE {{ VALUES ?username {{ "{twitter}" "{lower}" }}
                         ?item wdt:P2002 ?username }}""".format(
         twitter=escape_string(twitter), lower=escape_string(twitter).lower()
@@ -1446,7 +1459,7 @@ def github_to_qs(github):
 
     """
     # This query only matches on exact match
-    query = """select ?item
+    query = SPARQL_PREFIXES + """select ?item
                where {{ ?item wdt:P2037 "{github}" }}""".format(
         github=escape_string(github))
 
@@ -1479,7 +1492,7 @@ def inchikey_to_qs(inchikey):
 
     """
     # This query only matches on exact match
-    query = """select ?item
+    query = SPARQL_PREFIXES + """select ?item
                where {{ ?item wdt:P235 "{inchikey}" }}""".format(
         inchikey=escape_string(inchikey))
 
@@ -1512,7 +1525,7 @@ def cordis_to_qs(cordis):
 
     """
     # This query only matches on exact match
-    query = """select ?item
+    query = SPARQL_PREFIXES + """select ?item
                where {{ ?item wdt:P3400 "{cordis}" }}""".format(
         cordis=escape_string(cordis))
 
@@ -1545,7 +1558,7 @@ def cas_to_qs(cas):
 
     """
     # This query only matches on exact match
-    query = """select ?item
+    query = SPARQL_PREFIXES + """select ?item
                where {{ ?item wdt:P231 "{cas}" }}""".format(
         cas=cas)
 
@@ -1580,7 +1593,7 @@ def lipidmaps_to_qs(lmid):
 
     """
     # This query only matches on exact match
-    query = """select ?item
+    query = SPARQL_PREFIXES + """select ?item
                where {{ ?item wdt:P2063 "{lmid}" }}""".format(
         lmid=lmid)
     url = SPARQL_ENDPOINT
@@ -1612,7 +1625,7 @@ def atomic_number_to_qs(atomic_number):
 
     """
     # This query only matches on exact match
-    query = """SELECT ?item
+    query = SPARQL_PREFIXES + """SELECT ?item
                WHERE {{ ?item wdt:P31 wd:Q11344 ; wdt:P1086 ?number .
                  FILTER (STR(?number) = "{atomic_number}") }}""".format(
         atomic_number=atomic_number)
@@ -1645,7 +1658,7 @@ def atomic_symbol_to_qs(symbol):
 
     """
     # This query only matches on exact match
-    query = """SELECT ?item
+    query = SPARQL_PREFIXES + """SELECT ?item
                WHERE {{ ?item wdt:P246 "{symbol}" }}""".format(
         symbol=symbol)
     url = SPARQL_ENDPOINT
@@ -1679,7 +1692,7 @@ def website_to_qs(url):
     True
 
     """
-    query = 'SELECT ?work WHERE {{ ?work wdt:P856 <{url}> }}'.format(
+    query = SPARQL_PREFIXES + 'SELECT ?work WHERE {{ ?work wdt:P856 <{url}> }}'.format(
         url=url.strip())
 
     url_ = SPARQL_ENDPOINT
@@ -1721,7 +1734,7 @@ def random_author():
     values = " ".join("wd:Q{}".format(randrange(1, 100000000))
                       for _ in range(100))
 
-    query = """SELECT ?author {{
+    query = SPARQL_PREFIXES + """SELECT ?author {{
                  VALUES ?work {{ {values} }}
                  ?work wdt:P50 ?author .
                }}
@@ -1765,7 +1778,7 @@ def random_work():
     values = " ".join("wd:Q{}".format(randrange(1, 100000000))
                       for _ in range(100))
 
-    query = """SELECT ?work {{
+    query = SPARQL_PREFIXES + """SELECT ?work {{
                  VALUES ?work {{ {values} }}
                  ?work wdt:P50 ?author .
                }}
@@ -1804,7 +1817,7 @@ def random_podcast():
     True
 
     """
-    query = """SELECT ?podcast {{
+    query = SPARQL_PREFIXES + """SELECT ?podcast {{
                  ?podcast wdt:P31 wd:Q24634210 .
                }}"""
     bindings = query_to_bindings(query)

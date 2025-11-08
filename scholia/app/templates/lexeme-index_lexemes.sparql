@@ -1,4 +1,5 @@
 PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?lexeme (?lexeme_label AS ?lexemeLabel) (CONCAT("/lexeme/", SUBSTR(STR(?lexeme),32)) AS ?lexemeUrl) ?language ?languageLabel ?example_work ?example_workLabel ?example_workDescription (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {

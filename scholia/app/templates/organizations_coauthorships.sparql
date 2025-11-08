@@ -2,18 +2,23 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT DISTINCT ?author1 (REPLACE(STR(?author1), ".*/", "") AS ?author1Label) ?author2 (REPLACE(STR(?author2), ".*/", "") AS ?author2Label) ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) WHERE {
-  VALUES ?organization1 {
-  #    {% for q in qs %} wd:{{ q }} {% endfor %}
-}
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?author1 ?author1Label ?author2 ?author2Label ?work ?workLabel ?pubdate WHERE {
+  VALUES ?organization1 { 
+   {% for q in qs %} wd:{{ q }} {% endfor %}
+  }
   VALUES ?organization2 {
-  #    {% for q in qs %} wd:{{ q }} {% endfor %}
-}
-  ?author1 ?v1 ?organization1 .
-  ?author2 ?v2 ?organization2 .
-  ?work wdt:P50 ?author1, ?author2 .
+   {% for q in qs %} wd:{{ q }} {% endfor %}
+  } 
+  ?author1 ?v1 ?organization1 . 
+  ?author2 ?v2 ?organization2 . 
+  ?work wdt:P50 ?author1, ?author2 ;
+        wdt:P577 ?pubdate .
   FILTER (STR(?author1) < STR(?author2) && ?organization1 != ?organization2)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  ?author1 rdfs:label ?author1Label . FILTER(LANG(?author1Label)="en")
+  ?author2 rdfs:label ?author2Label . FILTER(LANG(?author2Label)="en")
+  ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel)="en")
 }
-ORDER BY ?author1Label
+ORDER BY DESC(?pubdate)
 LIMIT 500
