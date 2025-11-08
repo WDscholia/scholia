@@ -1,4 +1,8 @@
 # title: lists the taxons in which this chemical is found
+#sparql_endpoint = https://query.wikidata.org/sparql
+#sparql_endpoint_name= WDQS main
+#sparql_editurl = https://query.wikidata.org/#
+#sparql_embedurl = https://query.wikidata.org/embed.html#
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 
 SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) AS ?taxonUrl)
@@ -8,9 +12,15 @@ SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) A
   ?chemical p:P703 ?taxonStatement .
   ?taxonStatement ps:P703 ?taxon .
   OPTIONAL {
-      ?taxonStatement prov:wasDerivedFrom/pr:P248 ?source .
+    ?taxonStatement prov:wasDerivedFrom/pr:P248 ?source .
+    {
       OPTIONAL { ?source wdt:P356 ?doi . }
+    } UNION {
+      SERVICE wdsubgraph:scholarly_articles {
+        OPTIONAL { ?source wdt:P356 ?doi . }
+      }
     }
+  }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 } ORDER BY ASC(?taxonLabel)
   LIMIT 250
