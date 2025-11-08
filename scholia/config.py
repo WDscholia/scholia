@@ -25,7 +25,7 @@ sparql_embedurl = https://wikidata-query-gui.scholia.wiki/embed.html#
 sparql_endpoint_name = View in Wikidata Query GUI
 
 [requests]
-user_agent = Scholia
+user_agent = Scholia/0.3 (https://github.com/ad-freiburg/scholia; qlever.scholia.wiki)
 
 """
 
