@@ -17,6 +17,7 @@ SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon), 32)) A
       OPTIONAL { ?source wdt:P356 ?doi . }
     } UNION {
       SERVICE wdsubgraph:scholarly_articles {
+        ?source rdfs:label ?sourceLabel . FILTER (lang(?sourceLabel) = "mul" || lang(?sourceLabel) = "en")
         OPTIONAL { ?source wdt:P356 ?doi . }
       }
     }
