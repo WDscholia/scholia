@@ -5,7 +5,7 @@ PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?topic ?topicLabel WHERE {
   {
     SELECT (COUNT(?work) AS ?count) ?topic WHERE {
-      VALUES ?work {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
+      VALUES ?work {  {% for q in qs %} bd:{{ q }} {% endfor %}  }
       ?work wdt:P921 ?topic .
     }
     GROUP BY ?topic
