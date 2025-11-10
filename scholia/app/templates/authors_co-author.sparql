@@ -7,9 +7,9 @@ SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?work (REPLACE
   {
     SELECT ?work ?author WHERE {
       {}
-      { % for q1 IN qs %}
-      { % for q2 IN qs %}
-      { % IF q1 < q2 %}
+      {% for q1 in qs %}
+      {% for q2 in qs %}
+      {% if q1 < q2 %}
       UNION {
         SELECT ?work ?author WHERE {
           SERVICE gas:service {
@@ -24,9 +24,9 @@ SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?work (REPLACE
           ?work wdt:P50 ?author
         }
       } # UNION END
-      { % endif %}
-      { % endfor %}
-      { % endfor %}
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
     }
   }
   # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
