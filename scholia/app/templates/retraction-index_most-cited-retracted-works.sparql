@@ -1,3 +1,4 @@
+PREFIX wdsubgraph: <https://query-scholarly.wikidata.org/sparql?query=>
 #sparql_endpoint = https://query-scholarly.wikidata.org/sparql
 #sparql_endpoint_name= WDQS&nbsp;scholarly
 #sparql_editurl = https://query-scholarly.wikidata.org/#
