@@ -1,12 +1,15 @@
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 SELECT ?type (REPLACE(STR(?type), ".*/", "") AS ?typeLabel) ?count WHERE {
   {
     SELECT DISTINCT ?type (COUNT(?item) AS ?count) WHERE {
-      #    ?item wdt:P6104 wd:{{ q }};
-      (wdt:P31 
-    | wdt:P279 ) ?type .}
+      ?item wdt:P6104 bd:{{ q }};
+      VALUES ?p { wdt:P31 wdt:P279 }
+      ?item ?p ?type .
+
+    }
     GROUP BY ?type ?count
     ORDER BY DESC(?count)
   }
