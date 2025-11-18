@@ -53,4 +53,3 @@ SELECT ?time ?endtime ?event ?eventLabel ?image ?description WHERE {
   # SERVICE wikibase:label {
   bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
 }
-}
