@@ -1,11 +1,11 @@
-PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT ?count (MIN(?dates) AS ?date) ?citing_work ?citing_workLabel WHERE {
   {
     SELECT (COUNT(?work) AS ?count) ?citing_work WHERE {
-      VALUES ?work { {% for q in qs %} bd:{{ q }} {% endfor %} }
+      VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
       ?citing_work wdt:P2860 ?work .
     }
     GROUP BY ?citing_work
