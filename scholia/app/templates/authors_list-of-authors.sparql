@@ -1,10 +1,10 @@
-PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?authorDescription ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel) WHERE {
   {
     SELECT ?author (SAMPLE(?work) AS ?example_work) WHERE {
-      #    VALUES ?author { {% for q in qs %} wd:{{ q }} {% endfor %} }
+      VALUES ?author { {% for q in qs %} wd:{{ q }} {% endfor %} }
       OPTIONAL {
         ?work wdt:P50 ?author
       }

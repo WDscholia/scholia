@@ -1,5 +1,5 @@
+PREFIX wd: <http://www.wikidata.org/entity/>
 #defaultView:BubbleChart
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?topic ?topicLabel WHERE {
