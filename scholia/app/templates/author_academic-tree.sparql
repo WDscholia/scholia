@@ -1,6 +1,6 @@
 #defaultView:Graph
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-# Doctoral student/advisor network with a source from a spectific researcher
+PREFIX target: <http://www.wikidata.org/entity/{{q}}>
+# Doctoral student/supervisor network with a source from a specific researcher
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -8,17 +8,15 @@ PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT DISTINCT ?student1 (REPLACE(STR(?student1), ".*/", "") AS ?student1Label) ?rgb ?supervisor1 (REPLACE(STR(?supervisor1), ".*/", "") AS ?supervisor1Label) WHERE {
   {
     {
-      SELECT ?student1 ?supervisor1 WHERE {
+      SELECT ?student1 (MIN(?supervisor) AS ?supervisor1) WHERE {
         # Forward traversal: all reachable students and their predecessor (closest supervisor)
         # compute all reachable students
         target: wdt:P185+ ?student1 .
         # compute all of their supervisors
-        ?supervisor1 wdt:P185 ?student1 .
+        ?supervisor wdt:P185 ?student1 .
         # ensure that the supervisor is a predecessor
-        ?target  wdt:P185* ?supervisor1 .
-      } GROUP BY ?student1 ?supervisor1
-    } UNION {
-        BIND (target: AS ?student1)
+        target:  wdt:P185* ?supervisor .
+      } GROUP BY ?student1
     }
 
 # previous implementation using gas
@@ -35,40 +33,39 @@ SELECT DISTINCT ?student1 (REPLACE(STR(?student1), ".*/", "") AS ?student1Label)
 
   }
   UNION {
-    SELECT ?student1 ?supervisor1 WHERE {
+    SELECT (MIN(?student) AS ?student1) ?supervisor1 WHERE {
       # Reverse traversal: all reachable supervisors and there direct predecessors
       # compute all reachable supervisors
       ?supervisor1 wdt:P185+ target: .
       # compute all of their students
-      ?supervisor1 wdt:P185 ?student1 .
+      ?supervisor1 wdt:P185 ?student .
       # then make sure the student is a predecessor
-      ?student1 wdt:P185* target: .
-    } GROUP BY ?student1 ?supervisor1
-  } UNION {
-      BIND (target: AS ?supervisor1)
+      ?student wdt:P185* target: .
+    } GROUP BY ?supervisor1
   }
   UNION {
-    SELECT ?student1 ?supervisor1 WHERE {
+    SELECT (MIN(?student) AS ?student1) ?supervisor1 WHERE {
       # Forward traversal: all reachable supervisors and their students
       # compute all reachable supervisors
       target: wdt:P184+ ?supervisor1 .
       # compute all of their students
-      ?student1 wdt:P184 ?supervisor1 .
+      ?student wdt:P184 ?supervisor1 .
       # ensure that the student is a predecessor
-      target:  wdt:P184* ?student1 .
-    } GROUP BY ?student1 ?supervisor1
+      target:  wdt:P184* ?student .
+    } GROUP BY ?supervisor1
   }
   UNION {
-    SELECT ?student1 ?supervisor1 WHERE {
+      SELECT ?student1 (MIN(?supervisor) AS ?supervisor1) WHERE {
       # Reverse traversal: all reachable students and their direct predecessors
       # compute all reachable students
       ?student1 wdt:P184+ target: .
       # compute all of their supervisors
-      ?student1 wdt:P184 ?supervisor1 .
+      ?student1 wdt:P184 ?supervisor .
       # ensure the supervisor is a predecessor
-      ?supervisor1 wdt:P184* target: .
-    } GROUP BY ?student1 ?supervisor1
+      ?supervisor wdt:P184* target: .
+    } GROUP BY ?student1
   }
   BIND (IF(?student1 = target:,"3080BB","ffffff") AS ?rgb)
   # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .  } 
 }
+
