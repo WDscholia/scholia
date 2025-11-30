@@ -6,7 +6,7 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-SELECT ?year (COUNT(?work) AS ?number_of_publications) ?role WHERE {
+SELECT DISTINCT ?year (COUNT(?work) AS ?number_of_publications) ?role WHERE {
   {
     SELECT ?work (MIN(?years) AS ?year) ?type_ ?venue WHERE {
       ?work wdt:P577 ?dates ;
@@ -17,7 +17,7 @@ SELECT ?year (COUNT(?work) AS ?number_of_publications) ?role WHERE {
         ?work wdt:P31 wd:Q109229154 .
         BIND ("explicit" AS ?type_)
         ?work wdt:P1433 ?venue_ .
-        ?venue_ rdfs:label ?venue . FILTER (LANG(?venue) = "en")
+        ?venue_ rdfs:label ?venue . FILTER (LANG(?venue) = "en" || LANG(?venue) = "mul")
         MINUS {
           ?venue_ wdt:P31 wd:Q1143604
         }
