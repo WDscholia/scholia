@@ -6,8 +6,9 @@
 <script src="{{ url_for('static', filename='js/citation.js') }}"></script>
 <script>
 const Cite = require('citation-js').Cite
+const doi = '{{ doi | urlencode }}'
 try {
-  let example = new Cite('https://doi.org/{{ doi | urlencode }}', { forceType: '@doi/api' })
+  let example = new Cite('https://doi.org/' + doi, { forceType: '@doi/api' })
   let output = example.format('quickstatements')
   $( '#qs' ).text( output );
   output = encodeURIComponent(
@@ -18,8 +19,12 @@ try {
                "</a>\n"
   $( '#qs' ).after( htmlOutput );
 } catch (error) {
+  const crossrefUrl = 'https://search.crossref.org/search/works?from_ui=yes&q=' + doi
+  const crossrefLink = document.createElement('a')
+  crossrefLink.setAttribute('href', crossrefUrl)
+  crossrefLink.textContent = crossrefUrl
   if (error.message.includes("status code 404")) {
-    $( '#qs' ).append( "DOI does not exist" )
+    $( '#qs' ).after( "No metadata found for DOI. Please check the DOI for mistakes. This may be because the publisher has not (yet) submitted metadata to their DOI Registration Agency (e.g. Crossref or DataCite). If the DOI is newly minted, please check again in 1–4 weeks. You can check Crossref at ", crossrefLink )
   } else {
     console.error(error)
   }
