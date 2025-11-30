@@ -24,7 +24,7 @@ try {
   crossrefLink.setAttribute('href', crossrefUrl)
   crossrefLink.textContent = crossrefUrl
   if (error.message.includes("status code 404")) {
-    $( '#qs' ).after( "No metadata found for DOI. Please check the DOI for mistakes. The metadata may be unvailable because the publisher has not (yet) submitted metadata to their DOI Registration Agency (e.g. Crossref or DataCite). If the DOI is newly minted, please check again in 1–4 weeks. You can check Crossref at ", crossrefLink )
+    $( '#qs' ).after( "No metadata found for DOI. Please check the DOI for mistakes. The metadata may be unvailable if the publisher has not (yet) submitted metadata to their DOI Registration Agency (e.g. Crossref or DataCite). If the DOI is newly minted, please check again in 1–4 weeks. You can check Crossref at ", crossrefLink )
   } else {
     console.error(error)
   }
