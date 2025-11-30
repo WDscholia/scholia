@@ -1,6 +1,7 @@
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -17,7 +18,8 @@ SELECT DISTINCT ?date ?work ?workLabel ?venue ?venueLabel WHERE {
     }
     GROUP BY ?date ?work
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'en' || LANG(?workLabel) = 'mul')
+  ?venue rdfs:label ?venueLabel . FILTER(LANG(?venueLabel) = 'en' || LANG(?venueLabel) = 'mul')
 }
 ORDER BY DESC(?date)
 LIMIT 50
