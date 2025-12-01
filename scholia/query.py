@@ -57,6 +57,8 @@ from random import randrange
 
 import requests
 
+import re
+
 from six import u
 
 from .config import config
@@ -355,6 +357,9 @@ def doi_to_qs(doi):
 
     Wikidata Query Service is used to resolve the DOI.
 
+    If the DOI is given as a URL or with a "doi:" prefix,
+    that is removed first.
+
     The DOI string is converted to uppercase before any
     query is made. Uppercase DOIs are default in Wikidata.
 
@@ -380,7 +385,15 @@ def doi_to_qs(doi):
     >>> doi_to_qs(doi) == ['Q135403558']
     True
 
+    >>> doi = 'https://doi.org/10.3390/MICROORGANISMS12071299'
+    >>> doi_to_qs(doi) == ['Q135390431']
+    True
+
+    >>> doi_to_qs('doi:10.3390/MICROORGANISMS12071299') == ['Q135390431']
+    True
+
     """
+    doi = re.sub(r'(?i)^(https?://(www\.|dx\.)?doi\.org/?|doi:)', '', doi)
     query = 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
         doi=escape_string(doi.upper()))
 
