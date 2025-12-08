@@ -3,7 +3,6 @@
 #title: Taxa that co-occur with the target taxon in the literature
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count (CONCAT("/topics/", SUBSTR(STR(target:),32), ",", SUBSTR(STR(?taxon),32)) AS ?countUrl) ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon),32)) AS ?taxonUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
