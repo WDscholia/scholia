@@ -1,4 +1,3 @@
-PREFIX wdsubgraph: <https://query-scholarly.wikidata.org/sparql?query=>
 #sparql_endpoint = https://query-scholarly.wikidata.org/sparql
 #sparql_endpoint_name= WDQS&nbsp;scholarly
 #sparql_editurl = https://query-scholarly.wikidata.org/#
@@ -21,9 +20,7 @@ SELECT ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) (CONCAT("../retracti
         ?work wdt:P5824 [] .
       }
       {
-        SERVICE wdsubgraph:wikidata_main {
-          ?citation wdt:P2860 ?work .
-        }
+        ?citation wdt:P2860 ?work .
       }
       UNION {
         ?citation wdt:P2860 ?work .
