@@ -3,8 +3,8 @@
 import datetime
 import re
 
-from flask import (Blueprint, current_app, redirect, render_template, request,
-                   Response, url_for)
+from flask import (Blueprint, current_app, redirect, render_template as render_template_base,
+                   request, Response, url_for)
 from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
 
@@ -384,6 +384,25 @@ def get_js_config():
         config['query-server'].get('sparql_endpoint_name'),
     }
 
+def get_languages():
+    """Get language fallback chain for a given request.
+
+    Returns
+    -------
+    languages : str[]
+        Language fallback chain.
+
+    """
+    languages = [x[0] for x in request.accept_languages]
+    if 'en' not in request.accept_languages:
+        languages.append('en')
+    languages.append('mul')
+    return languages
+
+def render_template(*args, **kwargs):
+    if 'languages' not in kwargs:
+        kwargs['languages'] = get_languages()
+    return render_template_base(*args, **kwargs)
 
 @main.context_processor
 def inject_js_config():
