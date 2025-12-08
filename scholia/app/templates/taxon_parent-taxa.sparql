@@ -5,11 +5,11 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT (COUNT(?middle) AS ?distance) (GROUP_CONCAT(DISTINCT ?rank_Label; SEPARATOR=", ") AS ?rank) ?parent ?parentLabel ?parentDescription {
+SELECT (COUNT(?middle) AS ?distance) (GROUP_CONCAT(DISTINCT ?_rankLabel; SEPARATOR=", ") AS ?rank) ?parent ?parentLabel ?parentDescription {
   target: wdt:P171* ?middle .
   ?middle wdt:P171+ ?parent .
-  ?parent wdt:P105 ?rank_ .
-  {{ sparql_helpers.labels(["?rank_", "?parent"], languages) }}
+  ?parent wdt:P105 ?_rank .
+  {{ sparql_helpers.labels(["?_rank", "?parent"], languages) }}
   {{ sparql_helpers.descriptions(["?parent"], languages) }}
 }
 GROUP BY ?parent ?parentLabel ?parentDescription

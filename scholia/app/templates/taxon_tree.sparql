@@ -4,35 +4,35 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-SELECT (?child_ AS ?child) ?childLabel ?rgb (?parent_ AS ?parent) ?parentLabel WHERE {
+SELECT (?_child AS ?child) ?childLabel ?rgb (?_parent AS ?parent) ?parentLabel WHERE {
   {
     # Parent taxa
-    target: wdt:P171* ?child_ .
-    ?child_ wdt:P171 ?parent_ .
+    target: wdt:P171* ?_child .
+    ?_child wdt:P171 ?_parent .
     BIND ("FFFFFF" AS ?rgb)
   } UNION {
     # Child taxa
-    {SELECT ?child_ ?parent_ WHERE {
-      BIND (target: AS ?parent_) .
-      ?child_ wdt:P171 ?parent_ .
+    {SELECT ?_child ?_parent WHERE {
+      BIND (target: AS ?_parent) .
+      ?_child wdt:P171 ?_parent .
     } LIMIT 100}
     BIND ("DDDDDD" AS ?rgb)
   } UNION {
-    BIND (target: AS ?child_) .
-    ?child_ wdt:P171 ?parent_ .
+    BIND (target: AS ?_child) .
+    ?_child wdt:P171 ?_parent .
     BIND ("FF0000" AS ?rgb)
   }
 
   OPTIONAL {
-    ?child_ wdt:P105 ?child_rank_ .
-    {{ sparql_helpers.labels(["?child_rank_"], languages) }}
+    ?_child wdt:P105 ?_childRank .
+    {{ sparql_helpers.labels(["?_childRank"], languages) }}
   }
   OPTIONAL {
-    ?parent_ wdt:P105 ?parent_rank_ .
-    {{ sparql_helpers.labels(["?parent_rank_"], languages) }}
+    ?_parent wdt:P105 ?_parentRank .
+    {{ sparql_helpers.labels(["?_parentRank"], languages) }}
   }
-  {{ sparql_helpers.labels(["?child_", "?parent_"], languages) }}
+  {{ sparql_helpers.labels(["?_child", "?_parent"], languages) }}
 
-  BIND (CONCAT(?child_Label, " - ", COALESCE(?child_rank_Label, "???")) AS ?childLabel)
-  BIND (CONCAT(?parent_Label, " - ", COALESCE(?parent_rank_Label, "???")) AS ?parentLabel)
+  BIND (CONCAT(?_childLabel, " - ", COALESCE(?_childRankLabel, "???")) AS ?childLabel)
+  BIND (CONCAT(?_parentLabel, " - ", COALESCE(?_parentRankLabel, "???")) AS ?parentLabel)
 }
