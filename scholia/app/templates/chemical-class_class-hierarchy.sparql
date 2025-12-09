@@ -8,17 +8,31 @@ SELECT ?child ?childLabel ?rgb ?parent ?parentLabel WHERE {
   {
     SELECT ?child ?rgb ?parent WHERE {
       {
+        # SELECT ?child ?rgb ?parent WHERE {
+        #   SERVICE gas:service {
+        #     gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+        #                 gas:in target: ;
+        #                 gas:traversalDirection "Forward" ;
+        #                 gas:out ?child ;
+        #                 gas:out1 ?depth ;
+        #                 gas:out2 ?parent1 ;
+        #                 gas:linkType wdt:P279 ;
+        #   }
+        #   ?child wdt:P279 ?parent .
+        #   BIND (IF(?child = target:,"FF0000","FFFFFF") AS ?rgb)
+        # }
         SELECT ?child ?rgb ?parent WHERE {
-          SERVICE gas:service {
-            gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                        gas:in target: ;
-                        gas:traversalDirection "Forward" ;
-                        gas:out ?child ;
-                        gas:out1 ?depth ;
-                        gas:out2 ?parent1 ;
-                        gas:linkType wdt:P279 ;
+          {
+            SELECT ?parent ?child  WHERE {
+              # Forward traversal: all parent classes and their direct subclasses
+              # compute all reachable parent classes
+              target: wdt:P279+ ?parent .
+              # compute all of their direct children
+              ?child wdt:P279 ?parent .
+              # ensure that the child class is a parent class to the target
+              target: wdt:P279* ?child .
+            } GROUP BY ?parent ?child
           }
-          ?child wdt:P279 ?parent .
           BIND (IF(?child = target:,"FF0000","FFFFFF") AS ?rgb)
         }
       }
