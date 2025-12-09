@@ -1,24 +1,20 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?count WHERE {
-  SELECT ?author (COUNT(DISTINCT ?work) AS ?count) WHERE {
-    {
-      ?work wdt:P31 wd:Q45182324 .
-    }
-    UNION {
-      ?work wdt:P793 wd:Q7316896 .
-    }
-    UNION {
-      ?work wdt:P5824 [] .
-    }
-    ?work wdt:P50 ?author .
+SELECT ?author ?authorLabel (COUNT(DISTINCT ?work) AS ?count) WHERE {
+  {
+    ?work wdt:P31 wd:Q45182324 .
   }
-  GROUP BY ?author ?authorLabel
+  UNION {
+    ?work wdt:P793 wd:Q7316896 .
+  }
+  UNION {
+    ?work wdt:P5824 [] .
+  }
+  ?work wdt:P50 ?author .
+  {{ sparql_helpers.labels(["?author"], languages) }}
+} GROUP BY ?author ?authorLabel
   ORDER BY DESC(?count)
   LIMIT 100
-  
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-}
-ORDER BY DESC(?count)

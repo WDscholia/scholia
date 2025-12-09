@@ -1,12 +1,9 @@
-#sparql_endpoint = https://query-scholarly.wikidata.org/sparql
-#sparql_endpoint_name= WDQS&nbsp;scholarly
-#sparql_editurl = https://query-scholarly.wikidata.org/#
-#sparql_embedurl = https://query-scholarly.wikidata.org/embed.html#
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) (CONCAT("../retraction/", SUBSTR(STR(?work),32)) AS ?workUrl) ?count WHERE {
+SELECT ?work ?workLabel (CONCAT("../retraction/", SUBSTR(STR(?work),32)) AS ?workUrl) ?count WHERE {
   {
     SELECT ?work (COUNT(DISTINCT ?citation) AS ?count) WHERE {
       # hint:Query hint:optimizer "None" .
@@ -30,6 +27,6 @@ SELECT ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) (CONCAT("../retracti
     ORDER BY DESC(?count)
     LIMIT 100
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?count)
