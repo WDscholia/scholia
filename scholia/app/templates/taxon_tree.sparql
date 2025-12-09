@@ -2,12 +2,11 @@
 
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT (?_child AS ?child) ?childLabel ?rgb (?_parent AS ?parent) ?parentLabel WHERE {
   {
     # Parent taxa
-    target: wdt:P171* ?_child .
+    target: wdt:P171+ ?_child .
     ?_child wdt:P171 ?_parent .
     BIND ("FFFFFF" AS ?rgb)
   } UNION {
