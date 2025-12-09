@@ -3,8 +3,9 @@
 import datetime
 import re
 
-from flask import (Blueprint, current_app, redirect, render_template, request,
-                   Response, url_for)
+from flask import (Blueprint, current_app, redirect,
+                   render_template as render_template_base,
+                   request, Response, url_for)
 from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
 
@@ -383,6 +384,43 @@ def get_js_config():
         "sparqlEndpointName":
         config['query-server'].get('sparql_endpoint_name'),
     }
+
+
+def get_languages():
+    """Get language fallback chain for a given request.
+
+    Returns
+    -------
+    languages : list[str]
+        Language fallback chain.
+
+    """
+    languages = [x[0] for x in request.accept_languages]
+    if 'en' not in request.accept_languages:
+        languages.append('en')
+    languages.append('mul')
+    return languages
+
+
+def render_template(template_name_or_list, **context):
+    """Render a template by name with the given context.
+
+    Wrapper around flask.render_template, which automatically
+    determines language fallback chain from request headers.
+
+    Parameters
+    ----------
+    template_name_or_list : str or list[str]
+        The name of the template to render. If a list is given,
+        the first name to exist will be rendered.
+
+    context : dict
+        The variables to make available in the template.
+
+    """
+    if 'languages' not in context:
+        context['languages'] = get_languages()
+    return render_template_base(template_name_or_list, **context)
 
 
 @main.context_processor

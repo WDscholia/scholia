@@ -1,3 +1,5 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -25,5 +27,6 @@ SELECT DISTINCT ?metabolite ?metaboliteLabel ?metaboliteChemicalStructure ?metab
       BIND (COALESCE(?isoSmiles, ?canSmiles) AS ?metaboliteChemicalStructure)
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?metabolite"], languages) }}
+  {{ sparql_helpers.descriptions(["?metabolite"], languages) }}
 }

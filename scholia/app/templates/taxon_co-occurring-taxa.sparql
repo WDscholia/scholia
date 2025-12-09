@@ -1,3 +1,5 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #title: Taxa that co-occur with the target taxon in the literature
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -18,7 +20,7 @@ SELECT ?count (CONCAT("/topics/", SUBSTR(STR(target:),32), ",", SUBSTR(STR(?taxo
     }
     GROUP BY ?taxon
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?taxon", "?example_work"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 200
