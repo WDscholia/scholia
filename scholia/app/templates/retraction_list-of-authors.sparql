@@ -1,3 +1,5 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # List of authors for a work
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -7,37 +9,25 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-SELECT DISTINCT
-# Author order
-?order
-# Author item and label
-?author ?authorUrl (COUNT(DISTINCT ?work) AS ?retractions) WHERE {
+SELECT ?order ?author ?authorLabel ?authorUrl ?retractions WHERE {
   {
-    target: p:P50 ?author_statement .
-    ?author_statement ps:P50 ?author_ .
-    BIND (CONCAT("../author/", SUBSTR(STR(?author_),32), "#list-of-retracted-articles") AS ?authorUrl)
-    OPTIONAL {
-      ?author_statement pq:P1545 ?order_ .
-      BIND (xsd:integer(?order_) AS ?order)
-    }
-    ?work wdt:P50 ?author_ ;
-          wdt:P31 wd:Q45182324 .
+    { SELECT ?author (COUNT(DISTINCT ?work) AS ?retractions) WHERE {
+      target: wdt:P50 ?author .
+      ?work wdt:P50 ?author ;
+            wdt:P31 wd:Q45182324 .
+    } GROUP BY ?author }
+
+    target: p:P50 ?authorStatement .
+    ?authorStatement ps:P50 ?author .
+    BIND (CONCAT("../author/", SUBSTR(STR(?author), 32), "#list-of-retracted-articles") AS ?authorUrl)
+    {{ sparql_helpers.labels(["?author"], languages) }}
+  } UNION {
+    target: p:P2093 ?authorStatement .
+    ?authorStatement ps:P2093 ?author .
+    BIND (CONCAT(?author, " ↗") AS ?authorLabel)
+    BIND (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author)) AS ?authorUrl)
   }
-  UNION {
-    target: p:P2093 ?authorstring_statement .
-    ?authorstring_statement ps:P2093 ?author_
-    BIND (CONCAT(?author_, " ↗") AS ?author)
-    OPTIONAL {
-      ?authorstring_statement pq:P1545 ?order_ .
-      BIND (xsd:integer(?order_) AS ?order)
-    }
-    BIND (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_)) AS ?authorUrl)
-    BIND (target: AS ?work)
-  }
-  OPTIONAL {
-    ?author_ rdfs:label ?author .
-    FILTER (LANG(?author) = 'en')
-  }
-}
-GROUP BY ?order ?author ?authorUrl
-ORDER BY ?order
+
+  OPTIONAL { ?authorStatement pq:P1545 ?_order . }
+  BIND (xsd:integer(?_order) AS ?order)
+} ORDER BY ?order
