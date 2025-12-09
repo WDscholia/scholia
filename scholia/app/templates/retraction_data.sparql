@@ -1,3 +1,5 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
@@ -8,97 +10,88 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT DISTINCT ?description ?value ?valueUrl WHERE {
-  BIND (target: AS ?work)
   {
     BIND (1 AS ?order)
     BIND ("Title" AS ?description)
-    ?work wdt:P1476 ?value .
+    target: wdt:P1476 ?value .
   }
   UNION {
-    SELECT (2 AS ?order) ("Reviewers" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
-      BIND (1 AS ?dummy)
-      target: wdt:P4032 ?iri .
-      BIND (SUBSTR(STR(?iri),32) AS ?q)
-      ?iri rdfs:label ?value_string .
-      FILTER (LANG(?value_string) = 'en')
-      BIND (COALESCE(?value_string, ?q) AS ?value_)
-    }
-    GROUP BY ?dummy
+    BIND (2 AS ?order)
+    BIND ("Reviewers" AS ?description)
+    {SELECT (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
+      target: wdt:P4032 ?reviewer .
+      {{ sparql_helpers.labels(["?reviewer"], languages) }}
+      BIND (SUBSTR(STR(?reviewer), 32) AS ?q)
+      BIND (COALESCE(?reviewerLabel, ?q) AS ?value_)
+    }}
   }
   UNION {
     BIND (3 AS ?order)
     BIND ("Published in" AS ?description)
-    ?work wdt:P1433 ?iri .
-    BIND (SUBSTR(STR(?iri),32) AS ?q)
-    ?iri rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?q) AS ?value)
+    target: wdt:P1433 ?venue .
+    {{ sparql_helpers.labels(["?venue"], languages) }}
+    BIND (SUBSTR(STR(?venue), 32) AS ?q)
+    BIND (COALESCE(?venueLabel, ?q) AS ?value)
     BIND (CONCAT("../venue/", ?q) AS ?valueUrl)
   }
   UNION {
     BIND (4 AS ?order)
     BIND ("Publication date" AS ?description)
-    ?work p:P577/psv:P577 ?publication_date_value .
-    ?publication_date_value wikibase:timePrecision ?time_precision ;
-                            wikibase:timeValue ?publication_date .
-    BIND (IF(?time_precision = 9,YEAR(?publication_date),xsd:date(?publication_date)) AS ?value)
+    target: p:P577/psv:P577 [
+      wikibase:timePrecision ?time_precision ;
+      wikibase:timeValue ?publication_date
+    ] .
+    BIND (IF(?time_precision = 9, YEAR(?publication_date), xsd:date(?publication_date)) AS ?value)
   }
   UNION {
     BIND (5 AS ?order)
     BIND ("Retraction date" AS ?description)
-    ?work p:P31 ?isRetractedPaperStatement .
-    ?isRetractedPaperStatement ps:P31 wd:Q45182324 .
-    ?isRetractedPaperStatement pq:P580 ?retraction_date_value .
+    target: p:P31 [ ps:P31 wd:Q45182324 ; pq:P580 ?retraction_date_value ] .
     BIND (xsd:date(?retraction_date_value) AS ?value)
   }
   UNION {
     BIND (6 AS ?order)
     BIND ("Publisher" AS ?description)
-    ?work wdt:P123 ?iri .
-    BIND (SUBSTR(STR(?iri),32) AS ?q)
-    ?iri rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?q) AS ?value)
+    target: wdt:P123 ?publisher .
+    {{ sparql_helpers.labels(["?publisher"], languages) }}
+    BIND (SUBSTR(STR(?publisher), 32) AS ?q)
+    BIND (COALESCE(?publisherLabel, ?q) AS ?value)
     BIND (CONCAT("../publisher/", ?q) AS ?valueUrl)
   }
   UNION {
     BIND (7 AS ?order)
     BIND ("DOI" AS ?description)
-    ?work wdt:P356 ?valueUrl_ .
-    BIND (CONCAT("https://doi.org/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
-    BIND (CONCAT(?valueUrl_, " ↗") AS ?value)
+    target: wdt:P356 ?doi .
+    BIND (CONCAT("https://doi.org/", ENCODE_FOR_URI(?doi)) AS ?valueUrl)
+    BIND (CONCAT(?doi, " ↗") AS ?value)
   }
   UNION {
     BIND (8 AS ?order)
     BIND ("🛑 Retracted by" AS ?description)
-    ?work wdt:P5824 ?iri .
-    BIND (SUBSTR(STR(?iri),32) AS ?q)
-    ?iri rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?q) AS ?value)
+    target: wdt:P5824 ?retraction .
+    {{ sparql_helpers.labels(["?retraction"], languages) }}
+    BIND (SUBSTR(STR(?retraction), 32) AS ?q)
+    BIND (COALESCE(?retractionLabel, ?q) AS ?value)
     BIND (CONCAT("../work/", ?q) AS ?valueUrl)
   }
   UNION {
     BIND (9 AS ?order)
     BIND ("⚠️ Cites retracted article" AS ?description)
     {
-      ?work wdt:P2860 ?retracted .
+      target: wdt:P2860 ?retracted .
       ?retracted wdt:P31 wd:Q45182324 .
-    }
-    UNION {
-      ?work wdt:P2860 ?retracted .
+    } UNION {
+      target: wdt:P2860 ?retracted .
       ?retracted wdt:P793 wd:Q7316896 .
-    }
-    UNION {
-      ?work wdt:P2860 ?retracted .
+    } UNION {
+      target: wdt:P2860 ?retracted .
       ?retracted wdt:P5824 [] .
     }
-    ?retracted rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (SUBSTR(STR(?retracted),32) AS ?q)
-    BIND (COALESCE(?value_string, ?q) AS ?value)
+    {{ sparql_helpers.labels(["?retracted"], languages) }}
+    BIND (SUBSTR(STR(?retracted), 32) AS ?q)
+    BIND (COALESCE(?retractedLabel, ?q) AS ?value)
     BIND (CONCAT("../work/", ?q) AS ?valueUrl)
   }
-}
-ORDER BY ?order
+} ORDER BY ?order
