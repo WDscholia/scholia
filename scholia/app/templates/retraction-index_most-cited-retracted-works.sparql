@@ -20,9 +20,7 @@ SELECT ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) (CONCAT("../retracti
         ?work wdt:P5824 [] .
       }
       {
-        SERVICE wdsubgraph:wikidata_main {
-          ?citation wdt:P2860 ?work .
-        }
+        ?citation wdt:P2860 ?work .
       }
       UNION {
         ?citation wdt:P2860 ?work .

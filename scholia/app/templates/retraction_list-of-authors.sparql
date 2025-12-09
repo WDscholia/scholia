@@ -16,30 +16,27 @@ SELECT DISTINCT
 ?order
 # Author item and label
 ?author ?authorUrl (COUNT(DISTINCT ?work) AS ?retractions) WHERE {
-  # hint:Query hint:optimizer "None" .
-  SERVICE wdsubgraph:scholarly_articles {
-    {
-      target: p:P50 ?author_statement .
-      ?author_statement ps:P50 ?author_ .
-      BIND (CONCAT("../author/", SUBSTR(STR(?author_),32), "#list-of-retracted-articles") AS ?authorUrl)
-      OPTIONAL {
-        ?author_statement pq:P1545 ?order_ .
-        BIND (xsd:integer(?order_) AS ?order)
-      }
-      ?work wdt:P50 ?author_ ;
-            wdt:P31 wd:Q45182324 .
+  {
+    target: p:P50 ?author_statement .
+    ?author_statement ps:P50 ?author_ .
+    BIND (CONCAT("../author/", SUBSTR(STR(?author_),32), "#list-of-retracted-articles") AS ?authorUrl)
+    OPTIONAL {
+      ?author_statement pq:P1545 ?order_ .
+      BIND (xsd:integer(?order_) AS ?order)
     }
-    UNION {
-      target: p:P2093 ?authorstring_statement .
-      ?authorstring_statement ps:P2093 ?author_
-      BIND (CONCAT(?author_, " ↗") AS ?author)
-      OPTIONAL {
-        ?authorstring_statement pq:P1545 ?order_ .
-        BIND (xsd:integer(?order_) AS ?order)
-      }
-      BIND (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_)) AS ?authorUrl)
-      BIND (target: AS ?work)
+    ?work wdt:P50 ?author_ ;
+          wdt:P31 wd:Q45182324 .
+  }
+  UNION {
+    target: p:P2093 ?authorstring_statement .
+    ?authorstring_statement ps:P2093 ?author_
+    BIND (CONCAT(?author_, " ↗") AS ?author)
+    OPTIONAL {
+      ?authorstring_statement pq:P1545 ?order_ .
+      BIND (xsd:integer(?order_) AS ?order)
     }
+    BIND (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_)) AS ?authorUrl)
+    BIND (target: AS ?work)
   }
   OPTIONAL {
     ?author_ rdfs:label ?author .

@@ -7,17 +7,16 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?works ?venue ?venueLabel (CONCAT("../venue/", SUBSTR(STR(?venue),32)) AS ?venueUrl) ?venueDescription WHERE {
-  SERVICE wdsubgraph:scholarly_articles {
-    {
-      SELECT (COUNT(?work) AS ?works) ?venue WHERE {
-        ?work wdt:P31 wd:Q45182324 ;
-              wdt:P1433 ?venue .
-      }
-      GROUP BY ?venue
-      ORDER BY DESC(?works)
-      LIMIT 200
+  {
+    SELECT (COUNT(?work) AS ?works) ?venue WHERE {
+      ?work wdt:P31 wd:Q45182324 ;
+            wdt:P1433 ?venue .
     }
+    GROUP BY ?venue
+    ORDER BY DESC(?works)
+    LIMIT 200
   }
+  
   # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY DESC(?works)
