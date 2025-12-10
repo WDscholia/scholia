@@ -1,12 +1,13 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Graph
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-SELECT ?node (REPLACE(STR(?node), ".*/", "") AS ?nodeLabel) ?nodeImage ?childNode (REPLACE(STR(?childNode), ".*/", "") AS ?childNodeLabel) ?childNodeImage ?rgb WHERE {
+SELECT ?node ?nodeLabel ?nodeImage ?childNode ?childNodeLabel ?childNodeImage ?rgb WHERE {
   {
     {
       SELECT DISTINCT ?node ?childNode WHERE {
@@ -54,5 +55,6 @@ SELECT ?node (REPLACE(STR(?node), ".*/", "") AS ?nodeLabel) ?nodeImage ?childNod
     ?property wikibase:directClaim ?childNodeclaim .
     ?childNode ?childNodeclaim ?childNodeImage .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
+
+  {{ sparql_helpers.labels(["?node", "?childNode"], languages) }}
 }
