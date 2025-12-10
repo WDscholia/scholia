@@ -1,16 +1,24 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: List of uses
-PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?use ?useLabel ?useDescription (CONCAT("/use/", SUBSTR(STR(?use),32)) AS ?useUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
+SELECT ?use ?useLabel ?useDescription (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl) WHERE {
   {
-    SELECT ?use (SAMPLE(?work) AS ?example_work) WHERE {
-      #    VALUES ?use { {% for q in qs %} wd:{{ q }} {% endfor %} }
-      OPTIONAL {
+    {
+      SELECT ?use (SAMPLE(?work) AS ?example_work) WHERE {
+        VALUES ?use { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
         ?work wdt:P4510 ?use .
       }
+      GROUP BY ?use
     }
-    GROUP BY ?use
+
+    {{ sparql_helpers.labels(["?example_work"], languages) }}
+  } UNION {
+    VALUES ?use { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
+    FILTER NOT EXISTS { ?work wdt:P4510 ?use }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  {{ sparql_helpers.labels(["?use"], languages) }}
+  {{ sparql_helpers.descriptions(["?use"], languages) }}
 }

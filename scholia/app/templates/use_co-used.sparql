@@ -1,11 +1,14 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?count ?coused ?cousedLabel (CONCAT("/use/", SUBSTR(STR(?coused),32)) AS ?cousedUrl) ("🔎" AS ?zoom)
-  (CONCAT("../uses/{{ q }},", SUBSTR(STR(?coused), 32)) AS ?zoomUrl)
-?cousedDescription ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
-  # Label the result
+SELECT
+  ?count
+  ?coused ?cousedLabel (CONCAT("/use/", SUBSTR(STR(?coused), 32)) AS ?cousedUrl)
+  ("🔎" AS ?zoom) (CONCAT("../uses/{{ q }},", SUBSTR(STR(?coused), 32)) AS ?zoomUrl)
+  ?cousedDescription
+  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
+WHERE {
   { # Find works that are using a specific software,
     # and find other software used in the found works
     SELECT ?coused (COUNT(DISTINCT ?work) AS ?count) (SAMPLE(?work) AS ?example_work) WHERE {
@@ -15,6 +18,9 @@ SELECT ?count ?coused ?cousedLabel (CONCAT("/use/", SUBSTR(STR(?coused),32)) AS 
     }
     GROUP BY ?coused
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  # Label the result
+  {{ sparql_helpers.labels(["?coused", "?example_work"], languages) }}
+  {{ sparql_helpers.descriptions(["?coused"], languages) }}
 }
 ORDER BY DESC(?count)

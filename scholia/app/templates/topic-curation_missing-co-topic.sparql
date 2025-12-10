@@ -1,10 +1,11 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
+# tool: scholia
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?count ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl) WHERE {
   { # Count citations
-    SELECT (COUNT(DISTINCT ?citing_work) AS ?count) ?work (SAMPLE(?citing_work) AS ?example_citing_work) (COUNT(DISTINCT ?topic) AS ?topics) WHERE {
+    SELECT (COUNT(DISTINCT ?citing_work) AS ?count) ?work (COUNT(DISTINCT ?topic) AS ?topics) WHERE {
       ?work wdt:P921 target: .
       OPTIONAL {
         ?work wdt:P921 ?topic . FILTER (?topic != target:)
