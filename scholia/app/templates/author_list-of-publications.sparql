@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -37,7 +38,7 @@ SELECT (MIN(?dates) AS ?date) ?work ?workLabel (GROUP_CONCAT(DISTINCT ?type_labe
   OPTIONAL {
     ?work wdt:P1433 ?venue
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
+  {{ sparql_helpers.labels(["?work", "?venue"], languages) }}
 }
 GROUP BY ?work ?workLabel ?venue ?venueLabel
 ORDER BY DESC(?date)
