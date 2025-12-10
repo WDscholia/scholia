@@ -1,25 +1,26 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?count ?cited_work ?cited_workLabel (CONCAT("/work/", SUBSTR(STR(?cited_work),32)) AS ?cited_workUrl) WHERE {
+SELECT ?count ?cited_work ?cited_workLabel (CONCAT("/work/", SUBSTR(STR(?cited_work), 32)) AS ?cited_workUrl) WHERE {
   {
     SELECT (COUNT(?work) AS ?count) ?cited_work WHERE {
       {
         ?work wdt:P921/wdt:P31*/wdt:P279* target: .
-      }
-      UNION {
+      } UNION {
         ?work wdt:P921/wdt:P361+ target: .
-      }
-      UNION {
+      } UNION {
         ?work wdt:P921/wdt:P1269+ target: .
       }
       ?work wdt:P2860 ?cited_work .
     }
     GROUP BY ?cited_work
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+
+  {{ sparql_helpers.labels(["?cited_work"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 200

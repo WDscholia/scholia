@@ -1,9 +1,8 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?number_of_citations ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ?cited_work_example ?cited_work_exampleLabel (CONCAT("/work/", SUBSTR(STR(?cited_work_example),32)) AS ?cited_work_exampleUrl) WHERE {
-  # Label the results
   { # Find cited works
     SELECT (COUNT(?work) AS ?number_of_citations) ?author (SAMPLE(?cited_work) AS ?cited_work_example) WHERE {
       { # Find works about the topic
@@ -16,7 +15,9 @@ SELECT ?number_of_citations ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(
     }
     GROUP BY ?author
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  # Label the results
+  {{ sparql_helpers.labels(["?author", "?cited_work_example"], languages) }}
 }
 ORDER BY DESC(?number_of_citations)
 LIMIT 200

@@ -1,19 +1,20 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Map
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?location ?locationLabel ?geo ?example_work ?example_workLabel WHERE {
   {
     SELECT ?location ?geo (SAMPLE(?work) AS ?example_work) WHERE {
       # Find works that are marked with main subject of the topic.
       ?work wdt:P921/(wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) target: .
-      # Identify co-occuring topic that is geo-locatable. 
+      # Identify co-occuring topic that is geo-locatable.
       ?work wdt:P921 ?location .
       ?location wdt:P625 ?geo .
     }
     GROUP BY ?location ?geo
   }
+
   # Label the results
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?location", "?example_work"], languages) }}
 }

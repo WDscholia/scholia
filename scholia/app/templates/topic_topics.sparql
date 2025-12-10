@@ -1,9 +1,11 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic),32)) AS ?countUrl) ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic),32)) AS ?topicUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
+SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl) ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic),32)) AS ?topicUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl) WHERE {
   # Label the results
   {
     SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
@@ -16,6 +18,7 @@ SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic),32)) AS ?countUrl) 
     }
     GROUP BY ?topic
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+
+  {{ sparql_helpers.labels(["?topic", "?example_work"], languages) }}
 }
 ORDER BY DESC(?count)

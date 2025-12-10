@@ -5,13 +5,9 @@ PREFIX pr: <http://www.wikidata.org/prop/reference/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT DISTINCT ?entity ?entityLabel ?entityUrl ?property ?propertyLabel ?value ?valueLabel WHERE {
-  {
-    SELECT DISTINCT ?entity ?p ?statement ?retracted WHERE {
-      BIND (target: AS ?retracted)
-      ?entity ?p ?statement .
-      ?statement prov:wasDerivedFrom/pr:P248 ?retracted .
-    }
-  }
+  ?entity ?p ?statement .
+  ?statement prov:wasDerivedFrom/pr:P248 target:  .
+
   ?p ^wikibase:claim ?property .
   ?statement ?ps ?value .
   ?ps ^wikibase:statementProperty ?property .
