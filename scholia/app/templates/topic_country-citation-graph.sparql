@@ -1,22 +1,20 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Graph
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}> 
-PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT DISTINCT ?citing_country (REPLACE(STR(?citing_country), ".*/", "") AS ?citing_countryLabel) ?citing_flag ?cited_country (REPLACE(STR(?cited_country), ".*/", "") AS ?cited_countryLabel) ?cited_flag WHERE {
+SELECT DISTINCT ?citing_country ?citing_countryLabel ?citing_flag ?cited_country ?cited_countryLabel ?cited_flag WHERE {
   {
     SELECT DISTINCT ?cited_country ?citing_country (COUNT(?citing_country) AS ?count) WHERE {
-      ?citing_work wdt:P50 ?citing_author .
-      ?citing_work wdt:P921 target: .
-      ?cited_work wdt:P921 target: .
-      ?citing_work wdt:P2860 ?cited_work .
-      ?cited_work wdt:P50 ?cited_author .
+      ?citing_work wdt:P921 target: ;
+                   wdt:P50 ?citing_author ;
+                   wdt:P2860 ?cited_work .
+      ?cited_work wdt:P921 target: ;
+                  wdt:P50 ?cited_author .
+
       FILTER (?citing_work != ?cited_work)
-      FILTER NOT EXISTS {
-        ?citing_work wdt:P50 ?author .
-        ?citing_work wdt:P2860 ?cited_work .
-        ?cited_work wdt:P50 ?author .
-      }
+      FILTER (?citing_author != ?cited_author)
+
       ?citing_author (wdt:P108 | wdt:P1416) ?citing_organization .
       ?cited_author (wdt:P108 | wdt:P1416) ?cited_organization .
       ?cited_organization wdt:P17 ?cited_country .
@@ -30,5 +28,6 @@ SELECT DISTINCT ?citing_country (REPLACE(STR(?citing_country), ".*/", "") AS ?ci
   }
   ?cited_country wdt:P41 ?cited_flag .
   ?citing_country wdt:P41 ?citing_flag .
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
+
+  {{ sparql_helpers.labels(["?citing_country", "?cited_country"], languages) }}
 }

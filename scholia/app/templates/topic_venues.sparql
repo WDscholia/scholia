@@ -1,8 +1,8 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?short_name ?venue ?venueLabel (CONCAT("/venue/", SUBSTR(STR(?venue),32)) AS ?venueUrl) WHERE {
   {
     SELECT (COUNT(?work) AS ?count) ?venue (SAMPLE(?short_name_) AS ?short_name) WHERE {
@@ -22,7 +22,8 @@ SELECT ?count ?short_name ?venue ?venueLabel (CONCAT("/venue/", SUBSTR(STR(?venu
     }
     GROUP BY ?venue
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+
+  {{ sparql_helpers.labels(["?venue"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 200
