@@ -1,17 +1,15 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT
-# Number of works with the author
-?count
-# Author score - 3 points for authoring a work, 1 for being cited
-?score
-# Author as a string
-?author
-# Build URL to the Author disambiguator tool
-(CONCAT('https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=', ENCODE_FOR_URI(?author)) AS ?resolver_url)
-# Generate a score for each author
+  # Number of works with the author
+  ?count
+  # Author score - 3 points for authoring a work, 1 for being cited
+  ?score
+  # Author as a string
+  ?author
+  # Build URL to the Author disambiguator tool
+  (CONCAT('https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=', ENCODE_FOR_URI(?author)) AS ?resolver_url)
+  # Generate a score for each author
 WHERE {
   {
     SELECT (COUNT(?work) AS ?count) ?author WHERE {
@@ -45,7 +43,6 @@ WHERE {
     }
     GROUP BY ?author
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }
 ORDER BY DESC(?count) DESC(?score)
 LIMIT 200
