@@ -1,3 +1,5 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Authors for specific topics
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -15,6 +17,7 @@ SELECT ((?distinct_topics + ?topics / (?topics + 100)) AS ?score) ?author ?autho
     ORDER BY DESC(?distinct_topics) DESC(?topics)
     LIMIT 200
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  {{ sparql_helpers.labels(["?author", "?example_work"], languages) }}
 }
 ORDER BY DESC(?score)
