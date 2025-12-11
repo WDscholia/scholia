@@ -1,75 +1,64 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT ?citing_work ?citing_workLabel ?rgb ?cited_work ?cited_workLabel WHERE {
   {
     SELECT (COUNT(*) AS ?count) ?citing_work WHERE {
-      target: (^wdt:P2860 | wdt:P2860)/(^wdt:P2860 | wdt:P2860)? ?citing_work .
+      { target: ^wdt:P2860/^wdt:P2860 ?citing_work }
+      UNION
+      { target: wdt:P2860/^wdt:P2860 ?citing_work }
+      UNION
+      { target: ^wdt:P2860/wdt:P2860 ?citing_work }
+      UNION
+      { target: wdt:P2860/wdt:P2860 ?citing_work }
     }
     GROUP BY ?citing_work
     ORDER BY DESC(?count)
     LIMIT 40
   }
   {
-    SELECT (MAX(?count) AS ?max_count) WHERE {
-      {
-        SELECT (COUNT(*) AS ?count) ?citing_work WHERE {
-          target: (^wdt:P2860 | wdt:P2860)/(^wdt:P2860 | wdt:P2860)? ?citing_work .
-        }
-        GROUP BY ?citing_work
-        ORDER BY DESC(?count)
-        LIMIT 40
-      }
-      BIND (1 AS ?dummy)
-    }
-    GROUP BY ?dummy
-  }
-  {
     SELECT (COUNT(*) AS ?count_) ?cited_work WHERE {
-      target: (^wdt:P2860 | wdt:P2860)/(^wdt:P2860 | wdt:P2860)? ?cited_work .
+      { target: ^wdt:P2860/^wdt:P2860 ?cited_work }
+      UNION
+      { target: wdt:P2860/^wdt:P2860 ?cited_work }
+      UNION
+      { target: ^wdt:P2860/wdt:P2860 ?cited_work }
+      UNION
+      { target: wdt:P2860/wdt:P2860 ?cited_work }
     }
     GROUP BY ?cited_work
     ORDER BY DESC(?count_)
     LIMIT 40
   }
   ?citing_work wdt:P2860 ?cited_work .
-  BIND (STR(xsd:integer(99 * (1 - ?count / ?max_count))) AS ?grey)
-  BIND (CONCAT(SUBSTR("0",1,2 - STRLEN(?grey)), ?grey) AS ?padded_grey)
+  BIND (STR(xsd:integer(99 * (1 - ?count / MAX(?count)))) AS ?grey)
+  BIND (CONCAT(SUBSTR("0", STRLEN(?grey)), ?grey) AS ?padded_grey)
   BIND (CONCAT(?padded_grey, ?padded_grey, ?padded_grey) AS ?rgb)
   {
-    ?citing_work (p:P50) ?citing_author_statement .
-    ?citing_author_statement pq:P1545 "1" .
-    ?citing_author_statement ps:P50 ?citing_author .
-    ?citing_author rdfs:label ?citing_author_name .
-    FILTER (LANG(?citing_author_name) = 'en')
+    ?citing_work p:P50 [ pq:P1545 "1"; ps:P50 ?citing_author ]
+    {{ sparql_helpers.labels(["?citing_author"], languages) }}
   }
   UNION {
-    ?citing_work (p:P2093) ?citing_author_statement .
-    ?citing_author_statement pq:P1545 "1" .
-    ?citing_author_statement ps:P2093 ?citing_author_name .
+    ?citing_work p:P2093 [ pq:P1545 "1" ; ps:P2093 ?citing_authorLabel ]
   }
   {
-    ?cited_work (p:P50) ?cited_author_statement .
-    ?cited_author_statement pq:P1545 "1" .
-    ?cited_author_statement ps:P50 ?cited_author .
-    ?cited_author rdfs:label ?cited_author_name .
-    FILTER (LANG(?cited_author_name) = 'en')
+    ?cited_work p:P50 [ pq:P1545 "1" ; ps:P50 ?cited_author ]
+    {{ sparql_helpers.labels(["?cited_author"], languages) }}
   }
   UNION {
-    ?cited_work (p:P2093) ?cited_author_statement .
-    ?cited_author_statement pq:P1545 "1" .
-    ?cited_author_statement ps:P2093 ?cited_author_name .
+    ?cited_work p:P2093 [ pq:P1545 "1" ; ps:P2093 ?cited_authorLabel ]
   }
   ?citing_work wdt:P577 ?citing_date .
   ?cited_work wdt:P577 ?cited_date .
   BIND (YEAR(?citing_date) AS ?citing_year)
   BIND (YEAR(?cited_date) AS ?cited_year)
-  BIND (CONCAT(?citing_author_name, ", ", STR(?citing_year)) AS ?citing_workLabel)
-  BIND (CONCAT(?cited_author_name, ", ", STR(?cited_year)) AS ?cited_workLabel)
+  BIND (CONCAT(?citing_authorLabel, ", ", STR(?citing_year)) AS ?citing_workLabel)
+  BIND (CONCAT(?cited_authorLabel, ", ", STR(?cited_year)) AS ?cited_workLabel)
 }
 ORDER BY DESC(?count)

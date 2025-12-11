@@ -1,13 +1,13 @@
-PREFIX bd: <http://www.bigdata.com/rdf#>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
+PREFIX target1: <http://www.wikidata.org/prop/{{ q }}>
+PREFIX target2: <http://www.wikidata.org/prop/{{ q2 }}>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?citingArticle (REPLACE(STR(?citingArticle), ".*/", "") AS ?citingArticleLabel) ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention),32)) AS ?intentionUrl) WHERE {
-  #  VALUES ?CITEDARTICLE { wd:{{ q }} }
-  #  VALUES ?intention { wd:{{ q2 }} }
+SELECT ?citingArticle ?citingArticleLabel ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention),32)) AS ?intentionUrl) WHERE {
   ?citingArticle p:P2860 ?citationStatement .
-  ?citationStatement pq:P3712 ?intention ;
-                     ps:P2860 ?CITEDARTICLE .
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  ?citationStatement pq:P3712 target2: ;
+                     ps:P2860 target1: .
+  {{ sparql_helpers.labels(["?citingArticle", "?intention"], languages) }}
 }

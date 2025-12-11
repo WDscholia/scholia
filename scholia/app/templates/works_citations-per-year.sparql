@@ -1,22 +1,14 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:LineChart
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-SELECT ?year ?number_of_citations ?work WHERE {
-  {
-    SELECT ?year ?number_of_citations ?work1 (SAMPLE(?work1Labels) AS ?work1Label) WHERE {
-      {
-        SELECT ?year (COUNT(DISTINCT ?citing_work) AS ?number_of_citations) ?work1 WHERE {
-          #    VALUES ?work1 {   {% for q in qs %} wd:{{ q }} {% endfor %}   }
-          ?citing_work wdt:P2860 ?work1 .
-          # Year of citation 
-          ?citing_work wdt:P577 ?date .
-          BIND (STR(YEAR(?date)) AS ?year)
-        }
-        GROUP BY ?year ?work1
-      }
-      ?work1 rdfs:label ?work1Labels .
-    }
-    GROUP BY ?year ?number_of_citations ?work1
-  }
-  BIND (CONCAT(?work1Label, " (", SUBSTR(STR(?work1),32), ")") AS ?work)
+SELECT ?year (COUNT(DISTINCT ?citing_work) AS ?number_of_citations) (CONCAT(?work1Label, " (", SUBSTR(STR(?work1), 32), ")") AS ?work) WHERE {
+  VALUES ?work1 { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
+  ?citing_work wdt:P2860 ?work1 .
+  # Year of citation
+  ?citing_work wdt:P577 ?date .
+  BIND (STR(YEAR(?date)) AS ?year)
+  {{ sparql_helpers.labels(["?work1"], languages) }}
 }
+GROUP BY ?year ?work1 ?work1Label

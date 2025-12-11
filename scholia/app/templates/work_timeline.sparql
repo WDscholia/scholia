@@ -1,9 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Timeline
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT DISTINCT ?datetime ?description WHERE {
@@ -22,11 +23,11 @@ SELECT DISTINCT ?datetime ?description WHERE {
   UNION {
     target: p:P793 ?event_statement .
     ?event_statement ps:P793 ?event_type .
-    ?event_type rdfs:label ?description_ .
     ?event_statement pq:P585 ?datetime .
-    FILTER (LANG(?description_) = "en")
+    {{ sparql_helpers.labels(["?event_type"], languages) }}
+
     # Warning icon for retraction
-    BIND (IF(?event_type = wd:Q45203135,CONCAT("⛔ ", ?description_),IF(?event_type = wd:Q56478588,CONCAT("❓ ", ?description_),?description_)) AS ?description)
+    BIND (IF(?event_type = wd:Q45203135,CONCAT("⛔ ", ?event_typeLabel),IF(?event_type = wd:Q56478588,CONCAT("❓ ", ?event_typeLabel),?event_typeLabel)) AS ?description)
   }
   UNION {
     SELECT ?datetime ?description WHERE {

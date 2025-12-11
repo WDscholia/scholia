@@ -1,11 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
+#title: List of authors with works that are cited by the specified work
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-# List of authors with works that are cited by the specified work
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?cited_works ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ?cited_work_example ?cited_work_exampleLabel (CONCAT("/work/", SUBSTR(STR(?cited_work_example),32)) AS ?cited_work_exampleUrl) WHERE {
-  # Label the result
   {
     SELECT (COUNT(?cited_work) AS ?cited_works) ?author (SAMPLE(?cited_work) AS ?cited_work_example) WHERE {
       # Find works that are cited by the queried work
@@ -17,6 +16,8 @@ SELECT ?cited_works ?author ?authorLabel ?authorDescription (CONCAT("/author/", 
     ORDER BY DESC(?cited_works)
     LIMIT 1000
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  # Label the result
+  {{ sparql_helpers.labels(["?author", "?cited_work_example"], languages) }}
+  {{ sparql_helpers.descriptions(["?author"], languages) }}
 }
 ORDER BY DESC(?cited_works)
