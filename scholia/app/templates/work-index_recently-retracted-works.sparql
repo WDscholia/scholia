@@ -1,13 +1,13 @@
-PREFIX bd: <http://www.bigdata.com/rdf#>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT DISTINCT ?retracted_work ?retracted_workLabel (CONCAT("/work/", SUBSTR(STR(?retracted_work),32)) AS ?retracted_workUrl) ?date ?retraction ?retractionLabel (CONCAT("/work/", SUBSTR(STR(?retraction),32)) AS ?retractionUrl) WHERE {
-  { # Find retracted papers indicated by instance of retracted paper, 
+  { # Find retracted papers indicated by instance of retracted paper,
     # by retraction notice property or by significant event
     SELECT DISTINCT ?retracted_work WHERE {
       {
@@ -24,6 +24,7 @@ SELECT DISTINCT ?retracted_work ?retracted_workLabel (CONCAT("/work/", SUBSTR(ST
   OPTIONAL {
     ?retracted_work wdt:P5824 ?retraction .
     ?retraction wdt:P577 ?retraction_datetime
+    {{ sparql_helpers.labels(["?retraction"], languages) }}
   }
   OPTIONAL {
     ?retracted_work p:P793 [
@@ -32,7 +33,7 @@ SELECT DISTINCT ?retracted_work ?retracted_workLabel (CONCAT("/work/", SUBSTR(ST
     ]
   }
   BIND (COALESCE(xsd:date(COALESCE(?retraction_datetime, ?keyevent_datetime)), "Unknown date") AS ?date)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?retracted_work"], languages) }}
 }
 ORDER BY DESC(?date)
 LIMIT 500

@@ -1,320 +1,288 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT DISTINCT ?description ?value ?valueUrl WHERE {
-  BIND (target: AS ?work)
   {
     BIND (1 AS ?order)
     BIND ("Title" AS ?description)
-    ?work wdt:P1476 ?value .
+    target: wdt:P1476 ?value .
   }
   UNION {
     BIND (1.5 AS ?order)
     BIND ("Type" AS ?description)
-    ?work wdt:P31 ?iri .
-    BIND (SUBSTR(STR(?iri),32) AS ?q)
-    ?iri rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?q) AS ?value)
+    target: wdt:P31 ?_value .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../", ?qid) AS ?valueUrl)
   }
   UNION {
-    SELECT (2 AS ?order) ("Authors" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
-      BIND (1 AS ?dummy)
-      {
-        # GROUP_CONCAT does not order by standard but BlazeGraph seems to order
-        # so we are hoping the sorting is correct here.
-        SELECT ?value_ ?q WHERE {
-          target: p:P50 ?author_statement .
-          ?author_statement ps:P50 ?author .
-          BIND (SUBSTR(STR(?author),32) AS ?q)
-          ?author_statement pq:P1545 ?order .
-          BIND (xsd:integer(?order) AS ?n)
-          ?author rdfs:label ?value_string .
-          FILTER (LANG(?value_string) = 'en')
-          BIND (COALESCE(?value_string, ?q) AS ?value_)
+    {
+      SELECT (2 AS ?order) ("Authors" AS ?description) (GROUP_CONCAT(?_value; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?qid; SEPARATOR=",")) AS ?valueUrl) {
+        {
+          # GROUP_CONCAT does not order by standard but BlazeGraph seems to order
+          # so we are hoping the sorting is correct here.
+          SELECT ?_value ?qid WHERE {
+            target: p:P50 [ ps:P50 ?author; pq:P1545 ?order ] .
+            {{ sparql_helpers.labels(["?author"], languages) }}
+            BIND (SUBSTR(STR(?author), 32) AS ?qid)
+            BIND (COALESCE(?authorLabel, ?qid) AS ?_value)
+            BIND (xsd:integer(?order) AS ?n)
+          }
+          ORDER BY ?n
         }
-        ORDER BY ?n
       }
     }
-    GROUP BY ?dummy
+    FILTER (?value != "")
   }
   UNION {
-    SELECT (3 AS ?order) ("Editors" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
-      BIND (1 AS ?dummy)
-      target: wdt:P98 ?iri .
-      BIND (SUBSTR(STR(?iri),32) AS ?q)
-      ?iri rdfs:label ?value_string .
-      FILTER (LANG(?value_string) = 'en')
-      BIND (COALESCE(?value_string, ?q) AS ?value_)
+    {
+      SELECT (3 AS ?order) ("Editors" AS ?description) (GROUP_CONCAT(?_value; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?qid; SEPARATOR=",")) AS ?valueUrl) {
+        target: wdt:P98 ?editor .
+        {{ sparql_helpers.labels(["?editor"], languages) }}
+        BIND (SUBSTR(STR(?editor), 32) AS ?qid)
+        BIND (COALESCE(?editorLabel, ?qid) AS ?_value)
+      }
     }
-    GROUP BY ?dummy
+    FILTER (?value != "")
   }
   UNION {
     BIND (2.5 AS ?order)
     BIND ("Language" AS ?description)
-    ?work wdt:P407 ?iri .
-    BIND (SUBSTR(STR(?iri),32) AS ?q)
-    ?iri rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (STR(?value_string) AS ?value)
-    BIND (CONCAT("../language/", ?q) AS ?valueUrl)
+    target: wdt:P407 ?_value .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../language/", ?qid) AS ?valueUrl)
   }
   UNION {
-    SELECT (3 AS ?order) ("Reviewers" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
-      BIND (1 AS ?dummy)
-      target: wdt:P4032 ?iri .
-      BIND (SUBSTR(STR(?iri),32) AS ?q)
-      ?iri rdfs:label ?value_string .
-      FILTER (LANG(?value_string) = 'en')
-      BIND (COALESCE(?value_string, ?q) AS ?value_)
+    {
+      SELECT (3 AS ?order) ("Reviewers" AS ?description) (GROUP_CONCAT(?_value; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?qid; SEPARATOR=",")) AS ?valueUrl) {
+        target: wdt:P4032 ?reviewer .
+        {{ sparql_helpers.labels(["?reviewer"], languages) }}
+        BIND (SUBSTR(STR(?reviewer), 32) AS ?qid)
+        BIND (COALESCE(?reviewerLabel, ?qid) AS ?_value)
+      }
     }
-    GROUP BY ?dummy
+    FILTER (?value != "")
   }
   UNION {
     BIND (4 AS ?order)
     BIND ("Published in" AS ?description)
-    ?work wdt:P1433 ?iri .
-    BIND (SUBSTR(STR(?iri),32) AS ?q)
-    ?iri rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?q) AS ?value)
-    BIND (CONCAT("../venue/", ?q) AS ?valueUrl)
+    target: wdt:P1433 ?_value .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../venue/", ?qid) AS ?valueUrl)
   }
   UNION {
     BIND (4 AS ?order)
     BIND ("Series" AS ?description)
-    ?work wdt:P179 ?iri .
-    BIND (SUBSTR(STR(?iri),32) AS ?q)
-    ?iri rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?q) AS ?value)
-    BIND (CONCAT("../series/", ?q) AS ?valueUrl)
+    target: wdt:P179 ?_value .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../series/", ?qid) AS ?valueUrl)
   }
   UNION {
     BIND (6 AS ?order)
     BIND ("Publication date" AS ?description)
-    ?work p:P577/psv:P577 ?publication_date_value .
-    ?publication_date_value wikibase:timePrecision ?time_precision ;
-                            wikibase:timeValue ?publication_date .
-    BIND (IF(?time_precision = 9,YEAR(?publication_date),xsd:date(?publication_date)) AS ?value)
+    target: p:P577/psv:P577 [
+      wikibase:timePrecision ?time_precision ;
+      wikibase:timeValue ?publication_date
+    ]
+    BIND (IF(?time_precision = 9, YEAR(?publication_date), xsd:date(?publication_date)) AS ?value)
   }
   UNION {
     BIND (7 AS ?order)
     BIND ("Publisher" AS ?description)
-    ?work wdt:P123 ?iri .
-    BIND (SUBSTR(STR(?iri),32) AS ?q)
-    ?iri rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?q) AS ?value)
-    BIND (CONCAT("../publisher/", ?q) AS ?valueUrl)
+    target: wdt:P123 ?_value .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../publisher/", ?qid) AS ?valueUrl)
   }
   UNION {
-    SELECT (8 AS ?order) ("Topics" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../topics/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
-      BIND (1 AS ?dummy)
-      target: wdt:P921 ?iri .
-      BIND (SUBSTR(STR(?iri),32) AS ?q)
-      ?iri rdfs:label ?value_string .
-      FILTER (LANG(?value_string) = 'en')
-      BIND (COALESCE(?value_string, ?q) AS ?value_)
+    {
+      SELECT (8 AS ?order) ("Topics" AS ?description) (GROUP_CONCAT(?_value; SEPARATOR=", ") AS ?value) (CONCAT("../topics/", GROUP_CONCAT(?qid; SEPARATOR=",")) AS ?valueUrl) {
+        target: wdt:P921 ?topic .
+        {{ sparql_helpers.labels(["?topic"], languages) }}
+        BIND (SUBSTR(STR(?topic), 32) AS ?qid)
+        BIND (COALESCE(?topicLabel, ?qid) AS ?_value)
+      }
     }
-    GROUP BY ?dummy
+    FILTER (?value != "")
   }
   UNION {
-    SELECT (9 AS ?order) ("Uses" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../uses/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
-      BIND (1 AS ?dummy)
-      target: wdt:P4510 ?iri .
-      BIND (SUBSTR(STR(?iri),32) AS ?q)
-      ?iri rdfs:label ?value_string .
-      FILTER (LANG(?value_string) = 'en')
-      BIND (COALESCE(?value_string, ?q) AS ?value_)
+    {
+      SELECT (9 AS ?order) ("Uses" AS ?description) (GROUP_CONCAT(?_value; SEPARATOR=", ") AS ?value) (CONCAT("../uses/", GROUP_CONCAT(?qid; SEPARATOR=",")) AS ?valueUrl) {
+        target: wdt:P4510 ?use .
+        {{ sparql_helpers.labels(["?use"], languages) }}
+        BIND (SUBSTR(STR(?use), 32) AS ?qid)
+        BIND (COALESCE(?useLabel, ?qid) AS ?_value)
+      }
     }
-    GROUP BY ?dummy
+    FILTER (?value != "")
   }
   UNION {
     BIND (10 AS ?order)
     BIND ("DOI" AS ?description)
-    ?work wdt:P356 ?valueUrl_ .
+    target: wdt:P356 ?valueUrl_ .
     BIND (CONCAT("https://doi.org/", ENCODE_FOR_URI(?valueUrl_)) AS ?valueUrl)
     BIND (CONCAT(?valueUrl_, " ↗") AS ?value)
   }
   UNION {
     BIND (11 AS ?order)
     BIND ("Homepage" AS ?description)
-    ?work wdt:P856 ?valueUrl .
-    BIND (STR(?valueUrl) AS ?value)
+    target: wdt:P856 ?valueUrl .
+    BIND (CONCAT(STR(?valueUrl), " ↗") AS ?value)
   }
   UNION {
     BIND (12 AS ?order)
     BIND ("Full text" AS ?description)
-    ?work wdt:P953 ?valueUrl .
+    target: wdt:P953 ?valueUrl .
     BIND (CONCAT(STR(?valueUrl), " ↗") AS ?value)
   }
   UNION {
     BIND (13 AS ?order)
     BIND ("🛑 Retracted" AS ?description)
     {
-      ?work wdt:P31 wd:Q45182324 .
-    }
-    UNION {
-      ?work wdt:P793 wd:Q7316896 .
+      target: wdt:P31 wd:Q45182324 .
+    } UNION {
+      target: wdt:P793 wd:Q7316896 .
     }
     BIND ("open as retraction" AS ?value)
-    BIND (SUBSTR(STR(?work),32) AS ?q)
-    BIND (CONCAT("../retraction/", ?q) AS ?valueUrl)
+    BIND ("../retraction/{{ q }}" AS ?valueUrl)
   }
   UNION {
     BIND (14 AS ?order)
     BIND ("🛑 Retracted by" AS ?description)
-    ?work wdt:P5824 ?iri .
-    BIND (SUBSTR(STR(?iri),32) AS ?q)
-    ?iri rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?q) AS ?value)
-    BIND (CONCAT("../work/", ?q) AS ?valueUrl)
+    target: wdt:P5824 ?_value .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../work/", ?qid) AS ?valueUrl)
   }
   UNION {
     BIND (15 AS ?order)
     BIND ("⚠️ Preprint" AS ?description)
-    {
-      ?work p:P31 ?statement .
-      ?statement ps:P31 wd:Q580922 .
-      MINUS {
-        ?statement pq:P642 []
-      }
+    target: p:P31 ?statement .
+    ?statement ps:P31 wd:Q580922 .
+    MINUS {
+      ?statement pq:P642 []
     }
   }
   UNION {
     SELECT (COUNT(DISTINCT ?citationStatement) AS ?value) ?order ?description ?valueUrl WHERE {
-      #      VALUES ?work { wd:{{ q }} }
       VALUES ?intention { wd:Q96472102 wd:Q101149476 wd:Q96471820 }
-      ?work ^ps:P2860 ?citationStatement .
+      target: ^ps:P2860 ?citationStatement .
       ?citationStatement pq:P3712 ?intention .
-      BIND (20 AS ?order)
-      BIND ("Data or method used by" AS ?description)
-      #      BIND("./{{ q }}/cito" AS ?valueUrl)
-    }
-    GROUP BY ?order ?description ?valueUrl
+      BIND(20 AS ?order)
+      BIND("Data or method used by" AS ?description)
+      BIND("./{{ q }}/cito" AS ?valueUrl)
+    } GROUP BY ?order ?description ?valueUrl
   }
   UNION {
     SELECT (COUNT(DISTINCT ?citationStatement) AS ?value) ?order ?description ?valueUrl WHERE {
-      #      VALUES ?work { wd:{{ q }} }
       VALUES ?intention { wd:Q107687829 wd:Q107710355 wd:Q117121923 wd:Q117121932 }
-      ?work ^ps:P2860 ?citationStatement .
+      target: ^ps:P2860 ?citationStatement .
       ?citationStatement pq:P3712 ?intention .
-      BIND (21 AS ?order)
-      BIND ("Disagreed with by" AS ?description)
-      #      BIND("./{{ q }}/cito" AS ?valueUrl)
-    }
-    GROUP BY ?order ?description ?valueUrl
+      BIND(21 AS ?order)
+      BIND("Disagreed with by" AS ?description)
+      BIND("./{{ q }}/cito" AS ?valueUrl)
+    } GROUP BY ?order ?description ?valueUrl
   }
   UNION {
     BIND (30 AS ?order)
     BIND ("⚠️ Preprint of" AS ?description)
-    {
-      ?work p:P31 ?statement .
-      ?statement pq:P642 ?pub ;
-                 ps:P31 wd:Q580922 .
-      BIND (SUBSTR(STR(?pub),32) AS ?pubqid)
-      ?pub rdfs:label ?value_string .
-      FILTER (LANG(?value_string) = 'en')
-      BIND (COALESCE(?value_string, ?pubqid) AS ?value)
-      BIND (CONCAT("../work/", ?pubqid) AS ?valueUrl)
-    }
+    target: p:P31 ?statement .
+    ?statement pq:P642 ?_value ;
+               ps:P31 wd:Q580922 .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../work/", ?qid) AS ?valueUrl)
   }
   UNION {
     BIND (31 AS ?order)
     BIND ("⚠️ Cites retracted article" AS ?description)
     {
-      ?work wdt:P2860 ?retracted .
-      ?retracted wdt:P31 wd:Q45182324 .
+      target: wdt:P2860 ?_value .
+      ?_value wdt:P31 wd:Q45182324 .
+    } UNION {
+      target: wdt:P2860 ?_value .
+      ?_value wdt:P793 wd:Q7316896 .
+    } UNION {
+      target: wdt:P2860 ?_value .
+      ?_value wdt:P5824 [] .
     }
-    UNION {
-      ?work wdt:P2860 ?retracted .
-      ?retracted wdt:P793 wd:Q7316896 .
-    }
-    UNION {
-      ?work wdt:P2860 ?retracted .
-      ?retracted wdt:P5824 [] .
-    }
-    ?retracted rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (SUBSTR(STR(?retracted),32) AS ?q)
-    BIND (COALESCE(?value_string, ?q) AS ?value)
-    BIND (CONCAT("../work/", ?q) AS ?valueUrl)
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../work/", ?qid) AS ?valueUrl)
   }
   UNION {
     BIND (32 AS ?order)
     BIND ("Preprint" AS ?description)
-    {
-      ?preprint p:P31 ?statement .
-      ?statement pq:P642 ?work ;
-                 ps:P31 wd:Q580922 .
-      BIND (SUBSTR(STR(?preprint),32) AS ?pubqid)
-      ?preprint rdfs:label ?value_string .
-      FILTER (LANG(?value_string) = 'en')
-      BIND (COALESCE(?value_string, ?pubqid) AS ?value)
-      BIND (CONCAT("../work/", ?pubqid) AS ?valueUrl)
-    }
+    ?_value p:P31 ?statement .
+    ?statement pq:P642 target: ;
+                ps:P31 wd:Q580922 .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../", ?qid) AS ?valueUrl)
   }
   UNION {
     BIND (33 AS ?order)
     BIND ("⚠️ Erratum of" AS ?description)
-    {
-      ?work p:P31 ?statement .
-      ?statement pq:P642 ?pub ;
-                 ps:P31 wd:Q1348305 .
-      BIND (SUBSTR(STR(?pub),32) AS ?pubqid)
-      ?pub rdfs:label ?value_string .
-      FILTER (LANG(?value_string) = 'en')
-      BIND (COALESCE(?value_string, ?pubqid) AS ?value)
-      BIND (CONCAT("../work/", ?pubqid) AS ?valueUrl)
-    }
+    target: p:P31 ?statement .
+    ?statement pq:P642 ?_value ;
+                ps:P31 wd:Q1348305 .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../", ?qid) AS ?valueUrl)
   }
   UNION {
     BIND (34 AS ?order)
     BIND ("⚠️ Retracts" AS ?description)
     {
-      {
-        ?work p:P31 ?statement .
-        ?statement pq:P642 ?pub ;
-                   ps:P31 wd:Q7316896 .
-      }
-      UNION {
-        ?work ^wdt:P5824 ?pub .
-      }
-      BIND (SUBSTR(STR(?pub),32) AS ?pubqid)
-      ?pub rdfs:label ?value_string .
-      FILTER (LANG(?value_string) = 'en')
-      BIND (COALESCE(?value_string, ?pubqid) AS ?value)
-      BIND (CONCAT("../work/", ?pubqid) AS ?valueUrl)
+      target: p:P31 ?statement .
+      ?statement pq:P642 ?_value ;
+                 ps:P31 wd:Q7316896 .
+    } UNION {
+      target: ^wdt:P5824 ?_value .
     }
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../", ?qid) AS ?valueUrl)
   }
   UNION {
     BIND (35 AS ?order)
     BIND ("Replies to" AS ?description)
-    ?work wdt:P2675 ?value_ .
-    BIND (SUBSTR(STR(?value_),32) AS ?valueqid)
-    ?value_ rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?valueqid) AS ?value)
-    BIND (CONCAT("../", ?valueqid) AS ?valueUrl)
+    target: wdt:P2675 ?_value .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../", ?qid) AS ?valueUrl)
   }
   UNION {
     BIND (36 AS ?order)
     BIND ("Inspired by" AS ?description)
-    ?work wdt:P941 ?value_ .
-    BIND (SUBSTR(STR(?value_),32) AS ?valueqid)
-    ?value_ rdfs:label ?value_string .
-    FILTER (LANG(?value_string) = 'en')
-    BIND (COALESCE(?value_string, ?valueqid) AS ?value)
-    BIND (CONCAT("../", ?valueqid) AS ?valueUrl)
+    target: wdt:P941 ?_value .
+    {{ sparql_helpers.labels(["?_value"], languages) }}
+    BIND (SUBSTR(STR(?_value), 32) AS ?qid)
+    BIND (COALESCE(?_valueLabel, ?qid) AS ?value)
+    BIND (CONCAT("../", ?qid) AS ?valueUrl)
   }
 }
 ORDER BY ?order
