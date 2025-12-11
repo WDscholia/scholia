@@ -1,8 +1,8 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?number_of_works ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ?authorDescription ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
   {
     SELECT (COUNT(?work) AS ?number_of_works) ?author (SAMPLE(?work) AS ?example_work) WHERE {
@@ -14,6 +14,7 @@ SELECT ?number_of_works ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?aut
     ORDER BY DESC(?number_of_works)
     LIMIT 500
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,it,sv,uk,zh". }
+  {{ sparql_helpers.labels(["?author", "?example_work"], languages) }}
+  {{ sparql_helpers.descriptions(["?author"], languages) }}
 }
 ORDER BY DESC(?number_of_works)

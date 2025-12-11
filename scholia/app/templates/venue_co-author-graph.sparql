@@ -1,44 +1,27 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Co-author graph for a specific venue
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Graph
-PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?author1 (REPLACE(STR(?author1), ".*/", "") AS ?author1Label) ?rgb ?author2 (REPLACE(STR(?author2), ".*/", "") AS ?author2Label) WHERE {
-  { # Limit the number of authors
-    SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
-      { # Find works published in the given venue
-        SELECT ?work WHERE {
-          ?work wdt:P1433 target: .
-        }
-      }
-      ?work wdt:P50 ?author1 .
-    }
-    GROUP BY ?author1
-    ORDER BY DESC(?count1)
-    LIMIT 15
-  }
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label WHERE {
   { # Limit the number of coauthors
-    SELECT DISTINCT ?author2 ?author1 (COUNT(?work) AS ?count2) WHERE {
-      { # Find works published in the given venue
-        SELECT ?work WHERE {
-          ?work wdt:P1433 target: .
-        }
-      }
+    SELECT ?author2 ?author1 (COUNT(?work) AS ?count2) WHERE {
+      # Find works published in the given venue
+      ?work wdt:P1433 target: .
+
       { # Limit the number of authors
         SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
-          { # Find works published in the given venue
-            SELECT ?work WHERE {
-              ?work wdt:P1433 target: .
-            }
-          }
+          # Find works published in the given venue
+          ?work wdt:P1433 target: .
           ?work wdt:P50 ?author1 .
         }
         GROUP BY ?author1
         ORDER BY DESC(?count1)
         LIMIT 15
       }
+
       ?work wdt:P50 ?author1, ?author2 .
       FILTER (?author1 != ?author2)
     }
@@ -46,9 +29,11 @@ SELECT ?author1 (REPLACE(STR(?author1), ".*/", "") AS ?author1Label) ?rgb ?autho
     ORDER BY DESC(?count2)
     LIMIT 150
   }
+
   OPTIONAL {
     ?author1 wdt:P21 ?gender1 .
   }
   BIND (IF(?gender1 = wd:Q6581097,"3182BD","E6550D") AS ?rgb)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  {{ sparql_helpers.labels(["?author1", "?author2"], languages) }}
 }

@@ -1,9 +1,9 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Venues citing articles from this specific journal
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Table
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?short_name ?citing_journal ?citing_journalLabel WHERE {
   {
     SELECT (COUNT(?citing_work) AS ?count) ?citing_journal (SAMPLE(?short_name_) AS ?short_name) WHERE {
@@ -18,6 +18,6 @@ SELECT ?count ?short_name ?citing_journal ?citing_journalLabel WHERE {
     ORDER BY DESC(?count)
     LIMIT 1000
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?citing_journal"], languages) }}
 }
 ORDER BY DESC(?count)

@@ -1,9 +1,9 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Prolific authors for a specific journal
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?count ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?orcid ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel) WHERE {
+SELECT ?count ?author ?authorLabel ?orcid ?example_work ?example_workLabel WHERE {
   { # Count the number of works author by the author publishing in the journal
     SELECT ?author (COUNT(?work) AS ?count) (SAMPLE(?work) AS ?example_work) WHERE {
       ?work wdt:P50 ?author ;
@@ -15,7 +15,7 @@ SELECT ?count ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?orcid 
   OPTIONAL {
     ?author wdt:P496 ?orcid .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?author", "?example_work"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 50
