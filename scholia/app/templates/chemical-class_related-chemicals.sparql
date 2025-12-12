@@ -1,7 +1,6 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: lists related chemicals for this class
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl WHERE {

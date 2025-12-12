@@ -1,7 +1,6 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: identifiers for this chemical class
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
