@@ -1,7 +1,6 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: list the isotopes for this chemical element
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
