@@ -453,6 +453,36 @@ def index():
                            sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
+from flask import jsonify, render_template, request, current_app
+from .. import __version__
+from ..config import config
+
+# ... existing imports and blueprint setup ...
+
+@main.route('/backend')
+def backend():
+    """Show backend information."""
+    sparql_endpoint = config['query-server'].get('sparql_endpoint', '')
+    sparql_endpoint_name = config['query-server'].get('sparql_endpoint_name', '')
+
+    # Gather backend information
+    data = {
+        'version': __version__,
+        'sparql_endpoint': sparql_endpoint,
+        'sparql_endpoint_name': sparql_endpoint_name,
+        'text_to_topic_q_text_enabled': getattr(current_app, 'text_to_topic_q_text_enabled', False),
+        'third_parties_enabled': getattr(current_app, 'third_parties_enabled', False),
+    }
+
+    # Content negotiation
+    # Best practice for JSON APIs to check Accept header
+    if request.accept_mimetypes.accept_json and \
+       not request.accept_mimetypes.accept_html:
+        return jsonify(data)
+
+    # Default to HTML representation
+    return render_template('backend.html', **data)
+
 @main.route("/statistics")
 def index_statistics():
     """Return rendered main statistics page.

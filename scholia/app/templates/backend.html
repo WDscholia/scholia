@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Backend Information - Scholia{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <h1>Backend Information</h1>
+    <p>Configuration details for this Scholia instance.</p>
+
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Version</strong></td>
+                <td><code>{{ version }}</code></td>
+            </tr>
+            <tr>
+                <td><strong>SPARQL Endpoint Name</strong></td>
+                <td>{{ sparql_endpoint_name }}</td>
+            </tr>
+            <tr>
+                <td><strong>SPARQL Endpoint URL</strong></td>
+                <td><a href="{{ sparql_endpoint }}">{{ sparql_endpoint }}</a></td>
+            </tr>
+            <tr>
+                <td><strong>Text-to-Topic Enabled</strong></td>
+                <td>
+                    {% if text_to_topic_q_text_enabled %}
+                    <span class="badge badge-success">Yes</span>
+                    {% else %}
+                    <span class="badge badge-secondary">No</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Third Parties Enabled</strong></td>
+                <td>
+                    {% if third_parties_enabled %}
+                    <span class="badge badge-success">Yes</span>
+                    {% else %}
+                    <span class="badge badge-secondary">No</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h3>JSON Output</h3>
+    <p>
+        To retrieve this data programmatically, send a request with the header:
+        <br>
+        <code>Accept: application/json</code>
+    </p>
+
+</div>
+{% endblock %}
