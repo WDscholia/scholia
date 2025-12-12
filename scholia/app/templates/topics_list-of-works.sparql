@@ -1,20 +1,29 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: List of works on any combination of specific topics
-PREFIX bd: <http://www.bigdata.com/rdf#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT ?count (MIN(?publication_date_) AS ?publication_date) ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) ?topics ?topicsUrl WHERE {
   {
-    SELECT (COUNT(?topic) AS ?count) ?work (GROUP_CONCAT(DISTINCT ?topic_label; SEPARATOR=" // ") AS ?topics) (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic),32); SEPARATOR=",")) AS ?topicsUrl) WHERE {
-      #    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
-      # A broad query including "(wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )" seems to take
-      # long time and time out.
+    SELECT (COUNT(DISTINCT ?mainTopic) AS ?count) ?work (GROUP_CONCAT(DISTINCT ?topicLabel; SEPARATOR=" // ") AS ?topics) (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); SEPARATOR=",")) AS ?topicsUrl) WHERE {
+      {
+        SELECT DISTINCT ?topic ?mainTopic WHERE {
+          {% for q in qs -%}
+          { ?topic wdt:P31?/wdt:P279* wd:{{ q }} . BIND(wd:{{ q }} as ?mainTopic) }
+          UNION
+          { ?topic wdt:P361+ wd:{{ q }} . BIND(wd:{{ q }} as ?mainTopic) }
+          UNION
+          { ?topic wdt:P1269+ wd:{{ q }} . BIND(wd:{{ q }} as ?mainTopic) }{% if not loop.last %}
+          UNION{% endif %}
+          {% endfor %}
+        }
+      }
+
       ?work wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label .
-      FILTER (LANG(?topic_label) = 'en')
+      {{ sparql_helpers.labels(["?topic"], languages) }}
     }
-    GROUP BY ?work ?topics
+    GROUP BY ?work
     HAVING (?count > 1)
     ORDER BY DESC(?count)
     LIMIT 200
@@ -23,7 +32,8 @@ SELECT ?count (MIN(?publication_date_) AS ?publication_date) ?work ?workLabel (C
     ?work wdt:P577 ?publication_datetime .
     BIND (xsd:date(?publication_datetime) AS ?publication_date_)
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 GROUP BY ?count ?work ?workLabel ?topics ?topicsUrl
 ORDER BY DESC(?count) DESC(?publication_date)

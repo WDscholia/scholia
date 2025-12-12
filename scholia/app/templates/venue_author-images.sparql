@@ -1,10 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Author images for a specific venue
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:ImageGrid
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT (SAMPLE(?image_) AS ?image) ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?count WHERE {
+SELECT (SAMPLE(?image_) AS ?image) ?author ?authorLabel ?count WHERE {
   {
     SELECT ?author (COUNT(?work) AS ?count) WHERE {
       ?work wdt:P1433 target: ;
@@ -13,7 +13,8 @@ SELECT (SAMPLE(?image_) AS ?image) ?author (REPLACE(STR(?author), ".*/", "") AS 
     GROUP BY ?author
   }
   ?author wdt:P18 ?image_ .
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+
+  {{ sparql_helpers.labels(["?author"], languages) }}
 }
 GROUP BY ?author ?authorLabel ?count
 ORDER BY DESC(?count)

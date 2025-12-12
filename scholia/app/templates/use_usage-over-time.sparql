@@ -1,8 +1,8 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?year (COUNT(?work) AS ?number_of_works) ?useLabel WHERE {
   {
     SELECT (MIN(?year_) AS ?year) ?work ?use WHERE {
@@ -13,7 +13,7 @@ SELECT ?year (COUNT(?work) AS ?number_of_works) ?useLabel WHERE {
     }
     GROUP BY ?work ?use
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?use"], languages) }}
 }
 GROUP BY ?year ?useLabel
 ORDER BY ?year

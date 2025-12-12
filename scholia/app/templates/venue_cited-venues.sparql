@@ -1,8 +1,8 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: Cited venues from specific journal
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT ?count ?short_name ?cited_journal ?cited_journalLabel WHERE {
   {
@@ -11,16 +11,12 @@ SELECT ?count ?short_name ?cited_journal ?cited_journalLabel WHERE {
       ?work wdt:P2860 ?cited_work .
       ?cited_work wdt:P1433 ?cited_journal .
       OPTIONAL {
-        ?work wdt:P577 ?publication_datetime .
-        BIND (xsd:date(?publication_datetime) AS ?publication_date)
-      }
-      OPTIONAL {
         ?cited_journal wdt:P1813 ?short_name_ .
       }
     }
     GROUP BY ?cited_journal
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?cited_journal"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 200

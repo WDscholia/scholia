@@ -1,8 +1,8 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Most cited authors published in venue
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?author ?authorLabel ?orcid ?example_cited_work ?example_cited_workLabel ?example_citing_work ?example_citing_workLabel WHERE {
   { # Count the number of citations
     SELECT ?author (COUNT(?cited_work) AS ?count) (SAMPLE(?cited_work) AS ?example_cited_work) (SAMPLE(?citing_work) AS ?example_citing_work) WHERE {
@@ -16,7 +16,7 @@ SELECT ?count ?author ?authorLabel ?orcid ?example_cited_work ?example_cited_wor
   OPTIONAL {
     ?author wdt:P496 ?orcid .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?author", "?example_cited_work", "?example_citing_work"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 100

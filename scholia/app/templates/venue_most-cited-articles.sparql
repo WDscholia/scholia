@@ -1,11 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Most cited articles published in specific venue
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Table
-PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?work ?workLabel ?example_citing_work ?example_citing_workLabel WHERE {
-  # Label results
   { # Count citations
     SELECT (COUNT(?citing_work) AS ?count) ?work (SAMPLE(?citing_work) AS ?example_citing_work) WHERE {
       ?work wdt:P1433 target: .
@@ -15,6 +14,7 @@ SELECT ?count ?work ?workLabel ?example_citing_work ?example_citing_workLabel WH
     ORDER BY DESC(?count)
     LIMIT 1000
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # Label results
+  {{ sparql_helpers.labels(["?work", "?example_citing_work"], languages) }}
 }
 ORDER BY DESC(?count)

@@ -23,7 +23,8 @@ WHERE {
     {{ sparql_helpers.labels(["?article_type"], languages) }}
   }
   UNION {
-    [] wdt:P31 wd:Q577 ;
+    VALUES ?year_class { wd:Q577 wd:Q3186692 }
+    [] wdt:P31 ?year_class ;
        wdt:P585 ?date .
     BIND (YEAR(?date) AS ?year_)
     BIND ("_" AS ?article_typeLabel)

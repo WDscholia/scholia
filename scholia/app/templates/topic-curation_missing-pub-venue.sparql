@@ -1,7 +1,7 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?citations ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) (?work AS ?wikidata_url) WHERE {
   {
     SELECT (COUNT(?work1) AS ?citations) ?work WHERE {
@@ -11,7 +11,7 @@ SELECT ?citations ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?
           ?work wdt:P921/(wdt:P361+ | wdt:P1269+ | (wdt:P31*/wdt:P279*)) target: .
           # Works that do not have a statement about where they were published
           FILTER NOT EXISTS {
-            ?work wdt:P1433 ?date .
+            ?work wdt:P1433 ?venue .
           }
           # Works that do not have an ISSN, i.e. that are not periodicals
           FILTER NOT EXISTS {
@@ -31,6 +31,7 @@ SELECT ?citations ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?
     ORDER BY DESC(?citations)
     LIMIT 200
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?citations)
