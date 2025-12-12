@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: recent literature for this chemical class
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -55,7 +56,7 @@ SELECT ?publication_date ?work ?workLabel ?type ?via ?topics WHERE {
     }
     GROUP BY ?publication_date ?work ?via
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?publication_date)
 LIMIT 500
