@@ -1,9 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: lists related chemicals for this class
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?mol (REPLACE(STR(?mol), ".*/", "") AS ?molLabel) ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl WHERE {
+SELECT ?mol ?molLabel ?InChIKey ?CAS ?CASUrl ?ChemSpider ?ChemSpiderUrl ?PubChem_CID ?PubChem_CIDUrl WHERE {
   {
     SELECT DISTINCT ?mol WHERE {
       ?mol wdt:P279* target: .
@@ -46,5 +47,5 @@ SELECT ?mol (REPLACE(STR(?mol), ".*/", "") AS ?molLabel) ?InChIKey ?CAS ?CASUrl 
     }
     BIND (IRI(REPLACE(?PCformatterurl, '\\\\$1', STR(?PubChem_CID))) AS ?PubChem_CIDUrl) .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?mol"], languages) }}
 }
