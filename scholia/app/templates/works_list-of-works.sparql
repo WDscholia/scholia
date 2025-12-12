@@ -1,15 +1,20 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?example_author (REPLACE(STR(?example_author), ".*/", "") AS ?example_authorLabel) WHERE {
+SELECT ?work ?workLabel ?example_author ?example_authorLabel WHERE {
   {
-    SELECT ?work (SAMPLE(?author) AS ?example_author) WHERE {
-      VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
-      OPTIONAL {
+    VALUES ?work { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
+    FILTER NOT EXISTS { ?work wdt:P50 [] }
+  }
+  UNION {
+    {
+      SELECT ?work (SAMPLE(?author) AS ?example_author) WHERE {
+        VALUES ?work { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
         ?work wdt:P50 ?author
       }
+      GROUP BY ?work
     }
-    GROUP BY ?work
+    {{ sparql_helpers.labels(["?work", "?example_author"], languages) }}
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
 }

@@ -1,3 +1,5 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -77,7 +79,8 @@ SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel ?item ?itemLabel ?itemDescrip
       BIND (wd:Q11921 AS ?wikipedia)
     }
   }
-  # hint:Prior hint:runFirst "true" .
   BIND (CONCAT(?title_, "&nbsp;↗") AS ?title)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  {{ sparql_helpers.labels(["?wikipedia", "?item"], languages) }}
+  {{ sparql_helpers.descriptions(["?item"], languages) }}
 }

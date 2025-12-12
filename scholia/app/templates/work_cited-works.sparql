@@ -1,15 +1,14 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
+#title: List of works that is cited by the specified work
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-# List of works that is cited by the specified work
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-SELECT ?citations ?publication_date ?cited_work (REPLACE(STR(?cited_work), ".*/", "") AS ?cited_workLabel) (GROUP_CONCAT(DISTINCT ?intentionLabel; SEPARATOR=", ") AS ?intentions) WHERE {
+SELECT ?citations ?publication_date ?cited_work ?cited_workLabel (GROUP_CONCAT(DISTINCT ?intentionLabel; SEPARATOR=", ") AS ?intentions) WHERE {
   {
     SELECT (MIN(?date) AS ?publication_date) (COUNT(DISTINCT ?citing_cited_work) AS ?citations) ?cited_work WHERE {
       target: wdt:P2860 ?cited_work .
@@ -27,9 +26,9 @@ SELECT ?citations ?publication_date ?cited_work (REPLACE(STR(?cited_work), ".*/"
     target: p:P2860 ?citationStatement .
     ?citationStatement pq:P3712 ?intention ;
                        ps:P2860 ?cited_work .
-    ?intention rdfs:label ?intentionLabel . FILTER (LANG(?intentionLabel) = "en")
+    {{ sparql_helpers.labels(["?intention"], languages) }}
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?cited_work"], languages) }}
 }
 GROUP BY ?citations ?publication_date ?cited_work ?cited_workLabel
 ORDER BY DESC(?citations) DESC(?date)
