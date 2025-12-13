@@ -4,12 +4,24 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?number_of_citing_works ?author ?authorLabel ?organization ?organizationLabel ?example_work ?example_workLabel WHERE {
- { SELECT ?number_of_citing_works ?author ?organization ?example_work WHERE {
   {
-    SELECT ?author (COUNT(DISTINCT ?citing_work) AS ?number_of_citing_works) (SAMPLE(?organization_) AS ?organization) (SAMPLE(?work) AS ?example_work) WHERE {
+    SELECT ?author (COUNT(DISTINCT ?citing_work) AS ?number_of_citing_works) ?organization ?organizationLabel (SAMPLE(?work) AS ?example_work) WHERE {
       {
         SELECT DISTINCT ?author WHERE {
           ?author wdt:P27 | wdt:P1416/wdt:P17 | wdt:P108/wdt:P17 target: .
+        }
+      } 
+      UNION
+      {
+        SELECT DISTINCT ?author ?organization ?organizationLabel WHERE {
+          {
+            SELECT DISTINCT ?author (SAMPLE (?organization_) AS ?organization) WHERE {
+              ?author wdt:P27 | wdt:P1416/wdt:P17 | wdt:P108/wdt:P17 target: .
+ 	      ?author wdt:P1416 | wdt:P108 ?organization_ .
+ 	      ?organization_ wdt:P17 target:
+            } GROUP BY ?author
+          }
+ 	  {{ sparql_helpers.labels(["?organization"], languages) }}
         }
       }
       ?work wdt:P50 ?author .
@@ -20,9 +32,9 @@ SELECT ?number_of_citing_works ?author ?authorLabel ?organization ?organizationL
         ?author wdt:P1416 | wdt:P108 ?organization_ .
         ?organization_ wdt:P17 target:
       }
-    }
-    GROUP BY ?author
+    } GROUP BY ?author ?organization ?organizationLabel
   }
- } ORDER BY DESC(?number_of_citing_works) LIMIT 1000 }
-  {{ sparql_helpers.labels(["?author", "?organization", "?example_work"], languages) }}
+  {{ sparql_helpers.labels(["?author", "?example_work"], languages) }}
 }
+ORDER BY DESC(?number_of_citing_works)
+LIMIT 1000
