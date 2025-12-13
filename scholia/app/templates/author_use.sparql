@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -12,6 +13,6 @@ SELECT ?count ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use),32)) AS ?useUrl) 
     }
     GROUP BY ?use
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?use", "?example_work"], languages) }}
 }
 ORDER BY DESC(?count)

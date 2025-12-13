@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{q}}>
 # Doctoral student/supervisor network with a source from a specific researcher
@@ -5,7 +6,7 @@ PREFIX gas: <http://www.bigdata.com/rdf/gas#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT DISTINCT ?student1 (REPLACE(STR(?student1), ".*/", "") AS ?student1Label) ?rgb ?supervisor1 (REPLACE(STR(?supervisor1), ".*/", "") AS ?supervisor1Label) WHERE {
+SELECT DISTINCT ?student1 ?student1Label ?rgb ?supervisor1 ?supervisor1Label WHERE {
   {
     {
       SELECT ?student1 (MIN(?supervisor) AS ?supervisor1) WHERE {
@@ -66,6 +67,6 @@ SELECT DISTINCT ?student1 (REPLACE(STR(?student1), ".*/", "") AS ?student1Label)
     } GROUP BY ?student1
   }
   BIND (IF(?student1 = target:,"3080BB","ffffff") AS ?rgb)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .  } 
+  {{ sparql_helpers.labels(["?student1", "?supervisor1"], languages) }}
 }
 

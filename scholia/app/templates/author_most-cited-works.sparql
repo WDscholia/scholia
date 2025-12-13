@@ -1,10 +1,9 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # Author's most cited works
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?count ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) WHERE {
+SELECT ?count ?work ?workLabel WHERE {
   {
     SELECT (COUNT(?citing_work) AS ?count) ?work WHERE {
       ?work wdt:P50 target: .
@@ -14,7 +13,7 @@ SELECT ?count ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) WHERE {
     }
     GROUP BY ?work
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }        
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 500
