@@ -1,6 +1,6 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: structural identifiers for this chemical structure
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -18,7 +18,7 @@ SELECT ?Structural_identifier ?Structural_identifierLabel ?idLit (SAMPLE(?idUrls
     LIMIT 500
   }
   BIND (IRI(REPLACE(?formatterurl, '\\\\$1', STR(?idLit))) AS ?idUrls) .
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?Structural_identifier"], languages) }}
 }
 GROUP BY ?Structural_identifier ?Structural_identifierLabel ?idLit
 ORDER BY ASC(?ID_TypeLabel)
