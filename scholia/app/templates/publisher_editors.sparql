@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -16,5 +17,5 @@ SELECT ?number_of_editorships ?editor ?editorLabel ?example_venue ?example_venue
     }
     GROUP BY ?editor
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?editor", "?example_venue"], languages) }}
 }
