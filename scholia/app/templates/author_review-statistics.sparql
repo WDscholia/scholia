@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # Venue statistics for a specific reviewer
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -34,7 +35,7 @@ SELECT ?count (SAMPLE(?short_name_) AS ?short_name) ?venue ?venueLabel ?topics ?
   OPTIONAL {
     ?venue wdt:P1813 ?short_name_ .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
+  {{ sparql_helpers.labels(["?venue"], languages) }}
 }
 GROUP BY ?count ?venue ?venueLabel ?topics ?topicsUrl
 ORDER BY DESC(?count)

@@ -1,19 +1,17 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT (MIN(?dates) AS ?date) ?work ?workLabel (GROUP_CONCAT(DISTINCT ?type_label; SEPARATOR=", ") AS ?type) (SAMPLE(?pages_) AS ?pages) ?venue ?venueLabel (GROUP_CONCAT(DISTINCT ?author_label; SEPARATOR=", ") AS ?authors) (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author),32); SEPARATOR=",")) AS ?authorsUrl) WHERE {
-  ?work wdt:P50 target: .
+  ?work wdt:P50 wd:{{ q }} .
   { # By standard GROUP_CONCAT does not sort, but BlazeGraph seems to sort.
     SELECT ?work ?author ?author_label WHERE {
-      ?work wdt:P50 target: .
+      ?work wdt:P50 wd:{{ q }} .
       ?work p:P50 [
         ps:P50 ?author ;
         pq:P1545 ?order

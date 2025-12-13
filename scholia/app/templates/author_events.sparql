@@ -1,8 +1,7 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT (xsd:date(MIN(?start)) AS ?date) ?event ?eventLabel (CONCAT("/event/", SUBSTR(STR(?event),32)) AS ?eventUrl) (GROUP_CONCAT(DISTINCT ?role; SEPARATOR=", ") AS ?roles) (GROUP_CONCAT(DISTINCT ?location_label; SEPARATOR=", ") AS ?locations) WHERE {
   BIND (target: AS ?person)
@@ -37,7 +36,7 @@ SELECT (xsd:date(MIN(?start)) AS ?date) ?event ?eventLabel (CONCAT("/event/", SU
   OPTIONAL {
     ?event wdt:P580 | wdt:P585 ?start
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?event"], languages) }}
 }
 GROUP BY ?event ?eventLabel
 ORDER BY DESC(?date)
