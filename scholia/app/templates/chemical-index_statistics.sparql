@@ -1,4 +1,5 @@
 PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX mwapi: <https://www.mediawiki.org/ontology#API/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
@@ -6,52 +7,54 @@ SELECT
   (xsd:integer(?count_) AS ?count)
   (CONCAT("Total chemicals with ", ?description_) AS ?description)
 WHERE {
-  BIND("haswbstatement:P31=Q113145171|P31=Q59199015" AS ?constraint)
-  VALUES (?description_ ?property_query_term) {
-    ("or without stereochemistry" "")
-    ("fully defined stereochemistry" "P31=Q113145171")
-    ("undefined stereochemistry" "P31=Q59199015")
-    ("CAS registry number" "P231")
-    ("canonical SMILES" "P233")
-    ("InChI" "P234")
-    ("InChIKey" "P235")
-    ("chemical formula" "P274")
-    # ("ChEMBL ID" "P592") # limit IDs
-    # ("ChemSpider ID" "P661") # limit IDs
-    ("PubChem ID" "P662")
-    # ("KEGG ID" "P665") # limit IDs
-    ("ChEBI ID" "P683")
-    ("found in taxon" "P703")
-    ("isomeric SMILES" "P2017")
-    # ("ZINC ID" "P2084") # limit IDs
-    ("crystal structure" "haswbstatement:P3636|P11375")
-    ("safety classification and labelling" "P4952")
-    ("mass spectrum" "haswbstatement:P4964|P6689|P12472")
-    # ("SMARTS notation" "P8533") # not for now
-    ("NMR spectrum" "P9405")
-    # hacky way to get quantity properties.
-    ("pKa" "linksto:Property:P1117")
-    ("mass" "linksto:Property:P2067")
-    ("solubility" "linksto:Property:P2177")
-    ("melting point" "linksto:Property:P2101")
-    ("boiling point" "linksto:Property:P2102")
-    ("electric dipole moment" "linksto:Property:P2201")
-    ("ionization energy" "linksto:Property:P2260")
-    # ("minimum explosive concentration" "linksto:Property:P2204") # safety
-    # ("time-weighted average exposure limit" "linksto:Property:P2404") # safety
-    # ("ceiling exposure limit" "linksto:Property:P2405") # safety
-    # ("maximum peak exposure limit" "linksto:Property:P2406") # safety
-    # ("short-term exposure limit" "linksto:Property:P2407") # safety
-    # ("solubility product constant" "linksto:Property:P11813") # less than 5 statements
-  }
-  BIND(CONCAT(?property_query_term, " ", ?constraint) AS ?search_query)
-  SERVICE wikibase:mwapi {
-    bd:serviceParam wikibase:endpoint "www.wikidata.org" ; 
-                    wikibase:api "Search" ; 
-                    wikibase:limit "once" ; 
-                    mwapi:srsearch ?search_query;
-                    mwapi:srlimit "1".
-    ?count_ wikibase:apiOutput "//searchinfo[1]/@totalhits".
+  SERVICE <https://query.wikidata.org/sparql> {
+    BIND("haswbstatement:P31=Q113145171|P31=Q59199015" AS ?constraint)
+    VALUES (?description_ ?property_query_term) {
+      ("or without stereochemistry" "")
+      ("fully defined stereochemistry" "P31=Q113145171")
+      ("undefined stereochemistry" "P31=Q59199015")
+      ("CAS registry number" "P231")
+      ("canonical SMILES" "P233")
+      ("InChI" "P234")
+      ("InChIKey" "P235")
+      ("chemical formula" "P274")
+      # ("ChEMBL ID" "P592") # limit IDs
+      # ("ChemSpider ID" "P661") # limit IDs
+      ("PubChem ID" "P662")
+      # ("KEGG ID" "P665") # limit IDs
+      ("ChEBI ID" "P683")
+      ("found in taxon" "P703")
+      ("isomeric SMILES" "P2017")
+      # ("ZINC ID" "P2084") # limit IDs
+      ("crystal structure" "haswbstatement:P3636|P11375")
+      ("safety classification and labelling" "P4952")
+      ("mass spectrum" "haswbstatement:P4964|P6689|P12472")
+      # ("SMARTS notation" "P8533") # not for now
+      ("NMR spectrum" "P9405")
+      # hacky way to get quantity properties.
+      ("pKa" "linksto:Property:P1117")
+      ("mass" "linksto:Property:P2067")
+      ("solubility" "linksto:Property:P2177")
+      ("melting point" "linksto:Property:P2101")
+      ("boiling point" "linksto:Property:P2102")
+      ("electric dipole moment" "linksto:Property:P2201")
+      ("ionization energy" "linksto:Property:P2260")
+      # ("minimum explosive concentration" "linksto:Property:P2204") # safety
+      # ("time-weighted average exposure limit" "linksto:Property:P2404") # safety
+      # ("ceiling exposure limit" "linksto:Property:P2405") # safety
+      # ("maximum peak exposure limit" "linksto:Property:P2406") # safety
+      # ("short-term exposure limit" "linksto:Property:P2407") # safety
+      # ("solubility product constant" "linksto:Property:P11813") # less than 5 statements
+    }
+    BIND(CONCAT(?property_query_term, " ", ?constraint) AS ?search_query)
+    SERVICE wikibase:mwapi {
+      bd:serviceParam wikibase:endpoint "www.wikidata.org" ;
+                      wikibase:api "Search" ;
+                      wikibase:limit "once" ;
+                      mwapi:srsearch ?search_query;
+                      mwapi:srlimit "1".
+      ?count_ wikibase:apiOutput "//searchinfo[1]/@totalhits".
+    }
   }
 }
 ORDER BY DESC(?count)
