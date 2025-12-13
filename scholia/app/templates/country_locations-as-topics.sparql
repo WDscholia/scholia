@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: Locations as topics for a specific country
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Map{"markercluster":true}.
@@ -24,5 +25,5 @@ SELECT ?location ?locationLabel ?work ?workLabel ?geo ?layer WHERE {
     ?work wdt:P31/rdfs:label ?layer .
     FILTER (LANG(?layer) = 'en')
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?location", "?work"], languages) }}
 }

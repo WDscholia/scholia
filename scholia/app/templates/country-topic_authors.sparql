@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -16,6 +17,6 @@ SELECT ?number_of_works ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?aut
     }
     GROUP BY ?author
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_work", "?author"], languages) }}
 }
 ORDER BY DESC(?number_of_works)

@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: Nearby academic institutions around a specified geographic entity.
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -25,6 +26,7 @@ SELECT ?distance ?unit ?unitLabel ?organization ?organizationLabel ?organization
       FILTER (?distance < 250)
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?unit", "?organization"], languages) }}
+  {{ sparql_helpers.descriptions(["?organization"], languages) }}
 }
 ORDER BY ?distance

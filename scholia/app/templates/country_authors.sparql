@@ -1,8 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?number_of_citing_works ?author (REPLACE(STR(?author), "*./", "") AS ?authorLabel) ?organization (REPLACE(STR(?organization), "*./", "") AS ?organizationLabel) ?example_work (REPLACE(STR(?example_work), "*./", "") AS ?example_workLabel) WHERE {
+SELECT ?number_of_citing_works ?author ?authorLabel ?organization ?organizationLabel ?example_work ?example_workLabel WHERE {
+ { SELECT ?number_of_citing_works ?author ?organization ?example_work WHERE {
   {
     SELECT ?author (COUNT(DISTINCT ?citing_work) AS ?number_of_citing_works) (SAMPLE(?organization_) AS ?organization) (SAMPLE(?work) AS ?example_work) WHERE {
       {
@@ -21,7 +23,6 @@ SELECT ?number_of_citing_works ?author (REPLACE(STR(?author), "*./", "") AS ?aut
     }
     GROUP BY ?author
   }
-  # service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+ } ORDER BY DESC(?number_of_citing_works) LIMIT 1000 }
+  {{ sparql_helpers.labels(["?author", "?organization", "?example_work"], languages) }}
 }
-ORDER BY DESC(?number_of_citing_works)
-LIMIT 10000
