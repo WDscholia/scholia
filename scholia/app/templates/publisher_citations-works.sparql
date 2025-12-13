@@ -1,9 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:ScatterChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?work_count ?citation_count ?journal (REPLACE(STR(?journal), ".*/", "") AS ?journalLabel) WHERE {
+SELECT ?work_count ?citation_count ?journal  ?journalLabel WHERE {
   {
     SELECT ?work_count ?citation_count ?journal {
       {
@@ -23,5 +24,5 @@ SELECT ?work_count ?citation_count ?journal (REPLACE(STR(?journal), ".*/", "") A
       }
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?journal"], languages) }}
 }
