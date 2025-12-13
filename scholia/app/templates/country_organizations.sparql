@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: Organizations for a specific country
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -12,6 +13,6 @@ SELECT ?number_of_authors ?number_of_works ?organization ?organizationLabel WHER
     }
     GROUP BY ?organization
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,es,fr,jp,nl,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?organization"], languages) }}
 }
 ORDER BY DESC(?number_of_authors) DESC(?number_of_works)

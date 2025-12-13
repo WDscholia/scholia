@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 # title: Nearby researchers that work with a specific topic and near a specified geographical entity
@@ -51,6 +52,6 @@ SELECT ?score ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) 
     }
     GROUP BY ?author
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_work", "?author"], languages) }}
 }
 ORDER BY DESC(?score)
