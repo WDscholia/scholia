@@ -1,7 +1,8 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?mol (REPLACE(STR(?mol), ".*/", "") AS ?molLabel) ?InChIKey ?CAS ?ChemSpider ?PubChem_CID {
+SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID {
   {
     SELECT ?mol ?InChIKey WHERE {
       SERVICE wikibase:mwapi {
@@ -24,5 +25,5 @@ SELECT ?mol (REPLACE(STR(?mol), ".*/", "") AS ?molLabel) ?InChIKey ?CAS ?ChemSpi
   OPTIONAL {
     ?mol wdt:P662 ?PubChem_CID
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?mol"], languages) }}
 }
