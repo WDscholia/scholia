@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: recent literature about this chemical
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -7,7 +8,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-SELECT ?date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?type ?via ?topics WHERE {
+SELECT ?date ?work ?workLabel ?type ?via ?topics WHERE {
   {
     SELECT (MAX(?dates) AS ?datetime) ?work (GROUP_CONCAT(DISTINCT ?type_label; SEPARATOR=", ") AS ?type) ?via (GROUP_CONCAT(DISTINCT ?topic_label; SEPARATOR=" // ") AS ?topics) WHERE {
       {
@@ -54,7 +55,7 @@ SELECT ?date ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?type ?via ?to
     GROUP BY ?work ?via
   }
   BIND (xsd:date(?datetime) AS ?date)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?date)
 LIMIT 500
