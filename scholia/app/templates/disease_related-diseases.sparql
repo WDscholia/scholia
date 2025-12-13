@@ -1,8 +1,7 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?gene_count ?symptom_count ?disease ?diseaseLabel ?genes ?symptoms {
   {
     SELECT ?disease (COUNT(?gene) AS ?gene_count) (GROUP_CONCAT(?gene_label; SEPARATOR=" // ") AS ?genes) WHERE {
@@ -25,6 +24,6 @@ SELECT ?count ?gene_count ?symptom_count ?disease ?diseaseLabel ?genes ?symptoms
   }
   # Aggregate count
   BIND ((COALESCE(?symptom_count, 0) + COALESCE(?gene_count, 0)) AS ?count)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+   {{ sparql_helpers.labels(["?disease"], languages) }}
 }
 ORDER BY DESC(?count)
