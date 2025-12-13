@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # List of printed works by date
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -18,7 +19,7 @@ SELECT ?date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workU
     }
     GROUP BY ?work
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_author", "?work"], languages) }}
 }
 ORDER BY DESC(?date)
 LIMIT 1000

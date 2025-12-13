@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: Co-funders to a specific funder including an example funded work
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -13,6 +14,6 @@ SELECT ?count ?sponsor ?sponsorLabel (CONCAT("/sponsor/", SUBSTR(STR(?sponsor),3
     }
     GROUP BY ?sponsor
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+  {{ sparql_helpers.labels(["?sponsor", "?example_work"], languages) }}
 }
 ORDER BY DESC(?count)

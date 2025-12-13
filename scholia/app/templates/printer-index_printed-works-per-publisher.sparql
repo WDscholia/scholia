@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -8,7 +9,8 @@ SELECT ?count ?printer ?printerLabel ?printerDescription (CONCAT("/printer/", SU
     }
     GROUP BY ?printer
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?printer", "?example_work"], languages) }}
+  {{ sparql_helpers.descriptions(["?printer"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 1000

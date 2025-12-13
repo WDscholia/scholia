@@ -1,12 +1,13 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: Scatterplot of project budgets associated with a funder
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:ScatterChart
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?start_time ?budget ?project (REPLACE(STR(?project), ".*/", "") AS ?projectLabel) WHERE {
+SELECT ?start_time ?budget ?project ?projectLabel WHERE {
   ?project wdt:P859+ target: .
   ?project wdt:P2769 ?budget .
   ?project (wdt:P580 | wdt:P571) ?start_time .
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?project"], languages) }}
 }
