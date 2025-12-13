@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Map{"layer": "?counts"}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -12,7 +13,8 @@ SELECT ?geo ?printer ?printerLabel ?printerDescription ?counts ?example_work ?ex
   }
   BIND (IF(?count = 1,"1",IF(?count <= 5,"2-5",IF(?count <= 10,"6-10","10+"))) AS ?counts)
   ?printer wdt:P159?/wdt:P625 ?geo
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,it,jp,nl,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?printer", "?example_work"], languages) }}
+  {{ sparql_helpers.descriptions(["?printer"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 1000
