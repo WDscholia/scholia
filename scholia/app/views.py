@@ -453,12 +453,6 @@ def index():
                            sparql_editURL=editurl, sparql_embedURL=embedurl)
 
 
-from flask import jsonify, render_template, request, current_app
-from .. import __version__
-from ..config import config
-
-# ... existing imports and blueprint setup ...
-
 @main.route('/backend')
 def backend():
     """Show backend information."""
