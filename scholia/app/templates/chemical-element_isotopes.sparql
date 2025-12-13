@@ -1,11 +1,11 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: list the isotopes for this chemical element
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?isotope (REPLACE(STR(?isotope), ".*/", "") AS ?isotopeLabel) ?protons ?neutrons ?mass ?massUnit (REPLACE(STR(?massUnit), ".*/", "") AS ?massUnitLabel) ?halflife ?halflifeUnit ?halflifeUnitLabel WHERE {
+SELECT ?isotope ?isotopeLabel ?protons ?neutrons ?mass ?massUnit ?massUnitLabel ?halflife ?halflifeUnit ?halflifeUnitLabel WHERE {
   VALUES ?element { target: }
   ?element wdt:P1086 ?protons .
   ?isotope wdt:P279 ?element ;
@@ -18,6 +18,6 @@ SELECT ?isotope (REPLACE(STR(?isotope), ".*/", "") AS ?isotopeLabel) ?protons ?n
   ?halflifeStat psv:P2114 ?halflifeValNode .
   ?halflifeValNode wikibase:quantityAmount ?halflife ;
                    wikibase:quantityUnit ?halflifeUnit .
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?isotope", "?massUnit", "?halflifeUnit"], languages) }}
 }
 ORDER BY ?neutrons

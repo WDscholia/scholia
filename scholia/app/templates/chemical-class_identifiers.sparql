@@ -1,6 +1,6 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: identifiers for this chemical class
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -12,7 +12,8 @@ SELECT ?IDpred ?IDpredLabel ?id ?idUrl ?IDpredDescription {
     ?IDpred wdt:P1630 ?formatterurl .
   }
   BIND (IRI(REPLACE(?formatterurl, '\\\\$1', STR(?id))) AS ?idUrl) .
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?IDpred"], languages) }}
+  {{ sparql_helpers.descriptions(["?IDpred"], languages) }}
 }
 ORDER BY ASC(?IDpredLabel)
 LIMIT 500

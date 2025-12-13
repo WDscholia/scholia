@@ -1,10 +1,9 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: taxons in which this chemical class is found
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?chemicals ?example_chemical ?example_chemicalLabel (CONCAT("/chemical/", SUBSTR(STR(?example_chemical),32)) AS ?example_chemicalUrl) ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon),32)) AS ?taxonUrl) ?taxonDescription WHERE {
   {
     SELECT DISTINCT (COUNT(DISTINCT (?chemical)) AS ?chemicals) ?taxon (SAMPLE(?chemical) AS ?example_chemical) WHERE {
@@ -16,6 +15,7 @@ SELECT ?chemicals ?example_chemical ?example_chemicalLabel (CONCAT("/chemical/",
     ORDER BY DESC(?chemicals)
     LIMIT 250
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?example_chemical", "?taxon"], languages) }}
+  {{ sparql_helpers.descriptions(["?taxon"], languages) }}
 }
 ORDER BY DESC(?chemicals)

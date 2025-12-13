@@ -1,6 +1,6 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: list known allotropes
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
@@ -8,7 +8,7 @@ PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT DISTINCT ?allotrope (REPLACE(STR(?allotrope), ".*/", "") AS ?allotropeLabel) ?density ?densityUnit (REPLACE(STR(?densityUnit), ".*/", "") AS ?densityUnitLabel) {
+SELECT DISTINCT ?allotrope ?allotropeLabel ?density ?densityUnit ?densityUnitLabel {
   {
     SELECT ?allotrope (SAMPLE(?densityStats) AS ?densityStat) WHERE {
       ?allotrope wdt:P31 | wdt:P279 ?allotropeType .
@@ -27,6 +27,6 @@ SELECT DISTINCT ?allotrope (REPLACE(STR(?allotrope), ".*/", "") AS ?allotropeLab
     ?densityValNode wikibase:quantityAmount ?density ;
                     wikibase:quantityUnit ?densityUnit .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?allotrope", "?densityUnit"], languages) }}
 }
 ORDER BY ASC(?allotropeLabel)
