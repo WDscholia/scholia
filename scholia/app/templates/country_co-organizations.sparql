@@ -1,10 +1,11 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: Co-organizations for a specific country
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Map
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?coorganization (REPLACE(STR(?coorganization), ".*/", "") AS ?coorganizationLabel) ?geocoordinates ?example_coauthor (REPLACE(STR(?example_coauthor), ".*/", "") AS ?example_coauthorLabel) ?example_work (REPLACE(STR(?example_work), ".*/", "") AS ?example_workLabel) WHERE {
+SELECT ?coorganization ?example_workLabel WHERE {
   {
     SELECT ?coorganization (SAMPLE(?geocoordinates_) AS ?geocoordinates) (SAMPLE(?coauthor) AS ?example_coauthor) (SAMPLE(?work) AS ?example_work) WHERE {
       ?organization wdt:P17 target: .
@@ -18,5 +19,5 @@ SELECT ?coorganization (REPLACE(STR(?coorganization), ".*/", "") AS ?coorganizat
     }
     GROUP BY ?coorganization
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?example_work"], languages) }}
 }
