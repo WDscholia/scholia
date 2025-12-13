@@ -1,11 +1,9 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT DISTINCT ?start_date ?trial ?trialLabel ?intervention ?interventionLabel ?sponsor ?sponsorLabel WHERE {
   ?trial wdt:P31 wd:Q30612 ;
-         wdt:P1050/wdt:P279* target: .
+         wdt:P1050/wdt:P279* wd:{{ q }} .
   OPTIONAL {
     ?trial wdt:P580 ?starttime
     BIND (SUBSTR(STR(?starttime),0,11) AS ?start_date)
@@ -16,6 +14,6 @@ SELECT DISTINCT ?start_date ?trial ?trialLabel ?intervention ?interventionLabel 
   OPTIONAL {
     ?trial wdt:P859 ?sponsor
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?trial", "?intervention"], languages) }}
 }
 ORDER BY DESC(?starttime)
