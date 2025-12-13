@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -60,6 +61,6 @@ SELECT ?publication_date ?work ?workLabel ?researchers ?researchersUrl WHERE {
     GROUP BY ?work
   }
   BIND (xsd:date(?publication_datetime) AS ?publication_date)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?publication_date)

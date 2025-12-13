@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # Pages per year bar chart of an organization
@@ -23,7 +24,7 @@ SELECT ?year (SUM(?pages_per_author) AS ?number_of_pages) ?researcher ?researche
     }
     GROUP BY ?work ?researcher ?year
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?researcher"], languages) }}
 }
 GROUP BY ?year ?researcher ?researcherLabel
 ORDER BY ?year
