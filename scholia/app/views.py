@@ -3,7 +3,7 @@
 import datetime
 import re
 
-from flask import (Blueprint, current_app, redirect,
+from flask import (Blueprint, current_app, jsonify, redirect,
                    render_template as render_template_base,
                    request, Response, url_for)
 from jinja2 import TemplateNotFound
@@ -32,6 +32,7 @@ from ..utils import (remove_special_characters_url, sanitize_q, string_to_list,
                      string_to_type)
 from ..wikipedia import q_to_bibliography_templates
 from ..config import config
+from scholia import __version__
 
 
 ROBOTS_TXT = """User-agent: *
