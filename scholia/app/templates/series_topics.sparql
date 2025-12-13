@@ -1,9 +1,8 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BubbleChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?count ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) WHERE {
+SELECT ?count ?topic ?topicLabel WHERE {
   {
     SELECT (COUNT(*) AS ?count) ?topic WHERE {
       # Topics of series
@@ -23,7 +22,7 @@ SELECT ?count ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) WHERE {
     }
     GROUP BY ?topic
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?topic"], languages) }}
 }
 ORDER BY DESC(?count) DESC(?count)
 LIMIT 100

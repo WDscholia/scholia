@@ -17,7 +17,7 @@ SELECT ?year ?count ?organization (REPLACE(STR(?organization), ".*/", "") AS ?or
       }
       ?work wdt:P50 ?author .
       # For now, only employment relation
-      # We could add affiliation with "| wdt:P1416/wdt:P361*" 
+      # We could add affiliation with "| wdt:P1416/wdt:P361*"
       # Note that this extra term will double count.
       ?author wdt:P108 ?organization .
     }

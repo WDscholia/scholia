@@ -1,8 +1,7 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # Statistics for a serial grouped by author
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?number_of_works ?number_of_citations ?author ?authorLabel ?example_work ?example_workLabel WHERE {
   {
     SELECT (COUNT(DISTINCT ?work) AS ?number_of_works) (COUNT(?citing_work) AS ?number_of_citations) (SAMPLE(?work) AS ?example_work) ?author WHERE {
@@ -15,6 +14,6 @@ SELECT ?number_of_works ?number_of_citations ?author ?authorLabel ?example_work 
     }
     GROUP BY ?author
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+  {{ sparql_helpers.labels(["?author", "?example_work"], languages) }}
 }
 ORDER BY DESC(?number_of_works) DESC(?number_of_citations)

@@ -1,11 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-SELECT ?publication_date ?number_of_papers ?short_name ?ordinal ?collection (REPLACE(STR(?collection), ".*/", "") AS ?collectionLabel) WHERE {
+SELECT ?publication_date ?number_of_papers ?short_name ?ordinal ?collection ?collectionLabel WHERE {
   {
     SELECT (COUNT(?work) AS ?number_of_papers) (MIN(?datetimes) AS ?publication_datetime) (SAMPLE(?short_name_) AS ?short_name) ?collection (SAMPLE(?ordinal_) AS ?ordinal) WHERE {
       ?collection wdt:P179 target: .
@@ -25,6 +24,6 @@ SELECT ?publication_date ?number_of_papers ?short_name ?ordinal ?collection (REP
     GROUP BY ?collection
   }
   BIND (xsd:date(?publication_datetime) AS ?publication_date)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+  {{ sparql_helpers.labels(["?collection"], languages) }}
 }
 ORDER BY DESC(?publication_date) DESC(?number_of_papers)
