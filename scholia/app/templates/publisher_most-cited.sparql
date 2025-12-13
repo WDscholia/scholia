@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # Count the number of citations for each journal published by a specified publisher
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -15,6 +16,6 @@ SELECT ?number_of_citations ?work ?workLabel ?journal ?journalLabel WHERE {
     LIMIT 500
   }
   # Label the result
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?work", "?journal"], languages) }}
 }
 ORDER BY DESC(?number_of_citations)
