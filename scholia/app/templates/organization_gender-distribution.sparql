@@ -1,8 +1,9 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?count ?gender (REPLACE(STR(?gender), ".*/", "") AS ?genderLabel) WHERE {
+SELECT ?count ?gender ?genderLabel WHERE {
   {
     SELECT (COUNT(DISTINCT ?researcher) AS ?count) ?gender WHERE {
       ?researcher (wdt:P108 | wdt:P463 | wdt:P1416)/wdt:P361* target: .
@@ -10,6 +11,6 @@ SELECT ?count ?gender (REPLACE(STR(?gender), ".*/", "") AS ?genderLabel) WHERE {
     }
     GROUP BY ?gender
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?gender"], languages) }}
 }
 ORDER BY DESC(?count)
