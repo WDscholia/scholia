@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # Scholia
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -19,5 +20,5 @@ SELECT ?work ?workLabel ?authors ?authorsUrl ?topics ?topicsUrl WHERE {
     }
     GROUP BY ?work
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }

@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:LineChart
 PREFIX target: <http://www.wikidata.org/entity/{{q}}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -16,6 +17,6 @@ SELECT ?year ?acceptance_rate ?trackLabel WHERE {
   }
   BIND (COALESCE(?track_, "total") AS ?track)
   BIND (STR(YEAR(?datetime)) AS ?year)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?track"], languages) }}
 }
 ORDER BY ?year

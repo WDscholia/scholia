@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -12,6 +13,7 @@ SELECT ?score ?event ?eventLabel ?eventDescription ?example_person ?example_pers
     ORDER BY DESC(?score)
     LIMIT 200
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?event", "?example_person"], languages) }}
+  {{ sparql_helpers.descriptions(["?event"], languages) }}
 }
 ORDER BY DESC(?score)

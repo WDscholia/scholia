@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -20,6 +21,7 @@ SELECT ?events ?short_name ?event_series ?event_seriesLabel ?event_seriesDescrip
   OPTIONAL {
     ?event_series wdt:P1813 ?short_name
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,fr". }
+  {{ sparql_helpers.labels(["?event_series"], languages) }}
+  {{ sparql_helpers.descriptions(["?event_series"], languages) }}
 }
 ORDER BY DESC(?events)

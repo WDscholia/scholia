@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -78,6 +79,6 @@ SELECT ?description ?descriptionLabel ?descriptionUrl ?value ?valueLabel ?valueU
     }
     BIND (IF(BOUND(?track),CONCAT(STR(?acceptance_rate * 100), " % (", ?track, ")"),CONCAT(STR(?acceptance_rate * 100), " %")) AS ?value)
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?description", "?value"], languages) }}
 }
 ORDER BY ?order

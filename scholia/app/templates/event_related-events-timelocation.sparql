@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -60,6 +61,6 @@ SELECT (ROUND(1000 * ?score_) / 1000 AS ?score) (ROUND(1000 * ?time_score_) / 10
     GROUP BY ?event
   }
   FILTER (?event != target:)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?event"], languages) }}
 }
 ORDER BY DESC(?score)

@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:AreaChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -30,6 +31,6 @@ SELECT ?year ?works ?topic ?topicLabel WHERE {
     }
     GROUP BY ?year ?topic
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?topic"], languages) }}
 }
 ORDER BY ?year
