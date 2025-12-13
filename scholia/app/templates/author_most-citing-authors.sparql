@@ -1,8 +1,7 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?citing_author ?citing_authorLabel
 # Either show the ORCID iD or construct part of a URL to search on the ORCID homepage
 (COALESCE(?orcid_, CONCAT("orcid-search/search/?searchQuery=", ENCODE_FOR_URI(?citing_authorLabel))) AS ?orcid) WHERE {
@@ -27,6 +26,6 @@ SELECT ?count ?citing_author ?citing_authorLabel
     }
     GROUP BY ?count ?citing_author
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?citing_author"], languages) }}
 }
 ORDER BY DESC(?count)
