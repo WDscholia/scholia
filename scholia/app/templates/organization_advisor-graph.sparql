@@ -1,10 +1,11 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?author1 (REPLACE(STR(?author1), ".*/", "") AS ?author1Label) ?rgb ?author2 (REPLACE(STR(?author2), ".*/", "") AS ?author2Label) WHERE {
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label WHERE {
   {
     SELECT DISTINCT ?author1 ?author2 ?rgb WHERE {
       VALUES ?organisation { target: }
@@ -32,5 +33,5 @@ SELECT ?author1 (REPLACE(STR(?author1), ".*/", "") AS ?author1Label) ?rgb ?autho
       BIND (IF(?gender1 = wd:Q6581097,"3182BD","E6550D") AS ?rgb)
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?author1", "?author2"], languages) }}
 }

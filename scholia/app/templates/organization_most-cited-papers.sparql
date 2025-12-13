@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BubbleChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # Bubble chart of most cited works of first author associated
@@ -23,6 +24,6 @@ SELECT ?count ?work ?workLabel WHERE {
     ORDER BY DESC(?count)
     LIMIT 20
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?count)

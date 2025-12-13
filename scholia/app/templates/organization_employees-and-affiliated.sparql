@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: Employees and affiliated with a specified organization
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -30,7 +31,8 @@ SELECT (SAMPLE(?number_of_works_) AS ?works) (SAMPLE(?wikis_) AS ?wikis) ?resear
   OPTIONAL {
     ?researcher wikibase:sitelinks ?wikis_
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?researcher"], languages) }}
+  {{ sparql_helpers.descriptions(["?researcher"], languages) }}
 }
 GROUP BY ?researcher ?researcherLabel ?researcherDescription
 ORDER BY DESC(?works)
