@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Graph
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -46,11 +47,8 @@ SELECT ?author1 ?author1Label (SAMPLE(?image1_) AS ?image1) ?rgb ?author2 ?autho
   OPTIONAL {
     ?author2 wdt:P18 ?image2_ .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
-}
-}
-GROUP
-BY
+  {{ sparql_helpers.labels(["?author2", "?author1"], languages) }}
+} GROUP BY
 ?author1
 ?author1Label
 ?rgb

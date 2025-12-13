@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:LineChart
 PREFIX target: <http://www.wikidata.org/entity/{{q}}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -8,6 +9,5 @@ SELECT ?year ?number_of_participants WHERE {
          wdt:P580 ?datetime ;
          wdt:P1132 ?number_of_participants .
   BIND (STR(YEAR(?datetime)) AS ?year)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
 }
 ORDER BY ?year

@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: List of event and proceedings for a specific event series
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -30,7 +31,7 @@ SELECT DISTINCT (SAMPLE(?years) AS ?year) (SAMPLE(?ordinal_) AS ?ordinal) (SAMPL
       BIND (YEAR(?datetime) AS ?years)
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels_unbound(["?event", "?proceedings"], languages) }}
 }
 GROUP BY ?event ?year ?eventLabel ?proceedings ?proceedingsLabel
 ORDER BY DESC(?year)

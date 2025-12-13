@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -25,6 +26,7 @@ SELECT ?date ?deadline ?deadlineLabel ?short_name ?event ?eventLabel (CONCAT("/e
     GROUP BY ?datetime ?deadline ?event
   }
   BIND (xsd:date(?datetime) AS ?date)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?event", "?deadline"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?location"], languages) }}
 }
 ORDER BY (?date)

@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # Use by people associated with an event
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -26,7 +27,8 @@ SELECT ?number_of_persons ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use),32)) 
     }
     GROUP BY ?use
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?use", "?example_person"], languages) }}
+  {{ sparql_helpers.descriptions(["?use"], languages) }}
 }
 ORDER BY DESC(?number_of_persons)
 LIMIT 200

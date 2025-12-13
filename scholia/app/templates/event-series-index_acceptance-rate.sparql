@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
@@ -20,6 +21,6 @@ SELECT (ROUND(10000 * ?mean_acceptance_rate) / 100 AS ?mean_acceptance_percentag
     }
     GROUP BY ?event_series ?track
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?event_series", "?track"], languages) }}
 }
 ORDER BY ?mean_acceptance_rate
