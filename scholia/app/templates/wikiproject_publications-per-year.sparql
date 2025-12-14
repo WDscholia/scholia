@@ -1,60 +1,47 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-SELECT (STR(?year_) AS ?year) (COUNT(?work) AS ?number_of_publications)
-# Work type used to color the bar chart
-?type WHERE {
+SELECT
+  (STR(?year_) AS ?year)
+  (COUNT(?work) AS ?number_of_publications)
+  # Work type used to color the bar chart
+  (?article_typeLabel AS ?type)
+WHERE {
   {
     { # Find works with the topic. Also report the year
-      SELECT ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type) WHERE {
-        {
-          ?work wdt:P6104 target: .
-        }
-        UNION {
-          ?work wdt:P5008 target: .
-        }
-        ?work wdt:P577 ?dates .
+      SELECT ?work (MIN(?years) AS ?year_) (SAMPLE(?article_type_) AS ?article_type) WHERE {
+        ?work wdt:P6104|wdt:P5008 target: ;
+              wdt:P50 [] ;
+              wdt:P31 ?article_type_ ;
+              wdt:P577 ?dates .
         BIND (YEAR(?dates) AS ?years) .
-        ?work wdt:P31 ?article_type_ .
       }
       GROUP BY ?work
     }
-    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+    {{ sparql_helpers.labels(["?article_type"], languages) }}
   }
   UNION {
-    {
-      SELECT ?year_ WHERE {
-        # default values = 0
-        ?year_item wdt:P31 wd:Q577 .
-        ?year_item wdt:P585 ?date .
-        BIND (YEAR(?date) AS ?year_)
-      }
-    }
-    BIND ("_" AS ?type)
+    VALUES ?year_class { wd:Q577 wd:Q3186692 }
+    [] wdt:P31 ?year_class ;
+       wdt:P585 ?date .
+    BIND (YEAR(?date) AS ?year_)
+    BIND ("_" AS ?article_typeLabel)
   }
+
   { # Find earliest publication year
     SELECT (MIN(?year_) AS ?earliest_year) WHERE {
-      { # Find works with the topic. Also report the year
-        SELECT ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type) WHERE {
-          {
-            ?work wdt:P6104 target: .
-          }
-          UNION {
-            ?work wdt:P5008 target: .
-          }
-          ?work wdt:P577 ?dates .
-          BIND (YEAR(?dates) AS ?years) .
-          ?work wdt:P31 ?article_type_ .
-        }
-        GROUP BY ?work
-      }
+      ?work wdt:P6104|wdt:P5008 target: .
+      ?work wdt:P577 ?date .
+      BIND (YEAR(?date) AS ?year_) .
+      FILTER (ISLITERAL(?year_))
     }
-    GROUP BY ?dummy
   }
-  BIND (YEAR(NOW() 
-) AS ?this_year ) FILTER ( ?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR ( "1900-01-01" ^^ xsd:dateTime ) )}
-GROUP BY ?year_ ?type
+
+  BIND (YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= 1900)
+}
+GROUP BY ?year_ ?article_typeLabel
 ORDER BY ?year

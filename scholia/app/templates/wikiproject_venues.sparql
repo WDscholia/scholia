@@ -6,13 +6,8 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?short_name ?venue ?venueLabel (CONCAT("/venue/", SUBSTR(STR(?venue),32)) AS ?venueUrl) WHERE {
   {
-    SELECT (COUNT(?work) AS ?count) ?venue (SAMPLE(?short_name_) AS ?short_name) WHERE {
-      {
-        ?work wdt:P6104 target: .
-      }
-      UNION {
-        ?work wdt:P5008 target: .
-      }
+    SELECT (COUNT(DISTINCT ?work) AS ?count) ?venue (SAMPLE(?short_name_) AS ?short_name) WHERE {
+      ?work wdt:P6104|wdt:P5008 target: .
       ?work wdt:P1433/wdt:P179* ?venue .
       OPTIONAL {
         ?venue wdt:P1813 ?short_name_ .

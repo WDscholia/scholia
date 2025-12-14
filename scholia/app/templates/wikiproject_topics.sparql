@@ -2,18 +2,13 @@
 
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
 ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic),32)) AS ?topicUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
-  # Label the results
   {
     SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
       # Find works for the specific queried topic
-      VALUES ?p { wdt:P6104 wdt:P5008 }
-      ?work ?p target: .
-
+      ?work wdt:P6104|wdt:P5008 target: .
       # Find co-occuring topics
       ?work wdt:P921 ?topic .
       # Avoid listing the queried topic
@@ -21,6 +16,7 @@ SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
     }
     GROUP BY ?topic
   }
+  # Label the results
   {{ sparql_helpers.labels(["?topic", "?example_work"], languages) }}
 }
 ORDER BY DESC(?count)

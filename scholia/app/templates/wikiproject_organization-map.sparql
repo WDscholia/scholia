@@ -12,12 +12,7 @@ SELECT ?organization ?organizationLabel ?geo ?count ?layer WHERE {
       {
         SELECT DISTINCT ?work WHERE {
           # Works on the topic
-          {
-            ?work wdt:P6104 target: .
-          }
-          UNION {
-            ?work wdt:P5008 target: .
-          }
+          ?work wdt:P6104|wdt:P5008 target: .
           ?work wdt:P50 [] .
         }
         LIMIT 20000

@@ -1,28 +1,21 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT ?date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) ?topicsUrl ?topics WHERE {
   {
-    SELECT (MAX(?dates) AS ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topic_label; SEPARATOR=" // ") AS ?topics) (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic),32); SEPARATOR=",")) AS ?topicsUrl) WHERE {
+    SELECT (MAX(?dates) AS ?datetime) ?work (GROUP_CONCAT(DISTINCT ?topicLabel; SEPARATOR=" // ") AS ?topics) (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic),32); SEPARATOR=",")) AS ?topicsUrl) WHERE {
       {
         SELECT DISTINCT ?work WHERE {
-          {
-            ?work wdt:P6104 target: .
-          }
-          UNION {
-            ?work wdt:P5008 target: .
-          }
+          ?work wdt:P6104|wdt:P5008 target: ;
+                wdt:P50 []
         }
       }
       ?work wdt:P921 ?topic .
       OPTIONAL {
         ?work wdt:P577 ?dates .
       }
-      ?topic rdfs:label ?topic_label . FILTER (LANG(?topic_label) = 'en')
+      {{ sparql_helpers.labels(["?topic"], languages) }}
     }
     GROUP BY ?work
   }
