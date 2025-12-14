@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -19,6 +20,7 @@ SELECT ?count ?lexeme (?lexeme_label AS ?lexemeLabel) (CONCAT("/lexeme/", SUBSTR
     LIMIT 500
   }
   ?lexeme wikibase:lemma ?lexeme_label
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],cz,da,de,en,es,fr,jp,nl,no,pl,ru,sv,zh" . }
+  {{ sparql_helpers.labels(["?language", "?example_work"], languages) }}
+  {{ sparql_helpers.descriptions(["?example_work"], languages) }}
 }
 ORDER BY DESC(?count)
