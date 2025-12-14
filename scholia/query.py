@@ -80,7 +80,8 @@ HEADERS = {'User-Agent': USER_AGENT}
 #
 # cu, el and iu has multiple values
 
-# Provisional place for the prefixes - this should probably go into a configuraiton file
+# Provisional place for the prefixes - this should probably go into a
+# configuration file
 SPARQL_PREFIXES = """
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -298,7 +299,8 @@ def identifier_to_qs(property, identifier):
     True
 
     """
-    query = SPARQL_PREFIXES + 'SELECT ?work {{ ?work wdt:{property} "{identifier}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'SELECT ?work {{ ?work wdt:{property} "{identifier}" }}').format(
         property=property,
         identifier=escape_string(identifier),
     )
@@ -394,7 +396,8 @@ def doi_to_qs(doi):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?work where {{ ?work wdt:P356 "{doi}" }}').format(
         doi=escape_string(doi.upper()))
 
     url = SPARQL_ENDPOINT
@@ -436,7 +439,8 @@ def doi_prefix_to_qs(doi):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P1662 "{doi}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?work where {{ ?work wdt:P1662 "{doi}" }}').format(
         doi=escape_string(doi.upper()))
 
     url = SPARQL_ENDPOINT
@@ -475,9 +479,11 @@ def iso639_to_q(language):
 
     # Fallback on query
     if len(language) == 2:
-        query = SPARQL_PREFIXES + "SELECT * {{ ?language wdt:P218 '{}' }}".format(language)
+        query = SPARQL_PREFIXES + (
+            "SELECT * {{ ?language wdt:P218 '{}' }}").format(language)
     elif len(language) == 3:
-        query = SPARQL_PREFIXES + "SELECT * {{ ?language wdt:P219 '{}' }}".format(language)
+        query = SPARQL_PREFIXES + (
+            "SELECT * {{ ?language wdt:P219 '{}' }}").format(language)
     else:
         raise ValueError('ISO639 language code not recognized')
 
@@ -519,7 +525,8 @@ def pubchem_to_qs(cid):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?chemical where {{ ?chemical wdt:P662 "{cid}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?chemical where {{ ?chemical wdt:P662 "{cid}" }}').format(
         cid=cid)
 
     url = SPARQL_ENDPOINT
@@ -580,7 +587,8 @@ def pubmed_to_qs(pmid):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P698 "{pmid}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?work where {{ ?work wdt:P698 "{pmid}" }}').format(
         pmid=pmid)
 
     url = SPARQL_ENDPOINT
@@ -613,7 +621,8 @@ def ror_to_qs(rorid):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P6782 "{rorid}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?work where {{ ?work wdt:P6782 "{rorid}" }}').format(
         rorid=rorid)
 
     url = SPARQL_ENDPOINT
@@ -649,7 +658,8 @@ def uniprot_to_qs(protein):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?protein where {{ ?protein wdt:P352 "{protein}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?protein where {{ ?protein wdt:P352 "{protein}" }}').format(
         protein=protein)
 
     url = SPARQL_ENDPOINT
@@ -685,7 +695,8 @@ def ncbi_gene_to_qs(gene):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?gene where {{ ?gene wdt:P351 "{gene}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?gene where {{ ?gene wdt:P351 "{gene}" }}').format(
         gene=gene)
 
     url = SPARQL_ENDPOINT
@@ -721,7 +732,8 @@ def ncbi_taxon_to_qs(taxon):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P685 "{taxon}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?work where {{ ?work wdt:P685 "{taxon}" }}').format(
         taxon=taxon)
 
     url = SPARQL_ENDPOINT
@@ -754,9 +766,10 @@ def wikipathways_to_qs(wpid):
     True
 
     """
-    query = SPARQL_PREFIXES + ('select ?work where {{ VALUES ?wpid {{ "{wpid}" }} '
-             '?work wdt:P2410 ?wpid }}').format(
-                 wpid=wpid)
+    query = SPARQL_PREFIXES + (
+        'select ?work where {{ VALUES ?wpid {{ "{wpid}" }} '
+        '?work wdt:P2410 ?wpid }}').format(
+             wpid=wpid)
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
@@ -786,7 +799,8 @@ def issn_to_qs(issn):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?author where {{ ?author wdt:P236 "{issn}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?author where {{ ?author wdt:P236 "{issn}" }}').format(
         issn=escape_string(issn))
 
     url = SPARQL_ENDPOINT
@@ -817,7 +831,8 @@ def omim_to_qs(omimID):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?disease where {{ ?disease wdt:P492 "{omimID}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?disease where {{ ?disease wdt:P492 "{omimID}" }}').format(
         omimID=escape_string(omimID))
 
     url = SPARQL_ENDPOINT
@@ -848,7 +863,8 @@ def orcid_to_qs(orcid):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?author where {{ ?author wdt:P496 "{orcid}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?author where {{ ?author wdt:P496 "{orcid}" }}').format(
         orcid=escape_string(orcid))
 
     url = SPARQL_ENDPOINT
@@ -879,7 +895,8 @@ def mesh_to_qs(meshid):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?cmp where {{ ?cmp wdt:P486 "{meshid}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?cmp where {{ ?cmp wdt:P486 "{meshid}" }}').format(
         meshid=meshid)
 
     url = SPARQL_ENDPOINT
@@ -914,7 +931,8 @@ def q_to_dois(q):
     True
 
     """
-    query = SPARQL_PREFIXES + """SELECT ?doi {{ wd:{q} wdt:P356 ?doi }}""".format(q=q)
+    query = SPARQL_PREFIXES + (
+        """SELECT ?doi {{ wd:{q} wdt:P356 ?doi }}""").format(q=q)
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
@@ -947,8 +965,9 @@ def q_to_label(q, language='en'):
     True
 
     """
-    query = SPARQL_PREFIXES + """SELECT ?label WHERE {{ wd:{q} rdfs:label ?label .
-        FILTER (LANG(?label) = "{language}") }}""".format(
+    query = SPARQL_PREFIXES + (
+        """SELECT ?label WHERE {{ wd:{q} rdfs:label ?label .
+        FILTER (LANG(?label) = "{language}") }}""").format(
         q=q, language=language)
 
     url = SPARQL_ENDPOINT
@@ -1080,7 +1099,8 @@ def viaf_to_qs(viaf):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?author where {{ ?author wdt:P214 "{viaf}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?author where {{ ?author wdt:P214 "{viaf}" }}').format(
         viaf=escape_string(viaf))
 
     url = SPARQL_ENDPOINT
@@ -1114,7 +1134,8 @@ def q_to_class(q):
     is compared against a set of hardcoded matches.
 
     """
-    query = SPARQL_PREFIXES + 'SELECT ?class {{ wd:{q} wdt:P31 ?class }}'.format(
+    query = SPARQL_PREFIXES + (
+        'SELECT ?class {{ wd:{q} wdt:P31 ?class }}').format(
         q=escape_string(q))
 
     url = SPARQL_ENDPOINT
@@ -1367,7 +1388,8 @@ def q_to_class(q):
     elif ('Q16695773' in classes):  # wikiproject
         class_ = 'wikiproject'
     else:
-        query = SPARQL_PREFIXES + 'select ?class where {{ wd:{q} wdt:P279+ ?class }}'.format(
+        query = SPARQL_PREFIXES + (
+            'select ?class where {{ wd:{q} wdt:P279+ ?class }}').format(
             q=escape_string(q))
 
         url = SPARQL_ENDPOINT
@@ -1692,7 +1714,8 @@ def website_to_qs(url):
     True
 
     """
-    query = SPARQL_PREFIXES + 'SELECT ?work WHERE {{ ?work wdt:P856 <{url}> }}'.format(
+    query = SPARQL_PREFIXES + (
+        'SELECT ?work WHERE {{ ?work wdt:P856 <{url}> }}').format(
         url=url.strip())
 
     url_ = SPARQL_ENDPOINT
