@@ -6,7 +6,7 @@ SELECT DISTINCT ?description ?value ?valueUrl WHERE {
   {
     BIND (1 AS ?order)
     BIND ("Title" AS ?description)
-    ?podcast wdt:P1476 ?value .
+    target: wdt:P1476 ?value .
   }
   UNION {
     SELECT (2 AS ?order) ("Presenters" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
@@ -22,7 +22,7 @@ SELECT DISTINCT ?description ?value ?valueUrl WHERE {
   UNION {
     BIND (3 AS ?order)
     BIND ("Language" AS ?description)
-    ?podcast wdt:P407 ?iri .
+    target: wdt:P407 ?iri .
     BIND (SUBSTR(STR(?iri),32) AS ?q)
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
@@ -32,7 +32,7 @@ SELECT DISTINCT ?description ?value ?valueUrl WHERE {
   UNION {
     SELECT ?description ?order (MAX(?value_) AS ?value) WHERE {
       BIND (target: AS ?podcast)
-      ?podcast wdt:P1113 ?value_ .
+      target: wdt:P1113 ?value_ .
       BIND (4 AS ?order)
       BIND ("Number of episodes" AS ?description)
     }
@@ -41,7 +41,7 @@ SELECT DISTINCT ?description ?value ?valueUrl WHERE {
   UNION {
     BIND (5 AS ?order)
     BIND ("Web feed" AS ?description)
-    ?podcast wdt:P1019 ?valueUrl .
+    target: wdt:P1019 ?valueUrl .
     BIND ("feed" AS ?value)
   }
 }

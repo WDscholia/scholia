@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -19,7 +20,7 @@ SELECT ?publication_date ?podcast ?podcastLabel (CONCAT("/podcast/", SUBSTR(STR(
     ORDER BY DESC(?publication_date)
     LIMIT 50
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?episode", "?podcast"], languages) }}
 }
 GROUP BY ?publication_date ?episode ?episodeLabel ?podcast ?podcastLabel
 ORDER BY DESC(?publication_date)
