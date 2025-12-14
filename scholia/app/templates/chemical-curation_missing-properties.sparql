@@ -1,11 +1,11 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?property (REPLACE(STR(?property), ".*/", "") AS ?propertyLabel) WHERE {
+SELECT ?property ?propertyLabel WHERE {
   VALUES ?property { wdt:P2177 wdt:P2102 wdt:P2101 wdt:p3078 wdt:P2119 wdt:P3071 wdt:P2054 wdt:P2128 wdt:P1117 }
   MINUS {
-    target: ?property []
+    wd:{{q}} ?property []
   }
   ?property ^wikibase:directClaim/wdt:P1629/rdfs:label ?propertyLabel .
   FILTER (LANG(?propertyLabel) = "en")
