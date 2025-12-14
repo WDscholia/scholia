@@ -45,6 +45,32 @@ TOPIC_LABELS_SPARQL = """
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?topic ?topic_label
+WHERE {
+  {
+    SELECT ?work {
+      # Search only over scientific articles: This is probably
+      # most relevant
+      ?work wdt:P31 wd:Q13442814 ;
+            wdt:P921 [] .
+    } # The arbitratry limit here is to avoid timeout
+      LIMIT 50000
+  }
+  ?work wdt:P921 ?topic .
+  ?topic rdfs:label ?topic_label_ .
+  # The aliases could also be added: better retrieval, poorer precision?
+  # | skos:altLabel
+  FILTER(LANG(?topic_label_) = 'en')
+  BIND(LCASE(?topic_label_) AS ?topic_label)
+}
+"""
+
+# Wikidata WDQS version, that doesn't work on QLever'
+TOPIC_LABELS_SPARQL_FOR_WDQS = """
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?topic ?topic_label
 WITH {
   # Find works with a topic
