@@ -396,7 +396,8 @@ def doi_to_qs(doi):
     True
 
     """
-    query = SPARQL_PREFIXES + 'select ?work where {{ ?work wdt:P356 "{doi}" }}'.format(
+    query = SPARQL_PREFIXES + (
+        'select ?work where {{ ?work wdt:P356 "{doi}" }}').format(
         doi=escape_string(doi.upper()))
 
     url = SPARQL_ENDPOINT
@@ -478,9 +479,11 @@ def iso639_to_q(language):
 
     # Fallback on query
     if len(language) == 2:
-        query = SPARQL_PREFIXES + "SELECT * {{ ?language wdt:P218 '{}' }}".format(language)
+        query = SPARQL_PREFIXES + (
+            "SELECT * {{ ?language wdt:P218 '{}' }}").format(language)
     elif len(language) == 3:
-        query = SPARQL_PREFIXES + "SELECT * {{ ?language wdt:P219 '{}' }}".format(language)
+        query = SPARQL_PREFIXES + (
+            "SELECT * {{ ?language wdt:P219 '{}' }}").format(language)
     else:
         raise ValueError('ISO639 language code not recognized')
 
@@ -764,9 +767,9 @@ def wikipathways_to_qs(wpid):
 
     """
     query = SPARQL_PREFIXES + (
-            'select ?work where {{ VALUES ?wpid {{ "{wpid}" }} '
-             '?work wdt:P2410 ?wpid }}').format(
-                 wpid=wpid)
+        'select ?work where {{ VALUES ?wpid {{ "{wpid}" }} '
+        '?work wdt:P2410 ?wpid }}').format(
+             wpid=wpid)
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}

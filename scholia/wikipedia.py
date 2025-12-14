@@ -54,8 +54,10 @@ select ?work ?title ?venueLabel ?date ?volume ?issue ?pages
               filter(lang(?license) = 'en') }}
   optional {{ ?work wdt:P356 ?doi . }}
   optional {{ ?work wdt:P953 ?url . }}
-  OPTIONAL {{ ?venue rdfs:label ?venueLabel_en. FILTER(LANG(?venueLabel_en) = "en") }}
-  OPTIONAL {{ ?venue rdfs:label ?venueLabel_mul. FILTER(LANG(?venueLabel_mul) = "mul") }}
+  OPTIONAL {{ ?venue rdfs:label ?venueLabel_en .
+      FILTER(LANG(?venueLabel_en) = "en") }}
+  OPTIONAL {{ ?venue rdfs:label ?venueLabel_mul .
+      FILTER(LANG(?venueLabel_mul) = "mul") }}
   BIND(COALESCE(?venueLabel_en, ?venueLabel_mul) AS ?venueLabel)
 }}
 order by desc(?date)
