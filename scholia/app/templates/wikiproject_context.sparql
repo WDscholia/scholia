@@ -1,17 +1,17 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Graph
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?node ?childNodeLabel ?childNodeImage ?rgb WHERE {
+SELECT ?node ?nodeLabel ?nodeImage ?childNode ?childNodeLabel ?childNodeImage ?rgb WHERE {
   {
     {
       SELECT DISTINCT ?node ?childNode WHERE {
         BIND (target: AS ?node)
         ?node ?p ?i .
         ?childNode ?x ?p .
-        ?childNode wdt:P31 wikibase:Property.
+        ?childNode a wikibase:Property.
         FILTER (STRSTARTS(STR(?i),"http://www.wikidata.org/entity/Q"))
         FILTER (STRSTARTS(STR(?childNode),"http://www.wikidata.org/entity/P"))
       }
@@ -24,7 +24,7 @@ SELECT ?node ?childNodeLabel ?childNodeImage ?rgb WHERE {
         BIND ("EFFBD8" AS ?rgb)
         target: ?p ?childNode .
         ?node ?x ?p .
-        ?node wdt:P31 wikibase:Property.
+        ?node a wikibase:Property.
         FILTER (STRSTARTS(STR(?childNode),"http://www.wikidata.org/entity/Q"))
       }
       LIMIT 5000
@@ -52,5 +52,5 @@ SELECT ?node ?childNodeLabel ?childNodeImage ?rgb WHERE {
     ?property wikibase:directClaim ?childNodeclaim .
     ?childNode ?childNodeclaim ?childNodeImage .
   }
-  {{ sparql_helpers.labels(["?childNode"], languages) }}
+  {{ sparql_helpers.labels(["?node", "?childNode"], languages) }}
 }

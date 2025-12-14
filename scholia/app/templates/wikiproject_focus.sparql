@@ -1,14 +1,12 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
-PREFIX bd: <http://www.bigdata.com/rdf#>
-PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?type ?typeLabel ?count WHERE {
   {
     SELECT DISTINCT ?type (COUNT(?item) AS ?count) WHERE {
-      ?item wdt:P5008 bd:{{ q }};
-      VALUES ?p { wdt:P31 wdt:P279}
-      ?item ?p ?type .
+      ?item wdt:P5008 target: .
+      ?item wdt:P31|wdt:P279 ?type .
     }
     GROUP BY ?type ?count
     ORDER BY DESC(?count)

@@ -2,9 +2,7 @@
 
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?count ?wikiproject ?wikiprojectLabel (CONCAT("/wikiproject/", SUBSTR(STR(?wikiproject),32)) AS ?wikiprojectUrl) ?example_entity ?example_entityLabel (CONCAT("/", SUBSTR(STR(?example_entity),32)) AS ?example_entityUrl) WHERE {
   # Label the results
   {
