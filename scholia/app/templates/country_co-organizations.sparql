@@ -5,7 +5,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?coorganization ?example_workLabel WHERE {
+SELECT ?coorganization ?geocoordinates ?example_coauthorLabel ?example_workLabel WHERE {
   {
     SELECT ?coorganization (SAMPLE(?geocoordinates_) AS ?geocoordinates) (SAMPLE(?coauthor) AS ?example_coauthor) (SAMPLE(?work) AS ?example_work) WHERE {
       ?organization wdt:P17 target: .
@@ -19,5 +19,5 @@ SELECT ?coorganization ?example_workLabel WHERE {
     }
     GROUP BY ?coorganization
   }
-  {{ sparql_helpers.labels(["?example_work"], languages) }}
+  {{ sparql_helpers.labels(["?example_work", "?example_coauthor"], languages) }}
 }
