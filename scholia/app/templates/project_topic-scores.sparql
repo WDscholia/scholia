@@ -1,9 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BubbleChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?score ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) WHERE {
+SELECT ?score ?topic ?topicLabel WHERE {
   {
     SELECT (SUM(?score_) AS ?score) ?topic WHERE {
       {
@@ -26,7 +27,7 @@ SELECT ?score ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) WHERE {
     }
     GROUP BY ?topic
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,jp,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?topic"], languages) }}
 }
 ORDER BY DESC(?score)
 LIMIT 200
