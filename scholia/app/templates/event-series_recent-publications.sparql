@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -34,7 +35,7 @@ SELECT ?publication_date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32
     }
     GROUP BY ?work
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?publication_date)
 LIMIT 500

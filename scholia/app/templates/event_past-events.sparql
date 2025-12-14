@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -29,7 +30,8 @@ SELECT ?time ?short_name ?event ?eventLabel (CONCAT("/event/", SUBSTR(STR(?event
     }
     GROUP BY ?event
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,fr,jp,nl,no,pl,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?event"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?location"], languages) }}
 }
 ORDER BY DESC(?time)
 LIMIT 200
