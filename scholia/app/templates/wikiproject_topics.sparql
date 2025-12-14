@@ -1,3 +1,6 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
+
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -12,14 +15,6 @@ SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
       VALUES ?p { wdt:P6104 wdt:P5008 }
       ?work ?p target: .
 
-      ### non-functional bd:sample call, may need to be reimplemented
-      ### if searching through the entire db is too costly
-      ### if implemented, also implement in template: "wikiproject_co-ocurring-wikiprojects.sparql"
-      # SERVICE bd:sample {
-      #   ?work ?p target: .
-      #   bd:serviceParam bd:sample.limit 10000
-      # }
-
       # Find co-occuring topics
       ?work wdt:P921 ?topic .
       # Avoid listing the queried topic
@@ -27,6 +22,7 @@ SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
     }
     GROUP BY ?topic
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?topic, ?example_work"], languages) }}
 }
 ORDER BY DESC(?count)
