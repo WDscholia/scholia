@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -12,6 +13,6 @@ SELECT ?count ?medical_condition ?medical_conditionLabel (CONCAT("/disease/", SU
     ORDER BY DESC(?count)
     LIMIT 500
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_trial", "?medical_condition"], languages) }}
 }
 ORDER BY DESC(?count)

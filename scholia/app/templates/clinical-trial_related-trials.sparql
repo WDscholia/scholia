@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -6,18 +7,17 @@ PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?score ?trial ?trialLabel WHERE {
   {
     SELECT (SUM(?score_) AS ?score) ?trial WHERE {
-      BIND (target: AS ?query_trial)
       ?trial wdt:P31 wd:Q30612 .
       {
-        ?query_trial wdt:P1050/^wdt:P1050 ?trial .
+        target: wdt:P1050/^wdt:P1050 ?trial .
         BIND (3 AS ?score_)
       }
       UNION {
-        ?query_trial wdt:P4844/^wdt:P4844 ?trial .
+        target: wdt:P4844/^wdt:P4844 ?trial .
         BIND (2 AS ?score_)
       }
       UNION {
-        ?query_trial wdt:P859/^wdt:P859 ?trial .
+        target: wdt:P859/^wdt:P859 ?trial .
         BIND (1 AS ?score_)
       }
     }
@@ -26,6 +26,6 @@ SELECT ?score ?trial ?trialLabel WHERE {
     LIMIT 500
   }
   FILTER (target: != ?trial)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?trial"], languages) }}
 }
 ORDER BY DESC(?score)
