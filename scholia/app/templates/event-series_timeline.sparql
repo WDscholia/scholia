@@ -52,5 +52,4 @@ SELECT ?time ?endtime ?event ?eventLabel ?image ?description WHERE {
     ?event wdt:P18 ?image .
   }
   {{ sparql_helpers.labels(["?event"], languages) }}
-  bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" .
 }
