@@ -55,7 +55,7 @@ SELECT ?date ?work ?workLabel ?type ?via ?topics WHERE {
     GROUP BY ?work ?via
   }
   BIND (xsd:date(?datetime) AS ?date)
-  {{ sparql_helpers.labels(["?work"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?work"], languages) }}
 }
 ORDER BY DESC(?date)
 LIMIT 500

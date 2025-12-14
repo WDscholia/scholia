@@ -1,8 +1,9 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?wikis ?compound (REPLACE(STR(?compound), ".*/", "") AS ?compoundLabel) ?formula WHERE {
+SELECT ?wikis ?compound ?compoundLabel ?formula WHERE {
   {
     SELECT ?wikis ?compound WHERE {
       ?compound wdt:P31 wd:Q113145171 ;
@@ -18,6 +19,6 @@ SELECT ?wikis ?compound (REPLACE(STR(?compound), ".*/", "") AS ?compoundLabel) ?
   OPTIONAL {
     ?compound wdt:P274 ?formula
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?compound"], languages) }}
 }
 ORDER BY DESC(?wikis)

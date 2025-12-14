@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: biological processes in which this chemical is involved
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -8,7 +9,8 @@ SELECT DISTINCT ?pathway ?pathwayLabel (CONCAT("/pathway/", SUBSTR(STR(?pathway)
   ?pathway wdt:P527 target: ;
            wdt:P31 wd:Q2996394 .
   target: wdt:P361 ?pathway .
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?pathway"], languages) }}
+  {{ sparql_helpers.descriptions(["?pathway"], languages) }}
 }
 ORDER BY ASC(?pathwayLabel)
 LIMIT 250

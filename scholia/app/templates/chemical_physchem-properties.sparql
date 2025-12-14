@@ -47,6 +47,7 @@ SELECT DISTINCT ?propEntity ?propEntityLabel ?value ?units ?unitsLabel ?qualifie
     }
     GROUP BY ?propEntity ?value ?units ?source ?doi
   }
-  {{ sparql_helpers.labels(["?propEntity", "?units", "?source"], languages) }}
+  {{ sparql_helpers.labels(["?propEntity", "?units"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?source"], languages) }}
 }
 ORDER BY ASC(?propEntityLabel)
