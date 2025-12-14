@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:ImageGrid
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -19,6 +20,6 @@ SELECT ?year ?recipient ?recipientLabel ?image WHERE {
     }
     GROUP BY ?recipient ?year
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
+  {{ sparql_helpers.labels(["?recipient"], languages) }}
 }
 ORDER BY DESC(?year)

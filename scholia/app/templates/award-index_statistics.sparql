@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # tool: scholia
 #defaultView:ScatterChart
 # Statistics on number of recipients for award wrt. gender
@@ -7,7 +8,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?males ?females ?award ?awardLabel WHERE {
   {
-    SELECT (COUNT(?recipient_male) AS ?males) (COUNT(?recipient_female) AS ?females) ?award (REPLACE(STR(?award), ".*/", "") AS ?awardLabel) WHERE {
+    SELECT (COUNT(?recipient_male) AS ?males) (COUNT(?recipient_female) AS ?females) ?award WHERE {
       ?award wdt:P31 wd:Q11448906 .
       {
         ?recipient_male wdt:P166 ?award .
@@ -25,6 +26,6 @@ SELECT ?males ?females ?award ?awardLabel WHERE {
       (2000 2000 wd:Q10578722 "Fictive Award Label for axis")
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?award"], languages) }}
 }
 ORDER BY DESC(?males) DESC(?female)
