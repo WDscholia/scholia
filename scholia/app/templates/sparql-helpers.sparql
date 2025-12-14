@@ -31,9 +31,9 @@
 
 {% macro descriptions_unbound(variables, languages) -%}
   {% for variable in variables -%}
-    BIND (IF(BOUND ({{ variable }}), {{ variable }}, <http://doesntexist.example.com/nexistepas>) AS {{ variable }}__)
+    BIND (IF(BOUND ({{ variable }}), {{ variable }}, <http://doesntexist.example.com/nexistepas>) AS {{ variable }}___)
     {% for language in languages -%}
-      OPTIONAL { {{ variable }}__ <http://schema.org/description> {{ variable }}Description. FILTER(LANG({{ variable }}Description) = "{{ language }}") }
+      OPTIONAL { {{ variable }}___ <http://schema.org/description> {{ variable }}Description. FILTER(LANG({{ variable }}Description) = "{{ language }}") }
     {% endfor -%}
     {%- if not loop.last %}
     {% endif %}
