@@ -42,6 +42,8 @@ USER_AGENT = config['requests'].get('user_agent')
 HEADERS = {'User-Agent': USER_AGENT}
 
 PAPER_TO_Q_QUERY = u("""
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?paper WHERE {{
   OPTIONAL {{ ?label rdfs:label "{label}"@en . }}
   OPTIONAL {{ ?title wdt:P1476 "{title}"@en . }}
@@ -52,6 +54,7 @@ SELECT ?paper WHERE {{
 """)
 
 SHORT_TITLED_PAPER_TO_Q_QUERY = u("""
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?paper WHERE {{
   OPTIONAL {{ ?full_text_url wdt:P953 <{url}> . }}
   OPTIONAL {{ ?url wdt:P856 <{url}> . }}
