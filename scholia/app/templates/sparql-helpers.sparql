@@ -1,32 +1,40 @@
 {% macro labels(variables, languages) -%}
   {% for variable in variables -%}
     {% for language in languages -%}
-      OPTIONAL { {{ variable }} <http://www.w3.org/2000/01/rdf-schema#label> {{ variable }}Label_{{ language | replace("-", "_") }}. FILTER(LANG({{ variable }}Label_{{ language | replace("-", "_") }}) = "{{ language }}") }
+      OPTIONAL { {{ variable }} <http://www.w3.org/2000/01/rdf-schema#label> {{ variable }}Label. FILTER(LANG({{ variable }}Label) = "{{ language }}") }
     {% endfor -%}
-    BIND(COALESCE(
-    {%- for language in languages -%}
-      {{ variable }}Label_{{ language | replace("-", "_") }}
-      {%- if not loop.last %}, {% endif %}
-    {%- endfor -%}
-    ) AS {{ variable }}Label)
-
     {%- if not loop.last %}
     {% endif %}
   {%- endfor %}
 {%- endmacro -%}
 
-{%- macro descriptions(variables, languages) -%}
+{% macro labels_unbound(variables, languages) -%}
+  {% for variable in variables -%}
+    BIND (IF(BOUND ({{ variable }}), {{ variable }}, <http://doesntexist.example.com/nexistepas>) AS {{ variable }}__)
+    {% for language in languages -%}
+      OPTIONAL { {{ variable }}__ <http://www.w3.org/2000/01/rdf-schema#label> {{ variable }}Label. FILTER(LANG({{ variable }}Label) = "{{ language }}") }
+    {% endfor -%}
+    {%- if not loop.last %}
+    {% endif %}
+  {%- endfor %}
+{%- endmacro -%}
+
+{% macro descriptions(variables, languages) -%}
   {% for variable in variables -%}
     {% for language in languages -%}
-      OPTIONAL { {{ variable }} <http://schema.org/description> {{ variable }}Description_{{ language | replace("-", "_") }}. FILTER(LANG({{ variable }}Description_{{ language | replace("-", "_") }}) = "{{ language }}") }
+      OPTIONAL { {{ variable }} <http://schema.org/description> {{ variable }}Description. FILTER(LANG({{ variable }}Description) = "{{ language }}") }
     {% endfor -%}
-    BIND(COALESCE(
-    {%- for language in languages -%}
-      {{ variable }}Description_{{ language | replace("-", "_") }}
-      {%- if not loop.last %}, {% endif %}
-    {%- endfor -%}
-    ) AS {{ variable }}Description)
+    {%- if not loop.last %}
+    {% endif %}
+  {%- endfor %}
+{%- endmacro -%}
 
+{% macro descriptions_unbound(variables, languages) -%}
+  {% for variable in variables -%}
+    BIND (IF(BOUND ({{ variable }}), {{ variable }}, <http://doesntexist.example.com/nexistepas>) AS {{ variable }}__)
+    {% for language in languages -%}
+      OPTIONAL { {{ variable }}__ <http://schema.org/description> {{ variable }}Description. FILTER(LANG({{ variable }}Description) = "{{ language }}") }
+    {% endfor -%}
     {%- if not loop.last %}
     {% endif %}
   {%- endfor %}
