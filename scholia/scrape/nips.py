@@ -57,6 +57,8 @@ SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 USER_AGENT = config['requests'].get('user_agent')
 
 PAPER_TO_Q_QUERY = u("""
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?paper WHERE {{
   OPTIONAL {{ ?label rdfs:label "{label}"@en . }}
   OPTIONAL {{ ?title wdt:P1476 "{title}"@en . }}
