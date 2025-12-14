@@ -1,9 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?count ?protein (REPLACE(STR(?protein), ".*/", "") AS ?proteinLabel) ?species (REPLACE(STR(?species), ".*/", "") AS ?speciesLabel) ?functions WHERE {
+SELECT ?count ?protein ?proteinLabel ?species ?speciesLabel ?functions WHERE {
   {
     SELECT ?protein (COUNT(?function) AS ?count) (GROUP_CONCAT(?function_label; SEPARATOR=" // ") AS ?functions) WHERE {
       BIND (target: AS ?query_protein)
@@ -17,7 +18,8 @@ SELECT ?count ?protein (REPLACE(STR(?protein), ".*/", "") AS ?proteinLabel) ?spe
   OPTIONAL {
     ?protein wdt:P703 ?species .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?protein"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?species"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 500
