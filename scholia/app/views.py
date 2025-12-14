@@ -458,7 +458,8 @@ def index():
 def backend():
     """Show backend information."""
     sparql_endpoint = config['query-server'].get('sparql_endpoint', '')
-    sparql_endpoint_name = config['query-server'].get('sparql_endpoint_name', '')
+    sparql_endpoint_name = config['query-server'].get(
+        'sparql_endpoint_name', '')
     sparql_editurl = config['query-server'].get('sparql_editurl', '')
     sparql_embedurl = config['query-server'].get('sparql_embedurl', '')
 
@@ -469,8 +470,10 @@ def backend():
         'sparql_endpoint_name': sparql_endpoint_name,
         'sparql_editurl': sparql_editurl,
         'sparql_embedurl': sparql_embedurl,
-        'text_to_topic_q_text_enabled': getattr(current_app, 'text_to_topic_q_text_enabled', False),
-        'third_parties_enabled': getattr(current_app, 'third_parties_enabled', False),
+        'text_to_topic_q_text_enabled': getattr(
+            current_app, 'text_to_topic_q_text_enabled', False),
+        'third_parties_enabled': getattr(
+            current_app, 'third_parties_enabled', False),
     }
 
     # Content negotiation
@@ -481,6 +484,7 @@ def backend():
 
     # Default to HTML representation
     return render_template('backend.html', **data)
+
 
 @main.route("/statistics")
 def index_statistics():
