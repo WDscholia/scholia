@@ -1,3 +1,5 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -9,10 +11,8 @@ SELECT ?count ?wikiproject ?wikiprojectLabel (CONCAT("/wikiproject/", SUBSTR(STR
     SELECT (COUNT(?work) AS ?count) ?wikiproject (SAMPLE(?work) AS ?example_entity) WHERE {
       # Find works for the specific queried wikiproject
       VALUES ?p { wdt:P6104 wdt:P5008 }
-      SERVICE bd:sample {
-        ?work ?p target: .
-        bd:serviceParam bd:sample.limit 100000
-      }
+      ?work ?p target: .
+
       # Find co-occuring wikiprojects
       ?work ?p ?wikiproject .
       # Avoid listing the queried wikiproject
@@ -20,6 +20,7 @@ SELECT ?count ?wikiproject ?wikiprojectLabel (CONCAT("/wikiproject/", SUBSTR(STR
     }
     GROUP BY ?wikiproject
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?wikiproject", "?example_entity"], languages) }}
+
 }
 ORDER BY DESC(?count)
