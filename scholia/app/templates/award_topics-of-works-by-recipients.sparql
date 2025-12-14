@@ -1,10 +1,11 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BubbleChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # Count the number of time works by award recipients have set a main topic
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?count ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) WHERE {
+SELECT ?count ?topic ?topicLabel WHERE {
   {
     SELECT ?topic (COUNT(?work) AS ?count) WHERE {
       ?recipient wdt:P166 target: .
@@ -13,7 +14,7 @@ SELECT ?count ?topic (REPLACE(STR(?topic), ".*/", "") AS ?topicLabel) WHERE {
     }
     GROUP BY ?topic
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
+  {{ sparql_helpers.labels(["?topic"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 50

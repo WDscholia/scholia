@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -11,6 +12,7 @@ SELECT ?number_of_corecipients ?award ?awardLabel ?awardDescription WHERE {
     }
     GROUP BY ?award
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+  {{ sparql_helpers.labels(["?award"], languages) }}
+  {{ sparql_helpers.descriptions(["?award"], languages) }}
 }
 ORDER BY DESC(?number_of_corecipients)
