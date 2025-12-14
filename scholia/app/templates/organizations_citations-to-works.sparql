@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:LineChart
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -47,6 +48,6 @@ SELECT (?year_of_citation AS ?year) (?number_of_citations / ?number_of_works AS 
     GROUP BY ?year_of_cited ?organization
   }
   FILTER (?year_of_citation = ?year_of_cited)
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?organization"], languages) }}
 }
 ORDER BY ?year_of_citation

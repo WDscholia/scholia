@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # Find frequent unresolved author names that are coauthors with
 # people associated with an organization.
@@ -21,6 +22,6 @@ SELECT ?works ?researcher ?researcherLabel (CONCAT("/author/", SUBSTR(STR(?resea
     ORDER BY DESC(?works)
     LIMIT 200
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,nl,no,ru,sv,zh" . } 
+  {{ sparql_helpers.labels(["?researcher"], languages) }}
 }
 ORDER BY DESC(?works)
