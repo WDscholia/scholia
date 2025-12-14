@@ -42,6 +42,9 @@ import requests
 SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 
 TOPIC_LABELS_SPARQL = """
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?topic ?topic_label
 WITH {
   # Find works with a topic
@@ -72,6 +75,10 @@ WHERE {
 
 # Unfortunately we cannot use this - for the moment
 TOPIC_LABELS_SPARQL_THAT_TIMES_OUT = """
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?topic ?topic_label
 WITH {
   SELECT DISTINCT ?topic WHERE {
