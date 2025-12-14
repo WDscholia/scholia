@@ -1,10 +1,11 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?part (REPLACE(STR(?part), ".*/", "") AS ?partLabel) ?partDescription ?type WHERE {
+SELECT ?part ?partLabel ?partDescription ?type WHERE {
   {
     SELECT ?part (GROUP_CONCAT(DISTINCT ?type_label; SEPARATOR=", ") AS ?type) WHERE {
       VALUES ?process { wd:Q4915012 wd:Q2996394 }
@@ -18,6 +19,7 @@ SELECT ?part (REPLACE(STR(?part), ".*/", "") AS ?partLabel) ?partDescription ?ty
     }
     GROUP BY ?part
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?part"], languages) }}
+  {{ sparql_helpers.descriptions(["?part"], languages) }}
 }
 ORDER BY ASC(?partLabel)
