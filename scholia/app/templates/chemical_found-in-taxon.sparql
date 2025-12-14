@@ -15,7 +15,8 @@ SELECT DISTINCT ?taxon ?taxonLabel (CONCAT("/taxon/", SUBSTR(STR(?taxon),32)) AS
       ?source wdt:P356 ?doi .
     }
   }
-  {{ sparql_helpers.labels(["?taxon", "?source"], languages) }}
+  {{ sparql_helpers.labels(["?taxon"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?source"], languages) }}
 }
 ORDER BY ASC(?taxonLabel)
 LIMIT 250
