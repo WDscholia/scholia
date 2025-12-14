@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -25,7 +26,9 @@ SELECT ?year ?recipient ?recipientLabel ?recipientDescription ?example_work ?exa
     }
     GROUP BY ?recipient ?year
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+  {{ sparql_helpers.labels_unbound(["?example_work"], languages) }}
+  {{ sparql_helpers.labels(["?recipient"], languages) }}
+  {{ sparql_helpers.descriptions(["?recipient"], languages) }}
 }
 ORDER BY DESC(?year)
 LIMIT 10000
