@@ -1,6 +1,5 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
-
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -22,7 +21,6 @@ SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
     }
     GROUP BY ?topic
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
-  {{ sparql_helpers.labels(["?topic, ?example_work"], languages) }}
+  {{ sparql_helpers.labels(["?topic", "?example_work"], languages) }}
 }
 ORDER BY DESC(?count)
