@@ -1,8 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT DISTINCT ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) ?workDescription {
+SELECT DISTINCT ?work ?workLabel ?workDescription {
   wd:{{ lexeme }} wdt:P1343 | ^wdt:P6254 ?work
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,cz,da,de,es,fi,fr,it,nl,nn,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?work"], languages) }}
+  {{ sparql_helpers.descriptions(["?work"], languages) }}
 }
