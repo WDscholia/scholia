@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -16,6 +17,6 @@ SELECT DISTINCT ?publication_date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(
     ?work wdt:P577 ?publication_datetime .
     BIND (xsd:date(?publication_datetime) AS ?publication_date)
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?publication_date)

@@ -1,8 +1,9 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?organization ?organizationLabel ?organizationDescription ?location (REPLACE(STR(?location), "./*", "") AS ?locationLabel) ?country (REPLACE(STR(?country), "./*", "") AS ?countryLabel) WHERE {
+SELECT ?organization ?organizationLabel ?organizationDescription ?location ?countryLabel WHERE {
   {
     SELECT ?organization (SAMPLE(?location_) AS ?location) (SAMPLE(?country_) AS ?country) WHERE {
       #    VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
@@ -15,5 +16,6 @@ SELECT ?organization ?organizationLabel ?organizationDescription ?location (REPL
     }
     GROUP BY ?organization
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?organization", "?country"], languages) }}
+  {{ sparql_helpers.descriptions(["?organization"], languages) }}
 }
