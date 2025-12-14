@@ -1,17 +1,17 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Graph
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?node (REPLACE(STR(?node), ".*/", "") AS ?nodeLabel) ?nodeImage ?childNode (REPLACE(STR(?childNode), ".*/", "") AS ?childNodeLabel) ?childNodeImage ?rgb WHERE {
+SELECT ?node ?childNodeLabel ?childNodeImage ?rgb WHERE {
   {
     {
       SELECT DISTINCT ?node ?childNode WHERE {
         BIND (target: AS ?node)
         ?node ?p ?i .
         ?childNode ?x ?p .
-        ?childNode rdf:type wikibase:Property.
+        ?childNode wdt:P31 wikibase:Property.
         FILTER (STRSTARTS(STR(?i),"http://www.wikidata.org/entity/Q"))
         FILTER (STRSTARTS(STR(?childNode),"http://www.wikidata.org/entity/P"))
       }
@@ -24,7 +24,7 @@ SELECT ?node (REPLACE(STR(?node), ".*/", "") AS ?nodeLabel) ?nodeImage ?childNod
         BIND ("EFFBD8" AS ?rgb)
         target: ?p ?childNode .
         ?node ?x ?p .
-        ?node rdf:type wikibase:Property.
+        ?node wdt:P31 wikibase:Property.
         FILTER (STRSTARTS(STR(?childNode),"http://www.wikidata.org/entity/Q"))
       }
       LIMIT 5000
@@ -52,5 +52,5 @@ SELECT ?node (REPLACE(STR(?node), ".*/", "") AS ?nodeLabel) ?nodeImage ?childNod
     ?property wikibase:directClaim ?childNodeclaim .
     ?childNode ?childNodeclaim ?childNodeImage .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
+  {{ sparql_helpers.labels(["?childNode"], languages) }}
 }

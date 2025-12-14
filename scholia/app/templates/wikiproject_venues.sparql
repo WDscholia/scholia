@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -19,7 +20,7 @@ SELECT ?count ?short_name ?venue ?venueLabel (CONCAT("/venue/", SUBSTR(STR(?venu
     }
     GROUP BY ?venue
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?venue"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 200

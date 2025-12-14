@@ -1,8 +1,9 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX wd: <http://www.wikidata.org/entity/>
-SELECT ?type (REPLACE(STR(?type), ".*/", "") AS ?typeLabel) ?count WHERE {
+SELECT ?type ?typeLabel ?count WHERE {
   {
     SELECT DISTINCT ?type (COUNT(?item) AS ?count) WHERE {
       ?item wdt:P6104 bd:{{ q }};
@@ -13,6 +14,6 @@ SELECT ?type (REPLACE(STR(?type), ".*/", "") AS ?typeLabel) ?count WHERE {
     GROUP BY ?type ?count
     ORDER BY DESC(?count)
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,it,sv,uk,zh". }
+  {{ sparql_helpers.labels(["?type"], languages) }}
 }
 ORDER BY DESC(?count)
