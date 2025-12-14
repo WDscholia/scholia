@@ -4,20 +4,15 @@ Usage:
   scholia arxiv-to-quickstatements [options] <arxiv>
   scholia orcid-to-q <orcid>
   scholia string-to-type <string>
-  scholia run [--port=<port>]
+  scholia run
 
 Options:
   -o --output=file  Output filename, default output to stdout
-  -p --port=<port>  Port for web server [default: 8100]
 
 Examples
 --------
   $ python -m scholia orcid-to-q 0000-0001-6128-3356
   Q20980928
-  
-  $ python -m scholia run --port=5000
-  
-  $ python -m scholia run -p 9000
 
 References
 ----------
@@ -73,8 +68,7 @@ def main():
             third_parties_enabled=True,
         )
         app.config['APPLICATION_ROOT'] = '/'
-        port = int(arguments['--port'])
-        app.run(debug=True, port=port)
+        app.run(debug=True, port=8100)
 
 
 if __name__ == '__main__':
