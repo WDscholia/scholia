@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: identifiers for this gene
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -21,7 +22,8 @@ SELECT ?Identifier ?IdentifierLabel ?Value (SAMPLE(?idUrls) AS ?ValueUrl) ?Ident
       BIND (IRI(REPLACE(?formatterurl, '\\\\$1', STR(?Value))) AS ?idUrls) .
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?Identifier"], languages) }}
+  {{ sparql_helpers.descriptions(["?Identifier"], languages) }}
 }
 GROUP BY ?Identifier ?IdentifierLabel ?IdentifierDescription ?Value
 ORDER BY ASC(?IdentifierLabel)

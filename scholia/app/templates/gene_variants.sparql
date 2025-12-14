@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -18,5 +19,6 @@ SELECT ?variant ?variantLabel ?variantDescription ?types WHERE {
     }
     GROUP BY ?variant
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?variant"], languages) }}
+  {{ sparql_helpers.descriptions(["?variant"], languages) }}
 }
