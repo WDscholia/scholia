@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -11,5 +12,6 @@ SELECT ?ortholog ?orthologLabel ?orthologDescription ?taxon ?taxonLabel ?taxonDe
       ?ortholog wdt:P703 ?taxon .
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?ortholog", "?taxon"], languages) }}
+  {{ sparql_helpers.descriptions(["?taxon", "?ortholog"], languages) }}
 }

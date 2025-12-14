@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -10,5 +11,6 @@ SELECT ?protein ?proteinLabel ?proteinDescription WHERE {
               wdt:P688 ?protein .
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?protein"], languages) }}
+  {{ sparql_helpers.descriptions(["?protein"], languages) }}
 }

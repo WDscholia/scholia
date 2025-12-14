@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -16,5 +17,6 @@ SELECT ?transcript_ID ?reference ?referenceLabel ?referenceDescription WHERE {
                               prov:wasDerivedFrom/pr:P248 ?reference .
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?reference"], languages) }}
+  {{ sparql_helpers.descriptions(["?reference"], languages) }}
 }
