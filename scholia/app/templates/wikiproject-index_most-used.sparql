@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -10,7 +11,8 @@ SELECT ?count ?wikiproject ?wikiprojectLabel (CONCAT("/wikiproject/", SUBSTR(STR
     }
     GROUP BY ?wikiproject
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?wikiproject", "?example"], languages) }}
+  {{ sparql_helpers.descriptions(["?wikiproject"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 1000

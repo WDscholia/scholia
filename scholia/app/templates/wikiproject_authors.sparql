@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -22,6 +23,7 @@ SELECT ?count ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR
   OPTIONAL {
     ?author wdt:P496 ?orcid_ .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?author"], languages) }}
+  {{ sparql_helpers.descriptions(["?author"], languages) }}
 }
 ORDER BY DESC(?count)
