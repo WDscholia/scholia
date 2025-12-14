@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -15,7 +16,8 @@ SELECT ?count ?software ?softwareLabel ?softwareUrl ?described_by_example ?descr
     }
     GROUP BY ?software
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_use", "?software"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?described_by_example"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 500
