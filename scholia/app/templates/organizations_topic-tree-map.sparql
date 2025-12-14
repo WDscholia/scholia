@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:TreeMap
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -23,7 +24,7 @@ SELECT ?number_of_works ?topic ?topicLabel ?organization ?organizationLabel WHER
     }
     GROUP BY ?topic ?organization
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?organization", "?topic"], languages) }}
 }
 ORDER BY DESC(?number_of_works)
 LIMIT 100
