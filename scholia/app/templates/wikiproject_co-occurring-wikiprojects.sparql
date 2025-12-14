@@ -11,15 +11,6 @@ SELECT ?count ?wikiproject ?wikiprojectLabel (CONCAT("/wikiproject/", SUBSTR(STR
       VALUES ?p { wdt:P6104 wdt:P5008 }
       ?work ?p target: .
 
-
-      ### non-functional bd:sample call, may need to be reimplemented
-      ### if searching through the entire db is too costly
-      ### if implemented, also implement in template: "wikiproject_topics.sparql"      
-      # SERVICE bd:sample {
-      #   ?work ?p target: .
-      #   bd:serviceParam bd:sample.limit 100000
-      # }
-
       # Find co-occuring wikiprojects
       ?work ?p ?wikiproject .
       # Avoid listing the queried wikiproject
