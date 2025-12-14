@@ -36,6 +36,11 @@ SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 
 
 BIBLIOGRAPHY_SPARQL_QUERY = """
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
 select ?work ?title ?venueLabel ?date ?volume ?issue ?pages
        ?license ?doi ?url ?type where {{
   ?work wdt:P50 wd:{q} .
