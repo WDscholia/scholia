@@ -36,11 +36,9 @@ SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 
 
 BIBLIOGRAPHY_SPARQL_QUERY = """
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 select ?work ?title ?venueLabel ?date ?volume ?issue ?pages
        ?license ?doi ?url ?type where {{
   ?work wdt:P50 wd:{q} .
@@ -56,8 +54,9 @@ select ?work ?title ?venueLabel ?date ?volume ?issue ?pages
               filter(lang(?license) = 'en') }}
   optional {{ ?work wdt:P356 ?doi . }}
   optional {{ ?work wdt:P953 ?url . }}
-  service wikibase:label {{
-    bd:serviceParam wikibase:language "en,da,no,sv,de,fr,es,ru,jp,ru,zh" . }}
+  OPTIONAL {{ ?venue rdfs:label ?venueLabel_en. FILTER(LANG(?venueLabel_en) = "en") }}
+  OPTIONAL {{ ?venue rdfs:label ?venueLabel_mul. FILTER(LANG(?venueLabel_mul) = "mul") }}
+  BIND(COALESCE(?venueLabel_en, ?venueLabel_mul) AS ?venueLabel)
 }}
 order by desc(?date)
 """
