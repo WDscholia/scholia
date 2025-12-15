@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -9,7 +10,7 @@ SELECT (COUNT(DISTINCT ?citingArticle) AS ?count) ?journal ?journalLabel (CONCAT
   ?citingArticle p:P2860 ?citationStatement ;
                  wdt:P1433 ?journal .
   ?citationStatement pq:P3712 ?INTENTION .
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?journal"], languages) }}
 }
 GROUP BY ?journal ?journalLabel
 ORDER BY DESC(?count)
