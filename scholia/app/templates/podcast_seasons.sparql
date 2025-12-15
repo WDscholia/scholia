@@ -4,7 +4,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT DISTINCT ?season ?seasonLabel (MAX(?count) AS ?episodeCount) WHERE {
+SELECT DISTINCT ?season ?seasonLabel (CONCAT("/podcast-season/", SUBSTR(STR(?season),32)) AS ?seasonUrl) (MAX(?count) AS ?episodeCount) WHERE {
   ?season wdt:P31 wd:Q69154911 ;
           wdt:P179 target: .
   OPTIONAL {
