@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -38,7 +39,8 @@ SELECT ?Identifier ?IdentifierLabel ?id (SAMPLE(?idUrls) AS ?idUrl) ?IdentifierD
       BIND (IRI(REPLACE(?formatterurl, '\\\\$1', STR(?id))) AS ?idUrls) .
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?Identifier"], languages) }}
+  {{ sparql_helpers.descriptions(["?Identifier"], languages) }}
 }
 GROUP BY ?Identifier ?IdentifierLabel ?IdentifierDescription ?id
 ORDER BY ASC(?IdentifierLabel)
