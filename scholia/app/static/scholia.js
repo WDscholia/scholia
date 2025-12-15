@@ -157,7 +157,7 @@ function convertDataTableData(data, columns) {
 	    } else {
 		    var convertedRowValue = data[i][key];
 		    if (convertedRowValue.startsWith("http://www.wikidata.org/entity/Q")) {
-		        qid = convertedRowValue.slice(31);
+		        var qid = convertedRowValue.slice(31);
 		        convertedRowValue = '<a href="../' + qid + '">' + qid + '</a>';
 		    }
 		    convertedRow[key] = convertedRowValue;
