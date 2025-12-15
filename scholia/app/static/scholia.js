@@ -155,7 +155,7 @@ function convertDataTableData(data, columns) {
 		    $("<div>").text(data[i][key]).html() + '</a>';
 
 	    } else {
-		    convertedRowValue = data[i][key];
+		    var convertedRowValue = data[i][key];
 		    if (convertedRowValue.startsWith("http://www.wikidata.org/entity/Q")) {
 		        qid = convertedRowValue.slice(31);
 		        convertedRowValue = '<a href="../' + qid + '">' + qid + '</a>';
