@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -9,9 +10,8 @@ SELECT ?count ?language ?languageLabel (CONCAT("/language/", SUBSTR(STR(?languag
     GROUP BY ?language
   }
   # This is to get rid of a language number of unknown values
-  FILTER EXISTS {
-    ?language ?p []
-  }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  FILTER (! (STRSTARTS(STR(?language),"_")))
+  {{ sparql_helpers.labels(["?language"], languages) }}
+  {{ sparql_helpers.descriptions(["?language"], languages) }}
 }
 ORDER BY DESC(?count)
