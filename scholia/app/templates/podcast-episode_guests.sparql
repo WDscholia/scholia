@@ -3,7 +3,7 @@ PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT DISTINCT ?guest ?guestLabel WHERE {
+SELECT DISTINCT ?guest ?guestLabel (CONCAT("/", SUBSTR(STR(?guest),32)) AS ?guestUrl) WHERE {
   target: wdt:P5030 ?guest .
   {{ sparql_helpers.labels(["?guest"], languages) }}
 }

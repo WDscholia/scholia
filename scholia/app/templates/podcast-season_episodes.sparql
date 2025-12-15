@@ -4,7 +4,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT DISTINCT ?episode ?episodeLabel WHERE {
+SELECT DISTINCT ?episode ?episodeLabel (CONCAT("/podcast-episode/", SUBSTR(STR(?episode),32)) AS ?episodeUrl) WHERE {
   ?episode wdt:P31 wd:Q61855877 ;
            wdt:P4908 target: .
   {{ sparql_helpers.labels_unbound(["?episode"], languages) }}
