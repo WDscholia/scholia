@@ -1,10 +1,11 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX pr: <http://www.wikidata.org/prop/reference/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?citations ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) WHERE {
+SELECT ?citations ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) WHERE {
   {
     SELECT (COUNT(?work1) AS ?citations) ?work WHERE {
       {
@@ -24,7 +25,7 @@ SELECT ?citations ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) (CONCAT("
     }
     GROUP BY ?work
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?citations)
 LIMIT 200

@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 {% extends "base.html" %}
 
 {% block styles %}
@@ -165,7 +166,7 @@ Researcher with a published record.
                           ?num wikibase:apiOrdinal true.
                       }
                       ?item wdt:P50 ?author
-                      SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,jp". }
+  {{ sparql_helpers.labels(["?author"], languages) }}
                     } ORDER BY ASC(?num)
                     `,
                     format: "json"
@@ -226,7 +227,7 @@ Researcher with a published record.
                           ?num wikibase:apiOrdinal true.
                       }
                       ?item wdt:P50 ?author
-                      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  {{ sparql_helpers.labels(["?author"], languages) }}
                     } ORDER BY ASC(?num)
                     `,
                     format: 'json'
