@@ -1,9 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Graph
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?work (REPLACE(STR(?work), ".*/", "") AS ?workLabel) WHERE {
+SELECT ?author ?workLabel WHERE {
   {
     SELECT ?work ?author WHERE {
       {}
@@ -29,5 +30,5 @@ SELECT ?author (REPLACE(STR(?author), ".*/", "") AS ?authorLabel) ?work (REPLACE
       {% endfor %}
     }
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }

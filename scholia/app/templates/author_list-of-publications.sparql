@@ -36,7 +36,8 @@ SELECT (MIN(?dates) AS ?date) ?work ?workLabel (GROUP_CONCAT(DISTINCT ?type_labe
   OPTIONAL {
     ?work wdt:P1433 ?venue
   }
-  {{ sparql_helpers.labels(["?work", "?venue"], languages) }}
+  {{ sparql_helpers.labels(["?work"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?venue"], languages) }}
 }
 GROUP BY ?work ?workLabel ?venue ?venueLabel
 ORDER BY DESC(?date)

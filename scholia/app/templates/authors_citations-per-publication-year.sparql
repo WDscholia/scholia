@@ -1,5 +1,7 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BarChart
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?year ?number_of_citations ?author_label WHERE {
   {
@@ -9,8 +11,7 @@ SELECT ?year ?number_of_citations ?author_label WHERE {
         # DISTINCT to avoid count citations whether ther are multiple
         # publication dates
         (COUNT(DISTINCT ?citation) AS ?number_of_citations) WHERE {
-          # hint:Query hint:optimizer "None".
-          #          VALUES ?author {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
+          VALUES ?author {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
           ?work wdt:P50 ?author ;
                 wdt:P577 ?publication_date .
           ?citing_work wdt:P2860 ?work
@@ -21,8 +22,7 @@ SELECT ?year ?number_of_citations ?author_label WHERE {
         }
         GROUP BY ?author ?year
       }
-      ?author rdfs:label ?author_label_ .
-      FILTER (LANG(?author_label_) = 'en')
+      {{ sparql_helpers.labels(["?author"], languages) }}
     }
   }
   # Represent the author by name and Q identifier
