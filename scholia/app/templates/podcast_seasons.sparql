@@ -1,14 +1,15 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT DISTINCT ?season (REPLACE(STR(?season), ".*/", "") AS ?seasonLabel) (CONCAT("/podcast-season/", SUBSTR(STR(?season),32)) AS ?seasonUrl) (MAX(?count) AS ?episodeCount) WHERE {
+SELECT DISTINCT ?season ?seasonLabel (CONCAT("/podcast-season/", SUBSTR(STR(?season),32)) AS ?seasonUrl) (MAX(?count) AS ?episodeCount) WHERE {
   ?season wdt:P31 wd:Q69154911 ;
           wdt:P179 target: .
   OPTIONAL {
     ?season wdt:P1113 ?count .
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels_unbound(["?season"], languages) }}
 }
-GROUP BY ?season ?seasonLabel ?seasonUrl
+GROUP BY ?season ?seasonLabel

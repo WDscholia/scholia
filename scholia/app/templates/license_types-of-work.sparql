@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -10,6 +11,7 @@ SELECT ?count ?type ?typeLabel ?typeDescription WHERE {
     }
     GROUP BY ?type
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?type"], languages) }}
+  {{ sparql_helpers.descriptions(["?type"], languages) }}
 }
 ORDER BY DESC(?count)

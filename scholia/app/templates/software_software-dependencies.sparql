@@ -1,10 +1,9 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #description: Show software library, programming language and developer dependencies
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 #defaultView:Graph
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?resource1 (REPLACE(STR(?resource1), ".*/", "") AS ?resource1Label) ?image1 ?rgb ?resource2 (REPLACE(STR(?resource2), ".*/", "") AS ?resource2Label) ?image2 {
+SELECT ?resource1 ?resource1Label ?resource2 ?resource2Label ?image2 {
   {
     SELECT ?resource1 (SAMPLE(?image1_) AS ?image1) ?rgb ?resource2 (SAMPLE(?image2_) AS ?image2) {
       {
@@ -27,5 +26,5 @@ SELECT ?resource1 (REPLACE(STR(?resource1), ".*/", "") AS ?resource1Label) ?imag
     }
     GROUP BY ?resource1 ?resource2 ?rgb
   }
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?resource1", "?resource2"], languages) }}
 }

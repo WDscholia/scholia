@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX p: <http://www.wikidata.org/prop/>
@@ -16,7 +17,8 @@ SELECT ?number ?code ?item ?itemLabel ?itemDescription WHERE {
   # For numerical sorting the catalogue code should be converted to an integer
   BIND (xsd:integer(?code) AS ?number)
   # Label the result
-  # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,es,fr,jp,nl,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?item"], languages) }}
+  {{ sparql_helpers.descriptions(["?item"], languages) }}
 }
 ORDER BY ?number ?code
 LIMIT 1000

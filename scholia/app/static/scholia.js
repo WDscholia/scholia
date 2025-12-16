@@ -155,7 +155,12 @@ function convertDataTableData(data, columns) {
 		    $("<div>").text(data[i][key]).html() + '</a>';
 
 	    } else {
-		    convertedRow[key] = data[i][key];
+		    var convertedRowValue = data[i][key];
+		    if (convertedRowValue.startsWith("http://www.wikidata.org/entity/Q")) {
+		        var qid = convertedRowValue.slice(31);
+		        convertedRowValue = '<a href="../' + qid + '">' + qid + '</a>';
+		    }
+		    convertedRow[key] = convertedRowValue;
 	    }
 	}
 	convertedData.push(convertedRow);

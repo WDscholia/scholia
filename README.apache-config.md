@@ -1,7 +1,7 @@
 # Apache virtual host configuration
 
-Currently runs on https://qlever.scholia.wiki and
-https://wikidata-query-gui.scholia.wiki with the following
+Currently runs on <https://qlever.scholia.wiki> and
+<https://wikidata-query-gui.scholia.wiki> with the following
 Apache configurations:
 
 ```apache

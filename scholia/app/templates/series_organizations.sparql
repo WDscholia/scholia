@@ -1,9 +1,10 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?year ?count ?organization (REPLACE(STR(?organization), ".*/", "") AS ?organizationLabel) WHERE {
+SELECT ?year ?count ?organization ?organizationLabel WHERE {
   {
     SELECT ?year (COUNT(?work) AS ?count) ?organization WHERE {
       {
@@ -23,7 +24,8 @@ SELECT ?year ?count ?organization (REPLACE(STR(?organization), ".*/", "") AS ?or
     }
     GROUP BY ?year ?organization
     # Exclude organizations with only a single count
-    # HAVING(?count > 1) }
-    # SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+    # HAVING(?count > 1)
+    }
+  {{ sparql_helpers.labels(["?organization"], languages) }}
   }
  ORDER BY ?year
