@@ -11,12 +11,13 @@ SELECT ?distance ?unit ?unitLabel ?organization ?organizationLabel ?organization
     SELECT ?organization ?distance ?unit WHERE {
       { # Academic institutions on all levels
         SELECT DISTINCT ?organization ?other_geo WHERE {
-          { # Universities, research centers, etc.
-            SELECT ?university WHERE {
-              VALUES ?university { wd:Q3918 wd:Q1371037 wd:Q7315155 wd:Q31855 }
-            }
-          }
-          ?organization wdt:P361*/wdt:P31/wdt:P279* ?university .
+	  { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q3918 }
+	  UNION
+	  { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q1371037 }
+	  UNION
+	  { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q7315155 }
+	  UNION
+	  { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q31855 }
           ?organization wdt:P625 ?other_geo .
         }
       }
