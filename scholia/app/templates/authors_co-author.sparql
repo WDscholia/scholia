@@ -10,19 +10,21 @@ SELECT ?author ?workLabel WHERE {
       {}
       {% for q1 in qs %}
       {% for q2 in qs %}
-      {% if q1 < q2 %}
+      {% if q1 <= q2 %}
       UNION {
-        SELECT ?work ?author WHERE {
-          SERVICE gas:service {
-            gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-            #           gas:in wd:{{ q1 }} ;
-            #           gas:target wd:{{ q2 }} ;
-                        gas:traversalDirection "Undirected" ;
-                        gas:out ?work ;
-                        gas:linkType wdt:P50 ;
-                        gas:maxVisited 5000 .
+        SERVICE <https://query.wikidata.org/sparql> {
+          SELECT ?work ?author WHERE {
+            SERVICE gas:service {
+              gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                          gas:in wd:{{ q1 }} ;
+                          gas:target wd:{{ q2 }} ;
+                          gas:traversalDirection "Undirected" ;
+                          gas:out ?work ;
+                          gas:linkType wdt:P50 ;
+                          gas:maxVisited 5000 .
+            }
+            ?work wdt:P50 ?author
           }
-          ?work wdt:P50 ?author
         }
       } # UNION END
       {% endif %}
