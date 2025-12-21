@@ -44,7 +44,8 @@ SELECT (STR(?year_) AS ?year) (COUNT(?work) AS ?number_of_publications)
     }
     GROUP BY ?dummy
   }
-  BIND (YEAR(NOW() 
-) AS ?this_year ) FILTER ( ?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR ( "1900-01-01" ^^ xsd:dateTime ) )}
+  BIND (YEAR(NOW() ) AS ?this_year )
+  FILTER ( ?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR ( "1900-01-01" ^^ xsd:date ) )
+}
 GROUP BY ?year_ ?type
 ORDER BY ?year
