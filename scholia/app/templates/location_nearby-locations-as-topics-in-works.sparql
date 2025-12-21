@@ -27,6 +27,7 @@ SELECT (ROUND(1000 * ?distance_) / 1000 AS ?distance) ?work ?workLabel (CONCAT("
       }
       target: wdt:P159*/wdt:P625 ?geo .
       BIND (geof:distance(?other_geo,?geo) AS ?distances)
+      FILTER ( BOUND(?distances) )
     }
     GROUP BY ?work ?location
     ORDER BY ?distance_
