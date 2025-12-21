@@ -7,7 +7,8 @@ PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?author1 ?author1Label (SAMPLE(?image1_) AS ?image1) ?rgb ?author2 ?author2Label (SAMPLE(?image2_) AS ?image2) WHERE {
   {
     SELECT DISTINCT ?author1 ?author2 ?rgb WHERE {
-      {
+     { SELECT ?author1 ?rgb ?work WHERE {
+       {
         SELECT ?author1 (SAMPLE(?dark_rgb_) AS ?dark_rgb) (SAMPLE(?light_rgb_) AS ?light_rgb) WHERE {
           # Find people at the event
           {
@@ -27,6 +28,10 @@ SELECT ?author1 ?author1Label (SAMPLE(?image1_) AS ?image1) ?rgb ?author2 ?autho
           }
         }
         GROUP BY ?author1
+       }
+         BIND (COALESCE(?dark_rgb, ?light_rgb) AS ?rgb)
+ 	 ?work wdt:P50 ?author1 .
+       }
       }
       {
         target: (wdt:P823 | wdt:P664 | ^wdt:P1344 | wdt:P710 | ^wdt:P4745/^wdt:P1433/wdt:P50) | wdt:P5804 ?author2 .
@@ -36,9 +41,8 @@ SELECT ?author1 ?author1Label (SAMPLE(?image1_) AS ?image1) ?rgb ?author2 ?autho
                       wdt:P5072 target:
       }
       # Find co-authors
-      ?work wdt:P50 ?author1, ?author2 .
+      ?work wdt:P50 ?author2 .
       FILTER (?author1 != ?author2)
-      BIND (COALESCE(?dark_rgb, ?light_rgb) AS ?rgb)
     }
   }
   OPTIONAL {
@@ -47,7 +51,14 @@ SELECT ?author1 ?author1Label (SAMPLE(?image1_) AS ?image1) ?rgb ?author2 ?autho
   OPTIONAL {
     ?author2 wdt:P18 ?image2_ .
   }
-  {{ sparql_helpers.labels(["?author2", "?author1"], languages) }}
+  OPTIONAL { ?author2 <http://www.w3.org/2000/01/rdf-schema#label> ?author2Label. FILTER(LANG(?author2Label) = "en-US") }
+    OPTIONAL { ?author2 <http://www.w3.org/2000/01/rdf-schema#label> ?author2Label. FILTER(LANG(?author2Label) = "en") }
+    OPTIONAL { ?author2 <http://www.w3.org/2000/01/rdf-schema#label> ?author2Label. FILTER(LANG(?author2Label) = "mul") }
+    
+    OPTIONAL { ?author1 <http://www.w3.org/2000/01/rdf-schema#label> ?author1Label. FILTER(LANG(?author1Label) = "en-US") }
+    OPTIONAL { ?author1 <http://www.w3.org/2000/01/rdf-schema#label> ?author1Label. FILTER(LANG(?author1Label) = "en") }
+    OPTIONAL { ?author1 <http://www.w3.org/2000/01/rdf-schema#label> ?author1Label. FILTER(LANG(?author1Label) = "mul") }
+    
 } GROUP BY
 ?author1
 ?author1Label
