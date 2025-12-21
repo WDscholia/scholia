@@ -813,9 +813,12 @@ function askQuery(panel, askQuery, callback) {
 
 
 function askQuery2(endpointUrl, panel, askQuery, callback) {
-     if (!endpointUrl) endpointUrl = "https://query.wikidata.org/sparql";
-     
-     var settings = {
+    if (!endpointUrl) endpointUrl = "https://query.wikidata.org/sparql";
+    // overwrite the central URLs of SPARQL specific URLs are found
+    configFromSPARQL = extractConfig(askQuery);
+    if (configFromSPARQL["url"]) endpointUrl = configFromSPARQL["url"];
+
+    var settings = {
        headers: { Accept: 'application/sparql-results+json' },
        data: { query: askQuery },
      };
