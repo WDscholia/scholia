@@ -10,33 +10,29 @@ SELECT ?score ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) 
   {
     SELECT ?author (SUM(?topic_score) * MAX(?inverse_distance) AS ?score) (SAMPLE(?work) AS ?example_work) WHERE {
       { # Compute distance for authors
-        SELECT (MAX(?inverse_distance_) AS ?inverse_distance) ?author WHERE {
-          { # Academic institutions on all levels
-            SELECT DISTINCT ?organization ?other_geo ?distance WHERE {
-              { # Universities, research centers, etc.
-                SELECT ?university WHERE {
-                  VALUES ?university { wd:Q3918 wd:Q1371037 wd:Q7315155 wd:Q31855 wd:Q2385804 }
-                }
+        SELECT DISTINCT ?author (MAX(?inverse_distance_) AS ?inverse_distance) WHERE {
+          { 
+            SELECT DISTINCT ?organization ?geo ?other_geo ?inverse_distance_ WHERE {
+              { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q3918 .
+              } UNION {
+                ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q1371037 .
+              } UNION {
+                ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q7315155 .
+              } UNION {
+                ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q31855 .
+              } UNION {
+                ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q2385804 .
               }
-              {
-                SELECT ?organization ?distance ?other_geo {
-                  target1: wdt:P625 ?geo .
-                  SERVICE wikibase:around {
-                    ?organization wdt:P625 ?other_geo .
-                    bd:serviceParam wikibase:center ?geo .
-                    bd:serviceParam wikibase:radius "50" .
-                    bd:serviceParam wikibase:distance ?distance .
-                  }
-                }
-              }
-              ?organization wdt:P361*/wdt:P31/wdt:P279* ?university .
+              target1: wdt:P625 ?geo .
+              ?organization wdt:P625 ?other_geo .
+              BIND (geof:distance(?other_geo, ?geo) AS ?distance)
+              FILTER(BOUND(?distance))
+              BIND (1 / (?distance + 1) AS ?inverse_distance_)
             }
           }
-          BIND (1 / (?distance + 1) AS ?inverse_distance_)
           ?author wdt:P108 | wdt:P1416 ?organization .
-        }
-        GROUP BY ?author
-      }
+        } GROUP BY ?author
+      }}
       {
         # A score of 3 for each authorship in the topic
         ?work wdt:P50 ?author .
