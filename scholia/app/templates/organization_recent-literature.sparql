@@ -48,6 +48,11 @@ SELECT ?publication_date ?work ?workLabel ?researchers ?researchersUrl WHERE {
       {
         # GROUP_CONCAT cannot honor sorting, but this was an attempt
         SELECT ?work ?researcher ?researcher_label WHERE {
+      {
+        SELECT DISTINCT ?researcher WHERE {
+          ?researcher (wdt:P108 | wdt:P463 | wdt:P1416)/wdt:P361* target: .
+        }
+      }
           ?work p:P50 [
             ps:P50 ?researcher ;
             pq:P1545 ?order
