@@ -26,6 +26,7 @@ SELECT ?date ?deadline ?deadlineLabel ?short_name ?event ?eventLabel (CONCAT("/e
     GROUP BY ?datetime ?deadline ?event
   }
   BIND (xsd:date(?datetime) AS ?date)
+  FILTER ( xsd:date(NOW()) <= ?date )
   {{ sparql_helpers.labels(["?event", "?deadline"], languages) }}
   {{ sparql_helpers.labels_unbound(["?location"], languages) }}
 }
