@@ -9,14 +9,18 @@ SELECT (ROUND(1000 * ?score_) / 1000 AS ?score) (ROUND(1000 * ?time_score_) / 10
   {
     SELECT (SUM(?scores) AS ?score_) (MAX(?time_scores) AS ?time_score_) (MAX(?location_scores) AS ?location_score_) ?event WHERE {
       {
-        SELECT ?event WHERE {
-          {
-            SELECT ?event_type WHERE {
-              VALUES ?event_type { wd:Q2020153 wd:Q46855 wd:Q40444998 }
+            SELECT DISTINCT ?event ?geo WHERE {
+              { 
+                ?event wdt:P31/wdt:P279* wd:Q2020153 .
+                ?event wdt:P276?/wdt:P625 ?geo .
+              } UNION {
+                ?event wdt:P31/wdt:P279* wd:Q46855 .
+                ?event wdt:P276?/wdt:P625 ?geo .
+              } UNION {
+                ?event wdt:P31/wdt:P279* wd:Q40444998 .
+                ?event wdt:P276?/wdt:P625 ?geo .
+              }
             }
-          }
-          ?event wdt:P31/wdt:P279* ?event_type .
-        }
       }
       {
         # Around the same time
@@ -31,19 +35,22 @@ SELECT (ROUND(1000 * ?score_) / 1000 AS ?score) (ROUND(1000 * ?time_score_) / 10
       {
         SELECT ?event (MAX(?inverse_distance) AS ?location_scores) WHERE {
           {
-            SELECT ?event WHERE {
-              {
-                SELECT ?event_type WHERE {
-                  VALUES ?event_type { wd:Q2020153 wd:Q46855 wd:Q40444998 }
-                }
+            SELECT DISTINCT ?event ?geo WHERE {
+              { 
+                ?event wdt:P31/wdt:P279* wd:Q2020153 .
+                ?event wdt:P276?/wdt:P625 ?geo .
+              } UNION {
+                ?event wdt:P31/wdt:P279* wd:Q46855 .
+                ?event wdt:P276?/wdt:P625 ?geo .
+              } UNION {
+                ?event wdt:P31/wdt:P279* wd:Q40444998 .
+                ?event wdt:P276?/wdt:P625 ?geo .
               }
-              ?event wdt:P31/wdt:P279* ?event_type .
             }
           }
           # geocoordinate of the query event
           target: wdt:P276?/wdt:P159?/wdt:P625 ?geo0 .
           # geocoordinate of other events
-          ?event wdt:P276?/wdt:P625 ?geo .
           # inverse distance
           BIND ((200 / (1 + geof:distance(?geo,?geo0))) AS ?inverse_distance)
         }
