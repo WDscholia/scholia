@@ -12,38 +12,44 @@ PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT DISTINCT ?propEntity ?propEntityLabel ?value ?units ?unitsLabel ?qualifiers ?source ?sourceLabel ?doi WHERE {
   {
     SELECT DISTINCT ?propEntity ?value ?units ?source ?doi (GROUP_CONCAT(?qualifierStr; SEPARATOR=", ") AS ?qualifiers) WHERE {
-      target: ?propp ?statement .
-      ?statement a wikibase:BestRank ;
-                 ?proppsv [
-        wikibase:quantityAmount ?value ; wikibase:quantityUnit ?units
-      ] .
-      OPTIONAL {
-        ?statement prov:wasDerivedFrom/pr:P248 ?source .
-        OPTIONAL {
-          ?source wdt:P356 ?doi .
-        }
-      }
-      ?property wikibase:claim ?propp ;
+      {
+        SELECT DISTINCT ?propEntity ?value ?units (SAMPLE (?source_) AS ?source) (SAMPLE( ?doi_) AS ?doi) WHERE {
+          { 
+            target: ?propp ?statement .
+            ?statement a wikibase:BestRank ; ?proppsv [ wikibase:quantityAmount ?value ; wikibase:quantityUnit ?units ] .
+          } UNION {
+            target: ?propp ?statement .
+            ?statement a wikibase:BestRank ; ?proppsv [ wikibase:quantityAmount ?value ; wikibase:quantityUnit ?units ] .
+            ?statement prov:wasDerivedFrom/pr:P248 ?source_ .
+          } UNION {
+            target: ?propp ?statement .
+            ?statement a wikibase:BestRank ; ?proppsv [ wikibase:quantityAmount ?value ; wikibase:quantityUnit ?units ] .
+            ?statement prov:wasDerivedFrom/pr:P248 ?source_ .
+            ?source_ wdt:P356 ?doi_ .
+          } 
+          ?property wikibase:claim ?propp ;
                 wikibase:statementValue ?proppsv ;
                 wdt:P1629 ?propEntity ;
                 wdt:P31 wd:Q21077852 .
-      OPTIONAL {
-        {
-          ?qualifierProp wikibase:qualifier ?qualifier ;
-                         rdfs:label ?qProplabel ; FILTER (LANG(?qProplabel) = "en") .
-          ?qualifier a owl:DatatypeProperty .
-          ?statement ?qualifier ?qualifierVal .
-          BIND (CONCAT(STR(?qProplabel), ": ", STR(?qualifierVal)) AS ?qualifierStr)
-        }
-        UNION {
-          ?qualifierProp wikibase:qualifier ?qualifier ;
-                         rdfs:label ?qProplabel ; FILTER (LANG(?qProplabel) = "en") .
-          ?qualifier a owl:ObjectProperty .
-          ?statement ?qualifier ?qualifierVal .
-          ?qualifierVal rdfs:label ?qVallabel ; FILTER (LANG(?qVallabel) = "en") .
-          BIND (CONCAT(STR(?qProplabel), ": ", STR(?qVallabel)) AS ?qualifierStr)
-        }
+        } GROUP BY ?propEntity ?value ?units 
       }
+##      OPTIONAL {
+##        {
+##          ?qualifierProp wikibase:qualifier ?qualifier ;
+##                         rdfs:label ?qProplabel ; FILTER (LANG(?qProplabel) = "en") .
+##          ?qualifier a owl:DatatypeProperty .
+##          ?statement ?qualifier ?qualifierVal .
+##          BIND (CONCAT(STR(?qProplabel), ": ", STR(?qualifierVal)) AS ?qualifierStr)
+##        }
+##        UNION {
+##          ?qualifierProp wikibase:qualifier ?qualifier ;
+##                         rdfs:label ?qProplabel ; FILTER (LANG(?qProplabel) = "en") .
+##          ?qualifier a owl:ObjectProperty .
+##          ?statement ?qualifier ?qualifierVal .
+##          ?qualifierVal rdfs:label ?qVallabel ; FILTER (LANG(?qVallabel) = "en") .
+##          BIND (CONCAT(STR(?qProplabel), ": ", STR(?qVallabel)) AS ?qualifierStr)
+##        }
+##      }
     }
     GROUP BY ?propEntity ?value ?units ?source ?doi
   }
