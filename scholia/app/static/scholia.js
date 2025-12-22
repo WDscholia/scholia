@@ -265,7 +265,7 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var sparqlEndpointName = (typeof options.sparqlEndpointName === 'undefined')
-	? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
+        ? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
     
     $(element).html("<div class='loader'><div></div><div></div><div></div></div>");
 
@@ -304,7 +304,7 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
             '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
                 encodeURIComponent(sparql) +
                 '">' + sparqlEndpointName + '</a></span>' +
-                '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' +
+                '<span style="float:right; font-size:smaller;"><a href="https://github.com/ad-freiburg/scholia/blob/qlever/scholia/app/templates/' +
                 filename + '">' +
                 filename.replace("_", ": ") +
                 '</a></span></caption>'
@@ -377,7 +377,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
     const datatableFooter =
         '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
         encodeURIComponent(sparql) + '">' + sparqlEndpointName + '</a></span>' +
-        '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' +
+        '<span style="float:right; font-size:smaller;"><a href="https://github.com/ad-freiburg/scholia/blob/qlever/scholia/app/templates/' +
         filename +
         '">' +
         filename.replace('_', ': ') +
@@ -493,9 +493,9 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
             $('#' + loaderID).remove(); // remove loader
             let error_message = "";
             try {
-              error_message = "QLever execption: " + JSON.parse(jqXHR.responseText).exception;
+                error_message = "QLever execption: " + JSON.parse(jqXHR.responseText).exception;
             } catch (e) {
-              error_message = "getJSON query failed: " + textStatus + " " + errorThrown;
+                error_message = "getJSON query failed: " + textStatus + " " + errorThrown;
             }
             $(element).prepend("<p style='color:red;'>" + escapeHTML(error_message) + "</p>");
             const reloadButton = document.getElementById(element.slice(1) + '-reload');
@@ -524,6 +524,13 @@ function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
     if (!editURL) editURL = "https://query.wikidata.org/#";
 
     if (!embedURL) embedURL = "https://query.wikidata.org/embed.html#";
+
+    // overwrite the central URLs of SPARQL specific URLs are found
+    configFromSPARQL = extractConfig(sparql);
+    if (configFromSPARQL["url"]) url = configFromSPARQL["url"];
+    if (configFromSPARQL["editURL"]) editURL = configFromSPARQL["editURL"];
+    if (configFromSPARQL["embedURL"]) embedURL = configFromSPARQL["embedURL"];
+    if (configFromSPARQL["endpointName"]) sparqlEndpointName = configFromSPARQL["endpointName"];
 
     const wikidata_sparql = url + "?query=" + encodeURIComponent(sparql);
     const wikidata_query = editURL + encodeURIComponent(sparql);
@@ -569,7 +576,7 @@ function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
             }
             $iframe.parent().after(
                 '<span style="float:right; font-size:smaller">' +
-                    '<a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' + filename + '">' +
+                    '<a href="https://github.com/ad-freiburg/scholia/blob/qlever/scholia/app/templates/' + filename + '">' +
                         filename.replace("_", ": ") +
                     '</a>' +
                 '</span>'
@@ -806,9 +813,12 @@ function askQuery(panel, askQuery, callback) {
 
 
 function askQuery2(endpointUrl, panel, askQuery, callback) {
-     if (!endpointUrl) endpointUrl = "https://query.wikidata.org/sparql";
-     
-     var settings = {
+    if (!endpointUrl) endpointUrl = "https://query.wikidata.org/sparql";
+    // overwrite the central URLs of SPARQL specific URLs are found
+    configFromSPARQL = extractConfig(askQuery);
+    if (configFromSPARQL["url"]) endpointUrl = configFromSPARQL["url"];
+
+    var settings = {
        headers: { Accept: 'application/sparql-results+json' },
        data: { query: askQuery },
      };

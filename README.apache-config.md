@@ -2,7 +2,9 @@
 
 Currently runs on <https://qlever.scholia.wiki> and
 <https://wikidata-query-gui.scholia.wiki> with the following
-Apache configurations:
+Apache configurations.
+
+## qlever.scholia.wiki
 
 ```apache
 <VirtualHost *:443>
@@ -29,6 +31,8 @@ Apache configurations:
   CustomLog ${APACHE_LOG_DIR}/scholia-access.log combined
 </VirtualHost>
 ```
+
+## wikidata-query-gui.scholia.wiki
 
 ```apache
 <VirtualHost *:443>

@@ -1,44 +1,13 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?Identifier ?IdentifierLabel ?id (SAMPLE(?idUrls) AS ?idUrl) ?IdentifierDescription {
-  {
-    SELECT * WHERE {
-      {
-        SELECT ?Identifier ?id ?formatterurl WHERE {
-          target: ?IDdir ?id .
-          ?Identifier wikibase:directClaim ?IDdir ;
-                      wdt:P31/wdt:P279* wd:Q19847637 .
-          OPTIONAL {
-            ?Identifier wdt:P1630 ?formatterurl .
-          }
-        }
-        LIMIT 500
-      }
-      FILTER (?Identifier = wd:P234)
-      BIND (IRI(REPLACE(?formatterurl, '\\\\$1', ENCODE_FOR_URI(STR(?id)))) AS ?idUrls) .
-    }
-  }
-  UNION {
-    SELECT * WHERE {
-      {
-        SELECT ?Identifier ?id ?formatterurl WHERE {
-          target: ?IDdir ?id .
-          ?Identifier wikibase:directClaim ?IDdir ;
-                      wdt:P31/wdt:P279* wd:Q19847637 .
-          OPTIONAL {
-            ?Identifier wdt:P1630 ?formatterurl .
-          }
-        }
-        LIMIT 500
-      }
-      FILTER (?Identifier != wd:P234)
-      BIND (IRI(REPLACE(?formatterurl, '\\\\$1', STR(?id))) AS ?idUrls) .
-    }
-  }
+  wd:{{ q }} ?IDdir ?id .
+  ?Identifier wikibase:directClaim ?IDdir ;
+              wdt:P31/wdt:P279* wd:Q19847637 .
+  OPTIONAL { ?Identifier wdt:P1630 ?formatterurl . }
+  BIND (IRI(REPLACE(?formatterurl, '\\\\$1', STR(?id))) AS ?idUrls) .
   {{ sparql_helpers.labels(["?Identifier"], languages) }}
   {{ sparql_helpers.descriptions(["?Identifier"], languages) }}
 }
