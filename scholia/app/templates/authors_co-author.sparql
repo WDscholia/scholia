@@ -2,6 +2,7 @@
 #defaultView:Graph
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?author ?workLabel WHERE {
@@ -10,7 +11,7 @@ SELECT ?author ?workLabel WHERE {
       {}
       {% for q1 in qs %}
       {% for q2 in qs %}
-      {% if q1 <= q2 %}
+      {% if q1 < q2 %}
       UNION {
         SERVICE <https://query.wikidata.org/sparql> {
           SELECT ?work ?author WHERE {
