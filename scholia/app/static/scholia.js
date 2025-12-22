@@ -265,7 +265,7 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var sparqlEndpointName = (typeof options.sparqlEndpointName === 'undefined')
-	? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
+        ? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
     
     $(element).html("<div class='loader'><div></div><div></div><div></div></div>");
 
@@ -304,7 +304,7 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
             '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
                 encodeURIComponent(sparql) +
                 '">' + sparqlEndpointName + '</a></span>' +
-                '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' +
+                '<span style="float:right; font-size:smaller;"><a href="https://github.com/ad-freiburg/scholia/blob/qlever/scholia/app/templates/' +
                 filename + '">' +
                 filename.replace("_", ": ") +
                 '</a></span></caption>'
@@ -377,7 +377,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
     const datatableFooter =
         '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
         encodeURIComponent(sparql) + '">' + sparqlEndpointName + '</a></span>' +
-        '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' +
+        '<span style="float:right; font-size:smaller;"><a href="https://github.com/ad-freiburg/scholia/blob/qlever/scholia/app/templates/' +
         filename +
         '">' +
         filename.replace('_', ': ') +
@@ -576,7 +576,7 @@ function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
             }
             $iframe.parent().after(
                 '<span style="float:right; font-size:smaller">' +
-                    '<a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' + filename + '">' +
+                    '<a href="https://github.com/ad-freiburg/scholia/blob/qlever/scholia/app/templates/' + filename + '">' +
                         filename.replace("_", ": ") +
                     '</a>' +
                 '</span>'
