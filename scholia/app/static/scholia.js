@@ -493,9 +493,9 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
             $('#' + loaderID).remove(); // remove loader
             let error_message = "";
             try {
-              error_message = "QLever execption: " + JSON.parse(jqXHR.responseText).exception;
+                error_message = "QLever execption: " + JSON.parse(jqXHR.responseText).exception;
             } catch (e) {
-              error_message = "getJSON query failed: " + textStatus + " " + errorThrown;
+                error_message = "getJSON query failed: " + textStatus + " " + errorThrown;
             }
             $(element).prepend("<p style='color:red;'>" + escapeHTML(error_message) + "</p>");
             const reloadButton = document.getElementById(element.slice(1) + '-reload');
