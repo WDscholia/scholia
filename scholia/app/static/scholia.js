@@ -154,16 +154,16 @@ function convertDataTableData(data, columns) {
 		    encodeURIComponent(data[i][key]) + '">' +
 		    $("<div>").text(data[i][key]).html() + '</a>';
 
-	    } else {
-		    var convertedRowValue = data[i][key];
-		    if (convertedRowValue.startsWith("http://www.wikidata.org/entity/Q")) {
-		        var qid = convertedRowValue.slice(31);
-		        convertedRowValue = '<a href="../' + qid + '">' + qid + '</a>';
-		    }
-		    convertedRow[key] = convertedRowValue;
-	    }
-	}
-	convertedData.push(convertedRow);
+        } else {
+            var convertedRowValue = data[i][key];
+            if (convertedRowValue.startsWith("http://www.wikidata.org/entity/Q")) {
+                var qid = convertedRowValue.slice(31);
+                convertedRowValue = '<a href="../' + qid + '">' + qid + '</a>';
+            }
+            convertedRow[key] = convertedRowValue;
+        }
+    }
+    convertedData.push(convertedRow);
     }
     return { data: convertedData, columns: convertedColumns };
 }
