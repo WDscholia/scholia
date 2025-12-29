@@ -12,11 +12,7 @@ SELECT ?number_of_works ?topic ?topicLabel ?organization ?organizationLabel WHER
         SELECT
         # Should not count authors twice
         DISTINCT ?work ?organization WHERE {
-          { # Bind organizations to variable
-            SELECT ?organization WHERE {
-              #    VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
-            }
-          }
+          VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
           ?work wdt:P50/(wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*)) ?organization .
         }
       }
