@@ -11,7 +11,12 @@ app = create_app(
 app.config['APPLICATION_ROOT'] = '/'
 
 if __name__ == '__main__':
+    if len(sys.argv) == 3:
+        hostIP = port=sys.argv[2]
+    else :
+        hostIP = '0.0.0.0'
+
     if len(sys.argv) == 2:
-        app.run(debug=True, host='0.0.0.0', port=sys.argv[1])
+        app.run(debug=True, host=hostIP, port=sys.argv[1])
     else:
-        app.run(debug=True, host='0.0.0.0', port=8100)
+        app.run(debug=True, host=hostIP, port=8100)
