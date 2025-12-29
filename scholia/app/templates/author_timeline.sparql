@@ -21,6 +21,7 @@ SELECT ?label ?beginning ?ending ?education_degree_label WHERE {
               GROUP BY ?work
             }
             OPTIONAL {
+              ?work wdt:P50 target: .
               ?citing_article wdt:P2860 ?work .
             }
           }
@@ -45,6 +46,7 @@ SELECT ?label ?beginning ?ending ?education_degree_label WHERE {
               GROUP BY ?work
             }
             OPTIONAL {
+              ?work wdt:P50 target: .
               ?citing_article wdt:P2860 ?work .
             }
           }
@@ -69,6 +71,7 @@ SELECT ?label ?beginning ?ending ?education_degree_label WHERE {
               GROUP BY ?work
             }
             OPTIONAL {
+              ?work wdt:P50 target: .
               ?citing_article wdt:P2860 ?work .
             }
           }
@@ -88,12 +91,15 @@ SELECT ?label ?beginning ?ending ?education_degree_label WHERE {
     FILTER (LANG(?education_label) = 'en')
     BIND (CONCAT("🦉 ", ?education_label) AS ?label)
     OPTIONAL {
+	  target: p:P69 ?education_statement .
       ?education_statement pq:P580 ?beginning .
     }
     OPTIONAL {
+	  target: p:P69 ?education_statement .
       ?education_statement pq:P582 ?ending .
     }
     OPTIONAL {
+	  target: p:P69 ?education_statement .
       ?education_statement pq:P512 ?education_degree .
       ?education_degree rdfs:label ?education_degree_label .
       FILTER (LANG(?education_degree_label) = 'en')
@@ -108,12 +114,15 @@ SELECT ?label ?beginning ?ending ?education_degree_label WHERE {
     BIND (CONCAT("🏠 ", ?affiliation_label) AS ?label)
     # OPTIONAL { ?affiliation wdt:P18 ?image }
     OPTIONAL {
+	  target: p:P1416 | p:P108 ?affiliation_statement .
       ?affiliation_statement pq:P580 ?beginning .
     }
     OPTIONAL {
+	  target: p:P1416 | p:P108 ?affiliation_statement .
       ?affiliation_statement pq:P582 ?ending .
     }
     OPTIONAL {
+	  target: p:P1416 | p:P108 ?affiliation_statement .
       ?affiliation_statement pq:P512 ?affiliation_degree .
       ?affiliation_degree rdfs:label ?affiliation_degree_label .
       FILTER (LANG(?affiliation_degree_label) = 'en')
