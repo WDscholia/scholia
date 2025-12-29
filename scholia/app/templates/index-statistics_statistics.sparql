@@ -5,7 +5,7 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 SELECT ?count ?description WHERE {
   {
     {
-      SELECT (COUNT(*) AS ?c) WHERE {
+      SELECT (COUNT(?s) AS ?c) WHERE {
         ?s ?p ?o
       }
     }
@@ -13,15 +13,15 @@ SELECT ?count ?description WHERE {
   }
   UNION {
     {
-      SELECT (COUNT(*) AS ?c) WHERE {
-        ?s rdf:type wikibase:BestRank
+      SELECT (COUNT(?s) AS ?c) WHERE {
+        ?s a wikibase:BestRank
       }
     }
     BIND ("Total number of statements" AS ?d)
   }
   UNION {
     {
-      SELECT (COUNT(*) AS ?c) WHERE {
+      SELECT (COUNT(?p) AS ?c) WHERE {
         ?p a wikibase:Property
       }
     }
@@ -213,8 +213,8 @@ SELECT ?count ?description WHERE {
   }
   UNION {
     {
-      SELECT (COUNT(*) AS ?c) WHERE {
-        [] wdt:P31 []
+      SELECT (COUNT(?s) AS ?c) WHERE {
+        ?s wdt:P31 []
       }
     }
     BIND ("Things in Wikidata" AS ?d)
