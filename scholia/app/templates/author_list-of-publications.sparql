@@ -18,7 +18,8 @@ SELECT (MIN(?dates) AS ?date) ?work ?workLabel (GROUP_CONCAT(DISTINCT ?type_labe
       ] .
       BIND (xsd:integer(?order) AS ?n)
       OPTIONAL {
-        wd:{{ q }} ^wdt:P50 | wdt:P50 ?author .
+        wd:{{ q }} ^wdt:P50 ?work .
+        ?work wdt:P50 ?author .
         ?author rdfs:label ?author_label_ . FILTER (LANG(?author_label_) = 'en')
       }
       BIND (COALESCE(?author_label_, SUBSTR(STR(?author),32)) AS ?author_label)
