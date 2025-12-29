@@ -4,28 +4,23 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?year_of_citation ?number_of_citations ?organization ?organizationLabel WHERE {
+SELECT ?year_of_citation ?number_of_citations ?organization ?organizationLabel
+WHERE {
   # Since 1990
   # FILTER (?year_of_citation >= "1990")
   # Label the results
   { # Count citations per year per organization
-    SELECT ?year_of_citation (COUNT(?citing_work) AS ?number_of_citations) ?organization WHERE {
-      { # Find works author by the organization
-        SELECT DISTINCT ?work ?organization WHERE {
-          { # Bind organizations to variable
-            SELECT ?organization WHERE {
-              #    VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
-            }
-          }
-          ?work wdt:P50/(wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*)) ?organization .
-        }
-      }
+    SELECT ?year_of_citation (COUNT(?citing_work) AS ?number_of_citations)
+           ?organization ?organizationLabel
+    WHERE {
+      VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+      ?work wdt:P50/(wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*)) ?organization .
       ?citing_work wdt:P2860 ?work .
       ?citing_work wdt:P577 ?publication_date .
       BIND (STR(YEAR(?publication_date)) AS ?year_of_citation)
+      {{ sparql_helpers.labels(["?organization"], languages) }}
     }
-    GROUP BY ?year_of_citation ?organization
+    GROUP BY ?year_of_citation ?organization ?organizationLabel
   }
-  {{ sparql_helpers.labels(["?organization"], languages) }}
 }
 ORDER BY ?year_of_citation
