@@ -96,63 +96,63 @@ function convertDataTableData(data, columns) {
         }
     }
     for (var i = 0 ; i < data.length ; i++) {
-	var convertedRow = {};
-	for (var key in data[i]) {
-	    if (key.slice(-11) == 'Description') {
-		convertedRow[key.slice(0, key.length - 11) + ' description'] = data[i][key];
+    var convertedRow = {};
+    for (var key in data[i]) {
+        if (key.slice(-11) == 'Description') {
+        convertedRow[key.slice(0, key.length - 11) + ' description'] = data[i][key];
 
-	    } else if (
-			key + 'Label' in data[i] &&
+        } else if (
+            key + 'Label' in data[i] &&
             key + 'Url' in data[i]
-	    ) {
+        ) {
             convertedRow[key] = '<a href="' +
-		    data[i][key + 'Url'] +
-		    '">' + data[i][key + 'Label'] + '</a>';
+            data[i][key + 'Url'] +
+            '">' + data[i][key + 'Label'] + '</a>';
 
-	    } else if (key.slice(-17) == 'ChemicalStructure') {
+        } else if (key.slice(-17) == 'ChemicalStructure') {
             convertedRow[key.slice(0, key.length - 17) + ' structure'] = '<img loading="lazy" src="' +
             'https://cdkdepict.toolforge.org/depict/bow/svg?smi=' +
-		    encodeURIComponent(data[i][key]) +
+            encodeURIComponent(data[i][key]) +
             '&abbr=on&hdisp=bridgehead&showtitle=false&zoom=2&annotate=cip' +
-		    '" />';
+            '" />';
 
-	    } else if (
-			key + 'Label' in data[i] &&
-			/^http/.test(data[i][key]) &&
-			data[i][key].length > 30
-	    ) {
-		    convertedRow[key] = '<a href="../' +
-		    data[i][key].slice(31) +
-		    '">' + data[i][key + 'Label'] + '</a>';
+        } else if (
+            key + 'Label' in data[i] &&
+            /^http/.test(data[i][key]) &&
+            data[i][key].length > 30
+        ) {
+            convertedRow[key] = '<a href="../' +
+            data[i][key].slice(31) +
+            '">' + data[i][key + 'Label'] + '</a>';
 
         } else if (key.slice(-5) == 'Label') {
-		// pass
-		
-	    } else if (key + 'Url' in data[i]) {
-		    convertedRow[key] = '<a href="' +
-		    data[i][key + 'Url'] +
-		    '">' + data[i][key] + '</a>';
+        // pass
 
-	    } else if (key.slice(-3) == 'Url') {
-		// pass
+        } else if (key + 'Url' in data[i]) {
+            convertedRow[key] = '<a href="' +
+            data[i][key + 'Url'] +
+            '">' + data[i][key] + '</a>';
 
-	    } else if (key.slice(-3) == 'url') {
-		// Convert URL to a link
-		    convertedRow[key] = "<a href='" +
-		    data[i][key] + "'>" + 
-		    $("<div>").text(data[i][key]).html() + '</a>';
+        } else if (key.slice(-3) == 'Url') {
+        // pass
 
-	    } else if (key == 'orcid') {
-		// Add link to ORCID website
-		    convertedRow[key] = '<a href="https://orcid.org/' +
-		    data[i][key] + '">' + 
-		    data[i][key] + '</a>';
+        } else if (key.slice(-3) == 'url') {
+        // Convert URL to a link
+            convertedRow[key] = "<a href='" +
+            data[i][key] + "'>" +
+            $("<div>").text(data[i][key]).html() + '</a>';
 
-	    } else if (key == 'doi') {
-		// Add link to Crossref
-		    convertedRow[key] = '<a href="https://doi.org/' +
-		    encodeURIComponent(data[i][key]) + '">' +
-		    $("<div>").text(data[i][key]).html() + '</a>';
+        } else if (key == 'orcid') {
+        // Add link to ORCID website
+            convertedRow[key] = '<a href="https://orcid.org/' +
+            data[i][key] + '">' +
+            data[i][key] + '</a>';
+
+        } else if (key == 'doi') {
+        // Add link to Crossref
+            convertedRow[key] = '<a href="https://doi.org/' +
+            encodeURIComponent(data[i][key]) + '">' +
+            $("<div>").text(data[i][key]).html() + '</a>';
 
         } else {
             var convertedRowValue = data[i][key];
@@ -282,7 +282,7 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
             };
             columns.push(column);
         }
-	
+
         if (convertedData.data.length <= 10) {
           paging = false;
         }
@@ -364,7 +364,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var sparqlEndpointName = (typeof options.sparqlEndpointName === 'undefined')
-	? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
+    ? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
 
     // overwrite the central URLs of SPARQL specific URLs are found
     configFromSPARQL = extractConfig(sparql);
