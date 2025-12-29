@@ -18,6 +18,7 @@ SELECT (MIN(?dates) AS ?date) ?work ?workLabel (GROUP_CONCAT(DISTINCT ?type_labe
       ] .
       BIND (xsd:integer(?order) AS ?n)
       OPTIONAL {
+        wd:{{ q }} ^wdt:P50 | wdt:P50 ?author .
         ?author rdfs:label ?author_label_ . FILTER (LANG(?author_label_) = 'en')
       }
       BIND (COALESCE(?author_label_, SUBSTR(STR(?author),32)) AS ?author_label)
@@ -25,15 +26,18 @@ SELECT (MIN(?dates) AS ?date) ?work ?workLabel (GROUP_CONCAT(DISTINCT ?type_labe
     ORDER BY ?n
   }
   OPTIONAL {
+    wd:{{ q }} ^wdt:P50 ?work .
     ?work wdt:P31 ?type_ .
     ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en')
   }
   ?work wdt:P577 ?datetimes .
   BIND (xsd:date(?datetimes) AS ?dates)
   OPTIONAL {
+    wd:{{ q }} ^wdt:P50 ?work .
     ?work wdt:P1104 ?pages_
   }
   OPTIONAL {
+    wd:{{ q }} ^wdt:P50 ?work .
     ?work wdt:P1433 ?venue
   }
   {{ sparql_helpers.labels(["?work"], languages) }}
