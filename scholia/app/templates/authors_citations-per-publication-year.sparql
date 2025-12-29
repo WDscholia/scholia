@@ -5,9 +5,9 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?year ?number_of_citations ?author_label WHERE {
   {
-    SELECT ?year ?number_of_citations ?author ?author_label_ WHERE {
+    SELECT ?year ?number_of_citations ?author ?authorLabel WHERE {
       {
-        SELECT ?author ?year
+        SELECT ?author ?authorLabel ?year
         # DISTINCT to avoid count citations whether ther are multiple
         # publication dates
         (COUNT(DISTINCT ?citation) AS ?number_of_citations) WHERE {
@@ -19,13 +19,13 @@ SELECT ?year ?number_of_citations ?author_label WHERE {
           # We want to count the number of citations rather than the number of
           # citing works or the number of cited works
           BIND (CONCAT(STR(?work), STR(?citing_work)) AS ?citation)
+          {{ sparql_helpers.labels(["?author"], languages) }}
         }
-        GROUP BY ?author ?year
+        GROUP BY ?author ?authorLabel ?year
       }
-      {{ sparql_helpers.labels(["?author"], languages) }}
     }
   }
   # Represent the author by name and Q identifier
-  BIND (CONCAT(?author_label_, " (", SUBSTR(STR(?author),32), ")") AS ?author_label)
+  BIND (CONCAT(?authorLabel, " (", SUBSTR(STR(?author),32), ")") AS ?author_label)
 }
 ORDER BY ?year
