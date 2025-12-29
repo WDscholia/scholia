@@ -1,3 +1,4 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -15,10 +16,8 @@ SELECT DISTINCT ?author1 ?author1Label ?author2 ?author2Label ?work ?workLabel ?
   ?author2 ?v2 ?organization2 . 
   ?work wdt:P50 ?author1, ?author2 ;
         wdt:P577 ?pubdate .
-  FILTER (STR(?author1) < STR(?author2) && ?organization1 != ?organization2)
-  ?author1 rdfs:label ?author1Label . FILTER(LANG(?author1Label)="en")
-  ?author2 rdfs:label ?author2Label . FILTER(LANG(?author2Label)="en")
-  ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel)="en")
+  FILTER (?author1 <= ?author2 && ?organization1 != ?organization2)
+  {{ sparql_helpers.labels(["?work", "?author1", "?author2"], languages) }}
 }
 ORDER BY DESC(?pubdate)
 LIMIT 500
