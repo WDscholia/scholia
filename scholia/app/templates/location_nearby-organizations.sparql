@@ -5,7 +5,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
 SELECT ?distance ?unit ?unitLabel ?organization ?organizationLabel ?organizationDescription (CONCAT("/organization/", SUBSTR(STR(?organization),32)) AS ?organizationUrl) WHERE {
   { # Compute distance.
-    SELECT ?organization ?distance ?unit WHERE {
+    SELECT DISTINCT ?organization ?distance ?unit WHERE {
       # Academic institutions on all levels
       { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q3918 }
 	  UNION
