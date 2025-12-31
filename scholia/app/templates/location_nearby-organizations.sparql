@@ -1,27 +1,21 @@
 {% import 'sparql-helpers.sparql' as sparql_helpers -%}
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: Nearby academic institutions around a specified geographic entity.
-PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
 SELECT ?distance ?unit ?unitLabel ?organization ?organizationLabel ?organizationDescription (CONCAT("/organization/", SUBSTR(STR(?organization),32)) AS ?organizationUrl) WHERE {
   { # Compute distance.
     SELECT ?organization ?distance ?unit WHERE {
-      { # Academic institutions on all levels
-        SELECT DISTINCT ?organization ?other_geo WHERE {
-	  { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q3918 }
+      # Academic institutions on all levels
+      { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q3918 }
 	  UNION
 	  { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q1371037 }
 	  UNION
 	  { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q7315155 }
 	  UNION
 	  { ?organization wdt:P361*/wdt:P31/wdt:P279* wd:Q31855 }
-          ?organization wdt:P625 ?other_geo .
-        }
-      }
-      target: wdt:P159*/wdt:P625 ?geo .
+      ?organization wdt:P625 ?other_geo .
+      wd:{{ q }} wdt:P159*/wdt:P625 ?geo .
       BIND (geof:distance(?other_geo,?geo) AS ?distance)
       BIND (wd:Q828224 AS ?unit)
       FILTER (?distance < 250)
