@@ -6,6 +6,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
 SELECT ?score ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
   {
     SELECT ?author (SUM(?topic_score) * MAX(?inverse_distance) AS ?score) (SAMPLE(?work) AS ?example_work) WHERE {
@@ -32,7 +33,7 @@ SELECT ?score ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) 
           }
           ?author wdt:P108 | wdt:P1416 ?organization .
         } GROUP BY ?author
-      }}
+      }
       {
         # A score of 3 for each authorship in the topic
         ?work wdt:P50 ?author .
