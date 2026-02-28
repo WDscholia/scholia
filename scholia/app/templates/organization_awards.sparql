@@ -1,31 +1,24 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?count
-  ?award ?awardLabel
-  ?recipients ?recipientsUrl
-WITH {
-  SELECT
-    (COUNT(?researcher) AS ?count)
-    ?award
-    (GROUP_CONCAT(?researcher_label; separator=", ") AS ?recipients)
-    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher), 32); separator=",")) AS ?recipientsUrl)
-  WHERE {
-    hint:Query hint:optimizer "None" .
-    {
-      SELECT DISTINCT ?researcher WHERE {
-        ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
-      } 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?award ?awardLabel ?recipients ?recipientsUrl WHERE {
+  {
+    SELECT (COUNT(?researcher) AS ?count) ?award (GROUP_CONCAT(?researcher_label; SEPARATOR=", ") AS ?recipients) (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?researcher),32); SEPARATOR=",")) AS ?recipientsUrl) WHERE {
+      # hint:Query hint:optimizer "None" .
+      {
+        SELECT DISTINCT ?researcher WHERE {
+          ?researcher (wdt:P108 | wdt:P463 | wdt:P1416)/wdt:P361* target: .
+        }
+      }
+      ?researcher wdt:P166 ?award .
+      ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
     }
-    ?researcher wdt:P166 ?award .
-    ?researcher rdfs:label ?researcher_label . FILTER (LANG(?researcher_label) = 'en')
+    GROUP BY ?award
   }
-  GROUP BY ?award
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?award"], languages) }}
 }
 ORDER BY DESC(?count)

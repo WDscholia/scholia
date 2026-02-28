@@ -1,55 +1,21 @@
-#sparql_endpoint = https://query-scholarly.wikidata.org/sparql
-#sparql_endpoint_name= WDQS&nbsp;main
-#sparql_editurl = https://query-scholarly.wikidata.org/#
-#sparql_embedurl = https://query-scholarly.wikidata.org/embed.html#
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  (STR(?year_) AS ?year)
-  (SUM(?count_) AS ?count)
-  ?kind
-WHERE {
-  {
-    SELECT
-      ?year_
-      (COUNT(DISTINCT ?citing_work) AS ?count_)
-      ?kind2
-    WHERE {
-      ?citing_work wdt:P2860 target: .
-  
-      # Year of citation
-      ?citing_work wdt:P577 ?date .
-      BIND(YEAR(?date) AS ?year_)
-      BIND(xsd:date(?date) AS ?pubDate_)
-
-      target: p:P31 ?isRetractedPaperStatement .
-      ?isRetractedPaperStatement ps:P31 wd:Q45182324 .
-      ?isRetractedPaperStatement pq:P580 ?retractionDate
-      BIND(xsd:date(?retractionDate) AS ?retractionDate_)
-      BIND (IF (?retractionDate_ > ?pubDate_,
-        "before retraction", "after retraction") AS ?kind2)
-    }
-    GROUP BY ?year_ ?kind2
-  }
-  UNION 
-  {
-    SELECT
-      ?year_
-      (COUNT(DISTINCT ?citing_work) AS ?count_)
-      ?kind2
-    WHERE {
-      ?citing_work wdt:P2860 target: .
-  
-      # Year of citation
-      ?citing_work wdt:P577 ?date .
-      BIND(YEAR(?date) AS ?year_)
-      BIND(xsd:date(?date) AS ?pubDate_)
-      MINUS { target: p:P31 / pq:P580 ?retractionDate }
-    }
-    GROUP BY ?year_ ?kind2
-  }
-  BIND(IF(BOUND(?kind2), ?kind2, "_") AS ?kind)
-}
-GROUP BY ?year_ ?kind
-ORDER BY DESC(?year_)
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT (STR(?_year) AS ?year) (COUNT(DISTINCT ?citing_work) AS ?count) ?kind WHERE {
+  ?citing_work wdt:P2860 target: ;
+               wdt:P577 ?date .
+  OPTIONAL { target: p:P31 [ ps:P31 wd:Q45182324 ; pq:P580 ?retractionDate ] }
+  # Year of citation
+  BIND (YEAR(?date) AS ?_year)
+  # Type of citation
+  BIND (IF(BOUND(?retractionDate),
+    IF(xsd:date(?retractionDate) > xsd:date(?date), "before retraction", "after retraction"),
+    "_"
+  ) AS ?kind)
+} GROUP BY ?_year ?kind
+  ORDER BY DESC(?_year)

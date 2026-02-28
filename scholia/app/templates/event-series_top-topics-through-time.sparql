@@ -1,46 +1,36 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:AreaChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?year
-  ?works
-  ?topic ?topicLabel
-WITH {
-  SELECT 
-    ?work
-  WHERE {
-    ?work wdt:P1433 / wdt:P4745 / (wdt:P179 | wdt:P31) target: .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?year ?works ?topic ?topicLabel WHERE {
+  {
+    SELECT ?year (COUNT(?work) AS ?works) ?topic WHERE {
+      {
+        SELECT ?work WHERE {
+          ?work wdt:P1433/wdt:P4745/(wdt:P179 | wdt:P31) target: .
+        }
+      }
+      {
+        SELECT (COUNT(?work) AS ?count) ?topic WHERE {
+          {
+            SELECT ?work WHERE {
+              ?work wdt:P1433/wdt:P4745/(wdt:P179 | wdt:P31) target: .
+            }
+          }
+          ?work wdt:P921 ?topic .
+        }
+        GROUP BY ?topic
+        ORDER BY DESC(?count)
+        LIMIT 5
+      }
+      ?work wdt:P921 ?topic ;
+            wdt:P577 ?publication_datetime .
+      BIND (STR(YEAR(?publication_datetime)) AS ?year)
+    }
+    GROUP BY ?year ?topic
   }
-} AS %works
-WITH {
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?topic
-  WHERE {
-    INCLUDE %works
-    ?work wdt:P921 ?topic .
-  }
-  GROUP BY ?topic
-  ORDER BY DESC(?count)
-  LIMIT 5
-} AS %topics
-WITH {
-  SELECT
-    ?year 
-    (COUNT(?work) AS ?works)
-    ?topic
-  WHERE {
-    INCLUDE %works
-    INCLUDE %topics
-    ?work wdt:P921 ?topic ;
-          wdt:P577 ?publication_datetime .
-    BIND(STR(YEAR(?publication_datetime)) AS ?year)
-  }
-  GROUP BY ?year ?topic
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?topic"], languages) }}
 }
 ORDER BY ?year

@@ -1,17 +1,17 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?count ?theme ?themeLabel ?example_work ?example_workLabel
-WITH {
-  SELECT (COUNT(?work) AS ?count) ?theme (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work wdt:P50 target: .
-    ?work wdt:P921 ?theme .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?theme ?themeLabel ?example_work ?example_workLabel WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?theme (SAMPLE(?work) AS ?example_work) WHERE {
+      ?work wdt:P50 target: .
+      ?work wdt:P921 ?theme .
+    }
+    GROUP BY ?theme
   }
-  GROUP BY ?theme
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?theme", "?example_work"], languages) }}
 }
-ORDER BY DESC(?count) 
+ORDER BY DESC(?count)

@@ -1,8 +1,11 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?sponsor ?sponsorLabel ?sponsorUrl ?sponsorDescription
-WHERE {
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?sponsor ?sponsorLabel ?sponsorUrl ?sponsorDescription WHERE {
   target: wdt:P859 ?sponsor .
-  BIND(CONCAT("/sponsor/", SUBSTR(STR(?sponsor), 32)) AS ?sponsorUrl)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  BIND (CONCAT("/sponsor/", SUBSTR(STR(?sponsor),32)) AS ?sponsorUrl)
+  {{ sparql_helpers.labels(["?sponsor"], languages) }}
+  {{ sparql_helpers.descriptions(["?sponsor"], languages) }}
 }

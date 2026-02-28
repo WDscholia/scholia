@@ -1,29 +1,27 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #title: Recent works published in venue
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?publication_date
-  ?work ?workLabel
-  (GROUP_CONCAT(DISTINCT ?author_label; separator=", ") AS ?authors)
-  (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author), 32); separator=",")) AS ?authorsUrl)
-WITH {
-  SELECT DISTINCT ?work (MIN(?publication_date_) AS ?publication_date) WHERE {
-    ?work wdt:P1433 target: .
-    OPTIONAL {
-      ?work wdt:P577 ?publication_datetime .
-      BIND(xsd:date(?publication_datetime) AS ?publication_date_)
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?publication_date ?work ?workLabel (GROUP_CONCAT(DISTINCT ?authorLabel; SEPARATOR=", ") AS ?authors) (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?author),32); SEPARATOR=",")) AS ?authorsUrl) WHERE {
+  {
+    SELECT DISTINCT ?work (MIN(?publication_date_) AS ?publication_date) WHERE {
+      ?work wdt:P1433 target: .
+      OPTIONAL {
+        ?work wdt:P577 ?publication_datetime .
+        BIND (xsd:date(?publication_datetime) AS ?publication_date_)
+      }
     }
-  } GROUP BY ?work
+    GROUP BY ?work
     ORDER BY DESC(?publication_date)
     LIMIT 1000
-} AS %ARTICLES WHERE {
-  INCLUDE %ARTICLES
+  }
   OPTIONAL {
     ?work wdt:P50 ?author .
-    ?author rdfs:label ?author_label .
-    FILTER (LANG(?author_label) = 'en')
+    {{ sparql_helpers.labels(["?author"], languages) }}
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
-} GROUP BY ?publication_date ?work ?workLabel
+  {{ sparql_helpers.labels(["?work"], languages) }}
+}
+GROUP BY ?publication_date ?work ?workLabel
 ORDER BY DESC(?publication_date)

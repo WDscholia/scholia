@@ -1,17 +1,20 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: List of topics
-SELECT
-  ?topic ?topicLabel ?topicDescription (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
-  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT ?topic (SAMPLE(?work) AS ?example_work) WHERE {
-    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    OPTIONAL { 
-      ?work wdt:P921 ?topic ; wdt:P31 wd:Q13442814 .
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?topic ?topicLabel ?topicDescription (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl) WHERE {
+  {
+    SELECT ?topic (SAMPLE(?work) AS ?example_work) WHERE {
+      VALUES ?topic { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
+      OPTIONAL {
+        ?work wdt:P921 ?topic ;
+              wdt:P31 wd:Q13442814 .
+      }
     }
+    GROUP BY ?topic
   }
-  GROUP BY ?topic
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  {{ sparql_helpers.labels(["?topic", "?example_work"], languages) }}
+  {{ sparql_helpers.descriptions(["?topic"], languages) }}
 }

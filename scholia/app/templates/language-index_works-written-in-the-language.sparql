@@ -1,26 +1,17 @@
-SELECT
-  ?count
-  
-  ?language ?languageLabel
-  (CONCAT("/language/", SUBSTR(STR(?language), 32)) AS ?languageUrl)
-   ?languageDescription 
-WITH {
-  SELECT
-    (COUNT(*) AS ?count)
-    ?language
-  WHERE {
-    [] wdt:P407 ?language   
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?language ?languageLabel (CONCAT("/language/", SUBSTR(STR(?language),32)) AS ?languageUrl) ?languageDescription WHERE {
+  {
+    SELECT (COUNT(*) AS ?count) ?language WHERE {
+      [] wdt:P407 ?language
+    }
+    GROUP BY ?language
   }
-  GROUP BY ?language 
-} AS %result
-WHERE {
-  INCLUDE %result
-
   # This is to get rid of a language number of unknown values
-  FILTER EXISTS { ?language ?p [] }
-
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  FILTER (! (STRSTARTS(STR(?language),"_")))
+  {{ sparql_helpers.labels(["?language"], languages) }}
+  {{ sparql_helpers.descriptions(["?language"], languages) }}
 }
 ORDER BY DESC(?count)
-
-  

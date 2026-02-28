@@ -1,54 +1,45 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # Topics of works authored by people associated with an event
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
- SELECT ?score ?topic ?topicLabel ?topicDescription
-  (CONCAT("/topic/", STRAFTER(STR(?topic), "http://www.wikidata.org/entity/")) AS ?topicUrl)
-WITH {
-  SELECT
-    DISTINCT ?person
-  WHERE {
-    {
-      # speaker, organizer, program committee member
-      target: wdt:P823 | wdt:P664 | wdt:P5804 ?person .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?score ?topic ?topicLabel ?topicDescription (CONCAT("/topic/", STRAFTER(STR(?topic),"http://www.wikidata.org/entity/")) AS ?topicUrl) WHERE {
+  {
+    SELECT (SUM(?score_) AS ?score) ?topic WHERE {
+      {
+        target: wdt:P921 ?topic .
+        BIND (50 AS ?score_)
+      }
+      UNION {
+        {
+          SELECT DISTINCT ?person WHERE {
+            {
+              # speaker, organizer, program committee member
+              target: wdt:P823 | wdt:P664 | wdt:P5804 ?person .
+            }
+            UNION {
+              # participant
+              ?person wdt:P1344 | ^wdt:P710 target: .
+            }
+            UNION {
+              # author
+              ?person ^wdt:P50/wdt:P1433/wdt:P4745 target: .
+            }
+          }
+        }
+        ?person ^wdt:P50/wdt:P921 ?topic .
+        BIND (1 AS ?score_)
+      }
+      UNION {
+        target: ^wdt:P4745/^wdt:P1433/wdt:P921 ?topic .
+        BIND (7 AS ?score_)
+      }
     }
-    UNION
-    {
-      # participant
-      ?person wdt:P1344 | ^wdt:P710 target: .
-    }
-    UNION
-    {
-      # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 target: .
-    }
+    GROUP BY ?topic
   }
-} AS %people  
-WITH {
-  SELECT
-    (SUM(?score_) AS ?score) ?topic
-  WHERE {
-    {
-      target: wdt:P921 ?topic .
-      BIND(50 AS ?score_)
-    }
-    UNION
-    {
-      INCLUDE %people
-      ?person ^wdt:P50 / wdt:P921 ?topic .
-      BIND(1 AS ?score_)
-    }
-    UNION
-    {
-      target: ^wdt:P4745 / ^wdt:P1433 / wdt:P921 ?topic .
-      BIND(7 AS ?score_)
-    }
-  }
-  GROUP BY ?topic
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?topic"], languages) }}
+  {{ sparql_helpers.descriptions(["?topic"], languages) }}
 }
 ORDER BY DESC(?score)
 LIMIT 200

@@ -1,55 +1,37 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Graph
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?child ?childLabel
-  ?rgb 
-  ?parent ?parentLabel
-WITH {
-  SELECT ?child ?rgb ?parent WHERE {
-    { 
-      # Parent taxa
-      SELECT ?child ?rgb ?parent  WHERE {
-        SERVICE gas:service {
-          gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-                  gas:in target: ;
-                  # We should not do undirected here because this could result
-                  # in very big graphs.
-                  gas:traversalDirection "Forward" ;
-                  gas:out ?child ;
-                  gas:out1 ?depth ;
-                  gas:out2 ?parent1 ;
-                  gas:linkType wdt:P171 ;
-        }
-        ?child wdt:P171 ?parent .
-        BIND(IF(?child = target:, "FF0000", "FFFFFF") AS ?rgb)
-      }
-    }
-    UNION 
-    {
-      # Child taxa
-      SELECT ?child ?rgb ?parent WHERE {
-        BIND(target: AS ?parent)
-        ?child wdt:P171 ?parent . 
-        BIND("DDDDDD" AS ?rgb)
-      }
-      LIMIT 100
-    }
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT (?_child AS ?child) ?childLabel ?rgb (?_parent AS ?parent) ?parentLabel WHERE {
+  {
+    # Parent taxa
+    target: wdt:P171+ ?_child .
+    ?_child wdt:P171 ?_parent .
+    BIND ("FFFFFF" AS ?rgb)
+  } UNION {
+    # Child taxa
+    {SELECT ?_child ?_parent WHERE {
+      BIND (target: AS ?_parent) .
+      ?_child wdt:P171 ?_parent .
+    } LIMIT 100}
+    BIND ("DDDDDD" AS ?rgb)
+  } UNION {
+    BIND (target: AS ?_child) .
+    ?_child wdt:P171 ?_parent .
+    BIND ("FF0000" AS ?rgb)
   }
-} AS %results
-WHERE {
-  INCLUDE %results 
-          
-  ?child rdfs:label ?child_label . FILTER(LANG(?child_label) = 'en')
-  ?parent rdfs:label ?parent_label . FILTER(LANG(?parent_label) = 'en')
+
   OPTIONAL {
-    ?child wdt:P105 / rdfs:label ?child_rank_label . FILTER (LANG(?child_rank_label) = 'en')
+    ?_child wdt:P105 ?_childRank .
+    {{ sparql_helpers.labels(["?_childRank"], languages) }}
   }
   OPTIONAL {
-    ?parent wdt:P105 / rdfs:label ?parent_rank_label . FILTER (LANG(?parent_rank_label) = 'en')
+    ?_parent wdt:P105 ?_parentRank .
+    {{ sparql_helpers.labels(["?_parentRank"], languages) }}
   }
-  BIND(CONCAT(?child_label, " - ", COALESCE(?child_rank_label, "???")) AS ?childLabel)
-  BIND(CONCAT(?parent_label, " - ", COALESCE(?parent_rank_label, "???")) AS ?parentLabel)
+  {{ sparql_helpers.labels(["?_child", "?_parent"], languages) }}
 
+  BIND (CONCAT(?_childLabel, " - ", COALESCE(?_childRankLabel, "???")) AS ?childLabel)
+  BIND (CONCAT(?_parentLabel, " - ", COALESCE(?_parentRankLabel, "???")) AS ?parentLabel)
 }

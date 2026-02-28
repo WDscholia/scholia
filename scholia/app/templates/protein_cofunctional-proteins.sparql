@@ -1,22 +1,25 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?count ?protein ?proteinLabel ?species ?speciesLabel ?functions
-WITH {
-  SELECT ?protein (COUNT(?function) AS ?count)
-         (GROUP_CONCAT(?function_label; separator=" // ") AS ?functions)
-  WHERE {
-    BIND(target: AS ?query_protein)
-    ?query_protein wdt:P680 ?function .
-    FILTER (?query_protein != ?protein)
-    ?protein wdt:P680 ?function . 
-    ?function rdfs:label ?function_label FILTER(lang(?function_label) = "en")
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?protein ?proteinLabel ?species ?speciesLabel ?functions WHERE {
+  {
+    SELECT ?protein (COUNT(?function) AS ?count) (GROUP_CONCAT(?function_label; SEPARATOR=" // ") AS ?functions) WHERE {
+      BIND (target: AS ?query_protein)
+      ?query_protein wdt:P680 ?function .
+      FILTER (?query_protein != ?protein)
+      ?protein wdt:P680 ?function .
+      ?function rdfs:label ?function_label FILTER (LANG(?function_label) = "en")
+    }
+    GROUP BY ?protein
   }
-  GROUP BY ?protein
-} AS %result 
-WHERE {
-  INCLUDE %result
-  OPTIONAL { ?protein wdt:P703 ?species . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  OPTIONAL {
+    ?protein wdt:P703 ?species .
+  }
+  {{ sparql_helpers.labels(["?protein"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?species"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 500

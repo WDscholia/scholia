@@ -1,29 +1,28 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  (SAMPLE(?number_of_works_) AS ?number_of_works)
-  (MAX(?bfi) AS ?BFI)
-  ?journal ?journalLabel
-  (GROUP_CONCAT(?themes_labels; separator=", ") as ?theme)
-WITH {
-  SELECT 
-    ?journal
-    (COUNT(?work) AS ?number_of_works_)
-  WHERE {
-    ?journal wdt:P123 target: .
-    OPTIONAL { ?work wdt:P1433 ?journal . }
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT (SAMPLE(?number_of_works_) AS ?number_of_works) (MAX(?bfi) AS ?BFI) ?journal ?journalLabel (GROUP_CONCAT(?themes_labels; SEPARATOR=", ") AS ?theme) WHERE {
+  {
+    SELECT ?journal (COUNT(?work) AS ?number_of_works_) WHERE {
+      ?journal wdt:P123 target: .
+      OPTIONAL {
+        ?work wdt:P1433 ?journal .
+      }
+    }
+    GROUP BY ?journal
   }
-  GROUP BY ?journal 
-} AS %journals
-WHERE {
-  INCLUDE %journals
   OPTIONAL {
     ?journal wdt:P921 ?themes .
     ?themes rdfs:label ?themes_labels .
     FILTER (LANG(?themes_labels) = 'en')
   }
-  OPTIONAL { ?journal wdt:P1240 ?bfi . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
-} 
+  OPTIONAL {
+    ?journal wdt:P1240 ?bfi .
+  }
+  {{ sparql_helpers.labels(["?journal"], languages) }}
+}
 GROUP BY ?journal ?journalLabel
 ORDER BY DESC(?number_of_works)

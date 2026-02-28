@@ -1,25 +1,22 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?number_of_citations
-  ?publication_date
-  ?work ?workLabel
-WITH {
-  SELECT
-    (MIN(?datetimes) AS ?publication_datetime)
-    (COUNT(DISTINCT ?citing_work) AS ?number_of_citations)
-    ?work
-  WHERE {
-    ?collection wdt:P179 target: .
-    ?work wdt:P1433 ?collection .
-    OPTIONAL { ?work wdt:P577 ?datetimes . }
-    OPTIONAL { ?citing_work wdt:P2860 ?work . }
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?number_of_citations ?publication_date ?work ?workLabel WHERE {
+  {
+    SELECT (MIN(?datetimes) AS ?publication_datetime) (COUNT(DISTINCT ?citing_work) AS ?number_of_citations) ?work WHERE {
+      ?collection wdt:P179 target: .
+      ?work wdt:P1433 ?collection .
+      OPTIONAL {
+        ?work wdt:P577 ?datetimes .
+      }
+      OPTIONAL {
+        ?citing_work wdt:P2860 ?work .
+      }
+    }
+    GROUP BY ?work
   }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-  BIND(xsd:date(?publication_datetime) AS ?publication_date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+  BIND (xsd:date(?publication_datetime) AS ?publication_date)
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?number_of_citations) DESC(?publication_date)

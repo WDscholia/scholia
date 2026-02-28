@@ -1,41 +1,30 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BarChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # Pages per year bar chart of an organization
-SELECT
-  ?year
-  (SUM(?pages_per_author) AS ?number_of_pages)
-  ?researcher ?researcherLabel
-WITH {
-  SELECT 
-    DISTINCT ?researcher
-  WHERE {
-    ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) target: .
-  }
-} AS %researchers
-WITH {
-    SELECT
-      ?researcher ?work ?year
-      (SAMPLE(?pages) / COUNT(?researcher_of_paper) AS ?pages_per_author)
-    WHERE {
-      INCLUDE %researchers
-      
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?year (SUM(?pages_per_author) AS ?number_of_pages) ?researcher ?researcherLabel WHERE {
+  {
+    SELECT ?researcher ?work ?year (SAMPLE(?pages) / COUNT(?researcher_of_paper) AS ?pages_per_author) WHERE {
+      {
+        SELECT DISTINCT ?researcher WHERE {
+          ?researcher wdt:P108 | wdt:P463 | (wdt:P1416/wdt:P361*) target: .
+        }
+      }
       ?work (wdt:P50 | wdt:P2093) ?researcher_of_paper .
-      
       # Disabled to only look on scholarly articles
       # ?work wdt:P31 wd:Q13442814 .
-      
       ?work wdt:P50 ?researcher ;
             wdt:P1104 ?pages ;
-            wdt:P577 ?date . 
-      BIND(STR(YEAR(?date)) AS ?year) 
-    } 
+            wdt:P577 ?date .
+      BIND (STR(YEAR(?date)) AS ?year)
+    }
     GROUP BY ?work ?researcher ?year
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  }
+  {{ sparql_helpers.labels(["?researcher"], languages) }}
 }
 GROUP BY ?year ?researcher ?researcherLabel
 ORDER BY ?year

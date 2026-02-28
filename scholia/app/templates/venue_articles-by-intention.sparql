@@ -1,39 +1,41 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:BarChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
-select ?year (count(?work) as ?number_of_publications) ?intention where {
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?year (COUNT(?work) AS ?number_of_publications) ?intention WHERE {
   {
-    select (str(?year_) as ?year) (0 as ?pages) ("_" as ?intention) where {
+    SELECT DISTINCT (STR(?year_) as ?year) ("_" AS ?intention) WHERE {
       # default values = 0
-      ?year_item wdt:P31 wd:Q577 . 
-      ?year_item wdt:P585 ?date .
-      bind(year(?date) as ?year_)
+      VALUES ?year_class { wd:Q577 wd:Q3186692 }
+      [] wdt:P31 ?year_class ;
+         wdt:P585 ?date .
+      BIND (YEAR(?date) AS ?year_)
       {
-        select (min(?year_) as ?earliest_year)  (max(?year_) as ?latest_year) where {
-          VALUES ?JOURNAL { target: }
-          ?work wdt:P1433 ?JOURNAL .
-          ?work wdt:P577 ?publication_date . 
-          bind(year(?publication_date) as ?year_)
+        SELECT (MIN(?year) AS ?earliest_year) (MAX(?year) AS ?latest_year) WHERE {
+          ?work wdt:P1433 target: ;
+                wdt:P577 ?publication_date .
+          BIND (YEAR(?publication_date) AS ?year)
         }
       }
-      bind(year(now())+1 as ?next_year)
-      filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+      FILTER (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
     }
   }
-  union {
-    select ?work ?intention (min(?years) as ?year) where {
-      VALUES ?JOURNAL { target: }
-      ?work wdt:P577 ?dates ;
-            p:P2860 / pq:P3712 / rdfs:label ?intention ;
-            wdt:P1433 ?JOURNAL .
-      bind(str(year(?dates)) as ?years) .
-      FILTER (LANG(?intention) = "en")
+  UNION {
+    SELECT ?work (?_intentionLabel as ?intention) (STR(MIN(?years)) AS ?year) WHERE {
+      ?work wdt:P1433 target: ;
+            p:P2860/pq:P3712 ?_intention ;
+            wdt:P577 ?dates .
+      BIND (YEAR(?dates) AS ?years) .
+      {{ sparql_helpers.labels(["?_intention"], languages) }}
     }
-    group by ?work ?intention
+    GROUP BY ?work ?_intentionLabel
   }
 }
-group by ?year ?intention
-order by ?year
+GROUP BY ?year ?intention
+ORDER BY ?year

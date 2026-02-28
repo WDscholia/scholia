@@ -1,18 +1,13 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Authorship gender distribution for a specific venue
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?count ?gender ?genderLabel 
-WITH {
-  SELECT (COUNT(?author) AS ?count) ?gender WHERE {
-    ?work wdt:P1433 target: .
-    ?work wdt:P50 ?author .
-    ?author wdt:P21 ?gender .
-  } 
-  GROUP BY ?gender
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
-} 
- ORDER BY DESC(?count)
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT (COUNT(?author) AS ?count) ?gender ?genderLabel WHERE {
+  ?work wdt:P1433 target: .
+  ?work wdt:P50 ?author .
+  ?author wdt:P21 ?gender .
+  {{ sparql_helpers.labels(["?gender"], languages) }}
+}
+GROUP BY ?gender ?genderLabel
+ORDER BY DESC(?count)

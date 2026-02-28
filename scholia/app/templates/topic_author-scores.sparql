@@ -1,40 +1,42 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
-SELECT ?score 
-?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT
-    (SUM(?score_) AS ?score)
-    ?author
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    { 
-      ?author wdt:P101/wdt:P279* target: .
-      BIND(20 AS ?score_)
-    }
-    UNION
-    {
-      SELECT (3 AS ?score_) ?author ?work WHERE {
-        ?work wdt:P50 ?author ;
-              wdt:P921/wdt:P279* target: .
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?score ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl) WHERE {
+  {
+    SELECT (SUM(?score_) AS ?score) ?author (SAMPLE(?_example_work) AS ?example_work) (SAMPLE(?_example_workLabel) AS ?example_workLabel) WHERE {
+      {
+        ?author wdt:P101/wdt:P279* target: .
+        BIND (20 AS ?score_)
       }
-    }
-    UNION
-    {
-      SELECT (1 AS ?score_) ?author ?work WHERE {
-        ?work wdt:P50 ?author .
-        ?citing_work wdt:P2860 ?work .
-        ?citing_work wdt:P921/wdt:P279* target: .
+      UNION
+      {
+        {
+          SELECT (SUM(?workScore) AS ?score_) ?author (SAMPLE(?work) AS ?_example_work) WHERE {
+            {
+              ?work wdt:P50 ?author ;
+                    wdt:P921/wdt:P279* target: .
+              BIND (3 AS ?workScore)
+            }
+            UNION
+            {
+              ?citing_work wdt:P2860 ?work ;
+                          wdt:P921/wdt:P279* target: .
+              ?work wdt:P50 ?author .
+              BIND (1 AS ?workScore)
+            }
+          } GROUP BY ?author
+        }
+
+        # Label of example work needs to be loaded when it is definitely bound, otherwise it
+        # tries include all existing labels. At the same time, it needs to be loaded after
+        # the works are sampled, as otherwise the title and IRI may refer to different works.
+
+        {{ sparql_helpers.labels(["?_example_work"], languages) }}
       }
-    }
+    } GROUP BY ?author
   }
-  GROUP BY ?author
-  ORDER BY DESC(?score)
+
+  {{ sparql_helpers.labels(["?author"], languages) }}
+} ORDER BY DESC(?score)
   LIMIT 200
-} AS %results 
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,jp,no,ru,sv,zh". }
-}
-ORDER BY DESC(?score)

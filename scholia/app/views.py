@@ -3,8 +3,9 @@
 import datetime
 import re
 
-from flask import (Blueprint, current_app, redirect, render_template, request,
-                   Response, url_for)
+from flask import (Blueprint, current_app, jsonify, redirect,
+                   render_template as render_template_base,
+                   request, Response, url_for)
 from jinja2 import TemplateNotFound
 from werkzeug.routing import BaseConverter
 
@@ -31,6 +32,7 @@ from ..utils import (remove_special_characters_url, sanitize_q, string_to_list,
                      string_to_type)
 from ..wikipedia import q_to_bibliography_templates
 from ..config import config
+from scholia import __version__
 
 
 ROBOTS_TXT = """User-agent: *
@@ -385,6 +387,43 @@ def get_js_config():
     }
 
 
+def get_languages():
+    """Get language fallback chain for a given request.
+
+    Returns
+    -------
+    languages : list[str]
+        Language fallback chain.
+
+    """
+    languages = [x[0] for x in request.accept_languages]
+    if 'en' not in request.accept_languages:
+        languages.append('en')
+    languages.append('mul')
+    return languages
+
+
+def render_template(template_name_or_list, **context):
+    """Render a template by name with the given context.
+
+    Wrapper around flask.render_template, which automatically
+    determines language fallback chain from request headers.
+
+    Parameters
+    ----------
+    template_name_or_list : str or list[str]
+        The name of the template to render. If a list is given,
+        the first name to exist will be rendered.
+
+    context : dict
+        The variables to make available in the template.
+
+    """
+    if 'languages' not in context:
+        context['languages'] = get_languages()
+    return render_template_base(template_name_or_list, **context)
+
+
 @main.context_processor
 def inject_js_config():
     """Return configuration for Javascript for injection.
@@ -413,6 +452,38 @@ def index():
     embedurl = config['query-server'].get('sparql_embedurl')
     return render_template('index.html', sparql_endpoint=ep,
                            sparql_editURL=editurl, sparql_embedURL=embedurl)
+
+
+@main.route('/backend')
+def backend():
+    """Show backend information."""
+    sparql_endpoint = config['query-server'].get('sparql_endpoint', '')
+    sparql_endpoint_name = config['query-server'].get(
+        'sparql_endpoint_name', '')
+    sparql_editurl = config['query-server'].get('sparql_editurl', '')
+    sparql_embedurl = config['query-server'].get('sparql_embedurl', '')
+
+    # Gather backend information
+    data = {
+        'version': __version__,
+        'sparql_endpoint': sparql_endpoint,
+        'sparql_endpoint_name': sparql_endpoint_name,
+        'sparql_editurl': sparql_editurl,
+        'sparql_embedurl': sparql_embedurl,
+        'text_to_topic_q_text_enabled': getattr(
+            current_app, 'text_to_topic_q_text_enabled', False),
+        'third_parties_enabled': getattr(
+            current_app, 'third_parties_enabled', False),
+    }
+
+    # Content negotiation
+    # Best practice for JSON APIs to check Accept header
+    if request.accept_mimetypes.accept_json and \
+       not request.accept_mimetypes.accept_html:
+        return jsonify(data)
+
+    # Default to HTML representation
+    return render_template('backend.html', **data)
 
 
 @main.route("/statistics")

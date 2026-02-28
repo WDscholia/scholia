@@ -1,31 +1,39 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT DISTINCT ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl)
-  ?chemicalname
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX mwapi: <https://www.mediawiki.org/ontology#API/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT DISTINCT ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) ?chemicalname
   (CONCAT(SUBSTR(STR(?work),32), "\tP921\t{{ q }}\tS887\tQ69652283") AS ?quickStatements)
-  (CONCAT("https://quickstatements.toolforge.org/#/v1=",
+  (CONCAT("https://quickstatements.toolforge.org/#/v1=", 
           SUBSTR(STR(?work),32), "%7CP921%7C{{ q }}%7CS887%7CQ69652283") AS ?quickStatementsUrl)
-WITH {
-  SELECT  ?work ?chemicalname WHERE {
-    VALUES ?chemicalType {
-      wd:Q113145171 # type of a chemical entity
-      wd:Q59199015 # group of stereoisomers
-    }
-    target: wdt:P31 ?chemicalType ; rdfs:label ?chemicalname .
-    FILTER(lang(?chemicalname) = "en")
-    SERVICE wikibase:mwapi {
-      bd:serviceParam wikibase:endpoint "www.wikidata.org";
-      wikibase:api "Generator";
-      mwapi:generator "search";
-      mwapi:gsrsearch ?chemicalname;
-      mwapi:gsrlimit "max".
-      ?work wikibase:apiOutputItem mwapi:title.
+WHERE {
+  SELECT ?work ?chemicalname WHERE {
+    VALUES ?chemicalType { wd:Q113145171 # type of a chemical entity
+    wd:Q59199015 # group of stereoisomers
+  }
+    target: wdt:P31 ?chemicalType ;
+            rdfs:label ?chemicalname .
+    FILTER (LANG(?chemicalname) = "en")
+    SERVICE <https://query.wikidata.org/sparql> {
+      SERVICE wikibase:mwapi {
+        bd:serviceParam wikibase:endpoint "www.wikidata.org" ;
+                        wikibase:api "Generator" ;
+                        mwapi:generator "search" ;
+                        mwapi:gsrsearch ?chemicalname ;
+                        mwapi:gsrlimit "max" .
+        ?work wikibase:apiOutputItem mwapi:title.
+      }
     }
     ?work wdt:P1476 ?title .
-    MINUS {?work wdt:P921 target: }
-    FILTER (REGEX(LCASE(?title), LCASE(CONCAT( "\\\\", "b", ?chemicalname ,"\\\\", "b"))))
-  } LIMIT 200
-} AS %works WHERE {
-  INCLUDE %works
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+    MINUS {
+      ?work wdt:P921 target:
+    }
+    FILTER (REGEX(LCASE(?title),LCASE(CONCAT("\\\\", "b", ?chemicalname, "\\\\", "b"))))
+    {{ sparql_helpers.labels(["?work"], languages) }}
+  }
+  LIMIT 200
 }

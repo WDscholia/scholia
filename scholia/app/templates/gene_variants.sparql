@@ -1,25 +1,24 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?variant ?variantLabel ?variantDescription
-  ?types
-WITH {
-  SELECT ?variant ?type
-  WHERE {
-    ?variant wdt:P3433 target:
-  }
-} AS %variants
-WITH {
-  SELECT ?variant (GROUP_CONCAT(?type_label; separator=" // ") AS ?types) WHERE {
-    INCLUDE %variants
-    OPTIONAL {
-      ?variant wdt:P279 ?variantType . 
-      ?variantType rdfs:label ?type_label .  FILTER (lang(?type_label) = 'en')
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?variant ?variantLabel ?variantDescription ?types WHERE {
+  {
+    SELECT ?variant (GROUP_CONCAT(?type_label; SEPARATOR=" // ") AS ?types) WHERE {
+      {
+        SELECT ?variant ?type WHERE {
+          ?variant wdt:P3433 target:
+        }
+      }
+      OPTIONAL {
+        ?variant wdt:P279 ?variantType .
+        ?variantType rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en')
+      }
     }
+    GROUP BY ?variant
   }
-  GROUP BY ?variant
-} AS %result 
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?variant"], languages) }}
+  {{ sparql_helpers.descriptions(["?variant"], languages) }}
 }

@@ -1,34 +1,33 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}> 
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
 #defaultView:Graph
-SELECT DISTINCT ?citing_country ?citing_countryLabel ?citing_flag ?cited_country ?cited_countryLabel ?cited_flag
-WITH {
-  SELECT DISTINCT ?cited_country ?citing_country (COUNT(?citing_country) AS ?count)
-                                  WHERE {
-    ?citing_work wdt:P50 ?citing_author . 
-    ?citing_work wdt:P921 target: .
-    ?cited_work wdt:P921 target: .
-    ?citing_work wdt:P2860 ?cited_work . 
-    ?cited_work wdt:P50 ?cited_author .  
-    FILTER (?citing_work != ?cited_work)
-    FILTER NOT EXISTS {
-      ?citing_work wdt:P50 ?author .
-      ?citing_work wdt:P2860 ?cited_work .
-      ?cited_work  wdt:P50 ?author .
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT DISTINCT ?citing_country ?citing_countryLabel ?citing_flag ?cited_country ?cited_countryLabel ?cited_flag WHERE {
+  {
+    SELECT DISTINCT ?cited_country ?citing_country (COUNT(?citing_country) AS ?count) WHERE {
+      ?citing_work wdt:P921 target: ;
+                   wdt:P50 ?citing_author ;
+                   wdt:P2860 ?cited_work .
+      ?cited_work wdt:P921 target: ;
+                  wdt:P50 ?cited_author .
+
+      FILTER (?citing_work != ?cited_work)
+      FILTER (?citing_author != ?cited_author)
+
+      ?citing_author (wdt:P108 | wdt:P1416) ?citing_organization .
+      ?cited_author (wdt:P108 | wdt:P1416) ?cited_organization .
+      ?cited_organization wdt:P17 ?cited_country .
+      ?citing_organization wdt:P17 ?citing_country .
+      FILTER (?citing_country != ?cited_country)
     }
-    ?citing_author (wdt:P108|wdt:P1416) ?citing_organization . 
-    ?cited_author (wdt:P108|wdt:P1416) ?cited_organization . 
-    ?cited_organization wdt:P17 ?cited_country.
-    ?citing_organization wdt:P17 ?citing_country.
-    FILTER (?citing_country != ?cited_country)
+    GROUP BY ?cited_country ?citing_country
+    ORDER BY DESC(?count)
+    # Adjust number of connections to display
+    LIMIT 42
   }
-  GROUP BY ?cited_country ?citing_country
-  ORDER BY DESC(?count)
-  LIMIT 42 # Adjust number of connections to display
-} AS %results
-WHERE {
-  INCLUDE %results
-  ?cited_country wdt:P41 ?cited_flag . 
-  ?citing_country wdt:P41 ?citing_flag . 
- SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }        
- }
+  ?cited_country wdt:P41 ?cited_flag .
+  ?citing_country wdt:P41 ?citing_flag .
+
+  {{ sparql_helpers.labels(["?citing_country", "?cited_country"], languages) }}
+}

@@ -1,28 +1,21 @@
-#sparql_endpoint = https://query.wikidata.org/sparql
-#sparql_endpoint_name= WDQS main
-#sparql_editurl = https://query.wikidata.org/#
-#sparql_embedurl = https://query.wikidata.org/embed.html#
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT 
-  ?count 
-  ?software ?softwareLabel ?softwareDescription (CONCAT("/software/", SUBSTR(STR(?software), 32)) AS ?softwareUrl)
-WITH {
-  SELECT 
-    (COUNT(?other_software) AS ?count)
-    ?software 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?software ?softwareLabel ?softwareDescription (CONCAT("/software/", SUBSTR(STR(?software),32)) AS ?softwareUrl) WHERE {
   {
-    ?software wdt:P1547+ target: .
-    OPTIONAL {
-      ?other_software wdt:P1547+ ?software .
-    } 
+    SELECT (COUNT(?other_software) AS ?count) ?software {
+      ?software wdt:P1547+ target: .
+      OPTIONAL {
+        ?other_software wdt:P1547+ ?software .
+      }
+    }
+    GROUP BY ?software
+    ORDER BY DESC(?count)
+    LIMIT 500
   }
-  GROUP BY ?software
-  ORDER BY DESC(?count)
-  LIMIT 500
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?software"], languages) }}
+  {{ sparql_helpers.descriptions(["?software"], languages) }}
 }
 ORDER BY DESC(?count)

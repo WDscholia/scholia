@@ -1,15 +1,14 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
-SELECT
-  ?protein ?proteinLabel ?proteinDescription
-  ?gene ?geneLabel
-WITH {
-  SELECT ?protein ?gene ?chromosome WHERE {
-    ?protein wdt:P31 wd:Q8054 ;
-          wdt:P703 target: .
-  }
-} AS %results {
-  INCLUDE %results
-  ?protein wdt:P702 ?gene .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?protein ?proteinLabel ?proteinDescription ?gene ?geneLabel {
+  ?protein wdt:P31 wd:Q8054 ;
+           wdt:P703 target: ;
+           wdt:P702 ?gene.
+  {{ sparql_helpers.labels(["?protein", "?gene"], languages) }}
+  {{ sparql_helpers.descriptions(["?protein"], languages) }}
 }

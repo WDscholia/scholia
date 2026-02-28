@@ -1,18 +1,24 @@
-SELECT ?venue ?venueLabel ?publisher ?publisherLabel ?number_of_works ?number_of_citations
-WITH {
-  SELECT ?venue (COUNT(DISTINCT ?work) AS ?number_of_works) (COUNT(?citing_work) AS ?number_of_citations)
-  WHERE {
-    VALUES ?venue {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
-    OPTIONAL {
-      ?work wdt:P1433 ?venue .
-      OPTIONAL { ?citing_work wdt:P2860 ?work }
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?venue ?venueLabel ?publisher ?publisherLabel ?number_of_works ?number_of_citations WHERE {
+  {
+    SELECT ?venue (COUNT(DISTINCT ?work) AS ?number_of_works) (COUNT(?citing_work) AS ?number_of_citations) WHERE {
+      VALUES ?venue { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
+      OPTIONAL {
+        ?work wdt:P1433 ?venue .
+        OPTIONAL {
+          ?citing_work wdt:P2860 ?work
+        }
+      }
     }
-  } 
-  GROUP BY ?venue
-} AS %result
-WHERE {
-  INCLUDE %result
-  OPTIONAL { ?venue wdt:P123 ?publisher }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+    GROUP BY ?venue
+  }
+  OPTIONAL {
+    ?venue wdt:P123 ?publisher
+    {{ sparql_helpers.labels(["?publisher"], languages) }}
+  }
+  {{ sparql_helpers.labels(["?venue"], languages) }}
 }
 ORDER BY ?venueLabel

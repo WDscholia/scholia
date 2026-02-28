@@ -1,25 +1,21 @@
-SELECT
-  ?count
-  ?ontology ?ontologyLabel ?ontologyUrl
-  ?described_by_example ?described_by_exampleLabel
-  ?example_use ?example_useLabel
-WITH {
-  SELECT
-    (COUNT(DISTINCT ?work) AS ?count)
-    ?ontology
-    (CONCAT("/ontology/", SUBSTR(STR(?ontology), 32)) AS ?ontologyUrl)
-    (SAMPLE(?described_by) AS ?described_by_example)
-    (SAMPLE(?work) AS ?example_use)
-  WHERE {
-    ?work wdt:P4510 ?ontology . 
-    ?ontology wdt:P31/wdt:P279* wd:Q324254 . 
-    OPTIONAL { ?ontology wdt:P1343 ?described_by . }
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?ontology ?ontologyLabel ?ontologyUrl ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?work) AS ?count) ?ontology (CONCAT("/ontology/", SUBSTR(STR(?ontology),32)) AS ?ontologyUrl) (SAMPLE(?described_by) AS ?described_by_example) (SAMPLE(?work) AS ?example_use) WHERE {
+      ?work wdt:P4510 ?ontology .
+      ?ontology wdt:P31/wdt:P279* wd:Q324254 .
+      OPTIONAL {
+        ?ontology wdt:P1343 ?described_by .
+      }
+    }
+    GROUP BY ?ontology
   }
-  GROUP BY ?ontology
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_use", "?ontology"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?described_by_example"], languages) }}
 }
 ORDER BY DESC(?count)
-LIMIT 500    
+LIMIT 500

@@ -1,32 +1,38 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #title: Statements referencing the {{ q }} article
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel ?unit ?unitLabel WHERE {
+  {
+    { SELECT ?statement WHERE { ?statement prov:wasDerivedFrom/pr:P248 target: . } }
+    ?item a wikibase:Item ; ?p ?statement .
+    ?property wikibase:claim ?p ; wikibase:statementProperty ?ps .
+    ?statement ?ps ?value .
+    FILTER NOT EXISTS {
+      ?property wikibase:statementValueNormalized ?pn .
+      FILTER (ISLITERAL(?value))
+    }
+  } UNION {
+    { SELECT ?statement WHERE { ?statement prov:wasDerivedFrom/pr:P248 target: . } }
+    ?item a wikibase:Item ; ?p ?statement .
+    ?property wikibase:claim ?p ; wikibase:statementValueNormalized ?pn .
+    ?statement ?pn ?value .
+    FILTER (ISLITERAL(?value))
+  }
 
-SELECT ?item ?itemLabel ?property ?propertyLabel ?value ?valueLabel ?unit ?unitLabel
-WITH {
-  SELECT ?statement WHERE { 
-	  ?statement prov:wasDerivedFrom/pr:P248 target: .
+  OPTIONAL {
+    { SELECT ?statement WHERE { ?statement prov:wasDerivedFrom/pr:P248 target: . } }
+    ?item a wikibase:Item ; ?p ?statement .
+    ?property wikibase:claim ?p ; wikibase:statementProperty ?ps ; wikibase:statementValue ?psv .
+    ?statement ?psv [ wikibase:quantityUnit ?unit ]
+    {{ sparql_helpers.labels(["?unit"], languages) }}
   }
-  LIMIT 2000
-} AS %statements 
-WITH {
-  SELECT distinct ?item ?property ?value ?unit
-  WHERE {
-    INCLUDE %statements
-    ?item ?p ?statement .
-    ?property wikibase:claim ?p . OPTIONAL { ?property wikibase:statementValueNormalized ?a1 }
-    ?statement ?a1 ?value1 ; ?a2 ?value2 . BIND (COALESCE(?value1, ?value2) AS ?value) BIND (COALESCE(?a1, ?a2) AS ?a)
-    FILTER (!STRSTARTS(LCASE(STR(?value)), "http://wikiba.se/ontology#"))
-    FILTER (!STRSTARTS(LCASE(STR(?value)), "http://www.wikidata.org/value/"))
-    FILTER (!STRSTARTS(LCASE(STR(?value)), "http://www.wikidata.org/reference/"))
-    OPTIONAL {?statement ?psv_statement_predicate ?psv_statement .
-    ?statement_predicate_property wikibase:statementValue ?psv_statement_predicate.
-    ?psv_statement wikibase:quantityUnit ?unit}
-  }
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
-} 
-ORDER BY DESC(?itemLabel)
+
+  {{ sparql_helpers.labels(["?item", "?property", "?value"], languages) }}
+}
+ORDER BY ?item ?property
+LIMIT 2000

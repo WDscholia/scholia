@@ -1,17 +1,15 @@
-SELECT 
-  ?count 
-  ?license ?licenseLabel ?licenseDescription (CONCAT("/license/", SUBSTR(STR(?license), 32)) AS ?licenseUrl)
-WITH {
-  SELECT 
-    (COUNT(*) AS ?count)
-    ?license
-  WHERE {
-    [] wdt:P275 ?license .
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?license ?licenseLabel ?licenseDescription (CONCAT("/license/", SUBSTR(STR(?license),32)) AS ?licenseUrl) WHERE {
+  {
+    SELECT (COUNT(*) AS ?count) ?license WHERE {
+      [] wdt:P275 ?license .
+    }
+    GROUP BY ?license
   }
-  GROUP BY ?license
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?license"], languages) }}
+  {{ sparql_helpers.descriptions(["?license"], languages) }}
 }
 ORDER BY DESC(?count)

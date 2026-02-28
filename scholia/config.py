@@ -19,14 +19,13 @@ CONFIG_FILENAMES = [
 
 DEFAULTS = """
 [query-server]
-sparql_endpoint = https://query-legacy-full.wikidata.org/sparql
-sparql_editurl = https://query-legacy-full.wikidata.org/#
-sparql_embedurl = https://query-legacy-full.wikidata.org/embed.html#
-sparql_endpoint_name = WDQS legacy-full-graph
+sparql_endpoint = https://qlever.dev/api/wikidata
+sparql_editurl = https://wikidata-query-gui.scholia.wiki/#
+sparql_embedurl = https://wikidata-query-gui.scholia.wiki/embed.html#
+sparql_endpoint_name = View in Wikidata Query GUI
 
 [requests]
-user_agent = Scholia
-
+user_agent = Scholia/0.3 (github.com/ad-freiburg/scholia; qlever.scholia.wiki)
 """
 
 

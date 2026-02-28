@@ -1,64 +1,43 @@
 # title: data for this chemical element
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT DISTINCT ?description ?value ?valueUrl
-WHERE {
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT DISTINCT ?description ?value ?valueUrl WHERE {
   {
-    SELECT
-      (1 AS ?order)
-      ("Named after" AS ?description)
-      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-      (CONCAT("../topic/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
-    {
-      BIND(1 AS ?dummy)
+    SELECT (1 AS ?order) ("Named after" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../topic/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
+      BIND (1 AS ?dummy)
       target: wdt:P138 ?iri .
-      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
-      ?iri rdfs:label ?value_string . 
+      BIND (SUBSTR(STR(?iri),32) AS ?q)
+      ?iri rdfs:label ?value_string .
       FILTER (LANG(?value_string) = 'en')
-      BIND(COALESCE(?value_string, ?q) AS ?value_)
+      BIND (COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
   }
-  UNION
-  {
-    SELECT
-      (2 AS ?order)
-      ("Discoverer" AS ?description)
-      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-      (CONCAT("../topic/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
-    {
-      BIND(1 AS ?dummy)
+  UNION {
+    SELECT (2 AS ?order) ("Discoverer" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../topic/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
+      BIND (1 AS ?dummy)
       target: wdt:P61 ?iri .
-      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
-      ?iri rdfs:label ?value_string . 
+      BIND (SUBSTR(STR(?iri),32) AS ?q)
+      ?iri rdfs:label ?value_string .
       FILTER (LANG(?value_string) = 'en')
-      BIND(COALESCE(?value_string, ?q) AS ?value_)
+      BIND (COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
   }
-  UNION
-  {
-    SELECT
-      (3 AS ?order)
-      ("Oxidation states" AS ?description)
-      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-    {
-      BIND(1 AS ?dummy)
+  UNION {
+    SELECT (3 AS ?order) ("Oxidation states" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) {
+      BIND (1 AS ?dummy)
       target: wdt:P1121 ?value_ .
     }
     GROUP BY ?dummy
   }
-  UNION
-  {
-    SELECT
-      (4 AS ?order)
-      ("Electron configuration" AS ?description)
-      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-    {
-      BIND(1 AS ?dummy)
+  UNION {
+    SELECT (4 AS ?order) ("Electron configuration" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) {
+      BIND (1 AS ?dummy)
       target: wdt:P8000 ?value_ .
     }
     GROUP BY ?dummy
   }
-} 
+}
 ORDER BY ?order

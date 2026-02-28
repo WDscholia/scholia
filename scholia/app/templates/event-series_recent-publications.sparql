@@ -1,52 +1,41 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?publication_date
-  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-  ?authors ?authorsUrl
-WITH {
-  SELECT
-    DISTINCT ?person
-  WHERE {
-    ?event wdt:P179 | wdt:P31 target: .
-
-    {
-      # speaker
-      ?event wdt:P823 ?person .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?publication_date ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) ?authors ?authorsUrl WHERE {
+  {
+    SELECT (xsd:date(MAX(?publication_datetime)) AS ?publication_date) ?work (GROUP_CONCAT(DISTINCT ?person_label; SEPARATOR=", ") AS ?authors) (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?person),32); SEPARATOR=",")) AS ?authorsUrl) WHERE {
+      {
+        SELECT DISTINCT ?person WHERE {
+          ?event wdt:P179 | wdt:P31 target: .
+          {
+            # speaker
+            ?event wdt:P823 ?person .
+          }
+          UNION {
+            # organizer
+            ?event wdt:P664 ?person .
+          }
+          UNION {
+            # participant
+            ?person wdt:P1344 | ^wdt:P710 ?event .
+          }
+          UNION {
+            # author
+            ?person ^wdt:P50/wdt:P1433/wdt:P4745 ?event .
+          }
+        }
+      } .
+      ?work wdt:P50 ?person ;
+            wdt:P577 ?publication_datetime .
+      ?person rdfs:label ?person_label . FILTER (LANG(?person_label) = 'en')
     }
-    UNION
-    {
-      # organizer
-      ?event wdt:P664 ?person .
-    }
-    UNION
-    {
-      # participant
-      ?person wdt:P1344 | ^wdt:P710 ?event .
-    }
-    UNION
-    {
-      # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event .
-    }
+    GROUP BY ?work
   }
-} AS %people  
-WITH {
-  SELECT
-    (xsd:date(MAX(?publication_datetime)) AS ?publication_date)
-    ?work
-    (GROUP_CONCAT(DISTINCT ?person_label; separator=", ") AS ?authors)
-    (CONCAT("../authors/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?person), 32); separator=",")) AS ?authorsUrl)
-  WHERE {
-    INCLUDE %people .
-    ?work wdt:P50 ?person ; wdt:P577 ?publication_datetime .
-    ?person rdfs:label ?person_label . FILTER(LANG(?person_label) = 'en')
-  }
-  GROUP BY ?work
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?publication_date)
 LIMIT 500

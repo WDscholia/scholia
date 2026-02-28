@@ -1,34 +1,36 @@
 #defaultView:BarChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-select ?year ?number_of_pages ?work_label where {
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?year ?number_of_pages ?work_label WHERE {
   {
-    select ?year (sample(?pages) as ?number_of_pages) ?work_label where {
+    SELECT ?year (SAMPLE(?pages) AS ?number_of_pages) ?work_label WHERE {
       {
-        select (str(?year_) as ?year) (0 as ?pages) ("_" as ?work_label) where {
-          ?year_item wdt:P31 wd:Q577 . 
+        SELECT (STR(?year_) AS ?year) (0 AS ?pages) ("_" AS ?work_label) WHERE {
+          ?year_item wdt:P31 wd:Q577 .
           ?year_item wdt:P585 ?date .
-          bind(year(?date) as ?year_)
+          BIND (YEAR(?date) AS ?year_)
           {
-            select (min(?year_) as ?earliest_year) (max(?year_) as ?latest_year) where {
+            SELECT (MIN(?year_) AS ?earliest_year) (MAX(?year_) AS ?latest_year) WHERE {
               ?work wdt:P50 target: .
-              ?work wdt:P577 ?publication_date . 
-              bind(year(?publication_date) as ?year_)
+              ?work wdt:P577 ?publication_date .
+              BIND (YEAR(?publication_date) AS ?year_)
             }
           }
-          filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+          FILTER (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
         }
       }
-      union {
+      UNION {
         ?work wdt:P50 target: .
         ?work wdt:P1104 ?pages .
-        ?work wdt:P577 ?date . 
-        ?work rdfs:label ?long_work_label . filter(lang(?long_work_label) = 'en')
-        bind(substr(?long_work_label, 1, 20) as ?work_label)
-        bind(str(year(?date)) as ?year) 
+        ?work wdt:P577 ?date .
+        ?work rdfs:label ?long_work_label . FILTER (LANG(?long_work_label) = 'en')
+        BIND (SUBSTR(?long_work_label,1,20) AS ?work_label)
+        BIND (STR(YEAR(?date)) AS ?year)
       }
-	} 
-	group by ?year ?work ?work_label
-	order by ?year 
+    }
+    GROUP BY ?year ?work ?work_label
+    ORDER BY ?year
   }
 }

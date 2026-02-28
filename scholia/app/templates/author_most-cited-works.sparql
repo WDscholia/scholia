@@ -1,18 +1,19 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # Author's most cited works
-SELECT ?count ?work ?workLabel 
-WITH {
-  SELECT (count(?citing_work) as ?count) ?work WHERE {
-    ?work wdt:P50 target: .
-    OPTIONAL { ?citing_work wdt:P2860 ?work . }
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?count ?work ?workLabel WHERE {
+  {
+    SELECT (COUNT(?citing_work) AS ?count) ?work WHERE {
+      ?work wdt:P50 target: .
+      OPTIONAL {
+        ?citing_work wdt:P2860 ?work .
+      }
+    }
+    GROUP BY ?work
   }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }        
-}  
+  {{ sparql_helpers.labels(["?work"], languages) }}
+}
 ORDER BY DESC(?count)
 LIMIT 500

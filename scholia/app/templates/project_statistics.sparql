@@ -1,18 +1,29 @@
 # title: Statistics for projects identifiers
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?count ?description {
   {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3400 []. } }
-    BIND("Total number of projects with a CORDIS number" AS ?description)
+    {
+      SELECT (COUNT(*) AS ?count) WHERE {
+        [] wdt:P3400 [] .
+      }
+    }
+    BIND ("Total number of projects with a CORDIS number" AS ?description)
   }
-  UNION 
-  {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P4870 []. } }
-    BIND("Total number of projects with a GEPRIS number" AS ?description)
+  UNION {
+    {
+      SELECT (COUNT(*) AS ?count) WHERE {
+        [] wdt:P4870 [] .
+      }
+    }
+    BIND ("Total number of projects with a GEPRIS number" AS ?description)
   }
-  UNION 
-  {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6536 []. } }
-    BIND("Total number of projects with a Gateway to Research Project ID" AS ?description)
+  UNION {
+    {
+      SELECT (COUNT(*) AS ?count) WHERE {
+        [] wdt:P6536 [] .
+      }
+    }
+    BIND ("Total number of projects with a Gateway to Research Project ID" AS ?description)
   }
 }
 ORDER BY DESC(?count)

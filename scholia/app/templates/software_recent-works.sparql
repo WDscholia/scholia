@@ -1,22 +1,19 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?publication_date
-  ?work ?workLabel
-WITH{
-  SELECT
-    ?publication_datetime
-    ?work
-  WHERE {
-    ?work wdt:P4510 / wdt:P279* target: ;
-          wdt:P577 ?publication_datetime .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?publication_date ?work ?workLabel WHERE {
+  {
+    SELECT ?publication_datetime ?work WHERE {
+      ?work wdt:P4510/wdt:P279* target: ;
+            wdt:P577 ?publication_datetime .
+    }
+    ORDER BY DESC(?publication_datetime)
+    LIMIT 500
   }
-  ORDER BY DESC(?publication_datetime)
-  LIMIT 500
-} AS %result
-WHERE {
-  INCLUDE %result
-  BIND(xsd:date(?publication_datetime) AS ?publication_date)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  BIND (xsd:date(?publication_datetime) AS ?publication_date)
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?publication_date)

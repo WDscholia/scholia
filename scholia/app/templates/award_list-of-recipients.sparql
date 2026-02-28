@@ -1,26 +1,34 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?year
-  ?recipient ?recipientLabel ?recipientDescription
-  ?example_work ?example_workLabel
-WITH {
-  SELECT DISTINCT ?recipient ?year (SAMPLE(?work) AS ?example_work) WHERE {
-    ?recipient p:P166 ?award_statement . 
-    ?award_statement ps:P166 target: .
-    OPTIONAL {
-      { ?award_statement pq:P585 ?time }
-      UNION
-      { ?award_statement pq:P580 ?time }
-      BIND(YEAR(?time) AS ?year)
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?year ?recipient ?recipientLabel ?recipientDescription ?example_work ?example_workLabel WHERE {
+  {
+    SELECT DISTINCT ?recipient ?year (SAMPLE(?work) AS ?example_work) WHERE {
+      ?recipient p:P166 ?award_statement .
+      ?award_statement ps:P166 target: .
+      OPTIONAL {
+        {
+          ?award_statement pq:P585 ?time
+        }
+        UNION {
+          ?award_statement pq:P580 ?time
+        }
+        BIND (YEAR(?time) AS ?year)
+      }
+      OPTIONAL {
+        ?work wdt:P50 ?recipient .
+      }
     }
-    OPTIONAL { ?work wdt:P50 ?recipient . }
+    GROUP BY ?recipient ?year
   }
-  GROUP BY ?recipient ?year
-} AS %result
-WHERE {
-  INCLUDE %result 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+  {{ sparql_helpers.labels_unbound(["?example_work"], languages) }}
+  {{ sparql_helpers.labels(["?recipient"], languages) }}
+  {{ sparql_helpers.descriptions(["?recipient"], languages) }}
 }
 ORDER BY DESC(?year)
 LIMIT 10000

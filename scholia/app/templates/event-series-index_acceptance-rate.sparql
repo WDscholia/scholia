@@ -1,26 +1,26 @@
-SELECT 
-  (ROUND(10000 * ?mean_acceptance_rate) / 100 AS ?mean_acceptance_percentage)
-  ?track ?trackLabel
-  ?event_series ?event_seriesLabel
-  (CONCAT("/event-series/", SUBSTR(STR(?event_series), 32)) AS ?event_seriesUrl)
-WITH {
-  SELECT 
-    (SUM(?acceptance_rate)/COUNT(?acceptance_rate) AS ?mean_acceptance_rate)
-    ?event_series
-    ?track
-  WHERE {
-    ?event_series wdt:P31 / wdt:P279* wd:Q125391566 .
-    ?event wdt:P179 ?event_series ;
-           p:P5822 ?acceptance_rate_statement .
-    ?acceptance_rate_statement ps:P5822 ?acceptance_rate .
-    OPTIONAL { ?acceptance_rate_statement pq:P518 ?track_ . }
-    BIND(COALESCE(?track_, "-") AS ?track)
-    BIND(STR(YEAR(?datetime)) AS ?year)
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT (ROUND(10000 * ?mean_acceptance_rate) / 100 AS ?mean_acceptance_percentage) ?track ?trackLabel ?event_series ?event_seriesLabel (CONCAT("/event-series/", SUBSTR(STR(?event_series),32)) AS ?event_seriesUrl) WHERE {
+  {
+    SELECT (SUM(?acceptance_rate) / COUNT(?acceptance_rate) AS ?mean_acceptance_rate) ?event_series ?track WHERE {
+      ?event_series wdt:P31/wdt:P279* wd:Q125391566 .
+      ?event wdt:P179 ?event_series ;
+             p:P5822 ?acceptance_rate_statement .
+      ?acceptance_rate_statement ps:P5822 ?acceptance_rate .
+      OPTIONAL {
+        ?acceptance_rate_statement pq:P518 ?track_ .
+      }
+      BIND (COALESCE(?track_, "-") AS ?track)
+      BIND (STR(YEAR(?datetime)) AS ?year)
+    }
+    GROUP BY ?event_series ?track
   }
-  GROUP BY ?event_series ?track
-} AS %event_series
-WHERE {
-  INCLUDE %event_series
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?event_series", "?track"], languages) }}
 }
 ORDER BY ?mean_acceptance_rate

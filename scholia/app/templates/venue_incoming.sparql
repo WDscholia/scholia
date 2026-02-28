@@ -1,14 +1,24 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
-SELECT ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl)
-(COUNT(DISTINCT ?citingArticle) AS ?count) WHERE {
-  VALUES ?JOURNAL { target: }
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT
+  ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl)
+  (CONCAT("cito:", SUBSTR(STR(?cito), 27)) AS ?CiTO) (?cito AS ?CiTOUrl)
+  (COUNT(DISTINCT ?citingArticle) AS ?count)
+WHERE {
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?citedArticle .
-  ?citedArticle wdt:P1433 ?JOURNAL .
+  ?citedArticle wdt:P1433 target: .
   ?intention wdt:P31 wd:Q96471816 ;
              wdt:P2888 ?cito .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} GROUP BY ?cito ?intention ?intentionLabel
-  ORDER BY DESC(?count)
+  FILTER(STRSTARTS(STR(?cito), "http://purl.org/spar/cito/"))
+  {{ sparql_helpers.labels(["?intention"], languages) }}
+}
+GROUP BY ?cito ?intention ?intentionLabel
+ORDER BY DESC(?count)

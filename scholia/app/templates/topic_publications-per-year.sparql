@@ -1,54 +1,45 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:BarChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT
   (STR(?year_) AS ?year)
   (COUNT(?work) AS ?number_of_publications)
-
   # Work type used to color the bar chart
-  ?type
-WITH {
-  # Find works with the topic. Also report the year
-  SELECT
-    ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
-  WHERE {
-    ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) target: .
-    ?work wdt:P577 ?dates .
-    BIND(YEAR(?dates) AS ?years) .
-
-    ?work wdt:P31 ?article_type_ .
-  }
-  GROUP BY ?work 
-} AS %works
-WITH {
-  SELECT ?year_ WHERE {
-    # default values = 0
-    ?year_item wdt:P31 wd:Q577 . 
-    ?year_item wdt:P585 ?date .
-    BIND(YEAR(?date) AS ?year_)
-  }
-} AS %default_counts
-WITH {
-  # Find earliest publication year
-  SELECT (MIN(?year_) AS ?earliest_year) WHERE {
-    INCLUDE %works
-  }
-  GROUP BY ?dummy
-} AS %earliest  
+  (?article_typeLabel AS ?type)
 WHERE {
   {
-    INCLUDE %works
-    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+    { # Find works with the topic. Also report the year
+      SELECT ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type) WHERE {
+        ?work wdt:P921/(wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) target: .
+        ?work wdt:P577 ?dates .
+        BIND (YEAR(?dates) AS ?years) .
+        ?work wdt:P31 ?article_type_ .
+      }
+      GROUP BY ?work
+    }
+    {{ sparql_helpers.labels(["?article_type"], languages) }}
   }
-  UNION
-  {
-    INCLUDE %default_counts
-    BIND("_" AS ?type)
+  UNION {
+    VALUES ?year_class { wd:Q577 wd:Q3186692 }
+    [] wdt:P31 ?year_class ;
+       wdt:P585 ?date .
+    BIND (YEAR(?date) AS ?year_)
+    BIND ("_" AS ?article_typeLabel)
   }
-  INCLUDE %earliest
-  BIND(YEAR(NOW()) AS ?this_year)
-  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR("1900-01-01"^^xsd:dateTime))
+
+  { # Find earliest publication year
+    SELECT (MIN(?year_) AS ?earliest_year) WHERE {
+      ?work wdt:P921/(wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) target: .
+      ?work wdt:P577 ?date .
+      BIND (YEAR(?date) AS ?year_) .
+    }
+  }
+
+  BIND (YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= 1900)
 }
-GROUP BY ?year_ ?type
+GROUP BY ?year_ ?article_typeLabel
 ORDER BY ?year

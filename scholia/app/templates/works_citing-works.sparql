@@ -1,27 +1,23 @@
-SELECT
-  ?count
-  (MIN(?dates) AS ?date)
-  ?citing_work ?citing_workLabel
-WITH {
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?citing_work 
-  WHERE {
-    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    ?citing_work wdt:P2860 ?work .
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?count (MIN(?dates) AS ?date) ?citing_work ?citing_workLabel WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?citing_work WHERE {
+      VALUES ?work { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
+      ?citing_work wdt:P2860 ?work .
+    }
+    GROUP BY ?citing_work
+    ORDER BY DESC(?count)
+    LIMIT 200
   }
-  GROUP BY ?citing_work
-  ORDER BY DESC(?count)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
   OPTIONAL {
     ?citing_work wdt:P577 ?datetimes .
-    BIND(xsd:date(?datetimes) AS ?dates)
+    BIND (xsd:date(?datetimes) AS ?dates)
   }
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
-  }
+  {{ sparql_helpers.labels(["?citing_work"], languages) }}
+}
 GROUP BY ?count ?citing_work ?citing_workLabel
 ORDER BY DESC(?count) DESC(?date)

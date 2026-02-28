@@ -22,6 +22,11 @@ Examples
 
 """
 
+import random
+
+import time
+
+from typing import Optional
 
 import requests
 
@@ -127,48 +132,183 @@ def select_value_by_language_preferences(
     return next(iter(choices.values()))
 
 
-def wb_get_entities(qs):
-    """Get entities from Wikidata.
-
-    Query the Wikidata webservice via is API.
+def wb_get_entities(
+    qs,
+    *,
+    batch_size: int = 50,
+    rate_limit: float = 2.0,
+    max_retries: int = 5,
+    timeout: int = 30,
+    session: Optional[requests.Session] = None,
+    **extra_params,
+):
+    """Get entities from Wikidata with batching, rate limiting and backoff.
 
     Parameters
     ----------
     qs : list of str
-        List of strings, each with a Wikidata item identifier.
+        Wikidata entity IDs (e.g., ["Q42", "Q1", ...]).
+    batch_size : int, optional
+        Max IDs per API call (Wikidata limit is 50 for wbgetentities).
+    rate_limit : float, optional
+        Max requests per second (default 2.0 rps). Use lower if you plan many
+        calls.
+    max_retries : int, optional
+        Max retry attempts per batch for transient errors.
+    timeout : int, optional
+        Per-request timeout in seconds.
+    session : requests.Session or None, optional
+        Reuse a session (recommended for many batches). If None, uses requests
+        directly.
+    **extra_params
+        Extra query parameters for wbgetentities
+        (e.g., props="labels|descriptions", languages="en|da").
 
     Returns
     -------
-    data : dict of dict
-        Dictionary of dictionaries.
+    dict
+        Mapping from entity ID to entity data as returned by Wikidata.
 
+    Notes
+    -----
+    - Implements exponential backoff with jitter on transient errors:
+      HTTP 429/5xx, MediaWiki 'maxlag' or 'ratelimited' API errors, or internal
+      errors.
+    - Respects 'Retry-After' header when present.
+    - Sets MediaWiki 'maxlag' to be a good citizen.
+
+    Examples
+    --------
+    >>> out = wb_get_entities(["Q42", "Q1"], props="labels", languages="en")
+    >>> isinstance(out, dict)
+    True
     """
     if not qs:
         return {}
 
-    if len(qs) > 50:
-        raise NotImplementedError("Cannot handle over 50 qs yet")
+    # Deduplicate while keeping order
+    # (important if the caller expects same keys back)
+    seen = set()
+    qs = [q for q in qs if not (q in seen or seen.add(q))]
 
-    ids = "|".join(qs)
-    params = {
-        'action': 'wbgetentities',
-        'ids': ids,
-        'format': 'json',
-    }
-    response_data = requests.get(
-        'https://www.wikidata.org/w/api.php',
-        headers=HEADERS, params=params).json()
-    if 'entities' in response_data:
-        return response_data['entities']
+    url = "https://www.wikidata.org/w/api.php"
+    all_entities: dict = {}
 
-    # TODO: Make informative/better error handling
-    if 'error' in response_data:
-        message = response_data['error'].get('info', '')
-        message += ", id=" + response_data['error'].get('id', '')
-        raise Exception(message)
+    # Simple token bucket: ensure at most `rate_limit` requests per second
+    min_interval = 1.0 / rate_limit if rate_limit > 0 else 0.0
+    next_allowed_time = 0.0
 
-    # Last resort
-    raise Exception('API error')
+    # Create/choose a session
+    sess = session or requests.Session()
+
+    def _sleep_until_allowed():
+        nonlocal next_allowed_time
+        now = time.monotonic()
+        if now < next_allowed_time:
+            time.sleep(next_allowed_time - now)
+        next_allowed_time = time.monotonic() + min_interval
+
+    def _backoff_sleep(attempt: int, retry_after: Optional[float] = None):
+        # Respect Retry-After when present, otherwise
+        # exponential backoff + jitter
+        if retry_after is not None:
+            time.sleep(retry_after)
+            return
+        base = 0.75  # gentle starting point
+        delay = base * (2 ** attempt) + random.uniform(0.0, 0.4)
+        time.sleep(delay)
+
+    def _request_batch(batch_ids: list[str]) -> dict:
+        ids = "|".join(batch_ids)
+        params = {
+            "action": "wbgetentities",
+            "format": "json",
+            "ids": ids,
+            "maxlag": 5,  # be polite with Wikidata replicas
+        }
+        # Allow caller to pass props, languages, normalize, redirects, etc.
+        params.update(extra_params)
+
+        for attempt in range(max_retries + 1):
+            _sleep_until_allowed()
+            try:
+                resp = sess.get(url, headers=HEADERS, params=params,
+                                timeout=timeout)
+            except requests.RequestException as e:
+                # Network issue; retry unless out of attempts
+                if attempt >= max_retries:
+                    msg = f"Network error talking to Wikidata: {e}"
+                    raise RuntimeError(msg) from e
+                _backoff_sleep(attempt)
+                continue
+
+            # Handle HTTP layer
+            if resp.status_code == 200:
+                data = resp.json()
+                # MediaWiki may return API-level errors inside 200 OK
+                if "entities" in data:
+                    return data["entities"]
+
+                if "error" in data:
+                    code = data["error"].get("code", "")
+                    info = data["error"].get("info", "")
+                    # Transient, retryable API errors
+                    if (code in {"maxlag", "ratelimited"}
+                            or code.startswith("internal_api_error")):
+                        if attempt >= max_retries:
+                            msg = (f"Wikidata API error after retries: "
+                                   f"{code}: {info}")
+                            raise RuntimeError(msg)
+                        _backoff_sleep(attempt)
+                        continue
+
+                    # Non-retryable API errors
+                    err_id = data["error"].get("id", "")
+                    raise RuntimeError(
+                        f"Wikidata API error: {code}: {info}, id={err_id}")
+
+                # Unexpected 200 without entities or error
+                if attempt >= max_retries:
+                    raise RuntimeError(("Wikidata API: unexpected response "
+                                        "without 'entities' or 'error'."))
+                _backoff_sleep(attempt)
+                continue
+
+            # Retryable HTTP statuses
+            if resp.status_code in (429, 500, 502, 503, 504):
+                retry_after_hdr = resp.headers.get("Retry-After")
+                retry_after = None
+                if retry_after_hdr:
+                    try:
+                        retry_after = float(retry_after_hdr)
+                    except ValueError:
+                        retry_after = None
+
+                if attempt >= max_retries:
+                    msg = (f"HTTP {resp.status_code} from "
+                           "Wikidata after retries.")
+                    raise RuntimeError(msg)
+                _backoff_sleep(attempt, retry_after=retry_after)
+                continue
+
+            # Other HTTP errors: don't retry
+            try:
+                detail = resp.json()
+            except Exception:
+                detail = resp.text[:500]
+                raise RuntimeError(
+                    f"HTTP {resp.status_code} from Wikidata: {detail}")
+
+        # Should not reach here
+        raise RuntimeError("Exhausted retries without a result.")
+
+    # Process in batches
+    for i in range(0, len(qs), batch_size):
+        batch = qs[i:i + batch_size]
+        entities = _request_batch(batch)
+        all_entities.update(entities)
+
+    return all_entities
 
 
 def entity_to_authors(entity, return_humanness=False):

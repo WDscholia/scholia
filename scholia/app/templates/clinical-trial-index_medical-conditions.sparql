@@ -1,14 +1,11 @@
-SELECT
-  ?count
-  ?medical_condition ?medical_conditionLabel (CONCAT("/disease/", SUBSTR(STR(?medical_condition), 32)) AS ?medical_conditionUrl)
-  ?example_trial ?example_trialLabel
-WHERE {
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?medical_condition ?medical_conditionLabel (CONCAT("/disease/", SUBSTR(STR(?medical_condition),32)) AS ?medical_conditionUrl) ?example_trial ?example_trialLabel WHERE {
   {
-    SELECT
-      (COUNT(?trial) AS ?count)
-      ?medical_condition
-      (SAMPLE(?trial) AS ?example_trial)
-    WHERE {
+    SELECT (COUNT(?trial) AS ?count) ?medical_condition (SAMPLE(?trial) AS ?example_trial) WHERE {
       ?trial wdt:P31 wd:Q30612 .
       ?trial wdt:P1050 ?medical_condition
     }
@@ -16,6 +13,6 @@ WHERE {
     ORDER BY DESC(?count)
     LIMIT 500
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_trial", "?medical_condition"], languages) }}
 }
 ORDER BY DESC(?count)

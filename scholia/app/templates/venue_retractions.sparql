@@ -1,14 +1,25 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT DISTINCT ?work ?workLabel ?doi (COUNT(DISTINCT ?citing) AS ?citations) WHERE {
-  { ?work wdt:P31 wd:Q45182324 . }
-  UNION
-  { ?work wdt:P793 wd:Q7316896 . }
-  UNION
-  { ?work wdt:P5824 [] . }
-  OPTIONAL { ?citing wdt:P2860 ?work . }
-  ?work wdt:P1433 target: ; wdt:P356 ?doi .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} GROUP BY ?work ?workLabel ?doi
-  ORDER BY DESC(?citations)
-  LIMIT 100
+  {
+    ?work wdt:P31 wd:Q45182324 .
+  }
+  UNION {
+    ?work wdt:P793 wd:Q7316896 .
+  }
+  UNION {
+    ?work wdt:P5824 [] .
+  }
+  OPTIONAL {
+    ?citing wdt:P2860 ?work .
+  }
+  ?work wdt:P1433 target: ;
+        wdt:P356 ?doi .
+  {{ sparql_helpers.labels(["?work"], languages) }}
+}
+GROUP BY ?work ?workLabel ?doi
+ORDER BY DESC(?citations)
+LIMIT 100

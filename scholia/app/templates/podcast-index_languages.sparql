@@ -1,10 +1,11 @@
-SELECT ?language ?languageLabel (CONCAT("/language/", SUBSTR(STR(?language), 32), "/podcast") AS ?languageUrl)
-  (COUNT(DISTINCT ?podcast) AS ?podcasts)
-WHERE {
-  ?podcast wdt:P31 wd:Q24634210 ; wdt:P407 ?language .
-  BIND(SUBSTR(STR(?language), 32) AS ?q)
-  ?language rdfs:label ?value_string . 
-  FILTER (LANG(?value_string) = 'en')
-  BIND(COALESCE(?value_string, ?q) AS ?languageLabel)
-} GROUP BY ?language ?languageLabel
-  ORDER BY DESC(?podcasts)
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?language ?languageLabel (CONCAT("/language/", SUBSTR(STR(?language),32), "/podcast") AS ?languageUrl) (COUNT(DISTINCT ?podcast) AS ?podcasts) WHERE {
+  ?podcast wdt:P31 wd:Q24634210 ;
+           wdt:P407 ?language .
+  {{ sparql_helpers.labels(["?language"], languages) }}
+}
+GROUP BY ?language ?languageLabel
+ORDER BY DESC(?podcasts)

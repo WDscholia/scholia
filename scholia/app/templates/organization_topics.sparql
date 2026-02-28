@@ -1,33 +1,27 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?researchers
-  ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
-  ("🔎" AS ?zoom)
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?researchers ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic),32)) AS ?topicUrl) ("🔎" AS ?zoom)
   (CONCAT("{{ q }}/topic/", SUBSTR(STR(?topic), 32)) AS ?zoomUrl)
-  ?topicDescription
-  ?samplework ?sampleworkLabel (CONCAT("/work/", SUBSTR(STR(?samplework), 32)) AS ?sampleworkUrl)
-WITH {
-  SELECT DISTINCT ?researcher WHERE {
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* target: .
-  } 
-} AS %researchers
-WITH {
-  SELECT DISTINCT ?topic
-    (COUNT(DISTINCT ?researcher) AS ?researchers)
-    (SAMPLE(?work) AS ?samplework)
-  WHERE {
-    INCLUDE %researchers
-    ?work wdt:P50 ?researcher . 
-    ?work wdt:P921 ?topic . 
-  } 
-  GROUP BY ?topic
-  ORDER BY DESC(?researchers)
-  LIMIT 500
-} AS %works_and_number_of_researchers
-WHERE {
-  INCLUDE %works_and_number_of_researchers
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+?topicDescription ?samplework ?sampleworkLabel (CONCAT("/work/", SUBSTR(STR(?samplework),32)) AS ?sampleworkUrl) WHERE {
+  {
+    SELECT DISTINCT ?topic (COUNT(DISTINCT ?researcher) AS ?researchers) (SAMPLE(?work) AS ?samplework) WHERE {
+      {
+        SELECT DISTINCT ?researcher WHERE {
+          ?researcher (wdt:P108 | wdt:P463 | wdt:P1416)/wdt:P361* target: .
+        }
+      }
+      ?work wdt:P50 ?researcher .
+      ?work wdt:P921 ?topic .
+    }
+    GROUP BY ?topic
+    ORDER BY DESC(?researchers)
+    LIMIT 500
+  }
+  {{ sparql_helpers.labels(["?topic", "?samplework"], languages) }}
+  {{ sparql_helpers.descriptions(["?topic"], languages) }}
 }
 GROUP BY ?researchers ?topic ?topicLabel ?topicDescription ?samplework ?sampleworkLabel
 ORDER BY DESC(?researchers)

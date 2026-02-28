@@ -1,29 +1,27 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  (COUNT(?work) AS ?works) 
-  ?author_name
-  ("Author Disambiguator ↗" AS ?author_disambiguator)
-  (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", 
-          ENCODE_FOR_URI(?author_name)) AS ?author_disambiguatorUrl) 
-WITH {
-  SELECT DISTINCT ?author WHERE {
-    target: wdt:P50 ?author .
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT (COUNT(?work) AS ?works) ?author_name ("Author Disambiguator ↗" AS ?author_disambiguator) (CONCAT("https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=", ENCODE_FOR_URI(?author_name)) AS ?author_disambiguatorUrl) WHERE {
+  {
+    SELECT DISTINCT ?author_name WHERE {
+      {
+        {
+          SELECT DISTINCT ?author WHERE {
+            target: wdt:P50 ?author .
+          }
+          LIMIT 200
+        }
+        ?author skos:altLabel | rdfs:label | (^ps:P50/pq:P1932) ?author_name .
+      }
+      UNION {
+        target: wdt:P2093 ?author_name .
+      }
+    }
   }
-  LIMIT 200  
-} AS %authors
-WITH {
-  SELECT DISTINCT ?author_name WHERE {
-    {
-    INCLUDE %authors
-    ?author skos:altLabel | rdfs:label | (^ps:P50 / pq:P1932) ?author_name . }
-    UNION
-    { target: wdt:P2093 ?author_name . } 
-  }
-} AS %author_names
-WHERE {
-  INCLUDE %author_names
   ?work wdt:P2093 ?author_name .
 }
 GROUP BY ?author_name
-ORDER BY DESC (?works)
+ORDER BY DESC(?works)

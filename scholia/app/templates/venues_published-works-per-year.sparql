@@ -1,10 +1,14 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:LineChart
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?year (COUNT(?work) AS ?count) ?venue ?venueLabel WHERE {
-  VALUES ?venue { {% for q in qs %} wd:{{ q }} {% endfor %} }
+  VALUES ?venue { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
   ?work wdt:P1433 ?venue .
-  ?work wdt:P577 ?publication_datetime . 
-  BIND(STR(YEAR(?publication_datetime)) AS ?year)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  ?work wdt:P577 ?publication_datetime .
+  BIND (STR(YEAR(?publication_datetime)) AS ?year)
+  {{ sparql_helpers.labels(["?venue"], languages) }}
 }
 GROUP BY ?year ?venue ?venueLabel
 ORDER BY ?year

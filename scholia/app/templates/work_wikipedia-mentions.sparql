@@ -1,88 +1,79 @@
-SELECT
-  ?title ?titleUrl
-  ?wikipedia ?wikipediaLabel
-  ?item ?itemLabel ?itemDescription 
-WHERE {
-  {
-    SELECT ?title_ ?titleUrl ?item ?wikipedia {
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX mwapi: <https://www.mediawiki.org/ontology#API/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?title ?titleUrl ?wikipedia ?wikipediaLabel ?item ?itemLabel ?itemDescription WHERE {
+  SERVICE <https://query.wikidata.org/sparql> {
+    {
       SERVICE wikibase:mwapi {
         bd:serviceParam wikibase:endpoint "da.wikipedia.org" ;
                         wikibase:api "Generator" ;
-			mwapi:generator "search" ;
+                        mwapi:generator "search" ;
                         mwapi:gsrsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
                         mwapi:gsrlimit "200" .
         ?title_ wikibase:apiOutput mwapi:title .
-	?item wikibase:apiOutputItem mwapi:item .
+        ?item wikibase:apiOutputItem mwapi:item .
       }
-      BIND(URI(CONCAT("https://da.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
-      BIND(wd:Q181163 AS ?wikipedia)
-    } 
-  }
-  UNION
-  {
-    SELECT ?title_ ?titleUrl ?item ?wikipedia {
+      BIND (URI(CONCAT("https://da.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
+      BIND (wd:Q181163 AS ?wikipedia)
+    }
+    UNION {
       SERVICE wikibase:mwapi {
         bd:serviceParam wikibase:endpoint "de.wikipedia.org" ;
                         wikibase:api "Generator" ;
-			mwapi:generator "search" ;
+                        mwapi:generator "search" ;
                         mwapi:gsrsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
                         mwapi:gsrlimit "200" .
         ?title_ wikibase:apiOutput mwapi:title .
-	?item wikibase:apiOutputItem mwapi:item .
+        ?item wikibase:apiOutputItem mwapi:item .
       }
-      BIND(URI(CONCAT("https://de.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
-      BIND(wd:Q48183 AS ?wikipedia)
-    }     
-  }
-  UNION
-  {
-    SELECT ?title_ ?titleUrl ?item ?wikipedia {
+      BIND (URI(CONCAT("https://de.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
+      BIND (wd:Q48183 AS ?wikipedia)
+    }
+    UNION {
       SERVICE wikibase:mwapi {
         bd:serviceParam wikibase:endpoint "en.wikipedia.org" ;
                         wikibase:api "Generator" ;
-			mwapi:generator "search" ;
+                        mwapi:generator "search" ;
                         mwapi:gsrsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
                         mwapi:gsrlimit "200" .
         ?title_ wikibase:apiOutput mwapi:title .
-	?item wikibase:apiOutputItem mwapi:item .
+        ?item wikibase:apiOutputItem mwapi:item .
       }
-      BIND(URI(CONCAT("https://en.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
-      BIND(wd:Q328 AS ?wikipedia)
-    }     
-  }
-  UNION
-  {
-    SELECT ?title_ ?titleUrl ?item ?wikipedia {
+      BIND (URI(CONCAT("https://en.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
+      BIND (wd:Q328 AS ?wikipedia)
+    }
+    UNION {
       SERVICE wikibase:mwapi {
         bd:serviceParam wikibase:endpoint "fr.wikipedia.org" ;
                         wikibase:api "Generator" ;
-			mwapi:generator "search" ;
+                        mwapi:generator "search" ;
                         mwapi:gsrsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
                         mwapi:gsrlimit "200" .
         ?title_ wikibase:apiOutput mwapi:title .
-	?item wikibase:apiOutputItem mwapi:item .
+        ?item wikibase:apiOutputItem mwapi:item .
       }
-      BIND(URI(CONCAT("https://fr.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
-      BIND(wd:Q8447 AS ?wikipedia)
-    }     
-  }
-  UNION
-  {
-    SELECT ?title_ ?titleUrl ?item ?wikipedia {
+      BIND (URI(CONCAT("https://fr.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
+      BIND (wd:Q8447 AS ?wikipedia)
+    }
+    UNION {
       SERVICE wikibase:mwapi {
         bd:serviceParam wikibase:endpoint "pt.wikipedia.org" ;
                         wikibase:api "Generator" ;
-			mwapi:generator "search" ;
+                        mwapi:generator "search" ;
                         mwapi:gsrsearch '{{ q }}{% for doi in dois %} OR "{{ doi }}"{% endfor %}' ;
                         mwapi:gsrlimit "200" .
         ?title_ wikibase:apiOutput mwapi:title .
-	?item wikibase:apiOutputItem mwapi:item .
+        ?item wikibase:apiOutputItem mwapi:item .
       }
-      BIND(URI(CONCAT("https://pt.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
-      BIND(wd:Q11921 AS ?wikipedia)
-    }     
+      BIND (URI(CONCAT("https://pt.wikipedia.org/wiki/", ENCODE_FOR_URI(REPLACE(?title_, " ", "_")))) AS ?titleUrl)
+      BIND (wd:Q11921 AS ?wikipedia)
+    }
   }
-  hint:Prior hint:runFirst "true" .
-  BIND(CONCAT(?title_, "&nbsp;↗") AS ?title)
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
-} 
+
+  BIND (CONCAT(?title_, "&nbsp;↗") AS ?title)
+  {{ sparql_helpers.labels(["?wikipedia", "?item"], languages) }}
+  {{ sparql_helpers.descriptions(["?item"], languages) }}
+}

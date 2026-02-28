@@ -1,31 +1,26 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT
   ?count
-  
   ?coused ?cousedLabel (CONCAT("/use/", SUBSTR(STR(?coused), 32)) AS ?cousedUrl)
-  ("🔎" AS ?zoom)
-  (CONCAT("../uses/{{ q }},", SUBSTR(STR(?coused), 32)) AS ?zoomUrl)
+  ("🔎" AS ?zoom) (CONCAT("../uses/{{ q }},", SUBSTR(STR(?coused), 32)) AS ?zoomUrl)
   ?cousedDescription
-  
   ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  # Find works that are using a specific software,
-  # and find other software used in the found works
-  SELECT
-    ?coused
-    (COUNT(DISTINCT ?work) as ?count)
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work wdt:P4510 / wdt:P279* target: ;
-          wdt:P4510 ?coused .
-    FILTER (?coused != target:)
-  }
-  GROUP BY ?coused
-} AS %result
 WHERE {
+  { # Find works that are using a specific software,
+    # and find other software used in the found works
+    SELECT ?coused (COUNT(DISTINCT ?work) AS ?count) (SAMPLE(?work) AS ?example_work) WHERE {
+      ?work wdt:P4510/wdt:P279* target: ;
+            wdt:P4510 ?coused .
+      FILTER (?coused != target:)
+    }
+    GROUP BY ?coused
+  }
+
   # Label the result
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?coused", "?example_work"], languages) }}
+  {{ sparql_helpers.descriptions(["?coused"], languages) }}
 }
-ORDER BY DESC(?count) 
+ORDER BY DESC(?count)

@@ -1,21 +1,17 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: Authors on works sponsored or funded from a specific entity.
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?publication_count
-  ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT ?author (count(?work) as ?publication_count) (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work wdt:P859+ target: .
-    ?work wdt:P50 ?author .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?publication_count ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
+  {
+    SELECT ?author (COUNT(?work) AS ?publication_count) (SAMPLE(?work) AS ?example_work) WHERE {
+      ?work wdt:P859+ target: .
+      ?work wdt:P50 ?author .
+    }
+    GROUP BY ?author
   }
-  GROUP BY ?author
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
-} 
+  {{ sparql_helpers.labels(["?example_work", "?author"], languages) }}
+}
 ORDER BY DESC(?publication_count)

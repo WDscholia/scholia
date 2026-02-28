@@ -1,19 +1,20 @@
 #defaultView:BubbleChart
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?count ?venue (SAMPLE(?venue_label_) AS ?venue_label) 
-WITH {
-  SELECT (COUNT(?work) as ?count) ?venue WHERE {
-    ?work wdt:P50 target: .
-    ?work wdt:P1433 ?venue .
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?count ?venue (SAMPLE(?venue_label_) AS ?venue_label) WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?venue WHERE {
+      ?work wdt:P50 target: .
+      ?work wdt:P1433 ?venue .
+    }
+    GROUP BY ?venue
   }
-  GROUP BY ?venue
-} AS %counts
-WHERE {
-  INCLUDE %counts
-  ?venue rdfs:label ?long_venue_label FILTER(LANG(?long_venue_label) = 'en')
-  OPTIONAL { ?venue wdt:P1813 ?short_name . }
-  BIND(COALESCE(?short_name, ?long_venue_label) AS ?venue_label_)
+  ?venue rdfs:label ?long_venue_label FILTER (LANG(?long_venue_label) = 'en')
+  OPTIONAL {
+    ?venue wdt:P1813 ?short_name .
+  }
+  BIND (COALESCE(?short_name, ?long_venue_label) AS ?venue_label_)
 }
 GROUP BY ?venue ?count
-ORDER BY DESC(?count)  
+ORDER BY DESC(?count)

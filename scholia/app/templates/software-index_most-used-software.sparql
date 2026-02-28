@@ -1,27 +1,23 @@
-SELECT
-  ?count
-  ?software ?softwareLabel ?softwareUrl
-  ?described_by_example ?described_by_exampleLabel
-  ?example_use ?example_useLabel
-WITH {
-  SELECT
-    (COUNT(DISTINCT ?work) AS ?count)
-    ?software
-    (CONCAT("/software/", SUBSTR(STR(?software), 32)) AS ?softwareUrl)
-    (SAMPLE(?described_by) AS ?described_by_example)
-    (SAMPLE(?work) AS ?example_use)
-  WHERE {
-    ?work wdt:P4510 ?software . 
-    ?software wdt:P31/wdt:P279* wd:Q7397 . 
-    # Restricting to work takes too long time :(    
-    # ?work wdt:P31/wdt:P279* wd:Q386724 .
-    OPTIONAL { ?software wdt:P1343 ?described_by . }
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?software ?softwareLabel ?softwareUrl ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?work) AS ?count) ?software (CONCAT("/software/", SUBSTR(STR(?software),32)) AS ?softwareUrl) (SAMPLE(?described_by) AS ?described_by_example) (SAMPLE(?work) AS ?example_use) WHERE {
+      ?work wdt:P4510 ?software .
+      ?software wdt:P31/wdt:P279* wd:Q7397 .
+      # Restricting to work takes too long time :(    
+      # ?work wdt:P31/wdt:P279* wd:Q386724 .
+      OPTIONAL {
+        ?software wdt:P1343 ?described_by .
+      }
+    }
+    GROUP BY ?software
   }
-  GROUP BY ?software
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_use", "?software"], languages) }}
+  {{ sparql_helpers.labels_unbound(["?described_by_example"], languages) }}
 }
 ORDER BY DESC(?count)
-LIMIT 500    
+LIMIT 500

@@ -1,46 +1,25 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:AreaChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?year
-  ?works
-  ?topic ?topicLabel
-WITH {
-  SELECT 
-    ?work
-  WHERE {
-    ?work wdt:P1433 target: .
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?year (COUNT(?work) AS ?works) ?topic ?topicLabel WHERE {
+  # Find top 5 all time topics in venue
+  {
+    SELECT (COUNT(?work) AS ?count) ?topic WHERE {
+      ?work wdt:P1433 target: ;
+            wdt:P921 ?topic .
+    }
+    GROUP BY ?topic
+    ORDER BY DESC(?count)
+    LIMIT 5
   }
-} AS %works
-WITH {
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?topic
-  WHERE {
-    INCLUDE %works
-    ?work wdt:P921 ?topic .
-  }
-  GROUP BY ?topic
-  ORDER BY DESC(?count)
-  LIMIT 5
-} AS %topics
-WITH {
-  SELECT
-    ?year 
-    (COUNT(?work) AS ?works)
-    ?topic
-  WHERE {
-    INCLUDE %works
-    INCLUDE %topics
-    ?work wdt:P921 ?topic ;
-          wdt:P577 ?publication_datetime .
-    BIND(STR(YEAR(?publication_datetime)) AS ?year)
-  }
-  GROUP BY ?year ?topic
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  # Find works per year
+  ?work wdt:P1433 target: ;
+        wdt:P921 ?topic ;
+        wdt:P577 ?publication_datetime .
+  BIND (STR(YEAR(?publication_datetime)) AS ?year)
+  {{ sparql_helpers.labels(["?topic"], languages) }}
 }
+GROUP BY ?year ?topic ?topicLabel
 ORDER BY ?year

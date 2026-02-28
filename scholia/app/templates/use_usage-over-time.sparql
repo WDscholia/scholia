@@ -1,25 +1,19 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:BarChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?year
-  (COUNT(?work) AS ?number_of_works)
-  ?useLabel
-WITH{
-  SELECT
-    (MIN(?year_) AS ?year) ?work ?use
-  WHERE {
-    ?use wdt:P279* target: .
-    ?work wdt:P4510 ?use ; 
-          wdt:P577 ?publication_datetime .
-    BIND(STR(YEAR(?publication_datetime)) AS ?year_)
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?year (COUNT(?work) AS ?number_of_works) ?useLabel WHERE {
+  {
+    SELECT (MIN(?year_) AS ?year) ?work ?use WHERE {
+      ?use wdt:P279* target: .
+      ?work wdt:P4510 ?use ;
+            wdt:P577 ?publication_datetime .
+      BIND (STR(YEAR(?publication_datetime)) AS ?year_)
+    }
+    GROUP BY ?work ?use
   }
-  GROUP BY ?work ?use
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?use"], languages) }}
 }
 GROUP BY ?year ?useLabel
 ORDER BY ?year

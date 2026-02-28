@@ -1,11 +1,18 @@
-SELECT ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention), 32)) AS ?intentionUrl)
-(COUNT(DISTINCT ?citationStatement) AS ?citations) 
-(COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?intention ?intentionLabel (CONCAT("/cito/", SUBSTR(STR(?intention),32)) AS ?intentionUrl) (COUNT(DISTINCT ?citationStatement) AS ?citations) (COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
   ?citingArticle p:P2860 ?citationStatement .
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?citedArticle .
   ?intention wdt:P31 wd:Q96471816 ;
              wdt:P2888 ?cito .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} GROUP BY ?cito ?intention ?intentionLabel
-  ORDER BY DESC(?citations)
+  ?intention rdfs:label ?intentionLabel . FILTER(LANG(?intentionLabel) = 'en' || LANG(?intentionLabel) = 'mul')
+}
+GROUP BY ?cito ?intention ?intentionLabel
+ORDER BY DESC(?citations)

@@ -1,21 +1,16 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Count of topics in published work in specified venue
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?count ?topic ?topicLabel ?example_work ?example_workLabel
-WITH {
-  SELECT 
-    (COUNT(?work) as ?count)
-    ?topic
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work wdt:P1433 target: .
-    ?work wdt:P921 ?topic .
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?count ?topic ?topicLabel ?example_work ?example_workLabel WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
+      ?work wdt:P1433 target: .
+      ?work wdt:P921 ?topic .
+    }
+    GROUP BY ?topic
   }
-  GROUP BY ?topic
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?topic", "?example_work"], languages) }}
 }
 ORDER BY DESC(?count)

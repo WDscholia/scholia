@@ -1,23 +1,31 @@
-SELECT ?count ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use), 32)) AS ?useUrl)
-?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel
-WITH {
-  SELECT
-    (COUNT(DISTINCT ?work) AS ?count)
-    ?use
-    (SAMPLE(?described_by) AS ?described_by_example)
-    (SAMPLE(?work) AS ?example_use)
-  WHERE {
-    ?work wdt:P2283 | wdt:P4510 ?use . 
-    ?use wdt:P31/wdt:P279* wd:Q7397 . 
-    # Restricting to work takes too long time :(    
-    # ?work wdt:P31/wdt:P279* wd:Q386724 .
-    OPTIONAL { ?use wdt:P1343 ?described_by . }
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?count ?use ?useLabel (CONCAT("/use/", SUBSTR(STR(?use),32)) AS ?useUrl) ?described_by_example ?described_by_exampleLabel ?example_use ?example_useLabel WHERE {
+  {
+    {
+      SELECT (COUNT(DISTINCT ?work) AS ?count) ?use (SAMPLE(?work) AS ?example_use) (SAMPLE(?described_by) AS ?described_by_example) WHERE {
+        ?work wdt:P2283 | wdt:P4510 ?use .
+        ?use wdt:P31/wdt:P279* wd:Q7397 .
+        ?work wdt:P31/wdt:P279* wd:Q386724 .
+        ?use wdt:P1343 ?described_by .
+      }
+      GROUP BY ?use
+    }
+
+    {{ sparql_helpers.labels(["?described_by_example"], languages) }}
+  } UNION {
+    SELECT (COUNT(DISTINCT ?work) AS ?count) ?use (SAMPLE(?work) AS ?example_use) WHERE {
+      ?work wdt:P2283 | wdt:P4510 ?use .
+      ?use wdt:P31/wdt:P279* wd:Q7397 .
+      ?work wdt:P31/wdt:P279* wd:Q386724 .
+      FILTER NOT EXISTS { ?use wdt:P1343 ?described_by }
+    }
+    GROUP BY ?use
   }
-  GROUP BY ?use
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  {{ sparql_helpers.labels(["?use", "?example_use"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 500

@@ -1,18 +1,22 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Map
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT DISTINCT ?recipient ?recipientLabel ?image ?item ?itemLabel ?geo ?layer
-WITH {
-  SELECT DISTINCT ?recipient ?image ?item ?geo (?property_item_label AS ?layer) WHERE {
-    ?recipient wdt:P166 target: .
-    ?recipient ?property ?item . 
-    ?item wdt:P625 ?geo .
-    ?property_item wikibase:directClaim ?property .
-    ?property_item rdfs:label ?property_item_label . FILTER (LANG(?property_item_label) = 'en')
-    OPTIONAL { ?item wdt:P18 ?image . }
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT DISTINCT ?recipient ?itemLabel ?geo ?layer WHERE {
+  {
+    SELECT DISTINCT ?recipient ?image ?item ?geo (?property_item_label AS ?layer) WHERE {
+      ?recipient wdt:P166 target: .
+      ?recipient ?property ?item .
+      ?item wdt:P625 ?geo .
+      ?property_item wikibase:directClaim ?property .
+      ?property_item rdfs:label ?property_item_label . FILTER (LANG(?property_item_label) = 'en')
+      OPTIONAL {
+        ?item wdt:P18 ?image .
+      }
+    }
   }
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?item"], languages) }}
 }

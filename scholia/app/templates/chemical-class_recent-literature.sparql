@@ -1,75 +1,61 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # title: recent literature for this chemical class
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?publication_date
-  ?work ?workLabel
-  ?type
-  ?via
-  ?topics
-WITH {
-  SELECT DISTINCT
-    (MAX(?publication_datetime_) AS ?publication_datetime)
-    ?work ?via
-  WHERE {
-    {
-      ?work wdt:P921 target: .
-      BIND ("main topic" AS ?via)
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?publication_date ?work ?workLabel ?type ?via ?topics WHERE {
+  {
+    SELECT ?publication_date ?work (GROUP_CONCAT(DISTINCT ?type_label; SEPARATOR=", ") AS ?type) ?via (GROUP_CONCAT(DISTINCT ?topic_label; SEPARATOR=" // ") AS ?topics) WHERE {
+      {
+        SELECT DISTINCT (MAX(?publication_datetime_) AS ?publication_datetime) ?work ?via WHERE {
+          {
+            ?work wdt:P921 target: .
+            BIND ("main topic" AS ?via)
+          }
+          UNION {
+            ?work wdt:P921/wdt:P361+ target: .
+            BIND ("part" AS ?via)
+          }
+          UNION {
+            ?work wdt:P921/wdt:P279+ target: .
+            BIND ("subclass" AS ?via)
+            FILTER (?topic != target:)
+          }
+          UNION {
+            ?work wdt:P921/wdt:P1269+ target: .
+            BIND ("facet" AS ?via)
+          }
+          # This seems to be expensive
+          # UNION
+          # {
+          #    target: ?propp ?statement .
+          #    ?statement a wikibase:BestRank ;
+          #               prov:wasDerivedFrom / pr:P248 ?work .
+          #    BIND ("statement" AS ?via)
+          # }
+          # Force the UNION before the publication datetime
+          # hint:Prior hint:runFirst true .
+          ?work wdt:P577 ?publication_datetime_ .
+        }
+        GROUP BY ?work ?via
+        ORDER BY DESC(?publication_datetime)
+        LIMIT 250
+      }
+      ?work wdt:P921 ?topic .
+      BIND (xsd:date(?publication_datetime) AS ?publication_date)
+      OPTIONAL {
+        ?work wdt:P31 ?type_ .
+        ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en')
+      }
+      ?topic rdfs:label ?topic_label . FILTER (LANG(?topic_label) = 'en')
     }
-    UNION
-    {
-      ?work wdt:P921 / wdt:P361+ target: .
-      BIND ("part" AS ?via)
-    }
-    UNION
-    {
-      ?work wdt:P921 / wdt:P279+ target: .
-      BIND ("subclass" AS ?via)
-      FILTER (?topic != target:)
-    }
-    UNION
-    {
-      ?work wdt:P921 / wdt:P1269+ target: .
-      BIND ("facet" AS ?via)
-    }
-    
-    # This seems to be expensive
-    # UNION
-    # {
-    #    target: ?propp ?statement .
-    #    ?statement a wikibase:BestRank ;
-    #               prov:wasDerivedFrom / pr:P248 ?work .
-    #    BIND ("statement" AS ?via)
-    # }
-    
-    # Force the UNION before the publication datetime
-    hint:Prior hint:runFirst true .
-    
-    ?work wdt:P577 ?publication_datetime_ .
+    GROUP BY ?publication_date ?work ?via
   }
-  GROUP BY ?work ?via
-  ORDER BY DESC(?publication_datetime)
-  LIMIT 250
-} AS %works
-WITH {
-  SELECT
-    ?publication_date
-    ?work
-    (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
-    ?via
-    (GROUP_CONCAT(DISTINCT ?topic_label; separator=" // ") AS ?topics)
-  WHERE {
-    INCLUDE %works
-    ?work wdt:P921 ?topic . 
-    BIND(xsd:date(?publication_datetime) AS ?publication_date)
-    OPTIONAL { ?work wdt:P31 ?type_ . ?type_ rdfs:label ?type_label . FILTER (LANG(?type_label) = 'en') }
-    ?topic rdfs:label ?topic_label .  FILTER (lang(?topic_label) = 'en')
-  }
-  GROUP BY ?publication_date ?work ?via
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?publication_date)
 LIMIT 500

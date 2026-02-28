@@ -96,69 +96,74 @@ function convertDataTableData(data, columns) {
         }
     }
     for (var i = 0 ; i < data.length ; i++) {
-	var convertedRow = {};
-	for (var key in data[i]) {
-	    if (key.slice(-11) == 'Description') {
-		convertedRow[key.slice(0, key.length - 11) + ' description'] = data[i][key];
+    var convertedRow = {};
+    for (var key in data[i]) {
+        if (key.slice(-11) == 'Description') {
+        convertedRow[key.slice(0, key.length - 11) + ' description'] = data[i][key];
 
-	    } else if (
-			key + 'Label' in data[i] &&
+        } else if (
+            key + 'Label' in data[i] &&
             key + 'Url' in data[i]
-	    ) {
+        ) {
             convertedRow[key] = '<a href="' +
-		    data[i][key + 'Url'] +
-		    '">' + data[i][key + 'Label'] + '</a>';
+            data[i][key + 'Url'] +
+            '">' + data[i][key + 'Label'] + '</a>';
 
-	    } else if (key.slice(-17) == 'ChemicalStructure') {
+        } else if (key.slice(-17) == 'ChemicalStructure') {
             convertedRow[key.slice(0, key.length - 17) + ' structure'] = '<img loading="lazy" src="' +
             'https://cdkdepict.toolforge.org/depict/bow/svg?smi=' +
-		    encodeURIComponent(data[i][key]) +
+            encodeURIComponent(data[i][key]) +
             '&abbr=on&hdisp=bridgehead&showtitle=false&zoom=2&annotate=cip' +
-		    '" />';
+            '" />';
 
-	    } else if (
-			key + 'Label' in data[i] &&
-			/^http/.test(data[i][key]) &&
-			data[i][key].length > 30
-	    ) {
-		    convertedRow[key] = '<a href="../' +
-		    data[i][key].slice(31) +
-		    '">' + data[i][key + 'Label'] + '</a>';
+        } else if (
+            key + 'Label' in data[i] &&
+            /^http/.test(data[i][key]) &&
+            data[i][key].length > 30
+        ) {
+            convertedRow[key] = '<a href="../' +
+            data[i][key].slice(31) +
+            '">' + data[i][key + 'Label'] + '</a>';
 
         } else if (key.slice(-5) == 'Label') {
-		// pass
-		
-	    } else if (key + 'Url' in data[i]) {
-		    convertedRow[key] = '<a href="' +
-		    data[i][key + 'Url'] +
-		    '">' + data[i][key] + '</a>';
+        // pass
 
-	    } else if (key.slice(-3) == 'Url') {
-		// pass
+        } else if (key + 'Url' in data[i]) {
+            convertedRow[key] = '<a href="' +
+            data[i][key + 'Url'] +
+            '">' + data[i][key] + '</a>';
 
-	    } else if (key.slice(-3) == 'url') {
-		// Convert URL to a link
-		    convertedRow[key] = "<a href='" +
-		    data[i][key] + "'>" + 
-		    $("<div>").text(data[i][key]).html() + '</a>';
+        } else if (key.slice(-3) == 'Url') {
+        // pass
 
-	    } else if (key == 'orcid') {
-		// Add link to ORCID website
-		    convertedRow[key] = '<a href="https://orcid.org/' +
-		    data[i][key] + '">' + 
-		    data[i][key] + '</a>';
+        } else if (key.slice(-3) == 'url') {
+        // Convert URL to a link
+            convertedRow[key] = "<a href='" +
+            data[i][key] + "'>" +
+            $("<div>").text(data[i][key]).html() + '</a>';
 
-	    } else if (key == 'doi') {
-		// Add link to Crossref
-		    convertedRow[key] = '<a href="https://doi.org/' +
-		    encodeURIComponent(data[i][key]) + '">' +
-		    $("<div>").text(data[i][key]).html() + '</a>';
+        } else if (key == 'orcid') {
+        // Add link to ORCID website
+            convertedRow[key] = '<a href="https://orcid.org/' +
+            data[i][key] + '">' +
+            data[i][key] + '</a>';
 
-	    } else {
-		    convertedRow[key] = data[i][key];
-	    }
-	}
-	convertedData.push(convertedRow);
+        } else if (key == 'doi') {
+        // Add link to Crossref
+            convertedRow[key] = '<a href="https://doi.org/' +
+            encodeURIComponent(data[i][key]) + '">' +
+            $("<div>").text(data[i][key]).html() + '</a>';
+
+        } else {
+            var convertedRowValue = data[i][key];
+            if (convertedRowValue.startsWith("http://www.wikidata.org/entity/Q")) {
+                var qid = convertedRowValue.slice(31);
+                convertedRowValue = '<a href="../' + qid + '">' + qid + '</a>';
+            }
+            convertedRow[key] = convertedRowValue;
+        }
+    }
+    convertedData.push(convertedRow);
     }
     return { data: convertedData, columns: convertedColumns };
 }
@@ -260,7 +265,7 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var sparqlEndpointName = (typeof options.sparqlEndpointName === 'undefined')
-	? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
+        ? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
     
     $(element).html("<div class='loader'><div></div><div></div><div></div></div>");
 
@@ -277,7 +282,7 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
             };
             columns.push(column);
         }
-	
+
         if (convertedData.data.length <= 10) {
           paging = false;
         }
@@ -299,7 +304,7 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
             '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
                 encodeURIComponent(sparql) +
                 '">' + sparqlEndpointName + '</a></span>' +
-                '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' +
+                '<span style="float:right; font-size:smaller;"><a href="https://github.com/ad-freiburg/scholia/blob/qlever/scholia/app/templates/' +
                 filename + '">' +
                 filename.replace("_", ": ") +
                 '</a></span></caption>'
@@ -359,7 +364,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var sparqlEndpointName = (typeof options.sparqlEndpointName === 'undefined')
-	? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
+    ? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
 
     // overwrite the central URLs of SPARQL specific URLs are found
     configFromSPARQL = extractConfig(sparql);
@@ -372,7 +377,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
     const datatableFooter =
         '<caption><span style="float:left; font-size:smaller;"><a href="' + editURL +
         encodeURIComponent(sparql) + '">' + sparqlEndpointName + '</a></span>' +
-        '<span style="float:right; font-size:smaller;"><a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' +
+        '<span style="float:right; font-size:smaller;"><a href="https://github.com/ad-freiburg/scholia/blob/qlever/scholia/app/templates/' +
         filename +
         '">' +
         filename.replace('_', ': ') +
@@ -484,11 +489,15 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
                 }
                 $(element).append(datatableFooter);
             }
-        }).fail(function () {
+        }).fail(function (jqXHR, textStatus, errorThrown) {
             $('#' + loaderID).remove(); // remove loader
-            $(element).prepend(
-                '<p>This query has timed out, we recommend that you follow the link to the Wikidata Query Service below to modify the query to be less intensive. </p> '
-            );
+            let error_message = "";
+            try {
+                error_message = "QLever execption: " + JSON.parse(jqXHR.responseText).exception;
+            } catch (e) {
+                error_message = "getJSON query failed: " + textStatus + " " + errorThrown;
+            }
+            $(element).prepend("<p style='color:red;'>" + escapeHTML(error_message) + "</p>");
             const reloadButton = document.getElementById(element.slice(1) + '-reload');
             reloadButton.classList.add('btn-secondary');
             reloadButton.classList.remove('btn-outline-secondary');
@@ -515,6 +524,13 @@ function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
     if (!editURL) editURL = "https://query.wikidata.org/#";
 
     if (!embedURL) embedURL = "https://query.wikidata.org/embed.html#";
+
+    // overwrite the central URLs of SPARQL specific URLs are found
+    configFromSPARQL = extractConfig(sparql);
+    if (configFromSPARQL["url"]) url = configFromSPARQL["url"];
+    if (configFromSPARQL["editURL"]) editURL = configFromSPARQL["editURL"];
+    if (configFromSPARQL["embedURL"]) embedURL = configFromSPARQL["embedURL"];
+    if (configFromSPARQL["endpointName"]) sparqlEndpointName = configFromSPARQL["endpointName"];
 
     const wikidata_sparql = url + "?query=" + encodeURIComponent(sparql);
     const wikidata_query = editURL + encodeURIComponent(sparql);
@@ -549,6 +565,7 @@ function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
 
     $.ajax({
         url: wikidata_sparql,
+        headers: { Accept: "application/sparql-results+xml" },
         success: function (data) {
             let $xml = $(data);
             let results = $xml.find('results');
@@ -559,7 +576,7 @@ function sparqlToIframe2(url, editURL, embedURL, sparql, element, filename) {
             }
             $iframe.parent().after(
                 '<span style="float:right; font-size:smaller">' +
-                    '<a href="https://github.com/WDscholia/scholia/blob/main/scholia/app/templates/' + filename + '">' +
+                    '<a href="https://github.com/ad-freiburg/scholia/blob/qlever/scholia/app/templates/' + filename + '">' +
                         filename.replace("_", ": ") +
                     '</a>' +
                 '</span>'
@@ -796,9 +813,12 @@ function askQuery(panel, askQuery, callback) {
 
 
 function askQuery2(endpointUrl, panel, askQuery, callback) {
-     if (!endpointUrl) endpointUrl = "https://query.wikidata.org/sparql";
-     
-     var settings = {
+    if (!endpointUrl) endpointUrl = "https://query.wikidata.org/sparql";
+    // overwrite the central URLs of SPARQL specific URLs are found
+    configFromSPARQL = extractConfig(askQuery);
+    if (configFromSPARQL["url"]) endpointUrl = configFromSPARQL["url"];
+
+    var settings = {
        headers: { Accept: 'application/sparql-results+json' },
        data: { query: askQuery },
      };

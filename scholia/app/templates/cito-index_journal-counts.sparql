@@ -1,11 +1,18 @@
-SELECT ?journal ?journalLabel (CONCAT("/venue/", SUBSTR(STR(?journal), 32), "#cito") AS ?journalUrl)
-(COUNT(DISTINCT ?citationStatement) AS ?citations) 
-(COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?journal ?journalLabel (CONCAT("/venue/", SUBSTR(STR(?journal),32), "#cito") AS ?journalUrl) (COUNT(DISTINCT ?citationStatement) AS ?citations) (COUNT(DISTINCT ?citingArticle) AS ?articles) WHERE {
   ?citingArticle p:P2860 ?citationStatement ;
                  wdt:P1433 ?journal .
   ?citationStatement pq:P3712 ?intention ;
                      ps:P2860 ?citedArticle .
   ?intention wdt:P31 wd:Q96471816 .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-} GROUP BY ?journal ?journalLabel
-  ORDER BY DESC(?citations)
+  ?journal rdfs:label ?journalLabel . FILTER(LANG(?journalLabel) = 'en' || LANG(?journalLabel) = 'mul')
+}
+GROUP BY ?journal ?journalLabel
+ORDER BY DESC(?citations)

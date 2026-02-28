@@ -1,23 +1,37 @@
-SELECT ?count ?description
-WHERE {
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?count ?description WHERE {
   {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P31 wd:Q30612 . } }
-    BIND("Number of clinical trials" AS ?description)
+    {
+      SELECT (COUNT(*) AS ?count) WHERE {
+        [] wdt:P31 wd:Q30612 .
+      }
+    }
+    BIND ("Number of clinical trials" AS ?description)
   }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P3098 [] . } }
-    BIND("Links to ClinicalTrials.gov" AS ?description)
+  UNION {
+    {
+      SELECT (COUNT(*) AS ?count) WHERE {
+        [] wdt:P3098 [] .
+      }
+    }
+    BIND ("Links to ClinicalTrials.gov" AS ?description)
   }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6099 [] . } }
-    BIND("Number of clinical trial phases links" AS ?description)
+  UNION {
+    {
+      SELECT (COUNT(*) AS ?count) WHERE {
+        [] wdt:P6099 [] .
+      }
+    }
+    BIND ("Number of clinical trial phases links" AS ?description)
   }
-  UNION
-  {
-    { SELECT (COUNT(*) AS ?count) WHERE { [] wdt:P6220 [] . } }
-    BIND("Links to OpenTrials" AS ?description)
+  UNION {
+    {
+      SELECT (COUNT(*) AS ?count) WHERE {
+        [] wdt:P6220 [] .
+      }
+    }
+    BIND ("Links to OpenTrials" AS ?description)
   }
 }
 ORDER BY DESC(?count)

@@ -1,23 +1,18 @@
-SELECT 
-  ?count
-  ?wikiproject ?wikiprojectLabel
-  (CONCAT("/wikiproject/", SUBSTR(STR(?wikiproject), 32)) AS ?wikiprojectUrl)
-  ?wikiprojectDescription
-  ?example ?exampleLabel (CONCAT("/", SUBSTR(STR(?example), 32)) AS ?exampleUrl)
-WITH {
-  SELECT 
-    (COUNT(?item) AS ?count)
-    ?wikiproject
-    (SAMPLE(?item) AS ?example)
-  WHERE {
-    ?wikiproject wdt:P31 wd:Q16695773 ;
-                 ^(wdt:P6104 | wdt:P5008) ?item .
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?wikiproject ?wikiprojectLabel (CONCAT("/wikiproject/", SUBSTR(STR(?wikiproject),32)) AS ?wikiprojectUrl) ?wikiprojectDescription ?example ?exampleLabel (CONCAT("/", SUBSTR(STR(?example),32)) AS ?exampleUrl) WHERE {
+  {
+    SELECT (COUNT(?item) AS ?count) ?wikiproject (SAMPLE(?item) AS ?example) WHERE {
+      ?wikiproject wdt:P31 wd:Q16695773 ;
+                   ^(wdt:P6104 | wdt:P5008) ?item .
+    }
+    GROUP BY ?wikiproject
   }
-  GROUP BY ?wikiproject
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?wikiproject", "?example"], languages) }}
+  {{ sparql_helpers.descriptions(["?wikiproject"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 1000

@@ -1,25 +1,25 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:ImageGrid
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?year
-  ?recipient ?recipientLabel 
-  ?image
-WITH {
-  SELECT ?recipient ?year (SAMPLE(?image_) AS ?image) WHERE {
-    ?recipient p:P166 ?award_statement . 
-    ?award_statement ps:P166 target: .
-    OPTIONAL {
-      ?award_statement pq:P585 ?time .
-	  BIND(YEAR(?time) AS ?year)
-	}
-    ?recipient wdt:P18 ?image_ .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?year ?recipient ?recipientLabel ?image WHERE {
+  {
+    SELECT ?recipient ?year (SAMPLE(?image_) AS ?image) WHERE {
+      ?recipient p:P166 ?award_statement .
+      ?award_statement ps:P166 target: .
+      OPTIONAL {
+        ?award_statement pq:P585 ?time .
+        BIND (YEAR(?time) AS ?year)
+      }
+      ?recipient wdt:P18 ?image_ .
+    }
+    GROUP BY ?recipient ?year
   }
-  GROUP BY ?recipient ?year
-} AS %result
-WHERE {
-  INCLUDE %result 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
+  {{ sparql_helpers.labels(["?recipient"], languages) }}
 }
 ORDER BY DESC(?year)
-  

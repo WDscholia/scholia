@@ -1,35 +1,31 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BarChart
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?year ?number_of_citations ?author_label WHERE {
   {
-    SELECT ?year ?number_of_citations ?author ?author_label_
-    WHERE {
+    SELECT ?year ?number_of_citations ?author ?authorLabel WHERE {
       {
-        SELECT
-	  ?author
-	  ?year
-
-          # DISTINCT to avoid count citations whether ther are multiple
-	  # publication dates
-	  (COUNT(DISTINCT ?citation) AS ?number_of_citations)
-	WHERE {
-          hint:Query hint:optimizer "None".
+        SELECT ?author ?authorLabel ?year
+        # DISTINCT to avoid count citations whether ther are multiple
+        # publication dates
+        (COUNT(DISTINCT ?citation) AS ?number_of_citations) WHERE {
           VALUES ?author {  {% for q in qs %} wd:{{ q }} {% endfor %}  }
           ?work wdt:P50 ?author ;
                 wdt:P577 ?publication_date .
           ?citing_work wdt:P2860 ?work
-          BIND(STR(YEAR(?publication_date)) AS ?year)
-
-	  # We want to count the number of citations rather than the number of
-	  # citing works or the number of cited works
-          BIND(CONCAT(STR(?work), STR(?citing_work)) AS ?citation)
+          BIND (STR(YEAR(?publication_date)) AS ?year)
+          # We want to count the number of citations rather than the number of
+          # citing works or the number of cited works
+          BIND (CONCAT(STR(?work), STR(?citing_work)) AS ?citation)
+          {{ sparql_helpers.labels(["?author"], languages) }}
         }
-        GROUP BY ?author ?year 
-      } 
-      ?author rdfs:label ?author_label_ .
-      FILTER (LANG(?author_label_) = 'en')
+        GROUP BY ?author ?authorLabel ?year
+      }
     }
   }
   # Represent the author by name and Q identifier
-  BIND (CONCAT(?author_label_, " (", SUBSTR(STR(?author), 32), ")") AS ?author_label)
+  BIND (CONCAT(?authorLabel, " (", SUBSTR(STR(?author),32), ")") AS ?author_label)
 }
 ORDER BY ?year

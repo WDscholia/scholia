@@ -1,22 +1,27 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: Author awards for a specific venue
-SELECT DISTINCT
-  ?year 
-  ?author ?authorLabel
-  ?award ?awardLabel ?awardDescription
-WHERE {
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT DISTINCT ?year ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl) ?award ?awardLabel (CONCAT("/award/", SUBSTR(STR(?award), 32)) AS ?awardUrl) ?awardDescription WHERE {
   [] wdt:P1433 target: ;
      wdt:P50 ?author .
   ?author p:P166 ?award_statement .
   ?award_statement ps:P166 ?award .
   OPTIONAL {
-    { ?award_statement pq:P585 ?time }
-    UNION
-    { ?award_statement pq:P580 ?time }
-    BIND(YEAR(?time) AS ?year)
+    {
+      ?award_statement pq:P585 ?time
+    }
+    UNION {
+      ?award_statement pq:P580 ?time
+    }
+    BIND (YEAR(?time) AS ?year)
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
+  {{ sparql_helpers.labels(["?author", "?award"], languages) }}
+  {{ sparql_helpers.descriptions(["?award"], languages) }}
 }
 ORDER BY DESC(?year)
 LIMIT 500

@@ -1,36 +1,42 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  (xsd:date(MIN(?start)) AS ?date)  
-  ?event ?eventLabel
-  (CONCAT("/event/", SUBSTR(STR(?event), 32)) AS ?eventUrl)
-  (GROUP_CONCAT(DISTINCT ?role; separator=", ") AS ?roles)
-  (GROUP_CONCAT(DISTINCT ?location_label; separator=", ") AS ?locations)
-WHERE {
-    BIND(target: AS ?person)
-    {  # speaker
-      ?event wdt:P823 ?person .
-      BIND("speaker" AS ?role)
-    } UNION {  # organizer
-      ?event wdt:P664 ?person .
-      BIND("organizer" AS ?role)
-    } UNION {  # participant
-      ?person wdt:P1344 | ^wdt:P710 ?event  .
-      BIND("participant" AS ?role)
-    } UNION {  # editor
-      ?person ^wdt:P98 / wdt:P4745 ?event  .
-      BIND("editor of proceedings" AS ?role)
-    } UNION {  # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event  .
-      BIND("author" AS ?role)
-    } UNION {  # program committee member
-      ?event wdt:P5804 ?person .
-      BIND("program committee member" AS ?role)
-    }
-    OPTIONAL { ?event wdt:P276 ?location . ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')}
-    OPTIONAL { ?event wdt:P580 | wdt:P585 ?start }
- 
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT (xsd:date(MIN(?start)) AS ?date) ?event ?eventLabel (CONCAT("/event/", SUBSTR(STR(?event),32)) AS ?eventUrl) (GROUP_CONCAT(DISTINCT ?role; SEPARATOR=", ") AS ?roles) (GROUP_CONCAT(DISTINCT ?location_label; SEPARATOR=", ") AS ?locations) WHERE {
+  BIND (target: AS ?person)
+  { # speaker
+    ?event wdt:P823 ?person .
+    BIND ("speaker" AS ?role)
+  }
+  UNION { # organizer
+    ?event wdt:P664 ?person .
+    BIND ("organizer" AS ?role)
+  }
+  UNION { # participant
+    ?person wdt:P1344 | ^wdt:P710 ?event .
+    BIND ("participant" AS ?role)
+  }
+  UNION { # editor
+    ?person ^wdt:P98/wdt:P4745 ?event .
+    BIND ("editor of proceedings" AS ?role)
+  }
+  UNION { # author
+    ?person ^wdt:P50/wdt:P1433/wdt:P4745 ?event .
+    BIND ("author" AS ?role)
+  }
+  UNION { # program committee member
+    ?event wdt:P5804 ?person .
+    BIND ("program committee member" AS ?role)
+  }
+  OPTIONAL {
+    ?event wdt:P276 ?location .
+    ?location rdfs:label ?location_label . FILTER (LANG(?location_label) = 'en')
+  }
+  OPTIONAL {
+    ?event wdt:P580 | wdt:P585 ?start
+  }
+  {{ sparql_helpers.labels(["?event"], languages) }}
 }
 GROUP BY ?event ?eventLabel
-ORDER BY DESC(?date) 
+ORDER BY DESC(?date)

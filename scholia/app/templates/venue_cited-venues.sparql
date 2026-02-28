@@ -1,31 +1,22 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
 # title: Cited venues from specific journal
-SELECT
-  ?count
-  ?short_name
-  ?cited_journal ?cited_journalLabel
-WITH {
-  SELECT
-    (COUNT(?cited_work) AS ?count)
-    ?cited_journal
-    (SAMPLE(?short_name_) AS ?short_name)
-  WHERE {
-    ?work wdt:P1433 target: .
-    ?work wdt:P2860 ?cited_work .
-    ?cited_work wdt:P1433 ?cited_journal . 
-    OPTIONAL {
-      ?work wdt:P577 ?publication_datetime .
-      BIND(xsd:date(?publication_datetime) AS ?publication_date)
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?count ?short_name ?cited_journal ?cited_journalLabel WHERE {
+  {
+    SELECT (COUNT(?cited_work) AS ?count) ?cited_journal (SAMPLE(?short_name_) AS ?short_name) WHERE {
+      ?work wdt:P1433 target: .
+      ?work wdt:P2860 ?cited_work .
+      ?cited_work wdt:P1433 ?cited_journal .
+      OPTIONAL {
+        ?cited_journal wdt:P1813 ?short_name_ .
+      }
     }
-    OPTIONAL { ?cited_journal wdt:P1813 ?short_name_ . }
+    GROUP BY ?cited_journal
   }
-  GROUP BY ?cited_journal
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?cited_journal"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 200

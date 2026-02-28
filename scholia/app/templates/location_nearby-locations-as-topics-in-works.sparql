@@ -1,39 +1,37 @@
-PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  (ROUND(1000 * ?distance_) / 1000 AS ?distance)
-  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-  ?location ?locationLabel (CONCAT("/topic/", SUBSTR(STR(?location), 32)) AS ?locationUrl)
-WITH {
-  SELECT
-    ?work ?location
-    (min(?distances) AS ?distance_)
-  WHERE {
-    ?work wdt:P921 ?location . 
-
-    ?location p:P625 ?other_geo_statement . 
-
-    # Some locations have unknown geocoordinates indicated with novalue
-    # psv will remove them. 
-    ?other_geo_statement ps:P625 ?other_geo .
-    ?other_geo_statement psv:P625 [] .
-
-    # Remove articles from encyclopedia and dictionaries
-    # Filter is more expensive when applied here. 
-    MINUS { ?work wdt:P31 wd:Q17329259 }
-    MINUS { ?work wdt:P31 wd:Q4423781 }
-   
-    target: wdt:P159* / wdt:P625 ?geo .
-    BIND(geof:distance(?other_geo, ?geo) AS ?distances)
-  }
-  GROUP BY ?work ?location
-  ORDER BY ?distance_
-  LIMIT 500
-} AS %results
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+SELECT (ROUND(1000 * ?distance_) / 1000 AS ?distance) ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl)
+  ?location ?locationLabel (CONCAT("/topic/", SUBSTR(STR(?location),32)) AS ?locationUrl)
 WHERE {
-  INCLUDE %results
-          
-  # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {
+    SELECT DISTINCT ?work ?workLabel ?location ?locationLabel (MIN(?distances) AS ?distance_) WHERE {
+      ?work wdt:P921 ?location .
+      ?location p:P625 ?other_geo_statement .
+      # Some locations have unknown geocoordinates indicated with novalue
+      # psv will remove them. 
+      ?other_geo_statement ps:P625 ?other_geo .
+      ?other_geo_statement psv:P625 [] .
+      # Remove articles from encyclopedia and dictionaries
+      # Filter is more expensive when applied here. 
+      MINUS {
+        ?work wdt:P31 wd:Q17329259
+      }
+      MINUS {
+        ?work wdt:P31 wd:Q4423781
+      }
+      wd:{{ q }} wdt:P159*/wdt:P625 ?geo .
+      BIND (geof:distance(?other_geo,?geo) AS ?distances)
+      FILTER ( BOUND(?distances) )
+      {{ sparql_helpers.labels(["?location", "?work"], languages) }}
+    }
+    GROUP BY ?work ?workLabel ?location ?locationLabel
+    ORDER BY ?distance_
+    LIMIT 500
+  }
 }
 ORDER BY ?distance

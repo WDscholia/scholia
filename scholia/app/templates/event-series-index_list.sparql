@@ -1,19 +1,27 @@
-SELECT
-  ?events ?short_name
-  ?event_series ?event_seriesLabel ?event_seriesDescription
-  (CONCAT("/event-series/", SUBSTR(STR(?event_series), 32)) AS ?event_seriesUrl)
-WITH {
-  SELECT (COUNT(?event) AS ?events) ?event_series {  
-    { ?event_series wdt:P31 wd:Q47258130 . }
-    UNION 
-    { ?event_series wdt:P31 wd:Q47459256 . }
-    OPTIONAL { ?event_series ^wdt:P179 ?event }
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?events ?short_name ?event_series ?event_seriesLabel ?event_seriesDescription (CONCAT("/event-series/", SUBSTR(STR(?event_series),32)) AS ?event_seriesUrl) WHERE {
+  {
+    SELECT (COUNT(?event) AS ?events) ?event_series {
+      {
+        ?event_series wdt:P31 wd:Q47258130 .
+      }
+      UNION {
+        ?event_series wdt:P31 wd:Q47459256 .
+      }
+      OPTIONAL {
+        ?event_series ^wdt:P179 ?event
+      }
+    }
+    GROUP BY ?event_series
   }
-  GROUP BY ?event_series
-} AS %events
-WHERE {
-  INCLUDE %events
-  OPTIONAL { ?event_series wdt:P1813 ?short_name }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,fr". }
+  OPTIONAL {
+    ?event_series wdt:P1813 ?short_name
+  }
+  {{ sparql_helpers.labels(["?event_series"], languages) }}
+  {{ sparql_helpers.descriptions(["?event_series"], languages) }}
 }
 ORDER BY DESC(?events)

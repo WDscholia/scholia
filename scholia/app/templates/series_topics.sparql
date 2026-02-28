@@ -1,26 +1,28 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?count ?topic ?topicLabel
-WITH {
-  SELECT (COUNT(*) AS ?count) ?topic
-  WHERE {
-    # Topics of series
-    { target: wdt:P921 ?topic . }
-    
-    # Topics of collections in series
-    UNION { ?collection wdt:P179 target: ; wdt:P921 ?topic . }
-    
-    # Topics of works in collections in series
-    UNION { ?work wdt:P1433/wdt:P179 target: ; wdt:P921 ?topic . }
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?count ?topic ?topicLabel WHERE {
+  {
+    SELECT (COUNT(*) AS ?count) ?topic WHERE {
+      # Topics of series
+      {
+        target: wdt:P921 ?topic .
+      }
+      # Topics of collections in series
+      UNION {
+        ?collection wdt:P179 target: ;
+                    wdt:P921 ?topic .
+      }
+      # Topics of works in collections in series
+      UNION {
+        ?work wdt:P1433/wdt:P179 target: ;
+              wdt:P921 ?topic .
+      }
+    }
+    GROUP BY ?topic
   }
-  GROUP BY ?topic
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?topic"], languages) }}
 }
-ORDER BY DESC(?count)
-DESC(?count)
+ORDER BY DESC(?count) DESC(?count)
 LIMIT 100

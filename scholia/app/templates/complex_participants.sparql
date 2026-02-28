@@ -1,21 +1,28 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?quantity ?part ?partLabel ?partDescription ?type
-WITH {
-  SELECT ?part ?quantity (GROUP_CONCAT(DISTINCT ?type_label; separator=", ") AS ?type)
-  WHERE {
-    VALUES ?complex { target: }
-    ?complex p:P527 ?partStatement .
-    ?partStatement ps:P527 ?part .
-    OPTIONAL { ?partStatement pq:P1114 ?quantity }
-    OPTIONAL { 
-      ?part wdt:P31 ?type_ .
-      ?type_ rdfs:label ?type_label .
-      FILTER (LANG(?type_label) = 'en')
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?quantity ?part ?partLabel ?partDescription ?type WHERE {
+  {
+    SELECT ?part ?quantity (GROUP_CONCAT(DISTINCT ?type_label; SEPARATOR=", ") AS ?type) WHERE {
+      VALUES ?complex { target: }
+      ?complex p:P527 ?partStatement .
+      ?partStatement ps:P527 ?part .
+      OPTIONAL {
+        ?partStatement pq:P1114 ?quantity
+      }
+      OPTIONAL {
+        ?part wdt:P31 ?type_ .
+        ?type_ rdfs:label ?type_label .
+        FILTER (LANG(?type_label) = 'en')
+      }
     }
-  } GROUP BY ?part ?quantity 
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
-} ORDER BY ASC(?partLabel)
+    GROUP BY ?part ?quantity
+  }
+  {{ sparql_helpers.labels(["?part"], languages) }}
+  {{ sparql_helpers.descriptions(["?part"], languages) }}
+}
+ORDER BY ASC(?partLabel)

@@ -1,34 +1,27 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # tool: scholia
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?couses
-  ?citing_works
-  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-WITH {
-  # Count citations
-  SELECT
-    (COUNT(DISTINCT ?citing_work) AS ?citing_works)
-    ?work
-    (SAMPLE(?citing_work) AS ?example_citing_work)
-    (COUNT(DISTINCT ?use) AS ?couses)
-  WHERE {
-    ?work wdt:P4510 target: .
-    OPTIONAL { ?work wdt:P4510 ?use . FILTER (?use != target: )}
-    OPTIONAL { ?citing_work wdt:P2860 ?work. }
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?couses ?citing_works ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl) WHERE {
+  { # Count citations
+    SELECT (COUNT(DISTINCT ?citing_work) AS ?citing_works) ?work (COUNT(DISTINCT ?use) AS ?couses) WHERE {
+      ?work wdt:P4510 target: .
+      OPTIONAL {
+        ?work wdt:P4510 ?use . FILTER (?use != target:)
+      }
+      OPTIONAL {
+        ?citing_work wdt:P2860 ?work .
+      }
+    }
+    GROUP BY ?work
+    # Disabled to also show works with few co-uses
+    # HAVING (?couses < 1)
+    ORDER BY DESC(?count)
+    LIMIT 100
   }
-  GROUP BY ?work
 
-  # Disabled to also show works with few co-uses
-  # HAVING (?couses < 1)
-
-  ORDER BY DESC(?count)
-  LIMIT 100
-} AS %result
-WHERE {
   # Label results
-  INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY ?couses DESC(?citing_works)

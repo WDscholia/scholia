@@ -1,89 +1,72 @@
-#sparql_endpoint = https://query.wikidata.org/sparql
-#sparql_endpoint_name= WDQS main
-#sparql_editurl = https://query.wikidata.org/#
-#sparql_embedurl = https://query.wikidata.org/embed.html#
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT DISTINCT ?description ?value ?valueUrl
-WHERE {
-  BIND(target: AS ?software)
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT DISTINCT ?description ?value ?valueUrl WHERE {
+  BIND (target: AS ?software)
   {
-    BIND(1 AS ?order)
-    BIND("Title" AS ?description)
+    BIND (1 AS ?order)
+    BIND ("Title" AS ?description)
     ?software wdt:P1476 ?value .
   }
-  UNION
-  {
-    SELECT
-      (2 AS ?order)
-      ("Developers" AS ?description)
-      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
-    {
-      BIND(1 AS ?dummy)
+  UNION {
+    SELECT (2 AS ?order) ("Developers" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
+      BIND (1 AS ?dummy)
       target: wdt:P178 ?iri .
-      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
-      ?iri rdfs:label ?value_string . 
+      BIND (SUBSTR(STR(?iri),32) AS ?q)
+      ?iri rdfs:label ?value_string .
       FILTER (LANG(?value_string) = 'en')
-      BIND(COALESCE(?value_string, ?q) AS ?value_)
+      BIND (COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
   }
-  UNION
-  {
-    BIND(2 AS ?order)
-    BIND("Programming language" AS ?description)
+  UNION {
+    BIND (2 AS ?order)
+    BIND ("Programming language" AS ?description)
     ?software wdt:P277 ?iri .
-    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    BIND (SUBSTR(STR(?iri),32) AS ?q)
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
-    BIND(STR(?value_string) AS ?value)
-    BIND(CONCAT("../topic/", ?q) AS ?valueUrl)
+    BIND (STR(?value_string) AS ?value)
+    BIND (CONCAT("../topic/", ?q) AS ?valueUrl)
   }
-  UNION
-  {
-    BIND(3 AS ?order)
-    BIND("License" AS ?description)
+  UNION {
+    BIND (3 AS ?order)
+    BIND ("License" AS ?description)
     ?software wdt:P275 ?iri .
-    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    BIND (SUBSTR(STR(?iri),32) AS ?q)
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
-    BIND(STR(?value_string) AS ?value)
-    BIND(CONCAT("../license/", ?q) AS ?valueUrl)
+    BIND (STR(?value_string) AS ?value)
+    BIND (CONCAT("../license/", ?q) AS ?valueUrl)
   }
-  UNION
-  {
-    BIND(4 AS ?order)
-    BIND("Publication date" AS ?description)
-    ?software p:P577 / psv:P577 ?publication_date_value .
+  UNION {
+    BIND (4 AS ?order)
+    BIND ("Publication date" AS ?description)
+    ?software p:P577/psv:P577 ?publication_date_value .
     ?publication_date_value wikibase:timePrecision ?time_precision ;
                             wikibase:timeValue ?publication_date .
-    BIND(IF(?time_precision = 9, YEAR(?publication_date), xsd:date(?publication_date)) AS ?value)
+    BIND (IF(?time_precision = 9,YEAR(?publication_date),xsd:date(?publication_date)) AS ?value)
   }
-
-  UNION
-  {
-    SELECT
-      (5 AS ?order)
-      ("Uses" AS ?description)
-      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-      (CONCAT("../topics/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
-    {
-      BIND(1 AS ?dummy)
+  UNION {
+    SELECT (5 AS ?order) ("Uses" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../topics/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
+      BIND (1 AS ?dummy)
       target: wdt:P366 ?iri .
-      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
-      ?iri rdfs:label ?value_string . 
+      BIND (SUBSTR(STR(?iri),32) AS ?q)
+      ?iri rdfs:label ?value_string .
       FILTER (LANG(?value_string) = 'en')
-      BIND(COALESCE(?value_string, ?q) AS ?value_)
+      BIND (COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
   }
-  UNION
-  {
-    BIND(11 AS ?order)
-    BIND("Homepage" AS ?description)
+  UNION {
+    BIND (11 AS ?order)
+    BIND ("Homepage" AS ?description)
     ?software wdt:P856 ?valueUrl .
-    BIND(STR(?valueUrl) AS ?value)
+    BIND (STR(?valueUrl) AS ?value)
   }
-} 
+}
 ORDER BY ?order

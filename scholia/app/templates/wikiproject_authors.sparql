@@ -1,30 +1,27 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?count
-  ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-  (COALESCE(?orcid_, CONCAT("orcid-search/search/?searchQuery=", ?authorLabel)) AS ?orcid) 
-WITH {
-  SELECT
-    ?author
-    (count(?work) as ?count)
-  WHERE {
-    { ?work wdt:P6104 target: .}
-      union 
-    { ?work wdt:P5008 target: .}
-    ?work wdt:P50 ?author .
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?count ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) (COALESCE(?orcid_, CONCAT("orcid-search/search/?searchQuery=", ?authorLabel)) AS ?orcid) WHERE {
+  {
+    SELECT ?author (COUNT(?work) AS ?count) WHERE {
+      {
+        ?work wdt:P6104 target: .
+      }
+      UNION {
+        ?work wdt:P5008 target: .
+      }
+      ?work wdt:P50 ?author .
+    }
+    GROUP BY ?author
+    ORDER BY DESC(?count)
+    LIMIT 200
   }
-  GROUP BY ?author
-  ORDER BY DESC(?count)
-  LIMIT 200
-} AS %result
-WHERE {
-  INCLUDE %result
-          
   # Include optional ORCID iD
-  OPTIONAL { ?author wdt:P496 ?orcid_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  OPTIONAL {
+    ?author wdt:P496 ?orcid_ .
+  }
+  {{ sparql_helpers.labels(["?author"], languages) }}
+  {{ sparql_helpers.descriptions(["?author"], languages) }}
 }
 ORDER BY DESC(?count)

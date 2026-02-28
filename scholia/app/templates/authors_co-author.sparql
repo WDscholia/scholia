@@ -1,27 +1,37 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Graph
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
-
-SELECT ?author ?authorLabel ?work ?workLabel 
-WITH {
- SELECT ?work ?author WHERE { 
-  { }
-  {% for q1 in qs %} {% for q2 in qs %} {% if q1 < q2 %} UNION {
-   SELECT ?work ?author WHERE {
-    SERVICE gas:service {
-     gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
-           gas:in wd:{{ q1 }} ;
-           gas:target wd:{{ q2 }} ;
-           gas:traversalDirection "Undirected" ;
-           gas:out ?work ;
-           gas:linkType wdt:P50 ;
-          gas:maxVisited 5000 .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?author ?workLabel WHERE {
+  {
+    SELECT ?work ?author WHERE {
+      {}
+      {% for q1 in qs %}
+      {% for q2 in qs %}
+      {% if q1 < q2 %}
+      UNION {
+        SERVICE <https://query.wikidata.org/sparql> {
+          SELECT ?work ?author WHERE {
+            SERVICE gas:service {
+              gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                          gas:in wd:{{ q1 }} ;
+                          gas:target wd:{{ q2 }} ;
+                          gas:traversalDirection "Undirected" ;
+                          gas:out ?work ;
+                          gas:linkType wdt:P50 ;
+                          gas:maxVisited 5000 .
+            }
+            ?work wdt:P50 ?author
+          }
+        }
+      } # UNION END
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
     }
-    ?work wdt:P50 ?author
-   }
-  } # UNION END
-  {% endif %} {% endfor %}  {% endfor %}  } 
-} AS %result 
-WHERE {
- INCLUDE %result 
- SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }

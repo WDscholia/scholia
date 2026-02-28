@@ -1,20 +1,23 @@
-SELECT
-  ?organization ?organizationLabel ?organizationDescription
-  ?location ?locationLabel
-  ?country ?countryLabel
-WITH {
-  SELECT
-    ?organization
-    (SAMPLE(?location_) AS ?location)
-    (SAMPLE(?country_) AS ?country)
-  WHERE {
-    VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    OPTIONAL { ?organization wdt:P131 | wdt:P159 ?location_ }
-    OPTIONAL { ?organization wdt:P17 ?country_ }
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?organization ?organizationLabel ?organizationDescription ?location ?countryLabel WHERE {
+  {
+    SELECT ?organization (SAMPLE(?location_) AS ?location) (SAMPLE(?country_) AS ?country) WHERE {
+      VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+      OPTIONAL {
+        VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+        ?organization wdt:P131 | wdt:P159 ?location_
+      }
+      OPTIONAL {
+        VALUES ?organization { {% for q in qs %} wd:{{ q }} {% endfor %} }
+        ?organization wdt:P17 ?country_
+      }
+    }
+    GROUP BY ?organization
   }
-  GROUP BY ?organization
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?organization", "?country"], languages) }}
+  {{ sparql_helpers.descriptions(["?organization"], languages) }}
 }

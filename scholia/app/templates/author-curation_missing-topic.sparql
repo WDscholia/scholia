@@ -1,33 +1,34 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-?citations  ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work), 32)) AS ?workUrl)
-(?work AS ?wikidata_url)
-WITH {
-  SELECT (COUNT(?work) as ?count) ?work WHERE {
-  # Works by author
-    ?work wdt:P50 target: .
-  # Work does not have a main subject statement
-    FILTER NOT EXISTS { ?work wdt:P921 ?topic . }
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?citations ?work ?workLabel (CONCAT("/work/", SUBSTR(STR(?work),32)) AS ?workUrl) (?work AS ?wikidata_url) WHERE {
+  {
+    SELECT (COUNT(?work1) AS ?citations) ?work WHERE {
+      {
+        SELECT (COUNT(?work) AS ?count) ?work WHERE {
+          # Works by author
+          ?work wdt:P50 target: .
+          # Work does not have a main subject statement
+          FILTER NOT EXISTS {
+            ?work wdt:P921 ?topic .
+          }
+        }
+        GROUP BY ?work
+        ORDER BY DESC(?count)
+        LIMIT 2000
+      }
+      # Works cited
+      OPTIONAL {
+        ?work1 wdt:P2860 ?work
+      } .
+    }
+    GROUP BY ?work
+    ORDER BY DESC(?citations)
+    LIMIT 200
   }
-  GROUP BY ?work
-  ORDER BY DESC(?count)
-  LIMIT 2000
-} AS %works
-WITH {
-  SELECT (COUNT(?work1) as ?citations) ?work WHERE {
-  INCLUDE %works
-  # Works cited
-    OPTIONAL { ?work1 wdt:P2860 ?work }.
-  }
-  GROUP BY ?work
-  ORDER BY DESC(?citations)
-  LIMIT 200
-} AS %result
-WHERE {
-  INCLUDE %result
-  
   # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?work"], languages) }}
 }
 ORDER BY DESC(?citations)

@@ -1,34 +1,39 @@
 #defaultView:BarChart
-select ?year (count(?work) as ?number_of_publications) ?role where {
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT DISTINCT ?year (COUNT(?work) AS ?number_of_publications) ?role WHERE {
   {
-    select ?work (min(?years) as ?year) ?type_ ?venue where {
-      ?work wdt:P577 ?dates ;
-            p:P2860 ?citesStatement .
-      ?citesStatement pq:P3712 / wdt:P31 wd:Q96471816 .
-      bind(str(year(?dates)) as ?years) .
-      OPTIONAL {
-        ?work wdt:P31 wd:Q109229154 . bind("explicit" as ?type_)
-        ?work wdt:P1433 ?venue_ . ?venue_ rdfs:label ?venue . FILTER (LANG(?venue) = "en")
+    SELECT DISTINCT ?work (MIN(?years) AS ?year) ?type_ ?role WHERE {
+      {
+        wd:Q96471816 ^wdt:P31 / ^pq:P3712 ?citesStatement .
+        ?citesStatement ^p:P2860 ?work .
+        ?work wdt:P31 wd:Q109229154 ;
+              wdt:P1433 ?venue_ .
+         ?venue_ rdfs:label ?venue . FILTER (LANG(?venue) = "en" || LANG(?venue) = "mul")
         MINUS { ?venue_ wdt:P31 wd:Q1143604 }
-      }
-      OPTIONAL {
-        bind("nanopub" as ?type_) bind("Nanopublication" as ?venue)
+        BIND ("explicit" AS ?type_)
+      } UNION {
+        wd:Q96471816 ^wdt:P31 / ^pq:P3712 ?citesStatement .
+        ?citesStatement ^p:P2860 ?work .
         ?citesStatement prov:wasDerivedFrom ?reference .
-        ?reference pr:P854 | pr:P12545 ?referenceURL .
-        FILTER (
-          strstarts(str(?referenceURL), "https://w3id.org/np/") ||
-          strstarts(str(?referenceURL), "http://purl.org/np/")
-        )
+        ?reference pr:P12545 ?referenceURL .
+        BIND ("nanopub" AS ?type_)
+        BIND ("Nanopublication" AS ?venue)
+      } UNION {
+        wd:Q96471816 ^wdt:P31 / ^pq:P3712 ?citesStatement .
+        ?citesStatement ^p:P2860 ?work .
+        MINUS { ?work wdt:P31 wd:Q109229154 }
+        MINUS { ?citesStatement prov:wasDerivedFrom / pr:P12545 [] }
+        BIND ("other source" AS ?venue)
       }
-    }
-    group by ?work ?type_ ?venue
+      BIND (COALESCE(IF(BOUND(?type_),?venue,'other source')) AS ?role)
+      ?work wdt:P577 ?dates .
+      BIND (STR(YEAR(?dates)) AS ?years) .
+    } GROUP BY ?work ?type_ ?role
   }
-  bind(
-    coalesce(
-      if(bound(?type_), ?venue,
-      'other source')
-    ) as ?role
-  )
-}
-group by ?year ?role
-order by ?year
+} GROUP BY ?year ?role

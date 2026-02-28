@@ -1,80 +1,70 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT DISTINCT ?description ?value ?valueUrl
-WHERE {
-  BIND(target: AS ?podcast)
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT DISTINCT ?description ?value ?valueUrl WHERE {
+  BIND (target: AS ?podcast)
   {
-    BIND(1 AS ?order)
-    BIND("Title" AS ?description)
+    BIND (1 AS ?order)
+    BIND ("Title" AS ?description)
     ?podcast wdt:P1476 ?value .
   }
-  UNION
-  {
-    SELECT
-      (2 AS ?order)
-      ("Presenters" AS ?description)
-      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
-    {
-      BIND(1 AS ?dummy)
+  UNION {
+    SELECT (2 AS ?order) ("Presenters" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
+      BIND (1 AS ?dummy)
       target: wdt:P371 ?iri .
-      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
-      ?iri rdfs:label ?value_string . 
+      BIND (SUBSTR(STR(?iri),32) AS ?q)
+      ?iri rdfs:label ?value_string .
       FILTER (LANG(?value_string) = 'en')
-      BIND(COALESCE(?value_string, ?q) AS ?value_)
+      BIND (COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
   }
-  UNION
-  {
+  UNION {
     ?podcast wdt:P179 ?iri .
-    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    BIND (SUBSTR(STR(?iri),32) AS ?q)
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
-    BIND(STR(?value_string) AS ?value)
-    BIND(CONCAT("../podcast/", ?q) AS ?valueUrl)
-    BIND(3 AS ?order)
-    BIND("Podcast" AS ?description)
+    BIND (STR(?value_string) AS ?value)
+    BIND (CONCAT("../podcast/", ?q) AS ?valueUrl)
+    BIND (3 AS ?order)
+    BIND ("Podcast" AS ?description)
   }
-  UNION
-  {
+  UNION {
     ?podcast wdt:P577 ?publication_datetime .
-    BIND(xsd:date(?publication_datetime) AS ?value)
-    BIND(4 AS ?order)
-    BIND("Publication date" AS ?description)
+    BIND (xsd:date(?publication_datetime) AS ?value)
+    BIND (4 AS ?order)
+    BIND ("Publication date" AS ?description)
   }
-  UNION
-  {
+  UNION {
     ?podcast wdt:P4908 ?iri .
-    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    BIND (SUBSTR(STR(?iri),32) AS ?q)
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
-    BIND(STR(?value_string) AS ?value)
-    BIND(CONCAT("../podcast-season/", ?q) AS ?valueUrl)
-    BIND(5 AS ?order)
-    BIND("Season" AS ?description)
+    BIND (STR(?value_string) AS ?value)
+    BIND (CONCAT("../podcast-season/", ?q) AS ?valueUrl)
+    BIND (5 AS ?order)
+    BIND ("Season" AS ?description)
   }
-  UNION
-  {
+  UNION {
     ?podcast wdt:P155 ?iri .
-    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    BIND (SUBSTR(STR(?iri),32) AS ?q)
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
-    BIND(STR(?value_string) AS ?value)
-    BIND(CONCAT("../podcast-episode/", ?q) AS ?valueUrl)
-    BIND(6 AS ?order)
-    BIND("Previous episode" AS ?description)
+    BIND (STR(?value_string) AS ?value)
+    BIND (CONCAT("../podcast-episode/", ?q) AS ?valueUrl)
+    BIND (6 AS ?order)
+    BIND ("Previous episode" AS ?description)
   }
-  UNION
-  {
+  UNION {
     ?podcast wdt:P156 ?iri .
-    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+    BIND (SUBSTR(STR(?iri),32) AS ?q)
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
-    BIND(STR(?value_string) AS ?value)
-    BIND(CONCAT("../podcast-episode/", ?q) AS ?valueUrl)
-    BIND(7 AS ?order)
-    BIND("Next episode" AS ?description)
+    BIND (STR(?value_string) AS ?value)
+    BIND (CONCAT("../podcast-episode/", ?q) AS ?valueUrl)
+    BIND (7 AS ?order)
+    BIND ("Next episode" AS ?description)
   }
-} 
+}
 ORDER BY ?order

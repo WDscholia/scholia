@@ -1,26 +1,20 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:Graph
-
 PREFIX target1: <http://www.wikidata.org/entity/{{ q1 }}>
 PREFIX target2: <http://www.wikidata.org/entity/{{ q2 }}>
-
-SELECT
-  ?author1 ?author1Label
-  ?author2 ?author2Label
-WITH {  
-  SELECT
-    DISTINCT 
-    ?author1
-    ?author2
-  WHERE {
-    ?author1 ( wdt:P108 | wdt:P1416 ) / wdt:P17 target1: .
-    ?author2 ( wdt:P108 | wdt:P1416 ) / wdt:P17 target1: .
-    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) target2: .
-    ?work wdt:P50 ?author1 .  
-    ?work wdt:P50 ?author2 .
-    FILTER (?author1 != ?author2)
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?author1 ?author1Label ?author2 ?author2Label WHERE {
+  {
+    SELECT DISTINCT ?author1 ?author2 WHERE {
+      ?author1 (wdt:P108 | wdt:P1416)/wdt:P17 target1: .
+      ?author2 (wdt:P108 | wdt:P1416)/wdt:P17 target1: .
+      ?work wdt:P921/(wdt:P361+ | wdt:P1269+ | (wdt:P31*/wdt:P279*)) target2: .
+      ?work wdt:P50 ?author1 .
+      ?work wdt:P50 ?author2 .
+      FILTER (?author1 != ?author2)
+    }
   }
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?author2", "?author1"], languages) }}
 }

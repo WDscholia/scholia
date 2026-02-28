@@ -1,40 +1,29 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?score ?author ?authorLabel
-WITH {
-  SELECT 
-    ?author
-    (SUM(?score_) AS ?score)
-  WHERE {
-    { 
-      ?author wdt:P101/wdt:P279* target: .
-      BIND(20 AS ?score_)
-    }
-    UNION
-    {
-      SELECT (3 AS ?score_) ?author WHERE {
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?score ?author ?authorLabel WHERE {
+  {
+    SELECT ?author (SUM(?score_) AS ?score) WHERE {
+      {
+        ?author wdt:P101/wdt:P279* target: .
+        BIND (20 AS ?score_)
+      }
+      UNION {
         ?work wdt:P50 ?author ;
               wdt:P921/wdt:P279* target: .
+        BIND (3 AS ?score_)
       }
-    }
-    UNION
-    {
-      SELECT (1 AS ?score_) ?author WHERE {
-        ?cited_work wdt:P50 ?author .
-        ?citing_work wdt:P2860 ?cited_work .
-        ?citing_work wdt:P921/wdt:P279* target: .
+      UNION {
+        ?citing_work wdt:P2860 ?work ;
+                     wdt:P921/wdt:P279* target: .
+        ?work wdt:P50 ?author .
+        BIND (1 AS ?score_)
       }
-    }
+    } GROUP BY ?author
   }
-  GROUP BY ?author
-  ORDER BY DESC(?score)
+
+  {{ sparql_helpers.labels(["?author"], languages) }}
+} ORDER BY DESC(?score)
   LIMIT 200
-} AS %results 
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,jp,no,ru,sv,zh". }
-}
-ORDER BY DESC(?score)
-LIMIT 200

@@ -1,14 +1,11 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT DISTINCT
-  ?author ?authorLabel ?authorDescription
-  (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-
-  ("ORCID search ↗" AS ?orcid_search)
-  (CONCAT("https://orcid.org/orcid-search/search/?searchQuery=", ENCODE_FOR_URI(?authorLabel)) AS ?orcid_searchUrl)
-
-WHERE {
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT DISTINCT ?author ?authorLabel ?authorDescription (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ("ORCID search ↗" AS ?orcid_search) (CONCAT("https://orcid.org/orcid-search/search/?searchQuery=", ENCODE_FOR_URI(?authorLabel)) AS ?orcid_searchUrl) WHERE {
   target: wdt:P50 ?author .
-  FILTER NOT EXISTS { ?author wdt:P496 ?orcid . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  FILTER NOT EXISTS {
+    ?author wdt:P496 ?orcid .
+  }
+  {{ sparql_helpers.labels(["?author"], languages) }}
 }

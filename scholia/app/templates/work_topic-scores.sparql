@@ -1,41 +1,34 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?score ?topic ?topicLabel
-WITH {
-  SELECT
-    (SUM(?score_) AS ?score)
-    ?topic
-  WHERE {
-    { 
-      target: wdt:P921 ?topic .
-      BIND(20 AS ?score_)
-    }
-    UNION
-    { 
-     target: wdt:P921/wdt:P279 ?topic .
-     BIND(3 AS ?score_)
-    }
-    UNION
-    {
-      # Topic of a cited work
-      target: wdt:P2860/wdt:P921 ?topic .
-      BIND(1 AS ?score_)
-    }
-    UNION
-    {
-      SELECT (1 AS ?score_) ?topic WHERE {
-        ?citing_work wdt:P2860 target: .
-        ?citing_work wdt:P921 ?topic . 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?score ?topic ?topicLabel WHERE {
+  {
+    SELECT (SUM(?score_) AS ?score) ?topic WHERE {
+      {
+        target: wdt:P921 ?topic .
+        BIND (20 AS ?score_)
+      }
+      UNION {
+        target: wdt:P921/wdt:P279 ?topic .
+        BIND (3 AS ?score_)
+      }
+      UNION {
+        # Topic of a cited work
+        target: wdt:P2860/wdt:P921 ?topic .
+        BIND (1 AS ?score_)
+      }
+      UNION {
+        SELECT (1 AS ?score_) ?topic WHERE {
+          ?citing_work wdt:P2860 target: .
+          ?citing_work wdt:P921 ?topic .
+        }
       }
     }
+    GROUP BY ?topic
   }
-  GROUP BY ?topic
-} AS %results 
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,jp,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?topic"], languages) }}
 }
 ORDER BY DESC(?score)
 LIMIT 200

@@ -1,19 +1,16 @@
-SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID WITH {
-  SELECT ?mol ?InChIKey WHERE {
-    SERVICE wikibase:mwapi {
-        bd:serviceParam wikibase:endpoint "www.wikidata.org";
-        wikibase:api "Search";
-        mwapi:srsearch "_shortkey_ haswbstatement:P235";
-        mwapi:srlimit "max".
-        ?mol wikibase:apiOutputItem mwapi:title.
-      }
-    ?mol wdt:P235 ?InChIKey .
-    FILTER (regex(str(?InChIKey), "^_shortkey_"))
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?mol ?molLabel ?InChIKey ?CAS ?ChemSpider ?PubChem_CID {
+  ?mol wdt:P235 ?InChIKey .
+  FILTER (REGEX(?InChIKey,"^_shortkey_"))
+  OPTIONAL {
+    ?mol wdt:P231 ?CAS
   }
-} AS %MOLS {
-  INCLUDE %MOLS
-  OPTIONAL { ?mol wdt:P231 ?CAS }
-  OPTIONAL { ?mol wdt:P661 ?ChemSpider }
-  OPTIONAL { ?mol wdt:P662 ?PubChem_CID }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  OPTIONAL {
+    ?mol wdt:P661 ?ChemSpider
+  }
+  OPTIONAL {
+    ?mol wdt:P662 ?PubChem_CID
+  }
+  {{ sparql_helpers.labels(["?mol"], languages) }}
 }

@@ -1,22 +1,21 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # Count the number of citations for each journal published by a specified publisher
-SELECT
-  ?number_of_citations
-  ?work ?workLabel ?journal ?journalLabel 
-WITH {
-  SELECT ?work ?journal (COUNT(?citing_work) AS ?number_of_citations) WHERE {
-    ?journal wdt:P123 target: .
-    ?work wdt:P1433 ?journal .
-    ?citing_work wdt:P2860 ?work
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?number_of_citations ?work ?workLabel ?journal ?journalLabel WHERE {
+  {
+    SELECT ?work ?journal (COUNT(?citing_work) AS ?number_of_citations) WHERE {
+      ?journal wdt:P123 target: .
+      ?work wdt:P1433 ?journal .
+      ?citing_work wdt:P2860 ?work
+    }
+    GROUP BY ?work ?journal
+    ORDER BY DESC(?number_of_citations)
+    LIMIT 500
   }
-  GROUP BY ?work ?journal
-  ORDER BY DESC(?number_of_citations)
-  LIMIT 500  
-} AS %result
-WHERE {
-  INCLUDE %result
   # Label the result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?work", "?journal"], languages) }}
 }
 ORDER BY DESC(?number_of_citations)

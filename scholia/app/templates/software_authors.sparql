@@ -1,24 +1,19 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?count
-  ?author ?authorLabel ?authorDescription
-  ?example_work ?example_workLabel
-WITH{
-  SELECT
-    (COUNT(?work) AS ?count)
-    ?author
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* target: ;
-          wdt:P50 ?author .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?author ?authorLabel ?authorDescription ?example_work ?example_workLabel WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?author (SAMPLE(?work) AS ?example_work) WHERE {
+      ?work (wdt:P2283 | wdt:P4510)/wdt:P279* target: ;
+            wdt:P50 ?author .
+    }
+    GROUP BY ?author
+    ORDER BY DESC(?count)
+    LIMIT 500
   }
-  GROUP BY ?author
-  ORDER BY DESC(?count)
-  LIMIT 500
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_work", "?author"], languages) }}
+  {{ sparql_helpers.descriptions(["?author"], languages) }}
 }
 ORDER BY DESC(?count)

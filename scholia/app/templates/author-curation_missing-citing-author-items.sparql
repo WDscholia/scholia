@@ -1,35 +1,18 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  # Number of works with the coauthor
-  ?count
-
-  # The citing author as a string, - rather than as an item
-  ?citing_author
-
-  # Build URL to the Author disambiguator tool
-  (CONCAT(
-      'https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=',
-      ENCODE_FOR_URI(?citing_author)) AS ?resolver_url)
-
-  ?example_citing_work ?example_citing_workLabel
-  (CONCAT("/work/", SUBSTR(STR(?example_citing_work), 32)) AS ?example_citing_workUrl)
-WITH {
-  SELECT
-    (COUNT(?work) as ?count)
-    ?citing_author
-    (SAMPLE(?citing_work) AS ?example_citing_work) 
-  WHERE {
-    ?work wdt:P50 target: .
-    ?citing_work wdt:P2860 ?work .
-    ?citing_work wdt:P2093 ?citing_author .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?citing_author (CONCAT('https://author-disambiguator.toolforge.org/names_oauth.php?doit=Look+for+author&name=', ENCODE_FOR_URI(?citing_author)) AS ?resolver_url) ?example_citing_work ?example_citing_workLabel (CONCAT("/work/", SUBSTR(STR(?example_citing_work),32)) AS ?example_citing_workUrl) WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?citing_author (SAMPLE(?citing_work) AS ?example_citing_work) WHERE {
+      ?work wdt:P50 target: .
+      ?citing_work wdt:P2860 ?work .
+      ?citing_work wdt:P2093 ?citing_author .
+    }
+    GROUP BY ?citing_author
   }
-  GROUP BY ?citing_author
-} AS %result
-WHERE {
-  INCLUDE %result
-  # Label the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?example_citing_work"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 1000

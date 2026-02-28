@@ -1,28 +1,23 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Authors for specific topics
-SELECT
-  ((?distinct_topics + ?topics / (?topics + 100)) AS ?score)
-  ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author), 32)) AS ?authorUrl)
-  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT
-    (COUNT(DISTINCT ?topic) AS ?distinct_topics)
-    (COUNT(?topic) AS ?topics)
-    ?author
-    (SAMPLE(?work) AS ?example_work)
-  WHERE {
-    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    
-    # A broad query including "(wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )" seems to take
-    # long time and time out.
-    ?work wdt:P921 ?topic  ;
-          wdt:P50 ?author . 
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ((?distinct_topics + ?topics / (?topics + 100)) AS ?score) ?author ?authorLabel (CONCAT("/author/", SUBSTR(STR(?author),32)) AS ?authorUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?topic) AS ?distinct_topics) (COUNT(?topic) AS ?topics) ?author (SAMPLE(?work) AS ?example_work) WHERE {
+      #    VALUES ?topic { {% for q in qs %} wd:{{ q }} {% endfor %} }
+      # A broad query including "(wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )" seems to take
+      # long time and time out.
+      ?work wdt:P921 ?topic ;
+            wdt:P50 ?author .
+    }
+    GROUP BY ?author
+    ORDER BY DESC(?distinct_topics) DESC(?topics)
+    LIMIT 200
   }
-  GROUP BY ?author
-  ORDER BY DESC(?distinct_topics) DESC(?topics)
-  LIMIT 200
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+
+  {{ sparql_helpers.labels(["?author", "?example_work"], languages) }}
 }
 ORDER BY DESC(?score)

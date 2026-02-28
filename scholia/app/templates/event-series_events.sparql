@@ -1,18 +1,17 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 # title: List of event and proceedings for a specific event series
-SELECT DISTINCT 
-  (SAMPLE(?years) AS ?year)
-  (SAMPLE(?ordinal_) AS ?ordinal)
-  (SAMPLE(?short_names) AS ?short_name)
-  ?event ?eventLabel (CONCAT("/event/", SUBSTR(STR(?event), 32)) AS ?eventUrl)
-  ?proceedings ?proceedingsLabel (CONCAT("/venue/", SUBSTR(STR(?proceedings), 32)) AS ?proceedingsUrl)
-WHERE {
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT DISTINCT (SAMPLE(?years) AS ?year) (SAMPLE(?ordinal_) AS ?ordinal) (SAMPLE(?short_names) AS ?short_name) ?event ?eventLabel (CONCAT("/event/", SUBSTR(STR(?event),32)) AS ?eventUrl) ?proceedings ?proceedingsLabel (CONCAT("/venue/", SUBSTR(STR(?proceedings),32)) AS ?proceedingsUrl) WHERE {
   {
     ?event wdt:P179 | wdt:P31 target: .
     OPTIONAL {
       ?event wdt:P585 | wdt:P580 ?datetime .
-      BIND(YEAR(?datetime) AS ?years)
+      BIND (YEAR(?datetime) AS ?years)
     }
     OPTIONAL {
       ?event wdt:P1813 ?short_names
@@ -20,20 +19,19 @@ WHERE {
     OPTIONAL {
       ?proceedings wdt:P4745 ?event
     }
-    OPTIONAL{
+    OPTIONAL {
       ?event p:P179/pq:P1545 ?ordinal_
     }
   }
-  UNION
-  {
+  UNION {
     # proceedings even if the event is not there!!!
-    ?proceedings ( wdt:P179 / wdt:P4745 ) target: .
+    ?proceedings (wdt:P179/wdt:P4745) target: .
     OPTIONAL {
       ?proceedings wdt:P577 ?datetime .
-      BIND(YEAR(?datetime) AS ?years)    
+      BIND (YEAR(?datetime) AS ?years)
     }
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
-  }
+  {{ sparql_helpers.labels_unbound(["?event", "?proceedings"], languages) }}
+}
 GROUP BY ?event ?year ?eventLabel ?proceedings ?proceedingsLabel
 ORDER BY DESC(?year)

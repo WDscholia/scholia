@@ -1,36 +1,30 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #description: Show software library, programming language and developer dependencies
-#sparql_endpoint = https://query.wikidata.org/sparql
-#sparql_endpoint_name= WDQS main
-#sparql_editurl = https://query.wikidata.org/#
-#sparql_embedurl = https://query.wikidata.org/embed.html#
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 #defaultView:Graph
-SELECT ?resource1 ?resource1Label ?image1 ?rgb ?resource2 ?resource2Label ?image2
-WITH {
-  SELECT
-    ?resource1 (SAMPLE(?image1_) AS ?image1) ?rgb
-    ?resource2 (SAMPLE(?image2_) AS ?image2)
-    {
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?resource1 ?resource1Label ?resource2 ?resource2Label ?image2 {
+  {
+    SELECT ?resource1 (SAMPLE(?image1_) AS ?image1) ?rgb ?resource2 (SAMPLE(?image2_) AS ?image2) {
       {
         # root node with coloring
-        BIND(target: AS ?resource1)
-        BIND("3080BB" AS ?rgb)
+        BIND (target: AS ?resource1)
+        BIND ("3080BB" AS ?rgb)
       }
-      UNION
-      {
+      UNION {
         # dependencies, programming language, developer
-        target: ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275 )+ ?resource1 .
-        OPTIONAL { ?resource1 wdt:P18 ?image1_ }
+        target: (wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275)+ ?resource1 .
+        OPTIONAL {
+          ?resource1 wdt:P18 ?image1_
+        }
       }
-      target: ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275 )+ ?resource2 .
-      OPTIONAL { ?resource2 wdt:P18 ?image2_ }
-      ?resource1 ( wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275 ) ?resource2 .
+      target: (wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275)+ ?resource2 .
+      OPTIONAL {
+        ?resource2 wdt:P18 ?image2_
+      }
+      ?resource1 (wdt:P1547 | wdt:P277 | wdt:P178 | wdt:P2283 | wdt:P275) ?resource2 .
     }
     GROUP BY ?resource1 ?resource2 ?rgb
-} AS %result
-{
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  }
+  {{ sparql_helpers.labels(["?resource1", "?resource2"], languages) }}
 }

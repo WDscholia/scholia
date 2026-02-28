@@ -1,56 +1,48 @@
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT DISTINCT ?description ?value ?valueUrl
-WHERE {
-  BIND(target: AS ?podcast)
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT DISTINCT ?description ?value ?valueUrl WHERE {
+  BIND (target: AS ?podcast)
   {
-    BIND(1 AS ?order)
-    BIND("Title" AS ?description)
-    ?podcast wdt:P1476 ?value .
+    BIND (1 AS ?order)
+    BIND ("Title" AS ?description)
+    target: wdt:P1476 ?value .
   }
-  UNION
-  {
-    SELECT
-      (2 AS ?order)
-      ("Presenters" AS ?description)
-      (GROUP_CONCAT(?value_; separator=", ") AS ?value)
-      (CONCAT("../authors/", GROUP_CONCAT(?q; separator=",")) AS ?valueUrl)
-    {
-      BIND(1 AS ?dummy)
+  UNION {
+    SELECT (2 AS ?order) ("Presenters" AS ?description) (GROUP_CONCAT(?value_; SEPARATOR=", ") AS ?value) (CONCAT("../authors/", GROUP_CONCAT(?q; SEPARATOR=",")) AS ?valueUrl) {
+      BIND (1 AS ?dummy)
       target: wdt:P371 ?iri .
-      BIND(SUBSTR(STR(?iri), 32) AS ?q) 
-      ?iri rdfs:label ?value_string . 
+      BIND (SUBSTR(STR(?iri),32) AS ?q)
+      ?iri rdfs:label ?value_string .
       FILTER (LANG(?value_string) = 'en')
-      BIND(COALESCE(?value_string, ?q) AS ?value_)
+      BIND (COALESCE(?value_string, ?q) AS ?value_)
     }
     GROUP BY ?dummy
   }
-  UNION
-  {
-    BIND(3 AS ?order)
-    BIND("Language" AS ?description)
-    ?podcast wdt:P407 ?iri .
-    BIND(SUBSTR(STR(?iri), 32) AS ?q) 
+  UNION {
+    BIND (3 AS ?order)
+    BIND ("Language" AS ?description)
+    target: wdt:P407 ?iri .
+    BIND (SUBSTR(STR(?iri),32) AS ?q)
     ?iri rdfs:label ?value_string .
     FILTER (LANG(?value_string) = 'en')
-    BIND(STR(?value_string) AS ?value)
-    BIND(CONCAT("../language/", ?q, "/podcast") AS ?valueUrl)
+    BIND (STR(?value_string) AS ?value)
+    BIND (CONCAT("../language/", ?q, "/podcast") AS ?valueUrl)
   }
-  UNION
-  {
+  UNION {
     SELECT ?description ?order (MAX(?value_) AS ?value) WHERE {
-      BIND(target: AS ?podcast)
-      ?podcast wdt:P1113 ?value_ .
-      BIND(4 AS ?order)
-      BIND("Number of episodes" AS ?description)
-    } GROUP BY ?description ?order
+      BIND (target: AS ?podcast)
+      target: wdt:P1113 ?value_ .
+      BIND (4 AS ?order)
+      BIND ("Number of episodes" AS ?description)
+    }
+    GROUP BY ?description ?order
   }
-  UNION
-  {
-    BIND(5 AS ?order)
-    BIND("Web feed" AS ?description)
-    ?podcast wdt:P1019 ?valueUrl .
-    BIND("feed" AS ?value)
+  UNION {
+    BIND (5 AS ?order)
+    BIND ("Web feed" AS ?description)
+    target: wdt:P1019 ?valueUrl .
+    BIND ("feed" AS ?value)
   }
-} 
+}
 ORDER BY ?order

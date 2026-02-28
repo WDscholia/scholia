@@ -1,19 +1,16 @@
-SELECT
-  ?count
-  ?printer ?printerLabel ?printerDescription (CONCAT("/printer/", SUBSTR(STR(?printer), 32)) AS ?printerUrl)
-  ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WHERE {
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?printer ?printerLabel ?printerDescription (CONCAT("/printer/", SUBSTR(STR(?printer),32)) AS ?printerUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
   {
-    SELECT
-      (COUNT(?work) AS ?count)
-      ?printer
-      (SAMPLE(?work) AS ?example_work)
-    WHERE {
+    SELECT (COUNT(?work) AS ?count) ?printer (SAMPLE(?work) AS ?example_work) WHERE {
       ?work wdt:P872 ?printer .
     }
     GROUP BY ?printer
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?printer", "?example_work"], languages) }}
+  {{ sparql_helpers.descriptions(["?printer"], languages) }}
 }
 ORDER BY DESC(?count)
 LIMIT 1000

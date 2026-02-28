@@ -1,27 +1,22 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 #defaultView:Table
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?count (CONCAT("/topics/{{ q }},", SUBSTR(STR(?topic), 32)) AS ?countUrl)
-       ?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
-       ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work), 32)) AS ?example_workUrl)
-WITH {
-  SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
-    # Find works for the specific queried topic
-	  VALUES ?p { wdt:P6104 wdt:P5008 }
-	  SERVICE bd:sample { ?work ?p target: . bd:serviceParam bd:sample.limit 10000 }
-    
-    # Find co-occuring topics
-    ?work wdt:P921 ?topic .
-    
-    # Avoid listing the queried topic
+?topic ?topicLabel (CONCAT("/topic/", SUBSTR(STR(?topic),32)) AS ?topicUrl) ?example_work ?example_workLabel (CONCAT("/work/", SUBSTR(STR(?example_work),32)) AS ?example_workUrl) WHERE {
+  {
+    SELECT (COUNT(?work) AS ?count) ?topic (SAMPLE(?work) AS ?example_work) WHERE {
+      # Find works for the specific queried topic
+      ?work wdt:P6104|wdt:P5008 target: .
+      # Find co-occuring topics
+      ?work wdt:P921 ?topic .
+      # Avoid listing the queried topic
       FILTER (target: != ?topic)
+    }
+    GROUP BY ?topic
   }
-  GROUP BY ?topic
-} AS %result
-WHERE {
   # Label the results
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?topic", "?example_work"], languages) }}
 }
 ORDER BY DESC(?count)

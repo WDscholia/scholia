@@ -1,64 +1,56 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?score ?topic ?topicLabel ?topicDescription
-(CONCAT("/topic/", SUBSTR(STR(?topic), 32)) AS ?topicUrl)
-WITH {
-  SELECT
-    DISTINCT ?person
-  WHERE {
-    ?event (wdt:P179 | wdt:P31) target: .
-    {
-      # speaker
-      ?event wdt:P823 ?person .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?score ?topic ?topicLabel ?topicDescription (CONCAT("/topic/", SUBSTR(STR(?topic),32)) AS ?topicUrl) WHERE {
+  {
+    SELECT (SUM(?score_) AS ?score) ?topic WHERE {
+      # For some reason a path query does not work here.
+      {
+        ?event wdt:P179 target: .
+      }
+      UNION {
+        ?event wdt:P31 target: .
+      }
+      {
+        ?event wdt:P921 ?topic .
+        BIND (50 AS ?score_)
+      }
+      UNION {
+        {
+          SELECT DISTINCT ?person WHERE {
+            ?event (wdt:P179 | wdt:P31) target: .
+            {
+              # speaker
+              ?event wdt:P823 ?person .
+            }
+            UNION {
+              # organizer
+              ?event wdt:P664 ?person .
+            }
+            UNION {
+              # participant
+              ?person wdt:P1344 | ^wdt:P710 ?event .
+            }
+            UNION {
+              # author
+              ?person ^wdt:P50/wdt:P1433/wdt:P4745 ?event .
+            }
+          }
+        }
+        ?person ^wdt:P50/wdt:P921 ?topic .
+        BIND (1 AS ?score_)
+      }
+      UNION {
+        ?event ^wdt:P4745/^wdt:P1433/wdt:P921 ?topic .
+        BIND (7 AS ?score_)
+      }
     }
-    UNION
-    {
-      # organizer
-      ?event wdt:P664 ?person .
-    }
-    UNION
-    {
-      # participant
-      ?person wdt:P1344 | ^wdt:P710 ?event .
-    }
-    UNION
-    {
-      # author
-      ?person ^wdt:P50 / wdt:P1433 / wdt:P4745 ?event .
-    }
+    GROUP BY ?topic
   }
-} AS %people  
-WITH {
-  SELECT
-    (SUM(?score_) AS ?score) ?topic
-  WHERE {
-
-    # For some reason a path query does not work here.
-    { ?event wdt:P179 target: . }
-    UNION
-    { ?event wdt:P31 target: . }
-
-    {
-      ?event wdt:P921 ?topic .
-      BIND(50 AS ?score_)
-    }
-    UNION
-    {
-      INCLUDE %people
-      ?person ^wdt:P50 / wdt:P921 ?topic .
-      BIND(1 AS ?score_)
-    }
-    UNION
-    {
-      ?event ^wdt:P4745 / ^wdt:P1433 / wdt:P921 ?topic .
-      BIND(7 AS ?score_)
-    }
-  }
-  GROUP BY ?topic
-} AS %results
-WHERE {
-  INCLUDE %results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh". }
+  {{ sparql_helpers.labels(["?topic"], languages) }}
+  {{ sparql_helpers.descriptions(["?topic"], languages) }}
 }
 ORDER BY DESC(?score)
 LIMIT 200

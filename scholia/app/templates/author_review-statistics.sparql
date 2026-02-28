@@ -1,45 +1,41 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 # Venue statistics for a specific reviewer
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?count (SAMPLE(?short_name_) AS ?short_name)
-  ?venue ?venueLabel
-  ?topics ?topicsUrl
-WITH {
-  SELECT
-    (COUNT(DISTINCT ?work) as ?count)
-    ?venue
-    (GROUP_CONCAT(DISTINCT ?topic_label; separator=", ") AS ?topics)
-    (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic), 32); separator=",")) AS ?topicsUrl)
-  WHERE {
-    {
-      ?work wdt:P4032 target: ;
-            wdt:P1433 ?venue .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count (SAMPLE(?short_name_) AS ?short_name) ?venue ?venueLabel ?topics ?topicsUrl WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?work) AS ?count) ?venue (GROUP_CONCAT(DISTINCT ?topic_label; SEPARATOR=", ") AS ?topics) (CONCAT("../topics/", GROUP_CONCAT(DISTINCT SUBSTR(STR(?topic),32); SEPARATOR=",")) AS ?topicsUrl) WHERE {
+      {
+        ?work wdt:P4032 target: ;
+              wdt:P1433 ?venue .
+      }
+      UNION {
+        # program committee member for event in a series (work is here the event)
+        ?work wdt:P179 ?venue ;
+              wdt:P5804 target:
+      }
+      UNION {
+        # program committee member for event not in a series
+        ?venue wdt:P5804 target: .
+        MINUS {
+          ?venue wdt:P179 []
+        }
+        BIND ("dummy" AS ?work)
+      }
+      OPTIONAL {
+        ?venue wdt:P921 ?topic .
+        ?topic rdfs:label ?topic_label . FILTER (LANG(?topic_label) = 'en')
+      }
     }
-    UNION
-    {
-      # program committee member for event in a series (work is here the event)
-      ?work wdt:P179 ?venue ;
-            wdt:P5804 target: 
-    }
-    UNION
-    {
-      # program committee member for event not in a series
-      ?venue wdt:P5804 target: .
-      MINUS { ?venue wdt:P179 [] }
-      BIND("dummy" AS ?work)
-    }
-    OPTIONAL {
-      ?venue wdt:P921 ?topic .
-      ?topic rdfs:label ?topic_label . FILTER(LANG(?topic_label) = 'en')
-    }
+    GROUP BY ?venue
   }
-  GROUP BY ?venue
-} AS %result
-WHERE {
-  INCLUDE %result
-  OPTIONAL { ?venue wdt:P1813 ?short_name_ . }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }  
-} 
+  OPTIONAL {
+    ?venue wdt:P1813 ?short_name_ .
+  }
+  {{ sparql_helpers.labels(["?venue"], languages) }}
+}
 GROUP BY ?count ?venue ?venueLabel ?topics ?topicsUrl
 ORDER BY DESC(?count)

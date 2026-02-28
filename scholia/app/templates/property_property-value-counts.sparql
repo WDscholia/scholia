@@ -1,18 +1,17 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 #defaultView:BubbleChart
-
 PREFIX target: <http://www.wikidata.org/prop/direct/{{ p }}>
-
-SELECT ?count ?o ?oLabel 
-WITH {
-  SELECT (COUNT(?s) AS ?count) ?o WHERE {
-    ?s target: ?o .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?o ?oLabel WHERE {
+  {
+    SELECT (COUNT(?s) AS ?count) ?o WHERE {
+      ?s target: ?o .
+    }
+    GROUP BY ?o
+    ORDER BY DESC(?count)
+    LIMIT 100
   }
-  GROUP BY ?o
-  ORDER BY DESC(?count)
-  LIMIT 100
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label { bd:serviceParam wikibase:language  "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?o"], languages) }}
 }
 ORDER BY DESC(?count)

@@ -1,21 +1,17 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?count
-  ?type ?typeLabel ?typeDescription
-WITH {
-  SELECT
-    (COUNT(*) AS ?count)
-    ?type
- 
-  WHERE {
-    [] wdt:P275 target: ; 
-       wdt:P31 ?type .
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?count ?type ?typeLabel ?typeDescription WHERE {
+  {
+    SELECT (COUNT(*) AS ?count) ?type WHERE {
+      [] wdt:P275 target: ;
+         wdt:P31 ?type .
+    }
+    GROUP BY ?type
   }
-  GROUP BY ?type
-} AS %types
-WHERE {
-  INCLUDE %types
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  {{ sparql_helpers.labels(["?type"], languages) }}
+  {{ sparql_helpers.descriptions(["?type"], languages) }}
 }
 ORDER BY DESC(?count)

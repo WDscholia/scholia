@@ -1,13 +1,20 @@
-SELECT ?work ?workLabel ?example_author ?example_authorLabel
-WITH {
-  SELECT ?work (SAMPLE(?author) AS ?example_author) WHERE {
-    VALUES ?work { {% for q in qs %} wd:{{ q }} {% endfor %} }
-    OPTIONAL { ?work wdt:P50 ?author }
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?work ?workLabel ?example_author ?example_authorLabel WHERE {
+  {
+    VALUES ?work { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
+    FILTER NOT EXISTS { ?work wdt:P50 [] }
   }
-  GROUP BY ?work
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  UNION {
+    {
+      SELECT ?work (SAMPLE(?author) AS ?example_author) WHERE {
+        VALUES ?work { {% for q in qs -%} wd:{{ q }} {% endfor -%} }
+        ?work wdt:P50 ?author
+      }
+      GROUP BY ?work
+    }
+    {{ sparql_helpers.labels(["?work", "?example_author"], languages) }}
+  }
 }

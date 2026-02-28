@@ -1,11 +1,14 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT ?wpid ?organism ?organismLabel ?pathwayDescription
-WHERE {
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?wpid ?organism ?organismLabel ?pathwayDescription WHERE {
   VALUES ?pathway { target: }
   OPTIONAL {
     target: wdt:P2410 ?wpid ;
-    wdt:P703 ?organism .
+            wdt:P703 ?organism .
   }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . }
+  {{ sparql_helpers.labels(["?organism"], languages) }}
+  {{ sparql_helpers.descriptions(["?pathway"], languages) }}
 }

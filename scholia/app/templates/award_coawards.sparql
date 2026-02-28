@@ -1,18 +1,18 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
-SELECT
-  ?number_of_corecipients
-  ?award ?awardLabel ?awardDescription
-WITH {
-     SELECT DISTINCT ?award (COUNT(?recipient) AS ?number_of_corecipients) WHERE {
-    ?recipient wdt:P166 target: .
-	?recipient wdt:P166 ?award .
-			       FILTER (?award != target:)
-     }
-     GROUP BY ?award
-} AS %result
-WHERE {
-  INCLUDE %result 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?number_of_corecipients ?award ?awardLabel ?awardDescription WHERE {
+  {
+    SELECT DISTINCT ?award (COUNT(?recipient) AS ?number_of_corecipients) WHERE {
+      ?recipient wdt:P166 target: .
+      ?recipient wdt:P166 ?award .
+      FILTER (?award != target:)
+    }
+    GROUP BY ?award
+  }
+  {{ sparql_helpers.labels(["?award"], languages) }}
+  {{ sparql_helpers.descriptions(["?award"], languages) }}
 }
 ORDER BY DESC(?number_of_corecipients)

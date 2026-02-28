@@ -1,30 +1,23 @@
+{% import 'sparql-helpers.sparql' as sparql_helpers -%}
+
 # title: Venues citing articles from this specific journal
-
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
-
 #defaultView:Table
-SELECT
-  ?count
-  ?short_name
-  ?citing_journal ?citing_journalLabel 
-WITH {
-  SELECT
-    (COUNT(?citing_work) AS ?count)
-    ?citing_journal
-    (SAMPLE(?short_name_) AS ?short_name)
-  WHERE {
-    ?work wdt:P1433 target: .
-    ?citing_work wdt:P2860 ?work .
-    ?citing_work wdt:P1433 ?citing_journal .
-    OPTIONAL { ?citing_journal wdt:P1813 ?short_name_ . }
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?count ?short_name ?citing_journal ?citing_journalLabel WHERE {
+  {
+    SELECT (COUNT(?citing_work) AS ?count) ?citing_journal (SAMPLE(?short_name_) AS ?short_name) WHERE {
+      ?work wdt:P1433 target: .
+      ?citing_work wdt:P2860 ?work .
+      ?citing_work wdt:P1433 ?citing_journal .
+      OPTIONAL {
+        ?citing_journal wdt:P1813 ?short_name_ .
+      }
+    }
+    GROUP BY ?citing_journal
+    ORDER BY DESC(?count)
+    LIMIT 1000
   }
-  GROUP BY ?citing_journal
-  ORDER BY DESC(?count)
-  LIMIT 1000
-} AS %result
-WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" . } 
+  {{ sparql_helpers.labels(["?citing_journal"], languages) }}
 }
 ORDER BY DESC(?count)
