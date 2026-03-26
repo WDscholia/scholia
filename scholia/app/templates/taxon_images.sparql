@@ -1,0 +1,12 @@
+#defaultView:ImageGrid
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+SELECT ?item ?itemLabel ?image WITH {
+  SELECT ?item ?image WHERE {
+   ?item wdt:P31 wd:Q16521 .
+   ?item wdt:P171 target: .
+   ?item wdt:P18 ?image .
+  } LIMIT 50
+} AS %TAXONS WHERE {
+  INCLUDE %TAXONS
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}

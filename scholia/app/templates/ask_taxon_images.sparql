@@ -1,0 +1,2 @@
+PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+ASK WHERE { [] wdt:P31 wd:Q16521; wdt:P171 target: ; wdt:P18 ?o. }
