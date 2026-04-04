@@ -7,11 +7,11 @@ SELECT ?organization ?organizationLabel ?geo ?count ?layer WHERE {
     SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
       ?work wdt:P50 target: ;
             wdt:P50 ?author .
-      FILTER (?author != target:)
+      FILTER (STR(?author) != STR(target:))
       ?author (wdt:P108 | wdt:P463 | wdt:P1416)/wdt:P361* ?organization .
       ?organization (wdt:P625 | ((wdt:P276 | wdt:P159)/wdt:P625)) ?geo .
     }
-    GROUP BY ?organization ?geo ?count
+    GROUP BY ?organization ?geo
     ORDER BY DESC(?count)
     LIMIT 2000
   }
