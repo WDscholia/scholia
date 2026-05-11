@@ -29,6 +29,7 @@ import time
 from typing import Optional
 
 import requests
+from requests.adapters import HTTPAdapter
 
 from .config import config
 
@@ -36,6 +37,15 @@ from .config import config
 USER_AGENT = config['requests'].get('user_agent')
 
 HEADERS = {'User-Agent': USER_AGENT}
+
+# Shared session for connection pooling.
+# Without this, every requests.get() opens a new TCP/SSL connection,
+# which exhausts file descriptors under load (OSError: [Errno 24]).
+_shared_session = requests.Session()
+_shared_session.headers.update(HEADERS)
+_adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20)
+_shared_session.mount('https://', _adapter)
+_shared_session.mount('http://', _adapter)
 
 # Must be indexed from zero
 MONTH_NUMBER_TO_MONTH = {
@@ -199,7 +209,7 @@ def wb_get_entities(
     next_allowed_time = 0.0
 
     # Create/choose a session
-    sess = session or requests.Session()
+    sess = session or _shared_session
 
     def _sleep_until_allowed():
         nonlocal next_allowed_time
@@ -698,10 +708,10 @@ def search(query, page=0, limit=10):
     }
 
     # Query the Wikidata API
-    response = requests.get(
+    response = _shared_session.get(
         "https://www.wikidata.org/w/api.php",
         params=params,
-        headers=HEADERS)
+        timeout=10)
 
     # Convert the response
     response_data = response.json()

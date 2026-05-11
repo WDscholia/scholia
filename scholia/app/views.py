@@ -2268,7 +2268,13 @@ def show_search():
     prev_page = -1
 
     if query:
-        data = search(query, page)
+        try:
+            data = search(query, page)
+        except Exception:
+            raise ServiceUnavailable(
+                "Could not reach the Wikidata search API. "
+                "Please try again later."
+            )
         search_results = data["results"]
         next_page = data.get("next_page", -1)
         prev_page = data.get("prev_page", -1)
