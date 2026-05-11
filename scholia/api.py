@@ -137,8 +137,8 @@ def wb_get_entities(
     *,
     batch_size: int = 50,
     rate_limit: float = 2.0,
-    max_retries: int = 5,
-    timeout: int = 30,
+    max_retries: int = 0,
+    timeout: int = 5,
     session: Optional[requests.Session] = None,
     **extra_params,
 ):

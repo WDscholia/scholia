@@ -7,6 +7,7 @@ from flask import (Blueprint, current_app, jsonify, redirect,
                    render_template as render_template_base,
                    request, Response, url_for)
 from jinja2 import TemplateNotFound
+from werkzeug.exceptions import ServiceUnavailable
 from werkzeug.routing import BaseConverter
 
 from ..api import (entity_to_classes, entity_to_name, entity_to_smiles, search,
@@ -437,6 +438,19 @@ def inject_js_config():
     return dict(js_config=get_js_config())
 
 
+@main.errorhandler(ServiceUnavailable)
+def handle_service_unavailable(error):
+    """Serve error page for 503.
+
+    Returns
+    -------
+    html : str
+        Rederende HTML for index page.
+
+    """
+    return render_template("503.html", error=error), 503
+
+
 @main.route("/")
 def index():
     """Return rendered index page.
@@ -528,7 +542,7 @@ def redirect_q(q):
     """
     try:
         # Use the API to get entity information
-        entities = wb_get_entities([q])
+        entities = wb_get_entities([q], max_retries=0, timeout=2.0)
 
         # Extract 'instance of' information
         classes = entity_to_classes(entities[q])
@@ -809,7 +823,10 @@ def show_author(q):
     ep = config['query-server'].get('sparql_endpoint')
     editurl = config['query-server'].get('sparql_editurl')
     embedurl = config['query-server'].get('sparql_embedurl')
-    entities = wb_get_entities([q])
+    try:
+        entities = wb_get_entities([q])
+    except Exception as e:
+        raise ServiceUnavailable("Could not retrieve entity data") from e
     name = entity_to_name(entities[q])
     if name:
         first_initial, last_name = name[0], name.split()[-1]
