@@ -11,6 +11,8 @@
 {{ sparql_to_table('genome') }}
 {{ sparql_to_table('proteome') }}
 {{ sparql_to_table('metabolome') }}
+{% call ask_query_callback('images') %}
+{{ sparql_to_iframe('images') }}
  
 {% endblock %}
 
@@ -56,6 +58,9 @@ Taxa that are mentioned in the same publications. This does not imply biological
 
 <table class="table table-hover" id="metabolome-table"></table>
 
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" id="images-iframe" ></iframe>
+</div>
 
 {% endblock %}
     
