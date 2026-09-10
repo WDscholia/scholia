@@ -25,8 +25,8 @@ Getting started - set up a local Scholia server for testing purposes
 
    .. code:: shell
 
-       $ git clone https://github.com/WDscholia/scholia.git     # via HTTPS
-       $ git clone git@github.com:WDscholia/scholia.git         # or via SSH
+       $ git clone https://github.com/findsoftware/scholia-find-software.git     # via HTTPS
+       $ git clone git@github.com:findsoftware/scholia-find-software.git         # or via SSH
 
 2. Install required Python libraries:
 
