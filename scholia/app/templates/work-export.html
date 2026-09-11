@@ -95,7 +95,22 @@ $(function () {
     if (version) {
       data_ = new Cite(applyVersion(data_.data[0], data_.data[0].custom.versions[version - 1]))
     }
-    $('#output').text(data_.format(format))
+
+    var options = undefined
+    if (format === 'cff' && data_.data[0].type !== 'software' && data_.data[0].type !== 'dataset') {
+      options = {
+        main: `${data_.data[0]}-software`,
+        preferred: data_.data[0]
+      }
+
+      data_.add({
+        id: options.main,
+        type: 'software',
+        ...data_.data[0]
+      })
+    }
+
+    $('#output').text(data_.format(format, options))
   }
 
   $('#export-format').on('change', generateOutput)
