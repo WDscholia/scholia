@@ -1025,15 +1025,14 @@ def search_article_titles(q, search_string=None):
     query_template = """
       SELECT
         ?article ?title
-      WITH {{
-        SELECT ?article WHERE {{
-          ?article wdt:P31 wd:Q13442814
-        }}
-        LIMIT {batch_size}
-        OFFSET {offset}
-      }} AS %results
       WHERE {{
-        INCLUDE %results
+        {{
+          SELECT ?article WHERE {{
+            ?article wdt:P31 wd:Q13442814
+          }}
+          LIMIT {batch_size}
+          OFFSET {offset}
+        }}
         ?article wdt:P1476 ?title .
         MINUS {{ ?article wdt:P921 / wdt:P279* wd:{q} }}
         FILTER (CONTAINS(LCASE(?title), "{label}"))

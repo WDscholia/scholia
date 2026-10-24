@@ -65,142 +65,182 @@ WORK_ITEM_RSS = u("""
 
 
 AUTHOR_WORKS_SPARQL_QUERY = """
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?work ?workLabel ?date (?published_in AS ?description)
-WITH {{
-  SELECT
-    (MIN(?dates) AS ?date)
-    ?work
-    (GROUP_CONCAT(?published_in_label; separator=", ") AS ?published_in)
-  WHERE {{
-    ?work wdt:P50 wd:{q} .
-    ?work wdt:P577 ?datetimes .
-    BIND(xsd:date(?datetimes) AS ?dates)
-    OPTIONAL {{
-      ?work wdt:P1433 / rdfs:label ?published_in_label .
-      FILTER(LANG(?published_in_label) = 'en')
+WHERE {{
+  {{
+    SELECT
+      (MIN(?dates) AS ?date)
+      ?work
+      (GROUP_CONCAT(?published_in_label; separator=", ") AS ?published_in)
+    WHERE {{
+      ?work wdt:P50 wd:{q} .
+      ?work wdt:P577 ?datetimes .
+      BIND(xsd:date(?datetimes) AS ?dates)
+      OPTIONAL {{
+        ?work wdt:P1433 ?venue .
+        OPTIONAL {{
+          ?venue rdfs:label ?published_in_label .
+          FILTER(LANG(?published_in_label) = 'en')
+        }}
+      }}
     }}
+    GROUP BY ?work
+    ORDER BY DESC(?date)
+    LIMIT 10
   }}
-  GROUP BY ?work
-  ORDER BY DESC(?date)
-  LIMIT 10
-}} AS %content {{
-  INCLUDE %content
-  SERVICE wikibase:label {{
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }}
+
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'en') }}
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'mul') }}
 }}
 ORDER BY DESC(?date)
 """
 
 VENUE_SPARQL_QUERY = """
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?work ?workLabel ?date (?author AS ?description)
-WITH {{
-  SELECT
-    (MIN(?dates) AS ?date)
-    ?work
-    (GROUP_CONCAT(?author_label; separator=', ') AS ?author)
-  WHERE {{
-    ?work wdt:P1433 wd:{q} .
-    ?work wdt:P577 ?datetimes .
-    BIND(xsd:date(?datetimes) AS ?dates)
-    OPTIONAL {{
-      ?work wdt:P50 / rdfs:label ?author_label .
-      FILTER(LANG(?author_label) = 'en')
+WHERE {{
+  {{
+    SELECT
+      (MIN(?dates) AS ?date)
+      ?work
+      (GROUP_CONCAT(?author_label; separator=', ') AS ?author)
+    WHERE {{
+      ?work wdt:P1433 wd:{q} .
+      ?work wdt:P577 ?datetimes .
+      BIND(xsd:date(?datetimes) AS ?dates)
+      OPTIONAL {{
+        ?work wdt:P50 ?author_ .
+        OPTIONAL {{
+          ?author_ rdfs:label ?author_label .
+          FILTER(LANG(?author_label) = 'en')
+        }}
+      }}
     }}
+    GROUP BY ?work
+    ORDER BY DESC(?date)
+    LIMIT 10
   }}
-  GROUP BY ?work
-  ORDER BY DESC(?date)
-  LIMIT 10
-}} AS %content {{
-  INCLUDE %content
-  SERVICE wikibase:label {{
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }}
+
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'en') }}
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'mul') }}
 }}
 ORDER BY DESC(?date)
 """
 
 TOPIC_SPARQL_QUERY = """
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?work ?workLabel ?date (?author AS ?description)
-WITH {{
-  SELECT
-    (MIN(?dates) AS ?date)
-    ?work
-    (GROUP_CONCAT(?author_label; separator=', ') AS ?author)
-  WHERE {{
-    ?work
-      wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )
-      wd:{q} .
-    ?work wdt:P577 ?datetimes .
-    BIND(xsd:date(?datetimes) AS ?dates)
-    OPTIONAL {{
-      ?work wdt:P50 / rdfs:label ?author_label .
-      FILTER(LANG(?author_label) = 'en')
+WHERE {{
+  {{
+    SELECT
+      (MIN(?dates) AS ?date)
+      ?work
+      (GROUP_CONCAT(?author_label; separator=', ') AS ?author)
+    WHERE {{
+      ?work
+        wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) )
+        wd:{q} .
+      ?work wdt:P577 ?datetimes .
+      BIND(xsd:date(?datetimes) AS ?dates)
+      OPTIONAL {{
+        ?work wdt:P50 ?author_ .
+        OPTIONAL {{
+          ?author_ rdfs:label ?author_label .
+          FILTER(LANG(?author_label) = 'en')
+        }}
+      }}
     }}
+    GROUP BY ?work
+    ORDER BY DESC(?date)
+    LIMIT 20
   }}
-  GROUP BY ?work
-  ORDER BY DESC(?date)
-  LIMIT 20
-}} AS %content {{
-  INCLUDE %content
-  SERVICE wikibase:label {{
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }}
+
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'en') }}
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'mul') }}
 }}
 ORDER BY DESC(?date)
 """
 
 ORGANIZATION_SPARQL_QUERY = """
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?work ?workLabel ?date (?author AS ?description)
-WITH {{
-  SELECT
-    (MIN(?dates) AS ?date)
-    ?work
-    (GROUP_CONCAT(DISTINCT ?author_label; separator=', ') AS ?author)
-  WHERE {{
-    ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{q} .
-    ?work wdt:P50 ?researcher .
-    ?work wdt:P577 ?datetimes .
-    BIND(xsd:date(?datetimes) AS ?dates)
-    OPTIONAL {{
-      ?work wdt:P50 / rdfs:label ?author_label .
-      FILTER(LANG(?author_label) = 'en')
+WHERE {{
+  {{
+    SELECT
+      (MIN(?dates) AS ?date)
+      ?work
+      (GROUP_CONCAT(DISTINCT ?author_label; separator=', ') AS ?author)
+    WHERE {{
+      ?researcher ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* wd:{q} .
+      ?work wdt:P50 ?researcher .
+      ?work wdt:P577 ?datetimes .
+      BIND(xsd:date(?datetimes) AS ?dates)
+      OPTIONAL {{
+        ?work wdt:P50 ?author_ .
+        OPTIONAL {{
+          ?author_ rdfs:label ?author_label .
+          FILTER(LANG(?author_label) = 'en')
+        }}
+      }}
     }}
+    GROUP BY ?work
+    ORDER BY DESC(?date)
+    LIMIT 10
   }}
-  GROUP BY ?work
-  ORDER BY DESC(?date)
-  LIMIT 10
-}} AS %content {{
-  INCLUDE %content
-  SERVICE wikibase:label {{
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }}
+
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'en') }}
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'mul') }}
 }}
 ORDER BY DESC(?date)
 """
 
 SPONSOR_SPARQL_QUERY = """
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
 SELECT ?work ?workLabel ?date (?author AS ?description)
-WITH {{
-  SELECT
-    (MIN(?dates) AS ?date)
-    ?work
-    (GROUP_CONCAT(DISTINCT ?author_label; separator=', ') AS ?author)
-  WHERE {{
-    ?work p:P859 ?sponsor_statement ;
-          wdt:P577 ?datetimes .
-    ?sponsor_statement ps:P859 wd:{q} .
-    BIND(xsd:date(?datetimes) AS ?dates)
-    OPTIONAL {{
-      ?work wdt:P50 / rdfs:label ?author_label .
-      FILTER(LANG(?author_label) = 'en')
-    }}
-  }}
-  GROUP BY ?work
-  ORDER BY DESC(?date)
-  LIMIT 10
-}} AS %result
 WHERE {{
-  INCLUDE %result
-  SERVICE wikibase:label {{
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en".
+  {{
+    SELECT
+      (MIN(?dates) AS ?date)
+      ?work
+      (GROUP_CONCAT(DISTINCT ?author_label; separator=', ') AS ?author)
+    WHERE {{
+      ?work p:P859 ?sponsor_statement ;
+            wdt:P577 ?datetimes .
+      ?sponsor_statement ps:P859 wd:{q} .
+      BIND(xsd:date(?datetimes) AS ?dates)
+      OPTIONAL {{
+        ?work wdt:P50 ?author_ .
+        OPTIONAL {{
+          ?author_ rdfs:label ?author_label .
+          FILTER(LANG(?author_label) = 'en')
+        }}
+      }}
+    }}
+    GROUP BY ?work
+    ORDER BY DESC(?date)
+    LIMIT 10
   }}
+
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'en') }}
+  OPTIONAL {{ ?work rdfs:label ?workLabel . FILTER(LANG(?workLabel) = 'mul') }}
 }} ORDER BY DESC(?date)
 """
 
