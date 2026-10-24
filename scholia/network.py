@@ -16,19 +16,21 @@ SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 
 EXAMPLE_SPARQL_QUERY = """
 SELECT ?item1 ?item1Label ?item2 ?item2Label ?weight
-WITH {
-  SELECT ?item1 ?item2 (COUNT(?work) as ?weight) WHERE {
-    ?work wdt:P50 wd:Q20895785 .
-    ?work wdt:P50 ?item1 .
-    ?work wdt:P50 ?item2 .
-    FILTER (?item1 != ?item2)
-  }
-  GROUP BY ?item1 ?item2
-} AS %result
 WHERE {
-  INCLUDE %result
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+  {
+    SELECT ?item1 ?item2 (COUNT(?work) as ?weight) WHERE {
+      ?work wdt:P50 wd:Q20895785 .
+      ?work wdt:P50 ?item1 .
+      ?work wdt:P50 ?item2 .
+      FILTER (?item1 != ?item2)
+    }
+    GROUP BY ?item1 ?item2
+  }
+
+  OPTIONAL {{ ?item1 rdfs:label ?item1Label . FILTER(LANG(?item1Label) = 'en') }}
+  OPTIONAL {{ ?item1 rdfs:label ?item1Label . FILTER(LANG(?item1Label) = 'mul') }}
+  OPTIONAL {{ ?item2 rdfs:label ?item2Label . FILTER(LANG(?item2Label) = 'en') }}
+  OPTIONAL {{ ?item2 rdfs:label ?item2Label . FILTER(LANG(?item2Label) = 'mul') }}
 }
 """
 
