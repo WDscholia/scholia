@@ -142,6 +142,58 @@ def select_value_by_language_preferences(
     return next(iter(choices.values()))
 
 
+def wb_get_rest_entity(
+    qs,
+    timeout: int = 5,
+    session: Optional[requests.Session] = None,
+):
+    """Get single entity from Wikidata using REST API.
+
+    Parameters
+    ----------
+    qs : str
+        Wikidata entity IDs (e.g., "Q42", "Q1", ...).
+    timeout : int, optional
+        Per-request timeout in seconds.
+    session : requests.Session or None, optional
+        Reuse a session (recommended for many batches). If None, uses requests
+        directly.
+
+    Returns
+    -------
+    dict
+        Mapping from entity ID to entity data as returned by Wikidata.
+
+    Notes
+    -----
+    - Uses REST API and thus returns different data.
+
+    Examples
+    --------
+    >>> out = wb_get_rest_entity("Q42")
+    >>> isinstance(out, dict)
+    True
+    """
+    if not qs:
+        return {}
+
+    url = "https://www.wikidata.org/w/rest.php/wikibase/v1/entities/items/"
+
+    # Create/choose a session
+    sess = session or _shared_session
+
+    try:
+        resp = sess.get(url + qs, headers=HEADERS, timeout=timeout)
+        if resp.status_code == 200:
+            return resp.json()
+        else:
+            raise RuntimeError(f"HTTP {resp.status_code} from Wikidata: {detail}")
+    except Exception:
+        raise RuntimeError("Network error from Wikidata")
+
+    return detail
+
+
 def wb_get_entities(
     qs,
     *,
@@ -406,6 +458,33 @@ def entity_to_classes(entity):
     classes = []
     for statement in entity['claims'].get('P31', []):
         classes.append(statement['mainsnak']['datavalue']['value']['id'])
+    return classes
+
+
+def rest_entity_to_classes(entity):
+    """Extract 'instance_of' classes.
+
+    Parameters
+    ----------
+    entity : dict
+        Dictionary with Wikidata REST API item
+
+    Returns
+    -------
+    classes : list of str
+        List of strings.
+
+    Examples
+    --------
+    >>> entity = wb_get_rest_entity('Q28133147')
+    >>> classes = rest_entity_to_classes(entity)
+    >>> 'Q13442814' in classes
+    True
+
+    """
+    classes = []
+    for statement in entity['statements'].get('P31', []):
+        classes.append(statement['value']['content'])
     return classes
 
 

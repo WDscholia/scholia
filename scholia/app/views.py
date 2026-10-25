@@ -11,7 +11,7 @@ from werkzeug.exceptions import ServiceUnavailable
 from werkzeug.routing import BaseConverter
 
 from ..api import (entity_to_classes, entity_to_name, entity_to_smiles, search,
-                   wb_get_entities)
+                   rest_entity_to_classes, wb_get_entities, wb_get_rest_entity)
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works, wb_get_organization_latest_works,
                    wb_get_sponsor_latest_works)
@@ -541,15 +541,15 @@ def redirect_q(q):
 
     """
     try:
-        # Use the API to get entity information
-        entities = wb_get_entities([q], max_retries=0, timeout=2.0)
+        # Use the REST API to get entity information
+        entity = wb_get_rest_entity(q, timeout=2.0)
 
         # Extract 'instance of' information
-        classes = entity_to_classes(entities[q])
+        classes = rest_entity_to_classes(entity)
 
         # match classes to aspect
         aspect = classes_to_aspect(classes)
-    except Exception:
+    except Exception as e:
         # fallback
         aspect = 'topic'
 
