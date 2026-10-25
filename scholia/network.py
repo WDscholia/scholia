@@ -27,10 +27,21 @@ WHERE {
     GROUP BY ?item1 ?item2
   }
 
-  OPTIONAL {{ ?item1 rdfs:label ?item1Label . FILTER(LANG(?item1Label) = 'en') }}
-  OPTIONAL {{ ?item1 rdfs:label ?item1Label . FILTER(LANG(?item1Label) = 'mul') }}
-  OPTIONAL {{ ?item2 rdfs:label ?item2Label . FILTER(LANG(?item2Label) = 'en') }}
-  OPTIONAL {{ ?item2 rdfs:label ?item2Label . FILTER(LANG(?item2Label) = 'mul') }}
+  OPTIONAL {{
+    ?item1 rdfs:label ?item1Label .
+    FILTER(LANG(?item1Label) = 'en') }}
+  OPTIONAL {{
+    ?item1 rdfs:label ?item1Label .
+    FILTER(LANG(?item1Label) = 'mul')
+  }}
+  OPTIONAL {{
+    ?item2 rdfs:label ?item2Label .
+    FILTER(LANG(?item2Label) = 'en')
+  }}
+  OPTIONAL {{
+    ?item2 rdfs:label ?item2Label .
+    FILTER(LANG(?item2Label) = 'mul')
+  }}
 }
 """
 
