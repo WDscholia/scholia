@@ -173,6 +173,7 @@ def wb_get_rest_entity(
     >>> out = wb_get_rest_entity("Q42")
     >>> isinstance(out, dict)
     True
+
     """
     if not qs:
         return {}
@@ -187,11 +188,9 @@ def wb_get_rest_entity(
         if resp.status_code == 200:
             return resp.json()
         else:
-            raise RuntimeError(f"HTTP {resp.status_code} from Wikidata: {detail}")
+            raise RuntimeError(f"HTTP {resp.status_code} from Wikidata")
     except Exception:
         raise RuntimeError("Network error from Wikidata")
-
-    return detail
 
 
 def wb_get_entities(
