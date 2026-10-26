@@ -549,7 +549,7 @@ def redirect_q(q):
 
         # match classes to aspect
         aspect = classes_to_aspect(classes)
-    except Exception as e:
+    except Exception:
         # fallback
         aspect = 'topic'
 
