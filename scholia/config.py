@@ -23,6 +23,7 @@ sparql_endpoint = https://qlever.dev/api/wikidata
 sparql_editurl = https://wikidata-query-gui.scholia.wiki/#
 sparql_embedurl = https://wikidata-query-gui.scholia.wiki/embed.html#
 sparql_endpoint_name = View in Wikidata Query GUI
+rest_api_endpoint = https://www.wikidata.org/w/rest.php
 
 [requests]
 user_agent = Scholia/0.3 (github.com/ad-freiburg/scholia; qlever.scholia.wiki)
