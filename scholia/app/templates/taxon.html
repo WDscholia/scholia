@@ -13,6 +13,7 @@
 {{ sparql_to_table('metabolome') }}
 {% call ask_query_callback('images') %}
 {{ sparql_to_iframe('images') }}
+{% endcall %}
  
 {% endblock %}
 
