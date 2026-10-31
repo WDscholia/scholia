@@ -2,6 +2,8 @@
 
 #defaultView:ImageGrid
 PREFIX target: <http://www.wikidata.org/entity/{{ q }}>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?item ?itemLabel ?image WHERE {
   ?item wdt:P31 wd:Q16521 .
   ?item wdt:P171 target: .
