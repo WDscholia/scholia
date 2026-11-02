@@ -54,7 +54,7 @@ MONTH_NUMBER_TO_MONTH = {
 }
 
 
-def entity_to_smiles(entity):
+def rest_entity_to_smiles(entity):
     """Extract SMILES of a chemical.
 
     Parameters
@@ -69,22 +69,22 @@ def entity_to_smiles(entity):
 
     Examples
     --------
-    >>> entities = wb_get_entities(['Q48791494'])
-    >>> smiles = entity_to_smiles(entities['Q48791494'])
+    >>> entity = wb_get_rest_entity('Q48791494')
+    >>> smiles = rest_entity_to_smiles(entity)
     >>> smiles == 'CC(C)[C@H]1CC[C@@]2(CO2)[C@@H]3[C@@H]1C=C(COC3=O)C(=O)O'
     True
 
     """
-    for statement in entity['claims'].get('P2017', []):
-        smiles = statement['mainsnak']['datavalue']['value']
+    for statement in entity['statements'].get('P2017', []):
+        smiles = statement['value']['content']
         return smiles
 
-    for statement in entity['claims'].get('P233', []):
-        smiles = statement['mainsnak']['datavalue']['value']
+    for statement in entity['statements'].get('P233', []):
+        smiles = statement['value']['content']
         return smiles
 
-    for statement in entity['claims'].get('P10718', []):
-        smiles = statement['mainsnak']['datavalue']['value']
+    for statement in entity['statements'].get('P10718', []):
+        smiles = statement['value']['content']
         return smiles
 
     return ''
