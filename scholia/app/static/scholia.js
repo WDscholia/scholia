@@ -195,7 +195,7 @@ function resize(element) {
     console.log("resized with width " + width);
 }
 
-function addReloadButton(element, callback) {    
+function addReloadButton(element, callback) {
     var heading = element.previousElementSibling;
 
     var button = document.createElement('button');
@@ -261,12 +261,12 @@ function sparqlToDataTablePost2(url, editURL, sparql, element, filename, options
 
     /* The edit URL needs a hashmark.  */
     if (!editURL) editURL = "https://query.wikidata.org/#";
-    
+
     var paging = (typeof options.paging === 'undefined') ? true : options.paging;
     var sDom = (typeof options.sDom === 'undefined') ? 'lfrtip' : options.sDom;
     var sparqlEndpointName = (typeof options.sparqlEndpointName === 'undefined')
         ? window.jsConfig.sparqlEndpointName : options.sparqlEndpointName;
-    
+
     $(element).html("<div class='loader'><div></div><div></div><div></div></div>");
 
     $.post(url, data = { query: sparql }, function (response, textStatus) {
@@ -391,7 +391,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
 
     function makeRequest() {
         if ($.fn.dataTable.isDataTable(element)) {
-            // unnecessary to clear the data here but better UX to make it clear 
+            // unnecessary to clear the data here but better UX to make it clear
             // that we are reloading the data.
             $(element).DataTable().clear().draw();
         }
@@ -403,7 +403,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
                 "' class='loader'><div></div><div></div><div></div></div>"
         );
 
-        
+
         $.getJSON(url, function (response) {
             var simpleData = sparqlDataToSimpleData(response);
 
@@ -493,9 +493,13 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
             $('#' + loaderID).remove(); // remove loader
             let error_message = "";
             try {
-                error_message = "QLever execption: " + JSON.parse(jqXHR.responseText).exception;
+                error_message = "Query failed: QLever exeception: " + JSON.parse(jqXHR.responseText).exception;
             } catch (e) {
-                error_message = "getJSON query failed: " + textStatus + " " + errorThrown;
+                if (jqXHR.status === 429) {
+                    error_message = "Query failed: Too many requests (429)"
+                } else {
+                    error_message = "Query failed: " + textStatus + " " + errorThrown;
+                }
             }
             $(element).prepend("<p style='color:red;'>" + escapeHTML(error_message) + "</p>");
             const reloadButton = document.getElementById(element.slice(1) + '-reload');
@@ -608,20 +612,20 @@ function sparqlToMatrix2(endpointUrl, sparql, element, filename){
             qToLabel[item.topic.value.substring(31)] = item.topicLabel.value || item.topic.value.substring(31);
             qToLabel[item.work.value.substring(31)] = item.workLabel.value || item.work.value.substring(31);
         });
-   
+
         var works = $.map(data, function(row) {
             return row.work.value.substring(31);
         });
         var topics = $.map(data, function(row) {
             return row.topic.value.substring(31);
         });
-   
+
         // Sizes
         var margin = { top: 100, right: 0, bottom: 0, left: 0 },
             width = $(element)[0].clientWidth,
             axis_height = works.length * 12,
             full_height = axis_height + margin.top;
-   
+
         var svg = d3
             .select(element)
             .append("svg")
@@ -629,7 +633,7 @@ function sparqlToMatrix2(endpointUrl, sparql, element, filename){
             .attr("height", full_height)
             .append("g")
             .attr("transform", "translate(0, " + margin.top + ")");
-   
+
         // X scales and axis
         var xScale = d3
             .scaleBand()
@@ -648,13 +652,13 @@ function sparqlToMatrix2(endpointUrl, sparql, element, filename){
             .selectAll("text")
             .style("text-anchor", "start")
             .attr("transform", "rotate(-65)");
-   
+
         // Y scales and axis
         var yScale = d3
             .scaleBand()
             .range([0, axis_height])
             .domain(works);
-   
+
         svg
             .append("g")
             .style("font-size", "16px")
@@ -668,13 +672,13 @@ function sparqlToMatrix2(endpointUrl, sparql, element, filename){
                 return qToLabel[d];
                 })
             )
-   
+
         // Move y-label slight to the right so the first letter is not cut
             .selectAll("text")
             .attr("x", 1);
-   
+
         svg.selectAll("g .domain").remove();
-   
+
         // Tooltip
         var tooltip = d3
             .select("body")
@@ -686,7 +690,7 @@ function sparqlToMatrix2(endpointUrl, sparql, element, filename){
             .style("border-width", "2px")
             .style("padding", "10px")
             .style("font-size", "16px");
-   
+
         var mouseover = function(d) {
             var html =
             "<a href='../work/" +
@@ -700,7 +704,7 @@ function sparqlToMatrix2(endpointUrl, sparql, element, filename){
             "'>" +
             d.topicLabel.value +
             "</a>";
-   
+
             tooltip
             .html(html)
             .transition()
@@ -718,7 +722,7 @@ function sparqlToMatrix2(endpointUrl, sparql, element, filename){
             .duration(2000)
             .style("opacity", 0);
         };
-   
+
         // Add elements in matrix
         svg
             .selectAll()
@@ -756,13 +760,13 @@ function sparqlToPathWayPageViewer(sparql, filename){
     $(document).ready(function() {
         // Hide optional sections until data values are confirmed and ready
         var organismSection = document.getElementById("Organism");
-        organismSection.style.display = "none"; 
-      
+        organismSection.style.display = "none";
+
         var pathwayViewerSection = document.getElementById("pathway-viewer");
-        pathwayViewerSection.style.display = "none"; 
-      
+        pathwayViewerSection.style.display = "none";
+
         // Check for optional data values and then use them if available
-        const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' + 
+        const sparqlURL = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=' +
           encodeURIComponent(sparql) + '&format=json';
         $.getJSON(sparqlURL, function(response) {
           const simpleData = sparqlDataToSimpleData(response);
@@ -774,7 +778,7 @@ function sparqlToPathWayPageViewer(sparql, filename){
             var organismScholia = dataValues.organism.replace("http://www.wikidata.org/entity/","https://scholia.toolforge.org/taxon/");
             $("#Organism").after('<a href="' + organismScholia + '">' +
                      escapeHTML(dataValues.organismLabel) +
-                     '</a>'); 
+                     '</a>');
             organismSection.style.display = "";
           }
           if ("wpid" in dataValues) {
@@ -784,13 +788,13 @@ function sparqlToPathWayPageViewer(sparql, filename){
             });
             pathwayViewerSection.style.display = "";
             $("#pathway-viewer").after(
-                '<p>This diagram is showing WikiPathways <a href="https://www.wikipathways.org/instance/' + 
-                dataValues.wpid + '">' + dataValues.wpid + 
+                '<p>This diagram is showing WikiPathways <a href="https://www.wikipathways.org/instance/' +
+                dataValues.wpid + '">' + dataValues.wpid +
                 '</a> in an iframe with this <a href=' +
-                '"https://pathway-viewer.toolforge.org/?id=' + 
-                dataValues.wpid + 
+                '"https://pathway-viewer.toolforge.org/?id=' +
+                dataValues.wpid +
                 '">pathway-viewer running on Toolforge</a>.</p>' );
-                       
+
           }
         });
       });
