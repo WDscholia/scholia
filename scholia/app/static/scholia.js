@@ -493,7 +493,7 @@ function sparqlToDataTable2(url, editURL, sparql, element, filename, options = {
             $('#' + loaderID).remove(); // remove loader
             let error_message = "";
             try {
-                error_message = "Query failed: QLever exeception: " + JSON.parse(jqXHR.responseText).exception;
+                error_message = "Query failed: QLever exception: " + JSON.parse(jqXHR.responseText).exception;
             } catch (e) {
                 if (jqXHR.status === 429) {
                     error_message = "Query failed: Too many requests (429)"
