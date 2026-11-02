@@ -830,8 +830,8 @@ def main():
 
     elif arguments['q-to-classes']:
         q = arguments['<q>']
-        entities = wb_get_entities([q])
-        classes = entity_to_classes(entities[q])
+        entity = wb_get_rest_entity(q)
+        classes = rest_entity_to_classes(entity)
         for class_ in classes:
             print(class_)
 
