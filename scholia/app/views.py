@@ -10,8 +10,8 @@ from jinja2 import TemplateNotFound
 from werkzeug.exceptions import ServiceUnavailable
 from werkzeug.routing import BaseConverter
 
-from ..api import (entity_to_smiles, rest_entity_to_classes, rest_entity_to_name,
-                   search, wb_get_entities, wb_get_rest_entity)
+from ..api import (rest_entity_to_classes, rest_entity_to_name, rest_entity_to_smiles,
+                   search, wb_get_rest_entity)
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works, wb_get_organization_latest_works,
                    wb_get_sponsor_latest_works)
@@ -2740,8 +2740,8 @@ def show_chemical(q):
         Rendered HTML.
 
     """
-    entities = wb_get_entities([q])
-    smiles = entity_to_smiles(entities[q])
+    entity = wb_get_rest_entity(q)
+    smiles = rest_entity_to_smiles(entity)
     ep = config['query-server'].get('sparql_endpoint')
     editurl = config['query-server'].get('sparql_editurl')
     embedurl = config['query-server'].get('sparql_embedurl')
@@ -2841,8 +2841,8 @@ def show_chemical_class(q):
         Rendered HTML.
 
     """
-    entities = wb_get_entities([q])
-    smiles = entity_to_smiles(entities[q])
+    entity = wb_get_rest_entity(q)
+    smiles = rest_entity_to_smiles(entity)
     ep = config['query-server'].get('sparql_endpoint')
     editurl = config['query-server'].get('sparql_editurl')
     embedurl = config['query-server'].get('sparql_embedurl')
