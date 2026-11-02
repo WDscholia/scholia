@@ -10,8 +10,8 @@ from jinja2 import TemplateNotFound
 from werkzeug.exceptions import ServiceUnavailable
 from werkzeug.routing import BaseConverter
 
-from ..api import (entity_to_classes, entity_to_name, entity_to_smiles, search,
-                   rest_entity_to_classes, wb_get_entities, wb_get_rest_entity)
+from ..api import (entity_to_smiles, rest_entity_to_classes, rest_entity_to_name,
+                   search, wb_get_entities, wb_get_rest_entity)
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works, wb_get_organization_latest_works,
                    wb_get_sponsor_latest_works)
@@ -826,10 +826,10 @@ def show_author(q):
     editurl = config['query-server'].get('sparql_editurl')
     embedurl = config['query-server'].get('sparql_embedurl')
     try:
-        entities = wb_get_entities([q])
+        entity = wb_get_rest_entity(q)
     except Exception as e:
         raise ServiceUnavailable("Could not retrieve entity data") from e
-    name = entity_to_name(entities[q])
+    name = rest_entity_to_name(entity, get_languages())
     if name:
         first_initial, last_name = name[0], name.split()[-1]
     else:
