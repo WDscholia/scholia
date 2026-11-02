@@ -629,7 +629,7 @@ def entity_to_month(entity, language='en'):
     return None
 
 
-def rest_entity_to_name(entity, languages = ['en', 'mul']):
+def rest_entity_to_name(entity, languages=None):
     """Extract the name of the item.
 
     Parameters
@@ -653,6 +653,9 @@ def rest_entity_to_name(entity, languages = ['en', 'mul']):
     True
 
     """
+    if languages is None:
+        languages = ['en', 'mul']
+
     if 'labels' in entity:
         labels = entity['labels']
         for language in languages:
