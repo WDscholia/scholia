@@ -1,0 +1,18 @@
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  send-message:
+    runs-on: ubuntu-latest
+    name: Send message via Matrix
+    steps:
+    - name: Send message to notify channel
+      id: matrix-chat-message
+      uses: fadenb/matrix-chat-message@v0.0.6
+      with:
+        homeserver: 'matrix.org'
+        token: ${{ secrets.MATRIX_TOKEN }}
+        channel: '!n8_c63gQIoLruHdzM6v3Dje5qAIiQpq3rtFbvcLMlJM' # '!GUiXMqCtxKlSZXLDdw:matrix.org'
+        message: "${{ github.event.sender.login }} created a pull request for ${{ github.event.repository.name }}: ${{ github.event.pull_request.title }}"
