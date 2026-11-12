@@ -3,10 +3,13 @@
 
 from __future__ import absolute_import, division, print_function
 
+import os
+
 from flask import Flask
 from flask_bootstrap import Bootstrap, StaticCDN
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from ..config import config
 from ..text import TextToTopicQText
 
 
@@ -33,6 +36,12 @@ def create_app(text_to_topic_q_text_enabled=True, third_parties_enabled=False):
 
     """
     app = Flask(__name__)
+
+    # Allow the SPARQL endpoint to be overridden at deploy time, e.g. to
+    # point a Toolforge deployment at a QLever backend.
+    sparql_endpoint = os.environ.get('SCHOLIA_SPARQL_ENDPOINT')
+    if sparql_endpoint:
+        config['query-server']['url'] = sparql_endpoint
 
     # Configure for proxy deployment
     app.wsgi_app = ProxyFix(
