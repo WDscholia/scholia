@@ -1,0 +1,8 @@
+{
+	"name": "Python 3",
+	"image": "mcr.microsoft.com/devcontainers/python:3-3.14-trixie",
+	"postCreateCommand": "pip install -r requirements.txt",
+	"containerEnv": {
+		"FLASK_APP": "runserver.py"
+	}
+}
