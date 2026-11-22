@@ -10,8 +10,8 @@ from jinja2 import TemplateNotFound
 from werkzeug.exceptions import ServiceUnavailable
 from werkzeug.routing import BaseConverter
 
-from ..api import (rest_entity_to_classes, rest_entity_to_name, rest_entity_to_smiles,
-                   search, wb_get_rest_entity)
+from ..api import (rest_entity_to_classes, rest_entity_to_name,
+                   rest_entity_to_smiles, search, wb_get_rest_entity)
 from ..rss import (wb_get_author_latest_works, wb_get_venue_latest_works,
                    wb_get_topic_latest_works, wb_get_organization_latest_works,
                    wb_get_sponsor_latest_works)
