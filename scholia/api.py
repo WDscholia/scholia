@@ -178,7 +178,8 @@ def wb_get_rest_entity(
     if not qs:
         return {}
 
-    url = config['query-server'].get('rest_api_endpoint') + "/wikibase/v1/entities/items/"
+    url = (config['query-server'].get('rest_api_endpoint')
+           + "/wikibase/v1/entities/items/")
 
     # Create/choose a session
     sess = session or _shared_session
