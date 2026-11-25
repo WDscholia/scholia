@@ -56,10 +56,13 @@ from __future__ import absolute_import, division, print_function
 from random import randrange
 
 import requests
+from requests.adapters import HTTPAdapter
 
 import re
 
 from six import u
+
+from urllib3.util.retry import Retry
 
 from .config import config
 
@@ -69,6 +72,19 @@ SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 USER_AGENT = config['requests'].get('user_agent')
 
 HEADERS = {'User-Agent': USER_AGENT}
+
+# Shared session that retries with backoff when the SPARQL endpoint
+# rate-limits (HTTP 429) or is temporarily unavailable. The Retry-After
+# header is considered
+# also coveres 502 bad gateway, 503 service unavailable,
+# 504 Gateway timeout
+_retry = Retry(
+    total=5, backoff_factor=1, status_forcelist=(429, 502, 503, 504),
+    allowed_methods=frozenset(['GET', 'POST']),
+    respect_retry_after_header=True, raise_on_status=False)
+http_session = requests.Session()
+http_session.mount('https://', HTTPAdapter(max_retries=_retry))
+http_session.mount('http://', HTTPAdapter(max_retries=_retry))
 
 # Instead of of querying common ISO 639 codes, they are just listed
 # here
@@ -197,7 +213,7 @@ def query_to_bindings(query):
     """
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return data['results']['bindings']
@@ -310,7 +326,7 @@ def identifier_to_qs(property, identifier):
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     try:
-        response = requests.get(url, params=params, headers=HEADERS)
+        response = http_session.get(url, params=params, headers=HEADERS)
         data = response.json()
     except Exception:
         return []
@@ -361,7 +377,7 @@ def count_scientific_articles():
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return int(data['results']['bindings'][0]['count']['value'])
@@ -416,7 +432,7 @@ def doi_to_qs(doi):
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     try:
-        response = requests.get(url, params=params, headers=HEADERS)
+        response = http_session.get(url, params=params, headers=HEADERS)
         data = response.json()
 
         return [item['work']['value'][31:]
@@ -458,7 +474,7 @@ def doi_prefix_to_qs(doi):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['work']['value'][31:]
@@ -502,7 +518,7 @@ def iso639_to_q(language):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
     qs = [item['language']['value'][31:]
           for item in data['results']['bindings']]
@@ -544,7 +560,7 @@ def pubchem_to_qs(cid):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['chemical']['value'][31:]
@@ -606,7 +622,7 @@ def pubmed_to_qs(pmid):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['work']['value'][31:]
@@ -640,7 +656,7 @@ def ror_to_qs(rorid):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['work']['value'][31:]
@@ -677,7 +693,7 @@ def uniprot_to_qs(protein):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['protein']['value'][31:]
@@ -714,7 +730,7 @@ def ncbi_gene_to_qs(gene):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['gene']['value'][31:]
@@ -751,7 +767,7 @@ def ncbi_taxon_to_qs(taxon):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['work']['value'][31:]
@@ -786,7 +802,7 @@ def wikipathways_to_qs(wpid):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['work']['value'][31:]
@@ -818,7 +834,7 @@ def issn_to_qs(issn):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['author']['value'][31:]
@@ -850,7 +866,7 @@ def omim_to_qs(omimID):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['disease']['value'][31:]
@@ -882,7 +898,7 @@ def orcid_to_qs(orcid):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['author']['value'][31:]
@@ -914,7 +930,7 @@ def mesh_to_qs(meshid):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['cmp']['value'][31:]
@@ -949,7 +965,7 @@ def q_to_dois(q):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     results = data['results']['bindings']
@@ -985,7 +1001,7 @@ def q_to_label(q, language='en'):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     results = data['results']['bindings']
@@ -1055,7 +1071,7 @@ def search_article_titles(q, search_string=None):
             label=search_string.lower(), q=q)
 
         params = {'query': query, 'format': 'json'}
-        response = requests.get(url, params=params, headers=HEADERS)
+        response = http_session.get(url, params=params, headers=HEADERS)
         data = response.json()
         batch_results = [
             {
@@ -1117,7 +1133,7 @@ def viaf_to_qs(viaf):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['author']['value'][31:]
@@ -1152,7 +1168,7 @@ def q_to_class(q):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     try:
         data = response.json()
     except requests.exceptions.JSONDecodeError:
@@ -1407,7 +1423,7 @@ def q_to_class(q):
         url = SPARQL_ENDPOINT
         params = {'query': query, 'format': 'json'}
         try:
-            response = requests.get(url, params=params, headers=HEADERS)
+            response = http_session.get(url, params=params, headers=HEADERS)
             data = response.json()
             parents = set([item['class']['value'][31:]
                            for item in data['results']['bindings']])
@@ -1466,7 +1482,7 @@ def twitter_to_qs(twitter):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -1499,7 +1515,7 @@ def github_to_qs(github):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -1532,7 +1548,7 @@ def inchikey_to_qs(inchikey):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -1565,7 +1581,7 @@ def cordis_to_qs(cordis):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -1598,7 +1614,7 @@ def cas_to_qs(cas):
 
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -1632,7 +1648,7 @@ def lipidmaps_to_qs(lmid):
         lmid=lmid)
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -1665,7 +1681,7 @@ def atomic_number_to_qs(atomic_number):
         atomic_number=atomic_number)
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]
@@ -1697,7 +1713,7 @@ def atomic_symbol_to_qs(symbol):
         symbol=symbol)
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['item']['value'][31:]

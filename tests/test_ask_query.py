@@ -1,9 +1,10 @@
 """Test scholia ask queries."""
 
 import re
-import requests
 
 from scholia.config import config
+
+from scholia.query import http_session
 
 USER_AGENT = "Scholia"
 HEADERS = {"User-Agent": USER_AGENT}
@@ -48,6 +49,6 @@ def ask_query(file_name, q_number):
 
     url = config['query-server']['sparql_endpoint']
     params = {"query": query, "format": "json"}
-    response = requests.get(url, params=params, headers=HEADERS)
+    response = http_session.get(url, params=params, headers=HEADERS)
 
     return response.json()["boolean"]

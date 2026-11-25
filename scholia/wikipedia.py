@@ -25,11 +25,11 @@ import os
 
 import signal
 
-import requests
-
 from six import b, u
 
 from .config import config
+
+from .query import http_session
 
 
 SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
@@ -117,7 +117,7 @@ def q_to_bibliography_templates(q):
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
     headers = {'User-Agent': config['requests'].get('user_agent')}
-    response = requests.get(url, params=params, headers=headers)
+    response = http_session.get(url, params=params, headers=headers)
     data = response.json()
 
     wikitext = ('<!-- Generated with scholia.wikipedia '

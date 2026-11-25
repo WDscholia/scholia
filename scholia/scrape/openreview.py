@@ -25,7 +25,7 @@ import requests
 
 from ..config import config
 from ..qs import paper_to_quickstatements
-from ..query import escape_string
+from ..query import escape_string, http_session
 
 
 SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
@@ -169,7 +169,7 @@ def paper_to_q(paper):
         url=paper['url'],
         openreview_id=paper['openreview_id'])
 
-    response = requests.get(SPARQL_ENDPOINT,
+    response = http_session.get(SPARQL_ENDPOINT,
                             params={'query': query, 'format': 'json'},
                             headers=HEADERS)
     data = response.json()['results']['bindings']
