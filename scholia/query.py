@@ -1748,7 +1748,7 @@ def website_to_qs(url):
 
     url_ = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url_, params=params, headers=HEADERS)
+    response = http_session.get(url_, params=params, headers=HEADERS)
     data = response.json()
 
     return [item['work']['value'][31:]

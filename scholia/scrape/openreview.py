@@ -170,8 +170,8 @@ def paper_to_q(paper):
         openreview_id=paper['openreview_id'])
 
     response = http_session.get(SPARQL_ENDPOINT,
-                            params={'query': query, 'format': 'json'},
-                            headers=HEADERS)
+                                params={'query': query, 'format': 'json'},
+                                headers=HEADERS)
     data = response.json()['results']['bindings']
 
     if len(data) == 0 or not data[0]:

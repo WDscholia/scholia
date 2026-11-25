@@ -154,8 +154,8 @@ def paper_to_q(paper):
         url=paper['url'], full_text_url=paper['full_text_url'])
 
     response = http_session.get(SPARQL_ENDPOINT,
-                            params={'query': query, 'format': 'json'},
-                            headers={'User-Agent': USER_AGENT})
+                                params={'query': query, 'format': 'json'},
+                                headers={'User-Agent': USER_AGENT})
     if not response.ok:
         raise Exception("Wikidata API response error: {}".format(
             response.status_code))

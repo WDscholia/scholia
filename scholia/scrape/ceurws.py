@@ -271,8 +271,8 @@ def paper_to_q(paper):
             url=url)
 
     response = http_session.get(SPARQL_ENDPOINT,
-                            params={'query': query, 'format': 'json'},
-                            headers=HEADERS)
+                                params={'query': query, 'format': 'json'},
+                                headers=HEADERS)
     if not response.ok:
         response.raise_for_status()
 
