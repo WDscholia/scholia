@@ -9,7 +9,7 @@ from collections import OrderedDict
 
 from .config import config
 
-import requests
+from .query import HEADERS, http_session
 
 
 SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
@@ -53,7 +53,7 @@ def write_pajek_from_sparql(filename, sparql):
 
     url = SPARQL_ENDPOINT
     params = {'query': sparql, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()['results']['bindings']
 
     vertices = []

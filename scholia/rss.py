@@ -35,8 +35,6 @@ References
 
 from __future__ import print_function
 
-import requests
-
 from dateutil.parser import parse as parse_datetime
 
 from email.utils import formatdate
@@ -50,6 +48,8 @@ from re import sub
 from six import u
 
 from .config import config
+
+from .query import HEADERS, http_session
 
 SPARQL_ENDPOINT = config['query-server'].get('sparql_endpoint')
 
@@ -353,7 +353,7 @@ def wb_get_author_latest_works(q):
     query = AUTHOR_WORKS_SPARQL_QUERY.format(q=q)
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = http_session.get(url, params=params, headers=HEADERS)
 
     if response.ok:
         data = response.json()
@@ -402,7 +402,7 @@ def wb_get_venue_latest_works(q):
     query = VENUE_SPARQL_QUERY.format(q=q)
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     rss_body += entities_to_works_rss(data['results']['bindings'])
@@ -446,7 +446,7 @@ def wb_get_topic_latest_works(q):
     query = TOPIC_SPARQL_QUERY.format(q=q)
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     rss_body += entities_to_works_rss(data['results']['bindings'])
@@ -492,7 +492,7 @@ def wb_get_organization_latest_works(q):
     query = ORGANIZATION_SPARQL_QUERY.format(q=q)
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     rss_body += entities_to_works_rss(data['results']['bindings'])
@@ -538,7 +538,7 @@ def wb_get_sponsor_latest_works(q):
     query = SPONSOR_SPARQL_QUERY.format(q=q)
     url = SPARQL_ENDPOINT
     params = {'query': query, 'format': 'json'}
-    response = requests.get(url, params=params)
+    response = http_session.get(url, params=params, headers=HEADERS)
     data = response.json()
 
     rss_body += entities_to_works_rss(data['results']['bindings'])

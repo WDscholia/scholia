@@ -33,7 +33,7 @@ import requests
 
 from ..config import config
 from ..qs import paper_to_quickstatements
-from ..query import iso639_to_q, issn_to_qs
+from ..query import http_session, iso639_to_q, issn_to_qs
 from ..utils import escape_string, pages_to_number_of_pages
 
 
@@ -179,9 +179,9 @@ def paper_to_q(paper):
         query = SHORT_TITLED_PAPER_TO_Q_QUERY.format(
             url=paper['url'])
 
-    response = requests.get(SPARQL_ENDPOINT,
-                            params={'query': query, 'format': 'json'},
-                            headers=HEADERS)
+    response = http_session.get(SPARQL_ENDPOINT,
+                                params={'query': query, 'format': 'json'},
+                                headers=HEADERS)
     data = response.json()['results']['bindings']
 
     if len(data) == 0 or not data[0]:

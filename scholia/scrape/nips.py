@@ -49,6 +49,7 @@ import requests
 
 from ..config import config
 from ..qs import paper_to_quickstatements
+from ..query import http_session
 from ..utils import escape_string
 
 
@@ -152,9 +153,9 @@ def paper_to_q(paper):
         label=title, title=title,
         url=paper['url'], full_text_url=paper['full_text_url'])
 
-    response = requests.get(SPARQL_ENDPOINT,
-                            params={'query': query, 'format': 'json'},
-                            headers={'User-Agent': USER_AGENT})
+    response = http_session.get(SPARQL_ENDPOINT,
+                                params={'query': query, 'format': 'json'},
+                                headers={'User-Agent': USER_AGENT})
     if not response.ok:
         raise Exception("Wikidata API response error: {}".format(
             response.status_code))
